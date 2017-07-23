@@ -5,8 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TextureViewer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="525">
-    <StackPanel>
-        <TextBlock x:Name="MyText"></TextBlock>
-    </StackPanel>
+        Title="MainWindow" Height="600" Width="800">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open"/>
+                <MenuItem Header="_Save"/>
+                <MenuItem Header="Save As"/>
+                <MenuItem Header="_Export"/>
+            </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Header="_Tool Windows">
+                    <MenuItem Header="Mipmaps"/>
+                    <MenuItem Header="Layers"/>
+                    <MenuItem Header="Tone Mapping"/>
+                    <MenuItem Header="Manipulation"/>
+                </MenuItem>
+                <MenuItem Header="3D View"/>
+                <MenuItem Header="3D Dice"/>
+            </MenuItem>
+        </Menu>
+    </DockPanel>
 </Window>

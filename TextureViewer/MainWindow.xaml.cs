@@ -20,12 +20,10 @@ namespace TextureViewer
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow(string[] args)
+        public MainWindow(string file)
         {
             InitializeComponent();
-            MyText.Text = "args: ";
-            foreach (var t in args)
-                MyText.Text += t;
+            this.Title = "Texture Viewer - Panel - " + file;
         }
     }
 }

@@ -12,12 +12,29 @@ namespace TextureViewer
     /// </summary>
     public partial class App : Application
     {
+        private List<MainWindow> activeWindows = new List<MainWindow>();
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            var window = new MainWindow(e.Args);
-            window.Show();
-            
+            if (e.Args.Length == 0)
+            {
+                // create empty window
+                var wnd = new MainWindow(null);
+                wnd.Show();
+                activeWindows.Add(wnd);
+                //this.Shutdown(0);
+            }
+            else
+            {
+                // open a window for each file
+                foreach (var s in e.Args)
+                {
+                    var wnd = new MainWindow(s);
+                    wnd.Show();
+                    activeWindows.Add(wnd);
+                }
+            }
         }
 
         protected override void OnExit(ExitEventArgs e)
