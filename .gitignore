@@ -1,0 +1,28 @@
+# Executables
+*.out
+*.app
+*.exe
+
+# Visual Studio stuff
+*.opensdf
+*.sdf
+*.user
+*.suo
+*.db
+*.opendb
+packages/
+*.tlog
+*.lastbuildstate
+*.log
+*.idb
+*.pdb
+*.ilk
+.vs/
+
+#logs
+#*.txt
+
+# Build directories
+#log.txt
+Debug/
+Release/
