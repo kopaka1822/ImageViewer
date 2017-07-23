@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sharpGL="clr-namespace:SharpGL.WPF;assembly=SharpGL.WPF"
         xmlns:local="clr-namespace:TextureViewer"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="800">
@@ -25,5 +26,7 @@
                 <MenuItem Header="3D Dice"/>
             </MenuItem>
         </Menu>
+
+        <sharpGL:OpenGLControl OpenGLDraw="OpenGLControl_OnOpenGLDraw"/>
     </DockPanel>
 </Window>
