@@ -28,6 +28,7 @@
         </Menu>
         
         <sharpGL:OpenGLControl OpenGLDraw="OpenGLControl_OnOpenGLDraw"
+                               RenderContextType="FBO"
                                OpenGLInitialized="OpenGLControl_OnOpenGLInitialized"/>
        
     </DockPanel>
