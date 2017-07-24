@@ -26,7 +26,9 @@
                 <MenuItem Header="3D Dice"/>
             </MenuItem>
         </Menu>
-
-        <sharpGL:OpenGLControl OpenGLDraw="OpenGLControl_OnOpenGLDraw"/>
+        
+        <sharpGL:OpenGLControl OpenGLDraw="OpenGLControl_OnOpenGLDraw"
+                               OpenGLInitialized="OpenGLControl_OnOpenGLInitialized"/>
+       
     </DockPanel>
 </Window>
