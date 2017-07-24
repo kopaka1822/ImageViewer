@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using SharpGL;
 using SharpGL.SceneGraph;
+using SharpGL.SceneGraph.Shaders;
 
 namespace TextureViewer
 {
@@ -22,17 +23,20 @@ namespace TextureViewer
     /// </summary>
     public partial class MainWindow : Window
     {
+        private ShaderProgram program;
 
         public MainWindow(string file)
         {
             InitializeComponent();
             this.Title = "Texture Viewer - Panel - " + file;
         }
+        
 
         private void OpenGLControl_OnOpenGLDraw(object sender, OpenGLEventArgs args)
         {
             //  Get the OpenGL instance that's been passed to us.
             OpenGL gl = args.OpenGL;
+          
 
             gl.MatrixMode(OpenGL.GL_PROJECTION);
             gl.LoadIdentity();
@@ -47,15 +51,16 @@ namespace TextureViewer
             gl.LoadIdentity();
 
             //  Start drawing triangles.
+            program.Push(gl, null);
             gl.Begin(OpenGL.GL_TRIANGLE_STRIP);
             
-            gl.Color(1.0f, 0.0f, 0.0f);
             gl.Vertex(1.0f, -1.0f, 0.0f);
             gl.Vertex(-1.0f, -1.0f, 0.0f);
             gl.Vertex(1.0f, 1.0f, 0.0f);
             gl.Vertex(-1.0f, 1.0f, 0.0f);
 
             gl.End();
+            program.Pop(gl, null);
 
             //  Flush OpenGL.
             gl.Flush();
@@ -65,6 +70,23 @@ namespace TextureViewer
         {
             OpenGL gl = args.OpenGL;
             
+            VertexShader vertexShader = new VertexShader();
+            vertexShader.CreateInContext(gl);
+            vertexShader.SetSource("void main() { gl_Position =  vec4(gl_Vertex.xy, 0.0, 1.0); }");
+
+            FragmentShader fragmentShader = new FragmentShader();
+            fragmentShader.CreateInContext(gl);
+            fragmentShader.SetSource("void main() { gl_FragColor = vec4(1.0,1.0,0.0,0.0); }");
+
+            vertexShader.Compile();
+            fragmentShader.Compile();
+
+            program = new ShaderProgram();
+            program.CreateInContext(gl);
+
+            program.AttachShader(vertexShader);
+            program.AttachShader(fragmentShader);
+            program.Link();
         }
     }
 }
