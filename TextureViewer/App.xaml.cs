@@ -13,6 +13,8 @@ namespace TextureViewer
     public partial class App : Application
     {
         private List<MainWindow> activeWindows = new List<MainWindow>();
+        private LayerWindow layerWindow = null;
+        private MipMapWindow mipMapWindow = null;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -40,7 +42,7 @@ namespace TextureViewer
                 {
                     var image = ImageLoaderWrapper.LoadImage(filename);
 
-                    var wnd = new MainWindow(image);
+                    var wnd = new MainWindow(this, image);
                     wnd.Show();
                     activeWindows.Add(wnd);
                 }
@@ -55,9 +57,57 @@ namespace TextureViewer
             if (activeWindows.Count == 0)
             {
                 // spawn empty window
-                var wnd = new MainWindow(null);
+                var wnd = new MainWindow(this, null);
                 wnd.Show();
                 activeWindows.Add(wnd);
+            }
+        }
+
+        public void UnregisterWindow(MainWindow window)
+        {
+            activeWindows.Remove(window);
+
+            if(activeWindows.Count == 0)
+                Shutdown(0);
+        }
+
+        public void OpenLayerWindow()
+        {
+            if (layerWindow == null)
+            {
+                layerWindow = new LayerWindow(this);
+                layerWindow.Show();
+            }
+            layerWindow.Focus();
+        }
+
+        public void OpenMipMapWindow()
+        {
+            if (mipMapWindow == null)
+            {
+                mipMapWindow = new MipMapWindow(this);
+                mipMapWindow.Show();
+            }
+            mipMapWindow.Focus();
+        }
+
+        public void CloseLayerWindow()
+        {
+            if (layerWindow != null)
+            {
+                if(!layerWindow.IsClosing)
+                    layerWindow.Close();
+                layerWindow = null;
+            }
+        }
+
+        public void CloseMipMapWindow()
+        {
+            if (mipMapWindow != null)
+            {
+                if(!mipMapWindow.IsClosing)
+                    mipMapWindow.Close();
+                mipMapWindow = null;
             }
         }
 

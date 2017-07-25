@@ -4,6 +4,13 @@
              xmlns:local="clr-namespace:TextureViewer"
              >
     <Application.Resources>
-         
+        <Style x:Key="ListboxStyle">
+            <Style.Resources>
+                <!-- Background of selected item when focussed -->
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Red" />
+                <!-- Background of selected item when not focussed -->
+                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Green" />
+            </Style.Resources>
+        </Style>
     </Application.Resources>
 </Application>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,12 +25,15 @@ namespace TextureViewer
     /// </summary>
     public partial class MainWindow : Window
     {
+        private App parent;
+
         private ShaderProgram program;
         private ImageLoaderWrapper.Image image;
         private TextureArray2D textureArray2D;
 
-        public MainWindow(ImageLoaderWrapper.Image file)
+        public MainWindow(App parent, ImageLoaderWrapper.Image file)
         {
+            this.parent = parent;
             this.image = file;
 
             InitializeComponent();
@@ -76,14 +80,15 @@ namespace TextureViewer
         private void OpenGLControl_OnOpenGLInitialized(object sender, OpenGLEventArgs args)
         {
             OpenGL gl = args.OpenGL;
-            
+
             VertexShader vertexShader = new VertexShader();
             vertexShader.CreateInContext(gl);
             vertexShader.SetSource("void main() { gl_Position =  vec4(gl_Vertex.xy, 0.0, 1.0); }");
 
             FragmentShader fragmentShader = new FragmentShader();
             fragmentShader.CreateInContext(gl);
-            fragmentShader.SetSource("uniform sampler2DArray tex; void main() {  ivec2 texCoord = ivec2(gl_FragCoord.xy); gl_FragColor = texelFetch(tex, ivec3(texCoord, 0), 0); }");
+            fragmentShader.SetSource(
+                "uniform sampler2DArray tex; void main() {  ivec2 texCoord = ivec2(gl_FragCoord.xy); gl_FragColor = texelFetch(tex, ivec3(texCoord, 0), 0); }");
 
             vertexShader.Compile();
             fragmentShader.Compile();
@@ -96,6 +101,21 @@ namespace TextureViewer
             program.Link();
 
             textureArray2D = new TextureArray2D(gl, image, 0);
+        }
+
+        private void MenuItem_Click_Mipmaps(object sender, RoutedEventArgs e)
+        {
+            parent.OpenMipMapWindow();
+        }
+
+        private void MenuItem_Click_Layers(object sender, RoutedEventArgs e)
+        {
+            parent.OpenLayerWindow();
+        }
+
+        private void MainWindow_OnClosing(object sender, CancelEventArgs e)
+        {
+            parent.UnregisterWindow(this);
         }
     }
 }

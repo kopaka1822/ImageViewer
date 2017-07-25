@@ -6,7 +6,8 @@
         xmlns:sharpGL="clr-namespace:SharpGL.WPF;assembly=SharpGL.WPF"
         xmlns:local="clr-namespace:TextureViewer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800">
+        Title="MainWindow" Height="600" Width="800"
+        Closing="MainWindow_OnClosing">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
@@ -17,8 +18,8 @@
             </MenuItem>
             <MenuItem Header="_View">
                 <MenuItem Header="_Tool Windows">
-                    <MenuItem Header="Mipmaps"/>
-                    <MenuItem Header="Layers"/>
+                    <MenuItem Header="Mipmaps" Click="MenuItem_Click_Mipmaps" />
+                    <MenuItem Header="Layers" Click="MenuItem_Click_Layers"/>
                     <MenuItem Header="Tone Mapping"/>
                     <MenuItem Header="Manipulation"/>
                 </MenuItem>

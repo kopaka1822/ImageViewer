@@ -1,0 +1,36 @@
+﻿<Window x:Class="TextureViewer.LayerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TextureViewer"
+        mc:Ignorable="d"
+        Title="Layer" Height="300" Width="200"
+        ResizeMode="NoResize" Background="#eee"
+        Closing="LayerWindow_OnClosing">
+    <Grid>
+        <Border Padding="5">
+            <StackPanel>
+                <!-- Mode Selector -->    
+                <TextBlock Text="Mode:" Margin="0 0 0 2"/>
+                <ComboBox SelectedIndex="0" Margin="0 0 0 10">
+                    <ComboBoxItem>Single</ComboBoxItem>
+                    <ComboBoxItem>3D View</ComboBoxItem>
+                    <ComboBoxItem>Dice View</ComboBoxItem>
+                </ComboBox>
+                
+                <TextBlock Text="Layer:" Margin="0 0 0 2"/>
+                <ListBox SelectedIndex="0">
+                    <ListBoxItem>Layer 0</ListBoxItem>
+                    <ListBoxItem>Layer 1</ListBoxItem>
+                    <ListBoxItem>Layer 2</ListBoxItem>
+                    <ListBoxItem>Layer 3</ListBoxItem>
+                    <ListBoxItem>Layer 4</ListBoxItem>
+                    <ListBoxItem>Layer 5</ListBoxItem>
+                    <ListBoxItem>Layer 6</ListBoxItem>
+                </ListBox>
+
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
