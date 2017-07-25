@@ -27,6 +27,7 @@
                 </MenuItem>
                 <MenuItem Header="3D View"/>
                 <MenuItem Header="3D Dice"/>
+                <MenuItem Header="Linear Interpolation" x:Name="MenuItemLinearInterpolation" IsCheckable="True" IsChecked="True" Click="LinearFiltering_OnChecked"/>
             </MenuItem>
         </Menu>
         

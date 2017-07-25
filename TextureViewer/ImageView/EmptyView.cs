@@ -31,5 +31,10 @@ namespace TextureViewer.ImageView
         {
             throw new NotImplementedException();
         }
+
+        public void SetImageFilter(uint glImageFilter)
+        {
+            
+        }
     }
 }

@@ -102,7 +102,12 @@ namespace TextureViewer.ImageView
 
         public void OnScroll(double diff)
         {
-            curScale = Math.Min(Math.Max(curScale * (1.0 + (diff * 0.001)), 0.01), 10.0);
+            curScale = Math.Min(Math.Max(curScale * (1.0 + (diff * 0.001)), 0.01), 100.0);
+        }
+
+        public void SetImageFilter(uint glImageFilter)
+        {
+            texture.FilterMode = glImageFilter;
         }
 
 

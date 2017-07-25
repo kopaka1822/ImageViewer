@@ -14,5 +14,6 @@ namespace TextureViewer.ImageView
         void Draw();
         void OnDrag(Vector diff);
         void OnScroll(double diff);
+        void SetImageFilter(uint glImageFilter);
     }
 }

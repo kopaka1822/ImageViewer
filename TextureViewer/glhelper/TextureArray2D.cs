@@ -11,7 +11,7 @@ namespace TextureViewer.glhelper
     class TextureArray2D : TextureBase
     {
         public TextureArray2D(OpenGL gl, ImageLoaderWrapper.Image image, int mipmap) 
-            : base(gl)
+            : base(gl, OpenGL.GL_TEXTURE_2D_ARRAY)
         {
             int width = image.Layers[0].Mipmaps[mipmap].Width;
             int height = image.Layers[0].Mipmaps[mipmap].Width;
@@ -37,17 +37,8 @@ namespace TextureViewer.glhelper
                     Marshal.UnsafeAddrOfPinnedArrayElement(bytes, 0));
             }
 
-            // set linear filtering
-            gl.TexParameter(OpenGL.GL_TEXTURE_2D_ARRAY, OpenGL.GL_TEXTURE_MIN_FILTER, OpenGL.GL_LINEAR);
-            gl.TexParameter(OpenGL.GL_TEXTURE_2D_ARRAY, OpenGL.GL_TEXTURE_MAG_FILTER, OpenGL.GL_LINEAR);
             gl.TexParameter(OpenGL.GL_TEXTURE_2D_ARRAY, OpenGL.GL_TEXTURE_WRAP_S, OpenGL.GL_CLAMP_TO_EDGE);
             gl.TexParameter(OpenGL.GL_TEXTURE_2D_ARRAY, OpenGL.GL_TEXTURE_WRAP_T, OpenGL.GL_CLAMP_TO_EDGE);
-        }
-
-        public void Bind(uint slot)
-        {
-            gl.ActiveTexture(slot);
-            gl.BindTexture(OpenGL.GL_TEXTURE_2D_ARRAY, id);
         }
     }
 }

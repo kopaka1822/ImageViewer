@@ -40,13 +40,15 @@ namespace TextureViewer
         {
             this.parent = parent;
             this.Image = file;
-            InitializeComponent();
 
-            this.Title = getWindowName(file);
+            InitializeComponent();
+            
             if (file == null)
                 currentView = new EmptyView();
             else
                 currentView = new SingleView();
+
+            this.Title = getWindowName(file);
         }
         
 
@@ -139,6 +141,13 @@ namespace TextureViewer
         public int GetClientHeight()
         {
             return (int)OpenGlControl.ActualHeight;
+        }
+
+        private void LinearFiltering_OnChecked(object sender, RoutedEventArgs routedEventArgs)
+        {
+            currentView?.SetImageFilter(MenuItemLinearInterpolation.IsChecked
+                ? OpenGL.GL_LINEAR
+                : OpenGL.GL_NEAREST);
         }
     }
 }
