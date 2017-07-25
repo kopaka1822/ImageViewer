@@ -58,6 +58,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ImageView\EmptyView.cs" />
+    <Compile Include="ImageView\IImageView.cs" />
+    <Compile Include="ImageView\SingleView.cs" />
+    <Compile Include="ImageView\Views.cs" />
     <Compile Include="LayerWindow.xaml.cs">
       <DependentUpon>LayerWindow.xaml</DependentUpon>
     </Compile>

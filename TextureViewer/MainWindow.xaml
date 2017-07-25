@@ -7,9 +7,11 @@
         xmlns:local="clr-namespace:TextureViewer"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="800"
-        Closing="MainWindow_OnClosing">
+        Closing="MainWindow_OnClosing"
+        Background="#eee"
+        MinWidth="250" MinHeight="200">
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
+        <Menu DockPanel.Dock="Top" Background="#fff" Padding="0 0 0 2">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open"/>
                 <MenuItem Header="_Save"/>
@@ -28,9 +30,11 @@
             </MenuItem>
         </Menu>
         
-        <sharpGL:OpenGLControl OpenGLDraw="OpenGLControl_OnOpenGLDraw"
+        <sharpGL:OpenGLControl x:Name="OpenGlControl" 
+                               OpenGLDraw="OpenGLControl_OnOpenGLDraw"
                                RenderContextType="FBO"
-                               OpenGLInitialized="OpenGLControl_OnOpenGLInitialized"/>
+                               OpenGLInitialized="OpenGLControl_OnOpenGLInitialized"
+                               MouseMove="UIElement_OnMouseMove"/>
        
     </DockPanel>
 </Window>

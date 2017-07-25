@@ -81,9 +81,11 @@ namespace TextureViewer
             public readonly int ComponentSize;
             public readonly bool IsIntegerFormat;
             public readonly List<Layer> Layers;
+            public readonly string Filename;
 
-            public Image(Resource resource)
+            public Image(Resource resource, string filename)
             {
+                this.Filename = filename;
                 // load relevant information
                 int nLayer;
                 int nMipmaps;
@@ -94,11 +96,25 @@ namespace TextureViewer
                     Layers.Add(new Layer(resource, curLayer, nMipmaps));
                 }
             }
+
+            public int GetWidth(int mipmap)
+            {
+                if (Layers.Count > 0 && (uint)mipmap < Layers[0].Mipmaps.Count)
+                    return Layers[0].Mipmaps[mipmap].Width;
+                return 0;
+            }
+
+            public int GetHeight(int mipmap)
+            {
+                if (Layers.Count > 0 && (uint)mipmap < Layers[0].Mipmaps.Count)
+                    return Layers[0].Mipmaps[mipmap].Height;
+                return 0;
+            }
         }
 
         public static Image LoadImage(string file)
         {
-            return new Image(new Resource(file));
+            return new Image(new Resource(file), file);
         }
 
         public static int Test(int a, int b)

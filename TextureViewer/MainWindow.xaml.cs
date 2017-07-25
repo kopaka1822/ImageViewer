@@ -17,6 +17,7 @@ using SharpGL;
 using SharpGL.SceneGraph;
 using SharpGL.SceneGraph.Shaders;
 using TextureViewer.glhelper;
+using TextureViewer.ImageView;
 
 namespace TextureViewer
 {
@@ -25,24 +26,38 @@ namespace TextureViewer
     /// </summary>
     public partial class MainWindow : Window
     {
-        private App parent;
+        private readonly App parent;
+        public ImageLoaderWrapper.Image Image { get; private set; }
 
-        private ShaderProgram program;
-        private ImageLoaderWrapper.Image image;
-        private TextureArray2D textureArray2D;
+        private String errorMessage = "";
+
+        private IImageView currentView;
+
+        // mouse tracking
+        private Point mousePosition = new Point();
 
         public MainWindow(App parent, ImageLoaderWrapper.Image file)
         {
             this.parent = parent;
-            this.image = file;
-
+            this.Image = file;
             InitializeComponent();
-            this.Title = "Texture Viewer - Panel - ";
+
+            this.Title = getWindowName(file);
+            if (file == null)
+                currentView = new EmptyView();
+            else
+                currentView = new SingleView();
         }
         
 
         private void OpenGLControl_OnOpenGLDraw(object sender, OpenGLEventArgs args)
         {
+            if (errorMessage.Length > 0)
+            {
+                MessageBox.Show(errorMessage);
+                errorMessage = "";
+            }
+
             //  Get the OpenGL instance that's been passed to us.
             OpenGL gl = args.OpenGL;
           
@@ -54,24 +69,10 @@ namespace TextureViewer
             gl.LoadIdentity();
 
             //  Clear the color and depth buffers.
+            gl.ClearColor(0.9333f, 0.9333f, 0.9333f, 1.0f);
             gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
-
-            //  Reset the modelview matrix.
-            gl.LoadIdentity();
-
-            //  Start drawing triangles.
-            program.Push(gl, null);
-            textureArray2D.Bind(0);
-
-            gl.Begin(OpenGL.GL_TRIANGLE_STRIP);
             
-            gl.Vertex(1.0f, -1.0f, 0.0f);
-            gl.Vertex(-1.0f, -1.0f, 0.0f);
-            gl.Vertex(1.0f, 1.0f, 0.0f);
-            gl.Vertex(-1.0f, 1.0f, 0.0f);
-
-            gl.End();
-            program.Pop(gl, null);
+            currentView.Draw();
 
             //  Flush OpenGL.
             gl.Flush();
@@ -79,28 +80,14 @@ namespace TextureViewer
 
         private void OpenGLControl_OnOpenGLInitialized(object sender, OpenGLEventArgs args)
         {
-            OpenGL gl = args.OpenGL;
-
-            VertexShader vertexShader = new VertexShader();
-            vertexShader.CreateInContext(gl);
-            vertexShader.SetSource("void main() { gl_Position =  vec4(gl_Vertex.xy, 0.0, 1.0); }");
-
-            FragmentShader fragmentShader = new FragmentShader();
-            fragmentShader.CreateInContext(gl);
-            fragmentShader.SetSource(
-                "uniform sampler2DArray tex; void main() {  ivec2 texCoord = ivec2(gl_FragCoord.xy); gl_FragColor = texelFetch(tex, ivec3(texCoord, 0), 0); }");
-
-            vertexShader.Compile();
-            fragmentShader.Compile();
-
-            program = new ShaderProgram();
-            program.CreateInContext(gl);
-
-            program.AttachShader(vertexShader);
-            program.AttachShader(fragmentShader);
-            program.Link();
-
-            textureArray2D = new TextureArray2D(gl, image, 0);
+            try
+            {
+                currentView.Init(args.OpenGL, this);
+            }
+            catch (Exception e)
+            {
+                errorMessage = e.Message;
+            }
         }
 
         private void MenuItem_Click_Mipmaps(object sender, RoutedEventArgs e)
@@ -116,6 +103,37 @@ namespace TextureViewer
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
             parent.UnregisterWindow(this);
+        }
+
+        private string getWindowName(ImageLoaderWrapper.Image image)
+        {
+            if (image == null)
+                return "Texture Viewer";
+            return "Texture Viewer - " + image.Filename;
+        }
+
+        private void UIElement_OnMouseMove(object sender, MouseEventArgs e)
+        {
+            var newPosition = e.GetPosition(this.OpenGlControl);
+            if (e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed)
+            {
+                // drag event
+                var diff = newPosition - mousePosition;
+                
+                if(Math.Abs(diff.X) > 0.01 || Math.Abs(diff.Y) > 0.01)
+                    currentView.OnDrag(diff);
+            }
+            mousePosition = newPosition;
+        }
+
+        public int GetClientWidth()
+        {
+            return (int)OpenGlControl.ActualWidth;
+        }
+
+        public int GetClientHeight()
+        {
+            return (int)OpenGlControl.ActualHeight;
         }
     }
 }

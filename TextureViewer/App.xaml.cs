@@ -21,7 +21,7 @@ namespace TextureViewer
             base.OnStartup(e);
             if (e.Args.Length == 0)
             {
-                SpawnWindow(@"E:\git\TextureViewer\TextureViewer\Crate.bmp");
+                SpawnWindow(null);
             }
             else
             {
