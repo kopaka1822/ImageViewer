@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using SharpGL;
 using SharpGL.SceneGraph;
 using SharpGL.SceneGraph.Shaders;
+using TextureViewer.glhelper;
 
 namespace TextureViewer
 {
@@ -25,6 +26,7 @@ namespace TextureViewer
     {
         private ShaderProgram program;
         private ImageLoaderWrapper.Image image;
+        private TextureArray2D textureArray2D;
 
         public MainWindow(ImageLoaderWrapper.Image file)
         {
@@ -55,6 +57,8 @@ namespace TextureViewer
 
             //  Start drawing triangles.
             program.Push(gl, null);
+            textureArray2D.Bind(0);
+
             gl.Begin(OpenGL.GL_TRIANGLE_STRIP);
             
             gl.Vertex(1.0f, -1.0f, 0.0f);
@@ -79,7 +83,7 @@ namespace TextureViewer
 
             FragmentShader fragmentShader = new FragmentShader();
             fragmentShader.CreateInContext(gl);
-            fragmentShader.SetSource("void main() { gl_FragColor = vec4(1.0,1.0,0.0,0.0); }");
+            fragmentShader.SetSource("uniform sampler2DArray tex; void main() {  ivec2 texCoord = ivec2(gl_FragCoord.xy); gl_FragColor = texelFetch(tex, ivec3(texCoord, 0), 0); }");
 
             vertexShader.Compile();
             fragmentShader.Compile();
@@ -91,7 +95,7 @@ namespace TextureViewer
             program.AttachShader(fragmentShader);
             program.Link();
 
-
+            textureArray2D = new TextureArray2D(gl, image, 0);
         }
     }
 }

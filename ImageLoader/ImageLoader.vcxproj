@@ -144,14 +144,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\dependencies\stb\stb.h" />
+    <ClInclude Include="..\dependencies\stb\stb_image.h" />
+    <ClInclude Include="..\dependencies\stb\stb_image_write.h" />
     <ClInclude Include="ImageFormat.h" />
     <ClInclude Include="ImageLayer.h" />
     <ClInclude Include="ImageLoader.h" />
     <ClInclude Include="ImageMipmap.h" />
     <ClInclude Include="ImageResource.h" />
+    <ClInclude Include="stb_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImageLoader.cpp" />
+    <ClCompile Include="stb_loader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -66,6 +66,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="glhelper\TextureArray2D.cs" />
+    <Compile Include="glhelper\TextureBase.cs" />
     <Compile Include="ImageLoaderWrapper.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
