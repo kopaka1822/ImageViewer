@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <memory>
 #include "ImageResource.h"
+#include "stb_loader.h"
 
 int add(int a, int b)
 {
@@ -13,12 +14,13 @@ static std::unordered_map<int, std::unique_ptr<ImageResource>> s_resources;
 
 int open(const char* filename)
 {
+	// try loading the resource
+	auto res = stb_load(filename);
+	if (!res) // TODO set error
+		return 0;
+
 	int id = s_currentID++;
-	auto& res = s_resources[id] = std::make_unique<ImageResource>();
-	// init image resource
-	res->format.componentSize = 4;
-	res->format.componentType = ImageFormat::COMPONENT_TYPE_INT;
-	res->format.componentCount = 3;
+	s_resources[id] = move(res);
 
 	return id;
 }
@@ -58,7 +60,7 @@ void image_info_mipmap(int id, int mipmap, int& width, int& height, uint32_t& si
 		return;
 
 	width = it->second->layer[0].mipmaps[mipmap].width;
-	height = it->second->layer[0].mipmaps[mipmap].heigt;
+	height = it->second->layer[0].mipmaps[mipmap].height;
 	size = it->second->layer[0].mipmaps[mipmap].bytes.size();
 }
 
