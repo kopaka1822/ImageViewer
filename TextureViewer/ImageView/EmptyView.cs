@@ -26,5 +26,10 @@ namespace TextureViewer.ImageView
         {
             
         }
+
+        public void OnScroll(double diff)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

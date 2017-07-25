@@ -18,6 +18,7 @@ namespace TextureViewer.ImageView
         private MainWindow parent;
         private int curMipmap;
         private Vector curTranslation = new Vector(0.0, 0.0);
+        private double curScale = 1.0;
 
         public void Init(OpenGL gl, MainWindow parent)
         {
@@ -36,6 +37,7 @@ namespace TextureViewer.ImageView
             texture.Bind(0);
 
             ApplyAspectRatio();
+            ApplyScale();
             ApplyTranslation();
 
             gl.Begin(OpenGL.GL_TRIANGLE_STRIP);
@@ -87,11 +89,22 @@ namespace TextureViewer.ImageView
             gl.Translate(curTranslation.X, curTranslation.Y, 0.0);
         }
 
+        private void ApplyScale()
+        {
+            gl.Scale(curScale, curScale, 1.0);
+        }
+
         public void OnDrag(Vector diff)
         {
             // translate into local space
-            curTranslation += WindowToClient(diff);
+            curTranslation += WindowToClient(diff) / curScale;
         }
+
+        public void OnScroll(double diff)
+        {
+            curScale = Math.Min(Math.Max(curScale * (1.0 + (diff * 0.001)), 0.01), 10.0);
+        }
+
 
         private Vector WindowToClient(Vector vec)
         {

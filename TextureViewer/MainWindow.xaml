@@ -34,7 +34,8 @@
                                OpenGLDraw="OpenGLControl_OnOpenGLDraw"
                                RenderContextType="FBO"
                                OpenGLInitialized="OpenGLControl_OnOpenGLInitialized"
-                               MouseMove="UIElement_OnMouseMove"/>
+                               MouseMove="OpenGlControl_OnMouseMove"
+                               MouseWheel="OpenGlControl_OnMouseWheel"/>
        
     </DockPanel>
 </Window>

@@ -112,7 +112,7 @@ namespace TextureViewer
             return "Texture Viewer - " + image.Filename;
         }
 
-        private void UIElement_OnMouseMove(object sender, MouseEventArgs e)
+        private void OpenGlControl_OnMouseMove(object sender, MouseEventArgs e)
         {
             var newPosition = e.GetPosition(this.OpenGlControl);
             if (e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed)
@@ -124,6 +124,11 @@ namespace TextureViewer
                     currentView.OnDrag(diff);
             }
             mousePosition = newPosition;
+        }
+
+        private void OpenGlControl_OnMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            currentView.OnScroll((double)e.Delta);
         }
 
         public int GetClientWidth()

@@ -13,5 +13,6 @@ namespace TextureViewer.ImageView
         void Init(OpenGL gl, MainWindow parent);
         void Draw();
         void OnDrag(Vector diff);
+        void OnScroll(double diff);
     }
 }
