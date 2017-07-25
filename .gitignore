@@ -18,6 +18,8 @@ packages/
 *.pdb
 *.ilk
 .vs/
+*.exp
+*.lib
 
 #logs
 #*.txt

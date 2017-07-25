@@ -29,6 +29,9 @@ namespace TextureViewer
         {
             InitializeComponent();
             this.Title = "Texture Viewer - Panel - " + file;
+
+            int c = ImageLoaderWrapper.Test(5, 7);
+            c++;
         }
         
 
@@ -87,6 +90,8 @@ namespace TextureViewer
             program.AttachShader(vertexShader);
             program.AttachShader(fragmentShader);
             program.Link();
+
+
         }
     }
 }
