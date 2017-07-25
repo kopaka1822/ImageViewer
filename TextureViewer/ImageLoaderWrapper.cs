@@ -26,6 +26,81 @@ namespace TextureViewer
         [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr image_get_mipmap(int id, int layer, int mipmap);
 
+        public class Resource
+        {
+            public int Id { get; }
+
+            public Resource(string file)
+            {
+                Id = open(file);
+                if(Id == 0)
+                    throw new Exception("could not open " + file);
+            }
+
+            ~Resource()
+            {
+                if(Id != 0)
+                    release(Id);
+            }
+        }
+
+        public class Mipmap
+        {
+            public readonly int Width;
+            public readonly int Height;
+            public readonly byte[] Bytes;
+
+            public Mipmap(Resource resource, int layerId, int mipmapId)
+            {
+                uint size;
+                image_info_mipmap(resource.Id, mipmapId, out Width, out Height, out size);
+                Bytes = new byte[size];
+
+                IntPtr ptr = image_get_mipmap(resource.Id, layerId, mipmapId);
+                Marshal.Copy(ptr, Bytes, 0, (int)size);
+            }
+        }
+
+        public class Layer
+        {
+            public readonly List<Mipmap> Mipmaps;
+
+            public Layer(Resource resource, int layerId, int nMipmaps)
+            {
+                Mipmaps = new List<Mipmap>(nMipmaps);
+                for (int curMipmap = 0; curMipmap < nMipmaps; ++curMipmap)
+                {
+                    Mipmaps.Add(new Mipmap(resource, layerId, curMipmap));
+                }
+            }
+        }
+
+        public class Image
+        {
+            public readonly int NumComponents;
+            public readonly int ComponentSize;
+            public readonly bool IsIntegerFormat;
+            public readonly List<Layer> Layers;
+
+            public Image(Resource resource)
+            {
+                // load relevant information
+                int nLayer;
+                int nMipmaps;
+                image_info(resource.Id, out NumComponents, out ComponentSize, out IsIntegerFormat, out nLayer, out nMipmaps);
+                Layers = new List<Layer>(nLayer);
+                for (int curLayer = 0; curLayer < nLayer; ++curLayer)
+                {
+                    Layers.Add(new Layer(resource, curLayer, nMipmaps));
+                }
+            }
+        }
+
+        public static Image LoadImage(string file)
+        {
+            return new Image(new Resource(file));
+        }
+
         public static int Test(int a, int b)
         {
             int id = open("hello");
