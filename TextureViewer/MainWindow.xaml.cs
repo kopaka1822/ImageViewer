@@ -24,14 +24,14 @@ namespace TextureViewer
     public partial class MainWindow : Window
     {
         private ShaderProgram program;
+        private ImageLoaderWrapper.Image image;
 
-        public MainWindow(string file)
+        public MainWindow(ImageLoaderWrapper.Image file)
         {
-            InitializeComponent();
-            this.Title = "Texture Viewer - Panel - " + file;
+            this.image = file;
 
-            int c = ImageLoaderWrapper.Test(5, 7);
-            c++;
+            InitializeComponent();
+            this.Title = "Texture Viewer - Panel - ";
         }
         
 
