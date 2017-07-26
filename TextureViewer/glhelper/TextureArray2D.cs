@@ -14,7 +14,7 @@ namespace TextureViewer.glhelper
             : base(gl, OpenGL.GL_TEXTURE_2D_ARRAY)
         {
             int width = image.Layers[0].Mipmaps[mipmap].Width;
-            int height = image.Layers[0].Mipmaps[mipmap].Width;
+            int height = image.Layers[0].Mipmaps[mipmap].Height;
 
             gl.BindTexture(OpenGL.GL_TEXTURE_2D_ARRAY, id);
             

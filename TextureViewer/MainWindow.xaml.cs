@@ -112,7 +112,7 @@ namespace TextureViewer
         {
             try
             {
-                args.OpenGL.PixelStore(OpenGL.GL_UNPACK_ALIGNMENT, 1);
+                //args.OpenGL.PixelStore(OpenGL.GL_PACK_ALIGNMENT, 1);
                 currentView.Init(args.OpenGL, this);
             }
             catch (Exception e)
