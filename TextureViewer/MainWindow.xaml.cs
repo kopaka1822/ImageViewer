@@ -87,25 +87,34 @@ namespace TextureViewer
                 MessageBox.Show(errorMessage);
                 errorMessage = "";
             }
+            try
+            {
+                //  Get the OpenGL instance that's been passed to us.
+                OpenGL gl = args.OpenGL;
+                Utility.GlCheck(gl);
 
-            //  Get the OpenGL instance that's been passed to us.
-            OpenGL gl = args.OpenGL;
-          
+                gl.MatrixMode(OpenGL.GL_PROJECTION);
+                gl.LoadIdentity();
 
-            gl.MatrixMode(OpenGL.GL_PROJECTION);
-            gl.LoadIdentity();
+                gl.MatrixMode(OpenGL.GL_MODELVIEW);
+                gl.LoadIdentity();
 
-            gl.MatrixMode(OpenGL.GL_MODELVIEW);
-            gl.LoadIdentity();
+                //  Clear the color and depth buffers.
+                gl.ClearColor(0.9333f, 0.9333f, 0.9333f, 1.0f);
+                gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
+                Utility.GlCheck(gl);
 
-            //  Clear the color and depth buffers.
-            gl.ClearColor(0.9333f, 0.9333f, 0.9333f, 1.0f);
-            gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
-            
-            currentView.Draw();
+                currentView.Draw();
+                Utility.GlCheck(gl);
 
-            //  Flush OpenGL.
-            gl.Flush();
+                //  Flush OpenGL.
+                gl.Flush();
+            }
+            catch (Exception e)
+            {
+                errorMessage = e.Message + "\nstack: " + e.StackTrace;
+            }
+           
         }
 
         private void OpenGLControl_OnOpenGLInitialized(object sender, OpenGLEventArgs args)
@@ -114,10 +123,12 @@ namespace TextureViewer
             {
                 //args.OpenGL.PixelStore(OpenGL.GL_PACK_ALIGNMENT, 1);
                 currentView.Init(args.OpenGL, this);
+
+                Utility.GlCheck(args.OpenGL);
             }
             catch (Exception e)
             {
-                errorMessage = e.Message;
+                errorMessage = e.Message + "\nstack: " + e.StackTrace;
             }
         }
 

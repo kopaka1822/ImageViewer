@@ -37,7 +37,8 @@ void release(int id)
 		s_resources.erase(it);
 }
 
-void image_info(int id, uint32_t& openglInternalFormat, uint32_t& openglExternalFormat, uint32_t& openglType, int& nLayers, int& nMipmaps)
+void image_info(int id, uint32_t& openglInternalFormat, uint32_t& openglExternalFormat, 
+	uint32_t& openglType, int& nLayers, int& nMipmaps, bool& isCompressed)
 {
 	auto it = s_resources.find(id);
 	if (it == s_resources.end())
@@ -46,6 +47,8 @@ void image_info(int id, uint32_t& openglInternalFormat, uint32_t& openglExternal
 	openglInternalFormat = it->second->format.openglInternalFormat;
 	openglType = it->second->format.openglType;
 	openglExternalFormat = it->second->format.openglExternalFormat;
+	isCompressed = it->second->format.isCompressed;
+
 	nLayers = it->second->layer.size();
 	nMipmaps = 0;
 	if (it->second->layer.size())

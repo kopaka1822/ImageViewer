@@ -18,7 +18,8 @@ namespace TextureViewer
         private static extern void release(int id);
 
         [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void image_info(int id, out uint openglInternalFormat, out uint openglExternalFormat, out uint openglType, out int nLayers, out int nMipmaps);
+        private static extern void image_info(int id, out uint openglInternalFormat, out uint openglExternalFormat, 
+            out uint openglType, out int nLayers, out int nMipmaps, out bool isCompressed);
 
         [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void image_info_mipmap(int id, int mipmap, out int width, out int height, out uint size);
@@ -52,16 +53,16 @@ namespace TextureViewer
             public readonly int Width;
             public readonly int Height;
             public readonly IntPtr Bytes;
+            public readonly uint Size;
 
             public Mipmap(Resource resource, int layerId, int mipmapId)
             {
-                uint size;
-                image_info_mipmap(resource.Id, mipmapId, out Width, out Height, out size);
+                image_info_mipmap(resource.Id, mipmapId, out Width, out Height, out Size);
 
                 IntPtr ptr = image_get_mipmap(resource.Id, layerId, mipmapId);
-                Bytes = Marshal.AllocHGlobal((int) size);
+                Bytes = Marshal.AllocHGlobal((int)Size);
 
-                CopyMemory(Bytes, ptr, size);
+                CopyMemory(Bytes, ptr, Size);
             }
 
             ~Mipmap()
@@ -89,6 +90,7 @@ namespace TextureViewer
             public readonly uint OpenglInternalFormat;
             public readonly uint OpenglExternalFormat;
             public readonly uint OpenglType;
+            public readonly bool IsCompressed;
             public readonly List<Layer> Layers;
             public readonly string Filename;
 
@@ -98,7 +100,9 @@ namespace TextureViewer
                 // load relevant information
                 int nLayer;
                 int nMipmaps;
-                image_info(resource.Id, out OpenglInternalFormat, out OpenglExternalFormat, out OpenglType, out nLayer, out nMipmaps);
+                image_info(resource.Id, out OpenglInternalFormat, out OpenglExternalFormat,
+                    out OpenglType, out nLayer, out nMipmaps, out IsCompressed);
+
                 Layers = new List<Layer>(nLayer);
                 for (int curLayer = 0; curLayer < nLayer; ++curLayer)
                 {

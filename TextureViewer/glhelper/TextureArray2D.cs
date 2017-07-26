@@ -16,21 +16,51 @@ namespace TextureViewer.glhelper
             int width = image.Layers[0].Mipmaps[mipmap].Width;
             int height = image.Layers[0].Mipmaps[mipmap].Height;
 
-            gl.BindTexture(OpenGL.GL_TEXTURE_2D_ARRAY, id);
-            
-            // allocate memory
-            gl.TexImage3D(OpenGL.GL_TEXTURE_2D_ARRAY,
-                0, (int) image.OpenglInternalFormat, width, height,
-                image.Layers.Count, 0, image.OpenglExternalFormat,
-                image.OpenglType, IntPtr.Zero);
+            gl.BindTexture(OpenGL.GL_TEXTURE_2D_ARRAY, Id);
+            Utility.GlCheck(gl);
 
-            // upload layers
-            for (int curLayer = 0; curLayer < image.Layers.Count; ++curLayer)
+            if (image.IsCompressed)
             {
-                gl.TexSubImage3D(OpenGL.GL_TEXTURE_2D_ARRAY,
-                    0, 0, 0, curLayer, width, height, 1,
-                    image.OpenglExternalFormat, image.OpenglType,
-                    image.Layers[curLayer].Mipmaps[mipmap].Bytes);
+                uint imageSize = 0;
+                foreach (var t in image.Layers)
+                    imageSize += t.Mipmaps[mipmap].Size;
+
+                gl.CompressedTexImage3D(OpenGL.GL_TEXTURE_2D_ARRAY,
+                    0, image.OpenglInternalFormat, width, height,
+                    image.Layers.Count, 0, 
+                    (int)imageSize,
+                    IntPtr.Zero);
+
+                for (int curLayer = 0; curLayer < image.Layers.Count; ++curLayer)
+                {
+                    gl.CompressedTexSubImage3D(OpenGL.GL_TEXTURE_2D_ARRAY,
+                        0, 0, 0, curLayer, width, height, 1,
+                        image.OpenglInternalFormat, 
+                        (int)image.Layers[curLayer].Mipmaps[mipmap].Size,
+                        image.Layers[curLayer].Mipmaps[mipmap].Bytes);
+                    Utility.GlCheck(gl);
+
+                }
+            }
+            else
+            {
+                // create storage
+                gl.TexImage3D(OpenGL.GL_TEXTURE_2D_ARRAY,
+                    0, (int)image.OpenglInternalFormat, width, height,
+                    image.Layers.Count, 0, image.OpenglExternalFormat,
+                    image.OpenglType, IntPtr.Zero);
+                Utility.GlCheck(gl);
+
+                // upload layers
+                for (int curLayer = 0; curLayer < image.Layers.Count; ++curLayer)
+                {
+                    gl.TexSubImage3D(OpenGL.GL_TEXTURE_2D_ARRAY,
+                        0, 0, 0, curLayer, width, height, 1,
+                        image.OpenglExternalFormat, image.OpenglType,
+                        image.Layers[curLayer].Mipmaps[mipmap].Bytes);
+                    Utility.GlCheck(gl);
+
+                }
             }
 
             gl.TexParameter(OpenGL.GL_TEXTURE_2D_ARRAY, OpenGL.GL_TEXTURE_WRAP_S, OpenGL.GL_CLAMP_TO_EDGE);

@@ -34,11 +34,15 @@ namespace TextureViewer.ImageView
         public void Draw()
         {
             program.Push(gl, null);
+            Utility.GlCheck(gl);
+
             texture.Bind(0);
+            Utility.GlCheck(gl);
 
             ApplyAspectRatio();
             ApplyScale();
             ApplyTranslation();
+            Utility.GlCheck(gl);
 
             gl.Begin(OpenGL.GL_TRIANGLE_STRIP);
 
@@ -48,7 +52,10 @@ namespace TextureViewer.ImageView
             gl.Vertex(-1.0f, 1.0f, 0.0f);
 
             gl.End();
+            Utility.GlCheck(gl);
+
             program.Pop(gl, null);
+            Utility.GlCheck(gl);
         }
 
         private void LoadShader()

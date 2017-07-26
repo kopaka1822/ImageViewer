@@ -10,6 +10,7 @@ bool getImageFormat(ImageFormat& format, const gli::texture& tex)
 	format.openglInternalFormat = static_cast<uint32_t>(GLformat.Internal);
 	format.openglExternalFormat = static_cast<uint32_t>(GLformat.External);
 	format.openglType = static_cast<uint32_t>(GLformat.Type);
+	format.isCompressed = gli::is_compressed(tex.format());
 	return true;
 }
 

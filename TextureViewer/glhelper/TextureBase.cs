@@ -9,28 +9,31 @@ namespace TextureViewer.glhelper
 {
     class TextureBase
     {
+        // ReSharper disable once InconsistentNaming
         protected readonly OpenGL gl;
-        protected readonly uint id;
-        protected readonly uint target;
+        protected readonly uint Id;
+        protected readonly uint Target;
         public uint FilterMode { get; set; }
 
         public TextureBase(OpenGL gl, uint target)
         {
             this.gl = gl;
-            this.target = target;
+            this.Target = target;
             this.FilterMode = OpenGL.GL_LINEAR;
 
             uint[] ids = new uint[1];
             gl.GenTextures(1, ids);
-            this.id = ids[0];
+            this.Id = ids[0];
         }
 
         public void Bind(uint slot)
         {
-            gl.ActiveTexture(slot);
-            gl.BindTexture(target, id);
-            gl.TexParameter(target, OpenGL.GL_TEXTURE_MIN_FILTER, FilterMode);
-            gl.TexParameter(target, OpenGL.GL_TEXTURE_MAG_FILTER, FilterMode);
+            gl.ActiveTexture(OpenGL.GL_TEXTURE0 + slot);
+            Utility.GlCheck(gl);
+            gl.BindTexture(Target, Id);
+            gl.TexParameter(Target, OpenGL.GL_TEXTURE_MIN_FILTER, FilterMode);
+            gl.TexParameter(Target, OpenGL.GL_TEXTURE_MAG_FILTER, FilterMode);
+            Utility.GlCheck(gl);
         }
     }
 }

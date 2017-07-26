@@ -58,6 +58,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="glhelper\utility.cs" />
     <Compile Include="ImageView\EmptyView.cs" />
     <Compile Include="ImageView\IImageView.cs" />
     <Compile Include="ImageView\SingleView.cs" />

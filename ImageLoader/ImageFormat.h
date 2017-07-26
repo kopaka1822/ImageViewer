@@ -14,4 +14,5 @@ struct ImageFormat
 	uint32_t openglExternalFormat;
 	// UNSIGNED_BYTE UNSIGNED_SHORT
 	uint32_t openglType;
+	bool isCompressed;
 };

@@ -40,6 +40,7 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 		format.openglInternalFormat = getDefaultInternalFormat(nComponents);
 		format.openglExternalFormat = format.openglInternalFormat;
 		format.openglType = gli::gl::type_format::TYPE_F32;
+		format.isCompressed = false;
 
 		size_t mipSize = mipmap.width * mipmap.height * nComponents * 4;
 		mipmap.bytes.resize(mipSize);
@@ -59,6 +60,7 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 		format.openglInternalFormat = getDefaultInternalFormat(nComponents);
 		format.openglExternalFormat = format.openglInternalFormat;
 		format.openglType = gli::gl::type_format::TYPE_U8;
+		format.isCompressed = false;
 
 		size_t mipSize = mipmap.width * mipmap.height * nComponents;
 		mipmap.bytes.resize(mipSize);
