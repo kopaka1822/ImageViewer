@@ -30,6 +30,17 @@ namespace TextureViewer
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Updates content of this window depending on the passed window
+        /// </summary>
+        /// <param name="window"></param>
+        public void UpdateContent(MainWindow window)
+        {
+            MipMapList.Items.Clear();
+            foreach(var item in window.GenerateMipMapItems())
+                MipMapList.Items.Add(item);
+        }
+
         private void MipMapWindow_OnClosing(object sender, CancelEventArgs e)
         {
             IsClosing = true;

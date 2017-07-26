@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
 using SharpGL;
 using SharpGL.SceneGraph;
 using SharpGL.SceneGraph.Shaders;
@@ -28,6 +29,7 @@ namespace TextureViewer
     {
         private readonly App parent;
         public ImageLoaderWrapper.Image Image { get; private set; }
+        public ulong ZIndex { get; set; }
 
         private String errorMessage = "";
 
@@ -40,6 +42,7 @@ namespace TextureViewer
         {
             this.parent = parent;
             this.Image = file;
+            this.ZIndex = 0;
 
             InitializeComponent();
             
@@ -50,7 +53,32 @@ namespace TextureViewer
 
             this.Title = getWindowName(file);
         }
-        
+
+        public ListBoxItem[] GenerateMipMapItems()
+        {
+            if(Image == null)
+                return new ListBoxItem[0];
+
+            var items = new ListBoxItem[Image.GetNumMipmaps()];
+            // generate mip map previews
+            for (int curMipmap = 0; curMipmap < Image.GetNumMipmaps(); ++curMipmap)
+            {
+                items[curMipmap] = new ListBoxItem {Content = Image.GetWidth(curMipmap).ToString() + "x" + Image.GetHeight(curMipmap).ToString()};
+            }
+            return items;
+        }
+
+        public ListBoxItem[] GenerateLayerItems()
+        {
+            if(Image == null)
+                return new ListBoxItem[0];
+            var items = new ListBoxItem[Image.Layers.Count];
+            for (int curLayer = 0; curLayer < Image.Layers.Count; ++curLayer)
+            {
+                items[curLayer] = new ListBoxItem{Content = "Layer " + curLayer};
+            }
+            return items;
+        }
 
         private void OpenGLControl_OnOpenGLDraw(object sender, OpenGLEventArgs args)
         {
@@ -84,6 +112,7 @@ namespace TextureViewer
         {
             try
             {
+                args.OpenGL.PixelStore(OpenGL.GL_UNPACK_ALIGNMENT, 1);
                 currentView.Init(args.OpenGL, this);
             }
             catch (Exception e)
@@ -130,7 +159,7 @@ namespace TextureViewer
 
         private void OpenGlControl_OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            currentView.OnScroll((double)e.Delta);
+            currentView.OnScroll((double)e.Delta, e.GetPosition(OpenGlControl));
         }
 
         public int GetClientWidth()
@@ -148,6 +177,20 @@ namespace TextureViewer
             currentView?.SetImageFilter(MenuItemLinearInterpolation.IsChecked
                 ? OpenGL.GL_LINEAR
                 : OpenGL.GL_NEAREST);
+        }
+
+        private void OpenFile_OnClick(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Multiselect = false;
+            
+            if (ofd.ShowDialog(this) == true)
+                parent.SpawnWindow(ofd.FileName);
+        }
+
+        private void MainWindow_OnActivated(object sender, EventArgs e)
+        {
+            parent.SetActiveWindow(this);
         }
     }
 }

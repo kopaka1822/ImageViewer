@@ -26,6 +26,9 @@ namespace TextureViewer
         [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr image_get_mipmap(int id, int layer, int mipmap);
 
+        [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
+        public static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
+
         public class Resource
         {
             public int Id { get; }
@@ -48,16 +51,22 @@ namespace TextureViewer
         {
             public readonly int Width;
             public readonly int Height;
-            public readonly byte[] Bytes;
+            public readonly IntPtr Bytes;
 
             public Mipmap(Resource resource, int layerId, int mipmapId)
             {
                 uint size;
                 image_info_mipmap(resource.Id, mipmapId, out Width, out Height, out size);
-                Bytes = new byte[size];
 
                 IntPtr ptr = image_get_mipmap(resource.Id, layerId, mipmapId);
-                Marshal.Copy(ptr, Bytes, 0, (int)size);
+                Bytes = Marshal.AllocHGlobal((int) size);
+
+                CopyMemory(Bytes, ptr, size);
+            }
+
+            ~Mipmap()
+            {
+                Marshal.FreeHGlobal(Bytes);
             }
         }
 
@@ -108,6 +117,13 @@ namespace TextureViewer
             {
                 if (Layers.Count > 0 && (uint)mipmap < Layers[0].Mipmaps.Count)
                     return Layers[0].Mipmaps[mipmap].Height;
+                return 0;
+            }
+
+            public int GetNumMipmaps()
+            {
+                if (Layers.Count > 0)
+                    return Layers[0].Mipmaps.Count;
                 return 0;
             }
         }

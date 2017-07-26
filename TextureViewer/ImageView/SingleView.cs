@@ -56,12 +56,12 @@ namespace TextureViewer.ImageView
             VertexShader vertexShader = new VertexShader();
             vertexShader.CreateInContext(gl);
             vertexShader.SetSource(
-                "varying vec2 texcoord; void main() { texcoord = (gl_Vertex.xy + vec2(1.0)) * vec2(0.5); gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * vec4(gl_Vertex.xy, 0.0, 1.0); }");
+                "varying vec2 texcoord; void main() { texcoord = (gl_Vertex.xy + vec2(1.0, -1.0)) * vec2(0.5, -0.5); gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * vec4(gl_Vertex.xy, 0.0, 1.0); }");
 
             FragmentShader fragmentShader = new FragmentShader();
             fragmentShader.CreateInContext(gl);
             fragmentShader.SetSource(
-                "uniform sampler2DArray tex; varying vec2 texcoord; void main() {  gl_FragColor = texture(tex, vec3(texcoord, 0.0)); }");
+                "uniform sampler2DArray tex; varying vec2 texcoord; void main() { vec2 texel = texcoord /*+ vec2(1.0) / vec2(textureSize(tex, 0))*/; gl_FragColor = texture(tex, vec3(texel, 0.0)); }");
 
             vertexShader.Compile();
             fragmentShader.Compile();
@@ -97,10 +97,10 @@ namespace TextureViewer.ImageView
         public void OnDrag(Vector diff)
         {
             // translate into local space
-            curTranslation += WindowToClient(diff) / curScale;
+            curTranslation += WindowToClient(diff);
         }
 
-        public void OnScroll(double diff)
+        public void OnScroll(double diff, Point mouse)
         {
             curScale = Math.Min(Math.Max(curScale * (1.0 + (diff * 0.001)), 0.01), 100.0);
         }
@@ -110,12 +110,11 @@ namespace TextureViewer.ImageView
             texture.FilterMode = glImageFilter;
         }
 
-
         private Vector WindowToClient(Vector vec)
         {
             return new Vector(
-                vec.X * 2.0 / parent.Image.GetWidth(curMipmap),
-                -vec.Y * 2.0 / parent.Image.GetHeight(curMipmap)
+                vec.X * 2.0 / parent.Image.GetWidth(curMipmap) / curScale,
+                -vec.Y * 2.0 / parent.Image.GetHeight(curMipmap) / curScale
                 );
         }
     }

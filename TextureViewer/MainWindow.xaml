@@ -9,11 +9,13 @@
         Title="MainWindow" Height="600" Width="800"
         Closing="MainWindow_OnClosing"
         Background="#eee"
-        MinWidth="250" MinHeight="200">
+        MinWidth="250" MinHeight="200"
+        Focusable="True"
+        Activated="MainWindow_OnActivated">
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="#fff" Padding="0 0 0 2">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open"/>
+                <MenuItem Header="_Open" Click="OpenFile_OnClick"/>
                 <MenuItem Header="_Save"/>
                 <MenuItem Header="Save As"/>
                 <MenuItem Header="_Export"/>

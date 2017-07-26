@@ -27,14 +27,10 @@ namespace TextureViewer.glhelper
             // upload layers
             for (int curLayer = 0; curLayer < image.Layers.Count; ++curLayer)
             {
-                var bytes = image.Layers[curLayer].Mipmaps[mipmap].Bytes;
-                if (bytes == null)
-                    throw new Exception("image bytes are null");
-
                 gl.TexSubImage3D(OpenGL.GL_TEXTURE_2D_ARRAY,
                     0, 0, 0, curLayer, width, height, 1,
                     GetInternalFormat(image), GetImageType(image),
-                    Marshal.UnsafeAddrOfPinnedArrayElement(bytes, 0));
+                    image.Layers[curLayer].Mipmaps[mipmap].Bytes);
             }
 
             gl.TexParameter(OpenGL.GL_TEXTURE_2D_ARRAY, OpenGL.GL_TEXTURE_WRAP_S, OpenGL.GL_CLAMP_TO_EDGE);

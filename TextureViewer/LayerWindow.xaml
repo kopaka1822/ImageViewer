@@ -20,15 +20,7 @@
                 </ComboBox>
                 
                 <TextBlock Text="Layer:" Margin="0 0 0 2"/>
-                <ListBox SelectedIndex="0">
-                    <ListBoxItem>Layer 0</ListBoxItem>
-                    <ListBoxItem>Layer 1</ListBoxItem>
-                    <ListBoxItem>Layer 2</ListBoxItem>
-                    <ListBoxItem>Layer 3</ListBoxItem>
-                    <ListBoxItem>Layer 4</ListBoxItem>
-                    <ListBoxItem>Layer 5</ListBoxItem>
-                    <ListBoxItem>Layer 6</ListBoxItem>
-                </ListBox>
+                <ListBox SelectedIndex="0" x:Name="LayerList"/>
 
             </StackPanel>
         </Border>

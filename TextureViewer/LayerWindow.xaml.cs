@@ -35,5 +35,12 @@ namespace TextureViewer
             IsClosing = true;
             parent.CloseLayerWindow();
         }
+
+        public void UpdateContent(MainWindow window)
+        {
+            LayerList.Items.Clear();
+            foreach (var item in window.GenerateLayerItems())
+                LayerList.Items.Add(item);
+        }
     }
 }
