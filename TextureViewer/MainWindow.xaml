@@ -11,7 +11,8 @@
         Background="#eee"
         MinWidth="250" MinHeight="200"
         Focusable="True"
-        Activated="MainWindow_OnActivated">
+        Activated="MainWindow_OnActivated"
+        Deactivated="MainWindow_OnDeactivated">
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="#fff" Padding="0 0 0 2">
             <MenuItem Header="_File">

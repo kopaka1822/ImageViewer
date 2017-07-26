@@ -146,6 +146,28 @@ namespace TextureViewer
             // refresh dialogs
             mipMapWindow?.UpdateContent(activeWindow);
             layerWindow?.UpdateContent(activeWindow);
+
+            UpdateDialogVisibility();
+        }
+
+        public void UpdateDialogVisibility()
+        {
+            foreach (var openWindow in openWindows)
+            {
+                if (openWindow.IsActive)
+                {
+                    if (layerWindow != null)
+                        layerWindow.Topmost = true;
+                    if (mipMapWindow != null)
+                        mipMapWindow.Topmost = true;
+                    return;
+                }
+            }
+            // disable topmost
+            if(layerWindow != null)
+                layerWindow.Topmost = false;
+            if(mipMapWindow != null)
+                mipMapWindow.Topmost = false;
         }
 
         protected override void OnExit(ExitEventArgs e)

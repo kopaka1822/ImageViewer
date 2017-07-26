@@ -187,12 +187,7 @@ namespace TextureViewer
             if (ofd.ShowDialog(this) == true)
                 parent.SpawnWindow(ofd.FileName);
         }
-
-        private void MainWindow_OnActivated(object sender, EventArgs e)
-        {
-            parent.SetActiveWindow(this);
-        }
-
+        
         private void OpenGlControl_OnDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -205,6 +200,16 @@ namespace TextureViewer
                         parent.SpawnWindow(file);
             }
 
+        }
+
+        private void MainWindow_OnActivated(object sender, EventArgs e)
+        {
+            parent.SetActiveWindow(this);
+        }
+
+        private void MainWindow_OnDeactivated(object sender, EventArgs e)
+        {
+            parent.UpdateDialogVisibility();
         }
     }
 }
