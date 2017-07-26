@@ -20,16 +20,16 @@ namespace TextureViewer.glhelper
             
             // allocate memory
             gl.TexImage3D(OpenGL.GL_TEXTURE_2D_ARRAY,
-                0, (int)GetInternalFormat(image), width, height,
-                image.Layers.Count, 0, GetInternalFormat(image),
-                GetImageType(image), IntPtr.Zero);
+                0, (int) image.OpenglInternalFormat, width, height,
+                image.Layers.Count, 0, image.OpenglExternalFormat,
+                image.OpenglType, IntPtr.Zero);
 
             // upload layers
             for (int curLayer = 0; curLayer < image.Layers.Count; ++curLayer)
             {
                 gl.TexSubImage3D(OpenGL.GL_TEXTURE_2D_ARRAY,
                     0, 0, 0, curLayer, width, height, 1,
-                    GetInternalFormat(image), GetImageType(image),
+                    image.OpenglExternalFormat, image.OpenglType,
                     image.Layers[curLayer].Mipmaps[mipmap].Bytes);
             }
 

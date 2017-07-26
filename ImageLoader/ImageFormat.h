@@ -9,7 +9,9 @@ struct ImageFormat
 		COMPONENT_TYPE_FLOAT
 	};
 
-	uint8_t componentSize;
-	uint8_t componentType;
-	uint8_t componentCount;
+	// RGB BGRA...
+	uint32_t openglInternalFormat;
+	uint32_t openglExternalFormat;
+	// UNSIGNED_BYTE UNSIGNED_SHORT
+	uint32_t openglType;
 };

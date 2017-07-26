@@ -18,7 +18,7 @@ namespace TextureViewer
         private static extern void release(int id);
 
         [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void image_info(int id, out int nComponents, out int componentSize, out bool isIntegerFormat, out int nLayers, out int nMipmaps);
+        private static extern void image_info(int id, out uint openglInternalFormat, out uint openglExternalFormat, out uint openglType, out int nLayers, out int nMipmaps);
 
         [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void image_info_mipmap(int id, int mipmap, out int width, out int height, out uint size);
@@ -86,9 +86,9 @@ namespace TextureViewer
 
         public class Image
         {
-            public readonly int NumComponents;
-            public readonly int ComponentSize;
-            public readonly bool IsIntegerFormat;
+            public readonly uint OpenglInternalFormat;
+            public readonly uint OpenglExternalFormat;
+            public readonly uint OpenglType;
             public readonly List<Layer> Layers;
             public readonly string Filename;
 
@@ -98,7 +98,7 @@ namespace TextureViewer
                 // load relevant information
                 int nLayer;
                 int nMipmaps;
-                image_info(resource.Id, out NumComponents, out ComponentSize, out IsIntegerFormat, out nLayer, out nMipmaps);
+                image_info(resource.Id, out OpenglInternalFormat, out OpenglExternalFormat, out OpenglType, out nLayer, out nMipmaps);
                 Layers = new List<Layer>(nLayer);
                 for (int curLayer = 0; curLayer < nLayer; ++curLayer)
                 {
