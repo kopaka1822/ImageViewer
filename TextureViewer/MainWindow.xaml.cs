@@ -192,5 +192,19 @@ namespace TextureViewer
         {
             parent.SetActiveWindow(this);
         }
+
+        private void OpenGlControl_OnDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                
+                // TODO add file to current window if definitions match
+                if (files != null)
+                    foreach (var file in files)
+                        parent.SpawnWindow(file);
+            }
+
+        }
     }
 }

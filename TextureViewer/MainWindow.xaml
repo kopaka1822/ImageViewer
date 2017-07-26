@@ -38,7 +38,9 @@
                                RenderContextType="FBO"
                                OpenGLInitialized="OpenGLControl_OnOpenGLInitialized"
                                MouseMove="OpenGlControl_OnMouseMove"
-                               MouseWheel="OpenGlControl_OnMouseWheel"/>
+                               MouseWheel="OpenGlControl_OnMouseWheel"
+                               AllowDrop="True"
+                               Drop="OpenGlControl_OnDrop"/>
        
     </DockPanel>
 </Window>
