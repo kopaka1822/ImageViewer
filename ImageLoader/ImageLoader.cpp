@@ -3,6 +3,7 @@
 #include <memory>
 #include "ImageResource.h"
 #include "stb_loader.h"
+#include "gli_loader.h"
 
 int add(int a, int b)
 {
@@ -17,7 +18,11 @@ int open(const char* filename)
 	// try loading the resource
 	auto res = stb_load(filename);
 	if (!res) // TODO set error
-		return 0;
+	{
+		res = gli_load(filename);
+		if (!res)
+			return 0;
+	}
 
 	int id = s_currentID++;
 	s_resources[id] = move(res);
