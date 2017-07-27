@@ -39,6 +39,7 @@ namespace TextureViewer
             MipMapList.Items.Clear();
             foreach(var item in window.GenerateMipMapItems())
                 MipMapList.Items.Add(item);
+            MipMapList.SelectedIndex = (int)window.Context.ActiveMipmap;
         }
 
         private void MipMapWindow_OnClosing(object sender, CancelEventArgs e)
@@ -47,5 +48,11 @@ namespace TextureViewer
             parent.CloseDialog(App.UniqueDialog.Mipmaps);
         }
 
+        private void MipMapList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (parent.GetActiveWindow() == null)
+                return;
+            parent.GetActiveWindow().Context.ActiveMipmap = (uint)MipMapList.SelectedIndex;
+        }
     }
 }

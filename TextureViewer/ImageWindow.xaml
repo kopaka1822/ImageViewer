@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TextureViewer"
         mc:Ignorable="d"
-        Title="ImageWindow" Height="300" Width="200"
+        Title="ImageWindow" Height="320" Width="200"
         ResizeMode="NoResize" Background="#eee"
         Closing="ImageWindow_OnClosing">
     <StackPanel>

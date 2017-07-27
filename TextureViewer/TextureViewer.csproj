@@ -59,6 +59,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="glhelper\utility.cs" />
+    <Compile Include="ImageView\Context.cs" />
     <Compile Include="ImageView\EmptyView.cs" />
     <Compile Include="ImageView\IImageView.cs" />
     <Compile Include="ImageView\SingleView.cs" />

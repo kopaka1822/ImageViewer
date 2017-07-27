@@ -15,7 +15,8 @@
             <TextBlock Text="Mipmap:" Margin="0 0 0 2"/>
             <ListBox SelectedIndex="0" x:Name="MipMapList"
                      ScrollViewer.VerticalScrollBarVisibility="Visible"
-                     MinHeight="240" MaxHeight="240"/>
+                     MinHeight="240" MaxHeight="240"
+                     SelectionChanged="MipMapList_OnSelectionChanged"/>
         </StackPanel>
     </Border>
 </Window>

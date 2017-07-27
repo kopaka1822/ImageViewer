@@ -29,7 +29,7 @@ namespace TextureViewer
     public partial class MainWindow : Window
     {
         private readonly App parent;
-        public ImageLoaderWrapper.Image Image { get; private set; }
+        public Context Context { get; private set; }
         public ulong ZIndex { get; set; }
 
         private String errorMessage = "";
@@ -39,42 +39,38 @@ namespace TextureViewer
         // mouse tracking
         private Point mousePosition = new Point();
 
-        public MainWindow(App parent, ImageLoaderWrapper.Image file)
+        public MainWindow(App parent, Context context)
         {
             this.parent = parent;
-            this.Image = file;
+            this.Context = context;
             this.ZIndex = 0;
 
             InitializeComponent();
             
-            if (file == null)
+            if (Context.GetImages().Count == 0)
                 currentView = new EmptyView();
             else
                 currentView = new SingleView();
 
-            this.Title = getWindowName(file);
+            this.Title = getWindowName(null);
         }
 
         public ListBoxItem[] GenerateMipMapItems()
         {
-            if(Image == null)
-                return new ListBoxItem[0];
 
-            var items = new ListBoxItem[Image.GetNumMipmaps()];
+            var items = new ListBoxItem[Context.GetNumMipmaps()];
             // generate mip map previews
-            for (int curMipmap = 0; curMipmap < Image.GetNumMipmaps(); ++curMipmap)
+            for (int curMipmap = 0; curMipmap < Context.GetNumMipmaps(); ++curMipmap)
             {
-                items[curMipmap] = new ListBoxItem {Content = Image.GetWidth(curMipmap).ToString() + "x" + Image.GetHeight(curMipmap).ToString()};
+                items[curMipmap] = new ListBoxItem {Content = Context.GetWidth(curMipmap).ToString() + "x" + Context.GetHeight(curMipmap).ToString()};
             }
             return items;
         }
 
         public ListBoxItem[] GenerateLayerItems()
         {
-            if(Image == null)
-                return new ListBoxItem[0];
-            var items = new ListBoxItem[Image.Layers.Count];
-            for (int curLayer = 0; curLayer < Image.Layers.Count; ++curLayer)
+            var items = new ListBoxItem[Context.GetNumLayers()];
+            for (int curLayer = 0; curLayer < Context.GetNumLayers(); ++curLayer)
             {
                 items[curLayer] = new ListBoxItem{Content = "Layer " + curLayer};
             }
@@ -221,7 +217,7 @@ namespace TextureViewer
 
             if (ofd.ShowDialog(this) == true)
             {
-                if (Image == null)
+                if (Context.GetNumImages() == 0)
                 {
                     // TODO reinit window instead of closing
                     parent.SpawnWindow(ofd.FileName);

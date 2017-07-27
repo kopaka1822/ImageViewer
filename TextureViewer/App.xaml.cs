@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using TextureViewer.ImageView;
 
 
 namespace TextureViewer
@@ -55,7 +56,7 @@ namespace TextureViewer
                 {
                     var image = ImageLoaderWrapper.LoadImage(filename);
 
-                    var wnd = new MainWindow(this, image);
+                    var wnd = new MainWindow(this, new Context(image));
                     activeWindow = wnd;
                     openWindows.Add(wnd);
 
@@ -72,7 +73,7 @@ namespace TextureViewer
             if (openWindows.Count == 0)
             {
                 // spawn empty window
-                var wnd = new MainWindow(this, null);
+                var wnd = new MainWindow(this, new Context());
                 activeWindow = wnd;
                 openWindows.Add(wnd);
                 
@@ -178,6 +179,11 @@ namespace TextureViewer
 
             foreach (var w in uniqueDialogs)
                 w.Value.Topmost = topmost;
+        }
+
+        public MainWindow GetActiveWindow()
+        {
+            return activeWindow;
         }
 
         protected override void OnExit(ExitEventArgs e)

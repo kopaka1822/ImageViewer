@@ -12,32 +12,69 @@ namespace TextureViewer.ImageView
 {
     class SingleView : IImageView
     {
+        private class ImageData
+        {
+            private readonly ImageLoaderWrapper.Image image;
+            // textures[0] = Layers with mipmap 0
+            private List<TextureArray2D> textures;
+            public ImageData(ImageLoaderWrapper.Image image)
+            {
+                this.image = image;
+            }
+
+            public void Init(OpenGL gl)
+            {
+                if (textures == null)
+                {
+                    textures = new List<TextureArray2D>(image.GetNumMipmaps());
+                    for (int mipmap = 0; mipmap < image.GetNumMipmaps(); ++mipmap)
+                    {
+                        textures.Add(new TextureArray2D(gl, image, mipmap));
+                    }
+                }
+            }
+
+            public void Bind(uint slot, Context context)
+            {
+                textures[(int) context.ActiveMipmap].Bind(slot);
+            }
+        }
+
         private OpenGL gl;
         private ShaderProgram program;
-        private TextureArray2D texture;
         private MainWindow parent;
-        private int curMipmap;
         private Vector curTranslation = new Vector(0.0, 0.0);
         private double curScale = 1.0;
+        private List<ImageData> textures = new List<ImageData>();
 
         public void Init(OpenGL gl, MainWindow parent)
         {
             this.gl = gl;
             this.parent = parent;
-            this.curMipmap = 0;
 
             LoadShader();
-            // TODO load all layer
-            texture = new TextureArray2D(gl, parent.Image, 0);
+
+            for(int i = 0; i < parent.Context.GetNumImages(); ++i)
+                textures.Add(new ImageData(parent.Context.GetImages()[i]));
         }
 
         public void Draw()
         {
+            // init all images which are not initialized yet
+            foreach (var imageData in textures)
+            {
+                imageData.Init(gl);
+            }
+
             program.Push(gl, null);
             Utility.GlCheck(gl);
 
-            texture.Bind(0);
-            Utility.GlCheck(gl);
+            // TODO select correct layer in shader
+            for (uint texture = 0; texture < textures.Count; ++texture)
+            {
+                textures[(int) texture].Bind(texture, parent.Context);
+                Utility.GlCheck(gl);
+            }
 
             ApplyAspectRatio();
             ApplyScale();
@@ -87,8 +124,8 @@ namespace TextureViewer.ImageView
 
         private void ApplyAspectRatio()
         {
-            gl.Scale((float)parent.Image.GetWidth(curMipmap) / (float)parent.GetClientWidth(),
-                (float)parent.Image.GetHeight(curMipmap) / (float)parent.GetClientHeight(), 1.0f);
+            gl.Scale((float)parent.Context.GetWidth((int) parent.Context.ActiveMipmap) / (float)parent.GetClientWidth(),
+                (float)parent.Context.GetHeight((int)parent.Context.ActiveMipmap) / (float)parent.GetClientHeight(), 1.0f);
         }
 
         private void ApplyTranslation()
@@ -114,14 +151,14 @@ namespace TextureViewer.ImageView
 
         public void SetImageFilter(uint glImageFilter)
         {
-            texture.FilterMode = glImageFilter;
+            // TODO
         }
 
         private Vector WindowToClient(Vector vec)
         {
             return new Vector(
-                vec.X * 2.0 / parent.Image.GetWidth(curMipmap) / curScale,
-                -vec.Y * 2.0 / parent.Image.GetHeight(curMipmap) / curScale
+                vec.X * 2.0 / parent.Context.GetWidth((int) parent.Context.ActiveMipmap) / curScale,
+                -vec.Y * 2.0 / parent.Context.GetHeight((int)parent.Context.ActiveMipmap) / curScale
                 );
         }
     }
