@@ -15,11 +15,21 @@ namespace TextureViewer.ImageView
 
     public class Context
     {
+        public enum GrayscaleMode
+        {
+            Disabled,
+            Red,
+            Green,
+            Blue,
+            Alpha
+        }
+
         private readonly List<ImageLoaderWrapper.Image> images = new List<ImageLoaderWrapper.Image>();
         private uint activeMipmap = 0;
         private uint activeLayer = 0;
 
         public bool LinearInterpolation { get; set; } = true;
+        public GrayscaleMode Grayscale { get; set; } = GrayscaleMode.Disabled;
 
         public uint ActiveMipmap
         {

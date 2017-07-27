@@ -22,16 +22,23 @@
                 <MenuItem Header="_Export"/>
             </MenuItem>
             <MenuItem Header="_View">
-                <MenuItem Header="_Tool Windows">
-                    <MenuItem Header="Mipmaps" Click="MenuItem_Click_Mipmaps" />
-                    <MenuItem Header="Layers" Click="MenuItem_Click_Layers"/>
-                    <MenuItem Header="Images" Click="MenuItem_Click_Images"/>
-                    <MenuItem Header="Tone Mapping"/>
-                    <MenuItem Header="Manipulation"/>
-                </MenuItem>
                 <MenuItem Header="3D View"/>
                 <MenuItem Header="3D Dice"/>
                 <MenuItem Header="Linear Interpolation" x:Name="MenuItemLinearInterpolation" IsCheckable="True" IsChecked="True" Click="MenuItem_OnChecked_LinearFiltering"/>
+                <MenuItem Header="Grayscale">
+                    <MenuItem Header="Disabled" x:Name="MenuItemGrayscaleDisabled" IsChecked="True" Click="MenuItemGrayscale_OnChecked"/>
+                    <MenuItem Header="Red" x:Name="MenuItemGrayscaleRed" IsCheckable="True" Click="MenuItemGrayscale_OnChecked"/>
+                    <MenuItem Header="Green" x:Name="MenuItemGrayscaleGreen" IsCheckable="True" Click="MenuItemGrayscale_OnChecked"/>
+                    <MenuItem Header="Blue" x:Name="MenuItemGrayscaleBlue" IsCheckable="True" Click="MenuItemGrayscale_OnChecked"/>
+                    <MenuItem Header="Alpha" x:Name="MenuItemGrayscaleAlpha" IsCheckable="True" Click="MenuItemGrayscale_OnChecked"/>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Windows">
+                <MenuItem Header="Mipmaps" Click="MenuItem_Click_Mipmaps" />
+                <MenuItem Header="Layers" Click="MenuItem_Click_Layers"/>
+                <MenuItem Header="Images" Click="MenuItem_Click_Images"/>
+                <MenuItem Header="Tone Mapping"/>
+                <MenuItem Header="Manipulation"/>
             </MenuItem>
         </Menu>
         

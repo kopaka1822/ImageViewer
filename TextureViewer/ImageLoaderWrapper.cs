@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using SharpGL;
 
 namespace TextureViewer
 {
@@ -129,6 +130,21 @@ namespace TextureViewer
                 if (Layers.Count > 0)
                     return Layers[0].Mipmaps.Count;
                 return 0;
+            }
+
+            public bool IsGrayscale()
+            {
+                switch (OpenglExternalFormat)
+                {
+                    case OpenGL.GL_RED:
+                    case OpenGL.GL_RED_INTEGER:
+                    case OpenGL.GL_DEPTH_COMPONENT:
+                    case OpenGL.GL_LUMINANCE:
+                    case OpenGL.GL_ALPHA:
+                    case OpenGL.GL_LUMINANCE_ALPHA:
+                        return true;
+                }
+                return false;
             }
         }
 

@@ -21,6 +21,7 @@ namespace TextureViewer.ImageView.Shader
         // uniform locations
         private int uniformModelMatrix;
         private int uniformCurrentLayer;
+        private int uniformGrayscale;
         private List<int> uniformTextures = new List<int>();
 
         public Shader(Context context)
@@ -74,6 +75,7 @@ namespace TextureViewer.ImageView.Shader
             program.Push(gl, null);
             gl.UniformMatrix4(uniformModelMatrix, 1, false, tranform.AsColumnMajorArrayFloat);
             gl.Uniform1(uniformCurrentLayer, context.ActiveLayer);
+            gl.Uniform1(uniformGrayscale, (uint)context.Grayscale);
 
             Utility.GlCheck(gl);
         }
@@ -84,6 +86,7 @@ namespace TextureViewer.ImageView.Shader
 
             uniformCurrentLayer = gl.GetUniformLocation(program.ProgramObject, "currentLayer");
 
+            uniformGrayscale = gl.GetUniformLocation(program.ProgramObject, "grayscale");
             // locate texture uniforms
             uniformTextures.Clear();
 
@@ -110,7 +113,8 @@ namespace TextureViewer.ImageView.Shader
 
         protected string GetUniforms()
         {
-            return "uniform uint currentLayer;\n";
+            return "uniform uint currentLayer;\n" +
+                "uniform uint grayscale;\n";
         }
 
         protected string GetTextures(string type)
@@ -148,7 +152,14 @@ namespace TextureViewer.ImageView.Shader
 
         protected string GetMain()
         {
-            return "void main(){\n" + "fragColor = GetFinalColor();\n" + "}";
+            return "void main(){\n" + 
+                "vec4 color = GetFinalColor();\n" + 
+                "if(grayscale == uint(1)) color = color.rrrr;\n" +
+                "else if(grayscale == uint(2)) color = color.gggg;\n" +
+                "else if(grayscale == uint(3)) color = color.bbbb;\n" +
+                "else if(grayscale == uint(4)) color = color.aaaa;\n" +
+                "fragColor = color;\n" +
+                "}";
         }
 
         protected string GetVertexShaderCode()

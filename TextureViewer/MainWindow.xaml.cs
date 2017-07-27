@@ -53,6 +53,13 @@ namespace TextureViewer
                 currentView = new SingleView();
 
             this.Title = getWindowName(null);
+
+            if (Context.GetNumImages() == 1 && Context.GetImages()[0].IsGrayscale())
+            {
+                // send click event for red (grayscale with first component)
+                MenuItemGrayscaleRed.IsChecked = true;
+                UpdateGrayscale(MenuItemGrayscaleRed);
+            }
         }
 
 
@@ -278,5 +285,72 @@ namespace TextureViewer
         }
 
 #endregion
+
+        private void MenuItemGrayscale_OnChecked(object sender, RoutedEventArgs e)
+        {
+            UpdateGrayscale(e.Source);
+        }
+
+        private void UpdateGrayscale(object sender)
+        {
+            MenuItemGrayscaleDisabled.IsCheckable = true;
+            MenuItemGrayscaleRed.IsCheckable = true;
+            MenuItemGrayscaleGreen.IsCheckable = true;
+            MenuItemGrayscaleBlue.IsCheckable = true;
+            MenuItemGrayscaleAlpha.IsCheckable = true;
+
+            // Determine which was checked.
+            if (Equals(sender, MenuItemGrayscaleDisabled))
+            {
+                MenuItemGrayscaleDisabled.IsCheckable = false;
+                MenuItemGrayscaleRed.IsChecked = false;
+                MenuItemGrayscaleGreen.IsChecked = false;
+                MenuItemGrayscaleBlue.IsChecked = false;
+                MenuItemGrayscaleAlpha.IsChecked = false;
+            }
+            else if (Equals(sender, MenuItemGrayscaleRed))
+            {
+                MenuItemGrayscaleRed.IsCheckable = false;
+                MenuItemGrayscaleDisabled.IsChecked = false;
+                MenuItemGrayscaleGreen.IsChecked = false;
+                MenuItemGrayscaleBlue.IsChecked = false;
+                MenuItemGrayscaleAlpha.IsChecked = false;
+            }
+            else if (Equals(sender, MenuItemGrayscaleGreen))
+            {
+                MenuItemGrayscaleGreen.IsCheckable = false;
+                MenuItemGrayscaleRed.IsChecked = false;
+                MenuItemGrayscaleDisabled.IsChecked = false;
+                MenuItemGrayscaleBlue.IsChecked = false;
+                MenuItemGrayscaleAlpha.IsChecked = false;
+            }
+            else if (Equals(sender, MenuItemGrayscaleBlue))
+            {
+                MenuItemGrayscaleBlue.IsCheckable = false;
+                MenuItemGrayscaleRed.IsChecked = false;
+                MenuItemGrayscaleGreen.IsChecked = false;
+                MenuItemGrayscaleDisabled.IsChecked = false;
+                MenuItemGrayscaleAlpha.IsChecked = false;
+            }
+            else if (Equals(sender, MenuItemGrayscaleAlpha))
+            {
+                MenuItemGrayscaleAlpha.IsCheckable = false;
+                MenuItemGrayscaleRed.IsChecked = false;
+                MenuItemGrayscaleGreen.IsChecked = false;
+                MenuItemGrayscaleBlue.IsChecked = false;
+                MenuItemGrayscaleDisabled.IsChecked = false;
+            }
+
+            if (MenuItemGrayscaleDisabled.IsChecked)
+                Context.Grayscale = Context.GrayscaleMode.Disabled;
+            else if (MenuItemGrayscaleRed.IsChecked)
+                Context.Grayscale = Context.GrayscaleMode.Red;
+            else if (MenuItemGrayscaleGreen.IsChecked)
+                Context.Grayscale = Context.GrayscaleMode.Green;
+            else if (MenuItemGrayscaleBlue.IsChecked)
+                Context.Grayscale = Context.GrayscaleMode.Blue;
+            else if (MenuItemGrayscaleAlpha.IsChecked)
+                Context.Grayscale = Context.GrayscaleMode.Alpha;
+        }
     }
 }
