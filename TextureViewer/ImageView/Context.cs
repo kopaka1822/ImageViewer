@@ -39,7 +39,7 @@ namespace TextureViewer.ImageView
             get { return activeLayer; }
             set
             {
-                if (value != activeLayer)
+                if (value != activeLayer && value < GetNumLayers())
                 {
                     activeLayer = value;
                     OnChangedLayer();

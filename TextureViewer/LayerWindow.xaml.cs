@@ -41,6 +41,14 @@ namespace TextureViewer
             LayerList.Items.Clear();
             foreach (var item in window.GenerateLayerItems())
                 LayerList.Items.Add(item);
+            LayerList.SelectedIndex = (int) window.Context.ActiveLayer;
+        }
+
+        private void LayerList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (parent.GetActiveWindow() == null)
+                return;
+            parent.GetActiveWindow().Context.ActiveLayer = (uint) LayerList.SelectedIndex;
         }
     }
 }
