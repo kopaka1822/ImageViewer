@@ -155,10 +155,14 @@ namespace TextureViewer
             return "Texture Viewer - " + image.Filename;
         }
 
+#region OpenGL Control Mouse Interaction
+
+        private bool mouseDown = false;
+
         private void OpenGlControl_OnMouseMove(object sender, MouseEventArgs e)
         {
             var newPosition = e.GetPosition(this.OpenGlControl);
-            if (e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed)
+            if (mouseDown)
             {
                 // drag event
                 var diff = newPosition - mousePosition;
@@ -169,10 +173,29 @@ namespace TextureViewer
             mousePosition = newPosition;
         }
 
+        private void OpenGlControl_OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            mouseDown = e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed;
+            mousePosition = e.GetPosition(this.OpenGlControl);
+        }
+
+        private void OpenGlControl_OnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            mouseDown = e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed;
+            mousePosition = e.GetPosition(this.OpenGlControl);
+        }
+
+        private void OpenGlControl_OnMouseLeave(object sender, MouseEventArgs e)
+        {
+            mouseDown = false;
+        }
+
         private void OpenGlControl_OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
             currentView.OnScroll((double)e.Delta, e.GetPosition(OpenGlControl));
         }
+
+#endregion
 
         public int GetClientWidth()
         {
@@ -233,5 +256,7 @@ namespace TextureViewer
         {
             parent.OpenDialog(App.UniqueDialog.Image);
         }
+
+
     }
 }

@@ -41,6 +41,9 @@
                                OpenGLInitialized="OpenGLControl_OnOpenGLInitialized"
                                MouseMove="OpenGlControl_OnMouseMove"
                                MouseWheel="OpenGlControl_OnMouseWheel"
+                               MouseDown="OpenGlControl_OnMouseDown"
+                               MouseUp="OpenGlControl_OnMouseUp"
+                               MouseLeave="OpenGlControl_OnMouseLeave"
                                AllowDrop="True"
                                Drop="OpenGlControl_OnDrop"/>
        
