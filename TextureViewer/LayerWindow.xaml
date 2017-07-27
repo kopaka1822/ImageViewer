@@ -20,7 +20,9 @@
                 </ComboBox>
                 
                 <TextBlock Text="Layer:" Margin="0 0 0 2"/>
-                <ListBox SelectedIndex="0" x:Name="LayerList"/>
+                <ListBox SelectedIndex="0" x:Name="LayerList"
+                         ScrollViewer.VerticalScrollBarVisibility="Visible"                       
+                         MinHeight="180" MaxHeight="180"/>
 
             </StackPanel>
         </Border>
