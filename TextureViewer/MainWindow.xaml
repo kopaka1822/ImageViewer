@@ -25,6 +25,7 @@
                 <MenuItem Header="_Tool Windows">
                     <MenuItem Header="Mipmaps" Click="MenuItem_Click_Mipmaps" />
                     <MenuItem Header="Layers" Click="MenuItem_Click_Layers"/>
+                    <MenuItem Header="Images" Click="MenuItem_Click_Images"/>
                     <MenuItem Header="Tone Mapping"/>
                     <MenuItem Header="Manipulation"/>
                 </MenuItem>

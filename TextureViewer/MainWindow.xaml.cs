@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -134,12 +135,12 @@ namespace TextureViewer
 
         private void MenuItem_Click_Mipmaps(object sender, RoutedEventArgs e)
         {
-            parent.OpenMipMapWindow();
+            parent.OpenDialog(App.UniqueDialog.Mipmaps);
         }
 
         private void MenuItem_Click_Layers(object sender, RoutedEventArgs e)
         {
-            parent.OpenLayerWindow();
+            parent.OpenDialog(App.UniqueDialog.Layer);
         }
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
@@ -221,6 +222,16 @@ namespace TextureViewer
         private void MainWindow_OnDeactivated(object sender, EventArgs e)
         {
             parent.UpdateDialogVisibility();
+        }
+
+        public ListBoxItem[] GenerateImageItems()
+        {
+            return new ListBoxItem[0];
+        }
+
+        private void MenuItem_Click_Images(object sender, RoutedEventArgs e)
+        {
+            parent.OpenDialog(App.UniqueDialog.Image);
         }
     }
 }

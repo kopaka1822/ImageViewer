@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
+
 namespace TextureViewer
 {
     /// <summary>
@@ -13,10 +14,19 @@ namespace TextureViewer
     /// </summary>
     public partial class App : Application
     {
+        public enum UniqueDialog
+        {
+            Layer,
+            Mipmaps,
+            Image
+        }
+
+
         private List<MainWindow> openWindows = new List<MainWindow>();
+        
         private MainWindow activeWindow = null; // the last window that was active
-        private LayerWindow layerWindow = null;
-        private MipMapWindow mipMapWindow = null;
+        private Dictionary<UniqueDialog, Window> uniqueDialogs = new Dictionary<UniqueDialog, Window>();
+
         private ulong lastZIndex = 1;
 
         protected override void OnStartup(StartupEventArgs e)
@@ -94,45 +104,46 @@ namespace TextureViewer
             }
         }
 
-        public void OpenLayerWindow()
+        public void OpenDialog(UniqueDialog dialog)
         {
-            if (layerWindow == null)
+            Window window;
+            if (!uniqueDialogs.TryGetValue(dialog, out window))
             {
-                layerWindow = new LayerWindow(this);
-                layerWindow.UpdateContent(activeWindow);
-                layerWindow.Show();
+                // add dialog
+                switch (dialog)
+                {
+                    case UniqueDialog.Layer:
+                        window = new LayerWindow(this);
+                        break;
+                    case UniqueDialog.Mipmaps:
+                        window = new MipMapWindow(this);
+                        break;
+                    case UniqueDialog.Image:
+                        window = new ImageWindow(this);
+                        break;
+                }
+                IUniqueDialog dia = (IUniqueDialog) window;
+                dia?.UpdateContent(activeWindow);
+                window?.Show();
+                
+                if(window != null)
+                    uniqueDialogs.Add(dialog, window);
             }
-            layerWindow.Focus();
+            window?.Focus();
         }
 
-        public void OpenMipMapWindow()
+        public void CloseDialog(UniqueDialog dialog)
         {
-            if (mipMapWindow == null)
+            Window window;
+            if (uniqueDialogs.TryGetValue(dialog, out window))
             {
-                mipMapWindow = new MipMapWindow(this);
-                mipMapWindow.UpdateContent(activeWindow);
-                mipMapWindow.Show();
-            }
-            mipMapWindow.Focus();
-        }
-
-        public void CloseLayerWindow()
-        {
-            if (layerWindow != null)
-            {
-                if(!layerWindow.IsClosing)
-                    layerWindow.Close();
-                layerWindow = null;
-            }
-        }
-
-        public void CloseMipMapWindow()
-        {
-            if (mipMapWindow != null)
-            {
-                if(!mipMapWindow.IsClosing)
-                    mipMapWindow.Close();
-                mipMapWindow = null;
+                IUniqueDialog dia = window as IUniqueDialog;
+                if (dia != null)
+                {
+                    if(!dia.IsClosing)
+                        window.Close();
+                }
+                uniqueDialogs.Remove(dialog);
             }
         }
 
@@ -144,30 +155,29 @@ namespace TextureViewer
             window.ZIndex = lastZIndex++;
 
             // refresh dialogs
-            mipMapWindow?.UpdateContent(activeWindow);
-            layerWindow?.UpdateContent(activeWindow);
+            foreach (var w in uniqueDialogs)
+            {
+                IUniqueDialog dia = w.Value as IUniqueDialog;
+                dia?.UpdateContent(activeWindow);
+            }
 
             UpdateDialogVisibility();
         }
 
         public void UpdateDialogVisibility()
         {
+            bool topmost = false;
             foreach (var openWindow in openWindows)
             {
                 if (openWindow.IsActive)
                 {
-                    if (layerWindow != null)
-                        layerWindow.Topmost = true;
-                    if (mipMapWindow != null)
-                        mipMapWindow.Topmost = true;
-                    return;
+                    topmost = true;
+                    break;
                 }
             }
-            // disable topmost
-            if(layerWindow != null)
-                layerWindow.Topmost = false;
-            if(mipMapWindow != null)
-                mipMapWindow.Topmost = false;
+
+            foreach (var w in uniqueDialogs)
+                w.Value.Topmost = topmost;
         }
 
         protected override void OnExit(ExitEventArgs e)

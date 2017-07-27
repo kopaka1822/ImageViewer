@@ -18,10 +18,10 @@ namespace TextureViewer
     /// <summary>
     /// Interaction logic for LayerWindow.xaml
     /// </summary>
-    public partial class LayerWindow : Window
+    public partial class LayerWindow : Window, IUniqueDialog
     {
-        public bool IsClosing { get; private set; }
-        private App parent;
+        public bool IsClosing { get; set; }
+        private readonly App parent;
 
         public LayerWindow(App parent)
         {
@@ -33,7 +33,7 @@ namespace TextureViewer
         private void LayerWindow_OnClosing(object sender, CancelEventArgs e)
         {
             IsClosing = true;
-            parent.CloseLayerWindow();
+            parent.CloseDialog(App.UniqueDialog.Layer);
         }
 
         public void UpdateContent(MainWindow window)

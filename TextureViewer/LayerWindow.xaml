@@ -8,23 +8,22 @@
         Title="Layer" Height="300" Width="200"
         ResizeMode="NoResize" Background="#eee"
         Closing="LayerWindow_OnClosing">
-    <Grid>
-        <Border Padding="5">
-            <StackPanel>
-                <!-- Mode Selector -->    
-                <TextBlock Text="Mode:" Margin="0 0 0 2"/>
-                <ComboBox SelectedIndex="0" Margin="0 0 0 10">
-                    <ComboBoxItem>Single</ComboBoxItem>
-                    <ComboBoxItem>3D View</ComboBoxItem>
-                    <ComboBoxItem>Dice View</ComboBoxItem>
-                </ComboBox>
-                
-                <TextBlock Text="Layer:" Margin="0 0 0 2"/>
-                <ListBox SelectedIndex="0" x:Name="LayerList"
-                         ScrollViewer.VerticalScrollBarVisibility="Visible"                       
-                         MinHeight="180" MaxHeight="180"/>
 
-            </StackPanel>
-        </Border>
-    </Grid>
+    <Border Padding="5">
+        <StackPanel>
+            <!-- Mode Selector -->
+            <TextBlock Text="Mode:" Margin="0 0 0 2"/>
+            <ComboBox SelectedIndex="0" Margin="0 0 0 10">
+                <ComboBoxItem>Single</ComboBoxItem>
+                <ComboBoxItem>3D View</ComboBoxItem>
+                <ComboBoxItem>Dice View</ComboBoxItem>
+            </ComboBox>
+
+            <TextBlock Text="Layer:" Margin="0 0 0 2"/>
+            <ListBox SelectedIndex="0" x:Name="LayerList"
+                        ScrollViewer.VerticalScrollBarVisibility="Visible"                       
+                        MinHeight="180" MaxHeight="180"/>
+
+        </StackPanel>
+    </Border>
 </Window>

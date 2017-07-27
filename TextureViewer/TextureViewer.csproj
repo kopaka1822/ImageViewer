@@ -63,12 +63,20 @@
     <Compile Include="ImageView\IImageView.cs" />
     <Compile Include="ImageView\SingleView.cs" />
     <Compile Include="ImageView\Views.cs" />
+    <Compile Include="ImageWindow.xaml.cs">
+      <DependentUpon>ImageWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LayerWindow.xaml.cs">
       <DependentUpon>LayerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MipMapWindow.xaml.cs">
       <DependentUpon>MipMapWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UniqueDialog.cs" />
+    <Page Include="ImageWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LayerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

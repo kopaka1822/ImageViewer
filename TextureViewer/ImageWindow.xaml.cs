@@ -16,36 +16,32 @@ using System.Windows.Shapes;
 namespace TextureViewer
 {
     /// <summary>
-    /// Interaction logic for MipMapWindow.xaml
+    /// Interaction logic for ImageWindow.xaml
     /// </summary>
-    public partial class MipMapWindow : Window, IUniqueDialog
+    public partial class ImageWindow : Window, IUniqueDialog
     {
         private readonly App parent;
         public bool IsClosing { get; set; }
 
-        public MipMapWindow(App parent)
+        public ImageWindow(App parent)
         {
             this.parent = parent;
             IsClosing = false;
             InitializeComponent();
         }
 
-        /// <summary>
-        /// Updates content of this window depending on the passed window
-        /// </summary>
-        /// <param name="window"></param>
+
         public void UpdateContent(MainWindow window)
         {
-            MipMapList.Items.Clear();
-            foreach(var item in window.GenerateMipMapItems())
-                MipMapList.Items.Add(item);
+            ImageList.Items.Clear();
+            foreach (var item in window.GenerateImageItems())
+                ImageList.Items.Add(item);
         }
 
-        private void MipMapWindow_OnClosing(object sender, CancelEventArgs e)
+        private void ImageWindow_OnClosing(object sender, CancelEventArgs e)
         {
             IsClosing = true;
-            parent.CloseDialog(App.UniqueDialog.Mipmaps);
+            parent.CloseDialog(App.UniqueDialog.Image);
         }
-
     }
 }
