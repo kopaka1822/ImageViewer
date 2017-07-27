@@ -220,12 +220,14 @@
     <ClInclude Include="ImageLoader.h" />
     <ClInclude Include="ImageMipmap.h" />
     <ClInclude Include="ImageResource.h" />
+    <ClInclude Include="Pfm.h" />
     <ClInclude Include="stb_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gli_loader.cpp" />
     <ClCompile Include="ImageLoader.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Pfm.cpp" />
     <ClCompile Include="stb_loader.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

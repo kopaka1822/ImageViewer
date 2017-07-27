@@ -48,6 +48,9 @@
     <ClInclude Include="gli_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Pfm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImageLoader.cpp">
@@ -60,6 +63,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Pfm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

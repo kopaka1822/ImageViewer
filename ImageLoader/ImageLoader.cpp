@@ -4,6 +4,7 @@
 #include "ImageResource.h"
 #include "stb_loader.h"
 #include "gli_loader.h"
+#include "Pfm.h"
 
 int add(int a, int b)
 {
@@ -21,7 +22,11 @@ int open(const char* filename)
 	{
 		res = gli_load(filename);
 		if (!res)
-			return 0;
+		{
+			res = pfm_load(filename);
+			if (!res)
+				return 0;
+		}
 	}
 
 	int id = s_currentID++;
