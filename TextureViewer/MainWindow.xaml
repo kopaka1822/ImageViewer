@@ -16,7 +16,7 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="#fff" Padding="0 0 0 2">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open" Click="OpenFile_OnClick"/>
+                <MenuItem Header="_Open" Click="MenuItem_Click_Open"/>
                 <MenuItem Header="_Save"/>
                 <MenuItem Header="Save As"/>
                 <MenuItem Header="_Export"/>
@@ -31,7 +31,7 @@
                 </MenuItem>
                 <MenuItem Header="3D View"/>
                 <MenuItem Header="3D Dice"/>
-                <MenuItem Header="Linear Interpolation" x:Name="MenuItemLinearInterpolation" IsCheckable="True" IsChecked="True" Click="LinearFiltering_OnChecked"/>
+                <MenuItem Header="Linear Interpolation" x:Name="MenuItemLinearInterpolation" IsCheckable="True" IsChecked="True" Click="MenuItem_OnChecked_LinearFiltering"/>
             </MenuItem>
         </Menu>
         

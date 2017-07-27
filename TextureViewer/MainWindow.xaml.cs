@@ -55,27 +55,9 @@ namespace TextureViewer
             this.Title = getWindowName(null);
         }
 
-        public ListBoxItem[] GenerateMipMapItems()
-        {
 
-            var items = new ListBoxItem[Context.GetNumMipmaps()];
-            // generate mip map previews
-            for (int curMipmap = 0; curMipmap < Context.GetNumMipmaps(); ++curMipmap)
-            {
-                items[curMipmap] = new ListBoxItem {Content = Context.GetWidth(curMipmap).ToString() + "x" + Context.GetHeight(curMipmap).ToString()};
-            }
-            return items;
-        }
 
-        public ListBoxItem[] GenerateLayerItems()
-        {
-            var items = new ListBoxItem[Context.GetNumLayers()];
-            for (int curLayer = 0; curLayer < Context.GetNumLayers(); ++curLayer)
-            {
-                items[curLayer] = new ListBoxItem{Content = "Layer " + curLayer};
-            }
-            return items;
-        }
+#region OpenGL
 
         private void OpenGLControl_OnOpenGLDraw(object sender, OpenGLEventArgs args)
         {
@@ -129,6 +111,9 @@ namespace TextureViewer
             }
         }
 
+        #endregion
+
+#region Menu Items
         private void MenuItem_Click_Mipmaps(object sender, RoutedEventArgs e)
         {
             parent.OpenDialog(App.UniqueDialog.Mipmaps);
@@ -139,17 +124,36 @@ namespace TextureViewer
             parent.OpenDialog(App.UniqueDialog.Layer);
         }
 
-        private void MainWindow_OnClosing(object sender, CancelEventArgs e)
+        private void MenuItem_OnChecked_LinearFiltering(object sender, RoutedEventArgs routedEventArgs)
         {
-            parent.UnregisterWindow(this);
+            Context.LinearInterpolation = MenuItemLinearInterpolation.IsChecked;
         }
 
-        private string getWindowName(ImageLoaderWrapper.Image image)
+        private void MenuItem_Click_Open(object sender, RoutedEventArgs e)
         {
-            if (image == null)
-                return "Texture Viewer";
-            return "Texture Viewer - " + image.Filename;
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Multiselect = false;
+
+            if (ofd.ShowDialog(this) == true)
+            {
+                if (Context.GetNumImages() == 0)
+                {
+                    // TODO reinit window instead of closing
+                    parent.SpawnWindow(ofd.FileName);
+                    this.Close();
+                }
+                else
+                {
+                    parent.SpawnWindow(ofd.FileName);
+                }
+            }
         }
+        
+        private void MenuItem_Click_Images(object sender, RoutedEventArgs e)
+        {
+            parent.OpenDialog(App.UniqueDialog.Image);
+        }
+        #endregion
 
 #region OpenGL Control Mouse Interaction
 
@@ -191,8 +195,9 @@ namespace TextureViewer
             currentView.OnScroll((double)e.Delta, e.GetPosition(OpenGlControl));
         }
 
-#endregion
+        #endregion
 
+#region OpenGL Window Interaction
         public int GetClientWidth()
         {
             return (int)OpenGlControl.ActualWidth;
@@ -203,31 +208,6 @@ namespace TextureViewer
             return (int)OpenGlControl.ActualHeight;
         }
 
-        private void LinearFiltering_OnChecked(object sender, RoutedEventArgs routedEventArgs)
-        {
-            Context.LinearInterpolation = MenuItemLinearInterpolation.IsChecked;
-        }
-
-        private void OpenFile_OnClick(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Multiselect = false;
-
-            if (ofd.ShowDialog(this) == true)
-            {
-                if (Context.GetNumImages() == 0)
-                {
-                    // TODO reinit window instead of closing
-                    parent.SpawnWindow(ofd.FileName);
-                    this.Close();
-                }
-                else
-                {
-                    parent.SpawnWindow(ofd.FileName);
-                }
-            }
-        }
-        
         private void OpenGlControl_OnDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -241,7 +221,9 @@ namespace TextureViewer
             }
 
         }
+        #endregion
 
+#region General Window Interactions
         private void MainWindow_OnActivated(object sender, EventArgs e)
         {
             parent.SetActiveWindow(this);
@@ -252,16 +234,49 @@ namespace TextureViewer
             parent.UpdateDialogVisibility();
         }
 
+        private void MainWindow_OnClosing(object sender, CancelEventArgs e)
+        {
+            parent.UnregisterWindow(this);
+        }
+
+        private string getWindowName(ImageLoaderWrapper.Image image)
+        {
+            if (image == null)
+                return "Texture Viewer";
+            return "Texture Viewer - " + image.Filename;
+        }
+
+#endregion
+
+#region Dialog Generators
+
         public ListBoxItem[] GenerateImageItems()
         {
             return new ListBoxItem[0];
         }
 
-        private void MenuItem_Click_Images(object sender, RoutedEventArgs e)
+        public ListBoxItem[] GenerateMipMapItems()
         {
-            parent.OpenDialog(App.UniqueDialog.Image);
+
+            var items = new ListBoxItem[Context.GetNumMipmaps()];
+            // generate mip map previews
+            for (int curMipmap = 0; curMipmap < Context.GetNumMipmaps(); ++curMipmap)
+            {
+                items[curMipmap] = new ListBoxItem { Content = Context.GetWidth(curMipmap).ToString() + "x" + Context.GetHeight(curMipmap).ToString() };
+            }
+            return items;
         }
 
+        public ListBoxItem[] GenerateLayerItems()
+        {
+            var items = new ListBoxItem[Context.GetNumLayers()];
+            for (int curLayer = 0; curLayer < Context.GetNumLayers(); ++curLayer)
+            {
+                items[curLayer] = new ListBoxItem { Content = "Layer " + curLayer };
+            }
+            return items;
+        }
 
+#endregion
     }
 }
