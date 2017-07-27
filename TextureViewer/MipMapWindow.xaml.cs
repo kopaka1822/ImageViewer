@@ -21,6 +21,8 @@ namespace TextureViewer
     public partial class MipMapWindow : Window, IUniqueDialog
     {
         private readonly App parent;
+        private MainWindow activeWindow;
+
         public bool IsClosing { get; set; }
 
         public MipMapWindow(App parent)
@@ -36,10 +38,26 @@ namespace TextureViewer
         /// <param name="window"></param>
         public void UpdateContent(MainWindow window)
         {
+            if (!ReferenceEquals(window, activeWindow))
+            {
+                if (activeWindow != null)
+                    activeWindow.Context.ChangedMipmap -= OnChangedMipmap;
+                if (window != null)
+                    window.Context.ChangedMipmap += OnChangedMipmap;
+            }
+
+            activeWindow = window;
             MipMapList.Items.Clear();
-            foreach(var item in window.GenerateMipMapItems())
-                MipMapList.Items.Add(item);
-            MipMapList.SelectedIndex = (int)window.Context.ActiveMipmap;
+
+            if (window != null)
+            {
+                var activeMipmap = window.Context.ActiveMipmap;
+                foreach (var item in window.GenerateMipMapItems())
+                    MipMapList.Items.Add(item);
+
+                window.Context.ActiveMipmap = activeMipmap;
+                MipMapList.SelectedIndex = (int)activeWindow.Context.ActiveMipmap;
+            }
         }
 
         private void MipMapWindow_OnClosing(object sender, CancelEventArgs e)
@@ -48,11 +66,16 @@ namespace TextureViewer
             parent.CloseDialog(App.UniqueDialog.Mipmaps);
         }
 
+        private void OnChangedMipmap(object sender, EventArgs e)
+        {
+            MipMapList.SelectedIndex = (int) activeWindow.Context.ActiveMipmap;
+        }
+
         private void MipMapList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (parent.GetActiveWindow() == null)
+            if (activeWindow == null)
                 return;
-            parent.GetActiveWindow().Context.ActiveMipmap = (uint)MipMapList.SelectedIndex;
+            activeWindow.Context.ActiveMipmap = (uint)MipMapList.SelectedIndex;
         }
     }
 }

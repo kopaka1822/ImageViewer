@@ -52,7 +52,9 @@ namespace TextureViewer
             else
                 currentView = new SingleView();
 
-            this.Title = getWindowName(null);
+            context.ChangedMipmap += (sender, args) => UpdateWindowName();
+            context.ChangedLayer += (sender, args) => UpdateWindowName();
+            UpdateWindowName();
 
             if (Context.GetNumImages() == 1 && Context.GetImages()[0].IsGrayscale())
             {
@@ -160,6 +162,74 @@ namespace TextureViewer
         {
             parent.OpenDialog(App.UniqueDialog.Image);
         }
+
+        private void MenuItemGrayscale_OnChecked(object sender, RoutedEventArgs e)
+        {
+            UpdateGrayscale(e.Source);
+        }
+
+        private void UpdateGrayscale(object sender)
+        {
+            MenuItemGrayscaleDisabled.IsCheckable = true;
+            MenuItemGrayscaleRed.IsCheckable = true;
+            MenuItemGrayscaleGreen.IsCheckable = true;
+            MenuItemGrayscaleBlue.IsCheckable = true;
+            MenuItemGrayscaleAlpha.IsCheckable = true;
+
+            // Determine which was checked.
+            if (Equals(sender, MenuItemGrayscaleDisabled))
+            {
+                MenuItemGrayscaleDisabled.IsCheckable = false;
+                MenuItemGrayscaleRed.IsChecked = false;
+                MenuItemGrayscaleGreen.IsChecked = false;
+                MenuItemGrayscaleBlue.IsChecked = false;
+                MenuItemGrayscaleAlpha.IsChecked = false;
+            }
+            else if (Equals(sender, MenuItemGrayscaleRed))
+            {
+                MenuItemGrayscaleRed.IsCheckable = false;
+                MenuItemGrayscaleDisabled.IsChecked = false;
+                MenuItemGrayscaleGreen.IsChecked = false;
+                MenuItemGrayscaleBlue.IsChecked = false;
+                MenuItemGrayscaleAlpha.IsChecked = false;
+            }
+            else if (Equals(sender, MenuItemGrayscaleGreen))
+            {
+                MenuItemGrayscaleGreen.IsCheckable = false;
+                MenuItemGrayscaleRed.IsChecked = false;
+                MenuItemGrayscaleDisabled.IsChecked = false;
+                MenuItemGrayscaleBlue.IsChecked = false;
+                MenuItemGrayscaleAlpha.IsChecked = false;
+            }
+            else if (Equals(sender, MenuItemGrayscaleBlue))
+            {
+                MenuItemGrayscaleBlue.IsCheckable = false;
+                MenuItemGrayscaleRed.IsChecked = false;
+                MenuItemGrayscaleGreen.IsChecked = false;
+                MenuItemGrayscaleDisabled.IsChecked = false;
+                MenuItemGrayscaleAlpha.IsChecked = false;
+            }
+            else if (Equals(sender, MenuItemGrayscaleAlpha))
+            {
+                MenuItemGrayscaleAlpha.IsCheckable = false;
+                MenuItemGrayscaleRed.IsChecked = false;
+                MenuItemGrayscaleGreen.IsChecked = false;
+                MenuItemGrayscaleBlue.IsChecked = false;
+                MenuItemGrayscaleDisabled.IsChecked = false;
+            }
+
+            if (MenuItemGrayscaleDisabled.IsChecked)
+                Context.Grayscale = Context.GrayscaleMode.Disabled;
+            else if (MenuItemGrayscaleRed.IsChecked)
+                Context.Grayscale = Context.GrayscaleMode.Red;
+            else if (MenuItemGrayscaleGreen.IsChecked)
+                Context.Grayscale = Context.GrayscaleMode.Green;
+            else if (MenuItemGrayscaleBlue.IsChecked)
+                Context.Grayscale = Context.GrayscaleMode.Blue;
+            else if (MenuItemGrayscaleAlpha.IsChecked)
+                Context.Grayscale = Context.GrayscaleMode.Alpha;
+        }
+
         #endregion
 
 #region OpenGL Control Mouse Interaction
@@ -246,14 +316,30 @@ namespace TextureViewer
             parent.UnregisterWindow(this);
         }
 
-        private string getWindowName(ImageLoaderWrapper.Image image)
+        private void UpdateWindowName()
         {
-            if (image == null)
-                return "Texture Viewer";
-            return "Texture Viewer - " + image.Filename;
+            Title = "Texture Viewer - Layer " + Context.ActiveLayer + " - Mipmap " + Context.ActiveMipmap;
         }
 
-#endregion
+        private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Right:
+                    Context.ActiveLayer += 1;
+                    break;
+                case Key.Left:
+                    Context.ActiveLayer -= 1;
+                    break;
+                case Key.Up:
+                    Context.ActiveMipmap -= 1;
+                    break;
+                case Key.Down:
+                    Context.ActiveMipmap += 1;
+                    break;
+            }
+        }
+        #endregion
 
 #region Dialog Generators
 
@@ -286,71 +372,8 @@ namespace TextureViewer
 
 #endregion
 
-        private void MenuItemGrayscale_OnChecked(object sender, RoutedEventArgs e)
-        {
-            UpdateGrayscale(e.Source);
-        }
+        
 
-        private void UpdateGrayscale(object sender)
-        {
-            MenuItemGrayscaleDisabled.IsCheckable = true;
-            MenuItemGrayscaleRed.IsCheckable = true;
-            MenuItemGrayscaleGreen.IsCheckable = true;
-            MenuItemGrayscaleBlue.IsCheckable = true;
-            MenuItemGrayscaleAlpha.IsCheckable = true;
-
-            // Determine which was checked.
-            if (Equals(sender, MenuItemGrayscaleDisabled))
-            {
-                MenuItemGrayscaleDisabled.IsCheckable = false;
-                MenuItemGrayscaleRed.IsChecked = false;
-                MenuItemGrayscaleGreen.IsChecked = false;
-                MenuItemGrayscaleBlue.IsChecked = false;
-                MenuItemGrayscaleAlpha.IsChecked = false;
-            }
-            else if (Equals(sender, MenuItemGrayscaleRed))
-            {
-                MenuItemGrayscaleRed.IsCheckable = false;
-                MenuItemGrayscaleDisabled.IsChecked = false;
-                MenuItemGrayscaleGreen.IsChecked = false;
-                MenuItemGrayscaleBlue.IsChecked = false;
-                MenuItemGrayscaleAlpha.IsChecked = false;
-            }
-            else if (Equals(sender, MenuItemGrayscaleGreen))
-            {
-                MenuItemGrayscaleGreen.IsCheckable = false;
-                MenuItemGrayscaleRed.IsChecked = false;
-                MenuItemGrayscaleDisabled.IsChecked = false;
-                MenuItemGrayscaleBlue.IsChecked = false;
-                MenuItemGrayscaleAlpha.IsChecked = false;
-            }
-            else if (Equals(sender, MenuItemGrayscaleBlue))
-            {
-                MenuItemGrayscaleBlue.IsCheckable = false;
-                MenuItemGrayscaleRed.IsChecked = false;
-                MenuItemGrayscaleGreen.IsChecked = false;
-                MenuItemGrayscaleDisabled.IsChecked = false;
-                MenuItemGrayscaleAlpha.IsChecked = false;
-            }
-            else if (Equals(sender, MenuItemGrayscaleAlpha))
-            {
-                MenuItemGrayscaleAlpha.IsCheckable = false;
-                MenuItemGrayscaleRed.IsChecked = false;
-                MenuItemGrayscaleGreen.IsChecked = false;
-                MenuItemGrayscaleBlue.IsChecked = false;
-                MenuItemGrayscaleDisabled.IsChecked = false;
-            }
-
-            if (MenuItemGrayscaleDisabled.IsChecked)
-                Context.Grayscale = Context.GrayscaleMode.Disabled;
-            else if (MenuItemGrayscaleRed.IsChecked)
-                Context.Grayscale = Context.GrayscaleMode.Red;
-            else if (MenuItemGrayscaleGreen.IsChecked)
-                Context.Grayscale = Context.GrayscaleMode.Green;
-            else if (MenuItemGrayscaleBlue.IsChecked)
-                Context.Grayscale = Context.GrayscaleMode.Blue;
-            else if (MenuItemGrayscaleAlpha.IsChecked)
-                Context.Grayscale = Context.GrayscaleMode.Alpha;
-        }
+        
     }
 }

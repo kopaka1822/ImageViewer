@@ -28,7 +28,7 @@ namespace TextureViewer.ImageView
         private uint activeMipmap = 0;
         private uint activeLayer = 0;
 
-        public bool LinearInterpolation { get; set; } = true;
+        public bool LinearInterpolation { get; set; } = false;
         public GrayscaleMode Grayscale { get; set; } = GrayscaleMode.Disabled;
 
         public uint ActiveMipmap

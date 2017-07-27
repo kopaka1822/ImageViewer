@@ -12,7 +12,8 @@
         MinWidth="250" MinHeight="200"
         Focusable="True"
         Activated="MainWindow_OnActivated"
-        Deactivated="MainWindow_OnDeactivated">
+        Deactivated="MainWindow_OnDeactivated"
+        KeyDown="MainWindow_OnKeyDown">
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="#fff" Padding="0 0 0 2">
             <MenuItem Header="_File">
@@ -24,7 +25,7 @@
             <MenuItem Header="_View">
                 <MenuItem Header="3D View"/>
                 <MenuItem Header="3D Dice"/>
-                <MenuItem Header="Linear Interpolation" x:Name="MenuItemLinearInterpolation" IsCheckable="True" IsChecked="True" Click="MenuItem_OnChecked_LinearFiltering"/>
+                <MenuItem Header="Linear Interpolation" x:Name="MenuItemLinearInterpolation" IsCheckable="True" Click="MenuItem_OnChecked_LinearFiltering"/>
                 <MenuItem Header="Grayscale">
                     <MenuItem Header="Disabled" x:Name="MenuItemGrayscaleDisabled" IsChecked="True" Click="MenuItemGrayscale_OnChecked"/>
                     <MenuItem Header="Red" x:Name="MenuItemGrayscaleRed" IsCheckable="True" Click="MenuItemGrayscale_OnChecked"/>
@@ -52,7 +53,8 @@
                                MouseUp="OpenGlControl_OnMouseUp"
                                MouseLeave="OpenGlControl_OnMouseLeave"
                                AllowDrop="True"
-                               Drop="OpenGlControl_OnDrop"/>
+                               Drop="OpenGlControl_OnDrop"
+                               />
        
     </DockPanel>
 </Window>

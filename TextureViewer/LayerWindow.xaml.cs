@@ -22,6 +22,7 @@ namespace TextureViewer
     {
         public bool IsClosing { get; set; }
         private readonly App parent;
+        private MainWindow activeWindow;
 
         public LayerWindow(App parent)
         {
@@ -38,17 +39,38 @@ namespace TextureViewer
 
         public void UpdateContent(MainWindow window)
         {
+            if (!ReferenceEquals(window, activeWindow))
+            {
+                if (activeWindow != null)
+                    activeWindow.Context.ChangedLayer -= OnChangedLayer;
+                if (window != null)
+                    window.Context.ChangedLayer += OnChangedLayer;
+            }
+
+            activeWindow = window;
             LayerList.Items.Clear();
-            foreach (var item in window.GenerateLayerItems())
-                LayerList.Items.Add(item);
-            LayerList.SelectedIndex = (int) window.Context.ActiveLayer;
+
+            if (window != null)
+            {
+                var activeLayer = window.Context.ActiveLayer;
+                foreach (var item in window.GenerateLayerItems())
+                    LayerList.Items.Add(item);
+
+                window.Context.ActiveLayer = activeLayer;
+                LayerList.SelectedIndex = (int) window.Context.ActiveLayer;
+            }
+        }
+
+        private void OnChangedLayer(object sender, EventArgs e)
+        {
+            LayerList.SelectedIndex = (int)activeWindow.Context.ActiveLayer;
         }
 
         private void LayerList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (parent.GetActiveWindow() == null)
+            if (activeWindow == null)
                 return;
-            parent.GetActiveWindow().Context.ActiveLayer = (uint) LayerList.SelectedIndex;
+            activeWindow.Context.ActiveLayer = (uint) LayerList.SelectedIndex;
         }
     }
 }
