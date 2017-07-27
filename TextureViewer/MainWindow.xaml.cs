@@ -218,9 +218,20 @@ namespace TextureViewer
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Multiselect = false;
-            
+
             if (ofd.ShowDialog(this) == true)
-                parent.SpawnWindow(ofd.FileName);
+            {
+                if (Image == null)
+                {
+                    // TODO reinit window instead of closing
+                    parent.SpawnWindow(ofd.FileName);
+                    this.Close();
+                }
+                else
+                {
+                    parent.SpawnWindow(ofd.FileName);
+                }
+            }
         }
         
         private void OpenGlControl_OnDrop(object sender, DragEventArgs e)
