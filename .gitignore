@@ -20,6 +20,9 @@ packages/
 .vs/
 *.exp
 *.lib
+*.obj
+*.iobj
+*.ipdb
 
 #logs
 #*.txt
