@@ -205,9 +205,7 @@ namespace TextureViewer
 
         private void LinearFiltering_OnChecked(object sender, RoutedEventArgs routedEventArgs)
         {
-            currentView?.SetImageFilter(MenuItemLinearInterpolation.IsChecked
-                ? OpenGL.GL_LINEAR
-                : OpenGL.GL_NEAREST);
+            Context.LinearInterpolation = MenuItemLinearInterpolation.IsChecked;
         }
 
         private void OpenFile_OnClick(object sender, RoutedEventArgs e)

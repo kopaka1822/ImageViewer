@@ -36,7 +36,7 @@ namespace TextureViewer.ImageView
 
             public void Bind(uint slot, Context context)
             {
-                textures[(int) context.ActiveMipmap].Bind(slot);
+                textures[(int) context.ActiveMipmap].Bind(slot, context.LinearInterpolation?OpenGL.GL_LINEAR:OpenGL.GL_NEAREST);
             }
         }
 

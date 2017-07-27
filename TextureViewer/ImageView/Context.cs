@@ -19,6 +19,8 @@ namespace TextureViewer.ImageView
         private uint activeMipmap = 0;
         private uint activeLayer = 0;
 
+        public bool LinearInterpolation { get; set; } = true;
+
         public uint ActiveMipmap
         {
             get { return activeMipmap; }
