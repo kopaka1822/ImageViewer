@@ -62,6 +62,8 @@
     <Compile Include="ImageView\Context.cs" />
     <Compile Include="ImageView\EmptyView.cs" />
     <Compile Include="ImageView\IImageView.cs" />
+    <Compile Include="ImageView\Shader\Shader.cs" />
+    <Compile Include="ImageView\Shader\SingleViewShader.cs" />
     <Compile Include="ImageView\SingleView.cs" />
     <Compile Include="ImageView\Views.cs" />
     <Compile Include="ImageWindow.xaml.cs">

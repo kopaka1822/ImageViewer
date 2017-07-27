@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Effects;
 using SharpGL;
+using SharpGL.SceneGraph;
 using SharpGL.SceneGraph.Shaders;
 using TextureViewer.glhelper;
+using TextureViewer.ImageView.Shader;
 
 namespace TextureViewer.ImageView
 {
@@ -41,7 +44,7 @@ namespace TextureViewer.ImageView
         }
 
         private OpenGL gl;
-        private ShaderProgram program;
+        private SingleViewShader shader;
         private MainWindow parent;
         private Vector curTranslation = new Vector(0.0, 0.0);
         private double curScale = 1.0;
@@ -51,8 +54,8 @@ namespace TextureViewer.ImageView
         {
             this.gl = gl;
             this.parent = parent;
-
-            LoadShader();
+            shader = new SingleViewShader(parent.Context);
+            shader.Init(gl);
 
             for(int i = 0; i < parent.Context.GetNumImages(); ++i)
                 textures.Add(new ImageData(parent.Context.GetImages()[i]));
@@ -66,8 +69,7 @@ namespace TextureViewer.ImageView
                 imageData.Init(gl);
             }
 
-            program.Push(gl, null);
-            Utility.GlCheck(gl);
+            shader.Bind(gl, ApplyScale() * ApplyAspectRatio() * ApplyTranslation());
 
             // TODO select correct layer in shader
             for (uint texture = 0; texture < textures.Count; ++texture)
@@ -75,10 +77,7 @@ namespace TextureViewer.ImageView
                 textures[(int) texture].Bind(texture, parent.Context);
                 Utility.GlCheck(gl);
             }
-
-            ApplyAspectRatio();
-            ApplyScale();
-            ApplyTranslation();
+            
             Utility.GlCheck(gl);
 
             gl.Begin(OpenGL.GL_TRIANGLE_STRIP);
@@ -91,51 +90,41 @@ namespace TextureViewer.ImageView
             gl.End();
             Utility.GlCheck(gl);
 
-            program.Pop(gl, null);
-            Utility.GlCheck(gl);
+            shader.Unbind(gl);
         }
 
-        private void LoadShader()
+        private Matrix ApplyAspectRatio()
         {
-            VertexShader vertexShader = new VertexShader();
-            vertexShader.CreateInContext(gl);
-            vertexShader.SetSource(
-                "varying vec2 texcoord; void main() { texcoord = (gl_Vertex.xy + vec2(1.0, -1.0)) * vec2(0.5, -0.5); gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * vec4(gl_Vertex.xy, 0.0, 1.0); }");
-
-            FragmentShader fragmentShader = new FragmentShader();
-            fragmentShader.CreateInContext(gl);
-            fragmentShader.SetSource(
-                "uniform sampler2DArray tex; varying vec2 texcoord; void main() { vec2 texel = texcoord /*+ vec2(1.0) / vec2(textureSize(tex, 0))*/; gl_FragColor = texture(tex, vec3(texel, 0.0)); }");
-
-            vertexShader.Compile();
-            fragmentShader.Compile();
-            if (vertexShader.CompileStatus.HasValue && vertexShader.CompileStatus.Value == false)
-                throw new Exception("vertex shader: " + vertexShader.InfoLog);
-            if (fragmentShader.CompileStatus.HasValue && fragmentShader.CompileStatus.Value == false)
-                throw new Exception("fragment shader:" + fragmentShader.InfoLog);
-
-            program = new ShaderProgram();
-            program.CreateInContext(gl);
-
-            program.AttachShader(vertexShader);
-            program.AttachShader(fragmentShader);
-            program.Link();
+            Matrix mat = new Matrix(4,4);
+            mat[0, 0] = (double) parent.Context.GetWidth((int) parent.Context.ActiveMipmap) /
+                        (double) parent.GetClientWidth();
+            mat[1, 1] = (double) parent.Context.GetHeight((int) parent.Context.ActiveMipmap) /
+                        (double) parent.GetClientHeight();
+            mat[2, 2] = 1.0;
+            mat[3, 3] = 1.0;
+            return mat;
         }
 
-        private void ApplyAspectRatio()
+        private Matrix ApplyTranslation()
         {
-            gl.Scale((float)parent.Context.GetWidth((int) parent.Context.ActiveMipmap) / (float)parent.GetClientWidth(),
-                (float)parent.Context.GetHeight((int)parent.Context.ActiveMipmap) / (float)parent.GetClientHeight(), 1.0f);
+            Matrix mat = new Matrix(4, 4);
+            mat[0, 0] = 1.0;
+            mat[1, 1] = 1.0;
+            mat[2, 2] = 1.0;
+            mat[3, 3] = 1.0;
+            mat[0, 3] = curTranslation.X;
+            mat[1, 3] = curTranslation.Y;
+            return mat;
         }
 
-        private void ApplyTranslation()
+        private Matrix ApplyScale()
         {
-            gl.Translate(curTranslation.X, curTranslation.Y, 0.0);
-        }
-
-        private void ApplyScale()
-        {
-            gl.Scale(curScale, curScale, 1.0);
+            Matrix mat = new Matrix(4, 4);
+            mat[0, 0] = curScale;
+            mat[1, 1] = curScale;
+            mat[2, 2] = 1.0;
+            mat[3, 3] = 1.0;
+            return mat;
         }
 
         public void OnDrag(Vector diff)
