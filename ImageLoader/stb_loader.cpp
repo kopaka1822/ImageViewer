@@ -27,6 +27,7 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 	ImageMipmap mipmap;
 	ImageFormat format;
 
+	stbi_set_flip_vertically_on_load(true);
 	if (stbi_is_hdr(filename))
 	{
 		// load hdr file

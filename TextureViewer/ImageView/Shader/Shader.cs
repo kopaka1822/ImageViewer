@@ -158,7 +158,7 @@ namespace TextureViewer.ImageView.Shader
                 "out vec2 texcoord;\n" + 
                 "uniform mat4 modelMatrix;\n" +
                 "void main(){\n" +
-                    "texcoord = (vertex.xy + vec2(1.0, -1.0)) * vec2(0.5, -0.5);\n" +
+                    "texcoord = (vertex.xy + vec2(1.0)) * vec2(0.5);\n" +
                     "gl_Position = modelMatrix * vec4(vertex.xy, 0.0, 1.0);\n" +
                 "}";
         }

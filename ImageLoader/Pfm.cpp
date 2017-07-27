@@ -118,7 +118,7 @@ std::unique_ptr<ImageResource> pfm_load(const char* filename)
 		//cout << "Reading grayscale image (1-band)" << endl;
 		//cout << "Reading into CV_32FC1 image" << endl;
 
-		for (int i = height - 1; i >= 0; --i) {
+		for (int i = 0; i < height; ++i) {
 			for (int j = 0; j < width; ++j) {
 				file.read(reinterpret_cast<char*>(&fvalue), sizeof(fvalue));
 				if (needSwap) {
@@ -132,7 +132,7 @@ std::unique_ptr<ImageResource> pfm_load(const char* filename)
 		//cout << "Reading color image (3-band)" << endl;
 		//cout << "Reading into CV_32FC3 image" << endl;
 
-		for (int i = height - 1; i >= 0; --i) {
+		for (int i = 0; i < height; ++i) {
 			for (int j = 0; j < width; ++j) {
 				file.read(reinterpret_cast<char*>(&vfvalue), sizeof(vfvalue));
 				if (needSwap) {
