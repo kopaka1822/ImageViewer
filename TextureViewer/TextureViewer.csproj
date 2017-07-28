@@ -58,6 +58,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ExportWindow.xaml.cs">
+      <DependentUpon>ExportWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="glhelper\utility.cs" />
     <Compile Include="ImageView\Context.cs" />
     <Compile Include="ImageView\EmptyView.cs" />
@@ -76,6 +79,10 @@
       <DependentUpon>MipMapWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UniqueDialog.cs" />
+    <Page Include="ExportWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ImageWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

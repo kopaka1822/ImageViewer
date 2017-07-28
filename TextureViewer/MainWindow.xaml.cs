@@ -372,8 +372,20 @@ namespace TextureViewer
 
 #endregion
 
-        
 
-        
+        private void MenuItem_Click_Export(object sender, RoutedEventArgs e)
+        {
+            // open save file dialog
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|HDR (*.hdr)|*.hdr";
+            if (sfd.ShowDialog() == false)
+                return;
+
+            ExportWindow ew = new ExportWindow(this, sfd.FileName);
+            if (ew.ShowDialog() == false)
+                return;
+
+            // do the export
+        }
     }
 }
