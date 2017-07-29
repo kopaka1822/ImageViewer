@@ -102,7 +102,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>.\Bin</OutDir>
+    <OutDir>..\..\TextureViewer\bin\Debug\</OutDir>
     <TargetExt>.dll</TargetExt>
     <IncludePath>../dependencies/gli/external;../dependencies/gli;$(IncludePath)</IncludePath>
   </PropertyGroup>

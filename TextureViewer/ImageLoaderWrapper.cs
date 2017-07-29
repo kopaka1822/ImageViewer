@@ -10,7 +10,7 @@ namespace TextureViewer
 {
     public static class ImageLoaderWrapper
     {
-        private const string DLLFilePath = @"E:\git\TextureViewer\ImageLoader\Bin\ImageLoader.dll";
+        private const string DLLFilePath = @"ImageLoader.dll";
 
         [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern int open(string filename);
