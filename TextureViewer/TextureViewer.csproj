@@ -61,10 +61,12 @@
     <Compile Include="ExportWindow.xaml.cs">
       <DependentUpon>ExportWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="glhelper\TextureCubeMap.cs" />
     <Compile Include="glhelper\utility.cs" />
     <Compile Include="ImageView\Context.cs" />
     <Compile Include="ImageView\EmptyView.cs" />
     <Compile Include="ImageView\IImageView.cs" />
+    <Compile Include="ImageView\Shader\CubeMapShader.cs" />
     <Compile Include="ImageView\Shader\Shader.cs" />
     <Compile Include="ImageView\Shader\SingleViewShader.cs" />
     <Compile Include="ImageView\SingleView.cs" />

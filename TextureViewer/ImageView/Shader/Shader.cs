@@ -64,7 +64,7 @@ namespace TextureViewer.ImageView.Shader
             Utility.GlCheck(gl);
 
             if (program.LinkStatus.HasValue && program.LinkStatus.Value == false)
-                throw new Exception("shader linkin: " + program.InfoLog);
+                throw new Exception("shader linking: " + program.InfoLog);
 
             Utility.GlCheck(gl);
         }
@@ -73,11 +73,16 @@ namespace TextureViewer.ImageView.Shader
         {
             // TODO bind layer
             program.Push(gl, null);
+            UpdateUniforms(gl, tranform);
+
+            Utility.GlCheck(gl);
+        }
+
+        protected void UpdateUniforms(OpenGL gl, Matrix tranform)
+        {
             gl.UniformMatrix4(uniformModelMatrix, 1, false, tranform.AsColumnMajorArrayFloat);
             gl.Uniform1(uniformCurrentLayer, context.ActiveLayer);
             gl.Uniform1(uniformGrayscale, (uint)context.Grayscale);
-
-            Utility.GlCheck(gl);
         }
 
         protected void LocateUniforms(OpenGL gl)
@@ -105,12 +110,6 @@ namespace TextureViewer.ImageView.Shader
             return "#version 330\n";
         }
 
-        protected string GetVaryings()
-        {
-            return "in vec2 texcoord;\n" 
-                + "out vec4 fragColor;\n";
-        }
-
         protected string GetUniforms()
         {
             return "uniform uint currentLayer;\n" +
@@ -124,26 +123,7 @@ namespace TextureViewer.ImageView.Shader
                 res += "uniform " + type + " tex" + i + ";\n";
             return res;
         }
-
-        protected string GetTextures2DArray()
-        {
-            return GetTextures("sampler2DArray");
-        }
-
-        protected string GetTexture2DArrayGetters()
-        {
-            // TODO apply tone mapping function here?
-            string res = "";
-            for (int i = 0; i < context.GetNumImages(); ++i)
-            {
-                res += "vec4 GetTextureColor" + i + "(){\n";
-                // image function
-                res += "return texture(tex" + i + ", vec3(texcoord, float(currentLayer)));\n";
-                res += "}\n";
-            }
-            return res;
-        }
-
+        
         protected string GetFinalColor()
         {
             // TODO add custom operations
@@ -162,17 +142,7 @@ namespace TextureViewer.ImageView.Shader
                 "}";
         }
 
-        protected string GetVertexShaderCode()
-        {
-            return GetVersion() +
-                "in vec4 vertex;\n" +
-                "out vec2 texcoord;\n" + 
-                "uniform mat4 modelMatrix;\n" +
-                "void main(){\n" +
-                    "texcoord = (vertex.xy + vec2(1.0)) * vec2(0.5);\n" +
-                    "gl_Position = modelMatrix * vec4(vertex.xy, 0.0, 1.0);\n" +
-                "}";
-        }
+        protected abstract string GetVertexShaderCode();
 
         protected abstract string GetFragmentShaderCode();
     }

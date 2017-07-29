@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace TextureViewer.ImageView.Shader
 {
-    class SingleViewShader : Shader
+    class CubeMapShader : Shader
     {
-        public SingleViewShader(Context context) : base(context)
+        public CubeMapShader(Context context) : base(context)
         {
         }
 
@@ -17,19 +17,23 @@ namespace TextureViewer.ImageView.Shader
             return GetVersion()
                    + GetVaryings()
                    + GetUniforms()
-                   + GetTextures2DArray()
-                   + GetTexture2DArrayGetters()
+                   + GetTexturesCubeMap()
+                   + GetTextureCubeMapsGetters()
                    + GetFinalColor()
                    + GetMain();
         }
 
         protected string GetVaryings()
         {
-            return "in vec2 texcoord;\n" +
-                "out vec4 fragColor;\n";
+            return "in vec3 texcoord;\n";
         }
 
-        protected string GetTexture2DArrayGetters()
+        protected string GetTexturesCubeMap()
+        {
+            return GetTextures("samplerCube");
+        }
+
+        protected string GetTextureCubeMapsGetters()
         {
             // TODO apply tone mapping function here?
             string res = "";
@@ -37,27 +41,22 @@ namespace TextureViewer.ImageView.Shader
             {
                 res += "vec4 GetTextureColor" + i + "(){\n";
                 // image function
-                res += "return texture(tex" + i + ", vec3(texcoord, float(currentLayer)));\n";
+                res += "return texture(tex" + i + ", texcoord);\n";
                 res += "}\n";
             }
             return res;
         }
 
-        protected string GetTextures2DArray()
-        {
-            return GetTextures("sampler2DArray");
-        }
-
         protected override string GetVertexShaderCode()
         {
             return GetVersion() +
-                   "in vec4 vertex;\n" +
-                   "out vec2 texcoord;\n" +
-                   "uniform mat4 modelMatrix;\n" +
-                   "void main(){\n" +
-                   "texcoord = (vertex.xy + vec2(1.0)) * vec2(0.5);\n" +
-                   "gl_Position = modelMatrix * vec4(vertex.xy, 0.0, 1.0);\n" +
-                   "}";
+                "in vec3 vertex;\n" +
+                "out vec3 texcoord;\n" +
+                "uniform mat4 modelMatrix;\n" +
+                "void main(){\n" +
+                   "texcoord = (modelMatrix * vec3(vertex.xy,1.0,0.0)).xyz;\n" +
+                   "gl_Position = vec4(vertex.xy, 0.0, 1.0);\n" +
+                "}";
         }
     }
 }
