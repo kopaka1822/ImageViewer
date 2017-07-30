@@ -70,8 +70,7 @@ namespace TextureViewer.ImageView
             }
 
             shader.Bind(gl, ApplyScale() * ApplyAspectRatio() * ApplyTranslation());
-
-            // TODO select correct layer in shader
+            
             for (uint texture = 0; texture < textures.Count; ++texture)
             {
                 textures[(int) texture].Bind(texture, parent.Context);

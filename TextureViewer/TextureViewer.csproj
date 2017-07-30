@@ -64,6 +64,7 @@
     <Compile Include="glhelper\TextureCubeMap.cs" />
     <Compile Include="glhelper\utility.cs" />
     <Compile Include="ImageView\Context.cs" />
+    <Compile Include="ImageView\CubeMapView.cs" />
     <Compile Include="ImageView\EmptyView.cs" />
     <Compile Include="ImageView\IImageView.cs" />
     <Compile Include="ImageView\Shader\CubeMapShader.cs" />

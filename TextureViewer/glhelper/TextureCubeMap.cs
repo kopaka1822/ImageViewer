@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace TextureViewer.glhelper
             : 
             base(gl, OpenGL.GL_TEXTURE_CUBE_MAP)
         {
+            Debug.Assert(image.Layers.Count == 6);
             gl.BindTexture(OpenGL.GL_TEXTURE_CUBE_MAP, Id);
             Utility.GlCheck(gl);
 
