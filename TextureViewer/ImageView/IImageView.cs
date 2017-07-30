@@ -8,6 +8,13 @@ using SharpGL;
 
 namespace TextureViewer.ImageView
 {
+    public enum ImageViewType
+    {
+        Empty,
+        Single,
+        CubeMap
+    }
+
     interface IImageView
     {
         void Init(OpenGL gl, MainWindow parent);

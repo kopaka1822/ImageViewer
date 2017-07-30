@@ -31,10 +31,21 @@ namespace TextureViewer
         private readonly App parent;
         public Context Context { get; private set; }
         public ulong ZIndex { get; set; }
+        
+        private ImageViewType currentImageView;
+        private Dictionary<ImageViewType, IImageView> imageViews = new Dictionary<ImageViewType, IImageView>();
+        public ImageViewType CurrentView
+        {
+            get { return currentImageView; }
+            set
+            {
+                if (imageViews.ContainsKey(value))
+                    currentImageView = value;
+            }
+        }
 
         private String errorMessage = "";
 
-        private IImageView currentView;
 
         // mouse tracking
         private Point mousePosition = new Point();
@@ -47,10 +58,7 @@ namespace TextureViewer
 
             InitializeComponent();
             
-            if (Context.GetImages().Count == 0)
-                currentView = new EmptyView();
-            else
-                currentView = new SingleView();
+            CreateImageViews();
 
             context.ChangedMipmap += (sender, args) => UpdateWindowName();
             context.ChangedLayer += (sender, args) => UpdateWindowName();
@@ -64,7 +72,31 @@ namespace TextureViewer
             }
         }
 
+        private void CreateImageViews()
+        {
+            if (Context.GetImages().Count > 0)
+            {
+                imageViews.Add(ImageViewType.Single, new SingleView());
+                currentImageView = ImageViewType.Single;
+                if(Context.GetNumLayers() == 6)
+                    imageViews.Add(ImageViewType.CubeMap, new CubeMapView());
+            }
+            else
+            {
+                imageViews.Add(ImageViewType.Empty, new EmptyView());
+                currentImageView = ImageViewType.Empty;
+            }
+        }
 
+        public List<ImageViewType> GetAvailableViews()
+        {
+            List<ImageViewType> res = new List<ImageViewType>();
+            foreach (var imageView in imageViews)
+            {
+                res.Add(imageView.Key);
+            }
+            return res;
+        }
 
 #region OpenGL
 
@@ -92,7 +124,8 @@ namespace TextureViewer
                 gl.Clear(OpenGL.GL_COLOR_BUFFER_BIT | OpenGL.GL_DEPTH_BUFFER_BIT);
                 Utility.GlCheck(gl);
 
-                currentView.Draw();
+                //currentView.Draw();
+                imageViews[currentImageView]?.Draw();
                 Utility.GlCheck(gl);
 
                 //  Flush OpenGL.
@@ -109,8 +142,8 @@ namespace TextureViewer
         {
             try
             {
-                //args.OpenGL.PixelStore(OpenGL.GL_PACK_ALIGNMENT, 1);
-                currentView.Init(args.OpenGL, this);
+                foreach(var view in imageViews)
+                    view.Value.Init(args.OpenGL, this);
 
                 Utility.GlCheck(args.OpenGL);
             }
@@ -245,7 +278,7 @@ namespace TextureViewer
                 var diff = newPosition - mousePosition;
                 
                 if(Math.Abs(diff.X) > 0.01 || Math.Abs(diff.Y) > 0.01)
-                    currentView.OnDrag(diff);
+                    imageViews[currentImageView]?.OnDrag(diff);
             }
             mousePosition = newPosition;
         }
@@ -269,7 +302,7 @@ namespace TextureViewer
 
         private void OpenGlControl_OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            currentView.OnScroll((double)e.Delta, e.GetPosition(OpenGlControl));
+            imageViews[currentImageView]?.OnScroll((double)e.Delta, e.GetPosition(OpenGlControl));
         }
 
         #endregion

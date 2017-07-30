@@ -25,7 +25,8 @@ namespace TextureViewer.ImageView.Shader
 
         protected string GetVaryings()
         {
-            return "in vec3 texcoord;\n";
+            return "in vec3 texcoord;\n" +
+                   "out vec4 fragColor;\n";
         }
 
         protected string GetTexturesCubeMap()
@@ -54,7 +55,7 @@ namespace TextureViewer.ImageView.Shader
                 "out vec3 texcoord;\n" +
                 "uniform mat4 modelMatrix;\n" +
                 "void main(){\n" +
-                   "texcoord = (modelMatrix * vec3(vertex.xy,1.0,0.0)).xyz;\n" +
+                   "texcoord = (modelMatrix * vec4(vertex.xy,2.0,0.0)).xyz;\n" +
                    "gl_Position = vec4(vertex.xy, 0.0, 1.0);\n" +
                 "}";
         }

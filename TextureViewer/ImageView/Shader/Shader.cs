@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using SharpGL;
@@ -35,18 +36,23 @@ namespace TextureViewer.ImageView.Shader
 
             Debug.Assert(vertexShader == null);
             Debug.Assert(fragmentShader == null);
+
             vertexShader = new VertexShader();
-            fragmentShader = new FragmentShader();
             vertexShader.CreateInContext(gl);
-            fragmentShader.CreateInContext(gl);
-
             vertexShader.SetSource(GetVertexShaderCode());
-            fragmentShader.SetSource(GetFragmentShaderCode());
-
             vertexShader.Compile();
+
+            /*IntPtr ptr = Marshal.AllocHGlobal(512);
+            StringBuilder builder = new StringBuilder(512);
+            gl.GetShaderInfoLog(vertexShader.ShaderObject, 512, ptr, builder);
+            */
+            
             if (vertexShader.CompileStatus.HasValue && vertexShader.CompileStatus.Value == false)
                 throw new Exception("vertex shader: " + vertexShader.InfoLog);
 
+            fragmentShader = new FragmentShader();
+            fragmentShader.CreateInContext(gl);
+            fragmentShader.SetSource(GetFragmentShaderCode());
             fragmentShader.Compile();
             if (fragmentShader.CompileStatus.HasValue && fragmentShader.CompileStatus.Value == false)
                 throw new Exception("fragment shader:" + fragmentShader.InfoLog);

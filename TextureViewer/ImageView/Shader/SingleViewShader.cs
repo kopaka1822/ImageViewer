@@ -26,7 +26,7 @@ namespace TextureViewer.ImageView.Shader
         protected string GetVaryings()
         {
             return "in vec2 texcoord;\n" +
-                "out vec4 fragColor;\n";
+                   "out vec4 fragColor;\n";
         }
 
         protected string GetTexture2DArrayGetters()

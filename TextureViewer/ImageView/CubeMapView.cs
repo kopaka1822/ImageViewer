@@ -44,8 +44,11 @@ namespace TextureViewer.ImageView
 
         private OpenGL gl;
         private CubeMapShader shader;
-        private List<ImageData> textures;
+        private List<ImageData> textures = new List<ImageData>();
         private MainWindow parent;
+        private float yawn = 0.0f;
+        private float pitch = 0.0f;
+        private float roll = 0.0f;
 
         public void Init(OpenGL gl, MainWindow parent)
         {
@@ -66,7 +69,7 @@ namespace TextureViewer.ImageView
                 imageData.Init(gl);
             }
 
-            shader.Bind(gl, ApplyAspectRatio());
+            shader.Bind(gl, ApplyAspectRatio() * ApplyRotation() * ApplyOrientation());
 
             for (uint texture = 0; texture < textures.Count; ++texture)
             {
@@ -101,9 +104,61 @@ namespace TextureViewer.ImageView
             return mat;
         }
 
+        private Matrix ApplyRotation()
+        {
+            return ZRotation(yawn) * YRotation(pitch) * XRotation(roll);
+        }
+
+        private Matrix XRotation(float a)
+        {
+            Matrix mat = new Matrix(4, 4);
+            mat[0, 0] = 1.0;
+            mat[1, 1] = Math.Cos(a);
+            mat[1, 2] = -Math.Sin(a);
+            mat[2, 1] = Math.Sin(a);
+            mat[2, 2] = Math.Cos(a);
+            mat[3, 3] = 1.0;
+            return mat;
+        }
+
+        private Matrix YRotation(float a)
+        {
+            Matrix mat = new Matrix(4, 4);
+            mat[0, 0] = Math.Cos(a);
+            mat[0, 2] = Math.Sin(a);
+            mat[1, 1] = 1.0;
+            mat[2, 2] = Math.Cos(a);
+            mat[2, 0] = -Math.Sin(a);
+            mat[3, 3] = 1.0;
+            return mat;
+        }
+
+        private Matrix ZRotation(float a)
+        {
+            Matrix mat = new Matrix(4, 4);
+            mat[0, 0] = Math.Cos(a);
+            mat[0, 1] = -Math.Sin(a);
+            mat[1, 0] = Math.Sin(a);
+            mat[1, 1] = Math.Cos(a);
+            mat[2, 2] = 1.0;
+            mat[3, 3] = 1.0;
+            return mat;
+        }
+
+        private Matrix ApplyOrientation()
+        {
+            Matrix mat = new Matrix(4, 4);
+            mat[0, 0] = 1.0;
+            mat[1, 1] = -1.0;
+            mat[2, 2] = 1.0;
+            mat[3, 3] = 1.0;
+            return mat;
+        }
+
         public void OnDrag(Vector diff)
         {
-            // TODO
+            pitch += (float)diff.X * 0.01f;
+            roll += (float) diff.Y * -0.01f;
         }
 
         public void OnScroll(double diff, Point mouse)
