@@ -61,8 +61,9 @@ std::unique_ptr<ImageResource> pfm_load(const char* filename)
 
 							// extract header information, skips whitespace 
 	//file >> bands;
-	char bandBuffer[2];
+	char bandBuffer[3];
 	file.read(bandBuffer, 2);
+	bandBuffer[2] = '\0';
 	skip_space(file);
 	std::string bands = bandBuffer;
 
