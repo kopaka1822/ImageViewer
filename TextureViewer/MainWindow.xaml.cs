@@ -142,6 +142,9 @@ namespace TextureViewer
         {
             try
             {
+                // seamless cube mal
+                args.OpenGL.Enable(0x884f);
+
                 foreach(var view in imageViews)
                     view.Value.Init(args.OpenGL, this);
 
