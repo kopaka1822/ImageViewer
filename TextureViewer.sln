@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextureViewer", "TextureVie
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageLoader", "ImageLoader\ImageLoader.vcxproj", "{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageViewer", "ImageViewer\ImageViewer.csproj", "{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,24 @@ Global
 		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.TestDebug|x64.Build.0 = TestDebug|x64
 		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.TestDebug|x86.ActiveCfg = TestDebug|Win32
 		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.TestDebug|x86.Build.0 = TestDebug|Win32
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.Debug|x64.Build.0 = Debug|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.Debug|x86.Build.0 = Debug|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.Release|x64.ActiveCfg = Release|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.Release|x64.Build.0 = Release|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.Release|x86.ActiveCfg = Release|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.Release|x86.Build.0 = Release|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.TestDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.TestDebug|Any CPU.Build.0 = Debug|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.TestDebug|x64.ActiveCfg = Debug|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.TestDebug|x64.Build.0 = Debug|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.TestDebug|x86.ActiveCfg = Debug|Any CPU
+		{ECFBCB62-D05B-46D1-AFA8-8EBA4BD495F8}.TestDebug|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
