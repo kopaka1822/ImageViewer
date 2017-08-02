@@ -159,6 +159,7 @@ namespace OpenTK.WPF
             var gmode = new GraphicsMode(DisplayDevice.Default.BitsPerPixel, 16, 0, 4, 0, 2, false);
             mTkGlControl = new GLControl(gmode, VersionMajor, VersionMinor, GraphicsContextFlags.Default);
             mTkGlControl.MakeCurrent();
+            
 
             //  Fire the OpenGL initialised event.
             OpenGLInitialized?.Invoke(this, EventArgs.Empty);
@@ -222,11 +223,22 @@ namespace OpenTK.WPF
             //  Start the stopwatch so that we can time the rendering.
             mStopwatch.Restart();
 
+            // this test will ensure that the window can be displayed in the editor
+            try
+            {
+                if (GraphicsContext.CurrentContext == null)
+                    return;
+            }
+            catch (NullReferenceException)
+            {
+                return;
+            }
             // import from FrameBufferHandler
             if (GraphicsContext.CurrentContext != mTkGlControl.Context)
             {
-                mTkGlControl.MakeCurrent();
+                mTkGlControl?.MakeCurrent();
             }
+
 
             var framebuffersize = new Size(ActualWidth, ActualHeight);
             if (framebuffersize != mSize || mLoaded == false)
