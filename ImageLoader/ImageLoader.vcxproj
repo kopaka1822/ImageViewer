@@ -216,6 +216,7 @@
     <ClInclude Include="..\dependencies\stb\stb_image_write.h" />
     <ClInclude Include="gli_loader.h" />
     <ClInclude Include="ImageFormat.h" />
+    <ClInclude Include="ImageFace.h" />
     <ClInclude Include="ImageLayer.h" />
     <ClInclude Include="ImageLoader.h" />
     <ClInclude Include="ImageMipmap.h" />

@@ -1,8 +1,7 @@
 #pragma once
-#include <vector>
-#include "ImageMipmap.h"
+#include "ImageFace.h"
 
 struct ImageLayer
 {
-	std::vector<ImageMipmap> mipmaps;
+	std::vector<ImageFace> faces;
 };

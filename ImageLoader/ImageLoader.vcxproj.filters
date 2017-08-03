@@ -24,9 +24,6 @@
     <ClInclude Include="ImageResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImageLayer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ImageFormat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -49,6 +46,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Pfm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageFace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

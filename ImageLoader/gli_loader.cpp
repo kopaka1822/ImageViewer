@@ -26,57 +26,28 @@ std::unique_ptr<ImageResource> gli_load(const char* filename)
 	if (!getImageFormat(res->format, tex))
 		return nullptr;
 
-	auto depth = tex.extent(0).z;
-
-	if (depth == 1)
+	res->layer.assign(tex.layers(), ImageLayer());
+	for(size_t layer = 0; layer < tex.layers(); ++layer)
 	{
-		res->layer.assign(tex.faces() * tex.layers(), ImageLayer());
-
-		for (size_t layer = 0; layer < tex.layers(); ++layer)
+		res->layer.at(layer).faces.assign(tex.faces(), ImageFace());
+		for(size_t face = 0; face < tex.faces(); ++face)
 		{
-			for (size_t face = 0; face < tex.faces(); ++face)
+			// load face
+			res->layer.at(layer).faces.at(face).mipmaps.assign(tex.levels(), ImageMipmap());
+			for(size_t mip = 0; mip < tex.levels(); ++mip)
 			{
-				// load layer (faces)
-				res->layer[layer * tex.faces() + face].mipmaps.assign(tex.levels(), ImageMipmap());
-				for (size_t mip = 0; mip < tex.levels(); ++mip)
-				{
-					// fill mipmap
-					res->layer[layer * tex.faces() + face].mipmaps[mip].width = tex.extent(mip).x;
-					res->layer[layer * tex.faces() + face].mipmaps[mip].height = tex.extent(mip).y;
-					auto data = tex.data(layer, face, mip);
-					auto size = tex.size(mip);
-					res->layer[layer * tex.faces() + face].mipmaps[mip].bytes.assign(reinterpret_cast<char*>(data), reinterpret_cast<char*>(data) + size);
-				}
+				// fill mipmap
+				ImageMipmap& mipmap = res->layer.at(layer).faces.at(face).mipmaps.at(mip);
+				mipmap.width = tex.extent(mip).x;
+				mipmap.height = tex.extent(mip).y;
+				mipmap.depth = tex.extent(mip).z;
+
+				auto data = tex.data(layer, face, mip);
+				auto size = tex.size(mip);
+				mipmap.bytes.assign(reinterpret_cast<char*>(data), reinterpret_cast<char*>(data) + size);
 			}
 		}
 	}
-	else if(tex.levels() == 1) // no mipmaps
-	{
-		res->layer.assign(tex.faces() * tex.layers() * depth, ImageLayer());
-		// load 3d texture as layered texture (experimental)
-		for (size_t layer = 0; layer < tex.layers(); ++layer)
-		{
-			for (size_t face = 0; face < tex.faces(); ++face)
-			{
-				auto data = tex.data(layer, face, 0);
-				auto size = tex.size(0);
-				auto step = size / depth;
-				for (auto curDepth = 0; curDepth < depth; ++curDepth)
-				{
-					auto idx = (layer * tex.faces() + face) * depth + curDepth;
-					res->layer[idx].mipmaps.assign(1, ImageMipmap());
-					// fill mipmap
-					res->layer[idx].mipmaps[0].width = tex.extent(0).x;
-					res->layer[idx].mipmaps[0].height = tex.extent(0).y;
 
-					res->layer[idx].mipmaps[0].bytes.assign(reinterpret_cast<char*>(data), reinterpret_cast<char*>(data) + step);
-					data = reinterpret_cast<void*>(reinterpret_cast<char*>(data) + step);
-				}
-			}
-		}
-	}
-	else return nullptr;
-
-	// get data
 	return res;
 }

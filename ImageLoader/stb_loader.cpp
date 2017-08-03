@@ -71,10 +71,11 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 	}
 
 	// make the resource
-	std::unique_ptr<ImageResource> res = std::make_unique<ImageResource>();
+	auto res = std::make_unique<ImageResource>();
 	res->format = format;
-	res->layer.push_back(ImageLayer());
-	res->layer[0].mipmaps.push_back(std::move(mipmap));
+	res->layer.emplace_back();
+	res->layer[0].faces.emplace_back();
+	res->layer[0].faces[0].mipmaps.push_back(std::move(mipmap));
 
 	return res;
 }

@@ -20,13 +20,13 @@ namespace TextureViewer
 
         [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void image_info(int id, out uint openglInternalFormat, out uint openglExternalFormat, 
-            out uint openglType, out int nLayers, out int nMipmaps, out bool isCompressed);
+            out uint openglType, out int nImages ,out int nFaces, out int nMipmaps, out bool isCompressed);
 
         [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void image_info_mipmap(int id, int mipmap, out int width, out int height, out uint size);
+        private static extern void image_info_mipmap(int id, int mipmap, out int width, out int height);
 
         [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr image_get_mipmap(int id, int layer, int mipmap);
+        private static extern IntPtr image_get_mipmap(int id, int image, int face, int mipmap, out uint size);
 
         [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
         public static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
@@ -56,11 +56,11 @@ namespace TextureViewer
             public readonly IntPtr Bytes;
             public readonly uint Size;
 
-            public Mipmap(Resource resource, int layerId, int mipmapId)
+            public Mipmap(Resource resource, int imageId, int layerId, int mipmapId)
             {
-                image_info_mipmap(resource.Id, mipmapId, out Width, out Height, out Size);
+                image_info_mipmap(resource.Id, mipmapId, out Width, out Height);
 
-                IntPtr ptr = image_get_mipmap(resource.Id, layerId, mipmapId);
+                IntPtr ptr = image_get_mipmap(resource.Id, imageId, layerId, mipmapId, out Size);
                 Bytes = Marshal.AllocHGlobal((int)Size);
 
                 CopyMemory(Bytes, ptr, Size);
@@ -72,16 +72,16 @@ namespace TextureViewer
             }
         }
 
-        public class Layer
+        public class Face
         {
             public readonly List<Mipmap> Mipmaps;
 
-            public Layer(Resource resource, int layerId, int nMipmaps)
+            public Face(Resource resource, int imageId, int layerId, int nMipmaps)
             {
                 Mipmaps = new List<Mipmap>(nMipmaps);
                 for (int curMipmap = 0; curMipmap < nMipmaps; ++curMipmap)
                 {
-                    Mipmaps.Add(new Mipmap(resource, layerId, curMipmap));
+                    Mipmaps.Add(new Mipmap(resource, imageId, layerId, curMipmap));
                 }
             }
         }
@@ -92,22 +92,23 @@ namespace TextureViewer
             public readonly uint OpenglExternalFormat;
             public readonly uint OpenglType;
             public readonly bool IsCompressed;
-            public readonly List<Layer> Layers;
+            public readonly List<Face> Layers;
             public readonly string Filename;
 
-            public Image(Resource resource, string filename)
+            public Image(Resource resource, string filename, uint internalFormat, uint externalFormat,
+                uint type, int curImage, int nFaces, int nMipmaps, bool isCompressed)
             {
-                this.Filename = filename;
+                Filename = filename;
+                OpenglExternalFormat = externalFormat;
+                OpenglInternalFormat = internalFormat;
+                OpenglType = type;
+                IsCompressed = isCompressed;
                 // load relevant information
-                int nLayer;
-                int nMipmaps;
-                image_info(resource.Id, out OpenglInternalFormat, out OpenglExternalFormat,
-                    out OpenglType, out nLayer, out nMipmaps, out IsCompressed);
 
-                Layers = new List<Layer>(nLayer);
-                for (int curLayer = 0; curLayer < nLayer; ++curLayer)
+                Layers = new List<Face>(nFaces);
+                for (int curLayer = 0; curLayer < nFaces; ++curLayer)
                 {
-                    Layers.Add(new Layer(resource, curLayer, nMipmaps));
+                    Layers.Add(new Face(resource, curImage, curLayer, nMipmaps));
                 }
             }
 
@@ -148,9 +149,26 @@ namespace TextureViewer
             }
         }
 
-        public static Image LoadImage(string file)
+        public static List<Image> LoadImage(string file)
         {
-            return new Image(new Resource(file), file);
+            Resource res = new Resource(file);
+            uint internalFormat;
+            uint externalFormat;
+            uint openglType;
+            int nImages;
+            int nFaces;
+            int nMipmaps;
+            bool isCompressed;
+            image_info(res.Id, out internalFormat, out externalFormat, out openglType,
+                out nImages, out nFaces, out nMipmaps, out isCompressed);
+            List<Image> images = new List<Image>(nImages);
+            for (int curImage = 0; curImage < nImages; ++curImage)
+            {
+                images.Add(new Image(res, file, internalFormat, externalFormat, openglType, 
+                    curImage, nFaces, nMipmaps, isCompressed));
+            }
+
+            return images;
         }
 
         public static int Test(int a, int b)

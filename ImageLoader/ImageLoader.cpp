@@ -42,8 +42,8 @@ void release(int id)
 		s_resources.erase(it);
 }
 
-void image_info(int id, uint32_t& openglInternalFormat, uint32_t& openglExternalFormat, 
-	uint32_t& openglType, int& nLayers, int& nMipmaps, bool& isCompressed)
+void image_info(int id, uint32_t& openglInternalFormat, uint32_t& openglExternalFormat, uint32_t& openglType,
+	int& nImages, int& nFaces, int& nMipmaps, bool& isCompressed)
 {
 	auto it = s_resources.find(id);
 	if (it == s_resources.end())
@@ -54,13 +54,18 @@ void image_info(int id, uint32_t& openglInternalFormat, uint32_t& openglExternal
 	openglExternalFormat = it->second->format.openglExternalFormat;
 	isCompressed = it->second->format.isCompressed;
 
-	nLayers = it->second->layer.size();
+	nImages = it->second->layer.size();
 	nMipmaps = 0;
-	if (it->second->layer.size())
-		nMipmaps = it->second->layer[0].mipmaps.size();
+	nFaces = 0;
+	if(nImages > 0)
+	{
+		nFaces = it->second->layer.at(0).faces.size();
+		if (nFaces > 0)
+			nMipmaps = it->second->layer.at(0).faces.at(0).mipmaps.size();
+	}
 }
 
-void image_info_mipmap(int id, int mipmap, int& width, int& height, uint32_t& size)
+void image_info_mipmap(int id, int mipmap, int& width, int& height)
 {
 	auto it = s_resources.find(id);
 	if (it == s_resources.end())
@@ -69,25 +74,31 @@ void image_info_mipmap(int id, int mipmap, int& width, int& height, uint32_t& si
 	if (!it->second->layer.size())
 		return;
 
-	if (unsigned(mipmap) >= it->second->layer[0].mipmaps.size())
+	if (!it->second->layer.at(0).faces.size())
 		return;
 
-	width = it->second->layer[0].mipmaps[mipmap].width;
-	height = it->second->layer[0].mipmaps[mipmap].height;
-	size = it->second->layer[0].mipmaps[mipmap].bytes.size();
+	if (unsigned(mipmap) >= it->second->layer[0].faces[0].mipmaps.size())
+		return;
+
+	width = it->second->layer[0].faces[0].mipmaps[mipmap].width;
+	height = it->second->layer[0].faces[0].mipmaps[mipmap].height;
 }
 
-unsigned char* image_get_mipmap(int id, int layer, int mipmap)
+unsigned char* image_get_mipmap(int id, int image, int face, int mipmap, uint32_t& size)
 {
 	auto it = s_resources.find(id);
 	if (it == s_resources.end())
 		return nullptr;
 
-	if (unsigned(layer) >= it->second->layer.size())
+	if (unsigned(image) >= it->second->layer.size())
 		return nullptr;
 
-	if (unsigned(mipmap) >= it->second->layer[layer].mipmaps.size())
+	if (unsigned(face) >= it->second->layer.at(image).faces.size())
 		return nullptr;
 
-	return it->second->layer[layer].mipmaps[mipmap].bytes.data();
+	if (unsigned(mipmap) >= it->second->layer.at(image).faces.at(face).mipmaps.size())
+		return nullptr;
+
+	size = it->second->layer.at(image).faces.at(face).mipmaps[mipmap].bytes.size();
+	return it->second->layer.at(image).faces.at(face).mipmaps[mipmap].bytes.data();
 }

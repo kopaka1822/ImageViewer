@@ -1,7 +1,7 @@
 #pragma once
-#include "ImageLayer.h"
 #include <vector>
 #include "ImageFormat.h"
+#include "ImageLayer.h"
 
 struct ImageResource
 {

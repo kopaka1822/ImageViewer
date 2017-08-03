@@ -56,7 +56,7 @@ namespace TextureViewer
                 {
                     var image = ImageLoaderWrapper.LoadImage(filename);
 
-                    var wnd = new MainWindow(this, new Context(image));
+                    var wnd = new MainWindow(this, new Context(image?[0]));
                     activeWindow = wnd;
                     openWindows.Add(wnd);
 

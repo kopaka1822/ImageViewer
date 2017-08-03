@@ -76,14 +76,6 @@ std::unique_ptr<ImageResource> pfm_load(const char* filename)
 	int littleEndianMachine = littleendian();
 	int needSwap = (littleEndianFile != littleEndianMachine);
 
-	/*cout << setfill('=') << setw(19) << "=" << endl;
-	cout << "Reading image to pfm file: " << path << endl;
-	cout << "Little Endian?: " << ((needSwap) ? "false" : "true") << endl;
-	cout << "width: " << width << endl;
-	cout << "height: " << height << endl;
-	cout << "scale: " << scalef << endl;
-	*/
-
 	// skip SINGLE newline character after reading third arg
 	char c = file.get();
 	if (c == '\r')      // <cr> in some files before newline
@@ -101,18 +93,21 @@ std::unique_ptr<ImageResource> pfm_load(const char* filename)
 
 	bool grayscale = (bands == "Pf");
 
-	std::unique_ptr<ImageResource> res = std::make_unique<ImageResource>();
+	auto res = std::make_unique<ImageResource>();
 	res->format.isCompressed = false;
 	res->format.openglExternalFormat = res->format.openglInternalFormat = 
 		grayscale? gli::gl::external_format::EXTERNAL_RED : gli::gl::external_format::EXTERNAL_RGB;
 
 	res->format.openglType = gli::gl::type_format::TYPE_F32;
-	res->layer.push_back(ImageLayer());
-	res->layer[0].mipmaps.push_back(ImageMipmap());
-	res->layer[0].mipmaps[0].width = width;
-	res->layer[0].mipmaps[0].height = height;
-	res->layer[0].mipmaps[0].bytes.resize(width * height * 4 * (grayscale? 1 : 3));
-	auto data = reinterpret_cast<float*>(res->layer[0].mipmaps[0].bytes.data());
+	res->layer.emplace_back();
+	res->layer.at(0).faces.emplace_back();
+	res->layer.at(0).faces.at(0).mipmaps.emplace_back();
+	auto& mipmap = res->layer.at(0).faces.at(0).mipmaps.at(0);
+
+	mipmap.width = width;
+	mipmap.height = height;
+	mipmap.bytes.resize(width * height * 4 * (grayscale? 1 : 3));
+	auto data = reinterpret_cast<float*>(mipmap.bytes.data());
 
 	if (bands == "Pf") {          // handle 1-band image 
 
