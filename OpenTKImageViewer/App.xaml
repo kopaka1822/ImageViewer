@@ -1,7 +1,8 @@
-﻿<Application x:Class="ImageViewer.App"
+﻿<Application x:Class="OpenTKImageViewer.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:ImageViewer">
+             xmlns:local="clr-namespace:OpenTKImageViewer"
+             StartupUri="MainWindow.xaml">
     <Application.Resources>
          
     </Application.Resources>

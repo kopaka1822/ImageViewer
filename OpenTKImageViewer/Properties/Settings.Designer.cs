@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ImageViewer.Properties
+namespace OpenTKImageViewer.Properties
 {
 
 
