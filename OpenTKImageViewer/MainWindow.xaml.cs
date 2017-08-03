@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL4;
 
 namespace OpenTKImageViewer
 {
@@ -44,6 +45,17 @@ namespace OpenTKImageViewer
         private void GLControl_Paint(object sender, PaintEventArgs e)
         {
             glControl.MakeCurrent();
+            GL.ClearColor(0.933f, 0.933f, 0.933f, 1.0f);
+            GL.Clear(ClearBufferMask.ColorBufferBit);
+
+            GL.Finish();
+            glControl.SwapBuffers();
+
+            glControl.Invalidate();
+        }
+
+        private void WinFormsHost_OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
         }
     }
 }

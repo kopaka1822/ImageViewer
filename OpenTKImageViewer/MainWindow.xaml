@@ -8,6 +8,7 @@
         Title="MainWindow" Height="350" Width="525">
     <Grid>
         <WindowsFormsHost x:Name="WinFormsHost"
-                          Initialized="WinFormsHost_OnInitialized"/>
+                          Initialized="WinFormsHost_OnInitialized"
+                          SizeChanged="WinFormsHost_OnSizeChanged"/>
     </Grid>
 </Window>
