@@ -69,7 +69,6 @@ namespace OpenTKImageViewer
             _program = CreateProgram();
             GL.GenVertexArrays(1, out _vertexArray);
             GL.BindVertexArray(_vertexArray);
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
             GL.PatchParameter(PatchParameterInt.PatchVertices, 3);
         }
 
@@ -81,20 +80,21 @@ namespace OpenTKImageViewer
                 var shaders = new List<int>();
                 shaders.Add(CompileShader(ShaderType.VertexShader,
                     "#version 450 core\n" +
-                    "layout (location = 0) in float time;\n" +
                     "layout (location = 1) in vec4 position;\n" +
-                    "out vec4 frag_color;\n" +
                     "void main(void){\n" +
-                    "gl_Position = position;\n" +
-                    "frag_color = vec4(sin(time) * 0.5 + 0.5, cos(time) * 0.5 + 0.5, 0.0, 0.0);\n" +
+                    "vec4 vertex = vec4(0.0, 0.0, 0.0, 1.0);" +
+                    "if(gl_VertexID == 0u) vertex = vec4(1.0, -1.0, 0.0, 1.0);\n" +
+                    "if(gl_VertexID == 1u) vertex = vec4(-1.0, -1.0, 0.0, 1.0);\n" +
+                    "if(gl_VertexID == 2u) vertex = vec4(1.0, 1.0, 0.0, 1.0);\n" +
+                    "if(gl_VertexID == 3u) vertex = vec4(-1.0, 1.0, 0.0, 1.0);\n" +
+                    "gl_Position = vertex;\n" +
                     "}\n"
                     ));
                 shaders.Add(CompileShader(ShaderType.FragmentShader,
                     "#version 450 core\n" +
-                    "in vec4 frag_color;\n" +
                     "out vec4 color;\n" +
                     "void main(void){\n" +
-                    "color = frag_color;\n" +
+                    "color = vec4(1.0);\n" +
                     "}\n"
                     ));
 
@@ -153,17 +153,7 @@ namespace OpenTKImageViewer
 
                 GL.UseProgram(_program);
 
-                // add shader attributes here
-                GL.VertexAttrib1(0, _time);
-                Vector4 position;
-                position.X = (float)Math.Sin(_time) * 0.5f;
-                position.Y = (float)Math.Cos(_time) * 0.5f;
-                position.Z = 0.0f;
-                position.W = 1.0f;
-                GL.VertexAttrib4(1, position);
-
-                GL.DrawArrays(PrimitiveType.Patches, 0, 3);
-                GL.PointSize(10);
+                GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
                 
                 glControl.SwapBuffers();
             }
