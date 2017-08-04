@@ -76,6 +76,7 @@
     <Compile Include="glhelper\Mesh.cs" />
     <Compile Include="glhelper\Program.cs" />
     <Compile Include="glhelper\Shader.cs" />
+    <Compile Include="glhelper\Utility.cs" />
     <Compile Include="glhelper\VertexArrayObject.cs" />
     <Compile Include="glhelper\VertexBufferObject.cs" />
     <Compile Include="ImageContext\ImageContext.cs" />

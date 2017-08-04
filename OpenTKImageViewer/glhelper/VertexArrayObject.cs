@@ -36,6 +36,7 @@ namespace OpenTKImageViewer.glhelper
         public void Draw(PrimitiveType mode, int count)
         {
             GL.BindVertexArray(id);
+            GL.EnableVertexAttribArray(0);
             GL.DrawArrays(mode, 0, count);
         }
     }

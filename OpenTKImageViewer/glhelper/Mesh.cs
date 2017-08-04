@@ -28,12 +28,18 @@ namespace OpenTKImageViewer.glhelper
         public static Mesh GenerateQuad()
         {
             VertexBufferObject vbo = new VertexBufferObject(new float[]
-            {
+            /*{
                 1.0f, -1.0f,
                 -1.0f, -1.0f,
                 1.0f, 1.0f,
                 -1.0f, 1.0f
-            });
+            });*/
+                {
+                    0.5f, -0.5f,
+                    -0.5f, -0.5f,
+                    0.5f, 0.5f,
+                    -0.5f, 0.5f
+                });
             VertexArrayObject vao = new VertexArrayObject();
             vao.AddVertexBuffer(vbo, 0, 2);
 

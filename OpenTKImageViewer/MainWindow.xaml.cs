@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,8 +32,9 @@ namespace OpenTKImageViewer
     {
         private GLControl glControl;
 
-        private Mesh mesh;
-        private Program program;
+        private int _program;
+        private int _vertexArray;
+        private double _time;
 
         private string error = "";
         private int iteration = 0;
@@ -58,37 +60,74 @@ namespace OpenTKImageViewer
             }
             catch (Exception exception)
             {
-                error = exception.Message;
+                error = exception.Message + ": " + exception.StackTrace;
             }
         }
 
         private void InitGraphics()
+        { 
+            _program = CreateProgram();
+            GL.GenVertexArrays(1, out _vertexArray);
+            GL.BindVertexArray(_vertexArray);
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
+            GL.PatchParameter(PatchParameterInt.PatchVertices, 3);
+        }
+
+        private int CreateProgram()
         {
-            //mesh = Mesh.GenerateQuad();
+            try
+            {
+                var program = GL.CreateProgram();
+                var shaders = new List<int>();
+                shaders.Add(CompileShader(ShaderType.VertexShader,
+                    "#version 450 core\n" +
+                    "layout (location = 0) in float time;\n" +
+                    "layout (location = 1) in vec4 position;\n" +
+                    "out vec4 frag_color;\n" +
+                    "void main(void){\n" +
+                    "gl_Position = position;\n" +
+                    "frag_color = vec4(sin(time) * 0.5 + 0.5, cos(time) * 0.5 + 0.5, 0.0, 0.0);\n" +
+                    "}\n"
+                    ));
+                shaders.Add(CompileShader(ShaderType.FragmentShader,
+                    "#version 450 core\n" +
+                    "in vec4 frag_color;\n" +
+                    "out vec4 color;\n" +
+                    "void main(void){\n" +
+                    "color = frag_color;\n" +
+                    "}\n"
+                    ));
 
-            // make Shader
-            var vertexShader = new Shader(ShaderType.VertexShader);
-            vertexShader.Source += "#version 420\n";
-            //vertexShader.Source += "layout(location = 0) in vec2 vertex;\n";
-            vertexShader.Source += "void main(){\n";
-            //vertexShader.Source += "gl_Position = vec4(vertex, 0.0, 1.0);\n";
-            vertexShader.Source += "if(gl_VertexID == 0u) gl_Position = vec4(1.0, -1.0, 0.0, 1.0);";
-            vertexShader.Source += "if(gl_VertexID == 1u) gl_Position = vec4(-1.0, -1.0, 0.0, 1.0);";
-            vertexShader.Source += "if(gl_VertexID == 2u) gl_Position = vec4(1.0, 1.0, 0.0, 1.0);";
-            vertexShader.Source += "if(gl_VertexID == 3u) gl_Position = vec4(-1.0, 1.0, 0.0, 1.0);";
-            vertexShader.Source += "}";
-            vertexShader.Compile();
+                foreach (var shader in shaders)
+                    GL.AttachShader(program, shader);
+                GL.LinkProgram(program);
+                var info = GL.GetProgramInfoLog(program);
+                if (!string.IsNullOrWhiteSpace(info))
+                    throw new Exception($"CompileShaders ProgramLinking had errors: {info}");
 
-            var fragmentShader = new Shader(ShaderType.FragmentShader);
-            fragmentShader.Source += "#version 420\n";
-            fragmentShader.Source += "out vec4 color;\n";
-            fragmentShader.Source += "void main(){\n";
-            fragmentShader.Source += "color = vec4(1.0);\n";
-            fragmentShader.Source += "}";
+                foreach (var shader in shaders)
+                {
+                    GL.DetachShader(program, shader);
+                    GL.DeleteShader(shader);
+                }
+                return program;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                throw;
+            }
+        }
 
-            var shaders = new List<Shader> {vertexShader, fragmentShader};
-
-            program = new Program(shaders);
+        private int CompileShader(ShaderType type, string src)
+        {
+            var shader = GL.CreateShader(type);
+            GL.ShaderSource(shader, src);
+            GL.CompileShader(shader);
+            var info = GL.GetShaderInfoLog(shader);
+            if (!string.IsNullOrWhiteSpace(info))
+                throw new Exception($"CompileShader {type} had errors: {info}");
+            return shader;
         }
 
         private float r = 0.0f;
@@ -102,28 +141,36 @@ namespace OpenTKImageViewer
 
             try
             {
-                r += 0.001f;
-                glControl.MakeCurrent();
-                GL.ClearColor(r, 0.933f, 0.933f, 1.0f);
+                GL.Viewport(0, 0, (int)WinFormsHost.ActualWidth, (int)WinFormsHost.ActualHeight);
+                _time += 0.1f;
+                Color4 backColor;
+                backColor.A = 1.0f;
+                backColor.R = 0.1f;
+                backColor.G = 0.1f;
+                backColor.B = 0.3f;
+                GL.ClearColor(backColor);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-                GL.Disable(EnableCap.CullFace);
-                GL.Disable(EnableCap.DepthTest);
 
-                GL.UseProgram(0);
+                GL.UseProgram(_program);
 
-                program.Bind();
-                //mesh.Draw();
-                GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+                // add shader attributes here
+                GL.VertexAttrib1(0, _time);
+                Vector4 position;
+                position.X = (float)Math.Sin(_time) * 0.5f;
+                position.Y = (float)Math.Cos(_time) * 0.5f;
+                position.Z = 0.0f;
+                position.W = 1.0f;
+                GL.VertexAttrib4(1, position);
 
-                GL.Flush();
-                GL.Finish();
+                GL.DrawArrays(PrimitiveType.Patches, 0, 3);
+                GL.PointSize(10);
+                
                 glControl.SwapBuffers();
-
             }
             catch (Exception exception)
             {
                 if (error.Length == 0)
-                    error = exception.Message;
+                    error = exception.Message + ": " + exception.StackTrace;
             }
 
             glControl.Invalidate();
