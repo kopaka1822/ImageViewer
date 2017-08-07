@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,12 @@ namespace OpenTKImageViewer.ImageContext
         private class ImageData
         {
             public ImageLoader.Image image;
+
+            public ImageData(ImageLoader.Image image)
+            {
+                this.image = image;
+            }
+
             // TODO add opengl texture
         }
 
@@ -31,12 +38,23 @@ namespace OpenTKImageViewer.ImageContext
 
         public ImageContext(List<ImageLoader.Image> images)
         {
-            
+            if (images != null)
+            {
+                foreach (var image in images)
+                {
+                    AddImage(image);
+                }
+            }
         }
 
         public int GetNumImages()
         {
             return images.Count;
+        }
+
+        public void AddImage(ImageLoader.Image image)
+        {
+            images.Add(new ImageData(image));
         }
     }
 }

@@ -76,13 +76,14 @@ namespace OpenTKImageViewer
         {
             if (Context.GetNumImages() > 0)
             {
-                // TODO add other views
+                imageViews.Add(ImageViewType.Single, new SingleView(Context));
+                CurrentView = ImageViewType.Single;
+                // TODO add cube etc.
             }
 
             if (imageViews.Count == 0)
             {
                 imageViews.Add(ImageViewType.Empty, new EmptyView());
-                //imageViews.Add(ImageViewType.Empty, new SingleView(Context));
                 CurrentView = ImageViewType.Empty;
             }
         }
