@@ -24,6 +24,7 @@ using OpenTKImageViewer.View;
 using BeginMode = OpenTK.Graphics.OpenGL.BeginMode;
 using MatrixMode = OpenTK.Graphics.OpenGL.MatrixMode;
 using MessageBox = System.Windows.MessageBox;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 namespace OpenTKImageViewer
 {
@@ -102,6 +103,12 @@ namespace OpenTKImageViewer
 
                 glControl.MakeCurrent();
                 InitGraphics();
+
+                glControl.MouseMove += (o, args) => WinFormsHost_OnMouseMove(args);
+                glControl.MouseWheel += (o, args) => WinFormsHost_OnMouseWheel(args);
+                glControl.MouseDown += (o, args) => WinFormsHost_OnMouseDown(args);
+                glControl.MouseUp += (o, args) => WinFormsHost_OnMouseUp(args);
+                glControl.MouseLeave += (o, args) => WinFormsHost_OnMouseLeave(args);
             }
             catch (Exception exception)
             {
@@ -188,5 +195,49 @@ namespace OpenTKImageViewer
         {
 
         }
+
+        #region WINDOW INTERACTION
+
+        // mouse tracking
+        private Point mousePosition = new Point();
+        private bool mouseDown = false;
+
+        private void WinFormsHost_OnMouseMove(System.Windows.Forms.MouseEventArgs args)
+        {
+            var newPosition = new Point(args.X, args.Y);
+            if (mouseDown)
+            {
+                // drag event
+                var diff = newPosition - mousePosition;
+
+                if (Math.Abs(diff.X) > 0.01 || Math.Abs(diff.Y) > 0.01)
+                    imageViews[currentImageView]?.OnDrag(diff);
+            }
+            mousePosition = newPosition;
+        }
+
+        private void WinFormsHost_OnMouseDown(System.Windows.Forms.MouseEventArgs args)
+        {
+            mouseDown = ((args.Button & MouseButtons.Left) | (args.Button & MouseButtons.Right)) != 0;
+            mousePosition = new Point(args.X, args.Y);
+        }
+
+        private void WinFormsHost_OnMouseUp(System.Windows.Forms.MouseEventArgs args)
+        {
+            mouseDown = ((args.Button & MouseButtons.Left) | (args.Button & MouseButtons.Right)) != 0;
+            mousePosition = new Point(args.X, args.Y);
+        }
+
+        private void WinFormsHost_OnMouseLeave(System.EventArgs args)
+        {
+            mouseDown = false;
+        }
+
+        private void WinFormsHost_OnMouseWheel(System.Windows.Forms.MouseEventArgs args)
+        {
+            imageViews[currentImageView]?.OnScroll(args.Delta, new Point(args.X, args.Y));
+        }
+        
+        #endregion
     }
 }

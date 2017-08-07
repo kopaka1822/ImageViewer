@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using OpenTK;
 using OpenTKImageViewer.View.Shader;
 
 namespace OpenTKImageViewer.View
@@ -11,11 +12,13 @@ namespace OpenTKImageViewer.View
     public class SingleView : VertexArrayView
     {
         private ImageContext.ImageContext context;
-        private ViewShader shader;
+        private SingleViewShader shader;
+        private Matrix4 transform;
 
         public SingleView(ImageContext.ImageContext context)
         {
             this.context = context;
+            this.transform = Matrix4.Identity;
         }
 
         private void Init()
@@ -35,6 +38,7 @@ namespace OpenTKImageViewer.View
         {
             // bind the shader?
             shader.Bind(context);
+            shader.SetTransform(transform);
 
             // draw via vertex array
             base.Draw();
@@ -42,7 +46,7 @@ namespace OpenTKImageViewer.View
 
         public override void OnDrag(Vector diff)
         {
-
+            transform *= Matrix4.CreateTranslation((float) diff.X, (float) diff.Y, 0.0f);
         }
 
         public override void OnScroll(double diff, Point mouse)
