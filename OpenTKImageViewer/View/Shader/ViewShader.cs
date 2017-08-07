@@ -22,5 +22,10 @@ namespace OpenTKImageViewer.View.Shader
         }
 
         public abstract void Bind(ImageContext.ImageContext context);
+
+        protected static string GetVersion()
+        {
+            return "#version 430 core\n";
+        }
     }
 }

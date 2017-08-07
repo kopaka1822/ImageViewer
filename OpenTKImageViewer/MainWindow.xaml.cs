@@ -38,10 +38,6 @@ namespace OpenTKImageViewer
         private readonly App parent;
         private GLControl glControl;
 
-        private Program _program;
-        private int _vertexArray;
-        private double _time;
-
         private string error = "";
         private int iteration = 0;
         
@@ -119,47 +115,10 @@ namespace OpenTKImageViewer
         private void InitGraphics()
         { 
             GL.Enable(EnableCap.TextureCubeMapSeamless);
-            _program = CreateProgram();
         }
 
 #endregion
-
-        private Program CreateProgram()
-        {
-            try
-            {
-                var shaders = new List<Shader>();
-                shaders.Add(new Shader(ShaderType.VertexShader,
-                    "#version 450 core\n" +
-                    "layout (location = 1) in vec4 position;\n" +
-                    "void main(void){\n" +
-                    "vec4 vertex = vec4(0.0, 0.0, 0.0, 1.0);" +
-                    "if(gl_VertexID == 0u) vertex = vec4(1.0, -1.0, 0.0, 1.0);\n" +
-                    "if(gl_VertexID == 1u) vertex = vec4(-1.0, -1.0, 0.0, 1.0);\n" +
-                    "if(gl_VertexID == 2u) vertex = vec4(1.0, 1.0, 0.0, 1.0);\n" +
-                    "if(gl_VertexID == 3u) vertex = vec4(-1.0, 0.5, 0.0, 1.0);\n" +
-                    "gl_Position = vertex;\n" +
-                    "}\n").Compile());
-                
-                shaders.Add(new Shader(ShaderType.FragmentShader,
-                    "#version 450 core\n" +
-                    "out vec4 color;\n" +
-                    "void main(void){\n" +
-                    "color = vec4(1.0);\n" +
-                    "}\n").Compile());
-                
-                Program program = new Program(shaders, true);
-                
-                return program;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.ToString());
-                throw;
-            }
-        }
         
-
         private void GLControl_Paint(object sender, PaintEventArgs e)
         {
             if (error.Length > 0 && iteration++ > 0)
@@ -175,6 +134,7 @@ namespace OpenTKImageViewer
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
                 
                 imageViews[CurrentView]?.Update();
+                Context.Update();
 
                 imageViews[CurrentView]?.Draw();
 

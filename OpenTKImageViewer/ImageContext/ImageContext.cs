@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTKImageViewer.glhelper;
 
 namespace OpenTKImageViewer.ImageContext
 {
@@ -12,13 +13,12 @@ namespace OpenTKImageViewer.ImageContext
         private class ImageData
         {
             public ImageLoader.Image image;
+            public TextureArray2D TextureArray2D;
 
             public ImageData(ImageLoader.Image image)
             {
                 this.image = image;
             }
-
-            // TODO add opengl texture
         }
 
         public enum GrayscaleMode
@@ -47,6 +47,16 @@ namespace OpenTKImageViewer.ImageContext
             }
         }
 
+        public void Update()
+        {
+            // create gpu textures for newly added images
+            foreach (var imageData in images)
+            {
+                if(imageData.TextureArray2D == null)
+                    imageData.TextureArray2D = new TextureArray2D(imageData.image);
+            }
+        }
+
         public int GetNumImages()
         {
             return images.Count;
@@ -55,6 +65,15 @@ namespace OpenTKImageViewer.ImageContext
         public void AddImage(ImageLoader.Image image)
         {
             images.Add(new ImageData(image));
+        }
+
+        public void BindFinalTextureAs2DSamplerArray(int slot)
+        {
+            // TODO replace with correct code
+            if (images.Count > 0)
+            {
+                images[0].TextureArray2D.Bind(slot);
+            }
         }
     }
 }

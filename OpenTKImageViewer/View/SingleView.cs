@@ -39,6 +39,7 @@ namespace OpenTKImageViewer.View
             // bind the shader?
             shader.Bind(context);
             shader.SetTransform(transform);
+            context.BindFinalTextureAs2DSamplerArray(shader.GetTextureLocation());
 
             // draw via vertex array
             base.Draw();
