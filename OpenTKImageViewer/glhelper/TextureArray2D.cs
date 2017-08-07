@@ -62,14 +62,19 @@ namespace OpenTKImageViewer.glhelper
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLevel, image.GetNumMipmaps());
         }
 
-        public void Bind(int slot)
+        public void BindAs(int slot, TextureTarget target)
         {
             GL.ActiveTexture(TextureUnit.Texture0 + slot);
             Utility.GLCheck();
-            GL.BindTexture(TextureTarget.Texture2DArray, id);
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.BindTexture(target, id);
+            GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             Utility.GLCheck();
+        }
+
+        public void Bind(int slot)
+        {
+            BindAs(slot, TextureTarget.Texture2DArray);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK.Graphics.OpenGL4;
 using OpenTKImageViewer.glhelper;
 
 namespace OpenTKImageViewer.ImageContext
@@ -112,6 +113,16 @@ namespace OpenTKImageViewer.ImageContext
             // TODO replace with correct code
             if (images.Count > 0)
             {
+                images[0].TextureArray2D.Bind(slot);
+            }
+        }
+
+        public void BindFinalTextureAsCubeMap(int slot)
+        {
+            // TODO replace with correct code
+            if (images.Count > 0)
+            {
+                //images[0].TextureArray2D.BindAs(slot, TextureTarget.TextureCubeMap);
                 images[0].TextureArray2D.Bind(slot);
             }
         }

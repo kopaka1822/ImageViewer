@@ -66,8 +66,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="glhelper\TextureArray2D.cs" />
+    <Compile Include="View\CubeView.cs" />
     <Compile Include="View\EmptyView.cs" />
     <Compile Include="View\IImageView.cs" />
+    <Compile Include="View\Shader\CubeViewShader.cs" />
     <Compile Include="View\VertexArrayView.cs" />
     <Compile Include="View\Shader\SingleViewShader.cs" />
     <Compile Include="View\Shader\ViewShader.cs" />
