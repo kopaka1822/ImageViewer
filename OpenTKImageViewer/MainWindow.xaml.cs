@@ -82,6 +82,7 @@ namespace OpenTKImageViewer
             if (imageViews.Count == 0)
             {
                 imageViews.Add(ImageViewType.Empty, new EmptyView());
+                //imageViews.Add(ImageViewType.Empty, new SingleView(Context));
                 CurrentView = ImageViewType.Empty;
             }
         }
@@ -111,7 +112,6 @@ namespace OpenTKImageViewer
         { 
             GL.Enable(EnableCap.TextureCubeMapSeamless);
             _program = CreateProgram();
-            GL.GenVertexArrays(1, out _vertexArray);
         }
 
 #endregion
@@ -168,11 +168,9 @@ namespace OpenTKImageViewer
                 
                 imageViews[CurrentView]?.Update();
 
-                //_program.Bind();
-                //GL.BindVertexArray(_vertexArray);
+                imageViews[CurrentView]?.Draw();
 
-                //GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
-                imageViews[CurrentView]?.Update();
+                Utility.GLCheck();
                 
                 glControl.SwapBuffers();
             }
