@@ -26,6 +26,16 @@ namespace OpenTKImageViewer.View.Shader
             GL.UniformMatrix4(0, false, ref mat);
         }
 
+        public void SetLayer(float layer)
+        {
+            GL.Uniform1(2, layer);
+        }
+
+        public void SetLevel(float level)
+        {
+            GL.Uniform1(3, level);
+        }
+
         public int GetTextureLocation()
         {
             return 1;
@@ -56,12 +66,16 @@ namespace OpenTKImageViewer.View.Shader
             return GetVersion() +
                    // uniforms
                    "layout(location = 1) uniform sampler2DArray tex;\n" +
+                   "layout(location = 2) uniform float layer;\n" +
+                   "layout(location = 3) uniform float level;\n" +
                    // in out
                    "layout(location = 0) in vec2 texcoord;\n" +
                    "out vec4 fragColor;\n" +
 
                    "void main(void){\n" +
-                   "vec4 color = texture(tex, vec3(texcoord, 0.0));\n" +
+                   "ivec2 icoord = ivec2(vec2(textureSize(tex, int(level))) * texcoord);\n" +
+                   "vec4 color = texelFetch(tex, ivec3(icoord, int(layer)), int(level));\n" +
+                   //"vec4 color = textureLod(tex, vec3(texcoord, layer), level);\n" +
                    "fragColor = color;\n" +
                    "}\n";
         }

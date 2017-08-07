@@ -42,6 +42,8 @@ namespace OpenTKImageViewer.View
             // bind the shader?
             shader.Bind(context);
             shader.SetTransform(transform * aspectRatio);
+            shader.SetLevel((float)context.ActiveMipmap);
+            shader.SetLayer((float)context.ActiveLayer);
             context.BindFinalTextureAs2DSamplerArray(shader.GetTextureLocation());
 
             // draw via vertex array

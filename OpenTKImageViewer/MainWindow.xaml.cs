@@ -22,6 +22,7 @@ using OpenTKImageViewer.glhelper;
 using OpenTKImageViewer.ImageContext;
 using OpenTKImageViewer.View;
 using BeginMode = OpenTK.Graphics.OpenGL.BeginMode;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MatrixMode = OpenTK.Graphics.OpenGL.MatrixMode;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
@@ -139,7 +140,6 @@ namespace OpenTKImageViewer
                 imageViews[CurrentView]?.Draw();
 
                 Utility.GLCheck();
-                
                 glControl.SwapBuffers();
             }
             catch (Exception exception)
@@ -208,6 +208,25 @@ namespace OpenTKImageViewer
         public float GetClientHeight()
         {
             return (float) WinFormsHost.ActualHeight;
+        }
+
+        private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Right:
+                    Context.ActiveLayer += 1;
+                    break;
+                case Key.Left:
+                    Context.ActiveLayer -= 1;
+                    break;
+                case Key.Up:
+                    Context.ActiveMipmap -= 1;
+                    break;
+                case Key.Down:
+                    Context.ActiveMipmap += 1;
+                    break;
+            }
         }
     }
 }

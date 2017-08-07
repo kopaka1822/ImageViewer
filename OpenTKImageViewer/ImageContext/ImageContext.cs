@@ -36,6 +36,32 @@ namespace OpenTKImageViewer.ImageContext
         public bool LinearInterpolation { get; set; } = false;
         public GrayscaleMode Grayscale { get; set; } = GrayscaleMode.Disabled;
 
+        public uint ActiveMipmap
+        {
+            get { return activeMipmap; }
+            set
+            {
+                if (value != activeMipmap && value < GetNumMipmaps())
+                {
+                    activeMipmap = value;
+                    //OnChangedMipmap();
+                }
+            }
+        }
+
+        public uint ActiveLayer
+        {
+            get { return activeLayer; }
+            set
+            {
+                if (value != activeLayer && value < GetNumLayers())
+                {
+                    activeLayer = value;
+                    //OnChangedLayer();
+                }
+            }
+        }
+
         public ImageContext(List<ImageLoader.Image> images)
         {
             if (images != null)
@@ -60,6 +86,20 @@ namespace OpenTKImageViewer.ImageContext
         public int GetNumImages()
         {
             return images.Count;
+        }
+
+        public int GetNumMipmaps()
+        {
+            if (images.Count == 0)
+                return 0;
+            return images[0].image.GetNumMipmaps();
+        }
+
+        public int GetNumLayers()
+        {
+            if (images.Count == 0)
+                return 0;
+            return images[0].image.Layers.Count;
         }
 
         public void AddImage(ImageLoader.Image image)
