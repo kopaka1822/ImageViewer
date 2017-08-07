@@ -33,5 +33,10 @@ namespace OpenTKImageViewer.ImageContext
         {
             
         }
+
+        public int GetNumImages()
+        {
+            return images.Count;
+        }
     }
 }

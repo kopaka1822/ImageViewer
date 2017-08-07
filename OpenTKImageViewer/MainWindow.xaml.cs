@@ -20,6 +20,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using OpenTKImageViewer.glhelper;
 using OpenTKImageViewer.ImageContext;
+using OpenTKImageViewer.View;
 using BeginMode = OpenTK.Graphics.OpenGL.BeginMode;
 using MatrixMode = OpenTK.Graphics.OpenGL.MatrixMode;
 using MessageBox = System.Windows.MessageBox;
@@ -31,6 +32,8 @@ namespace OpenTKImageViewer
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        #region VARIABLES
         private readonly App parent;
         private GLControl glControl;
 
@@ -42,15 +45,45 @@ namespace OpenTKImageViewer
         private int iteration = 0;
         
         public ulong ZIndex { get; set; }
-        private ImageContext.ImageContext ImageContext { get; set; }
+        private ImageContext.ImageContext Context { get; set; }
+        private Dictionary<ImageViewType, IImageView> imageViews = new Dictionary<ImageViewType, IImageView>();
+        private ImageViewType currentImageView;
+        public ImageViewType CurrentView
+        {
+            get { return currentImageView; }
+            set
+            {
+                if (imageViews.ContainsKey(value))
+                    currentImageView = value;
+            }
+        }
 
-        public MainWindow(App parent, ImageContext.ImageContext imageContext)
+        #endregion
+
+        #region INITIALIZATION
+
+        public MainWindow(App parent, ImageContext.ImageContext context)
         {
             this.parent = parent;
-            this.ImageContext = imageContext;
+            this.Context = context;
             this.ZIndex = 0;
 
             InitializeComponent();
+            CreateImageViews();
+        }
+
+        private void CreateImageViews()
+        {
+            if (Context.GetNumImages() > 0)
+            {
+                // TODO add other views
+            }
+
+            if (imageViews.Count == 0)
+            {
+                imageViews.Add(ImageViewType.Empty, new EmptyView());
+                CurrentView = ImageViewType.Empty;
+            }
         }
 
 
@@ -76,9 +109,12 @@ namespace OpenTKImageViewer
 
         private void InitGraphics()
         { 
+            GL.Enable(EnableCap.TextureCubeMapSeamless);
             _program = CreateProgram();
             GL.GenVertexArrays(1, out _vertexArray);
         }
+
+#endregion
 
         private Program CreateProgram()
         {
@@ -127,19 +163,16 @@ namespace OpenTKImageViewer
             try
             {
                 GL.Viewport(0, 0, (int)WinFormsHost.ActualWidth, (int)WinFormsHost.ActualHeight);
-                _time += 0.1f;
-                Color4 backColor;
-                backColor.A = 1.0f;
-                backColor.R = 0.1f;
-                backColor.G = 0.1f;
-                backColor.B = 0.3f;
-                GL.ClearColor(backColor);
+                GL.ClearColor(0.9333f, 0.9333f, 0.9333f, 1.0f);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
                 
-                _program.Bind();
-                GL.BindVertexArray(_vertexArray);
+                imageViews[CurrentView]?.Update();
 
-                GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
+                //_program.Bind();
+                //GL.BindVertexArray(_vertexArray);
+
+                //GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
+                imageViews[CurrentView]?.Update();
                 
                 glControl.SwapBuffers();
             }
