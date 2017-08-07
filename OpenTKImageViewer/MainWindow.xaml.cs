@@ -32,7 +32,7 @@ namespace OpenTKImageViewer
     {
         private GLControl glControl;
 
-        private int _program;
+        private Program _program;
         private int _vertexArray;
         private double _time;
 
@@ -68,17 +68,14 @@ namespace OpenTKImageViewer
         { 
             _program = CreateProgram();
             GL.GenVertexArrays(1, out _vertexArray);
-            GL.BindVertexArray(_vertexArray);
-            GL.PatchParameter(PatchParameterInt.PatchVertices, 3);
         }
 
-        private int CreateProgram()
+        private Program CreateProgram()
         {
             try
             {
-                var program = GL.CreateProgram();
-                var shaders = new List<int>();
-                shaders.Add(CompileShader(ShaderType.VertexShader,
+                var shaders = new List<Shader>();
+                shaders.Add(new Shader(ShaderType.VertexShader,
                     "#version 450 core\n" +
                     "layout (location = 1) in vec4 position;\n" +
                     "void main(void){\n" +
@@ -86,30 +83,19 @@ namespace OpenTKImageViewer
                     "if(gl_VertexID == 0u) vertex = vec4(1.0, -1.0, 0.0, 1.0);\n" +
                     "if(gl_VertexID == 1u) vertex = vec4(-1.0, -1.0, 0.0, 1.0);\n" +
                     "if(gl_VertexID == 2u) vertex = vec4(1.0, 1.0, 0.0, 1.0);\n" +
-                    "if(gl_VertexID == 3u) vertex = vec4(-1.0, 1.0, 0.0, 1.0);\n" +
+                    "if(gl_VertexID == 3u) vertex = vec4(-1.0, 0.5, 0.0, 1.0);\n" +
                     "gl_Position = vertex;\n" +
-                    "}\n"
-                    ));
-                shaders.Add(CompileShader(ShaderType.FragmentShader,
+                    "}\n").Compile());
+                
+                shaders.Add(new Shader(ShaderType.FragmentShader,
                     "#version 450 core\n" +
                     "out vec4 color;\n" +
                     "void main(void){\n" +
                     "color = vec4(1.0);\n" +
-                    "}\n"
-                    ));
-
-                foreach (var shader in shaders)
-                    GL.AttachShader(program, shader);
-                GL.LinkProgram(program);
-                var info = GL.GetProgramInfoLog(program);
-                if (!string.IsNullOrWhiteSpace(info))
-                    throw new Exception($"CompileShaders ProgramLinking had errors: {info}");
-
-                foreach (var shader in shaders)
-                {
-                    GL.DetachShader(program, shader);
-                    GL.DeleteShader(shader);
-                }
+                    "}\n").Compile());
+                
+                Program program = new Program(shaders, true);
+                
                 return program;
             }
             catch (Exception ex)
@@ -117,17 +103,6 @@ namespace OpenTKImageViewer
                 Debug.WriteLine(ex.ToString());
                 throw;
             }
-        }
-
-        private int CompileShader(ShaderType type, string src)
-        {
-            var shader = GL.CreateShader(type);
-            GL.ShaderSource(shader, src);
-            GL.CompileShader(shader);
-            var info = GL.GetShaderInfoLog(shader);
-            if (!string.IsNullOrWhiteSpace(info))
-                throw new Exception($"CompileShader {type} had errors: {info}");
-            return shader;
         }
 
         private float r = 0.0f;
@@ -150,8 +125,9 @@ namespace OpenTKImageViewer
                 backColor.B = 0.3f;
                 GL.ClearColor(backColor);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-                GL.UseProgram(_program);
+                
+                _program.Bind();
+                GL.BindVertexArray(_vertexArray);
 
                 GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
                 

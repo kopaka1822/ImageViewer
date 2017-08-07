@@ -11,11 +11,9 @@ namespace OpenTKImageViewer.glhelper
     public class Program
     {
         private int id;
-        private List<Shader> shaders;
 
-        public Program(List<Shader> shaders)
+        public Program(List<Shader> shaders, bool deleteShaders)
         {
-            this.shaders = shaders;
             id = GL.CreateProgram();
 
             foreach (var shader in shaders)
@@ -30,12 +28,28 @@ namespace OpenTKImageViewer.glhelper
             GL.GetProgram(id, GetProgramParameterName.LinkStatus, out status);
             if(status == 0)
                 throw new Exception($"Error Linking Shader Programm: {GL.GetProgramInfoLog(id)}");
+
+            foreach (var shader in shaders)
+            {
+                GL.DetachShader(id, shader.Id);
+                if(deleteShaders)
+                    shader.Dispose();
+            }
         }
 
         public void Bind()
         {
             Debug.Assert(id != 0);
             GL.UseProgram(id);
+        }
+
+        public void Dispose()
+        {
+            if (id != 0)
+            {
+                GL.DeleteProgram(id);
+                id = 0;
+            }
         }
     }
 }

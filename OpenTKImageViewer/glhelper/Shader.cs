@@ -19,7 +19,14 @@ namespace OpenTKImageViewer.glhelper
             Id = GL.CreateShader(type);
         }
 
-        public void Compile()
+        public Shader(ShaderType type, String source)
+        {
+            this.type = type;
+            this.Source = source;
+            Id = GL.CreateShader(type);
+        }
+
+        public Shader Compile()
         {
             GL.ShaderSource(Id, Source);
             GL.CompileShader(Id);
@@ -29,6 +36,17 @@ namespace OpenTKImageViewer.glhelper
             
             if (status == 0)
                 throw new Exception($"Error Compiling {type.ToString()} Shader: {GL.GetShaderInfoLog(Id)}");
+
+            return this;
+        }
+
+        public void Dispose()
+        {
+            if (Id != 0)
+            {
+                GL.DeleteShader(Id);
+                Id = 0;
+            }
         }
     }
 }
