@@ -29,6 +29,9 @@ namespace OpenTKImageViewer.ImageContext
         public bool LinearInterpolation { get; set; } = false;
         public GrayscaleMode Grayscale { get; set; } = GrayscaleMode.Disabled;
 
-        
+        public ImageContext(List<ImageLoader.Image> images)
+        {
+            
+        }
     }
 }

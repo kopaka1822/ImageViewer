@@ -19,6 +19,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using OpenTKImageViewer.glhelper;
+using OpenTKImageViewer.ImageContext;
 using BeginMode = OpenTK.Graphics.OpenGL.BeginMode;
 using MatrixMode = OpenTK.Graphics.OpenGL.MatrixMode;
 using MessageBox = System.Windows.MessageBox;
@@ -30,6 +31,7 @@ namespace OpenTKImageViewer
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly App parent;
         private GLControl glControl;
 
         private Program _program;
@@ -38,11 +40,19 @@ namespace OpenTKImageViewer
 
         private string error = "";
         private int iteration = 0;
+        
+        public ulong ZIndex { get; set; }
+        private ImageContext.ImageContext ImageContext { get; set; }
 
-        public MainWindow()
+        public MainWindow(App parent, ImageContext.ImageContext imageContext)
         {
+            this.parent = parent;
+            this.ImageContext = imageContext;
+            this.ZIndex = 0;
+
             InitializeComponent();
         }
+
 
         private void WinFormsHost_OnInitialized(object sender, EventArgs e)
         {
@@ -104,8 +114,8 @@ namespace OpenTKImageViewer
                 throw;
             }
         }
+        
 
-        private float r = 0.0f;
         private void GLControl_Paint(object sender, PaintEventArgs e)
         {
             if (error.Length > 0 && iteration++ > 0)
