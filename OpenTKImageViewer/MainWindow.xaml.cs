@@ -133,7 +133,7 @@ namespace OpenTKImageViewer
                 GL.ClearColor(0.9333f, 0.9333f, 0.9333f, 1.0f);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
                 
-                imageViews[CurrentView]?.Update();
+                imageViews[CurrentView]?.Update(this);
                 Context.Update();
 
                 imageViews[CurrentView]?.Draw();
@@ -171,7 +171,7 @@ namespace OpenTKImageViewer
                 var diff = newPosition - mousePosition;
 
                 if (Math.Abs(diff.X) > 0.01 || Math.Abs(diff.Y) > 0.01)
-                    imageViews[currentImageView]?.OnDrag(diff);
+                    imageViews[currentImageView]?.OnDrag(diff, this);
             }
             mousePosition = newPosition;
         }
@@ -184,7 +184,7 @@ namespace OpenTKImageViewer
 
         private void WinFormsHost_OnMouseUp(System.Windows.Forms.MouseEventArgs args)
         {
-            mouseDown = ((args.Button & MouseButtons.Left) | (args.Button & MouseButtons.Right)) != 0;
+            mouseDown = ((args.Button & MouseButtons.Left) | (args.Button & MouseButtons.Right)) == 0;
             mousePosition = new Point(args.X, args.Y);
         }
 
@@ -199,5 +199,15 @@ namespace OpenTKImageViewer
         }
         
         #endregion
+
+        public float GetClientWidth()
+        {
+            return (float)WinFormsHost.ActualWidth;
+        }
+
+        public float GetClientHeight()
+        {
+            return (float) WinFormsHost.ActualHeight;
+        }
     }
 }

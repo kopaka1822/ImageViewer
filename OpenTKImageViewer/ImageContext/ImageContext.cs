@@ -75,5 +75,17 @@ namespace OpenTKImageViewer.ImageContext
                 images[0].TextureArray2D.Bind(slot);
             }
         }
+
+        public int GetWidth(int mipmap)
+        {
+            Debug.Assert(images.Count != 0);
+            return images[0].image.GetWidth(mipmap);
+        }
+
+        public int GetHeight(int mipmap)
+        {
+            Debug.Assert(images.Count != 0);
+            return images[0].image.GetHeight(mipmap);
+        }
     }
 }

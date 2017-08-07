@@ -13,7 +13,7 @@ namespace OpenTKImageViewer.View
     {
         private int vertexArrayId = 0;
 
-        public virtual void Update()
+        public virtual void Update(MainWindow window)
         {
             if(vertexArrayId == 0)
                 vertexArrayId = GL.GenVertexArray();
@@ -26,7 +26,7 @@ namespace OpenTKImageViewer.View
             GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
         }
 
-        public virtual void OnDrag(Vector diff)
+        public virtual void OnDrag(Vector diff, MainWindow window)
         {
             
         }

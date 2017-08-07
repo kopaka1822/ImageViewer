@@ -9,7 +9,7 @@ namespace OpenTKImageViewer.View
 {
     public class EmptyView : IImageView
     {
-        public void Update()
+        public void Update(MainWindow window)
         {
             
         }
@@ -19,7 +19,7 @@ namespace OpenTKImageViewer.View
             
         }
 
-        public void OnDrag(Vector diff)
+        public void OnDrag(Vector diff, MainWindow window)
         {
             
         }
