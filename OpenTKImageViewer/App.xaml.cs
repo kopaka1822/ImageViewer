@@ -159,7 +159,7 @@ namespace OpenTKImageViewer
                 {
                     // TODO
                     case UniqueDialog.Layer:
-                        //window = new LayerWindow(this);
+                        window = new LayerWindow(this);
                         break;
                     case UniqueDialog.Mipmaps:
                         window = new MipMapWindow(this);

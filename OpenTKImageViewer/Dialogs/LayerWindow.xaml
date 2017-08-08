@@ -1,0 +1,28 @@
+﻿<Window x:Class="OpenTKImageViewer.Dialogs.LayerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
+        mc:Ignorable="d"
+        Title="Layer" Height="300" Width="200"
+        ResizeMode="NoResize" Background="#eee"
+        Closing="LayerWindow_OnClosing">
+    
+    <Border Padding="5">
+        <StackPanel>
+            <!-- Mode Selector -->
+            <TextBlock Text="Mode:" Margin="0 0 0 2"/>
+            <ComboBox SelectedIndex="0" Margin="0 0 0 10"
+                      x:Name="BoxMode"
+                      SelectionChanged="BoxMode_OnSelectionChanged"/>
+
+            <TextBlock Text="Layer:" Margin="0 0 0 2"/>
+            <ListBox SelectedIndex="0" x:Name="LayerList"
+                     ScrollViewer.VerticalScrollBarVisibility="Visible"                       
+                     MinHeight="180" MaxHeight="180"
+                     SelectionChanged="LayerList_OnSelectionChanged"/>
+
+        </StackPanel>
+    </Border>
+</Window>

@@ -65,6 +65,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Dialogs\LayerWindow.xaml.cs">
+      <DependentUpon>LayerWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\MipMapWindow.xaml.cs">
       <DependentUpon>MipMapWindow.xaml</DependentUpon>
     </Compile>
@@ -77,6 +80,10 @@
     <Compile Include="View\Shader\SingleViewShader.cs" />
     <Compile Include="View\Shader\ViewShader.cs" />
     <Compile Include="View\SingleView.cs" />
+    <Page Include="Dialogs\LayerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\MipMapWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

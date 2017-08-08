@@ -394,5 +394,25 @@ namespace OpenTKImageViewer
         {
             parent.UpdateDialogVisibility();
         }
+
+        public ListBoxItem[] GenerateLayerItems()
+        {
+            var items = new ListBoxItem[Context.GetNumLayers()];
+            for (int curLayer = 0; curLayer < Context.GetNumLayers(); ++curLayer)
+            {
+                items[curLayer] = new ListBoxItem { Content = "Layer " + curLayer };
+            }
+            return items;
+        }
+
+        public List<ImageViewType> GetAvailableViews()
+        {
+            List<ImageViewType> res = new List<ImageViewType>();
+            foreach (var imageView in imageViews)
+            {
+                res.Add(imageView.Key);
+            }
+            return res;
+        }
     }
 }
