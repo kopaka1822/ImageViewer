@@ -38,7 +38,7 @@ namespace OpenTKImageViewer.View
         public override void Draw()
         {
             shader.Bind(context);
-            shader.SetTransform(GetRotation());
+            shader.SetTransform(GetRotation() * GetOrientation());
 
             context.BindFinalTextureAsCubeMap(shader.GetTextureLocation());
             // draw via vertex array
@@ -47,13 +47,18 @@ namespace OpenTKImageViewer.View
 
         private Matrix4 GetRotation()
         {
-            return Matrix4.CreateRotationZ(yawn) * Matrix4.CreateRotationY(pitch) * Matrix4.CreateRotationX(roll);
+            return  Matrix4.CreateRotationX(roll) * Matrix4.CreateRotationY(pitch) * Matrix4.CreateRotationZ(yawn);
+        }
+
+        private Matrix4 GetOrientation()
+        {
+            return Matrix4.CreateScale(1.0f, -1.0f, 1.0f);
         }
 
         public override void OnDrag(Vector diff, MainWindow window)
         {
             pitch += (float)diff.X * 0.01f;
-            roll += (float)diff.Y * -0.01f;
+            roll += (float)diff.Y * 0.01f;
         }
 
         public override void OnScroll(double diff, Point mouse)

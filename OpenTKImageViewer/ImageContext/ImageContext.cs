@@ -123,7 +123,8 @@ namespace OpenTKImageViewer.ImageContext
             if (images.Count > 0)
             {
                 //images[0].TextureArray2D.BindAs(slot, TextureTarget.TextureCubeMap);
-                images[0].TextureArray2D.Bind(slot);
+                //images[0].TextureArray2D.Bind(slot);
+                images[0].TextureArray2D.BindAsCubemap(slot);
             }
         }
 

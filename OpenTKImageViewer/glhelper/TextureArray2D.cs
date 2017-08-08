@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace OpenTKImageViewer.glhelper
     public class TextureArray2D
     {
         private int id;
+        private int cubeId = 0;
 
         public TextureArray2D(ImageLoader.Image image)
         {
@@ -60,13 +62,62 @@ namespace OpenTKImageViewer.glhelper
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLod, (float)image.GetNumMipmaps());
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureBaseLevel, 0);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLevel, image.GetNumMipmaps());
+
+            if(image.Layers.Count == 6)
+                CreateCubeMapView(image);
         }
 
-        public void BindAs(int slot, TextureTarget target)
+        private void CreateCubeMapView(ImageLoader.Image image)
+        {
+            Debug.Assert(image.Layers.Count == 6);
+            /*PixelInternalFormat pixelInternalFormat = (PixelInternalFormat) image.OpenglInternalFormat;
+            cubeId = GL.GenTexture();
+            GL.TextureView(cubeId, TextureTarget.TextureCubeMap, id,
+                pixelInternalFormat, 0, image.GetNumMipmaps(), 0, 6);
+
+            Utility.GLCheck();*/
+            cubeId = GL.GenTexture();
+            GL.BindTexture(TextureTarget.TextureCubeMap, cubeId);
+            Utility.GLCheck();
+
+            if (image.IsCompressed)
+            {
+                for (int level = 0; level < image.GetNumMipmaps(); ++level)
+                {
+                    for (int face = 0; face < 6; ++face)
+                    {
+                        GL.CompressedTexImage2D(TextureTarget.TextureCubeMapPositiveX + face, level,
+                            (PixelInternalFormat)image.OpenglInternalFormat, image.GetWidth(level), image.GetHeight(level), 0,
+                            (int)image.Layers[face].Mipmaps[level].Size,
+                            image.Layers[face].Mipmaps[level].Bytes);
+                    }
+                }
+            }
+            else
+            {
+                for (int level = 0; level < image.GetNumMipmaps(); ++level)
+                {
+                    for (int face = 0; face < 6; ++face)
+                    {
+                        GL.TexImage2D(TextureTarget.TextureCubeMapPositiveX + face, level,
+                            (PixelInternalFormat) image.OpenglInternalFormat, image.GetWidth(level), image.GetHeight(level), 0,
+                            (PixelFormat)image.OpenglExternalFormat, (PixelType)image.OpenglType,
+                            image.Layers[face].Mipmaps[level].Bytes);
+                    }
+                }
+            }
+
+            Utility.GLCheck();
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapR, (int)TextureParameterName.ClampToEdge);
+        }
+
+        private void BindAs(int slot, TextureTarget target, int texId)
         {
             GL.ActiveTexture(TextureUnit.Texture0 + slot);
             Utility.GLCheck();
-            GL.BindTexture(target, id);
+            GL.BindTexture(target, texId);
             GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             Utility.GLCheck();
@@ -74,7 +125,12 @@ namespace OpenTKImageViewer.glhelper
 
         public void Bind(int slot)
         {
-            BindAs(slot, TextureTarget.Texture2DArray);
+            BindAs(slot, TextureTarget.Texture2DArray, id);
+        }
+
+        public void BindAsCubemap(int slot)
+        {
+            BindAs(slot, TextureTarget.TextureCubeMap, cubeId);
         }
     }
 }
