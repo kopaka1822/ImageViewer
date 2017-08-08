@@ -39,6 +39,7 @@
         <WindowsFormsHost x:Name="WinFormsHost"
                           Initialized="WinFormsHost_OnInitialized"
                           SizeChanged="WinFormsHost_OnSizeChanged"
+                          Focusable="True"
                           />
     </DockPanel>
 </Window>

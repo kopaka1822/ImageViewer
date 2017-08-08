@@ -79,7 +79,7 @@ namespace OpenTKImageViewer
                 if (Context.GetNumLayers() == 6)
                 {
                     imageViews.Add(ImageViewType.CubeMap, new CubeView(Context));
-                    CurrentView = ImageViewType.CubeMap;
+                    //CurrentView = ImageViewType.CubeMap;
                 }
                 // TODO add ploar etc.
             }
@@ -242,8 +242,11 @@ namespace OpenTKImageViewer
                 case Key.Down:
                     Context.ActiveMipmap += 1;
                     break;
+                default:
+                    return;
             }
             RedrawFrame();
+            e.Handled = true;
         }
 
         #region MENU ITEMS
