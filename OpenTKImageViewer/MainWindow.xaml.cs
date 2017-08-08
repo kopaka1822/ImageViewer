@@ -414,5 +414,10 @@ namespace OpenTKImageViewer
             }
             return res;
         }
+
+        public ListBoxItem[] GenerateImageItems()
+        {
+            return new ListBoxItem[0];
+        }
     }
 }

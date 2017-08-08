@@ -165,7 +165,7 @@ namespace OpenTKImageViewer
                         window = new MipMapWindow(this);
                         break;
                     case UniqueDialog.Image:
-                        //window = new ImageWindow(this);
+                        window = new ImageWindow(this);
                         break;
                 }
                 IUniqueDialog dia = (IUniqueDialog)window;
