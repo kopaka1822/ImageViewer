@@ -6,7 +6,13 @@
         xmlns:local="clr-namespace:OpenTKImageViewer"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525"
-        KeyDown="MainWindow_OnKeyDown">
+        KeyDown="MainWindow_OnKeyDown"
+        Focusable="True"
+        Closing="MainWindow_OnClosing"
+        Background="#eee"
+        MinWidth="250" MinHeight="200"
+        Activated="MainWindow_OnActivated"
+        Deactivated="MainWindow_OnDeactivated">
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="#fff" Padding="0 0 0 2">
             <MenuItem Header="_File">

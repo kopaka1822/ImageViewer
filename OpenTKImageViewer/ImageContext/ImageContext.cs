@@ -9,6 +9,12 @@ using OpenTKImageViewer.glhelper;
 
 namespace OpenTKImageViewer.ImageContext
 {
+    public delegate void ChangedLayerHandler(object sender, EventArgs e);
+
+    public delegate void ChangedMipmapHanlder(object sender, EventArgs e);
+
+    public delegate void ChangedImagesHandler(object sender, EventArgs e);
+
     public class ImageContext
     {
         private class ImageData
@@ -37,6 +43,25 @@ namespace OpenTKImageViewer.ImageContext
         public bool LinearInterpolation { get; set; } = false;
         public GrayscaleMode Grayscale { get; set; } = GrayscaleMode.Disabled;
 
+        public event ChangedLayerHandler ChangedLayer;
+        public event ChangedMipmapHanlder ChangedMipmap;
+        public event ChangedImagesHandler ChangedImages;
+
+        protected virtual void OnChangedLayer()
+        {
+            ChangedLayer?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected virtual void OnChangedMipmap()
+        {
+            ChangedMipmap?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected virtual void OnChangedImages()
+        {
+            ChangedImages?.Invoke(this, EventArgs.Empty);
+        }
+
         public uint ActiveMipmap
         {
             get { return activeMipmap; }
@@ -45,7 +70,7 @@ namespace OpenTKImageViewer.ImageContext
                 if (value != activeMipmap && value < GetNumMipmaps())
                 {
                     activeMipmap = value;
-                    //OnChangedMipmap();
+                    OnChangedMipmap();
                 }
             }
         }
@@ -58,7 +83,7 @@ namespace OpenTKImageViewer.ImageContext
                 if (value != activeLayer && value < GetNumLayers())
                 {
                     activeLayer = value;
-                    //OnChangedLayer();
+                    OnChangedLayer();
                 }
             }
         }
@@ -106,6 +131,7 @@ namespace OpenTKImageViewer.ImageContext
         public void AddImage(ImageLoader.Image image)
         {
             images.Add(new ImageData(image));
+            OnChangedImages();
         }
 
         public void BindFinalTextureAs2DSamplerArray(int slot)

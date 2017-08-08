@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.Remoting.Contexts;
 using System.Threading.Tasks;
 using System.Windows;
+using OpenTKImageViewer.Dialogs;
 
 namespace OpenTKImageViewer
 {
@@ -58,6 +59,14 @@ namespace OpenTKImageViewer
                     openWindows.Add(wnd);
 
                     wnd.Show();
+
+                    // open relevant dialoges
+                    if(wnd.Context.GetNumMipmaps() > 1)
+                        OpenDialog(UniqueDialog.Mipmaps);
+                    if (wnd.Context.GetNumLayers() > 1)
+                        OpenDialog(UniqueDialog.Layer);
+                    if (wnd.Context.GetNumImages() > 1)
+                        OpenDialog(UniqueDialog.Image);
                 }
                 catch (Exception e)
                 {
@@ -153,7 +162,7 @@ namespace OpenTKImageViewer
                         //window = new LayerWindow(this);
                         break;
                     case UniqueDialog.Mipmaps:
-                        //window = new MipMapWindow(this);
+                        window = new MipMapWindow(this);
                         break;
                     case UniqueDialog.Image:
                         //window = new ImageWindow(this);
@@ -165,6 +174,7 @@ namespace OpenTKImageViewer
 
                 if (window != null)
                     uniqueDialogs.Add(dialog, window);
+
             }
             window?.Focus();
         }

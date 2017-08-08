@@ -65,6 +65,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Dialogs\MipMapWindow.xaml.cs">
+      <DependentUpon>MipMapWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="glhelper\TextureArray2D.cs" />
     <Compile Include="View\CubeView.cs" />
     <Compile Include="View\EmptyView.cs" />
@@ -74,6 +77,10 @@
     <Compile Include="View\Shader\SingleViewShader.cs" />
     <Compile Include="View\Shader\ViewShader.cs" />
     <Compile Include="View\SingleView.cs" />
+    <Page Include="Dialogs\MipMapWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

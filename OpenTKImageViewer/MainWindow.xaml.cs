@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -43,9 +45,9 @@ namespace OpenTKImageViewer
         private int iteration = 0;
         
         public ulong ZIndex { get; set; }
-        private ImageContext.ImageContext Context { get; set; }
         private Dictionary<ImageViewType, IImageView> imageViews = new Dictionary<ImageViewType, IImageView>();
         private ImageViewType currentImageView;
+        public ImageContext.ImageContext Context { get; set; }
         public ImageViewType CurrentView
         {
             get { return currentImageView; }
@@ -214,18 +216,6 @@ namespace OpenTKImageViewer
             RedrawFrame();
         }
         
-        #endregion
-
-        public float GetClientWidth()
-        {
-            return (float)WinFormsHost.ActualWidth;
-        }
-
-        public float GetClientHeight()
-        {
-            return (float) WinFormsHost.ActualHeight;
-        }
-
         private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
@@ -248,6 +238,19 @@ namespace OpenTKImageViewer
             RedrawFrame();
             e.Handled = true;
         }
+
+        #endregion
+
+        public float GetClientWidth()
+        {
+            return (float)WinFormsHost.ActualWidth;
+        }
+
+        public float GetClientHeight()
+        {
+            return (float) WinFormsHost.ActualHeight;
+        }
+
 
         #region MENU ITEMS
 
@@ -361,5 +364,35 @@ namespace OpenTKImageViewer
 
 
         #endregion
+
+        #region DIALOG HELPER
+
+        public ListBoxItem[] GenerateMipMapItems()
+        {
+            var items = new ListBoxItem[Context.GetNumMipmaps()];
+            // generate mip map previews
+            for (int curMipmap = 0; curMipmap < Context.GetNumMipmaps(); ++curMipmap)
+            {
+                items[curMipmap] = new ListBoxItem { Content = Context.GetWidth(curMipmap).ToString() + "x" + Context.GetHeight(curMipmap).ToString() };
+            }
+            return items;
+        }
+
+#endregion
+
+        private void MainWindow_OnClosing(object sender, CancelEventArgs e)
+        {
+            parent.UnregisterWindow(this);
+        }
+
+        private void MainWindow_OnActivated(object sender, EventArgs e)
+        {
+            parent.SetActiveWindow(this);
+        }
+
+        private void MainWindow_OnDeactivated(object sender, EventArgs e)
+        {
+            parent.UpdateDialogVisibility();
+        }
     }
 }

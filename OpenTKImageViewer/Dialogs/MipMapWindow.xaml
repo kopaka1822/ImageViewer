@@ -1,0 +1,22 @@
+﻿<Window x:Class="OpenTKImageViewer.Dialogs.MipMapWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
+        mc:Ignorable="d"
+        Title="Mipmaps" Height="300" Width="200" 
+        ResizeMode="NoResize" Background="#eee"
+        Closing="MipMapWindow_OnClosing">
+    
+    <Border Padding="5">
+
+        <StackPanel>
+            <TextBlock Text="Mipmap:" Margin="0 0 0 2"/>
+            <ListBox SelectedIndex="0" x:Name="MipMapList"
+                     ScrollViewer.VerticalScrollBarVisibility="Visible"
+                     MinHeight="240" MaxHeight="240"
+                     SelectionChanged="MipMapList_OnSelectionChanged"/>
+        </StackPanel>
+    </Border>
+</Window>
