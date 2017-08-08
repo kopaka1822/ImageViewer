@@ -16,6 +16,7 @@ namespace OpenTKImageViewer.View
         private float yawn = 0.0f;
         private float pitch = 0.0f;
         private float roll = 0.0f;
+        private float zoom = 2.0f;
 
         public CubeView(ImageContext.ImageContext context)
         {
@@ -39,7 +40,7 @@ namespace OpenTKImageViewer.View
         {
             shader.Bind(context);
             shader.SetTransform(GetRotation() * GetOrientation());
-
+            shader.SetFarplane(zoom);
             context.BindFinalTextureAsCubeMap(shader.GetTextureLocation());
             // draw via vertex array
             base.Draw();
@@ -63,7 +64,7 @@ namespace OpenTKImageViewer.View
 
         public override void OnScroll(double diff, Point mouse)
         {
-            base.OnScroll(diff, mouse);
+            zoom = (float) Math.Min(Math.Max(zoom * (1.0 + (diff * 0.001)), 0.1), 100.0);
         }
     }
 }

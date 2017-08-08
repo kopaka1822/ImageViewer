@@ -25,6 +25,11 @@ namespace OpenTKImageViewer.View.Shader
             GL.UniformMatrix4(0, false, ref trans);
         }
 
+        public void SetFarplane(float farplane)
+        {
+            GL.Uniform1(2, farplane);
+        }
+
         public int GetTextureLocation()
         {
             return 1;
@@ -35,6 +40,7 @@ namespace OpenTKImageViewer.View.Shader
             return GetVersion() +
                    // uniforms
                    "layout(location = 0) uniform mat4 transform;\n" +
+                   "layout(location = 2) uniform float farplane;\n" +
                    // out
                    "layout(location = 0) out vec3 viewDir;" +
 
@@ -45,7 +51,7 @@ namespace OpenTKImageViewer.View.Shader
                    "if(gl_VertexID == 2u) vertex = vec4(1.0, 1.0, 0.0, 1.0);\n" +
                    "if(gl_VertexID == 3u) vertex = vec4(-1.0, 1.0, 0.0, 1.0);\n" +
                    "gl_Position = vertex;\n" +
-                   "viewDir = (transform * vec4(vertex.xy, 2.0, 0.0)).xyz;\n" +
+                   "viewDir = (transform * vec4(vertex.xy, farplane, 0.0)).xyz;\n" +
                    "}\n";
         }
 
