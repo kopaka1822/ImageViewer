@@ -7,14 +7,18 @@ using System.Threading.Tasks;
 
 namespace OpenTKImageViewer.Equation
 {
-    class ImageToken : Token
+    class ImageToken : ValueToken
     {
         private int id;
 
-        public ImageToken(int id) : 
-            base(Type.Value)
+        public ImageToken(int id)
         {
             this.id = id;
+        }
+
+        public override string ToOpenGl()
+        {
+            return $"GetTexture{id}()";
         }
     }
 }

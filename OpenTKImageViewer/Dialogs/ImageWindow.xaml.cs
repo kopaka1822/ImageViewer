@@ -29,6 +29,7 @@ namespace OpenTKImageViewer.Dialogs
             this.parent = parent;
             IsClosing = false;
             InitializeComponent();
+            EquationBox1.FontFamily = new FontFamily("Consolas");
         }
 
         public void UpdateContent(MainWindow window)
@@ -72,6 +73,7 @@ namespace OpenTKImageViewer.Dialogs
             try
             {
                 var eq = new Equation.Equation(EquationBox1.Text, activeWindow.Context.GetNumImages());
+                MessageBox.Show(eq.GetOpenGlExpression());
             }
             catch (Exception exception)
             {

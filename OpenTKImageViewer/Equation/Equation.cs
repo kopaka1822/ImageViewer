@@ -12,7 +12,7 @@ namespace OpenTKImageViewer.Equation
     public class Equation
     {
         private readonly int maxTextureUnits;
-        private Token finalToken;
+        private ValueToken finalToken;
 
         public Equation(string formula, int maxTextureUnits)
         {
@@ -23,6 +23,11 @@ namespace OpenTKImageViewer.Equation
                 throw new Exception("Please enter a formula");
             // check for syntax
             Compile(tokens);
+        }
+
+        public string GetOpenGlExpression()
+        {
+            return finalToken.ToOpenGl();
         }
 
         private List<Token> GetToken(string formula)
@@ -111,7 +116,7 @@ namespace OpenTKImageViewer.Equation
             if(tokens[0].TokenType != Token.Type.Value)
                 throw new Exception("Please enter a valid formula");
 
-            finalToken = tokens[0];
+            finalToken = (ValueToken)tokens[0];
         }
 
         private List<MarkovRule> GetRules()

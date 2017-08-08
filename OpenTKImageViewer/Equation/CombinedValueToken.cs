@@ -6,19 +6,28 @@ using System.Threading.Tasks;
 
 namespace OpenTKImageViewer.Equation
 {
-    class CombinedValueToken : Token
+    class CombinedValueToken : ValueToken
     {
-        private Token left;
+        private ValueToken left;
         // operator between the two tokens
-        private Token operat;
-        private Token right;
+        private SingleCharToken operat;
+        private ValueToken right;
 
-        public CombinedValueToken(Token left, Token operat, Token right) : 
-            base(Type.Value)
+        public CombinedValueToken(Token left, Token operat, Token right)
         {
-            this.left = left;
-            this.operat = operat;
-            this.right = right;
+            this.left = (ValueToken) left;
+            this.operat = (SingleCharToken) operat;
+            this.right = (ValueToken) right;
+        }
+
+        public override string ToOpenGl()
+        {
+            if (operat.Symbol == '^')
+            {
+                return $"pow({left.ToOpenGl()},{right.ToOpenGl()})";
+            }
+            // + - * / is easy
+            return $"({left.ToOpenGl()} {operat.Symbol} {right.ToOpenGl()})";
         }
     }
 }
