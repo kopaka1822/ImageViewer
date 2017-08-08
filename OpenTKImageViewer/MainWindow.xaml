@@ -7,10 +7,38 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525"
         KeyDown="MainWindow_OnKeyDown">
-    <Grid>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Background="#fff" Padding="0 0 0 2">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open" Click="MenuItem_Click_Open"/>
+                <MenuItem Header="_Import"/>
+                <!--<MenuItem Header="_Save"/>
+                <MenuItem Header="Save As"/>-->
+                <!--<MenuItem Header="_Export" Click="MenuItem_Click_Export"/>-->
+            </MenuItem>
+            <MenuItem Header="_View">
+                <!--<MenuItem Header="3D View"/>
+                <MenuItem Header="3D Dice"/>-->
+                <MenuItem Header="Linear Interpolation" x:Name="MenuItemLinearInterpolation" IsCheckable="True" Click="MenuItem_OnChecked_LinearFiltering"/>
+                <MenuItem Header="_Grayscale">
+                    <MenuItem Header="_Disabled" x:Name="MenuItemGrayscaleDisabled" IsChecked="True" Click="MenuItem_OnChecked_Grayscale"/>
+                    <MenuItem Header="_Red" x:Name="MenuItemGrayscaleRed" IsCheckable="True" Click="MenuItem_OnChecked_Grayscale"/>
+                    <MenuItem Header="_Green" x:Name="MenuItemGrayscaleGreen" IsCheckable="True" Click="MenuItem_OnChecked_Grayscale"/>
+                    <MenuItem Header="_Blue" x:Name="MenuItemGrayscaleBlue" IsCheckable="True" Click="MenuItem_OnChecked_Grayscale"/>
+                    <MenuItem Header="_Alpha" x:Name="MenuItemGrayscaleAlpha" IsCheckable="True" Click="MenuItem_OnChecked_Grayscale"/>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Windows">
+                <MenuItem Header="Mipmaps" Click="MenuItem_Click_Mipmaps" />
+                <MenuItem Header="Layers" Click="MenuItem_Click_Layers"/>
+                <MenuItem Header="Images" Click="MenuItem_Click_Images"/>
+                <MenuItem Header="Tone Mapping"/>
+            </MenuItem>
+        </Menu>
+        
         <WindowsFormsHost x:Name="WinFormsHost"
                           Initialized="WinFormsHost_OnInitialized"
                           SizeChanged="WinFormsHost_OnSizeChanged"
                           />
-    </Grid>
+    </DockPanel>
 </Window>
