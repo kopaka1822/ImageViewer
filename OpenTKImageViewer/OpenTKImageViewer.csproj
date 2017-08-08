@@ -74,8 +74,14 @@
     <Compile Include="Dialogs\MipMapWindow.xaml.cs">
       <DependentUpon>MipMapWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Equation\CombinedValueToken.cs" />
     <Compile Include="Equation\Equation.cs" />
     <Compile Include="Equation\ImageToken.cs" />
+    <Compile Include="Equation\Markov\BracketRule.cs" />
+    <Compile Include="Equation\Markov\MarkovProcess.cs" />
+    <Compile Include="Equation\Markov\MarkovRule.cs" />
+    <Compile Include="Equation\Markov\RuleSign.cs" />
+    <Compile Include="Equation\Markov\RuleValueOperationValue.cs" />
     <Compile Include="Equation\NumberToken.cs" />
     <Compile Include="Equation\SingleCharToken.cs" />
     <Compile Include="Equation\Token.cs" />

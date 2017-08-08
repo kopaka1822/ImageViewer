@@ -8,10 +8,10 @@ namespace OpenTKImageViewer.Equation
 {
     public class SingleCharToken : Token
     {
-        private char symbol;
+        public char Symbol { get; private set; }
         public SingleCharToken(Type type, char symbol) : base(type)
         {
-            this.symbol = symbol;
+            this.Symbol = symbol;
         }
     }
 }

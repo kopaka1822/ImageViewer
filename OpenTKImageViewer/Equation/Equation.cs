@@ -1,22 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Deployment.Internal;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTKImageViewer.Equation.Markov;
 
 namespace OpenTKImageViewer.Equation
 {
     public class Equation
     {
         private readonly int maxTextureUnits;
+        private Token finalToken;
 
         public Equation(string formula, int maxTextureUnits)
         {
             this.maxTextureUnits = maxTextureUnits;
             // resolve to token
             var tokens = GetToken(formula);
+            if(tokens.Count == 0)
+                throw new Exception("Please enter a formula");
             // check for syntax
+            Compile(tokens);
         }
 
         private List<Token> GetToken(string formula)
@@ -93,6 +99,32 @@ namespace OpenTKImageViewer.Equation
             if(!Double.TryParse(identifier, out value))
                 throw new Exception($"Invalid Number: {identifier}");
             return new NumberToken((float)value);
+        }
+
+        private void Compile(List<Token> tokens)
+        {
+            tokens = MarkovProcess.Run(GetRules(), tokens);
+
+            if(tokens.Count != 1)
+                throw new Exception("Could not resolve all tokens to an expression");
+
+            if(tokens[0].TokenType != Token.Type.Value)
+                throw new Exception("Please enter a valid formula");
+
+            finalToken = tokens[0];
+        }
+
+        private List<MarkovRule> GetRules()
+        {
+            List<MarkovRule> rules = new List<MarkovRule>();
+
+            rules.Add(new RuleValueOperationValue(Token.Type.Operation1));
+            rules.Add(new RuleValueOperationValue(Token.Type.Operation2));
+            rules.Add(new RuleValueOperationValue(Token.Type.Operation3));
+            rules.Add(new RuleSign());
+            rules.Add(new BracketRule());
+
+            return rules;
         }
     }
 }
