@@ -22,6 +22,7 @@ namespace OpenTKImageViewer.Dialogs
     {
         private readonly App parent;
         public bool IsClosing { get; set; }
+        private MainWindow activeWindow;
 
         public ImageWindow(App parent)
         {
@@ -32,9 +33,32 @@ namespace OpenTKImageViewer.Dialogs
 
         public void UpdateContent(MainWindow window)
         {
+            if (!ReferenceEquals(window, activeWindow))
+            {
+                if (activeWindow != null)
+                    activeWindow.Context.ChangedImages -= OnChangedImages;
+                if (window != null)
+                    window.Context.ChangedLayer += OnChangedImages;
+            }
+
+            activeWindow = window;
+            RefreshImageList();
+        }
+
+        private void OnChangedImages(object sender, EventArgs e)
+        {
+            RefreshImageList();
+        }
+
+        private void RefreshImageList()
+        {
             ImageList.Items.Clear();
-            foreach (var item in window.GenerateImageItems())
-                ImageList.Items.Add(item);
+            if (activeWindow != null)
+            {
+                // refresh image list
+                foreach (var item in activeWindow.GenerateImageItems())
+                    ImageList.Items.Add(item);
+            }
         }
 
         private void ImageWindow_OnClosing(object sender, CancelEventArgs e)

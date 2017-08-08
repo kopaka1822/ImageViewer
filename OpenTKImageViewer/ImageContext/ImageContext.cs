@@ -184,5 +184,11 @@ namespace OpenTKImageViewer.ImageContext
             Debug.Assert(images.Count != 0);
             return images[0].image.GetHeight(mipmap);
         }
+
+        public string GetFilename(int image)
+        {
+            Debug.Assert((uint)(image) < images.Count);
+            return images[image].image.Filename;
+        }
     }
 }

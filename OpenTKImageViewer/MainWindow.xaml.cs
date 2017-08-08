@@ -133,8 +133,10 @@ namespace OpenTKImageViewer
             GL.Enable(EnableCap.TextureCubeMapSeamless);
         }
 
-#endregion
-        
+        #endregion
+
+        #region OpenGL
+
         private void GLControl_Paint(object sender, PaintEventArgs e)
         {
             if (error.Length > 0 && iteration++ > 0)
@@ -145,6 +147,7 @@ namespace OpenTKImageViewer
 
             try
             {
+                glControl.MakeCurrent();
                 GL.Viewport(0, 0, (int)WinFormsHost.ActualWidth, (int)WinFormsHost.ActualHeight);
                 GL.ClearColor(0.9333f, 0.9333f, 0.9333f, 1.0f);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -169,6 +172,8 @@ namespace OpenTKImageViewer
         {
             RedrawFrame();
         }
+
+        #endregion
 
         #region WINDOW INTERACTION
 
@@ -297,6 +302,7 @@ namespace OpenTKImageViewer
                 {
                     Context.AddImage(image);
                 }
+                parent.OpenDialog(App.UniqueDialog.Image);
             }
             catch (Exception exception)
             {
@@ -305,6 +311,8 @@ namespace OpenTKImageViewer
         }
 
         #endregion
+
+        #region VIEW
 
         private void MenuItem_OnChecked_LinearFiltering(object sender, RoutedEventArgs e)
         {
@@ -378,6 +386,10 @@ namespace OpenTKImageViewer
                 Context.Grayscale = ImageContext.ImageContext.GrayscaleMode.Alpha;
         }
 
+        #endregion
+
+        #region WINDOWS
+
         private void MenuItem_Click_Mipmaps(object sender, RoutedEventArgs e)
         {
             parent.OpenDialog(App.UniqueDialog.Mipmaps);
@@ -393,7 +405,7 @@ namespace OpenTKImageViewer
             parent.OpenDialog(App.UniqueDialog.Image);
         }
 
-
+        #endregion
 
         #endregion
 
@@ -447,9 +459,28 @@ namespace OpenTKImageViewer
             return res;
         }
 
+        private string RemoveFilePath(string file)
+        {
+            var idx = file.LastIndexOf("\\", StringComparison.Ordinal);
+            if (idx > 0)
+            {
+                return file.Substring(idx + 1);
+            }
+            return file;
+        }
+
         public ListBoxItem[] GenerateImageItems()
         {
-            return new ListBoxItem[0];
+            var items = new ListBoxItem[Context.GetNumImages()];
+            for (int curImage = 0; curImage < Context.GetNumImages(); ++curImage)
+            {
+                items[curImage] = new ListBoxItem
+                {
+                    Content = $"Image {curImage} - {RemoveFilePath(Context.GetFilename(curImage))}", 
+                    ToolTip = Context.GetFilename(curImage)
+                };
+            }
+            return items;
         }
 
     }
