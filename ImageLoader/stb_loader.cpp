@@ -21,6 +21,40 @@ uint32_t getDefaultInternalFormat(int nComponents)
 	return uint32_t(-1);
 }
 
+uint32_t getSizedInternalFormat(int nComponents, bool isFloat)
+{
+	if(isFloat)
+	{
+		switch (nComponents)
+		{
+		case 1:
+			return gli::gl::internal_format::INTERNAL_R32F;
+		case 2:
+			return gli::gl::internal_format::INTERNAL_RG32F;
+		case 3:
+			return gli::gl::internal_format::INTERNAL_RGB32F;
+		case 4:
+			return gli::gl::internal_format::INTERNAL_RGBA32F;
+		}
+	}
+	else
+	{
+		switch (nComponents)
+		{
+		case 1:
+			return gli::gl::internal_format::INTERNAL_R8_UNORM;
+		case 2:
+			return gli::gl::internal_format::INTERNAL_RG8_UNORM;
+		case 3:
+			return gli::gl::internal_format::INTERNAL_RGB8_UNORM;
+		case 4:
+			return gli::gl::internal_format::INTERNAL_RGBA8_UNORM;
+		}
+	}
+	
+	return uint32_t(-1);
+}
+
 std::unique_ptr<ImageResource> stb_load(const char* filename)
 {
 	// create resource with one layer
@@ -38,8 +72,8 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 		if (!data)
 			return nullptr;
 
-		format.openglInternalFormat = getDefaultInternalFormat(nComponents);
-		format.openglExternalFormat = format.openglInternalFormat;
+		format.openglInternalFormat = getSizedInternalFormat(nComponents, true);
+		format.openglExternalFormat = getDefaultInternalFormat(nComponents);
 		format.openglType = gli::gl::type_format::TYPE_F32;
 		format.isCompressed = false;
 
@@ -58,8 +92,8 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 		if (!data)
 			return nullptr;
 
-		format.openglInternalFormat = getDefaultInternalFormat(nComponents);
-		format.openglExternalFormat = format.openglInternalFormat;
+		format.openglInternalFormat = getSizedInternalFormat(nComponents, false);
+		format.openglExternalFormat = getDefaultInternalFormat(nComponents);
 		format.openglType = gli::gl::type_format::TYPE_U8;
 		format.isCompressed = false;
 

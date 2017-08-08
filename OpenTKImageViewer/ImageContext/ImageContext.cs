@@ -130,6 +130,25 @@ namespace OpenTKImageViewer.ImageContext
 
         public void AddImage(ImageLoader.Image image)
         {
+            // only add if layout is consistent
+            if (images.Count > 0)
+            {
+                var i = images[0].image;
+                if(image.Layers.Count != i.Layers.Count)
+                    throw new Exception($"Inconsistent amount of layers. Expected {i.Layers.Count} got {image.Layers.Count}");
+
+                if (image.GetNumMipmaps() != i.GetNumMipmaps())
+                    throw new Exception($"Inconsistent amount of mipmaps. Expected {i.GetNumMipmaps()} got {image.GetNumMipmaps()}");
+
+                // test mipmaps
+                for (int level = 0; level < image.GetNumMipmaps(); ++level)
+                {
+                    if(image.GetWidth(level) != i.GetWidth(level) || image.GetHeight(level) != i.GetHeight(level))
+                        throw new Exception($"Inconsistent mipmaps dimension. Expected {i.GetWidth(level)}x{i.GetHeight(level)}" +
+                                            $" got {image.GetWidth(level)}x{image.GetHeight(level)}");
+                }
+            }
+
             images.Add(new ImageData(image));
             OnChangedImages();
         }

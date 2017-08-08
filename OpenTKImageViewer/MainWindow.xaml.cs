@@ -254,6 +254,7 @@ namespace OpenTKImageViewer
 
         #region MENU ITEMS
 
+        #region FILE
         private void MenuItem_Click_Open(object sender, RoutedEventArgs e)
         {
             var ofd = new Microsoft.Win32.OpenFileDialog();
@@ -273,6 +274,37 @@ namespace OpenTKImageViewer
                 }
             }
         }
+
+
+        private void MenuItem_Click_Import(object sender, RoutedEventArgs e)
+        {
+            // import without image is open
+            if (Context.GetNumImages() == 0)
+            {
+                MenuItem_Click_Open(sender, e);
+                return;
+            }
+
+            var ofd = new Microsoft.Win32.OpenFileDialog();
+            ofd.Multiselect = false;
+
+            if (ofd.ShowDialog() != true) return;
+            // load image and import if possible
+            try
+            {
+                var images = ImageLoader.LoadImage(ofd.FileName);
+                foreach (var image in images)
+                {
+                    Context.AddImage(image);
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+        }
+
+        #endregion
 
         private void MenuItem_OnChecked_LinearFiltering(object sender, RoutedEventArgs e)
         {
@@ -419,5 +451,6 @@ namespace OpenTKImageViewer
         {
             return new ListBoxItem[0];
         }
+
     }
 }

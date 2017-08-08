@@ -95,8 +95,10 @@ std::unique_ptr<ImageResource> pfm_load(const char* filename)
 
 	auto res = std::make_unique<ImageResource>();
 	res->format.isCompressed = false;
-	res->format.openglExternalFormat = res->format.openglInternalFormat = 
+	res->format.openglExternalFormat = 
 		grayscale? gli::gl::external_format::EXTERNAL_RED : gli::gl::external_format::EXTERNAL_RGB;
+	res->format.openglInternalFormat =
+		grayscale ? gli::gl::internal_format::INTERNAL_R32F : gli::gl::internal_format::INTERNAL_RGB32F;
 
 	res->format.openglType = gli::gl::type_format::TYPE_F32;
 	res->layer.emplace_back();

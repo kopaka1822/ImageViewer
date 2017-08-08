@@ -24,6 +24,7 @@ namespace OpenTKImageViewer.glhelper
             GL.TexStorage3D(TextureTarget3d.Texture2DArray, image.GetNumMipmaps(),
                 internalFormat, image.GetWidth(0),
                 image.GetHeight(0), image.Layers.Count);
+            Utility.GLCheck();
 
             if (image.IsCompressed)
             {
