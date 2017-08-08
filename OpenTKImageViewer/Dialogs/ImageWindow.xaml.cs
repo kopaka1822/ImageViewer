@@ -66,5 +66,17 @@ namespace OpenTKImageViewer.Dialogs
             IsClosing = true;
             parent.CloseDialog(App.UniqueDialog.Image);
         }
+
+        private void ButtonApply_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var eq = new Equation.Equation(EquationBox1.Text, activeWindow.Context.GetNumImages());
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+        }
     }
 }

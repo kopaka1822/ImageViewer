@@ -17,9 +17,11 @@
                      ScrollViewer.VerticalScrollBarVisibility="Visible"                       
                      MinHeight="180" MaxHeight="180"/>
             <TextBlock Text="Equation:" Margin="0 2 0 2"/>
-            <TextBox Text="Image1 + Image2" Margin="0 0 0 5"/>
+            <TextBox Text="Image1 + Image2" Margin="0 0 0 5"
+                     x:Name="EquationBox1"/>
 
-            <Button Content="Apply" MinWidth="100" HorizontalAlignment="Right"/>
+            <Button Content="Apply" MinWidth="100" HorizontalAlignment="Right"
+                    Click="ButtonApply_OnClick"/>
         </StackPanel>
     </Border>
 </Window>
