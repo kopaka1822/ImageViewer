@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -77,6 +78,12 @@ namespace OpenTKImageViewer
             context.ImageFormula1.Changed += (sender, args) => RedrawFrame();
             context.ChangedImages += (sender, args) => RedrawFrame();
             context.ChangedLayer += (sender, args) => RedrawFrame();
+            context.ChangedFiltering += (sender, args) => RedrawFrame();
+
+            // set default values
+            MenuItemLinearInterpolation.IsChecked = context.LinearInterpolation;
+            context.ChangedFiltering += (sender, args) => MenuItemLinearInterpolation.IsChecked =
+                context.LinearInterpolation;
         }
 
         private void CreateImageViews()

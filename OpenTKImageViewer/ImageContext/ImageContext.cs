@@ -15,6 +15,8 @@ namespace OpenTKImageViewer.ImageContext
 
     public delegate void ChangedImagesHandler(object sender, EventArgs e);
 
+    public delegate void ChangedFilteringHandler(object sender, EventArgs e);
+
     public class ImageContext
     {
         #region Structures and Enums
@@ -48,12 +50,23 @@ namespace OpenTKImageViewer.ImageContext
         private uint activeLayer = 0;
         private TextureArray2D combinedImage1;
         private readonly ImageCombineShader imageCombineShader1;
+        private bool linearInterpolation = false;
 
         #endregion
 
         #region Public Properties
 
-        public bool LinearInterpolation { get; set; } = false;
+        public bool LinearInterpolation
+        {
+            get => linearInterpolation;
+            set
+            {
+                if (value == linearInterpolation) return;
+                linearInterpolation = value;
+                OnChangedFiltering();
+            }
+        }
+
         public GrayscaleMode Grayscale { get; set; } = GrayscaleMode.Disabled;
         public uint ActiveMipmap
         {
@@ -203,6 +216,7 @@ namespace OpenTKImageViewer.ImageContext
         public event ChangedLayerHandler ChangedLayer;
         public event ChangedMipmapHanlder ChangedMipmap;
         public event ChangedImagesHandler ChangedImages;
+        public event ChangedFilteringHandler ChangedFiltering;
 
         protected virtual void OnChangedLayer()
         {
@@ -219,8 +233,13 @@ namespace OpenTKImageViewer.ImageContext
             ChangedImages?.Invoke(this, EventArgs.Empty);
         }
 
+        protected virtual void OnChangedFiltering()
+        {
+            ChangedFiltering?.Invoke(this, EventArgs.Empty);
+        }
+
         #endregion
-        
+
 
         public ImageContext(List<ImageLoader.Image> images)
         {
@@ -254,6 +273,5 @@ namespace OpenTKImageViewer.ImageContext
                 }
             }
         }
-
     }
 }
