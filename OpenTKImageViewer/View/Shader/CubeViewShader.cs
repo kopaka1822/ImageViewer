@@ -30,6 +30,11 @@ namespace OpenTKImageViewer.View.Shader
             GL.Uniform1(2, farplane);
         }
 
+        public void SetLevel(float level)
+        {
+            GL.Uniform1(3, level);
+        }
+
         public int GetTextureLocation()
         {
             return 1;
@@ -60,13 +65,13 @@ namespace OpenTKImageViewer.View.Shader
             return GetVersion() +
                    // uniforms
                    "layout(location = 1) uniform samplerCube tex;\n" +
+                   "layout(location = 3) uniform float level;\n" +
                    // in out
                    "layout(location = 0) in vec3 viewdir;\n" +
                    "out vec4 fragColor;\n" +
 
                    "void main(void){\n" +
-                   "vec4 color = texture(tex, viewdir);\n" +
-                   //"vec4 color = vec4(viewdir, 1.0);\n" +
+                   "vec4 color = textureLod(tex, viewdir, level);\n" +
                    "fragColor = color;\n" +
                    "}\n";
         }

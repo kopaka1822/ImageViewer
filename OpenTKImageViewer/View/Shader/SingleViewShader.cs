@@ -74,8 +74,8 @@ namespace OpenTKImageViewer.View.Shader
 
                    "void main(void){\n" +
                    "ivec2 icoord = ivec2(vec2(textureSize(tex, int(level))) * texcoord);\n" +
-                   "vec4 color = texelFetch(tex, ivec3(icoord, int(layer)), int(level));\n" +
-                   //"vec4 color = textureLod(tex, vec3(texcoord, layer), level);\n" +
+                   //"vec4 color = texelFetch(tex, ivec3(icoord, int(layer)), int(level));\n" +
+                   "vec4 color = textureLod(tex, vec3(texcoord, layer), level);\n" +
                    "fragColor = color;\n" +
                    "}\n";
         }

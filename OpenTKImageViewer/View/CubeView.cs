@@ -41,6 +41,7 @@ namespace OpenTKImageViewer.View
             shader.Bind(context);
             shader.SetTransform(GetRotation() * GetOrientation());
             shader.SetFarplane(zoom);
+            shader.SetLevel((float)context.ActiveMipmap);
             context.BindFinalTextureAsCubeMap(shader.GetTextureLocation());
             // draw via vertex array
             base.Draw();

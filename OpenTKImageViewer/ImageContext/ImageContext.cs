@@ -159,12 +159,12 @@ namespace OpenTKImageViewer.ImageContext
 
         public void BindFinalTextureAs2DSamplerArray(int slot)
         {
-            combinedImage1?.Bind(slot);
+            combinedImage1?.Bind(slot, LinearInterpolation);
         }
 
         public void BindFinalTextureAsCubeMap(int slot)
         {
-            combinedImage1?.BindAsCubemap(slot);
+            combinedImage1?.BindAsCubemap(slot, LinearInterpolation);
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace OpenTKImageViewer.ImageContext
                 {
                     for (int image = 0; image < GetNumImages(); ++image)
                     {
-                        images[image].TextureArray2D.Bind(imageCombineShader1.GetSourceImageBinding(image));
+                        images[image].TextureArray2D.Bind(imageCombineShader1.GetSourceImageBinding(image), false);
                     }
                     target.BindAsImage(imageCombineShader1.GetDestinationImageBinding(),
                         level, layer, TextureAccess.WriteOnly);

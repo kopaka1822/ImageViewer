@@ -13,11 +13,13 @@ namespace OpenTKImageViewer.glhelper
         private int id;
         private int cubeId = 0;
         private readonly SizedInternalFormat internalFormat;
+        private readonly bool hasMipmaps;
 
         public TextureArray2D(int numLayers, int numMipmaps, SizedInternalFormat internalFormat, int width, int height)
         {
             id = GL.GenTexture();
             this.internalFormat = internalFormat;
+            hasMipmaps = numMipmaps > 1;
             GL.BindTexture(TextureTarget.Texture2DArray, id);
 
             GL.TexStorage3D(TextureTarget3d.Texture2DArray, numMipmaps,
@@ -32,6 +34,7 @@ namespace OpenTKImageViewer.glhelper
         public TextureArray2D(ImageLoader.Image image)
         {
             id = GL.GenTexture();
+            hasMipmaps = image.GetNumMipmaps() > 1;
             GL.BindTexture(TextureTarget.Texture2DArray, id);
 
             // create storage
@@ -97,24 +100,42 @@ namespace OpenTKImageViewer.glhelper
             Utility.GLCheck();
         }
 
-        private void BindAs(int slot, TextureTarget target, int texId)
+        private void BindAs(int slot, TextureTarget target, int texId, bool linearFiltering)
         {
             GL.ActiveTexture(TextureUnit.Texture0 + slot);
             Utility.GLCheck();
             GL.BindTexture(target, texId);
-            GL.TexParameter(target, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-            GL.TexParameter(target, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            
+            GL.TexParameter(target, TextureParameterName.TextureMinFilter, GetMinFilter(linearFiltering));
+            GL.TexParameter(target, TextureParameterName.TextureMagFilter, GetMagFilter(linearFiltering));
             Utility.GLCheck();
         }
 
-        public void Bind(int slot)
+        private int GetMinFilter(bool linearFiltering)
         {
-            BindAs(slot, TextureTarget.Texture2DArray, id);
+            if (hasMipmaps)
+            {
+                if (linearFiltering) return (int) TextureMinFilter.LinearMipmapNearest; // sharps switching between mipmaps
+                return (int) TextureMinFilter.NearestMipmapNearest;
+            }
+            if (linearFiltering) return (int) TextureMinFilter.Linear;
+            return (int) TextureMinFilter.Nearest;
         }
 
-        public void BindAsCubemap(int slot)
+        private int GetMagFilter(bool linearFiltering)
         {
-            BindAs(slot, TextureTarget.TextureCubeMap, cubeId);
+            if (linearFiltering) return (int) TextureMagFilter.Linear;
+            return (int) TextureMagFilter.Nearest;
+        }
+
+        public void Bind(int slot, bool linearFiltering)
+        {
+            BindAs(slot, TextureTarget.Texture2DArray, id, linearFiltering);
+        }
+
+        public void BindAsCubemap(int slot, bool linearFiltering)
+        {
+            BindAs(slot, TextureTarget.TextureCubeMap, cubeId, linearFiltering);
         }
 
         public void BindAsImage(int slot, int level, int layer, TextureAccess access)
