@@ -12,6 +12,19 @@ namespace OpenTKImageViewer.glhelper
     {
         private int id;
         private int cubeId = 0;
+        private readonly SizedInternalFormat internalFormat;
+
+        public TextureArray2D(int numLayers, int numMipmaps, SizedInternalFormat internalFormat, int width, int height)
+        {
+            id = GL.GenTexture();
+            this.internalFormat = internalFormat;
+            GL.BindTexture(TextureTarget.Texture2DArray, id);
+
+            GL.TexStorage3D(TextureTarget3d.Texture2DArray, numMipmaps,
+                internalFormat, width,
+                height, numLayers);
+            Utility.GLCheck();
+        }
 
         public TextureArray2D(ImageLoader.Image image)
         {
@@ -19,7 +32,7 @@ namespace OpenTKImageViewer.glhelper
             GL.BindTexture(TextureTarget.Texture2DArray, id);
 
             // create storage
-            var internalFormat = (SizedInternalFormat)image.OpenglInternalFormat;
+            internalFormat = (SizedInternalFormat)image.OpenglInternalFormat;
 
             GL.TexStorage3D(TextureTarget3d.Texture2DArray, image.GetNumMipmaps(),
                 internalFormat, image.GetWidth(0),
@@ -132,6 +145,11 @@ namespace OpenTKImageViewer.glhelper
         public void BindAsCubemap(int slot)
         {
             BindAs(slot, TextureTarget.TextureCubeMap, cubeId);
+        }
+
+        public void BindAsImage(int slot, int level, int layer, TextureAccess access)
+        {
+            GL.BindImageTexture(slot, id, level, true, layer, access, internalFormat);
         }
     }
 }

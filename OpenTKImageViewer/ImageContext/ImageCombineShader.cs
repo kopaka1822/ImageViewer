@@ -19,6 +19,7 @@ namespace OpenTKImageViewer.ImageContext
         public ImageCombineShader(ImageContext context)
         {
             this.context = context;
+            context.ChangedImageCombineFormula += (sender, args) => contentChanged = true;
         }
 
         public void Update()
@@ -36,9 +37,45 @@ namespace OpenTKImageViewer.ImageContext
             }
         }
 
-        public void Bind()
+        /// <summary>
+        /// dispatches the shader with the given layer and level
+        /// target image and source textures have to be bound before a call to this function
+        /// </summary>
+        /// <param name="layer"></param>
+        /// <param name="level"></param>
+        /// <param name="width">mipmap width</param>
+        /// <param name="height">mipmap height</param>
+        public void Run(int layer, int level, int width, int height)
         {
             program.Bind();
+            SetLevel(level);
+            SetLayer(layer);
+            GL.DispatchCompute(width / LocalSize + 1, height / LocalSize + 1, 1);
+        }
+
+        public int GetDestinationImageBinding()
+        {
+            return 0;
+        }
+
+        /// <summary>
+        /// required binding for the source textures (starting with texture 0)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public int GetSourceImageBinding(int id)
+        {
+            return TextureBindingStart + id;
+        }
+
+        private void SetLayer(int layer)
+        {
+            GL.Uniform1(1, layer);
+        }
+
+        private void SetLevel(int level)
+        {
+            GL.Uniform1(2, level);
         }
 
         private string GenerateShaderSource()
@@ -75,7 +112,7 @@ namespace OpenTKImageViewer.ImageContext
 
         private string GetImageColor()
         {
-            return "vec4(1.0)";
+            return context.ImageCombineFormula;
         }
 
         private string GetTextureGetters()
@@ -84,7 +121,7 @@ namespace OpenTKImageViewer.ImageContext
             for (int i = 0; i < context.GetNumImages(); ++i)
             {
                 res += $"vec4 GetTexture{i}(){'{'}\n" +
-                       $"return texelFetch(texture{i}, ivec3(pixelPos, layer), level);\n" +
+                       $"return texelFetch(texture{i}, ivec3(pixelPos, level), level);\n" +
                        "}\n";
             }
             return res;

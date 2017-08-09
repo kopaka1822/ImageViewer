@@ -70,6 +70,12 @@ namespace OpenTKImageViewer
 
             InitializeComponent();
             CreateImageViews();
+
+            // redraw if context changes
+            context.ChangedMipmap += (sender, args) => RedrawFrame();
+            context.ChangedImageCombineFormula += (sender, args) => RedrawFrame();
+            context.ChangedImages += (sender, args) => RedrawFrame();
+            context.ChangedLayer += (sender, args) => RedrawFrame();
         }
 
         private void CreateImageViews()

@@ -15,6 +15,8 @@ namespace OpenTKImageViewer.ImageContext
 
     public delegate void ChangedImagesHandler(object sender, EventArgs e);
 
+    public delegate void ChangedImagesCombineFormulaHandler(object sender, EventArgs e);
+
     public class ImageContext
     {
         private class ImageData
@@ -40,12 +42,15 @@ namespace OpenTKImageViewer.ImageContext
         private readonly List<ImageData> images = new List<ImageData>();
         private uint activeMipmap = 0;
         private uint activeLayer = 0;
+        private string imageCombineFormula = "vec4(1.0)";
+        private TextureArray2D combinedImages;
         public bool LinearInterpolation { get; set; } = false;
         public GrayscaleMode Grayscale { get; set; } = GrayscaleMode.Disabled;
 
         public event ChangedLayerHandler ChangedLayer;
         public event ChangedMipmapHanlder ChangedMipmap;
         public event ChangedImagesHandler ChangedImages;
+        public event ChangedImagesCombineFormulaHandler ChangedImageCombineFormula;
 
         private ImageCombineShader imageCombineShader;
 
@@ -62,6 +67,11 @@ namespace OpenTKImageViewer.ImageContext
         protected virtual void OnChangedImages()
         {
             ChangedImages?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected virtual void OnChangedImageCombineFormula()
+        {
+            ChangedImageCombineFormula?.Invoke(this, EventArgs.Empty);
         }
 
         public uint ActiveMipmap
@@ -90,6 +100,19 @@ namespace OpenTKImageViewer.ImageContext
             }
         }
 
+        public string ImageCombineFormula
+        {
+            get { return imageCombineFormula; }
+            set
+            {
+                if (imageCombineFormula != value)
+                {
+                    imageCombineFormula = value;
+                    OnChangedImageCombineFormula();
+                }
+            }
+        }
+
         public ImageContext(List<ImageLoader.Image> images)
         {
             imageCombineShader = new ImageCombineShader(this);
@@ -104,6 +127,9 @@ namespace OpenTKImageViewer.ImageContext
 
         public void Update()
         {
+            if (images.Count == 0)
+                return;
+
             // create gpu textures for newly added images
             foreach (var imageData in images)
             {
@@ -111,7 +137,16 @@ namespace OpenTKImageViewer.ImageContext
                     imageData.TextureArray2D = new TextureArray2D(imageData.image);
             }
 
+            if (combinedImages == null)
+            {
+                // create image
+                combinedImages = new TextureArray2D(GetNumLayers(), GetNumMipmaps(), 
+                    SizedInternalFormat.Rgba32f, GetWidth(0), GetHeight(0));
+            }
+
             imageCombineShader.Update();
+
+            RecomputeCombinedImage();
         }
 
         public int GetNumImages()
@@ -161,10 +196,11 @@ namespace OpenTKImageViewer.ImageContext
         public void BindFinalTextureAs2DSamplerArray(int slot)
         {
             // TODO replace with correct code
-            if (images.Count > 0)
+            /*if (images.Count > 0)
             {
                 images[0].TextureArray2D.Bind(slot);
-            }
+            }*/
+            combinedImages?.Bind(slot);
         }
 
         public void BindFinalTextureAsCubeMap(int slot)
@@ -195,5 +231,27 @@ namespace OpenTKImageViewer.ImageContext
             Debug.Assert((uint)(image) < images.Count);
             return images[image].image.Filename;
         }
+
+        private void RecomputeCombinedImage()
+        {
+            if (images.Count == 0)
+                return;
+
+            for (int layer = 0; layer < GetNumLayers(); ++layer)
+            {
+                for (int level = 0; level < GetNumMipmaps(); ++level)
+                {
+                    for (int image = 0; image < GetNumImages(); ++image)
+                    {
+                        images[0].TextureArray2D.Bind(imageCombineShader.GetSourceImageBinding(image));
+                    }
+                    combinedImages.BindAsImage(imageCombineShader.GetDestinationImageBinding(),
+                        level, layer, TextureAccess.WriteOnly);
+                    
+                    imageCombineShader.Run(layer, level, GetWidth(level), GetHeight(level));
+                }
+            }
+        }
+
     }
 }

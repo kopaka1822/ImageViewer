@@ -70,10 +70,11 @@ namespace OpenTKImageViewer.Dialogs
 
         private void ButtonApply_OnClick(object sender, RoutedEventArgs e)
         {
+            if (activeWindow == null) return;
             try
             {
                 var eq = new Equation.Equation(EquationBox1.Text, activeWindow.Context.GetNumImages());
-                MessageBox.Show(eq.GetOpenGlExpression());
+                activeWindow.Context.ImageCombineFormula = eq.GetOpenGlExpression();
             }
             catch (Exception exception)
             {
