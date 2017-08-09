@@ -24,6 +24,9 @@ namespace OpenTKImageViewer.glhelper
                 internalFormat, width,
                 height, numLayers);
             Utility.GLCheck();
+
+            if(numLayers == 6)
+                CreateCubeMapView(numMipmaps, (PixelInternalFormat)internalFormat);
         }
 
         public TextureArray2D(ImageLoader.Image image)
@@ -76,55 +79,21 @@ namespace OpenTKImageViewer.glhelper
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLod, (float)image.GetNumMipmaps());
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureBaseLevel, 0);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLevel, image.GetNumMipmaps());
-
-            if(image.Layers.Count == 6)
-                CreateCubeMapView(image);
         }
 
-        private void CreateCubeMapView(ImageLoader.Image image)
+        private void CreateCubeMapView(int numLevels, PixelInternalFormat pixelInternalFormat)
         {
-            Debug.Assert(image.Layers.Count == 6);
-            /*PixelInternalFormat pixelInternalFormat = (PixelInternalFormat) image.OpenglInternalFormat;
             cubeId = GL.GenTexture();
             GL.TextureView(cubeId, TextureTarget.TextureCubeMap, id,
-                pixelInternalFormat, 0, image.GetNumMipmaps(), 0, 6);
-
-            Utility.GLCheck();*/
-            cubeId = GL.GenTexture();
-            GL.BindTexture(TextureTarget.TextureCubeMap, cubeId);
-            Utility.GLCheck();
-
-            if (image.IsCompressed)
-            {
-                for (int level = 0; level < image.GetNumMipmaps(); ++level)
-                {
-                    for (int face = 0; face < 6; ++face)
-                    {
-                        GL.CompressedTexImage2D(TextureTarget.TextureCubeMapPositiveX + face, level,
-                            (PixelInternalFormat)image.OpenglInternalFormat, image.GetWidth(level), image.GetHeight(level), 0,
-                            (int)image.Layers[face].Mipmaps[level].Size,
-                            image.Layers[face].Mipmaps[level].Bytes);
-                    }
-                }
-            }
-            else
-            {
-                for (int level = 0; level < image.GetNumMipmaps(); ++level)
-                {
-                    for (int face = 0; face < 6; ++face)
-                    {
-                        GL.TexImage2D(TextureTarget.TextureCubeMapPositiveX + face, level,
-                            (PixelInternalFormat) image.OpenglInternalFormat, image.GetWidth(level), image.GetHeight(level), 0,
-                            (PixelFormat)image.OpenglExternalFormat, (PixelType)image.OpenglType,
-                            image.Layers[face].Mipmaps[level].Bytes);
-                    }
-                }
-            }
+                pixelInternalFormat, 0, numLevels, 0, 6);
 
             Utility.GLCheck();
+
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapR, (int)TextureParameterName.ClampToEdge);
+
+            Utility.GLCheck();
         }
 
         private void BindAs(int slot, TextureTarget target, int texId)

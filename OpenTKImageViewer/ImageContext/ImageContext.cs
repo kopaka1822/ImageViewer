@@ -46,8 +46,8 @@ namespace OpenTKImageViewer.ImageContext
         private readonly List<ImageData> images = new List<ImageData>();
         private uint activeMipmap = 0;
         private uint activeLayer = 0;
-        private TextureArray2D combinedImages;
-        private ImageCombineShader imageCombineShader;
+        private TextureArray2D combinedImage1;
+        private readonly ImageCombineShader imageCombineShader1;
 
         #endregion
 
@@ -159,23 +159,12 @@ namespace OpenTKImageViewer.ImageContext
 
         public void BindFinalTextureAs2DSamplerArray(int slot)
         {
-            // TODO replace with correct code
-            /*if (images.Count > 0)
-            {
-                images[0].TextureArray2D.Bind(slot);
-            }*/
-            combinedImages?.Bind(slot);
+            combinedImage1?.Bind(slot);
         }
 
         public void BindFinalTextureAsCubeMap(int slot)
         {
-            // TODO replace with correct code
-            if (images.Count > 0)
-            {
-                //images[0].TextureArray2D.BindAs(slot, TextureTarget.TextureCubeMap);
-                //images[0].TextureArray2D.Bind(slot);
-                images[0].TextureArray2D.BindAsCubemap(slot);
-            }
+            combinedImage1?.BindAsCubemap(slot);
         }
 
         /// <summary>
@@ -193,16 +182,18 @@ namespace OpenTKImageViewer.ImageContext
                     imageData.TextureArray2D = new TextureArray2D(imageData.image);
             }
 
-            if (combinedImages == null)
+            // create destination images
+            if (combinedImage1 == null)
             {
                 // create image
-                combinedImages = new TextureArray2D(GetNumLayers(), GetNumMipmaps(),
+                combinedImage1 = new TextureArray2D(GetNumLayers(), GetNumMipmaps(),
                     SizedInternalFormat.Rgba32f, GetWidth(0), GetHeight(0));
             }
 
-            imageCombineShader.Update();
+            // update image combine shader
+            if(imageCombineShader1.Update())
+                RecomputeCombinedImage(combinedImage1);
 
-            RecomputeCombinedImage();
         }
 
         #endregion
@@ -233,7 +224,7 @@ namespace OpenTKImageViewer.ImageContext
 
         public ImageContext(List<ImageLoader.Image> images)
         {
-            imageCombineShader = new ImageCombineShader(this, ImageFormula1);
+            imageCombineShader1 = new ImageCombineShader(this, ImageFormula1);
             if (images != null)
             {
                 foreach (var image in images)
@@ -243,10 +234,7 @@ namespace OpenTKImageViewer.ImageContext
             }
         }
 
-        
-        
-
-        private void RecomputeCombinedImage()
+        private void RecomputeCombinedImage(TextureArray2D target)
         {
             if (images.Count == 0)
                 return;
@@ -257,12 +245,12 @@ namespace OpenTKImageViewer.ImageContext
                 {
                     for (int image = 0; image < GetNumImages(); ++image)
                     {
-                        images[image].TextureArray2D.Bind(imageCombineShader.GetSourceImageBinding(image));
+                        images[image].TextureArray2D.Bind(imageCombineShader1.GetSourceImageBinding(image));
                     }
-                    combinedImages.BindAsImage(imageCombineShader.GetDestinationImageBinding(),
+                    target.BindAsImage(imageCombineShader1.GetDestinationImageBinding(),
                         level, layer, TextureAccess.WriteOnly);
                     
-                    imageCombineShader.Run(layer, level, GetWidth(level), GetHeight(level));
+                    imageCombineShader1.Run(layer, level, GetWidth(level), GetHeight(level));
                 }
             }
         }

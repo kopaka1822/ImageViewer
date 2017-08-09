@@ -24,19 +24,23 @@ namespace OpenTKImageViewer.ImageContext
             formula.Changed += (sender, args) => contentChanged = true;
         }
 
-        public void Update()
+        /// <summary>
+        /// updates contentes of the shader.
+        /// </summary>
+        /// <returns>true if the shader was changed and the image hast to be recomputed</returns>
+        public bool Update()
         {
-            if (program == null || contentChanged)
-            {
-                program?.Dispose();
+            if (program != null && !contentChanged) return false;
 
-                // compile new shader
-                var computeShader = new Shader(ShaderType.ComputeShader);
-                computeShader.Source = GenerateShaderSource();
-                computeShader.Compile();
+            program?.Dispose();
 
-                program = new Program(new List<Shader>{computeShader}, true);
-            }
+            // compile new shader
+            var computeShader = new Shader(ShaderType.ComputeShader);
+            computeShader.Source = GenerateShaderSource();
+            computeShader.Compile();
+
+            program = new Program(new List<Shader>{computeShader}, true);
+            return true;
         }
 
         /// <summary>
