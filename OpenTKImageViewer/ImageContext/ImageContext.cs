@@ -47,6 +47,8 @@ namespace OpenTKImageViewer.ImageContext
         public event ChangedMipmapHanlder ChangedMipmap;
         public event ChangedImagesHandler ChangedImages;
 
+        private ImageCombineShader imageCombineShader;
+
         protected virtual void OnChangedLayer()
         {
             ChangedLayer?.Invoke(this, EventArgs.Empty);
@@ -90,6 +92,7 @@ namespace OpenTKImageViewer.ImageContext
 
         public ImageContext(List<ImageLoader.Image> images)
         {
+            imageCombineShader = new ImageCombineShader(this);
             if (images != null)
             {
                 foreach (var image in images)
@@ -107,6 +110,8 @@ namespace OpenTKImageViewer.ImageContext
                 if(imageData.TextureArray2D == null)
                     imageData.TextureArray2D = new TextureArray2D(imageData.image);
             }
+
+            imageCombineShader.Update();
         }
 
         public int GetNumImages()
