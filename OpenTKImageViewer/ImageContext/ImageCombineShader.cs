@@ -121,7 +121,7 @@ namespace OpenTKImageViewer.ImageContext
             for (int i = 0; i < context.GetNumImages(); ++i)
             {
                 res += $"vec4 GetTexture{i}(){'{'}\n" +
-                       $"return texelFetch(texture{i}, ivec3(pixelPos, level), level);\n" +
+                       $"return texelFetch(texture{i}, ivec3(pixelPos, layer), level);\n" +
                        "}\n";
             }
             return res;
