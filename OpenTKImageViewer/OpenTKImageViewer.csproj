@@ -159,5 +159,13 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\import.png" />
+    <Resource Include="Icons\open.png" />
+    <Resource Include="Icons\save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\app.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -12,15 +12,29 @@
         Background="#eee"
         MinWidth="250" MinHeight="200"
         Activated="MainWindow_OnActivated"
-        Deactivated="MainWindow_OnDeactivated">
+        Deactivated="MainWindow_OnDeactivated"
+        Icon="Icons/app.png">
     <DockPanel>
         <Menu DockPanel.Dock="Top" Background="#fff" Padding="0 0 0 2">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open" Click="MenuItem_Click_Open"/>
-                <MenuItem Header="_Import" Click="MenuItem_Click_Import"/>
+                <MenuItem Header="_Open" Click="MenuItem_Click_Open">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/open.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Import" Click="MenuItem_Click_Import">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/import.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <!--<MenuItem Header="_Save"/>
                 <MenuItem Header="Save As"/>-->
-                <!--<MenuItem Header="_Export" Click="MenuItem_Click_Export"/>-->
+                <Separator/>
+                <MenuItem Header="_Export" Click="MenuItem_Click_Export">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/save.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="_View">
                 <!--<MenuItem Header="3D View"/>
