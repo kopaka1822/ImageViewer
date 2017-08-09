@@ -86,6 +86,7 @@ namespace OpenTKImageViewer.glhelper
             cubeId = GL.GenTexture();
             GL.TextureView(cubeId, TextureTarget.TextureCubeMap, id,
                 pixelInternalFormat, 0, numLevels, 0, 6);
+            GL.BindTexture(TextureTarget.TextureCubeMap, cubeId);
 
             Utility.GLCheck();
 

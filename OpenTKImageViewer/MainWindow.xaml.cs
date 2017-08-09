@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -104,7 +105,7 @@ namespace OpenTKImageViewer
         {
             try
             {
-                var flags = GraphicsContextFlags.Default;
+                var flags = GraphicsContextFlags.Default | GraphicsContextFlags.Debug;
                 glControl = new GLControl(new GraphicsMode(32, 24), 4, 2, flags);
                 glControl.Paint += GLControl_Paint;
                 glControl.Dock = DockStyle.Fill;
@@ -112,7 +113,8 @@ namespace OpenTKImageViewer
                 if (windowsFormsHost != null) windowsFormsHost.Child = glControl;
 
                 glControl.MakeCurrent();
-                InitGraphics();
+                EnableDebugCallback();
+                GL.Enable(EnableCap.TextureCubeMapSeamless);
 
                 glControl.MouseMove += (o, args) => WinFormsHost_OnMouseMove(args);
                 glControl.MouseWheel += (o, args) => WinFormsHost_OnMouseWheel(args);
@@ -126,17 +128,27 @@ namespace OpenTKImageViewer
             }
         }
 
+        private void EnableDebugCallback()
+        {
+            GL.Enable(EnableCap.DebugOutput);
+            GL.Arb.DebugMessageCallback(OpenGlDebug, IntPtr.Zero);
+            GL.Arb.DebugMessageControl(All.DontCare, All.DontCare, All.DontCare, 0, new int[0], true);
+        }
+
+        public static void OpenGlDebug(DebugSource source, DebugType type, int id, DebugSeverity severity, int length,
+            IntPtr message, IntPtr userParam)
+        {
+            //string str = Marshal.PtrToStringAuto(message, length);
+            string str = Marshal.PtrToStringAnsi(message, length);
+            MessageBox.Show(str);
+        }
+
         /// <summary>
         /// the frame will be redrawn as soon as possible
         /// </summary>
         public void RedrawFrame()
         {
             glControl?.Invalidate();
-        }
-
-        private void InitGraphics()
-        { 
-            GL.Enable(EnableCap.TextureCubeMapSeamless);
         }
 
         #endregion
@@ -154,6 +166,8 @@ namespace OpenTKImageViewer
             try
             {
                 glControl.MakeCurrent();
+                EnableDebugCallback();
+
                 GL.Viewport(0, 0, (int)WinFormsHost.ActualWidth, (int)WinFormsHost.ActualHeight);
                 GL.ClearColor(0.9333f, 0.9333f, 0.9333f, 1.0f);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
