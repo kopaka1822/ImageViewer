@@ -42,7 +42,7 @@ namespace OpenTKImageViewer.ImageContext
         private readonly List<ImageData> images = new List<ImageData>();
         private uint activeMipmap = 0;
         private uint activeLayer = 0;
-        private string imageCombineFormula = "vec4(1.0)";
+        private string imageCombineFormula = "GetTexture0()";
         private TextureArray2D combinedImages;
         public bool LinearInterpolation { get; set; } = false;
         public GrayscaleMode Grayscale { get; set; } = GrayscaleMode.Disabled;

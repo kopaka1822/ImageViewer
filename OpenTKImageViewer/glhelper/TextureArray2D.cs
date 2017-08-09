@@ -149,7 +149,7 @@ namespace OpenTKImageViewer.glhelper
 
         public void BindAsImage(int slot, int level, int layer, TextureAccess access)
         {
-            GL.BindImageTexture(slot, id, level, true, layer, access, internalFormat);
+            GL.BindImageTexture(slot, id, level, false, layer, access, internalFormat);
         }
     }
 }
