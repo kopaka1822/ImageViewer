@@ -95,7 +95,7 @@
     <Compile Include="View\Shader\CubeViewShader.cs" />
     <Compile Include="View\VertexArrayView.cs" />
     <Compile Include="View\Shader\SingleViewShader.cs" />
-    <Compile Include="View\ViewShader.cs" />
+    <Compile Include="View\Shader\ViewShader.cs" />
     <Compile Include="View\SingleView.cs" />
     <Page Include="Dialogs\ImageWindow.xaml">
       <SubType>Designer</SubType>

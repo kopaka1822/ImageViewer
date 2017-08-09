@@ -135,20 +135,27 @@ namespace OpenTKImageViewer
 
             public bool IsGrayscale()
             {
-                // TODO
-                return false;
-                /*
-                switch (OpenglExternalFormat)
+                PixelFormat pixelFormat = (PixelFormat) OpenglExternalFormat;
+                switch (pixelFormat)
                 {
-                    case OpenGL.GL_RED:
-                    case OpenGL.GL_RED_INTEGER:
-                    case OpenGL.GL_DEPTH_COMPONENT:
-                    case OpenGL.GL_LUMINANCE:
-                    case OpenGL.GL_ALPHA:
-                    case OpenGL.GL_LUMINANCE_ALPHA:
+                    case PixelFormat.UnsignedShort:
+                    case PixelFormat.UnsignedInt:
+                    case PixelFormat.ColorIndex:
+                    case PixelFormat.StencilIndex:
+                    case PixelFormat.DepthComponent:
+                    case PixelFormat.Red:
+                    case PixelFormat.Green:
+                    case PixelFormat.Blue:
+                    case PixelFormat.Alpha:
+                    case PixelFormat.Luminance:
+                    case PixelFormat.LuminanceAlpha:
+                    case PixelFormat.RedInteger:
+                    case PixelFormat.GreenInteger:
+                    case PixelFormat.BlueInteger:
+                    case PixelFormat.AlphaInteger:
                         return true;
                 }
-                return false;*/
+                return false;
             }
         }
 

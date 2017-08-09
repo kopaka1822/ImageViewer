@@ -27,5 +27,17 @@ namespace OpenTKImageViewer.View.Shader
         {
             return "#version 430 core\n";
         }
+
+        /// <summary>
+        /// adds grayscale line to shader. color must be the current color and grayscale the grayscale mode
+        /// </summary>
+        /// <returns></returns>
+        protected static string ApplyGrayscale()
+        {
+            return "if(grayscale == uint(1)) color = color.rrrr;\n" +
+                   "else if(grayscale == uint(2)) color = color.gggg;\n" +
+                   "else if(grayscale == uint(3)) color = color.bbbb;\n" +
+                   "else if(grayscale == uint(4)) color = color.aaaa;\n";
+        }
     }
 }

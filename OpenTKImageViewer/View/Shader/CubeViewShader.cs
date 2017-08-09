@@ -35,6 +35,11 @@ namespace OpenTKImageViewer.View.Shader
             GL.Uniform1(3, level);
         }
 
+        public void SetGrayscale(ImageContext.ImageContext.GrayscaleMode mode)
+        {
+            GL.Uniform1(4, (uint)mode);
+        }
+
         public int GetTextureLocation()
         {
             return 1;
@@ -66,12 +71,14 @@ namespace OpenTKImageViewer.View.Shader
                    // uniforms
                    "layout(location = 1) uniform samplerCube tex;\n" +
                    "layout(location = 3) uniform float level;\n" +
+                   "layout(location = 4) uniform uint grayscale;\n" +
                    // in out
                    "layout(location = 0) in vec3 viewdir;\n" +
                    "out vec4 fragColor;\n" +
 
                    "void main(void){\n" +
                    "vec4 color = textureLod(tex, viewdir, level);\n" +
+                   ApplyGrayscale() +
                    "fragColor = color;\n" +
                    "}\n";
         }

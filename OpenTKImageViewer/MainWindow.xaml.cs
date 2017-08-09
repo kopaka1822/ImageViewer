@@ -79,11 +79,15 @@ namespace OpenTKImageViewer
             context.ChangedImages += (sender, args) => RedrawFrame();
             context.ChangedLayer += (sender, args) => RedrawFrame();
             context.ChangedFiltering += (sender, args) => RedrawFrame();
+            context.ChangedGrayscale += (sender, args) => RedrawFrame();
 
             // set default values
             MenuItemLinearInterpolation.IsChecked = context.LinearInterpolation;
             context.ChangedFiltering += (sender, args) => MenuItemLinearInterpolation.IsChecked =
                 context.LinearInterpolation;
+
+            SetGrayscale(context.Grayscale);
+            context.ChangedGrayscale += (sender, args) => SetGrayscale(context.Grayscale);
         }
 
         private void CreateImageViews()
@@ -95,7 +99,7 @@ namespace OpenTKImageViewer
                 if (Context.GetNumLayers() == 6)
                 {
                     imageViews.Add(ImageViewType.CubeMap, new CubeView(Context));
-                    //CurrentView = ImageViewType.CubeMap;
+                    CurrentView = ImageViewType.CubeMap;
                 }
                 // TODO add ploar etc.
             }
@@ -344,6 +348,28 @@ namespace OpenTKImageViewer
         private void MenuItem_OnChecked_LinearFiltering(object sender, RoutedEventArgs e)
         {
             Context.LinearInterpolation = MenuItemLinearInterpolation.IsChecked;
+        }
+
+        private void SetGrayscale(ImageContext.ImageContext.GrayscaleMode mode)
+        {
+            switch (mode)
+            {
+                case ImageContext.ImageContext.GrayscaleMode.Disabled:
+                    UpdateGrayscale(MenuItemGrayscaleDisabled);
+                    break;
+                case ImageContext.ImageContext.GrayscaleMode.Red:
+                    UpdateGrayscale(MenuItemGrayscaleRed);
+                    break;
+                case ImageContext.ImageContext.GrayscaleMode.Green:
+                    UpdateGrayscale(MenuItemGrayscaleGreen);
+                    break;
+                case ImageContext.ImageContext.GrayscaleMode.Blue:
+                    UpdateGrayscale(MenuItemGrayscaleBlue);
+                    break;
+                case ImageContext.ImageContext.GrayscaleMode.Alpha:
+                    UpdateGrayscale(MenuItemGrayscaleAlpha);
+                    break;
+            }
         }
 
         private void MenuItem_OnChecked_Grayscale(object sender, RoutedEventArgs e)

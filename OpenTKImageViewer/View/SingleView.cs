@@ -44,6 +44,7 @@ namespace OpenTKImageViewer.View
             shader.SetTransform(transform * aspectRatio);
             shader.SetLevel((float)context.ActiveMipmap);
             shader.SetLayer((float)context.ActiveLayer);
+            shader.SetGrayscale(context.Grayscale);
             context.BindFinalTextureAs2DSamplerArray(shader.GetTextureLocation());
 
             // draw via vertex array

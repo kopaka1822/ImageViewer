@@ -17,6 +17,8 @@ namespace OpenTKImageViewer.ImageContext
 
     public delegate void ChangedFilteringHandler(object sender, EventArgs e);
 
+    public delegate void ChangedGrayscaleHandler(object sender, EventArgs e);
+
     public class ImageContext
     {
         #region Structures and Enums
@@ -51,6 +53,7 @@ namespace OpenTKImageViewer.ImageContext
         private TextureArray2D combinedImage1;
         private readonly ImageCombineShader imageCombineShader1;
         private bool linearInterpolation = false;
+        private GrayscaleMode grayscale = GrayscaleMode.Disabled;
 
         #endregion
 
@@ -67,7 +70,16 @@ namespace OpenTKImageViewer.ImageContext
             }
         }
 
-        public GrayscaleMode Grayscale { get; set; } = GrayscaleMode.Disabled;
+        public GrayscaleMode Grayscale
+        {
+            get => grayscale;
+            set
+            {
+                if (value == grayscale) return;
+                grayscale = value;
+                OnChangedGrayscale();
+            }
+        }
         public uint ActiveMipmap
         {
             get { return activeMipmap; }
@@ -137,6 +149,16 @@ namespace OpenTKImageViewer.ImageContext
             return images[image].image.Filename;
         }
 
+        public bool HasOnlyGrayscale()
+        {
+            foreach (var imageData in images)
+            {
+                if (!imageData.image.IsGrayscale())
+                    return false;
+            }
+            return true;
+        }
+
         #endregion
 
         #region Public Methods
@@ -168,6 +190,8 @@ namespace OpenTKImageViewer.ImageContext
 
             images.Add(new ImageData(image));
             OnChangedImages();
+            if(HasOnlyGrayscale())
+                Grayscale = GrayscaleMode.Red;
         }
 
         public void BindFinalTextureAs2DSamplerArray(int slot)
@@ -217,6 +241,7 @@ namespace OpenTKImageViewer.ImageContext
         public event ChangedMipmapHanlder ChangedMipmap;
         public event ChangedImagesHandler ChangedImages;
         public event ChangedFilteringHandler ChangedFiltering;
+        public event ChangedGrayscaleHandler ChangedGrayscale;
 
         protected virtual void OnChangedLayer()
         {
@@ -236,6 +261,11 @@ namespace OpenTKImageViewer.ImageContext
         protected virtual void OnChangedFiltering()
         {
             ChangedFiltering?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected virtual void OnChangedGrayscale()
+        {
+            ChangedGrayscale?.Invoke(this, EventArgs.Empty);
         }
 
         #endregion
