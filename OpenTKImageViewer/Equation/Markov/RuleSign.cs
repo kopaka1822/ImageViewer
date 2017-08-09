@@ -20,7 +20,7 @@ namespace OpenTKImageViewer.Equation.Markov
 
         public override List<Token> Apply(List<Token> match)
         {
-            Debug.Assert(match.Count == 3);
+            Debug.Assert(match.Count == 2);
             var signToken = match[0] as SingleCharToken;
             if (signToken != null)
             {

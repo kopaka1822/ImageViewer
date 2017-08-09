@@ -39,7 +39,7 @@ namespace OpenTKImageViewer.Dialogs
                 if (activeWindow != null)
                     activeWindow.Context.ChangedImages -= OnChangedImages;
                 if (window != null)
-                    window.Context.ChangedLayer += OnChangedImages;
+                    window.Context.ChangedImages += OnChangedImages;
             }
 
             activeWindow = window;
@@ -59,6 +59,8 @@ namespace OpenTKImageViewer.Dialogs
                 // refresh image list
                 foreach (var item in activeWindow.GenerateImageItems())
                     ImageList.Items.Add(item);
+
+                EquationBox1.Text = activeWindow.Context.ImageCombineFormula;
             }
         }
 

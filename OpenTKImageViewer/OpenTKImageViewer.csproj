@@ -74,18 +74,18 @@
     <Compile Include="Dialogs\MipMapWindow.xaml.cs">
       <DependentUpon>MipMapWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Equation\CombinedValueToken.cs" />
+    <Compile Include="Equation\Token\CombinedValueToken.cs" />
     <Compile Include="Equation\Equation.cs" />
-    <Compile Include="Equation\ImageToken.cs" />
+    <Compile Include="Equation\Token\ImageToken.cs" />
     <Compile Include="Equation\Markov\BracketRule.cs" />
     <Compile Include="Equation\Markov\MarkovProcess.cs" />
     <Compile Include="Equation\Markov\MarkovRule.cs" />
     <Compile Include="Equation\Markov\RuleSign.cs" />
     <Compile Include="Equation\Markov\RuleValueOperationValue.cs" />
-    <Compile Include="Equation\NumberToken.cs" />
-    <Compile Include="Equation\SingleCharToken.cs" />
-    <Compile Include="Equation\Token.cs" />
-    <Compile Include="Equation\ValueToken.cs" />
+    <Compile Include="Equation\Token\NumberToken.cs" />
+    <Compile Include="Equation\Token\SingleCharToken.cs" />
+    <Compile Include="Equation\Token\Token.cs" />
+    <Compile Include="Equation\Token\ValueToken.cs" />
     <Compile Include="glhelper\TextureArray2D.cs" />
     <Compile Include="ImageContext\ImageCombineShader.cs" />
     <Compile Include="View\CubeView.cs" />
@@ -94,7 +94,7 @@
     <Compile Include="View\Shader\CubeViewShader.cs" />
     <Compile Include="View\VertexArrayView.cs" />
     <Compile Include="View\Shader\SingleViewShader.cs" />
-    <Compile Include="View\Shader\ViewShader.cs" />
+    <Compile Include="View\ViewShader.cs" />
     <Compile Include="View\SingleView.cs" />
     <Page Include="Dialogs\ImageWindow.xaml">
       <SubType>Designer</SubType>
