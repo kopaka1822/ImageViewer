@@ -101,7 +101,10 @@ namespace OpenTKImageViewer
                     imageViews.Add(ImageViewType.CubeMap, new CubeView(Context));
                     CurrentView = ImageViewType.CubeMap;
                 }
-                // TODO add ploar etc.
+                else if (Context.GetNumLayers() == 1)
+                {
+                    imageViews.Add(ImageViewType.Polar, new PolarView(Context));
+                }
             }
 
             if (imageViews.Count == 0)

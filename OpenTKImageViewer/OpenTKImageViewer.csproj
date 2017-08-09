@@ -92,7 +92,9 @@
     <Compile Include="View\CubeView.cs" />
     <Compile Include="View\EmptyView.cs" />
     <Compile Include="View\IImageView.cs" />
+    <Compile Include="View\PolarView.cs" />
     <Compile Include="View\Shader\CubeViewShader.cs" />
+    <Compile Include="View\Shader\PolarViewShader.cs" />
     <Compile Include="View\VertexArrayView.cs" />
     <Compile Include="View\Shader\SingleViewShader.cs" />
     <Compile Include="View\Shader\ViewShader.cs" />
