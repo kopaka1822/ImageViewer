@@ -60,7 +60,7 @@ namespace OpenTKImageViewer.Dialogs
                 foreach (var item in activeWindow.GenerateImageItems())
                     ImageList.Items.Add(item);
 
-                EquationBox1.Text = activeWindow.Context.ImageCombineFormula;
+                EquationBox1.Text = activeWindow.Context.ImageFormula1.Original;
             }
         }
 
@@ -75,8 +75,7 @@ namespace OpenTKImageViewer.Dialogs
             if (activeWindow == null) return;
             try
             {
-                var eq = new Equation.Equation(EquationBox1.Text, activeWindow.Context.GetNumImages());
-                activeWindow.Context.ImageCombineFormula = eq.GetOpenGlExpression();
+                activeWindow.Context.ImageFormula1.ApplyFormula(EquationBox1.Text, activeWindow.Context.GetNumImages());
             }
             catch (Exception exception)
             {

@@ -73,7 +73,7 @@ namespace OpenTKImageViewer
 
             // redraw if context changes
             context.ChangedMipmap += (sender, args) => RedrawFrame();
-            context.ChangedImageCombineFormula += (sender, args) => RedrawFrame();
+            context.ImageFormula1.Changed += (sender, args) => RedrawFrame();
             context.ChangedImages += (sender, args) => RedrawFrame();
             context.ChangedLayer += (sender, args) => RedrawFrame();
         }

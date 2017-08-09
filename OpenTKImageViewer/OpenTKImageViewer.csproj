@@ -88,6 +88,7 @@
     <Compile Include="Equation\Token\ValueToken.cs" />
     <Compile Include="glhelper\TextureArray2D.cs" />
     <Compile Include="ImageContext\ImageCombineShader.cs" />
+    <Compile Include="ImageContext\ImageFormula.cs" />
     <Compile Include="View\CubeView.cs" />
     <Compile Include="View\EmptyView.cs" />
     <Compile Include="View\IImageView.cs" />

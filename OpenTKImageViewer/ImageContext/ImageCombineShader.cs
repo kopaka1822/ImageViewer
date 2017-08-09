@@ -15,11 +15,13 @@ namespace OpenTKImageViewer.ImageContext
         private bool contentChanged = false;
         private const int LocalSize = 8;
         private const int TextureBindingStart = 3;
+        private ImageFormula formula;
 
-        public ImageCombineShader(ImageContext context)
+        public ImageCombineShader(ImageContext context, ImageFormula formula)
         {
             this.context = context;
-            context.ChangedImageCombineFormula += (sender, args) => contentChanged = true;
+            this.formula = formula;
+            formula.Changed += (sender, args) => contentChanged = true;
         }
 
         public void Update()
@@ -112,7 +114,7 @@ namespace OpenTKImageViewer.ImageContext
 
         private string GetImageColor()
         {
-            return context.ImageCombineFormula;
+            return formula.Converted;
         }
 
         private string GetTextureGetters()

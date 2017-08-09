@@ -15,8 +15,6 @@ namespace OpenTKImageViewer.ImageContext
 
     public delegate void ChangedImagesHandler(object sender, EventArgs e);
 
-    public delegate void ChangedImagesCombineFormulaHandler(object sender, EventArgs e);
-
     public class ImageContext
     {
         #region Structures and Enums
@@ -48,7 +46,6 @@ namespace OpenTKImageViewer.ImageContext
         private readonly List<ImageData> images = new List<ImageData>();
         private uint activeMipmap = 0;
         private uint activeLayer = 0;
-        private string imageCombineFormula = "GetTexture0()";
         private TextureArray2D combinedImages;
         private ImageCombineShader imageCombineShader;
 
@@ -84,18 +81,7 @@ namespace OpenTKImageViewer.ImageContext
             }
         }
 
-        public string ImageCombineFormula
-        {
-            get { return imageCombineFormula; }
-            set
-            {
-                if (imageCombineFormula != value)
-                {
-                    imageCombineFormula = value;
-                    OnChangedImageCombineFormula();
-                }
-            }
-        }
+        public ImageFormula ImageFormula1 { get; } = new ImageFormula();
 
         #endregion
 
@@ -226,7 +212,6 @@ namespace OpenTKImageViewer.ImageContext
         public event ChangedLayerHandler ChangedLayer;
         public event ChangedMipmapHanlder ChangedMipmap;
         public event ChangedImagesHandler ChangedImages;
-        public event ChangedImagesCombineFormulaHandler ChangedImageCombineFormula;
 
         protected virtual void OnChangedLayer()
         {
@@ -243,17 +228,12 @@ namespace OpenTKImageViewer.ImageContext
             ChangedImages?.Invoke(this, EventArgs.Empty);
         }
 
-        protected virtual void OnChangedImageCombineFormula()
-        {
-            ChangedImageCombineFormula?.Invoke(this, EventArgs.Empty);
-        }
-
         #endregion
         
 
         public ImageContext(List<ImageLoader.Image> images)
         {
-            imageCombineShader = new ImageCombineShader(this);
+            imageCombineShader = new ImageCombineShader(this, ImageFormula1);
             if (images != null)
             {
                 foreach (var image in images)
