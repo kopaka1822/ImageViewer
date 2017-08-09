@@ -11,9 +11,9 @@ namespace OpenTKImageViewer.glhelper
     {
         public static void GLCheck()
         {
-            //var glerr = GL.GetError();
-            //if (glerr != ErrorCode.NoError)
-              //  throw new Exception(glerr.ToString());
+            var glerr = GL.GetError();
+            if (glerr != ErrorCode.NoError)
+              throw new Exception(glerr.ToString());
         }
     }
 }
