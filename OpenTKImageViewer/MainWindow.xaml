@@ -15,6 +15,7 @@
         Deactivated="MainWindow_OnDeactivated"
         Icon="Icons/app.png">
     <DockPanel>
+    <!--<StackPanel>-->
         <Menu DockPanel.Dock="Top" Background="#fff" Padding="0 0 0 2">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Click="MenuItem_Click_Open">
@@ -55,11 +56,21 @@
                 <MenuItem Header="Tone Mapping"/>
             </MenuItem>
         </Menu>
-        
-        <WindowsFormsHost x:Name="WinFormsHost"
-                          Initialized="WinFormsHost_OnInitialized"
-                          SizeChanged="WinFormsHost_OnSizeChanged"
-                          Focusable="True"
-                          />
+
+        <Grid DockPanel.Dock="Bottom">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <WindowsFormsHost x:Name="WinFormsHost"
+                              Initialized="WinFormsHost_OnInitialized"
+                              SizeChanged="WinFormsHost_OnSizeChanged"
+                              Focusable="True"
+            />
+            <StatusBar Height="30" Grid.Row="1" BorderBrush="DarkGray" BorderThickness="0 1 0 0">
+
+            </StatusBar>
+        </Grid>
     </DockPanel>
 </Window>
