@@ -564,12 +564,51 @@ namespace OpenTKImageViewer
             sfd.Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|HDR (*.hdr)|*.hdr";
             if (sfd.ShowDialog() == false)
                 return;
-            
-            ExportWindow ew = new ExportWindow(this, sfd.FileName);
+
+            // obtain format
+            ExportWindow.FileFormat format = ExportWindow.FileFormat.Png;
+            if(sfd.FileName.EndsWith(".bmp"))
+                format = ExportWindow.FileFormat.Bmp;
+            else if(sfd.FileName.EndsWith(".hdr"))
+                format = ExportWindow.FileFormat.Hdr;
+
+            // open dialog
+            ExportWindow ew = new ExportWindow(this, sfd.FileName, format);
             if (ew.ShowDialog() == false)
                 return;
 
             // do the export
+            glControl.MakeCurrent();
+            int width;
+            int height;
+            var data = Context.GetCurrentImageData(ew.SelectedMipmap, ew.SelectedLayer, ew.SelectedFormat,
+                ew.SelectedPixelType, out width, out height);
+
+            if (data == null)
+            {
+                App.ShowErrorDialog(this, "error retrieving file from gpu");
+                return;
+            }
+
+            try
+            {
+                switch (format)
+                {
+                    case ExportWindow.FileFormat.Png:
+                        ImageLoader.SavePng(sfd.FileName, width, height, TextureArray2D.GetPixelFormatCount(ew.SelectedFormat), data);
+                        break;
+                    case ExportWindow.FileFormat.Bmp:
+                        ImageLoader.SaveBmp(sfd.FileName, width, height, TextureArray2D.GetPixelFormatCount(ew.SelectedFormat), data);
+                        break;
+                    case ExportWindow.FileFormat.Hdr:
+                        ImageLoader.SaveHdr(sfd.FileName, width, height, TextureArray2D.GetPixelFormatCount(ew.SelectedFormat), data);
+                        break;
+                }
+            }
+            catch (Exception exception)
+            {
+                App.ShowErrorDialog(this, exception.Message);
+            }
         }
     }
 }

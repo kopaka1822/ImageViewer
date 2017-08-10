@@ -159,6 +159,17 @@ namespace OpenTKImageViewer.ImageContext
             return true;
         }
 
+        public byte[] GetCurrentImageData(int level, int layer, PixelFormat format, PixelType type, out int width,
+            out int height)
+        {
+            width = GetWidth(level);
+            height = GetHeight(level);
+            if (combinedImage1 == null)
+                return null;
+
+            return combinedImage1.GetData(level, layer, format, type, out width, out height);
+        }
+
         #endregion
 
         #region Public Methods

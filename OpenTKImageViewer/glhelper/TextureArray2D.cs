@@ -182,7 +182,7 @@ namespace OpenTKImageViewer.glhelper
             return buffer;
         }
 
-        private static int GetPixelFormatCount(PixelFormat f)
+        public static int GetPixelFormatCount(PixelFormat f)
         {
             switch (f)
             {

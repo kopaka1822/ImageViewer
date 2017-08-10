@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
         mc:Ignorable="d"
-        Title="Export" Height="400" Width="400"
+        Title="Export" Height="200" Width="400"
         ResizeMode="NoResize" Background="#eee"
         Icon="../Icons/app.png">
     <Border Padding="5">
@@ -29,15 +29,24 @@
                 <ComboBox Grid.Column="1" x:Name="BoxLayer"/>
             </Grid>
             <!-- MIPMAPS -->
+            <Grid Margin="0 0 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Mipmap:"/>
+                <ComboBox Grid.Column="1" x:Name="BoxMipmaps"/>
+            </Grid>
+            <!-- Format -->
             <Grid Margin="0 0 0 15">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="60"/>
-                    <ColumnDefinition Width="31*" />
-                    <ColumnDefinition Width="77*"/>
+                    <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Mipmap:"/>
-                <ComboBox Grid.Column="1" x:Name="BoxMipmaps" Grid.ColumnSpan="2"/>
+                <TextBlock Text="Format:"/>
+                <ComboBox Grid.Column="1" x:Name="BoxFormat"/>
             </Grid>
+            
             <Grid HorizontalAlignment="Right">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
