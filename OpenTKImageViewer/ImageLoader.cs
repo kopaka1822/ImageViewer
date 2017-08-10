@@ -31,6 +31,15 @@ namespace OpenTKImageViewer
         [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr get_error(out int length);
 
+        [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool save_png(string filename, int width, int height, int components, byte[] data);
+
+        [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool save_bmp(string filename, int width, int height, int components, byte[] data);
+
+        [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool save_hdr(string filename, int width, int height, int components, byte[] data);
+
         private static string GetError()
         {
             int length;
@@ -197,6 +206,24 @@ namespace OpenTKImageViewer
 
             release(id);
             return 0;
+        }
+
+        public static void SavePng(string filename, int width, int height, int components, byte[] data)
+        {
+            if(!save_png(filename, width, height, components, data))
+                throw new Exception("saving image failed: " + GetError());
+        }
+
+        public static void SaveBmp(string filename, int width, int height, int components, byte[] data)
+        {
+            if (!save_bmp(filename, width, height, components, data))
+                throw new Exception("saving image failed: " + GetError());
+        }
+
+        public static void SaveHdr(string filename, int width, int height, int components, byte[] data)
+        {
+            if (!save_hdr(filename, width, height, components, data))
+                throw new Exception("saving image failed: " + GetError());
         }
     }
 }
