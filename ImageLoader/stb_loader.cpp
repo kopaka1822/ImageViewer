@@ -2,6 +2,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../dependencies/stb/stb_image.h"
+#include <fstream>
 
 #include <gli/gl.hpp>
 
@@ -66,11 +67,10 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 	{
 		// load hdr file
 		int nComponents = 0;
-		//format.componentType = ImageFormat::COMPONENT_TYPE_FLOAT;
 		float* data = stbi_loadf(filename, reinterpret_cast<int*>(&mipmap.width),
 			reinterpret_cast<int*>(&mipmap.height), &nComponents, 0);
 		if (!data)
-			return nullptr;
+			throw std::exception("error during reading file");
 
 		format.openglInternalFormat = getSizedInternalFormat(nComponents, true);
 		format.openglExternalFormat = getDefaultInternalFormat(nComponents);
@@ -90,7 +90,7 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 		stbi_uc* data = stbi_load(filename, reinterpret_cast<int*>(&mipmap.width), 
 			reinterpret_cast<int*>(&mipmap.height), &nComponents, 0);
 		if (!data)
-			return nullptr;
+			throw std::exception("error during reading file");
 
 		format.openglInternalFormat = getSizedInternalFormat(nComponents, false);
 		format.openglExternalFormat = getDefaultInternalFormat(nComponents);

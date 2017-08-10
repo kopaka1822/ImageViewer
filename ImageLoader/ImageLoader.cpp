@@ -5,29 +5,57 @@
 #include "stb_loader.h"
 #include "gli_loader.h"
 #include "Pfm.h"
-
-int add(int a, int b)
-{
-	return a + b;
-}
+#include <algorithm>
+#include <fstream>
 
 static int s_currentID = 1;
 static std::unordered_map<int, std::unique_ptr<ImageResource>> s_resources;
+std::string s_error;
+
+bool hasEnding(std::string const &fullString, std::string const &ending) {
+	if (fullString.length() >= ending.length()) {
+		return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
+	}
+	return false;
+}
+
+inline bool file_exists(const std::string& name) {
+	std::ifstream f(name.c_str());
+	return f.good();
+}
 
 int open(const char* filename)
 {
 	// try loading the resource
-	auto res = stb_load(filename);
-	if (!res) // TODO set error
+	// transform filename to lowercase for file extension check
+	std::string fname = filename;
+	std::transform(fname.begin(), fname.end(), fname.begin(), ::tolower);
+
+	std::unique_ptr<ImageResource> res;
+
+	try
 	{
-		res = gli_load(filename);
-		if (!res)
+		if (!file_exists(filename))
+			throw std::exception("unable to open file");
+
+		if (hasEnding(fname, ".pfm"))
 		{
 			res = pfm_load(filename);
-			if (!res)
-				return 0;
+		}
+		else if (hasEnding(fname, ".dds") || hasEnding(fname, ".ktx"))
+		{
+			res = gli_load(filename);
+		}
+		else
+		{
+			res = stb_load(filename);
 		}
 	}
+	catch(const std::exception& e)
+	{
+		set_error(e.what());
+	}
+	if (!res) return 0;
 
 	int id = s_currentID++;
 	s_resources[id] = move(res);
@@ -101,4 +129,15 @@ unsigned char* image_get_mipmap(int id, int image, int face, int mipmap, uint32_
 
 	size = it->second->layer.at(image).faces.at(face).mipmaps[mipmap].bytes.size();
 	return it->second->layer.at(image).faces.at(face).mipmaps[mipmap].bytes.data();
+}
+
+const char* get_error(int& length)
+{
+	length = s_error.length();
+	return s_error.data();
+}
+
+void set_error(const std::string& str)
+{
+	s_error = str;
 }

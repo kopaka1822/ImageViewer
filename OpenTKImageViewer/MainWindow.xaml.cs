@@ -173,7 +173,7 @@ namespace OpenTKImageViewer
         {
             if (error.Length > 0 && iteration++ > 0)
             {
-                MessageBox.Show(error);
+                App.ShowErrorDialog(this, error);
                 error = "";
             }
 

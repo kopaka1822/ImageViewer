@@ -45,6 +45,14 @@ namespace OpenTKImageViewer
             }
         }
 
+        public static void ShowErrorDialog(Window owner, string message)
+        {
+            if(owner != null)
+                MessageBox.Show(owner, message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            else
+                MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
         public void SpawnWindow(string filename)
         {
             if (filename != null)
@@ -71,8 +79,7 @@ namespace OpenTKImageViewer
                 catch (Exception e)
                 {
                     // could not load the image
-                    // TODO delete this
-                    MessageBox.Show(e.Message);
+                    ShowErrorDialog(null, e.Message);
                 }
             }
 

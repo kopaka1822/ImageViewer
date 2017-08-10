@@ -3,7 +3,7 @@
 #include <gli/gl.hpp>
 
 
-bool getImageFormat(ImageFormat& format, const gli::texture& tex)
+void getImageFormat(ImageFormat& format, const gli::texture& tex)
 {
 	gli::gl GL(gli::gl::PROFILE_GL33);
 	auto GLformat = GL.translate(tex.format(), tex.swizzles());
@@ -11,20 +11,18 @@ bool getImageFormat(ImageFormat& format, const gli::texture& tex)
 	format.openglExternalFormat = static_cast<uint32_t>(GLformat.External);
 	format.openglType = static_cast<uint32_t>(GLformat.Type);
 	format.isCompressed = gli::is_compressed(tex.format());
-	return true;
 }
 
 std::unique_ptr<ImageResource> gli_load(const char* filename)
 {
 	gli::texture tex = gli::load(filename);
 	if (tex.empty())
-		return nullptr;
+		throw std::exception("error opening file");
 
 	std::unique_ptr<ImageResource> res = std::make_unique<ImageResource>();
 	
 	// determine image format
-	if (!getImageFormat(res->format, tex))
-		return nullptr;
+	getImageFormat(res->format, tex);
 
 	res->layer.assign(tex.layers(), ImageLayer());
 	for(size_t layer = 0; layer < tex.layers(); ++layer)

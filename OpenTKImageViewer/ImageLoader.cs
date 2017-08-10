@@ -28,6 +28,16 @@ namespace OpenTKImageViewer
         [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr image_get_mipmap(int id, int image, int face, int mipmap, out uint size);
 
+        [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr get_error(out int length);
+
+        private static string GetError()
+        {
+            int length;
+            var ptr = get_error(out length);
+            return ptr.Equals(IntPtr.Zero) ? "" : Marshal.PtrToStringAnsi(ptr, length);
+        }
+
         [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
         public static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
 
@@ -39,7 +49,7 @@ namespace OpenTKImageViewer
             {
                 Id = open(file);
                 if (Id == 0)
-                    throw new Exception("could not open " + file);
+                    throw new Exception("error in " + file + ": " + GetError());
             }
 
             ~Resource()

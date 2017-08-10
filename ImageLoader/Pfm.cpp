@@ -38,21 +38,13 @@ struct Pixel
 	float r, g, b;
 };
 
-bool hasEnding(std::string const &fullString, std::string const &ending) 
-{
-	if (fullString.length() >= ending.length()) 
-		return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
-
-	return false;
-}
-
 std::unique_ptr<ImageResource> pfm_load(const char* filename) 
 {
-	if (!hasEnding(filename, ".pfm"))
-		return nullptr;
 	// create fstream object to read in pfm file 
 	// open the file in binary
 	std::fstream file(filename, std::ios::in | std::ios::binary);
+	if (!file.is_open())
+		throw std::exception("error opening file");
 
 	//                          "PF" = color        (3-band)
 	int width, height;      // width and height of the image
@@ -81,14 +73,9 @@ std::unique_ptr<ImageResource> pfm_load(const char* filename)
 	if (c == '\r')      // <cr> in some files before newline
 		c = file.get();
 	if (c != '\n') {
-		if (c == ' ' || c == '\t' || c == '\r') {
-			//cout << "newline expected";
-			return nullptr;
-		}
-		else {
-			//cout << "whitespace expected";
-			return nullptr;
-		}
+		if (c == ' ' || c == '\t' || c == '\r')
+			throw std::exception("invalid header - newline expected");
+		throw std::exception("invalid header - whitespace expected");
 	}
 
 	bool grayscale = (bands == "Pf");
@@ -113,9 +100,6 @@ std::unique_ptr<ImageResource> pfm_load(const char* filename)
 
 	if (bands == "Pf") {          // handle 1-band image 
 
-		//cout << "Reading grayscale image (1-band)" << endl;
-		//cout << "Reading into CV_32FC1 image" << endl;
-
 		for (int i = 0; i < height; ++i) {
 			for (int j = 0; j < width; ++j) {
 				file.read(reinterpret_cast<char*>(&fvalue), sizeof(fvalue));
@@ -127,8 +111,6 @@ std::unique_ptr<ImageResource> pfm_load(const char* filename)
 		}
 	}
 	else if (bands == "PF") {    // handle 3-band image
-		//cout << "Reading color image (3-band)" << endl;
-		//cout << "Reading into CV_32FC3 image" << endl;
 
 		for (int i = 0; i < height; ++i) {
 			for (int j = 0; j < width; ++j) {
@@ -144,10 +126,8 @@ std::unique_ptr<ImageResource> pfm_load(const char* filename)
 			}
 		}
 	}
-	else {
-		//cout << "unknown bands description";
-		return nullptr;
-	}
-	//cout << setfill('=') << setw(19) << "=" << endl << endl;
+	else
+		throw std::exception("invalid header - unknown bands description");
+
 	return res;
 }
