@@ -117,7 +117,7 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 
 void stb_save_png(const char* filename, int width, int height, int components, const void* data)
 {
-	auto res = stbi_write_png(filename, width, height, components, data, width * 4);
+	auto res = stbi_write_png(filename, width, height, components, data, width * components);
 	if (!res)
 		throw std::exception("could not save file");
 }

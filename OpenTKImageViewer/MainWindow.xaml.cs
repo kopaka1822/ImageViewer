@@ -608,6 +608,7 @@ namespace OpenTKImageViewer
             catch (Exception exception)
             {
                 App.ShowErrorDialog(this, exception.Message);
+                return;
             }
         }
     }

@@ -121,17 +121,23 @@ namespace OpenTKImageViewer.Dialogs
             {
                 case FileFormat.Png:
                     res.Add(GlFormat.Red);
+                    res.Add(GlFormat.Green);
+                    res.Add(GlFormat.Blue);
                     res.Add(GlFormat.Rg);
                     res.Add(GlFormat.Rgb);
                     res.Add(GlFormat.Rgba);
                     break;
                 case FileFormat.Bmp:
                     res.Add(GlFormat.Red);
+                    res.Add(GlFormat.Green);
+                    res.Add(GlFormat.Blue);
                     res.Add(GlFormat.Rg);
                     res.Add(GlFormat.Rgb);
                     break;
                 case FileFormat.Hdr:
                     res.Add(GlFormat.Red);
+                    res.Add(GlFormat.Green);
+                    res.Add(GlFormat.Blue);
                     res.Add(GlFormat.Rgb);
                     break;
             }
