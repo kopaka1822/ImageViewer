@@ -142,5 +142,99 @@ namespace OpenTKImageViewer.glhelper
         {
             GL.BindImageTexture(slot, id, level, false, layer, access, internalFormat);
         }
+
+        /// <summary>
+        /// reads data from gpu
+        /// </summary>
+        /// <param name="level"></param>
+        /// <param name="layer">requested layer or -1 if all layers</param>
+        /// <param name="format"></param>
+        /// <param name="type"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        public byte[] GetData(int level, int layer, PixelFormat format, PixelType type, out int width, out int height)
+        {
+            // retrieve width and height of the level
+            GL.BindTexture(TextureTarget.Texture2DArray, id);
+            int numLayer;
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureWidth, out width);
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureHeight, out height);
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureDepth, out numLayer);
+
+            Debug.Assert((uint)layer < numLayer);
+
+            int bufferSize = width * height * GetPixelTypeSize(type) * GetPixelFormatCount(format) * numLayer;
+            byte[] buffer = new byte[bufferSize];
+            GL.GetTexImage(TextureTarget.Texture2DArray, level, format, type, buffer);
+
+            if (numLayer > 1 && layer >= 0)
+            {
+                // get data from the layer
+                int layerSize = bufferSize / numLayer;
+                byte[] layerBuffer = new byte[layerSize];
+                for (int i = 0; i < layerSize; ++i)
+                    layerBuffer[i] = buffer[layer * layerSize + i];
+
+                buffer = layerBuffer;
+            }
+
+            return buffer;
+        }
+
+        private static int GetPixelFormatCount(PixelFormat f)
+        {
+            switch (f)
+            {
+                case PixelFormat.RedInteger:
+                case PixelFormat.GreenInteger:
+                case PixelFormat.BlueInteger:
+                case PixelFormat.AlphaInteger:
+                case PixelFormat.Green:
+                case PixelFormat.Blue:
+                case PixelFormat.Alpha:
+                case PixelFormat.Red:
+                case PixelFormat.Luminance:
+                    return 1;
+
+                case PixelFormat.Rgb:
+                case PixelFormat.Bgr:
+                case PixelFormat.RgbInteger:
+                case PixelFormat.BgrInteger:
+                    return 3;
+                case PixelFormat.Rgba:
+                case PixelFormat.AbgrExt:
+                case PixelFormat.Bgra:
+                case PixelFormat.RgbaInteger:
+                case PixelFormat.BgraInteger:
+                    return 4;
+                case PixelFormat.RgInteger:
+                case PixelFormat.Rg:
+                case PixelFormat.LuminanceAlpha:
+                    return 2;
+                default:
+                    throw new Exception("invalid pixel format used: " + f);
+            }
+        }
+
+        private static int GetPixelTypeSize(PixelType t)
+        {
+            switch (t)
+            {
+                case PixelType.UnsignedByte:
+                case PixelType.Byte:
+                    return 1;
+                case PixelType.HalfFloat:
+                case PixelType.Short:
+                case PixelType.UnsignedShort:
+                    return 2;
+                case PixelType.Int:
+                case PixelType.UnsignedInt:
+                case PixelType.Float:
+                    return 4;
+                default:
+                    throw new Exception("invalid pixel type used: " + t);
+            }
+        }
     }
 }
