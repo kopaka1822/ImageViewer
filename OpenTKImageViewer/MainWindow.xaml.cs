@@ -22,6 +22,7 @@ using System.Windows.Shapes;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
+using OpenTKImageViewer.Dialogs;
 using OpenTKImageViewer.glhelper;
 using OpenTKImageViewer.ImageContext;
 using OpenTKImageViewer.View;
@@ -30,6 +31,7 @@ using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MatrixMode = OpenTK.Graphics.OpenGL.MatrixMode;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
+using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace OpenTKImageViewer
 {
@@ -554,7 +556,20 @@ namespace OpenTKImageViewer
 
         private void MenuItem_Click_Export(object sender, RoutedEventArgs e)
         {
+            if(Context.GetNumImages() == 0)
+                return;
+
+            // open save file dialog
+            Microsoft.Win32.SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|HDR (*.hdr)|*.hdr";
+            if (sfd.ShowDialog() == false)
+                return;
             
+            ExportWindow ew = new ExportWindow(this, sfd.FileName);
+            if (ew.ShowDialog() == false)
+                return;
+
+            // do the export
         }
     }
 }
