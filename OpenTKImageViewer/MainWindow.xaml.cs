@@ -294,6 +294,41 @@ namespace OpenTKImageViewer
         #region MENU ITEMS
 
         #region FILE
+
+        private void ImportImage(string filename)
+        {
+            try
+            {
+                bool resetViews = Context.GetNumImages() == 0;
+
+                var images = ImageLoader.LoadImage(filename);
+                foreach (var image in images)
+                {
+                    Context.AddImage(image);
+                }
+                // newly opened
+                if(resetViews && Context.GetNumMipmaps() > 1)
+                    parent.OpenDialog(App.UniqueDialog.Mipmaps);
+                if(resetViews && Context.GetNumLayers() > 1)
+                    parent.OpenDialog(App.UniqueDialog.Layer);
+
+                if (Context.GetNumImages() > 1)
+                {
+                    parent.OpenDialog(App.UniqueDialog.Image);
+                }
+
+                if (resetViews)
+                {
+                    imageViews.Clear();
+                    CreateImageViews();
+                }
+            }
+            catch (Exception exception)
+            {
+                App.ShowErrorDialog(this, exception.Message);
+            }
+        }
+
         private void MenuItem_Click_Open(object sender, RoutedEventArgs e)
         {
             var ofd = new Microsoft.Win32.OpenFileDialog();
@@ -303,9 +338,7 @@ namespace OpenTKImageViewer
             {
                 if (Context.GetNumImages() == 0)
                 {
-                    // TODO reinit window instead of closing
-                    parent.SpawnWindow(ofd.FileName);
-                    this.Close();
+                    ImportImage(ofd.FileName);
                 }
                 else
                 {
@@ -314,34 +347,14 @@ namespace OpenTKImageViewer
             }
         }
 
-
         private void MenuItem_Click_Import(object sender, RoutedEventArgs e)
         {
-            // import without image is open
-            if (Context.GetNumImages() == 0)
-            {
-                MenuItem_Click_Open(sender, e);
-                return;
-            }
-
             var ofd = new Microsoft.Win32.OpenFileDialog();
             ofd.Multiselect = false;
 
             if (ofd.ShowDialog() != true) return;
             // load image and import if possible
-            try
-            {
-                var images = ImageLoader.LoadImage(ofd.FileName);
-                foreach (var image in images)
-                {
-                    Context.AddImage(image);
-                }
-                parent.OpenDialog(App.UniqueDialog.Image);
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message);
-            }
+            ImportImage(ofd.FileName);
         }
 
         #endregion
@@ -478,23 +491,6 @@ namespace OpenTKImageViewer
             return items;
         }
 
-#endregion
-
-        private void MainWindow_OnClosing(object sender, CancelEventArgs e)
-        {
-            parent.UnregisterWindow(this);
-        }
-
-        private void MainWindow_OnActivated(object sender, EventArgs e)
-        {
-            parent.SetActiveWindow(this);
-        }
-
-        private void MainWindow_OnDeactivated(object sender, EventArgs e)
-        {
-            parent.UpdateDialogVisibility();
-        }
-
         public ListBoxItem[] GenerateLayerItems()
         {
             var items = new ListBoxItem[Context.GetNumLayers()];
@@ -532,11 +528,28 @@ namespace OpenTKImageViewer
             {
                 items[curImage] = new ListBoxItem
                 {
-                    Content = $"Image {curImage} - {RemoveFilePath(Context.GetFilename(curImage))}", 
+                    Content = $"Image {curImage} - {RemoveFilePath(Context.GetFilename(curImage))}",
                     ToolTip = Context.GetFilename(curImage)
                 };
             }
             return items;
+        }
+
+        #endregion
+
+        private void MainWindow_OnClosing(object sender, CancelEventArgs e)
+        {
+            parent.UnregisterWindow(this);
+        }
+
+        private void MainWindow_OnActivated(object sender, EventArgs e)
+        {
+            parent.SetActiveWindow(this);
+        }
+
+        private void MainWindow_OnDeactivated(object sender, EventArgs e)
+        {
+            parent.UpdateDialogVisibility();
         }
 
         private void MenuItem_Click_Export(object sender, RoutedEventArgs e)
