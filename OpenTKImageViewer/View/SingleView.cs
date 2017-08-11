@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using OpenTK;
+using OpenTKImageViewer.UI;
 using OpenTKImageViewer.View.Shader;
 
 namespace OpenTKImageViewer.View
@@ -15,11 +17,13 @@ namespace OpenTKImageViewer.View
         private SingleViewShader shader;
         private Matrix4 transform;
         private Matrix4 aspectRatio;
+        private TextBox boxScroll;
 
-        public SingleView(ImageContext.ImageContext context)
+        public SingleView(ImageContext.ImageContext context, TextBox boxScroll)
         {
             this.context = context;
             this.transform = Matrix4.Identity;
+            this.boxScroll = boxScroll;
         }
 
         private void Init()
@@ -30,11 +34,24 @@ namespace OpenTKImageViewer.View
         public override void Update(MainWindow window)
         {
             base.Update(window);
+            window.StatusBar.LayerMode = StatusBarControl.LayerModeType.Single;
             // update uniforms etc
-            if(shader == null)
+            if (shader == null)
                 Init();
 
             aspectRatio = GetAspectRatio(window.GetClientWidth(), window.GetClientHeight());
+
+            boxScroll.Text = Math.Round((Decimal)(transform[0, 0] * 100.0f), 2).ToString() + "%";
+
+            
+        }
+
+        public override void UpdateMouseDisplay(MainWindow window)
+        {
+            var mousePoint = window.StatusBar.GetCanonicalMouseCoordinates();
+            var transMouse = (transform * aspectRatio).Inverted() *
+                             new Vector4((float)mousePoint.X, (float)mousePoint.Y, 0.0f, 1.0f);
+            window.StatusBar.SetMouseCoordinates((int)(transMouse.X * 100.0f), (int)(transMouse.Y * 100.0f));
         }
 
         public override void Draw()
@@ -70,7 +87,6 @@ namespace OpenTKImageViewer.View
 
         private Vector WindowToClient(Vector vec)
         {
-            // TODO mip
             return new Vector(
                 vec.X * 2.0 / context.GetWidth(0),
                 -vec.Y * 2.0 / context.GetHeight(0)

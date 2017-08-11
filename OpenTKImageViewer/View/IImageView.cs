@@ -21,5 +21,6 @@ namespace OpenTKImageViewer.View
         void Draw();
         void OnDrag(Vector diff, MainWindow window);
         void OnScroll(double diff, Point mouse);
+        void UpdateMouseDisplay(MainWindow window);
     }
 }

@@ -34,5 +34,10 @@ namespace OpenTKImageViewer.View
         public virtual void OnScroll(double diff, Point mouse)
         {
         }
+
+        public virtual void UpdateMouseDisplay(MainWindow window)
+        {
+            
+        }
     }
 }

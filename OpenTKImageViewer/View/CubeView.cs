@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using OpenTK;
+using OpenTKImageViewer.UI;
 using OpenTKImageViewer.View.Shader;
 
 namespace OpenTKImageViewer.View
@@ -31,6 +32,7 @@ namespace OpenTKImageViewer.View
         public override void Update(MainWindow window)
         {
             base.Update(window);
+            window.StatusBar.LayerMode = StatusBarControl.LayerModeType.All;
 
             if(shader == null)
                 Init();

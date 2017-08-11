@@ -92,6 +92,7 @@
     <Compile Include="glhelper\TextureArray2D.cs" />
     <Compile Include="ImageContext\ImageCombineShader.cs" />
     <Compile Include="ImageContext\ImageFormula.cs" />
+    <Compile Include="UI\StatusBarControl.cs" />
     <Compile Include="View\CubeView.cs" />
     <Compile Include="View\EmptyView.cs" />
     <Compile Include="View\IImageView.cs" />
@@ -175,6 +176,16 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\app.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\cross_arrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\image.png" />
+    <Resource Include="Icons\image_layer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\zoom.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

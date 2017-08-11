@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using OpenTKImageViewer.UI;
 
 namespace OpenTKImageViewer.View
 {
@@ -11,7 +12,8 @@ namespace OpenTKImageViewer.View
     {
         public void Update(MainWindow window)
         {
-            
+
+            window.StatusBar.LayerMode = StatusBarControl.LayerModeType.None;
         }
 
         public void Draw()
@@ -27,6 +29,11 @@ namespace OpenTKImageViewer.View
         public void OnScroll(double diff, Point mouse)
         {
             
+        }
+
+        public void UpdateMouseDisplay(MainWindow window)
+        {
+            window.StatusBar.SetMouseCoordinates(0, 0);
         }
     }
 }

@@ -25,6 +25,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTKImageViewer.Dialogs;
 using OpenTKImageViewer.glhelper;
 using OpenTKImageViewer.ImageContext;
+using OpenTKImageViewer.UI;
 using OpenTKImageViewer.View;
 using BeginMode = OpenTK.Graphics.OpenGL.BeginMode;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -51,6 +52,7 @@ namespace OpenTKImageViewer
         public ulong ZIndex { get; set; }
         private Dictionary<ImageViewType, IImageView> imageViews = new Dictionary<ImageViewType, IImageView>();
         private ImageViewType currentImageView;
+        public StatusBarControl StatusBar { get; }
         public ImageContext.ImageContext Context { get; set; }
         public ImageViewType CurrentView
         {
@@ -75,6 +77,8 @@ namespace OpenTKImageViewer
             InitializeComponent();
             CreateImageViews();
 
+            StatusBar = new StatusBarControl(this);
+
             // redraw if context changes
             context.ChangedMipmap += (sender, args) => RedrawFrame();
             context.ImageFormula1.Changed += (sender, args) => RedrawFrame();
@@ -96,7 +100,7 @@ namespace OpenTKImageViewer
         {
             if (Context.GetNumImages() > 0)
             {
-                imageViews.Add(ImageViewType.Single, new SingleView(Context));
+                imageViews.Add(ImageViewType.Single, new SingleView(Context, BoxScroll));
                 CurrentView = ImageViewType.Single;
                 if (Context.GetNumLayers() == 6)
                 {
@@ -214,16 +218,17 @@ namespace OpenTKImageViewer
         #region WINDOW INTERACTION
 
         // mouse tracking
-        private Point mousePosition = new Point();
+        public Point MousePosition { get; private set; } = new Point();
         private bool mouseDown = false;
 
         private void WinFormsHost_OnMouseMove(System.Windows.Forms.MouseEventArgs args)
         {
             var newPosition = new Point(args.X, args.Y);
+            imageViews[CurrentView]?.UpdateMouseDisplay(this);
             if (mouseDown)
             {
                 // drag event
-                var diff = newPosition - mousePosition;
+                var diff = newPosition - MousePosition;
 
                 if (Math.Abs(diff.X) > 0.01 || Math.Abs(diff.Y) > 0.01)
                 {
@@ -231,19 +236,19 @@ namespace OpenTKImageViewer
                     RedrawFrame();
                 }
             }
-            mousePosition = newPosition;
+            MousePosition = newPosition;
         }
 
         private void WinFormsHost_OnMouseDown(System.Windows.Forms.MouseEventArgs args)
         {
             mouseDown = ((args.Button & MouseButtons.Left) | (args.Button & MouseButtons.Right)) != 0;
-            mousePosition = new Point(args.X, args.Y);
+            MousePosition = new Point(args.X, args.Y);
         }
 
         private void WinFormsHost_OnMouseUp(System.Windows.Forms.MouseEventArgs args)
         {
             mouseDown = ((args.Button & MouseButtons.Left) | (args.Button & MouseButtons.Right)) == 0;
-            mousePosition = new Point(args.X, args.Y);
+            MousePosition = new Point(args.X, args.Y);
         }
 
         private void WinFormsHost_OnMouseLeave(System.EventArgs args)
