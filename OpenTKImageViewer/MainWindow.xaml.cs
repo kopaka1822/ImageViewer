@@ -60,7 +60,10 @@ namespace OpenTKImageViewer
             set
             {
                 if (imageViews.ContainsKey(value))
+                {
                     currentImageView = value;
+                    RedrawFrame();
+                }
             }
         }
 
@@ -75,9 +78,10 @@ namespace OpenTKImageViewer
             this.ZIndex = 0;
 
             InitializeComponent();
-            CreateImageViews();
 
             StatusBar = new StatusBarControl(this);
+            CreateImageViews();
+
 
             // redraw if context changes
             context.ChangedMipmap += (sender, args) => RedrawFrame();
@@ -118,6 +122,9 @@ namespace OpenTKImageViewer
                 imageViews.Add(ImageViewType.Empty, new EmptyView());
                 CurrentView = ImageViewType.Empty;
             }
+
+            // update view box
+            StatusBar.UpdateViewBox();
         }
 
 

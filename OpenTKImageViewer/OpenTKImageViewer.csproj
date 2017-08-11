@@ -187,5 +187,9 @@
   <ItemGroup>
     <Resource Include="Icons\zoom.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\eye.png" />
+    <Resource Include="Icons\eyedropper.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

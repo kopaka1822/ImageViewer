@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using OpenTKImageViewer.View;
 
 namespace OpenTKImageViewer.UI
 {
@@ -15,6 +16,11 @@ namespace OpenTKImageViewer.UI
             All,
             Single,
             None
+        }
+
+        class ModeBoxItem : ComboBoxItem
+        {
+            public ImageViewType ViewType { get; set; }
         }
 
         private readonly MainWindow window;
@@ -39,6 +45,14 @@ namespace OpenTKImageViewer.UI
             window.Context.ChangedMipmap += (sender, args) => OnMipmapChange();
             // image loading => no  mipmaps to mipmap 0
             window.Context.ChangedImages += (sender, args) => OnMipmapChange();
+
+            window.ComboBoxView.SelectionChanged += ComboBoxViewOnSelectionChanged;
+        }
+
+        private void ComboBoxViewOnSelectionChanged(object o, SelectionChangedEventArgs selectionChangedEventArgs)
+        {
+            if(window.ComboBoxView.SelectedIndex >= 0)
+                window.CurrentView = ((ModeBoxItem)window.ComboBoxView.Items.GetItemAt(window.ComboBoxView.SelectedIndex)).ViewType;
         }
 
         public void SetMouseCoordinates(int x, int y)
@@ -55,6 +69,28 @@ namespace OpenTKImageViewer.UI
             p.Y *= 2.0;
             p.Y -= 1.0;
             return p;
+        }
+
+        public void UpdateViewBox()
+        {
+            var activeView = window.CurrentView;
+            int selectedBox = 0;
+            int currentView = 0;
+
+            window.ComboBoxView.Items.Clear();
+            foreach (var availableView in window.GetAvailableViews())
+            {
+                window.ComboBoxView.Items.Add(new ModeBoxItem
+                {
+                    ViewType = availableView,
+                    Content = availableView.ToString()
+                });
+                if (activeView == availableView)
+                    selectedBox = currentView;
+                ++currentView;
+            }
+            window.ComboBoxView.SelectedIndex = selectedBox;
+            window.ComboBoxView.IsEnabled = window.ComboBoxView.Items.Count >= 2;
         }
 
         private void SetLayerDisplay(int layer)
