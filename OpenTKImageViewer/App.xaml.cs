@@ -20,7 +20,8 @@ namespace OpenTKImageViewer
         {
             Layer,
             Mipmaps,
-            Image
+            Image,
+            Tonemap
         }
 
         private List<MainWindow> openWindows = new List<MainWindow>();
@@ -160,7 +161,6 @@ namespace OpenTKImageViewer
                 // add dialog
                 switch (dialog)
                 {
-                    // TODO
                     case UniqueDialog.Layer:
                         window = new LayerWindow(this);
                         break;
@@ -169,6 +169,9 @@ namespace OpenTKImageViewer
                         break;
                     case UniqueDialog.Image:
                         window = new ImageWindow(this);
+                        break;
+                    case UniqueDialog.Tonemap:
+                        window = new TonemapWindow(this);
                         break;
                 }
                 IUniqueDialog dia = (IUniqueDialog)window;

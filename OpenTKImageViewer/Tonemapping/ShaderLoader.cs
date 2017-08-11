@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace OpenTKImageViewer.Tonemapping
 {
-    class ShaderLoader
+    public class ShaderLoader
     {
         public enum ParameterType
         {
@@ -23,9 +23,16 @@ namespace OpenTKImageViewer.Tonemapping
             public decimal Min { get; set; }
             public decimal Max { get; set; }
             public decimal Default { get; set; }
+
+            private decimal currentValue = 0;
+            public decimal CurrentValue
+            {
+                get => currentValue;
+                set => currentValue = Math.Min(Max, Math.Max(Min, value));
+            }
         }
 
-        private string shaderSource = "";
+        public string ShaderSource { get; private set; } = "";
         public List<Parameter> Parameters { get; private set; } = new List<Parameter>();
         public bool IsSepa { get; private set; }= false;
         public string Name { get; private set; }
@@ -50,16 +57,16 @@ namespace OpenTKImageViewer.Tonemapping
                     if (line.StartsWith("#param"))
                     {
                         HandleParam(GetParameters(line.Substring("#param".Length)));
-                        shaderSource += "\n"; // remember line for error information
+                        ShaderSource += "\n"; // remember line for error information
                     }
                     else if (line.StartsWith("#setting"))
                     {
                         HandleSetting(GetParameters(line.Substring("#setting".Length)));
-                        shaderSource += "\n"; // remember line for error information
+                        ShaderSource += "\n"; // remember line for error information
                     }
                     else
                     {
-                        shaderSource += line + "\n";
+                        ShaderSource += line + "\n";
                     }
                     ++lineNumber;
                 }
@@ -99,6 +106,7 @@ namespace OpenTKImageViewer.Tonemapping
 
             p.Max = pars.Length >= 6 ? GetDecimalValue(pars[5], p.Type) : Decimal.MaxValue;
 
+            p.CurrentValue = p.Default;
             Parameters.Add(p);
         }
 

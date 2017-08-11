@@ -77,6 +77,9 @@
     <Compile Include="Dialogs\MipMapWindow.xaml.cs">
       <DependentUpon>MipMapWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\TonemapWindow.xaml.cs">
+      <DependentUpon>TonemapWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Equation\Token\CombinedValueToken.cs" />
     <Compile Include="Equation\Equation.cs" />
     <Compile Include="Equation\Token\ImageToken.cs" />
@@ -93,6 +96,7 @@
     <Compile Include="ImageContext\ImageCombineShader.cs" />
     <Compile Include="ImageContext\ImageFormula.cs" />
     <Compile Include="Tonemapping\ShaderLoader.cs" />
+    <Compile Include="Tonemapping\ToneShader.cs" />
     <Compile Include="UI\StatusBarControl.cs" />
     <Compile Include="View\CubeView.cs" />
     <Compile Include="View\EmptyView.cs" />
@@ -117,6 +121,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\MipMapWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\TonemapWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

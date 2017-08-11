@@ -633,5 +633,10 @@ namespace OpenTKImageViewer
                 e.Handled = true;
             }
         }
+
+        private void MenuItem_Click_Tonemapper(object sender, RoutedEventArgs e)
+        {
+            parent.OpenDialog(App.UniqueDialog.Tonemap);
+        }
     }
 }

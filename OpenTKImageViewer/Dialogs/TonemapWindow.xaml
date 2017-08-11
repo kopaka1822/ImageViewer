@@ -1,0 +1,44 @@
+﻿<Window x:Class="OpenTKImageViewer.Dialogs.TonemapWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
+        mc:Ignorable="d"
+        Title="Tonemapper" Height="300" Width="500"
+        ResizeMode="NoResize" Background="#eee"
+        Icon="../Icons/app.png"
+        Closing="TonemapWindow_OnClosing">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="180"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Border Padding="5">
+            <StackPanel>
+                <TextBlock Text="Used Tonemapper:" Margin="0 0 0 2"/>
+                <ListBox Height="200"
+                         ScrollViewer.VerticalScrollBarVisibility="Visible"
+                         Margin="0 0 0 10"/>
+
+                <Grid HorizontalAlignment="Right">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Content="_Add" Margin="0 0 10 0" Width="60" Click="ButtonAdd_OnClick"/>
+                    <Button Grid.Column="1" Content="Apply" Width="60" Click="ButtonApply_OnClock"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+        
+        <!-- Custom Panel -->
+        <Border Padding="5" Grid.Column="1" BorderThickness="1 0 0 0" BorderBrush="Gray">
+            <StackPanel x:Name="StackPanelMapper">
+                
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
+
