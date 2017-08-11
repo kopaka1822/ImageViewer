@@ -71,8 +71,6 @@ namespace OpenTKImageViewer
                     // open relevant dialoges
                     if(wnd.Context.GetNumMipmaps() > 1)
                         OpenDialog(UniqueDialog.Mipmaps);
-                    if (wnd.Context.GetNumLayers() > 1)
-                        OpenDialog(UniqueDialog.Layer);
                     if (wnd.Context.GetNumImages() > 1)
                         OpenDialog(UniqueDialog.Image);
                 }

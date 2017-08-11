@@ -32,6 +32,7 @@ namespace OpenTKImageViewer.UI
             set
             {
                 layerMode = value;
+                UpdateLayerBox();
                 SetLayerDisplay((int)window.Context.ActiveLayer);
             }
         }
@@ -39,6 +40,7 @@ namespace OpenTKImageViewer.UI
         public StatusBarControl(MainWindow window)
         {
             this.window = window;
+            UpdateLayerBox();
             OnLayerChange();
             OnMipmapChange();
             window.Context.ChangedLayer += (sender, args) => OnLayerChange();
@@ -47,6 +49,18 @@ namespace OpenTKImageViewer.UI
             window.Context.ChangedImages += (sender, args) => OnMipmapChange();
 
             window.ComboBoxView.SelectionChanged += ComboBoxViewOnSelectionChanged;
+            window.ComboBoxLayer.SelectionChanged += ComboBoxLayerOnSelectionChanged;
+        }
+
+        private void ComboBoxLayerOnSelectionChanged(object o, SelectionChangedEventArgs selectionChangedEventArgs)
+        {
+            if (window.ComboBoxLayer.SelectedIndex >= 0)
+            {
+                if (LayerMode == LayerModeType.Single)
+                {
+                    window.Context.ActiveLayer = (uint)window.ComboBoxLayer.SelectedIndex;
+                }
+            }
         }
 
         private void ComboBoxViewOnSelectionChanged(object o, SelectionChangedEventArgs selectionChangedEventArgs)
@@ -93,19 +107,36 @@ namespace OpenTKImageViewer.UI
             window.ComboBoxView.IsEnabled = window.ComboBoxView.Items.Count >= 2;
         }
 
-        private void SetLayerDisplay(int layer)
+        private void UpdateLayerBox()
         {
+            window.ComboBoxLayer.Items.Clear();
             switch (LayerMode)
             {
                 case LayerModeType.All:
-                    window.TextLayer.Text = "All Layer";
+                    window.ComboBoxLayer.Items.Add(new ComboBoxItem { Content = "All Layer"});
                     break;
                 case LayerModeType.Single:
-                    window.TextLayer.Text = "Layer " + layer;
+                    var selectedLayer = window.Context.ActiveLayer;
+                    for (int i = 0; i < window.Context.GetNumLayers(); ++i)
+                        window.ComboBoxLayer.Items.Add(new ComboBoxItem {Content = "Layer " + i});
+                    window.Context.ActiveLayer = selectedLayer;
+                    window.ComboBoxLayer.SelectedIndex = (int)selectedLayer;
                     break;
                 case LayerModeType.None:
-                    window.TextLayer.Text = "No Layer";
+                    window.ComboBoxLayer.Items.Add(new ComboBoxItem {Content = "No Layer"});
                     break;
+            }
+            window.ComboBoxLayer.IsEnabled = true;
+            if (window.ComboBoxLayer.Items.Count == 1)
+                window.ComboBoxLayer.SelectedIndex = 0;
+            window.ComboBoxLayer.IsEnabled = window.ComboBoxLayer.Items.Count >= 2;
+        }
+
+        private void SetLayerDisplay(int layer)
+        {
+            if (LayerMode == LayerModeType.Single)
+            {
+                window.ComboBoxLayer.SelectedIndex = layer;
             }
         }
 

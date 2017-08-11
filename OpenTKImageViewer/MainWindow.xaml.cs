@@ -324,8 +324,6 @@ namespace OpenTKImageViewer
                 // newly opened
                 if(resetViews && Context.GetNumMipmaps() > 1)
                     parent.OpenDialog(App.UniqueDialog.Mipmaps);
-                if(resetViews && Context.GetNumLayers() > 1)
-                    parent.OpenDialog(App.UniqueDialog.Layer);
 
                 if (Context.GetNumImages() > 1)
                 {
@@ -477,11 +475,6 @@ namespace OpenTKImageViewer
         private void MenuItem_Click_Mipmaps(object sender, RoutedEventArgs e)
         {
             parent.OpenDialog(App.UniqueDialog.Mipmaps);
-        }
-
-        private void MenuItem_Click_Layers(object sender, RoutedEventArgs e)
-        {
-            parent.OpenDialog(App.UniqueDialog.Layer);
         }
 
         private void MenuItem_Click_Images(object sender, RoutedEventArgs e)
