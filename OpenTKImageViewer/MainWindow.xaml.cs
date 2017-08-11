@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
+using System.Net.Mime;
 using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Channels;
 using System.Text;
@@ -608,6 +610,27 @@ namespace OpenTKImageViewer
             {
                 App.ShowErrorDialog(this, exception.Message);
                 return;
+            }
+        }
+
+        private void BoxScroll_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.IsDown && e.Key == Key.Return)
+            {
+                if (imageViews.Count == 0)
+                    return; // not yet initialized
+
+                var text = BoxScroll.Text;
+                if (text.EndsWith("%"))
+                    text = text.Substring(0, text.Length - 1);
+
+                decimal dec;
+                if (Decimal.TryParse(text, out dec))
+                {
+                    imageViews[CurrentView]?.SetZoom((float)dec / 100.0f);
+                    RedrawFrame();
+                }
+                e.Handled = true;
             }
         }
     }

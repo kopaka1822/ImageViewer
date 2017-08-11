@@ -71,6 +71,13 @@ namespace OpenTKImageViewer.View
             window.StatusBar.SetMouseCoordinates((int)(transMouse.X), (int)(transMouse.Y));
         }
 
+        public override void SetZoom(float dec)
+        {
+            dec = Math.Min(Math.Max(dec, 0.01f), 100.0f);
+            transform[0, 0] = dec;
+            transform[1, 1] = dec;
+        }
+
         public override void Draw()
         {
             // bind the shader?

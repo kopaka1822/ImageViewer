@@ -39,5 +39,10 @@ namespace OpenTKImageViewer.View
         {
             
         }
+
+        public virtual void SetZoom(float dec)
+        {
+            
+        }
     }
 }

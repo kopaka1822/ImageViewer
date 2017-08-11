@@ -35,5 +35,10 @@ namespace OpenTKImageViewer.View
         {
             window.StatusBar.SetMouseCoordinates(0, 0);
         }
+
+        public void SetZoom(float dec)
+        {
+            
+        }
     }
 }
