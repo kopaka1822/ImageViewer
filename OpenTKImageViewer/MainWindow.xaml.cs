@@ -259,6 +259,7 @@ namespace OpenTKImageViewer
         private void WinFormsHost_OnMouseWheel(System.Windows.Forms.MouseEventArgs args)
         {
             imageViews[currentImageView]?.OnScroll(args.Delta, new Point(args.X, args.Y));
+            imageViews[CurrentView]?.UpdateMouseDisplay(this);
             RedrawFrame();
         }
         

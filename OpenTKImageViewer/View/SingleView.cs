@@ -49,9 +49,26 @@ namespace OpenTKImageViewer.View
         public override void UpdateMouseDisplay(MainWindow window)
         {
             var mousePoint = window.StatusBar.GetCanonicalMouseCoordinates();
-            var transMouse = (transform * aspectRatio).Inverted() *
-                             new Vector4((float)mousePoint.X, (float)mousePoint.Y, 0.0f, 1.0f);
-            window.StatusBar.SetMouseCoordinates((int)(transMouse.X * 100.0f), (int)(transMouse.Y * 100.0f));
+            // Matrix Coordinate system is reversed (left handed)
+            var vec = new Vector4((float)mousePoint.X, (float)mousePoint.Y, 0.0f, 1.0f);//new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+            var transMouse = vec * (GetOrientation() * transform * aspectRatio).Inverted();
+
+            // trans mouse is betweem [-1,1] in texture coordinates => to [0,1]
+            transMouse.X += 1.0f;
+            transMouse.X /= 2.0f;
+
+            transMouse.Y += 1.0f;
+            transMouse.Y /= 2.0f;
+
+            // clamp value
+            transMouse.X = Math.Min(0.9999f, Math.Max(0.0f, transMouse.X));
+            transMouse.Y = Math.Min(0.9999f, Math.Max(0.0f, transMouse.Y));
+
+            // scale with mipmap level
+            transMouse.X *= (float)context.GetWidth((int)context.ActiveMipmap);
+            transMouse.Y *= (float)context.GetHeight((int)context.ActiveMipmap);
+
+            window.StatusBar.SetMouseCoordinates((int)(transMouse.X), (int)(transMouse.Y));
         }
 
         public override void Draw()
@@ -91,6 +108,11 @@ namespace OpenTKImageViewer.View
                 vec.X * 2.0 / context.GetWidth(0),
                 -vec.Y * 2.0 / context.GetHeight(0)
             );
+        }
+
+        private Matrix4 GetOrientation()
+        {
+            return Matrix4.CreateScale(1.0f, -1.0f, 1.0f);
         }
     }
 }

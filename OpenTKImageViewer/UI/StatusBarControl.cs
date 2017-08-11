@@ -48,7 +48,7 @@ namespace OpenTKImageViewer.UI
 
         public Point GetCanonicalMouseCoordinates()
         {
-            var p = new Point(window.MousePosition.X / window.WinFormsHost.ActualWidth, window.MousePosition.Y / window.WinFormsHost.ActualWidth);
+            var p = new Point(window.MousePosition.X / window.WinFormsHost.ActualWidth, 1.0f - window.MousePosition.Y / window.WinFormsHost.ActualHeight);
             p.X *= 2.0;
             p.X -= 1.0;
             

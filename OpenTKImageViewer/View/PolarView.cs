@@ -74,5 +74,6 @@ namespace OpenTKImageViewer.View
         {
             zoom = (float)Math.Min(Math.Max(zoom * (1.0 + (diff * 0.001)), 0.1), 100.0);
         }
+
     }
 }
