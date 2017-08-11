@@ -1,0 +1,9 @@
+#setting sepa true
+#param Blur Radius, 1, int, 5, 1
+
+layout(location = 1) uniform int blur_radius;
+
+void main()
+{
+	
+}
