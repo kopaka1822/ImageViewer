@@ -50,7 +50,6 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="_Windows">
-                <MenuItem Header="Mipmaps" Click="MenuItem_Click_Mipmaps" />
                 <MenuItem Header="Images" Click="MenuItem_Click_Images"/>
                 <MenuItem Header="Tone Mapping"/>
             </MenuItem>
@@ -95,7 +94,8 @@
                 </StatusBarItem>
 
                 <!-- LAYER -->
-                <StatusBarItem Width="150" HorizontalAlignment="Left" BorderBrush="DarkGray" BorderThickness="0 0 1 0">
+                <StatusBarItem Width="150" HorizontalAlignment="Left" BorderBrush="DarkGray" BorderThickness="0 0 1 0"
+                               ToolTip="Use Left and Right keys to switch between layers">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -107,14 +107,15 @@
                 </StatusBarItem>
 
                 <!-- MIPMAP -->
-                <StatusBarItem Width="150" HorizontalAlignment="Left" BorderBrush="DarkGray" BorderThickness="0 0 1 0">
+                <StatusBarItem Width="150" HorizontalAlignment="Left" BorderBrush="DarkGray" BorderThickness="0 0 1 0"
+                               ToolTip="Use Up and Down keys to switch between mipmaps">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Image Source="Icons/image.png" Width="16" Height="16" Margin="0 0 5 0"/>
-                        <TextBlock x:Name="TextMipmap" Text="Mipmap 0" Grid.Column="1"/>
+                        <ComboBox Grid.Column="1" Width="120" x:Name="ComboBoxMipmap"/>
                     </Grid>
                 </StatusBarItem>
 

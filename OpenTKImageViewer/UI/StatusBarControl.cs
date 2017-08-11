@@ -43,13 +43,24 @@ namespace OpenTKImageViewer.UI
             UpdateLayerBox();
             OnLayerChange();
             OnMipmapChange();
+            UpdateMipmapBox();
+
             window.Context.ChangedLayer += (sender, args) => OnLayerChange();
             window.Context.ChangedMipmap += (sender, args) => OnMipmapChange();
             // image loading => no  mipmaps to mipmap 0
-            window.Context.ChangedImages += (sender, args) => OnMipmapChange();
+            window.Context.ChangedImages += (sender, args) => { OnMipmapChange(); UpdateMipmapBox(); };
 
             window.ComboBoxView.SelectionChanged += ComboBoxViewOnSelectionChanged;
             window.ComboBoxLayer.SelectionChanged += ComboBoxLayerOnSelectionChanged;
+            window.ComboBoxMipmap.SelectionChanged += ComboBoxMipmapOnSelectionChanged;
+        }
+
+        private void ComboBoxMipmapOnSelectionChanged(object o, SelectionChangedEventArgs selectionChangedEventArgs)
+        {
+            if (window.ComboBoxMipmap.SelectedIndex >= 0)
+            {
+                window.Context.ActiveMipmap = (uint) window.ComboBoxMipmap.SelectedIndex;
+            }
         }
 
         private void ComboBoxLayerOnSelectionChanged(object o, SelectionChangedEventArgs selectionChangedEventArgs)
@@ -132,6 +143,31 @@ namespace OpenTKImageViewer.UI
             window.ComboBoxLayer.IsEnabled = window.ComboBoxLayer.Items.Count >= 2;
         }
 
+        private void UpdateMipmapBox()
+        {
+            var box = window.ComboBoxMipmap;
+            box.Items.Clear();
+            if (window.Context.GetNumMipmaps() == 0)
+            {
+                box.Items.Add(new ComboBoxItem {Content = "No Mipmap"});
+            }
+            else
+            {
+                var activeMipmap = window.Context.ActiveMipmap;
+                for (int curMipmap = 0; curMipmap < window.Context.GetNumMipmaps(); ++curMipmap)
+                {
+                    box.Items.Add(new ComboBoxItem{ Content = window.Context.GetWidth(curMipmap).ToString() + "x" + window.Context.GetHeight(curMipmap).ToString() });
+                }
+                window.Context.ActiveMipmap = activeMipmap;
+                window.ComboBoxMipmap.SelectedIndex = (int)activeMipmap;
+            }
+
+            box.IsEnabled = true;
+            if (box.Items.Count == 1)
+                box.SelectedIndex = 0;
+            box.IsEnabled = box.Items.Count >= 2;
+        }
+
         private void SetLayerDisplay(int layer)
         {
             if (LayerMode == LayerModeType.Single)
@@ -142,10 +178,10 @@ namespace OpenTKImageViewer.UI
 
         private void SetMipmapDisplay(int mipmap)
         {
-            if (window.Context.GetNumMipmaps() == 0)
-                window.TextMipmap.Text = "No Mipmap";
-            else
-                window.TextMipmap.Text = $"Mipmap {mipmap}: {window.Context.GetWidth(mipmap)}x{window.Context.GetHeight(mipmap)}";
+            if (window.Context.GetNumMipmaps() > 0)
+            {
+                window.ComboBoxMipmap.SelectedIndex = mipmap;
+            }
         }
 
         private void OnLayerChange()

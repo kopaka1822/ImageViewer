@@ -98,6 +98,8 @@ namespace OpenTKImageViewer
 
             SetGrayscale(context.Grayscale);
             context.ChangedGrayscale += (sender, args) => SetGrayscale(context.Grayscale);
+
+            context.ChangedMipmap += (sender, args) => imageViews[currentImageView]?.UpdateMouseDisplay(this);
         }
 
         private void CreateImageViews()
@@ -321,14 +323,10 @@ namespace OpenTKImageViewer
                 {
                     Context.AddImage(image);
                 }
-                // newly opened
-                if(resetViews && Context.GetNumMipmaps() > 1)
-                    parent.OpenDialog(App.UniqueDialog.Mipmaps);
 
                 if (Context.GetNumImages() > 1)
-                {
                     parent.OpenDialog(App.UniqueDialog.Image);
-                }
+                
 
                 if (resetViews)
                 {
@@ -471,11 +469,6 @@ namespace OpenTKImageViewer
         #endregion
 
         #region WINDOWS
-
-        private void MenuItem_Click_Mipmaps(object sender, RoutedEventArgs e)
-        {
-            parent.OpenDialog(App.UniqueDialog.Mipmaps);
-        }
 
         private void MenuItem_Click_Images(object sender, RoutedEventArgs e)
         {
