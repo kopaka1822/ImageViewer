@@ -186,6 +186,18 @@ namespace OpenTKImageViewer
 
         #region OpenGL
 
+        public double GetDpiScalingX()
+        {
+            PresentationSource source = PresentationSource.FromVisual(this);
+            return source.CompositionTarget.TransformToDevice.M11;
+        }
+
+        public double GetDpiScalingY()
+        {
+            PresentationSource source = PresentationSource.FromVisual(this);
+            return source.CompositionTarget.TransformToDevice.M22;
+        }
+
         private void GLControl_Paint(object sender, PaintEventArgs e)
         {
             if (error.Length > 0 && iteration++ > 0)
@@ -199,7 +211,8 @@ namespace OpenTKImageViewer
                 glControl.MakeCurrent();
                 EnableDebugCallback();
 
-                GL.Viewport(0, 0, (int)WinFormsHost.ActualWidth, (int)WinFormsHost.ActualHeight);
+                GL.Viewport(0, 0, (int)(GetClientWidth()), 
+                    (int)(GetClientHeight()));
                 GL.ClearColor(0.9333f, 0.9333f, 0.9333f, 1.0f);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
                 
@@ -234,8 +247,9 @@ namespace OpenTKImageViewer
 
         private void WinFormsHost_OnMouseMove(System.Windows.Forms.MouseEventArgs args)
         {
+            //var newPosition = new Point(args.X * GetDpiScalingX(), args.Y * GetDpiScalingY());
             var newPosition = new Point(args.X, args.Y);
-            imageViews[CurrentView]?.UpdateMouseDisplay(this);
+            
             if (mouseDown)
             {
                 // drag event
@@ -248,17 +262,20 @@ namespace OpenTKImageViewer
                 }
             }
             MousePosition = newPosition;
+            imageViews[CurrentView]?.UpdateMouseDisplay(this);
         }
 
         private void WinFormsHost_OnMouseDown(System.Windows.Forms.MouseEventArgs args)
         {
             mouseDown = ((args.Button & MouseButtons.Left) | (args.Button & MouseButtons.Right)) != 0;
+            //MousePosition = new Point(args.X * GetDpiScalingX(), args.Y * GetDpiScalingY());
             MousePosition = new Point(args.X, args.Y);
         }
 
         private void WinFormsHost_OnMouseUp(System.Windows.Forms.MouseEventArgs args)
         {
             mouseDown = ((args.Button & MouseButtons.Left) | (args.Button & MouseButtons.Right)) == 0;
+            //MousePosition = new Point(args.X * GetDpiScalingX(), args.Y * GetDpiScalingY());
             MousePosition = new Point(args.X, args.Y);
         }
 
@@ -301,12 +318,12 @@ namespace OpenTKImageViewer
 
         public float GetClientWidth()
         {
-            return (float)WinFormsHost.ActualWidth;
+            return (float)(WinFormsHost.ActualWidth * GetDpiScalingX());
         }
 
         public float GetClientHeight()
         {
-            return (float) WinFormsHost.ActualHeight;
+            return (float)(WinFormsHost.ActualHeight * GetDpiScalingY());
         }
 
 
