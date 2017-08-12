@@ -11,23 +11,34 @@ namespace OpenTKImageViewer.Tonemapping
 {
     public class ToneShader
     {
-        private Program program;
-        private ShaderLoader loader;
+        private readonly Program program;
 
         private const int LocalSize = 8;
 
+        public string Name { get; }
+        public string Description { get; }
+        public bool IsSepa { get; }
+
         public ToneShader(ShaderLoader loader)
         {
-            this.loader = loader;
+            this.IsSepa = loader.IsSepa;
+            this.Name = loader.Name;
+            this.Description = loader.Description;
+
             // generate missing source
             Shader shader = new Shader(ShaderType.ComputeShader,
-                GetShaderHeader(loader.IsSepa) +
+                GetShaderHeader() +
                             "#line 0\n" +
                             loader.ShaderSource);
 
             shader.Compile();
 
             program = new Program(new List<Shader> {shader}, true);
+        }
+
+        public void Dispose()
+        {
+            program.Dispose();
         }
 
         public int GetSourceImageLocation()
@@ -40,19 +51,20 @@ namespace OpenTKImageViewer.Tonemapping
             return 1;
         }
 
-        public void Dispatch(int width, int height) => Dispatch(width, height, 0);
+        public void Dispatch(int width, int height, List<ShaderLoader.Parameter> parameters) => Dispatch(width, height, parameters, 0);
 
         /// <summary>
         /// dispatching command for sepa shader
         /// </summary>
         /// <param name="width"></param>
         /// <param name="height"></param>
+        /// <param name="parameters">parameters to update</param>
         /// <param name="iteration">0 for first iteration, 1 for second iteration</param>
-        public void Dispatch(int width, int height, int iteration)
+        public void Dispatch(int width, int height, List<ShaderLoader.Parameter> parameters, int iteration)
         {
             program.Bind();
             // set parameter
-            foreach (var parameter in loader.Parameters)
+            foreach (var parameter in parameters)
             {
                 switch (parameter.Type)
                 {
@@ -66,7 +78,7 @@ namespace OpenTKImageViewer.Tonemapping
                 }
             }
 
-            if (loader.IsSepa)
+            if (IsSepa)
             {
                 // set direction for sepa shader
                 Debug.Assert(iteration == 1 || iteration == 0);
@@ -76,13 +88,13 @@ namespace OpenTKImageViewer.Tonemapping
             GL.DispatchCompute(width / LocalSize + 1, height / LocalSize + 1, 1);
         }
 
-        private string GetShaderHeader(bool isSepa)
+        private string GetShaderHeader()
         {
             return "#version 430\n" +
                    $"layout(local_size_x = {LocalSize}, local_size_y = {LocalSize}) in;\n" +
                    "layout(rgba32f, binding = 0) uniform readonly image2D src_image;\n" +
                    "layout(rgba32f, binding = 1) uniform readonly image2D dst_image;\n" +
-                   (isSepa?"layout(location = 0) uniform ivec2 dir;\n":"");
+                   (IsSepa?"layout(location = 0) uniform ivec2 dir;\n":"");
 
         }
     }

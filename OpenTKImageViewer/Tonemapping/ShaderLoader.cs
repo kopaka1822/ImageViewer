@@ -30,6 +30,24 @@ namespace OpenTKImageViewer.Tonemapping
                 get => currentValue;
                 set => currentValue = Math.Min(Max, Math.Max(Min, value));
             }
+
+            /// <summary>
+            /// deep copy of parameter
+            /// </summary>
+            /// <returns>deep copy</returns>
+            public Parameter Clone()
+            {
+                return new Parameter
+                {
+                    Name = Name,
+                    Location = Location,
+                    Type = Type,
+                    Min = Min,
+                    Max = Max,
+                    Default = Default,
+                    currentValue = currentValue
+                };
+            }
         }
 
         public string ShaderSource { get; private set; } = "";
@@ -37,9 +55,11 @@ namespace OpenTKImageViewer.Tonemapping
         public bool IsSepa { get; private set; }= false;
         public string Name { get; private set; }
         public string Description { get; private set; }
+        public string Filename { get; }
 
         public ShaderLoader(string filename)
         {
+            this.Filename = filename;
             Name = filename;
             Description = "";
 

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 using OpenTKImageViewer.glhelper;
+using OpenTKImageViewer.Tonemapping;
 
 namespace OpenTKImageViewer.ImageContext
 {
@@ -107,6 +108,7 @@ namespace OpenTKImageViewer.ImageContext
         }
 
         public ImageFormula ImageFormula1 { get; } = new ImageFormula();
+        public TonemapperManager Tonemapper { get; } = new TonemapperManager();
 
         #endregion
 
