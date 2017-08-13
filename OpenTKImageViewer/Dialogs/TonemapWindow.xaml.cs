@@ -12,6 +12,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Microsoft.Win32;
+using OpenTKImageViewer.Tonemapping;
 
 namespace OpenTKImageViewer.Dialogs
 {
@@ -40,11 +42,28 @@ namespace OpenTKImageViewer.Dialogs
         public void UpdateContent(MainWindow window)
         {
             // TODO
+            activeWindow = window;
         }
 
         private void ButtonAdd_OnClick(object sender, RoutedEventArgs e)
         {
-            
+            var ofd = new OpenFileDialog();
+            ofd.Multiselect = false;
+
+            if (ofd.ShowDialog() != true) return;
+
+            // load shader
+            activeWindow.EnableOpenGl();
+            try
+            {
+                var param = activeWindow.Context.Tonemapper.LoadShader(ofd.FileName);
+                activeWindow.Context.Tonemapper.Apply(new List<ToneParameter>{param});
+                // TODO add to list
+            }
+            catch (Exception exception)
+            {
+                App.ShowErrorDialog(this, exception.Message);
+            }
         }
 
         private void ButtonApply_OnClock(object sender, RoutedEventArgs e)

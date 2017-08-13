@@ -251,7 +251,7 @@ namespace OpenTKImageViewer.ImageContext
             {
                 recomputeImages = false;
                 RecomputeCombinedImage(textures[0]);
-                //Tonemapper.ApplyShader(ref textures[0], ref textures[1], this);
+                Tonemapper.ApplyShader(ref textures[0], ref textures[1], this);
             }
         }
 

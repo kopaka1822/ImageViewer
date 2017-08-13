@@ -49,7 +49,8 @@ namespace OpenTKImageViewer.ImageContext
         {
             foreach (var p in settings)
             {
-                for (int iteration = 0; iteration < (p.Shader.IsSepa ? 1 : 2); ++iteration)
+                int numIterations = p.Shader.IsSepa ? 2 : 1;
+                for (int iteration = 0; iteration < numIterations; ++iteration)
                 {
                     for (int level = 0; level < context.GetNumMipmaps(); ++level)
                     {
@@ -57,7 +58,7 @@ namespace OpenTKImageViewer.ImageContext
                         {
                             ping.BindAsImage(p.Shader.GetSourceImageLocation(), level, layer, TextureAccess.ReadOnly);
                             pong.BindAsImage(p.Shader.GetDestinationImageLocation(), level, layer, TextureAccess.WriteOnly);
-                            p.Shader.Dispatch(context.GetWidth(level), context.GetHeight(level), p.Parameters);
+                            p.Shader.Dispatch(context.GetWidth(level), context.GetHeight(level), p.Parameters, iteration);
                         }
                     }
 

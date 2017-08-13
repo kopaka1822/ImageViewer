@@ -28,7 +28,7 @@ namespace OpenTKImageViewer.Tonemapping
             // generate missing source
             Shader shader = new Shader(ShaderType.ComputeShader,
                 GetShaderHeader() +
-                            "#line 0\n" +
+                            "#line 1\n" +
                             loader.ShaderSource);
 
             shader.Compile();
@@ -93,8 +93,8 @@ namespace OpenTKImageViewer.Tonemapping
             return "#version 430\n" +
                    $"layout(local_size_x = {LocalSize}, local_size_y = {LocalSize}) in;\n" +
                    "layout(rgba32f, binding = 0) uniform readonly image2D src_image;\n" +
-                   "layout(rgba32f, binding = 1) uniform readonly image2D dst_image;\n" +
-                   (IsSepa?"layout(location = 0) uniform ivec2 dir;\n":"");
+                   "layout(rgba32f, binding = 1) uniform writeonly image2D dst_image;\n" +
+                   (IsSepa?"layout(location = 0) uniform ivec2 filterDirection;\n":"");
 
         }
     }

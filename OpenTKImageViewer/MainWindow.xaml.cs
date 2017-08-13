@@ -658,5 +658,14 @@ namespace OpenTKImageViewer
         {
             parent.OpenDialog(App.UniqueDialog.Tonemap);
         }
+
+        /// <summary>
+        /// enables the opengl context from this window
+        /// </summary>
+        public void EnableOpenGl()
+        {
+            glControl?.MakeCurrent();
+            EnableDebugCallback();
+        }
     }
 }
