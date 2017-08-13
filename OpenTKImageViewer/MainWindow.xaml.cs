@@ -92,6 +92,7 @@ namespace OpenTKImageViewer
             context.ChangedLayer += (sender, args) => RedrawFrame();
             context.ChangedFiltering += (sender, args) => RedrawFrame();
             context.ChangedGrayscale += (sender, args) => RedrawFrame();
+            context.Tonemapper.ChangedSettings += (sender, args) => RedrawFrame();
 
             // set default values
             MenuItemLinearInterpolation.IsChecked = context.LinearInterpolation;

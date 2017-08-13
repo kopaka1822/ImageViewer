@@ -28,10 +28,11 @@ namespace OpenTKImageViewer.ImageContext
         /// updates contentes of the shader.
         /// </summary>
         /// <returns>true if the shader was changed and the image hast to be recomputed</returns>
-        public bool Update()
+        public void Update()
         {
-            if (program != null && !contentChanged) return false;
+            if (program != null && !contentChanged) return;
 
+            contentChanged = false;
             program?.Dispose();
 
             // compile new shader
@@ -40,7 +41,6 @@ namespace OpenTKImageViewer.ImageContext
             computeShader.Compile();
 
             program = new Program(new List<Shader>{computeShader}, true);
-            return true;
         }
 
         /// <summary>

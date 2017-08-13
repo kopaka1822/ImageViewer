@@ -51,10 +51,11 @@ namespace OpenTKImageViewer.ImageContext
         private readonly List<ImageData> images = new List<ImageData>();
         private uint activeMipmap = 0;
         private uint activeLayer = 0;
-        private TextureArray2D combinedImage1;
+        private TextureArray2D[] textures;
         private readonly ImageCombineShader imageCombineShader1;
         private bool linearInterpolation = false;
         private GrayscaleMode grayscale = GrayscaleMode.Disabled;
+        private bool recomputeImages = true;
 
         #endregion
 
@@ -166,10 +167,10 @@ namespace OpenTKImageViewer.ImageContext
         {
             width = GetWidth(level);
             height = GetHeight(level);
-            if (combinedImage1 == null)
+            if (textures?[0] == null)
                 return null;
 
-            return combinedImage1.GetData(level, layer, format, type, out width, out height);
+            return textures[0].GetData(level, layer, format, type, out width, out height);
         }
 
         #endregion
@@ -209,12 +210,12 @@ namespace OpenTKImageViewer.ImageContext
 
         public void BindFinalTextureAs2DSamplerArray(int slot)
         {
-            combinedImage1?.Bind(slot, LinearInterpolation);
+            textures?[0]?.Bind(slot, LinearInterpolation);
         }
 
         public void BindFinalTextureAsCubeMap(int slot)
         {
-            combinedImage1?.BindAsCubemap(slot, LinearInterpolation);
+            textures?[0]?.BindAsCubemap(slot, LinearInterpolation);
         }
 
         /// <summary>
@@ -233,17 +234,25 @@ namespace OpenTKImageViewer.ImageContext
             }
 
             // create destination images
-            if (combinedImage1 == null)
+            if (textures == null)
             {
                 // create image
-                combinedImage1 = new TextureArray2D(GetNumLayers(), GetNumMipmaps(),
-                    SizedInternalFormat.Rgba32f, GetWidth(0), GetHeight(0));
+                // 1 image for the final result. 1 image for ping pong buffering
+                textures = new TextureArray2D[1];
+                for(int i = 0; i < textures.Length; ++i)
+                    textures[i] = new TextureArray2D(GetNumLayers(), GetNumMipmaps(),
+                        SizedInternalFormat.Rgba32f, GetWidth(0), GetHeight(0));
             }
 
-            // update image combine shader
-            if(imageCombineShader1.Update())
-                RecomputeCombinedImage(combinedImage1);
+            imageCombineShader1.Update();
 
+            // update images?
+            if (recomputeImages)
+            {
+                recomputeImages = false;
+                RecomputeCombinedImage(textures[0]);
+                //Tonemapper.ApplyShader(ref textures[0], ref textures[1], this);
+            }
         }
 
         #endregion
@@ -286,6 +295,10 @@ namespace OpenTKImageViewer.ImageContext
 
         public ImageContext(List<ImageLoader.Image> images)
         {
+            // on changed events
+            Tonemapper.ChangedSettings += (sender, args) => recomputeImages = true;
+            ImageFormula1.Changed += (sender, args) => recomputeImages = true;
+
             imageCombineShader1 = new ImageCombineShader(this, ImageFormula1);
             if (images != null)
             {
