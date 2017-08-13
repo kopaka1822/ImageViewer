@@ -45,15 +45,17 @@ namespace OpenTKImageViewer.ImageContext
 
         /// <summary>
         /// dispatches the shader with the given layer and level
-        /// target image and source textures have to be bound before a call to this function
+        /// source textures have to be bound before a call to this function
         /// </summary>
         /// <param name="layer"></param>
         /// <param name="level"></param>
         /// <param name="width">mipmap width</param>
         /// <param name="height">mipmap height</param>
-        public void Run(int layer, int level, int width, int height)
+        /// <param name="target">target image</param>
+        public void Run(int layer, int level, int width, int height, TextureArray2D target)
         {
             program.Bind();
+            target.BindAsImage(GetDestinationImageBinding(), level, layer, TextureAccess.WriteOnly);
             SetLevel(level);
             SetLayer(layer);
             GL.DispatchCompute(width / LocalSize + 1, height / LocalSize + 1, 1);

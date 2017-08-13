@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using OpenTK;
+using OpenTKImageViewer.glhelper;
 using OpenTKImageViewer.UI;
 using OpenTKImageViewer.View.Shader;
 
@@ -87,9 +88,11 @@ namespace OpenTKImageViewer.View
             shader.SetLayer((float)context.ActiveLayer);
             shader.SetGrayscale(context.Grayscale);
             context.BindFinalTextureAs2DSamplerArray(shader.GetTextureLocation());
+            Utility.GLCheck();
 
             // draw via vertex array
             base.Draw();
+            Utility.GLCheck();
         }
 
         public Matrix4 GetAspectRatio(float clientWidth, float clientHeight)

@@ -238,10 +238,10 @@ namespace OpenTKImageViewer.ImageContext
             {
                 // create image
                 // 1 image for the final result. 1 image for ping pong buffering
-                textures = new TextureArray2D[1];
+                textures = new TextureArray2D[2];
                 for(int i = 0; i < textures.Length; ++i)
                     textures[i] = new TextureArray2D(GetNumLayers(), GetNumMipmaps(),
-                        SizedInternalFormat.Rgba32f, GetWidth(0), GetHeight(0));
+                    SizedInternalFormat.Rgba32f, GetWidth(0), GetHeight(0));
             }
 
             imageCombineShader1.Update();
@@ -322,10 +322,8 @@ namespace OpenTKImageViewer.ImageContext
                     {
                         images[image].TextureArray2D.Bind(imageCombineShader1.GetSourceImageBinding(image), false);
                     }
-                    target.BindAsImage(imageCombineShader1.GetDestinationImageBinding(),
-                        level, layer, TextureAccess.WriteOnly);
                     
-                    imageCombineShader1.Run(layer, level, GetWidth(level), GetHeight(level));
+                    imageCombineShader1.Run(layer, level, GetWidth(level), GetHeight(level), target);
                 }
             }
         }

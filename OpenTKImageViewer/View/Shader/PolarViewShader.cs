@@ -47,7 +47,7 @@ namespace OpenTKImageViewer.View.Shader
 
         public int GetTextureLocation()
         {
-            return 1;
+            return 0;
         }
 
         public static string GetVertexSource()
@@ -74,7 +74,7 @@ namespace OpenTKImageViewer.View.Shader
         {
             return GetVersion() +
                    // uniforms
-                   "layout(location = 1) uniform sampler2DArray tex;\n" +
+                   "layout(binding = 0) uniform sampler2DArray tex;\n" +
                    "layout(location = 2) uniform float layer;\n" +
                    "layout(location = 3) uniform float level;\n" +
                    "layout(location = 4) uniform uint grayscale;\n" +

@@ -218,7 +218,9 @@ namespace OpenTKImageViewer
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
                 
                 imageViews[CurrentView]?.Update(this);
+                Utility.GLCheck();
                 Context.Update();
+                Utility.GLCheck();
 
                 imageViews[CurrentView]?.Draw();
 

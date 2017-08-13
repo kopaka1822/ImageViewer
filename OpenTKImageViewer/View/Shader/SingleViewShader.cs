@@ -23,7 +23,7 @@ namespace OpenTKImageViewer.View.Shader
 
         public void SetTransform(Matrix4 mat)
         {
-            GL.UniformMatrix4(0, false, ref mat);
+            GL.UniformMatrix4(1, false, ref mat);
         }
 
         public void SetLayer(float layer)
@@ -43,14 +43,14 @@ namespace OpenTKImageViewer.View.Shader
 
         public int GetTextureLocation()
         {
-            return 1;
+            return 0;
         }
 
         public static string GetVertexSource()
         {
             return GetVersion() +
                    // uniforms
-                   "layout(location = 0) uniform mat4 transform;\n" +
+                   "layout(location = 1) uniform mat4 transform;\n" +
                    // out
                    "layout(location = 0) out vec2 texcoord;" +
 
@@ -70,7 +70,7 @@ namespace OpenTKImageViewer.View.Shader
         {
             return GetVersion() +
                    // uniforms
-                   "layout(location = 1) uniform sampler2DArray tex;\n" +
+                   "layout(binding = 0) uniform sampler2DArray tex;\n" +
                    "layout(location = 2) uniform float layer;\n" +
                    "layout(location = 3) uniform float level;\n" +
                    "layout(location = 4) uniform uint grayscale;\n" +
