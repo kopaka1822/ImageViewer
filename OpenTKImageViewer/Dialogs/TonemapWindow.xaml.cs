@@ -35,7 +35,7 @@ namespace OpenTKImageViewer.Dialogs
             InitializeComponent();
             
             // clone current tonemapping settings
-            toneSettings = parent.Context.Tonemapper.CloneSettings();
+            toneSettings = parent.Context.Tonemapper.GetSettings();
 
             UpdateList();
         }
@@ -76,6 +76,8 @@ namespace OpenTKImageViewer.Dialogs
             {
                 ListBoxMapper.Items.Add(GenerateItem(toneParameter));
             }
+            if (ListBoxMapper.Items.Count > 0)
+                ListBoxMapper.SelectedIndex = 0;
         }
 
         private void DisplayItem(ToneParameter p)
@@ -160,16 +162,6 @@ namespace OpenTKImageViewer.Dialogs
         {
             Debug.Assert(p.Type == ShaderLoader.ParameterType.Bool);
             return p.CurrentValue != (decimal) 0.0;
-        }
-
-        private static decimal IntToDecimal(decimal min, decimal max, int val)
-        {
-            return Math.Min(max, Math.Max(min, (decimal) val));
-        }
-
-        private static decimal Clamp(decimal min, decimal max, decimal val)
-        {
-            return Math.Min(max, Math.Max(min, val));
         }
 
         private decimal BoolToDecimal(bool? b)

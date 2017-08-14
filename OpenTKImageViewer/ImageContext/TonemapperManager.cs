@@ -33,7 +33,8 @@ namespace OpenTKImageViewer.ImageContext
 
         public void Apply(List<ToneParameter> p)
         {
-            settings = p;
+            // create copy
+            settings = CloneSettings(p);
             
             RemoveUnusedShader();
             OnChangedSettings();
@@ -74,10 +75,19 @@ namespace OpenTKImageViewer.ImageContext
         /// creates deep copy of settings (except for the shader refence that will be kept)
         /// </summary>
         /// <returns></returns>
-        public List<ToneParameter> CloneSettings()
+        public List<ToneParameter> GetSettings()
+        {
+            return CloneSettings(settings);
+        }
+
+        /// <summary>
+        /// creates deep copy of the list (except for the shader refence that will be kept)
+        /// </summary>
+        /// <returns></returns>
+        private static List<ToneParameter> CloneSettings(List<ToneParameter> p)
         {
             var res = new List<ToneParameter>();
-            foreach (var toneParameter in settings)
+            foreach (var toneParameter in p)
             {
                 res.Add(toneParameter.Clone());
             }
