@@ -31,5 +31,13 @@ namespace OpenTKImageViewer.Tonemapping
 
             return new ToneParameter(p, Shader);
         }
+
+        public void RestoreDefaults()
+        {
+            foreach (var parameter in Parameters)
+            {
+                parameter.CurrentValue = parameter.Default;
+            }
+        }
     }
 }

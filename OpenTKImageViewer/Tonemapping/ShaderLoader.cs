@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace OpenTKImageViewer.Tonemapping
 {
+    public delegate void ChangedValueHandler(object sender, EventArgs e);
+
     public class ShaderLoader
     {
         public enum ParameterType
@@ -28,9 +30,23 @@ namespace OpenTKImageViewer.Tonemapping
             public decimal CurrentValue
             {
                 get => currentValue;
-                set => currentValue = Math.Min(Max, Math.Max(Min, value));
+                set
+                {
+                    var val = Math.Min(Max, Math.Max(Min, value));
+                    if (currentValue != val)
+                    {
+
+                        currentValue = val;
+                        OnValueChanged();
+                    }
+                    else if(value != val)
+                        // in order to clamp the numeric up down values correctly
+                        OnValueChanged();
+                }
             }
 
+            public event ChangedValueHandler ValueChanged;
+                
             /// <summary>
             /// deep copy of parameter
             /// </summary>
@@ -47,6 +63,11 @@ namespace OpenTKImageViewer.Tonemapping
                     Default = Default,
                     currentValue = currentValue
                 };
+            }
+
+            protected virtual void OnValueChanged()
+            {
+                ValueChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 

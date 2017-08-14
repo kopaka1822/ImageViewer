@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -60,6 +61,7 @@ namespace OpenTKImageViewer.Dialogs
 
                 toneSettings.Add(param);
                 ListBoxMapper.Items.Add(GenerateItem(param));
+                ListBoxMapper.SelectedIndex = ListBoxMapper.Items.Count - 1;
             }
             catch (Exception exception)
             {
@@ -91,34 +93,67 @@ namespace OpenTKImageViewer.Dialogs
             foreach (var para in p.Parameters)
             {
                 list.Add(new TextBlock {Text = para.Name + ":", Margin = margin, TextWrapping = TextWrapping.Wrap});
-                
-                if (para.Type == ShaderLoader.ParameterType.Bool)
+
+                switch (para.Type)
                 {
-                    // check Box
-                    var e = new CheckBox {IsChecked = GetBoolValue(para), Margin = margin};
-                    e.Checked += (sender, args) => para.CurrentValue = BoolToDecimal(e.IsChecked);
-                    list.Add(e);
-                }
-                else if(para.Type == ShaderLoader.ParameterType.Int)
-                {
-                    // use num up down
-                    var e = new IntegerUpDown {Value = (int) para.CurrentValue, Margin = margin};
-                    e.ValueChanged += (sender, args) =>
+                    case ShaderLoader.ParameterType.Bool:
                     {
-                        if (e.Value != null) para.CurrentValue = IntToDecimal(para.Min, para.Max, (int)e.Value);
-                    };
-                    list.Add(e);
-                }
-                else
-                {
-                    var e = new DecimalUpDown {Value = para.CurrentValue, Margin = margin};
-                    e.ValueChanged += (sender, args) =>
+                        // check Box
+                        var e = new CheckBox {IsChecked = GetBoolValue(para), Margin = margin};
+                        e.Checked += (sender, args) => para.CurrentValue = BoolToDecimal(e.IsChecked);
+                        para.ValueChanged += (sender, args) => e.IsChecked = para.CurrentValue != (decimal)0.0;
+                        list.Add(e);
+                    }
+                        break;
+                    case ShaderLoader.ParameterType.Int:
                     {
-                        if (e.Value != null) para.CurrentValue = Clamp(para.Min, para.Max, (decimal)e.Value);
-                    };
-                    list.Add(e);
+                        // use num up down
+                        var e = new IntegerUpDown
+                        {
+                            Value = (int) para.CurrentValue, Margin = margin,
+                            //Maximum = (int)para.Max, Minimum = (int)para.Min
+                        };
+                        e.ValueChanged += (sender, args) =>
+                        {
+                            if (e.Value != null) para.CurrentValue = (decimal)e.Value;
+                        };
+                        para.ValueChanged += (sender, args) => e.Value = (int)para.CurrentValue;
+                        list.Add(e);
+                    }
+                        break;
+                    default:
+                    {
+                        var e = new DecimalUpDown
+                        {
+                            Value = para.CurrentValue, Margin = margin,
+                            //Maximum = para.Max, Minimum = para.Min
+                        };
+                        e.ValueChanged += (sender, args) =>
+                        {
+                            if (e.Value != null) para.CurrentValue =(decimal)e.Value;
+                        };
+                        para.ValueChanged += (sender, args) =>
+                        {
+
+                            e.Value = para.CurrentValue;
+                            e.Text = para.CurrentValue.ToString(CultureInfo.InvariantCulture);
+                        };
+                        list.Add(e);
+                    }
+                        break;
                 }
             }
+
+            // default button
+            var btn = new Button
+            {
+                Content = "Restore Defaults",
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Margin = new Thickness(0.0, 8.0, 0.0, 0.0),
+                Padding = new Thickness(2)
+            };
+            btn.Click += (sender, args) => p.RestoreDefaults();
+            list.Add(btn);
         }
 
         private static bool GetBoolValue(ShaderLoader.Parameter p)
