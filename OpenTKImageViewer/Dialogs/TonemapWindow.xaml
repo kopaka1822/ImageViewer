@@ -17,10 +17,13 @@
 
         <Border Padding="5">
             <StackPanel>
-                <TextBlock Text="Used Tonemapper:" Margin="0 0 0 2"/>
+                <TextBlock Text="Used Tonemapper:" 
+                           Margin="0 0 0 2"/>
                 <ListBox Height="200"
                          ScrollViewer.VerticalScrollBarVisibility="Visible"
-                         Margin="0 0 0 10"/>
+                         Margin="0 0 0 10"
+                         x:Name="ListBoxMapper"
+                         SelectionChanged="ListBoxMapper_OnSelectionChanged"/>
 
                 <Grid HorizontalAlignment="Right">
                     <Grid.ColumnDefinitions>
@@ -28,16 +31,18 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Button Content="_Add" Margin="0 0 10 0" Width="60" Click="ButtonAdd_OnClick"/>
-                    <Button Grid.Column="1" Content="Apply" Width="60" Click="ButtonApply_OnClock"/>
+                    <Button Grid.Column="1" Content="Apply" Width="60" Click="ButtonApply_OnClick"/>
                 </Grid>
             </StackPanel>
         </Border>
         
         <!-- Custom Panel -->
-        <Border Padding="5" Grid.Column="1" BorderThickness="1 0 0 0" BorderBrush="Gray">
-            <StackPanel x:Name="StackPanelMapper">
-                
-            </StackPanel>
+        <Border Padding="5 5 0 5" Grid.Column="1" BorderThickness="1 0 0 0" BorderBrush="Gray">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <Border Padding="0 0 5 0">
+                    <StackPanel x:Name="StackPanelMapper"/>
+                </Border>
+            </ScrollViewer>
         </Border>
     </Grid>
 </Window>

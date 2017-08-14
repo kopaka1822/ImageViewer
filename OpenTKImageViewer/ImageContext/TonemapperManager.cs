@@ -84,8 +84,18 @@ namespace OpenTKImageViewer.ImageContext
             return res;
         }
 
-        public void RemoveUnusedShader() => shaders.RemoveAll(
-            shader => !settings.Any(toneParameter => ReferenceEquals(toneParameter.Shader, shader)));
+        public void RemoveUnusedShader()
+        {
+            shaders.RemoveAll(
+                shader =>
+                {
+                    if (settings.Any(toneParameter => ReferenceEquals(toneParameter.Shader, shader)))
+                        return false;
+
+                    shader.Dispose();
+                    return true;
+                });
+        }
 
         protected virtual void OnChangedSettings()
         {
