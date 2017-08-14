@@ -69,6 +69,8 @@ namespace OpenTKImageViewer
             }
         }
 
+        public TonemapWindow TonemapDialog { get; set; } = null;
+
         #endregion
 
         #region INITIALIZATION
@@ -497,6 +499,15 @@ namespace OpenTKImageViewer
             parent.OpenDialog(App.UniqueDialog.Image);
         }
 
+        private void MenuItem_Click_Tonemapper(object sender, RoutedEventArgs e)
+        {
+            if (TonemapDialog == null)
+                TonemapDialog = new TonemapWindow(this);
+            TonemapDialog.Show();
+            TonemapDialog.Activate();
+            TonemapDialog.Topmost = true;
+        }
+
         #endregion
 
         #endregion
@@ -562,16 +573,25 @@ namespace OpenTKImageViewer
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
+            TonemapDialog?.Close();
             parent.UnregisterWindow(this);
         }
 
         private void MainWindow_OnActivated(object sender, EventArgs e)
         {
+            if (TonemapDialog != null)
+            {
+                TonemapDialog.Topmost = true;
+            }
             parent.SetActiveWindow(this);
         }
 
         private void MainWindow_OnDeactivated(object sender, EventArgs e)
         {
+            if (TonemapDialog != null)
+            {
+                TonemapDialog.Topmost = false;
+            }
             parent.UpdateDialogVisibility();
         }
 
@@ -654,10 +674,7 @@ namespace OpenTKImageViewer
             }
         }
 
-        private void MenuItem_Click_Tonemapper(object sender, RoutedEventArgs e)
-        {
-            parent.OpenDialog(App.UniqueDialog.Tonemap);
-        }
+
 
         /// <summary>
         /// enables the opengl context from this window

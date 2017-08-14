@@ -20,13 +20,12 @@ namespace OpenTKImageViewer.Dialogs
     /// <summary>
     /// Interaction logic for TonemapWindow.xaml
     /// </summary>
-    public partial class TonemapWindow : Window, IUniqueDialog
+    public partial class TonemapWindow : Window
     {
         public bool IsClosing { get; set; } = false;
-        private readonly App parent;
-        private MainWindow activeWindow;
+        private MainWindow parent;
 
-        public TonemapWindow(App parent)
+        public TonemapWindow(MainWindow parent)
         {
             this.parent = parent;
             InitializeComponent();
@@ -35,14 +34,7 @@ namespace OpenTKImageViewer.Dialogs
         private void TonemapWindow_OnClosing(object sender, CancelEventArgs e)
         {
             IsClosing = true;
-            parent.CloseDialog(App.UniqueDialog.Tonemap);
-        }
-
-
-        public void UpdateContent(MainWindow window)
-        {
-            // TODO
-            activeWindow = window;
+            parent.TonemapDialog = null;
         }
 
         private void ButtonAdd_OnClick(object sender, RoutedEventArgs e)
@@ -53,11 +45,11 @@ namespace OpenTKImageViewer.Dialogs
             if (ofd.ShowDialog() != true) return;
 
             // load shader
-            activeWindow.EnableOpenGl();
+            parent.EnableOpenGl();
             try
             {
-                var param = activeWindow.Context.Tonemapper.LoadShader(ofd.FileName);
-                activeWindow.Context.Tonemapper.Apply(new List<ToneParameter>{param});
+                var param = parent.Context.Tonemapper.LoadShader(ofd.FileName);
+                parent.Context.Tonemapper.Apply(new List<ToneParameter>{param});
                 // TODO add to list
             }
             catch (Exception exception)
