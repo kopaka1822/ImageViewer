@@ -1,0 +1,69 @@
+#setting title, Median Filter
+#setting description, Removes noise from an image.
+#setting sepa, true
+
+#param Radius, 1, Int, 5, 1, 50
+
+layout(location = 1) uniform int radius;
+
+float get(vec4 color)
+{
+	return dot(color.rgb, vec3(0.299, 0.587, 0.114));
+}
+
+vec4 buf[101];
+
+void bubbleSort(int numLength)
+{
+	int i = 0;
+	int j = 0;
+	int flag = 1;
+	for(i = 1; (i <= numLength) && (flag != 0); i++)
+	{
+		flag = 0;
+		for (j=0; j < (numLength -1); j++)
+		{
+			if (get(buf[j+1]) > get(buf[j]))
+			{
+				vec4 temp = buf[j];
+				buf[j] = buf[j+1];
+				buf[j+1] = temp;
+				flag = 1;
+			}
+		}
+	}
+}
+
+int doti(ivec2 x, ivec2 y)
+{
+	return x.x * y.x + x.y * y.y;
+}
+			
+void main()
+{
+	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy);
+	ivec2 imgSize = imageSize(src_image);
+	if(pixelCoord.x < imgSize.x && pixelCoord.y < imgSize.y)
+	{
+		// fill buffer
+		int midpoint = doti(pixelCoord, filterDirection);
+		int start = doti(pixelCoord,filterDirection) - radius;
+		int end = doti(pixelCoord,filterDirection) + radius;
+		start = max(0,start);
+		end = min(doti(imgSize, filterDirection) - 1, end);
+		
+		int buflen = end - start;
+		int i = start;
+		while(i <= end)
+		{
+			buf[i - start] = imageLoad(src_image, pixelCoord + (midpoint - i) * filterDirection);
+			++i;
+		}
+		
+		// sort the buffer
+		bubbleSort(buflen);
+		
+		float alpha = imageLoad(src_image, pixelCoord).a;
+		imageStore(dst_image, pixelCoord, vec4(buf[buflen/2].rgb, alpha));
+	}
+}
