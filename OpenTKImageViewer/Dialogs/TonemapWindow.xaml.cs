@@ -44,6 +44,7 @@ namespace OpenTKImageViewer.Dialogs
         {
             IsClosing = true;
             parent.TonemapDialog = null;
+            parent.Context.Tonemapper.RemoveUnusedShader();
         }
 
         private void ButtonAdd_OnClick(object sender, RoutedEventArgs e)
@@ -171,9 +172,126 @@ namespace OpenTKImageViewer.Dialogs
             return (bool)b ? 1 : 0;
         }
 
-        private static ListBoxItem GenerateItem(ToneParameter p)
+        private ListBoxItem GenerateItem(ToneParameter p)
         {
-            return new ListBoxItem {Content = p.Shader.Name, ToolTip = p.Shader.Description};
+            var imgUp = new Image
+            {
+                Source = new BitmapImage(new Uri(Environment.CurrentDirectory + "/Icons/arrow_up.png"))
+            };
+            var imgDown = new Image
+            {
+                Source = new BitmapImage(new Uri(Environment.CurrentDirectory + "/Icons/arrow_down.png"))
+            };
+            var imgDelete = new Image
+            {
+                Source = new BitmapImage(new Uri(Environment.CurrentDirectory + "/Icons/cancel.png"))
+            };
+
+            var btnUp = new Button
+            {
+                Height = 8,
+                Width = 16,
+                Content = imgUp
+            };
+            var btnDown = new Button
+            {
+                Height = 8,
+                Width = 16,
+                Content = imgDown
+            };
+            var btnDelete = new Button
+            {
+                Height = 16,
+                Width = 16,
+                Content = imgDelete
+            };
+
+            var upDownPanel = new StackPanel
+            {
+                HorizontalAlignment = HorizontalAlignment.Right
+            };
+            upDownPanel.Children.Add(btnUp);
+            upDownPanel.Children.Add(btnDown);
+
+            var text = new TextBlock {Text = p.Shader.Name };
+            
+            var grid = new Grid {Width = 210.0};
+            grid.ColumnDefinitions.Add(new ColumnDefinition{Width = new GridLength(1.0, GridUnitType.Star)});
+            grid.ColumnDefinitions.Add(new ColumnDefinition{Width = new GridLength(1.0, GridUnitType.Auto)});
+            grid.ColumnDefinitions.Add(new ColumnDefinition{Width = new GridLength(1.0, GridUnitType.Auto)});
+
+            Grid.SetColumn(text, 0);
+            grid.Children.Add(text);
+            Grid.SetColumn(btnDelete, 1);
+            grid.Children.Add(btnDelete);
+            Grid.SetColumn(upDownPanel, 2);
+            grid.Children.Add(upDownPanel);
+
+            // add callbacks
+            var item = new ListBoxItem { Content = grid, ToolTip = p.Shader.Description };
+
+            btnUp.Click += (sender, args) => ItemMoveUp(item);
+            btnDown.Click += (sender, args) => ItemMoveDown(item);
+            btnDelete.Click += (sender, args) => ItemDelete(item);
+
+            return item;
+        }
+
+        private int GetItemIndex(ListBoxItem item)
+        {
+            for (int i = 0; i < ListBoxMapper.Items.Count; ++i)
+            {
+                if (ReferenceEquals(ListBoxMapper.Items[i], item))
+                    return i;
+            }
+            return -1;
+        }
+
+        private void SwapItems(int idx1, int idx2)
+        {
+            Debug.Assert(idx1 < idx2);
+
+            // remember values
+            var box1  = ListBoxMapper.Items[idx1];
+            var box2 = ListBoxMapper.Items[idx2];
+
+            // detach
+            ListBoxMapper.Items.RemoveAt(idx2);
+            ListBoxMapper.Items.RemoveAt(idx1);
+
+            // attach
+            ListBoxMapper.Items.Insert(idx1, box2);
+            ListBoxMapper.Items.Insert(idx2, box1);
+
+            var tmp2 = toneSettings[idx1];
+            toneSettings[idx1] = toneSettings[idx2];
+            toneSettings[idx2] = tmp2;
+        }
+
+        private void ItemMoveUp(ListBoxItem item)
+        {
+            var idx = GetItemIndex(item);
+            if (idx < 1) return;
+            
+            SwapItems(idx - 1, idx);
+            ListBoxMapper.SelectedIndex = idx - 1;
+        }
+
+        private void ItemMoveDown(ListBoxItem item)
+        {
+            var idx = GetItemIndex(item);
+            if (idx < 0 || idx == ListBoxMapper.Items.Count - 1) return;
+            
+            SwapItems(idx, idx + 1);
+            ListBoxMapper.SelectedIndex = idx + 1;
+        }
+
+        private void ItemDelete(ListBoxItem item)
+        {
+            var idx = GetItemIndex(item);
+            if (idx < 0) return;
+            ListBoxMapper.Items.RemoveAt(idx);
+            toneSettings.RemoveAt(idx);
         }
 
         private void ButtonApply_OnClick(object sender, RoutedEventArgs e)
@@ -188,7 +306,7 @@ namespace OpenTKImageViewer.Dialogs
             if (ListBoxMapper.SelectedIndex >= 0)
             {
                 DisplayItem(toneSettings[ListBoxMapper.SelectedIndex]);
-            }
+            } else StackPanelMapper.Children.Clear();
         }
     }
 }

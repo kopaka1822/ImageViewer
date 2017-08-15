@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
         mc:Ignorable="d"
-        Title="Tonemapper" Height="300" Width="500"
+        Title="Tonemapper" Height="300" Width="600"
         ResizeMode="NoResize" Background="#eee"
         Icon="../Icons/app.png"
         Closing="TonemapWindow_OnClosing">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="180"/>
+            <ColumnDefinition Width="250"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
@@ -23,7 +23,8 @@
                          ScrollViewer.VerticalScrollBarVisibility="Visible"
                          Margin="0 0 0 10"
                          x:Name="ListBoxMapper"
-                         SelectionChanged="ListBoxMapper_OnSelectionChanged"/>
+                         SelectionChanged="ListBoxMapper_OnSelectionChanged">
+                </ListBox>
 
                 <Grid HorizontalAlignment="Right">
                     <Grid.ColumnDefinitions>
@@ -46,4 +47,6 @@
         </Border>
     </Grid>
 </Window>
+
+
 

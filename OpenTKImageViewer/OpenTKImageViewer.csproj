@@ -221,5 +221,10 @@
     <Resource Include="Icons\eye.png" />
     <Resource Include="Icons\eyedropper.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\arrow_down.png" />
+    <Resource Include="Icons\arrow_up.png" />
+    <Resource Include="Icons\cancel.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
