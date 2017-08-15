@@ -95,6 +95,9 @@
     <Compile Include="Dialogs\MipMapWindow.xaml.cs">
       <DependentUpon>MipMapWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\ProgressWindow.xaml.cs">
+      <DependentUpon>ProgressWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\TonemapWindow.xaml.cs">
       <DependentUpon>TonemapWindow.xaml</DependentUpon>
     </Compile>
@@ -142,6 +145,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\MipMapWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ProgressWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

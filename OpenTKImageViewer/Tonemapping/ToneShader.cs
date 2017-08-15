@@ -13,7 +13,7 @@ namespace OpenTKImageViewer.Tonemapping
     {
         private readonly Program program;
 
-        private const int LocalSize = 8;
+        private const int LocalSize = 32;
 
         public string Name { get; }
         public string Description { get; }
