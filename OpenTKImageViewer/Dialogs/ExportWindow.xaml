@@ -53,7 +53,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Button Content="_Export" Margin="0 0 10 0" Width="60" Click="ButtonExport_OnClick"/>
-                <Button Grid.Column="1" Content="_Cancel" Width="60" Click="ButtonCancel_OnClock"/>
+                <Button Grid.Column="1" Content="_Cancel" Width="60" Click="ButtonCancel_OnClick"/>
             </Grid>
         </StackPanel>
     </Border>

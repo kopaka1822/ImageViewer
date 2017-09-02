@@ -149,7 +149,7 @@ namespace OpenTKImageViewer.Dialogs
             DialogResult = true;
         }
 
-        private void ButtonCancel_OnClock(object sender, RoutedEventArgs e)
+        private void ButtonCancel_OnClick(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
         }
