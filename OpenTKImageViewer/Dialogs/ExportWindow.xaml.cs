@@ -160,7 +160,7 @@ namespace OpenTKImageViewer.Dialogs
             {
                 case FileFormat.Bmp:
                 case FileFormat.Png:
-                    return PixelType.Byte;
+                    return PixelType.UnsignedByte;
                 case FileFormat.Hdr:
                     return PixelType.Float;
             }
