@@ -146,7 +146,7 @@ namespace OpenTKImageViewer.glhelper
         /// <summary>
         /// reads data from gpu
         /// </summary>
-        /// <param name="level"></param>
+        /// <param name="level">requested level</param>
         /// <param name="layer">requested layer or -1 if all layers</param>
         /// <param name="format"></param>
         /// <param name="type"></param>
@@ -179,7 +179,35 @@ namespace OpenTKImageViewer.glhelper
                 buffer = layerBuffer;
             }
 
+            // mirror horizontally
+            if (layer >= 0)
+            {
+                // only this layer
+                MirrorHorizontally(buffer, width * GetPixelTypeSize(type) * GetPixelFormatCount(format), height, layer * (bufferSize / numLayer));
+            }
+            else
+            {
+                // all layer
+                for(int curLayer = 0; curLayer < numLayer; ++curLayer)
+                    MirrorHorizontally(buffer, width * GetPixelTypeSize(type) * GetPixelFormatCount(format), height, curLayer * (bufferSize / numLayer));
+            }
+
             return buffer;
+        }
+
+        private void MirrorHorizontally(byte[] buffer, int lineWidth, int height, int offset)
+        {
+            for (int y = 0; y < height / 2; ++y)
+            { 
+                for (int x = 0; x < lineWidth; ++x)
+                {
+                    var a = y * lineWidth + x + offset;
+                    var b = (height - y - 1) * lineWidth + x + offset;
+                    var tmp = buffer[a];
+                    buffer[a] = buffer[b];
+                    buffer[b] = tmp;
+                }
+            }
         }
 
         public static int GetPixelFormatCount(PixelFormat f)
