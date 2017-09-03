@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 using OpenTKImageViewer.glhelper;
 using OpenTKImageViewer.Tonemapping;
+using OpenTKImageViewer.Utility;
 
 namespace OpenTKImageViewer.ImageContext
 {
@@ -39,7 +42,7 @@ namespace OpenTKImageViewer.ImageContext
             RemoveUnusedShader();
             OnChangedSettings();
         }
-
+        
         /// <summary>
         /// applies the current set of shaders to the images. ping will point to the final image
         /// </summary>
@@ -69,6 +72,93 @@ namespace OpenTKImageViewer.ImageContext
                     pong = temp;
                 }
             }
+        }
+
+        private class ShaderStepper : IStepable
+        {
+            private ImageContext context;
+            private readonly List<ToneParameter> settings;
+            private readonly TextureArray2D[] pingpong;
+
+            private int curParameter = 0;
+            private int curSepaIteration = 0;
+            private int curLevel = 0;
+            private int curLayer = 0;
+
+            private int numExecuted = 0;
+
+            public ShaderStepper(ImageContext context, List<ToneParameter> settings, TextureArray2D[] pingpong)
+            {
+                this.context = context;
+                this.settings = settings;
+                this.pingpong = pingpong;
+            }
+
+            public bool HasStep()
+            {
+                return curParameter < settings.Count;
+            }
+
+            public void NextStep()
+            {
+                var p = settings[curParameter];
+
+                // ping
+                pingpong[0].BindAsImage(p.Shader.GetSourceImageLocation(), curLevel, curLayer, TextureAccess.ReadOnly);
+                // pong
+                pingpong[1].BindAsImage(p.Shader.GetDestinationImageLocation(), curLevel, curLayer, TextureAccess.WriteOnly);
+                p.Shader.Dispatch(context.GetWidth(curLevel), context.GetHeight(curLevel), p.Parameters, curSepaIteration);
+
+                // increment
+                if (curLayer < context.GetNumLayers() - 1)
+                {
+                    ++curLayer;
+                    return;
+                }
+                curLayer = 0;
+
+                if (curLevel < context.GetNumMipmaps() - 1)
+                {
+                    ++curLevel;
+                    return;
+                }
+                curLevel = 0;
+
+                // swap ping pong images
+                var temp = pingpong[0];
+                pingpong[0] = pingpong[1];
+                pingpong[1] = temp;
+
+                if (curSepaIteration < (p.Shader.IsSepa ? 1 : 0))
+                {
+                    ++curSepaIteration;
+                    return;
+                }
+                curSepaIteration = 0;
+
+                ++curParameter;
+            }
+
+            public int CurrentStep()
+            {
+                return numExecuted;
+            }
+
+            public int GetNumSteps()
+            {
+                int iterations = 0;
+                foreach (var p in settings)
+                {
+                    int numIterations = p.Shader.IsSepa ? 2 : 1;
+                    iterations += numIterations * context.GetNumMipmaps() * context.GetNumLayers();
+                }
+                return iterations;
+            }
+        }
+
+        public IStepable GetApplyShaderStepable(TextureArray2D[] pingpong, ImageContext context)
+        {
+            return new ShaderStepper(context, settings, pingpong);
         }
 
         /// <summary>
