@@ -122,6 +122,8 @@
     <Compile Include="Tonemapping\ToneParameter.cs" />
     <Compile Include="Tonemapping\ToneShader.cs" />
     <Compile Include="UI\StatusBarControl.cs" />
+    <Compile Include="Utility\IStepable.cs" />
+    <Compile Include="Utility\StepList.cs" />
     <Compile Include="View\CubeView.cs" />
     <Compile Include="View\EmptyView.cs" />
     <Compile Include="View\IImageView.cs" />

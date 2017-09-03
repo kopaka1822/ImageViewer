@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 using OpenTKImageViewer.glhelper;
 using OpenTKImageViewer.Tonemapping;
+using OpenTKImageViewer.Utility;
 
 namespace OpenTKImageViewer.ImageContext
 {
@@ -56,6 +57,7 @@ namespace OpenTKImageViewer.ImageContext
         private bool linearInterpolation = false;
         private GrayscaleMode grayscale = GrayscaleMode.Disabled;
         private bool recomputeImages = true;
+        private IStepable tonemappingStepable = null;
 
         #endregion
 
@@ -221,10 +223,11 @@ namespace OpenTKImageViewer.ImageContext
         /// <summary>
         /// should be called before drawing the final image in order to update its contents if required
         /// </summary>
-        public void Update()
+        /// <return>true if image is ready to be drawn, false if image has to be processed</return>
+        public bool Update()
         {
             if (images.Count == 0)
-                return;
+                return true;
 
             // create gpu textures for newly added images
             foreach (var imageData in images)
@@ -251,8 +254,32 @@ namespace OpenTKImageViewer.ImageContext
             {
                 recomputeImages = false;
                 RecomputeCombinedImage(textures[0]);
-                Tonemapper.ApplyShader(ref textures[0], ref textures[1], this);
+                // set new stepable
+                tonemappingStepable = Tonemapper.GetApplyShaderStepable(textures, this);
             }
+
+            if (tonemappingStepable != null)
+            {
+                if(tonemappingStepable.HasStep())
+                    tonemappingStepable.NextStep();
+
+                if (!tonemappingStepable.HasStep())
+                {
+                    // finished stepping
+                    tonemappingStepable = null;
+                    return true;
+                }
+                return false;
+            }
+
+            return true;
+        }
+
+        public float GetImageProcess()
+        {
+            if (tonemappingStepable == null)
+                return 1.0f;
+            return (float)tonemappingStepable.CurrentStep() / tonemappingStepable.GetNumSteps();
         }
 
         #endregion

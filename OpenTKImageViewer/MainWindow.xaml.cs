@@ -54,6 +54,8 @@ namespace OpenTKImageViewer
         public ulong ZIndex { get; set; }
         private Dictionary<ImageViewType, IImageView> imageViews = new Dictionary<ImageViewType, IImageView>();
         private ImageViewType currentImageView;
+        private ProgressWindow progressWindow = null;
+
         public StatusBarControl StatusBar { get; }
         public ImageContext.ImageContext Context { get; set; }
         public ImageViewType CurrentView
@@ -218,15 +220,38 @@ namespace OpenTKImageViewer
                     (int)(GetClientHeight()));
                 GL.ClearColor(0.9333f, 0.9333f, 0.9333f, 1.0f);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-                
-                imageViews[CurrentView]?.Update(this);
-                Utility.GLCheck();
-                Context.Update();
-                Utility.GLCheck();
 
-                imageViews[CurrentView]?.Draw();
+                if (Context.Update())
+                {
+                    // image is ready
+                    glhelper.Utility.GLCheck();
+                    if (progressWindow != null)
+                    {
+                        progressWindow.Close();
+                        progressWindow = null;
+                    }
 
-                Utility.GLCheck();
+                    imageViews[CurrentView]?.Update(this);
+                    glhelper.Utility.GLCheck();
+
+                    imageViews[CurrentView]?.Draw();
+                }
+                else
+                {
+                    if (progressWindow == null)
+                    {
+                        progressWindow = new ProgressWindow();
+                        progressWindow.Show();
+                        progressWindow.SetDescription("applying tonemappers");
+                    }
+                    
+                    // image is not ready yet
+                    glhelper.Utility.GLCheck();
+                    RedrawFrame();
+                    progressWindow.SetProgress(Context.GetImageProcess());
+                }
+
+                glhelper.Utility.GLCheck();
                 glControl.SwapBuffers();
             }
             catch (Exception exception)

@@ -156,6 +156,12 @@ namespace OpenTKImageViewer.ImageContext
             }
         }
 
+        /// <summary>
+        /// applies the current set of shaders to the images. pingpong[0] will point to the final image
+        /// </summary>
+        /// <param name="pingpong">source [0] and destination [1] image</param>
+        /// <param name="context">image context</param>
+        /// <returns>Stepable container</returns>
         public IStepable GetApplyShaderStepable(TextureArray2D[] pingpong, ImageContext context)
         {
             return new ShaderStepper(context, settings, pingpong);

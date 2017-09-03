@@ -88,11 +88,12 @@ namespace OpenTKImageViewer.View
             shader.SetLayer((float)context.ActiveLayer);
             shader.SetGrayscale(context.Grayscale);
             context.BindFinalTextureAs2DSamplerArray(shader.GetTextureLocation());
-            Utility.GLCheck();
+            glhelper.Utility.GLCheck();
+            
 
             // draw via vertex array
             base.Draw();
-            Utility.GLCheck();
+            glhelper.Utility.GLCheck();
         }
 
         public Matrix4 GetAspectRatio(float clientWidth, float clientHeight)
