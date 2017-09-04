@@ -282,6 +282,13 @@ namespace OpenTKImageViewer.ImageContext
             return (float)tonemappingStepable.CurrentStep() / tonemappingStepable.GetNumSteps();
         }
 
+        public string GetImageLoadingDescription()
+        {
+            if (tonemappingStepable == null)
+                return "";
+            return tonemappingStepable.GetDescription();
+        }
+
         #endregion
 
         #region Events

@@ -76,9 +76,10 @@ namespace OpenTKImageViewer.ImageContext
 
         private class ShaderStepper : IStepable
         {
-            private ImageContext context;
+            private readonly ImageContext context;
             private readonly List<ToneParameter> settings;
             private readonly TextureArray2D[] pingpong;
+            private IStepable curStepable = null;
 
             private int curParameter = 0;
             private int curSepaIteration = 0;
@@ -107,21 +108,28 @@ namespace OpenTKImageViewer.ImageContext
                 pingpong[0].BindAsImage(p.Shader.GetSourceImageLocation(), curLevel, curLayer, TextureAccess.ReadOnly);
                 // pong
                 pingpong[1].BindAsImage(p.Shader.GetDestinationImageLocation(), curLevel, curLayer, TextureAccess.WriteOnly);
-                p.Shader.Dispatch(context.GetWidth(curLevel), context.GetHeight(curLevel), p.Parameters, curSepaIteration);
+                if (curStepable == null)
+                    curStepable = p.Shader.GetDispatchStepable(context.GetWidth(curLevel), context.GetHeight(curLevel),
+                        p.Parameters, curSepaIteration);
+                
+                if(curStepable.HasStep())
+                    curStepable.NextStep();
+
+                if (curStepable.HasStep())
+                    return;
+
+                curStepable = null;
+                ++numExecuted;
 
                 // increment
-                if (curLayer < context.GetNumLayers() - 1)
-                {
-                    ++curLayer;
+                if (++curLayer < context.GetNumLayers())
                     return;
-                }
+                
                 curLayer = 0;
 
-                if (curLevel < context.GetNumMipmaps() - 1)
-                {
-                    ++curLevel;
+                if (++curLevel < context.GetNumMipmaps())
                     return;
-                }
+                
                 curLevel = 0;
 
                 // swap ping pong images
@@ -139,9 +147,13 @@ namespace OpenTKImageViewer.ImageContext
                 ++curParameter;
             }
 
-            public int CurrentStep()
+            public float CurrentStep()
             {
-                return numExecuted;
+                float extraSteps = 0.0f;
+                if (curStepable != null)
+                    extraSteps += curStepable.CurrentStep();
+
+                return ((float)numExecuted + extraSteps) / GetNumSteps();
             }
 
             public int GetNumSteps()
@@ -153,6 +165,14 @@ namespace OpenTKImageViewer.ImageContext
                     iterations += numIterations * context.GetNumMipmaps() * context.GetNumLayers();
                 }
                 return iterations;
+            }
+
+            public string GetDescription()
+            {
+                if (!HasStep())
+                    return "";
+                var p = settings[curParameter];
+                return "executing " + p.Shader.Name;
             }
         }
 

@@ -235,6 +235,7 @@ namespace OpenTKImageViewer
                     glhelper.Utility.GLCheck();
 
                     imageViews[CurrentView]?.Draw();
+                    glControl.SwapBuffers();
                 }
                 else
                 {
@@ -249,10 +250,10 @@ namespace OpenTKImageViewer
                     glhelper.Utility.GLCheck();
                     RedrawFrame();
                     progressWindow.SetProgress(Context.GetImageProcess());
+                    progressWindow.SetDescription(Context.GetImageLoadingDescription());
+                    //GL.Finish();
+                    GL.Flush();
                 }
-
-                glhelper.Utility.GLCheck();
-                glControl.SwapBuffers();
             }
             catch (Exception exception)
             {

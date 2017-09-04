@@ -10,7 +10,8 @@ namespace OpenTKImageViewer.Utility
     {
         bool HasStep();
         void NextStep();
-        int CurrentStep();
+        float CurrentStep();
         int GetNumSteps();
+        string GetDescription();
     }
 }

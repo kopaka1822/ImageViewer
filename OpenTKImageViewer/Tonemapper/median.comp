@@ -2,9 +2,9 @@
 #setting description, Removes noise from an image.
 #setting sepa, true
 
-#param Radius, 1, Int, 5, 1, 50
+#param Radius, 2, Int, 5, 1, 50
 
-layout(location = 1) uniform int radius;
+layout(location = 2) uniform int radius;
 
 float get(vec4 color)
 {
@@ -41,7 +41,7 @@ int doti(ivec2 x, ivec2 y)
 			
 void main()
 {
-	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy);
+	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
 	ivec2 imgSize = imageSize(src_image);
 	if(pixelCoord.x < imgSize.x && pixelCoord.y < imgSize.y)
 	{

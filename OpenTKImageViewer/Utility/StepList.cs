@@ -28,14 +28,19 @@ namespace OpenTKImageViewer.Utility
             }
         }
 
-        public int CurrentStep()
+        public float CurrentStep()
         {
-            return numExecuted;
+            return (float)numExecuted / GetNumSteps();
         }
 
         public int GetNumSteps()
         {
             return Steps.Sum(stepable => stepable.GetNumSteps());
+        }
+
+        public string GetDescription()
+        {
+            return "";
         }
     }
 }
