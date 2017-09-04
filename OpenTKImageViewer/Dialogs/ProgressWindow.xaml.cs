@@ -14,17 +14,25 @@ using System.Windows.Shapes;
 
 namespace OpenTKImageViewer.Dialogs
 {
+    public delegate void OperationAbortHandler(object sender, EventArgs e);
+
     /// <summary>
     /// Interaction logic for ProgressWindow.xaml
     /// </summary>
     public partial class ProgressWindow : Window
     {
+        public event OperationAbortHandler Abort;
+
         public ProgressWindow()
         {
             InitializeComponent();
             this.Topmost = true;
         }
 
+        /// <summary>
+        /// sets the progress bar on a range from 0.0 to 1.0
+        /// </summary>
+        /// <param name="percent">[0,1]</param>
         public void SetProgress(double percent)
         {
             percent = Math.Max(0.0, Math.Min(1.0, percent));
@@ -34,6 +42,24 @@ namespace OpenTKImageViewer.Dialogs
         public void SetDescription(string text)
         {
             TextDescription.Text = text;
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            if(ProgressBar.Value < 100.0f)
+                OnAbort();
+
+            base.OnClosed(e);
+        }
+
+        protected virtual void OnAbort()
+        {
+            Abort?.Invoke(this, EventArgs.Empty);
         }
     }
 }

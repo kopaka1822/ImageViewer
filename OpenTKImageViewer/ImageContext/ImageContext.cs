@@ -84,6 +84,7 @@ namespace OpenTKImageViewer.ImageContext
                 OnChangedGrayscale();
             }
         }
+
         public uint ActiveMipmap
         {
             get { return activeMipmap; }
@@ -180,11 +181,14 @@ namespace OpenTKImageViewer.ImageContext
         #region Public Methods
 
         /// <summary>
-        /// trues to add the image. Throws Exception if image could not be added
+        /// tries to add the image. Throws Exception if image could not be added
         /// </summary>
         /// <param name="image"></param>
         public void AddImage(ImageLoader.Image image)
         {
+            if(IsImageProcessing())
+                throw new Exception("Images cannot be added while an operation is running");
+
             // only add if layout is consistent
             if (images.Count > 0)
             {
@@ -287,6 +291,19 @@ namespace OpenTKImageViewer.ImageContext
             if (tonemappingStepable == null)
                 return "";
             return tonemappingStepable.GetDescription();
+        }
+
+        public bool IsImageProcessing()
+        {
+            return tonemappingStepable != null;
+        }
+
+        public void AbortImageProcessing()
+        {
+            if (!IsImageProcessing()) return;
+
+            // TODO restore old image?
+            tonemappingStepable = null;
         }
 
         #endregion

@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
         mc:Ignorable="d"
-        Title="Operation Running..." Height="150" Width="300"
+        Title="Operation Running..." 
+        Height="160" 
+        Width="300"
         ResizeMode="NoResize">
     <Border Padding="5">
         <StackPanel>
@@ -18,9 +20,13 @@
                          Height="20"
                          Margin="0 0 0 10"
                          x:Name="ProgressBar"/>
-            <TextBlock Text="Task 5/7"
+            <TextBlock Text="executing ..."
                        x:Name="TextDescription"
                        TextWrapping="Wrap"/>
+            <Button Content="_Abort" 
+                    Width="70" 
+                    HorizontalAlignment="Right" 
+                    Click="ButtonBase_OnClick"/>
         </StackPanel>
     </Border>
 </Window>

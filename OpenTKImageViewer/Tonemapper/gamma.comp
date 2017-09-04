@@ -1,4 +1,4 @@
-#setting title, Gamme Correction
+#setting title, Gamma Correction
 #setting description, Nonlinear operation used to encode and decode luminance or tristimulus values in video or still image systems. Formula: Factor * (V ^ Gamma).
 
 #param Gamma, 3, float, 0.45454545, 0

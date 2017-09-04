@@ -53,6 +53,14 @@ namespace OpenTKImageViewer
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
+        public static void ShowInfoDialog(Window owner, string message)
+        {
+            if (owner != null)
+                MessageBox.Show(owner, message, "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            else
+                MessageBox.Show(message, "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
         public void SpawnWindow(string filename)
         {
             if (filename != null)

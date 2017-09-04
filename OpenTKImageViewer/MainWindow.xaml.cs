@@ -227,6 +227,8 @@ namespace OpenTKImageViewer
                     glhelper.Utility.GLCheck();
                     if (progressWindow != null)
                     {
+                        // should be finished
+                        progressWindow.SetProgress(1.0f);
                         progressWindow.Close();
                         progressWindow = null;
                         EnableWindowInteractions();
@@ -248,6 +250,12 @@ namespace OpenTKImageViewer
                         DisableWindowInteractions();
 
                         progressWindow.SetDescription("applying tonemappers");
+
+                        progressWindow.Abort += (o, args) =>
+                        {
+                            Context.AbortImageProcessing();
+                            App.ShowInfoDialog((TonemapDialog==null)?(Window)this:(Window)TonemapDialog, "Operation aborted. The displayed picture may contain errors.");
+                        };
                     }
                     
                     // image is not ready yet
