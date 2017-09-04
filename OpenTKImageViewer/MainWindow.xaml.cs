@@ -30,6 +30,8 @@ using OpenTKImageViewer.ImageContext;
 using OpenTKImageViewer.UI;
 using OpenTKImageViewer.View;
 using BeginMode = OpenTK.Graphics.OpenGL.BeginMode;
+using DataFormats = System.Windows.DataFormats;
+using DragEventArgs = System.Windows.DragEventArgs;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MatrixMode = OpenTK.Graphics.OpenGL.MatrixMode;
 using MessageBox = System.Windows.MessageBox;
@@ -157,6 +159,12 @@ namespace OpenTKImageViewer
                 glControl.MouseDown += (o, args) => WinFormsHost_OnMouseDown(args);
                 glControl.MouseUp += (o, args) => WinFormsHost_OnMouseUp(args);
                 glControl.MouseLeave += (o, args) => WinFormsHost_OnMouseLeave(args);
+                glControl.DragDrop += (o, args) => WinFormsHost_OnDrop(args);
+                glControl.DragOver += (o, args) =>
+                {
+                    args.Effect = System.Windows.Forms.DragDropEffects.Copy;
+                };
+                glControl.AllowDrop = true;
             }
             catch (Exception exception)
             {
@@ -299,6 +307,18 @@ namespace OpenTKImageViewer
             IsEnabled = true;
         }
 
+        private void WinFormsHost_OnDrop(System.Windows.Forms.DragEventArgs args)
+        {
+            if (args.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])args.Data.GetData(DataFormats.FileDrop);
+
+                if (files != null)
+                    foreach (var file in files)
+                        ImportOrOpenImage(file);
+            }
+        }
+
         // mouse tracking
         public Point MousePosition { get; private set; } = new Point();
         private bool mouseDown = false;
@@ -389,27 +409,63 @@ namespace OpenTKImageViewer
 
         #region FILE
 
+        private void ImportOrOpenImage(string filename)
+        {
+            List<ImageLoader.Image> images;
+            try
+            {
+                images = ImageLoader.LoadImage(filename);
+            }
+            catch (Exception e)
+            {
+                App.ShowErrorDialog(this, e.Message);
+                return;
+            }
+
+            // import if format is correct
+            try
+            {
+                ImportImage(images);
+            }
+            catch (Exception)
+            {
+                parent.SpawnWindow(images);
+            }
+        }
+
+        /// <summary>
+        /// tries to import the image. throws error on failure
+        /// </summary>
+        /// <param name="images"></param>
+        private void ImportImage(List<ImageLoader.Image> images)
+        {
+            bool resetViews = Context.GetNumImages() == 0;
+            foreach (var image in images)
+            {
+                Context.AddImage(image);
+            }
+
+            if (Context.GetNumImages() > 1)
+                parent.OpenDialog(App.UniqueDialog.Image);
+
+
+            if (resetViews)
+            {
+                imageViews.Clear();
+                CreateImageViews();
+            }
+        }
+
+        /// <summary>
+        /// tries to import the image. displays dialog on failure
+        /// </summary>
+        /// <param name="filename"></param>
         private void ImportImage(string filename)
         {
             try
             {
-                bool resetViews = Context.GetNumImages() == 0;
-
                 var images = ImageLoader.LoadImage(filename);
-                foreach (var image in images)
-                {
-                    Context.AddImage(image);
-                }
-
-                if (Context.GetNumImages() > 1)
-                    parent.OpenDialog(App.UniqueDialog.Image);
-                
-
-                if (resetViews)
-                {
-                    imageViews.Clear();
-                    CreateImageViews();
-                }
+                ImportImage(images);
             }
             catch (Exception exception)
             {
@@ -737,5 +793,7 @@ namespace OpenTKImageViewer
             glControl?.MakeCurrent();
             EnableDebugCallback();
         }
+
+
     }
 }

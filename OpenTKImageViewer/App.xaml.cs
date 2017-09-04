@@ -33,7 +33,7 @@ namespace OpenTKImageViewer
             base.OnStartup(e);
             if (e.Args.Length == 0)
             {
-                SpawnWindow(null);
+                SpawnWindow((string)null);
             }
             else
             {
@@ -70,15 +70,7 @@ namespace OpenTKImageViewer
                 {
                     var images = ImageLoader.LoadImage(filename);
 
-                    var wnd = new MainWindow(this, new ImageContext.ImageContext(images));
-                    activeWindow = wnd;
-                    openWindows.Add(wnd);
-
-                    wnd.Show();
-
-                    // open relevant dialoges
-                    if (wnd.Context.GetNumImages() > 1)
-                        OpenDialog(UniqueDialog.Image);
+                    SpawnWindow(images);
                 }
                 catch (Exception e)
                 {
@@ -96,6 +88,23 @@ namespace OpenTKImageViewer
 
                 wnd.Show();
             }
+        }
+
+        /// <summary>
+        /// opens a window with the provided images
+        /// </summary>
+        /// <param name="images"></param>
+        public void SpawnWindow(List<ImageLoader.Image> images)
+        {
+            var wnd = new MainWindow(this, new ImageContext.ImageContext(images));
+            activeWindow = wnd;
+            openWindows.Add(wnd);
+
+            wnd.Show();
+
+            // open relevant dialoges
+            if (wnd.Context.GetNumImages() > 1)
+                OpenDialog(UniqueDialog.Image);
         }
 
         public void UnregisterWindow(MainWindow window)

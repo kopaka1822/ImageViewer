@@ -65,6 +65,7 @@
                               Initialized="WinFormsHost_OnInitialized"
                               SizeChanged="WinFormsHost_OnSizeChanged"
                               Focusable="True"
+                              AllowDrop="True"
             />
             
             <!-- STATUS BAR -->
