@@ -279,7 +279,7 @@ namespace OpenTKImageViewer.ImageContext
         {
             if (tonemappingStepable == null)
                 return 1.0f;
-            return (float)tonemappingStepable.CurrentStep() / tonemappingStepable.GetNumSteps();
+            return (float)tonemappingStepable.CurrentStep();
         }
 
         public string GetImageLoadingDescription()

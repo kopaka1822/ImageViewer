@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
         mc:Ignorable="d"
-        Title="ProgressWindow" Height="150" Width="300"
+        Title="Operation Running..." Height="150" Width="300"
         ResizeMode="NoResize">
     <Border Padding="5">
         <StackPanel>

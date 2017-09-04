@@ -229,6 +229,7 @@ namespace OpenTKImageViewer
                     {
                         progressWindow.Close();
                         progressWindow = null;
+                        EnableWindowInteractions();
                     }
 
                     imageViews[CurrentView]?.Update(this);
@@ -243,6 +244,9 @@ namespace OpenTKImageViewer
                     {
                         progressWindow = new ProgressWindow();
                         progressWindow.Show();
+                        // disable all interactions with open windows
+                        DisableWindowInteractions();
+
                         progressWindow.SetDescription("applying tonemappers");
                     }
                     
@@ -251,8 +255,8 @@ namespace OpenTKImageViewer
                     RedrawFrame();
                     progressWindow.SetProgress(Context.GetImageProcess());
                     progressWindow.SetDescription(Context.GetImageLoadingDescription());
-                    //GL.Finish();
-                    GL.Flush();
+                    GL.Finish();
+                    //GL.Flush();
                 }
             }
             catch (Exception exception)
@@ -263,6 +267,7 @@ namespace OpenTKImageViewer
 
         }
 
+
         private void WinFormsHost_OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
             RedrawFrame();
@@ -271,6 +276,20 @@ namespace OpenTKImageViewer
         #endregion
 
         #region WINDOW INTERACTION
+
+        private void DisableWindowInteractions()
+        {
+            if (TonemapDialog != null)
+                TonemapDialog.IsEnabled = false;
+            IsEnabled = false;
+        }
+
+        private void EnableWindowInteractions()
+        {
+            if (TonemapDialog != null)
+                TonemapDialog.IsEnabled = true;
+            IsEnabled = true;
+        }
 
         // mouse tracking
         public Point MousePosition { get; private set; } = new Point();
