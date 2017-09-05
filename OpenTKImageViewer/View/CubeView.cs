@@ -70,13 +70,13 @@ namespace OpenTKImageViewer.View
 
         public override void OnDrag(Vector diff, MainWindow window)
         {
-            pitch += (float)diff.X * 0.01f;
-            roll += (float)diff.Y * 0.01f;
+            pitch += (float)diff.X * 0.01f / zoom;
+            roll += (float)diff.Y * 0.01f / zoom;
         }
 
         public override void OnScroll(double diff, Point mouse)
         {
-            zoom = (float) Math.Min(Math.Max(zoom * (1.0 + (diff * 0.001)), 0.1), 100.0);
+            zoom = (float) Math.Min(Math.Max(zoom * (1.0 + (diff * 0.001)), 0.5), 100.0);
         }
     }
 }
