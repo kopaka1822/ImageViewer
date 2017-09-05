@@ -52,7 +52,7 @@ namespace OpenTKImageViewer.View.Shader
                    "layout(location = 0) uniform mat4 transform;\n" +
                    "layout(location = 2) uniform float farplane;\n" +
                    // out
-                   "layout(location = 0) out vec3 viewDir;" +
+                   "layout(location = 0) out vec3 viewDir;\n" +
 
                    "void main(void){\n" +
                    "vec4 vertex = vec4(0.0, 0.0, 0.0, 1.0);" +

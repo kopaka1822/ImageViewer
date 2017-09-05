@@ -14,6 +14,7 @@ namespace OpenTKImageViewer.View
     {
         private ImageContext.ImageContext context;
         private CubeViewShader shader;
+        private Matrix4 aspectRatio;
         private float yawn = 0.0f;
         private float pitch = 0.0f;
         private float roll = 0.0f;
@@ -34,6 +35,8 @@ namespace OpenTKImageViewer.View
             base.Update(window);
             window.StatusBar.LayerMode = StatusBarControl.LayerModeType.All;
 
+            aspectRatio = GetAspectRatio(window.GetClientWidth(), window.GetClientHeight());
+
             if(shader == null)
                 Init();
         }
@@ -41,7 +44,7 @@ namespace OpenTKImageViewer.View
         public override void Draw()
         {
             shader.Bind(context);
-            shader.SetTransform(GetRotation() * GetOrientation());
+            shader.SetTransform(aspectRatio * GetRotation() * GetOrientation());
             shader.SetFarplane(zoom);
             shader.SetLevel((float)context.ActiveMipmap);
             shader.SetGrayscale(context.Grayscale);
@@ -58,6 +61,11 @@ namespace OpenTKImageViewer.View
         private Matrix4 GetOrientation()
         {
             return Matrix4.CreateScale(1.0f, -1.0f, 1.0f);
+        }
+
+        public Matrix4 GetAspectRatio(float clientWidth, float clientHeight)
+        {
+            return Matrix4.CreateScale(clientWidth / clientHeight, 1.0f, 1.0f);
         }
 
         public override void OnDrag(Vector diff, MainWindow window)
