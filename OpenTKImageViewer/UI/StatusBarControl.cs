@@ -85,6 +85,10 @@ namespace OpenTKImageViewer.UI
             window.TextMousePosition.Text = $"{x}, {y}";
         }
 
+        /// <summary>
+        /// mouse coordinates in range [-1.0, 1.0]
+        /// </summary>
+        /// <returns></returns>
         public Point GetCanonicalMouseCoordinates()
         {
             var p = new Point(window.MousePosition.X / window.GetClientWidth(), 1.0f - window.MousePosition.Y / window.GetClientHeight());

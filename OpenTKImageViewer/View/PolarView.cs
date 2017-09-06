@@ -46,7 +46,7 @@ namespace OpenTKImageViewer.View
         {
             // bind the shader?
             shader.Bind(context);
-            shader.SetTransform(aspectRatio * GetRotation() * GetOrientation());
+            shader.SetTransform(GetTransform());
             shader.SetLevel((float)context.ActiveMipmap);
             shader.SetLayer((float)context.ActiveLayer);
             shader.SetFarplane(zoom);
@@ -55,6 +55,11 @@ namespace OpenTKImageViewer.View
 
             // draw via vertex array
             base.Draw();
+        }
+
+        private Matrix4 GetTransform()
+        {
+            return aspectRatio * GetRotation() * GetOrientation();
         }
 
         private Matrix4 GetRotation()
@@ -83,5 +88,34 @@ namespace OpenTKImageViewer.View
             zoom = (float)Math.Min(Math.Max(zoom * (1.0 + (diff * 0.001)), 0.5), 100.0);
         }
 
+        public override void UpdateMouseDisplay(MainWindow window)
+        {
+            var mousePoint = window.StatusBar.GetCanonicalMouseCoordinates();
+
+            // Matrix Coordinate system is reversed (left handed)
+            var viewDir = (new Vector4((float)mousePoint.X, (float)mousePoint.Y, zoom, 0.0f)) * (GetTransform() * GetLeftHandedOrientation());
+            viewDir.Normalize();
+
+            // determine pixel coordinate from view dir
+            Vector2 polarDirection = new Vector2();
+            // t computation
+            polarDirection.Y = (float) (Math.Acos(viewDir.Y) / Math.PI);
+
+            // s computation
+            var normalizedDirection = new Vector3(viewDir.X, 0.0f, viewDir.Z).Normalized();
+            if (normalizedDirection.X >= 0)
+                polarDirection.X = (float) (Math.Acos(-normalizedDirection.Z) / (2.0 * Math.PI));
+            else
+                polarDirection.X = (float) ((Math.Acos(normalizedDirection.Z) + Math.PI) / (2.0 * Math.PI));
+ 
+            //window.StatusBar.SetMouseCoordinates((int)(mousePoint.X * 100.0), (int)(mousePoint.Y * 100.0));
+            window.StatusBar.SetMouseCoordinates((int)(polarDirection.X * context.GetWidth((int)context.ActiveMipmap)), 
+                (int)(polarDirection.Y * context.GetHeight((int)context.ActiveMipmap)));
+        }
+
+        private Matrix4 GetLeftHandedOrientation()
+        {
+            return Matrix4.CreateScale(1.0f, -1.0f, 1.0f);
+        }
     }
 }

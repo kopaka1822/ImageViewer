@@ -44,13 +44,18 @@ namespace OpenTKImageViewer.View
         public override void Draw()
         {
             shader.Bind(context);
-            shader.SetTransform(aspectRatio * GetRotation() * GetOrientation());
+            shader.SetTransform(GetTransform());
             shader.SetFarplane(zoom);
             shader.SetLevel((float)context.ActiveMipmap);
             shader.SetGrayscale(context.Grayscale);
             context.BindFinalTextureAsCubeMap(shader.GetTextureLocation());
             // draw via vertex array
             base.Draw();
+        }
+
+        public Matrix4 GetTransform()
+        {
+            return aspectRatio * GetRotation() * GetOrientation();
         }
 
         private Matrix4 GetRotation()
@@ -77,6 +82,18 @@ namespace OpenTKImageViewer.View
         public override void OnScroll(double diff, Point mouse)
         {
             zoom = (float) Math.Min(Math.Max(zoom * (1.0 + (diff * 0.001)), 0.5), 100.0);
+        }
+
+        public override void UpdateMouseDisplay(MainWindow window)
+        {
+            var mousePoint = window.StatusBar.GetCanonicalMouseCoordinates();
+
+            var viewDir = GetTransform() * new Vector4((float)mousePoint.X, (float)mousePoint.Y, zoom, 0.0f);
+            viewDir.Normalize();
+
+            // TODO determine pixel coordinate from view dir
+
+            window.StatusBar.SetMouseCoordinates((int)(viewDir.X * 100), (int)(viewDir.Y * 100));
         }
     }
 }
