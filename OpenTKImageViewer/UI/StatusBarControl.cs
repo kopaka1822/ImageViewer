@@ -15,6 +15,7 @@ namespace OpenTKImageViewer.UI
         {
             All,
             Single,
+            SingleDeactivated,
             None
         }
 
@@ -125,26 +126,29 @@ namespace OpenTKImageViewer.UI
         private void UpdateLayerBox()
         {
             window.ComboBoxLayer.Items.Clear();
+
             switch (LayerMode)
             {
                 case LayerModeType.All:
                     window.ComboBoxLayer.Items.Add(new ComboBoxItem { Content = "All Layer"});
                     break;
+                case LayerModeType.SingleDeactivated:
                 case LayerModeType.Single:
                     var selectedLayer = window.Context.ActiveLayer;
                     for (int i = 0; i < window.Context.GetNumLayers(); ++i)
                         window.ComboBoxLayer.Items.Add(new ComboBoxItem {Content = "Layer " + i});
                     window.Context.ActiveLayer = selectedLayer;
-                    window.ComboBoxLayer.SelectedIndex = (int)selectedLayer;
+                    window.ComboBoxLayer.SelectedIndex = (int) selectedLayer;
                     break;
                 case LayerModeType.None:
                     window.ComboBoxLayer.Items.Add(new ComboBoxItem {Content = "No Layer"});
                     break;
             }
+
             window.ComboBoxLayer.IsEnabled = true;
             if (window.ComboBoxLayer.Items.Count == 1)
                 window.ComboBoxLayer.SelectedIndex = 0;
-            window.ComboBoxLayer.IsEnabled = window.ComboBoxLayer.Items.Count >= 2;
+            window.ComboBoxLayer.IsEnabled = window.ComboBoxLayer.Items.Count >= 2 && LayerMode != LayerModeType.SingleDeactivated;
         }
 
         private void UpdateMipmapBox()
