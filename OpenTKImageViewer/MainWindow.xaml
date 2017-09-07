@@ -15,7 +15,7 @@
         Deactivated="MainWindow_OnDeactivated"
         Icon="Icons/app.png">
     <DockPanel>
-    <!--<StackPanel>-->
+        <!--<StackPanel>-->
         <Menu DockPanel.Dock="Top" Background="#fff" Padding="0 0 0 2">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Click="MenuItem_Click_Open">
@@ -38,8 +38,6 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="_View">
-                <!--<MenuItem Header="3D View"/>
-                <MenuItem Header="3D Dice"/>-->
                 <MenuItem Header="Linear Interpolation" x:Name="MenuItemLinearInterpolation" IsCheckable="True" Click="MenuItem_OnChecked_LinearFiltering"/>
                 <MenuItem Header="_Grayscale">
                     <MenuItem Header="_Disabled" x:Name="MenuItemGrayscaleDisabled" IsChecked="True" Click="MenuItem_OnChecked_Grayscale"/>
@@ -47,6 +45,14 @@
                     <MenuItem Header="_Green" x:Name="MenuItemGrayscaleGreen" IsCheckable="True" Click="MenuItem_OnChecked_Grayscale"/>
                     <MenuItem Header="_Blue" x:Name="MenuItemGrayscaleBlue" IsCheckable="True" Click="MenuItem_OnChecked_Grayscale"/>
                     <MenuItem Header="_Alpha" x:Name="MenuItemGrayscaleAlpha" IsCheckable="True" Click="MenuItem_OnChecked_Grayscale"/>
+                    <MenuItem.Icon>
+                        <Image Source="Icons/grayscale.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Pixel Display">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/eyedropper.png"/>
+                    </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="_Windows">
@@ -56,6 +62,10 @@
         </Menu>
 
         <Grid DockPanel.Dock="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="67*"/>
+            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -65,11 +75,11 @@
                               Initialized="WinFormsHost_OnInitialized"
                               SizeChanged="WinFormsHost_OnSizeChanged"
                               Focusable="True"
-                              AllowDrop="True"
+                              AllowDrop="True" Grid.ColumnSpan="2"
             />
-            
+
             <!-- STATUS BAR -->
-            <StatusBar Grid.Row="1" BorderBrush="DarkGray" BorderThickness="0 1 0 0">
+            <StatusBar Grid.Row="1" BorderBrush="DarkGray" BorderThickness="0 1 0 0" Grid.ColumnSpan="2">
                 <!-- MOUSE POSITION -->
                 <StatusBarItem Width="100" HorizontalAlignment="Left" BorderBrush="DarkGray" BorderThickness="0 0 1 0">
                     <Grid>
