@@ -30,10 +30,12 @@ using OpenTKImageViewer.ImageContext;
 using OpenTKImageViewer.UI;
 using OpenTKImageViewer.View;
 using BeginMode = OpenTK.Graphics.OpenGL.BeginMode;
+using ContextMenu = System.Windows.Forms.ContextMenu;
 using DataFormats = System.Windows.DataFormats;
 using DragEventArgs = System.Windows.DragEventArgs;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MatrixMode = OpenTK.Graphics.OpenGL.MatrixMode;
+using MenuItem = System.Windows.Controls.MenuItem;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
@@ -165,6 +167,11 @@ namespace OpenTKImageViewer
                     args.Effect = System.Windows.Forms.DragDropEffects.Copy;
                 };
                 glControl.AllowDrop = true;
+
+                // create context menu
+                glControl.ContextMenu = new ContextMenu();
+                var item = glControl.ContextMenu.MenuItems.Add("Copy RGBA");
+                
             }
             catch (Exception exception)
             {
@@ -599,6 +606,12 @@ namespace OpenTKImageViewer
                 Context.Grayscale = ImageContext.ImageContext.GrayscaleMode.Alpha;
         }
 
+        private void MenuItem_Click_PixelDisplay(object sender, RoutedEventArgs e)
+        {
+            var dia = new PixelDisplayWindow(this);
+            dia.ShowDialog();
+        }
+
         #endregion
 
         #region WINDOWS
@@ -793,7 +806,5 @@ namespace OpenTKImageViewer
             glControl?.MakeCurrent();
             EnableDebugCallback();
         }
-
-
     }
 }

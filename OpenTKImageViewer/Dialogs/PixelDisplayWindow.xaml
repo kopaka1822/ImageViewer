@@ -1,0 +1,64 @@
+﻿<Window x:Class="OpenTKImageViewer.Dialogs.PixelDisplayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="Pixel Display" Height="160" Width="200"
+        ResizeMode="NoResize" Background="#eee"
+        Icon="../Icons/app.png">
+    <Border Padding="5">
+        <StackPanel>
+            <!-- FORMAT -->
+            <Grid Margin="0 0 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Format:"/>
+                <ComboBox Grid.Column="1" 
+                          x:Name="BoxFormat"
+                          SelectedIndex="0">
+                    <ComboBoxItem Content="8 bit"/>
+                    <ComboBoxItem Content="decimal"/>
+                </ComboBox>
+            </Grid>
+            
+            <!-- Alpha -->
+            <Grid Margin="0 0 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Show Alpha:"/>
+                <CheckBox Grid.Column="1"
+                          x:Name="BoxAlpha"/>
+            </Grid>
+
+            <!-- Radius -->
+            <Grid Margin="0 0 0 15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Radius:"/>
+                <xctk:IntegerUpDown Grid.Column="1" 
+                                    Value="0"
+                                    x:Name="NumRadius"
+                                    Minimum="0"/>
+            </Grid>
+
+            <!-- Buttons -->
+            <Grid HorizontalAlignment="Right">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Content="_Apply" Margin="0 0 10 0" Width="60" Click="Apply_OnClick"/>
+                <Button Grid.Column="1" Content="_Cancel" Width="60" Click="Cancel_OnClick"/>
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>

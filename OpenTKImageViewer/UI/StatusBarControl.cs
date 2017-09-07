@@ -20,12 +20,19 @@ namespace OpenTKImageViewer.UI
             None
         }
 
+        public enum PixelDisplayType
+        {
+            Bit,
+            Float
+        }
+
         class ModeBoxItem : ComboBoxItem
         {
             public ImageViewType ViewType { get; set; }
         }
 
         private readonly MainWindow window;
+        private int pixelRadius = 0;
 
         private LayerModeType layerMode = LayerModeType.None;
         public LayerModeType LayerMode
@@ -38,6 +45,18 @@ namespace OpenTKImageViewer.UI
                 SetLayerDisplay((int)window.Context.ActiveLayer);
             }
         }
+        public PixelDisplayType PixelDisplay { get; set; } = PixelDisplayType.Bit;
+        public int PixelRadius
+        {
+            get => pixelRadius;
+            set
+            {
+                if (value >= 1)
+                    pixelRadius = value;
+            }
+        }
+
+        public bool PixelShowAlpha { get; set; } = false;
 
         public StatusBarControl(MainWindow window)
         {
@@ -87,17 +106,28 @@ namespace OpenTKImageViewer.UI
             window.TextMousePosition.Text = $"{x}, {y}";
             if (window.Context.CpuCachedTexture != null)
             {
-                var color =
-                    window.Context.CpuCachedTexture.GetPixel(x, y, (int)window.Context.ActiveLayer,
-                        (int)window.Context.ActiveMipmap);
-                window.TextMousePositionColor.Text = GetColorString(color);
+                window.TextMousePositionColor.Text = GetColorString(GetPixelColor(x,y));
             }
+        }
+
+        private Vector4 GetPixelColor(int x, int y)
+        {
+            var sum = new Vector4(0.0f);
+            for(var curX = x - PixelRadius; curX < x + PixelRadius + 1; ++curX)
+            for (var curY = y - PixelRadius; curY < y + PixelRadius + 1; ++curY)
+                sum += window.Context.CpuCachedTexture.GetPixel(curX, curY, (int) window.Context.ActiveLayer,
+                    (int) window.Context.ActiveMipmap);
+
+            var w = 1 + 2 * PixelRadius;
+            return sum / (w * w);
         }
 
         private string GetColorString(Vector4 v)
         {
-            //return $"{v.X:0.00} {v.Y:0.00} {v.Z:0.00}";
-            return $"{(int)(v.X * 255.0f)} {(int)(v.Y * 255.0f)} {(int)(v.Z * 255.0f)}";
+            if(PixelDisplay == PixelDisplayType.Bit)
+                return $"{(int)(v.X * 255.0f)} {(int)(v.Y * 255.0f)} {(int)(v.Z * 255.0f)}" + (PixelShowAlpha?$" {(int)(v.W * 255.0f)}":"");
+
+            return $"{v.X:0.00} {v.Y:0.00} {v.Z:0.00}" + (PixelShowAlpha?$" {v.W:0.00}":"");
         }
 
         /// <summary>
