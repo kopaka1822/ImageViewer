@@ -81,7 +81,19 @@
                         <TextBlock x:Name="TextMousePosition" Text="0, 0" Grid.Column="1"/>
                     </Grid>
                 </StatusBarItem>
-                
+
+                <!-- MOUSE POSITION COLOR -->
+                <StatusBarItem Width="125" HorizontalAlignment="Left" BorderBrush="DarkGray" BorderThickness="0 0 1 0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Source="Icons/eyedropper.png" Width="16" Height="16" Margin="0 0 5 0"/>
+                        <TextBlock x:Name="TextMousePositionColor" Text="0.000 0.000 0.000" Grid.Column="1"/>
+                    </Grid>
+                </StatusBarItem>
+
                 <!-- Views -->
                 <StatusBarItem Width="150" HorizontalAlignment="Left" BorderBrush="DarkGray" BorderThickness="0 0 1 0">
                     <Grid>

@@ -63,6 +63,8 @@ namespace OpenTKImageViewer.glhelper
         private Vector4 GetPixelRaw(int x, int y, int face, int level)
         {
             var ldata = pixels[level];
+            // pictures are upside down
+            y = ldata.Height - y - 1;
             var faceSize = ldata.Width * ldata.Height * 4;
             int idx = faceSize * face + (y * ldata.Width + x) * 4;
             return new Vector4(ldata.Pixels[idx], ldata.Pixels[idx + 1], ldata.Pixels[idx + 2], ldata.Pixels[idx + 3]);

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using OpenTK;
 using OpenTKImageViewer.View;
 
 namespace OpenTKImageViewer.UI
@@ -84,6 +85,19 @@ namespace OpenTKImageViewer.UI
         public void SetMouseCoordinates(int x, int y)
         {
             window.TextMousePosition.Text = $"{x}, {y}";
+            if (window.Context.CpuCachedTexture != null)
+            {
+                var color =
+                    window.Context.CpuCachedTexture.GetPixel(x, y, (int)window.Context.ActiveLayer,
+                        (int)window.Context.ActiveMipmap);
+                window.TextMousePositionColor.Text = GetColorString(color);
+            }
+        }
+
+        private string GetColorString(Vector4 v)
+        {
+            //return $"{v.X:0.00} {v.Y:0.00} {v.Z:0.00}";
+            return $"{(int)(v.X * 255.0f)} {(int)(v.Y * 255.0f)} {(int)(v.Z * 255.0f)}";
         }
 
         /// <summary>
