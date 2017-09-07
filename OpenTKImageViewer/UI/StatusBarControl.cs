@@ -48,7 +48,7 @@ namespace OpenTKImageViewer.UI
 
             window.Context.ChangedLayer += (sender, args) => OnLayerChange();
             window.Context.ChangedMipmap += (sender, args) => OnMipmapChange();
-            // image loading => no  mipmaps to mipmap 0
+            // image loading => no mipmaps to mipmap 0
             window.Context.ChangedImages += (sender, args) => { OnMipmapChange(); UpdateMipmapBox(); };
 
             window.ComboBoxView.SelectionChanged += ComboBoxViewOnSelectionChanged;

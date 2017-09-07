@@ -144,6 +144,35 @@ namespace OpenTKImageViewer.glhelper
         }
 
         /// <summary>
+        /// retries data from all layers and wraps it around a cpu texture
+        /// </summary>
+        /// <param name="nLevel">number of levels</param>
+        /// <param name="nFaces">number of faces</param>
+        /// <returns></returns>
+        public CpuTexture GetFloatPixels(int nLevel, int nFaces)
+        {
+            var target = new CpuTexture(nLevel, nFaces);
+
+            GL.BindTexture(TextureTarget.Texture2DArray, id);
+
+            for (int level = 0; level < nLevel; ++level)
+            {
+                // retrieve width and height of the level
+                int width;
+                int height;
+                GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureWidth, out width);
+                GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureHeight, out height);
+                float[] buffer = new float[width * height * 4 * nFaces];
+
+                // get data
+                GL.GetTexImage(TextureTarget.Texture2DArray, level, PixelFormat.Rgba, PixelType.Float, buffer);
+                target.SetLevel(buffer, level, width, height);
+            }
+
+            return target;
+        }
+
+        /// <summary>
         /// reads data from gpu
         /// </summary>
         /// <param name="level">requested level</param>

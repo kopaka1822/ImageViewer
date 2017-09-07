@@ -114,6 +114,8 @@ namespace OpenTKImageViewer.ImageContext
         public ImageFormula ImageFormula1 { get; } = new ImageFormula();
         public TonemapperManager Tonemapper { get; } = new TonemapperManager();
 
+        public CpuTexture CpuCachedTexture { get; private set; } = null;
+
         #endregion
 
         #region Public Getter
@@ -271,6 +273,9 @@ namespace OpenTKImageViewer.ImageContext
                 {
                     // finished stepping
                     tonemappingStepable = null;
+
+                    // retrieve the complete image for the cpu
+                    CpuCachedTexture = textures[0].GetFloatPixels(GetNumMipmaps(), GetNumLayers());
                     return true;
                 }
                 return false;
