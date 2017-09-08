@@ -169,8 +169,8 @@ namespace OpenTKImageViewer
                 glControl.AllowDrop = true;
 
                 // create context menu
-                glControl.ContextMenu = new ContextMenu();
-                var item = glControl.ContextMenu.MenuItems.Add("Copy RGBA");
+                //glControl.ContextMenu = new ContextMenu();
+                //var item = glControl.ContextMenu.MenuItems.Add("Copy RGBA");
                 
             }
             catch (Exception exception)
@@ -270,6 +270,7 @@ namespace OpenTKImageViewer
                         {
                             Context.AbortImageProcessing();
                             App.ShowInfoDialog((TonemapDialog==null)?(Window)this:(Window)TonemapDialog, "Operation aborted. The displayed picture may contain errors.");
+                            EnableWindowInteractions();
                         };
                     }
                     
