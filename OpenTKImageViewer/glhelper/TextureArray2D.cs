@@ -153,6 +153,7 @@ namespace OpenTKImageViewer.glhelper
         {
             var target = new CpuTexture(nLevel, nFaces);
 
+            GL.BindTexture(TextureTarget.Texture2DArray, 0);
             GL.BindTexture(TextureTarget.Texture2DArray, id);
 
             for (int level = 0; level < nLevel; ++level)
@@ -168,6 +169,7 @@ namespace OpenTKImageViewer.glhelper
                 GL.GetTexImage(TextureTarget.Texture2DArray, level, PixelFormat.Rgba, PixelType.Float, buffer);
                 target.SetLevel(buffer, level, width, height);
             }
+            GL.BindTexture(TextureTarget.Texture2DArray, 0);
 
             return target;
         }

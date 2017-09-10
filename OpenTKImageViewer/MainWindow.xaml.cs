@@ -191,7 +191,7 @@ namespace OpenTKImageViewer
         {
             //string str = Marshal.PtrToStringAuto(message, length);
             string str = Marshal.PtrToStringAnsi(message, length);
-            MessageBox.Show(str);
+            App.ShowErrorDialog(null, str);
         }
 
         /// <summary>
