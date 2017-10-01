@@ -126,7 +126,7 @@ namespace OpenTKImageViewer
                 }
                 else if (Context.GetNumLayers() == 1)
                 {
-                    imageViews.Add(ImageViewType.Polar, new PolarView(Context));
+                    imageViews.Add(ImageViewType.Polar, new PolarView(Context, BoxScroll));
                 }
             }
 
@@ -784,13 +784,13 @@ namespace OpenTKImageViewer
                     return; // not yet initialized
 
                 var text = BoxScroll.Text;
-                if (text.EndsWith("%"))
+                if (text.EndsWith("%") || text.EndsWith("°"))
                     text = text.Substring(0, text.Length - 1);
 
                 decimal dec;
                 if (Decimal.TryParse(text, out dec))
                 {
-                    imageViews[CurrentView]?.SetZoom((float)dec / 100.0f);
+                    imageViews[CurrentView]?.SetZoom((float)dec);
                     RedrawFrame();
                 }
                 e.Handled = true;

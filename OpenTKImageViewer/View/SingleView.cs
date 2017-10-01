@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace OpenTKImageViewer.View
         private SingleViewShader shader;
         private Matrix4 transform;
         private Matrix4 aspectRatio;
-        private TextBox boxScroll;
+        private readonly TextBox boxScroll;
 
         public SingleView(ImageContext.ImageContext context, TextBox boxScroll)
         {
@@ -42,7 +43,7 @@ namespace OpenTKImageViewer.View
 
             aspectRatio = GetAspectRatio(window.GetClientWidth(), window.GetClientHeight());
 
-            boxScroll.Text = Math.Round((Decimal)(transform[0, 0] * 100.0f), 2).ToString() + "%";
+            boxScroll.Text = Math.Round((Decimal)(transform[0, 0] * 100.0f), 2).ToString(CultureInfo.InvariantCulture) + "%";
 
             
         }
@@ -61,8 +62,13 @@ namespace OpenTKImageViewer.View
             window.StatusBar.SetMouseCoordinates((int)(transMouse.X), (int)(transMouse.Y));
         }
 
+        /// <summary>
+        /// set zoom in percent
+        /// </summary>
+        /// <param name="dec">zoom in percent</param>
         public override void SetZoom(float dec)
         {
+            dec *= 0.01f;
             dec = Math.Min(Math.Max(dec, 0.01f), 100.0f);
             transform[0, 0] = dec;
             transform[1, 1] = dec;
