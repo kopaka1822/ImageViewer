@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using OpenTK;
 using OpenTKImageViewer.UI;
 using OpenTKImageViewer.View.Shader;
@@ -19,10 +21,12 @@ namespace OpenTKImageViewer.View
         private float pitch = 0.0f;
         private float roll = 0.0f;
         private float zoom = 2.0f;
+        private readonly TextBox boxScroll;
 
-        public CubeView(ImageContext.ImageContext context)
+        public CubeView(ImageContext.ImageContext context, TextBox boxScroll)
         {
             this.context = context;
+            this.boxScroll = boxScroll;
         }
 
         private void Init()
@@ -39,6 +43,26 @@ namespace OpenTKImageViewer.View
 
             if(shader == null)
                 Init();
+
+            // recalculate zoom to degrees
+            var angle = 2.0 * Math.Atan(1.0 / (2.0 * (double)zoom));
+
+            boxScroll.Text = Math.Round((Decimal)(angle / Math.PI * 180.0), 2).ToString(CultureInfo.InvariantCulture) + "°";
+        }
+
+        public void SetZoomFarplane(float dec)
+        {
+            zoom = Math.Min(Math.Max(dec, 0.5f), 100.0f);
+        }
+
+        /// <summary>
+        /// set zoom in radians
+        /// </summary>
+        /// <param name="dec">desired angle in radians</param>
+        public override void SetZoom(float dec)
+        {
+            var degree = dec * Math.PI / 180.0;
+            SetZoomFarplane((float)(1.0 / (2.0 * Math.Tan(degree / 2.0))));
         }
 
         public override void Draw()
@@ -81,7 +105,7 @@ namespace OpenTKImageViewer.View
 
         public override void OnScroll(double diff, Point mouse)
         {
-            zoom = (float) Math.Min(Math.Max(zoom * (1.0 + (diff * 0.001)), 0.5), 100.0);
+            SetZoomFarplane((float)(zoom * (1.0 + (diff * 0.001))));
         }
 
         public override void UpdateMouseDisplay(MainWindow window)
