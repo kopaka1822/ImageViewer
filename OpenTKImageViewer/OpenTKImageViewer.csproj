@@ -132,6 +132,7 @@
     <Compile Include="View\EmptyView.cs" />
     <Compile Include="View\IImageView.cs" />
     <Compile Include="View\PolarView.cs" />
+    <Compile Include="View\Shader\CheckersShader.cs" />
     <Compile Include="View\Shader\CubeViewShader.cs" />
     <Compile Include="View\Shader\PolarViewShader.cs" />
     <Compile Include="View\VertexArrayView.cs" />

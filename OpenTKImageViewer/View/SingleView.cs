@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using OpenTK;
+using OpenTK.Graphics.OpenGL4;
 using OpenTKImageViewer.glhelper;
 using OpenTKImageViewer.UI;
 using OpenTKImageViewer.View.Shader;
@@ -17,6 +18,7 @@ namespace OpenTKImageViewer.View
     {
         private ImageContext.ImageContext context;
         private SingleViewShader shader;
+        private CheckersShader checkersShader;
         private Matrix4 transform;
         private Matrix4 aspectRatio;
         private readonly TextBox boxScroll;
@@ -31,6 +33,7 @@ namespace OpenTKImageViewer.View
         private void Init()
         {
             shader = new SingleViewShader();
+            checkersShader = new CheckersShader();
         }
 
         public override void Update(MainWindow window)
@@ -76,7 +79,13 @@ namespace OpenTKImageViewer.View
 
         public override void Draw()
         {
-            // bind the shader?
+            checkersShader.Bind(transform * aspectRatio);
+            base.Draw();
+            glhelper.Utility.GLCheck();
+
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+
             shader.Bind(context);
             shader.SetTransform(transform * aspectRatio);
             shader.SetLevel((float)context.ActiveMipmap);
@@ -89,6 +98,8 @@ namespace OpenTKImageViewer.View
             // draw via vertex array
             base.Draw();
             glhelper.Utility.GLCheck();
+
+            GL.Disable(EnableCap.Blend);
         }
 
         public Matrix4 GetAspectRatio(float clientWidth, float clientHeight)
