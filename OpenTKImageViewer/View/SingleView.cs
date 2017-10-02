@@ -96,7 +96,7 @@ namespace OpenTKImageViewer.View
             
 
             // draw via vertex array
-            base.Draw();
+            DeawQuad();
             glhelper.Utility.GLCheck();
 
             GL.Disable(EnableCap.Blend);

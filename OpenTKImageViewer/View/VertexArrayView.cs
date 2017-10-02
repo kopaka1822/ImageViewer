@@ -20,11 +20,16 @@ namespace OpenTKImageViewer.View
                 vertexArrayId = GL.GenVertexArray();
         }
 
-        public virtual void Draw()
+        protected void DeawQuad()
         {
             Debug.Assert(vertexArrayId != 0);
             GL.BindVertexArray(vertexArrayId);
             GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
+        }
+
+        public virtual void Draw()
+        {
+            
         }
 
         public virtual void OnDrag(Vector diff, MainWindow window)

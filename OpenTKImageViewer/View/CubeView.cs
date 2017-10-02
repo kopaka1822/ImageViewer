@@ -13,119 +13,52 @@ using OpenTKImageViewer.View.Shader;
 
 namespace OpenTKImageViewer.View
 {
-    public class CubeView : VertexArrayView
+    public class CubeView : ProjectionView
     {
-        private ImageContext.ImageContext context;
         private CubeViewShader shader;
-        private CheckersShader checkersShader;
-        private Matrix4 aspectRatio;
-        private float yawn = 0.0f;
-        private float pitch = 0.0f;
-        private float roll = 0.0f;
-        private float zoom = 2.0f;
-        private readonly TextBox boxScroll;
 
         public CubeView(ImageContext.ImageContext context, TextBox boxScroll)
+            :
+            base(context, boxScroll)
         {
-            this.context = context;
-            this.boxScroll = boxScroll;
         }
 
-        private void Init()
+        protected override void Init()
         {
+            base.Init();
             shader = new CubeViewShader();
-            checkersShader = new CheckersShader();
-        }
-
-        public override void Update(MainWindow window)
-        {
-            base.Update(window);
-            window.StatusBar.LayerMode = StatusBarControl.LayerModeType.SingleDeactivated;
-
-            aspectRatio = GetAspectRatio(window.GetClientWidth(), window.GetClientHeight());
-
-            if(shader == null)
-                Init();
-
-            // recalculate zoom to degrees
-            var angle = 2.0 * Math.Atan(1.0 / (2.0 * (double)zoom));
-
-            boxScroll.Text = Math.Round((Decimal)(angle / Math.PI * 180.0), 2).ToString(CultureInfo.InvariantCulture) + "°";
-        }
-
-        public void SetZoomFarplane(float dec)
-        {
-            zoom = Math.Min(Math.Max(dec, 0.5f), 100.0f);
-        }
-
-        /// <summary>
-        /// set zoom in radians
-        /// </summary>
-        /// <param name="dec">desired angle in radians</param>
-        public override void SetZoom(float dec)
-        {
-            var degree = dec * Math.PI / 180.0;
-            SetZoomFarplane((float)(1.0 / (2.0 * Math.Tan(degree / 2.0))));
         }
 
         public override void Draw()
         {
-            checkersShader.Bind(Matrix4.Identity);
-            base.Draw();
-            glhelper.Utility.GLCheck();
+            DrawCheckers();
 
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
 
-            shader.Bind(context);
+            shader.Bind(Context);
             shader.SetTransform(GetTransform());
-            shader.SetFarplane(zoom);
-            shader.SetLevel((float)context.ActiveMipmap);
-            shader.SetGrayscale(context.Grayscale);
-            context.BindFinalTextureAsCubeMap(shader.GetTextureLocation());
+            shader.SetFarplane(GetZoom());
+            shader.SetLevel((float)Context.ActiveMipmap);
+            shader.SetGrayscale(Context.Grayscale);
+            Context.BindFinalTextureAsCubeMap(shader.GetTextureLocation());
             // draw via vertex array
-            base.Draw();
+            DeawQuad();
 
             GL.Disable(EnableCap.Blend);
         }
 
-        public Matrix4 GetTransform()
-        {
-            return aspectRatio * GetRotation() * GetOrientation();
-        }
-
-        private Matrix4 GetRotation()
-        {
-            return  Matrix4.CreateRotationX(roll) * Matrix4.CreateRotationY(pitch) * Matrix4.CreateRotationZ(yawn);
-        }
-
-        private Matrix4 GetOrientation()
+        protected override Matrix4 GetOrientation()
         {
             return Matrix4.CreateScale(1.0f, -1.0f, 1.0f);
         }
-
-        public Matrix4 GetAspectRatio(float clientWidth, float clientHeight)
-        {
-            return Matrix4.CreateScale(clientWidth / clientHeight, 1.0f, 1.0f);
-        }
-
-        public override void OnDrag(Vector diff, MainWindow window)
-        {
-            pitch += (float)diff.X * 0.01f / zoom;
-            roll += (float)diff.Y * 0.01f / zoom;
-        }
-
-        public override void OnScroll(double diff, Point mouse)
-        {
-            SetZoomFarplane((float)(zoom * (1.0 + (diff * 0.001))));
-        }
-
+        
         public override void UpdateMouseDisplay(MainWindow window)
         {
             var mousePoint = window.StatusBar.GetCanonicalMouseCoordinates();
 
             // left handed coordinate system
-            var viewDir = new Vector4((float)mousePoint.X, (float)mousePoint.Y, zoom, 0.0f) * GetTransform();
+            var viewDir = new Vector4((float)mousePoint.X, (float)mousePoint.Y, GetZoom(), 0.0f) * GetTransform();
             var dir = new Vector3(viewDir.X, viewDir.Y, viewDir.Z).Normalized();
 
             // TODO determine pixel coordinate from view dir
@@ -201,8 +134,8 @@ namespace OpenTKImageViewer.View
             }
             
             var transMouse = MouseToTextureCoordinates(new Vector4(sc, tc, 0.0f, 0.0f),
-                context.GetWidth((int)context.ActiveMipmap),
-                context.GetHeight((int)context.ActiveMipmap));
+                Context.GetWidth((int)Context.ActiveMipmap),
+                Context.GetHeight((int)Context.ActiveMipmap));
 
             window.StatusBar.SetMouseCoordinates((int)(transMouse.X), (int)(transMouse.Y));
             window.Context.ActiveLayer = (uint)maxIndex;
