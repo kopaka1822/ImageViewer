@@ -1,0 +1,20 @@
+#setting title, Absolute Color
+#setting description, Converts color values into absolute values (including alpha).
+
+// abs seems to be broken somehow..
+float fabs(float c)
+{
+	if(c < 0.0)
+		return -c;
+	return c;
+}
+
+void main()
+{
+	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
+	if(pixelCoord.x < imageSize(src_image).x && pixelCoord.y < imageSize(src_image).y)
+	{
+		vec4 color = imageLoad(src_image, pixelCoord);
+		imageStore(dst_image, pixelCoord, vec4(fabs(color.r),fabs(color.g),fabs(color.b),fabs(color.a)));
+	}
+}

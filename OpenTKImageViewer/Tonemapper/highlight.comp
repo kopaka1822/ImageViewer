@@ -1,0 +1,22 @@
+#setting title, Highlighting
+#setting description, Highlights certain colors. Only compares rgb.
+
+#param Negative Values (blue), 2, bool, false
+#param Values > 1 (red), 3, bool, false
+
+layout(location = 2) uniform bool negative;
+layout(location = 3) uniform bool grOne;
+
+void main()
+{
+	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
+	if(pixelCoord.x < imageSize(src_image).x && pixelCoord.y < imageSize(src_image).y)
+	{
+		vec4 color = imageLoad(src_image, pixelCoord);
+		if( negative && (color.r < 0.0 || color.g < 0.0 || color.b < 0.0))
+			color = vec4(0.0, 0.0, 1.0, 1.0);
+		if( grOne && (color.r > 1.0 || color.g > 1.0 || color.b > 1.0))
+			color = vec4(1.0, 0.0, 0.0, 1.0);
+		imageStore(dst_image, pixelCoord, color);
+	}
+}

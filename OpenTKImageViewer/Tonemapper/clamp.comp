@@ -1,0 +1,18 @@
+#setting title, Color Clamping
+#setting description, Clamps the RGB values between minimum and maximum. Alpha won't be changed.
+
+#param Minimum, 2, float, 0
+#param Maximum, 3, float, 1
+
+layout(location = 2) uniform float minimum;
+layout(location = 3) uniform float maximum;
+
+void main()
+{
+	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
+	if(pixelCoord.x < imageSize(src_image).x && pixelCoord.y < imageSize(src_image).y)
+	{
+		vec4 color = imageLoad(src_image, pixelCoord);
+		imageStore(dst_image, pixelCoord, vec4(clamp(color.rgb, vec3(minimum), vec3(maximum)), color.a));
+	}
+}
