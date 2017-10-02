@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using OpenTK;
+using OpenTK.Graphics.OpenGL4;
 using OpenTKImageViewer.UI;
 using OpenTKImageViewer.View.Shader;
 
@@ -16,6 +17,7 @@ namespace OpenTKImageViewer.View
     {
         private ImageContext.ImageContext context;
         private PolarViewShader shader;
+        private CheckersShader checkersShader;
         private Matrix4 aspectRatio;
         private float yawn = 0.0f;
         private float pitch = 0.0f;
@@ -47,6 +49,7 @@ namespace OpenTKImageViewer.View
         private void Init()
         {
             shader = new PolarViewShader();
+            checkersShader = new CheckersShader();
         }
 
         public override void Update(MainWindow window)
@@ -69,6 +72,13 @@ namespace OpenTKImageViewer.View
 
         public override void Draw()
         {
+            checkersShader.Bind(Matrix4.Identity);
+            base.Draw();
+            glhelper.Utility.GLCheck();
+
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+
             // bind the shader?
             shader.Bind(context);
             shader.SetTransform(GetTransform());
@@ -80,6 +90,8 @@ namespace OpenTKImageViewer.View
 
             // draw via vertex array
             base.Draw();
+
+            GL.Disable(EnableCap.Blend);
         }
 
         private Matrix4 GetTransform()

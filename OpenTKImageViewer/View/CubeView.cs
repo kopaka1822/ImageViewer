@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using OpenTK;
+using OpenTK.Graphics.OpenGL4;
 using OpenTKImageViewer.UI;
 using OpenTKImageViewer.View.Shader;
 
@@ -16,6 +17,7 @@ namespace OpenTKImageViewer.View
     {
         private ImageContext.ImageContext context;
         private CubeViewShader shader;
+        private CheckersShader checkersShader;
         private Matrix4 aspectRatio;
         private float yawn = 0.0f;
         private float pitch = 0.0f;
@@ -32,6 +34,7 @@ namespace OpenTKImageViewer.View
         private void Init()
         {
             shader = new CubeViewShader();
+            checkersShader = new CheckersShader();
         }
 
         public override void Update(MainWindow window)
@@ -67,6 +70,13 @@ namespace OpenTKImageViewer.View
 
         public override void Draw()
         {
+            checkersShader.Bind(Matrix4.Identity);
+            base.Draw();
+            glhelper.Utility.GLCheck();
+
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+
             shader.Bind(context);
             shader.SetTransform(GetTransform());
             shader.SetFarplane(zoom);
@@ -75,6 +85,8 @@ namespace OpenTKImageViewer.View
             context.BindFinalTextureAsCubeMap(shader.GetTextureLocation());
             // draw via vertex array
             base.Draw();
+
+            GL.Disable(EnableCap.Blend);
         }
 
         public Matrix4 GetTransform()
