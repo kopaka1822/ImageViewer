@@ -155,6 +155,8 @@ namespace OpenTKImageViewer
                 glControl.MakeCurrent();
                 EnableDebugCallback();
                 GL.Enable(EnableCap.TextureCubeMapSeamless);
+                GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
+                GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
 
                 glControl.MouseMove += (o, args) => WinFormsHost_OnMouseMove(args);
                 glControl.MouseWheel += (o, args) => WinFormsHost_OnMouseWheel(args);
