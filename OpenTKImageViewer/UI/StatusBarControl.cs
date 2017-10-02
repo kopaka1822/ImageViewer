@@ -65,11 +65,12 @@ namespace OpenTKImageViewer.UI
             OnLayerChange();
             OnMipmapChange();
             UpdateMipmapBox();
+            OnImageChange();
 
             window.Context.ChangedLayer += (sender, args) => OnLayerChange();
             window.Context.ChangedMipmap += (sender, args) => OnMipmapChange();
             // image loading => no mipmaps to mipmap 0
-            window.Context.ChangedImages += (sender, args) => { OnMipmapChange(); UpdateMipmapBox(); };
+            window.Context.ChangedImages += (sender, args) => { OnMipmapChange(); UpdateMipmapBox(); OnImageChange(); };
 
             window.ComboBoxView.SelectionChanged += ComboBoxViewOnSelectionChanged;
             window.ComboBoxLayer.SelectionChanged += ComboBoxLayerOnSelectionChanged;
@@ -244,6 +245,11 @@ namespace OpenTKImageViewer.UI
         private void OnMipmapChange()
         {
             SetMipmapDisplay((int)window.Context.ActiveMipmap);
+        }
+
+        private void OnImageChange()
+        {
+            PixelShowAlpha = window.Context.HasAlpha();
         }
     }
 }

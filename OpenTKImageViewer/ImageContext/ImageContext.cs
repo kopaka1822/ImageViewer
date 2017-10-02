@@ -159,12 +159,12 @@ namespace OpenTKImageViewer.ImageContext
 
         public bool HasOnlyGrayscale()
         {
-            foreach (var imageData in images)
-            {
-                if (!imageData.image.IsGrayscale())
-                    return false;
-            }
-            return true;
+            return images.All(imageData => imageData.image.IsGrayscale());
+        }
+
+        public bool HasAlpha()
+        {
+            return images.Any(imageData => imageData.image.HasAlpha());
         }
 
         public byte[] GetCurrentImageData(int level, int layer, PixelFormat format, PixelType type, out int width,

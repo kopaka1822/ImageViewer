@@ -176,6 +176,25 @@ namespace OpenTKImageViewer
                 }
                 return false;
             }
+
+            public bool HasAlpha()
+            {
+                var pixelFormat = (PixelFormat)OpenglExternalFormat;
+                switch (pixelFormat)
+                {
+                    case PixelFormat.Rgba:
+                    case PixelFormat.LuminanceAlpha:
+                    case PixelFormat.AbgrExt:
+                    case PixelFormat.CmykaExt:
+                    case PixelFormat.Bgra:
+                    case PixelFormat.Alpha16IccSgix:
+                    case PixelFormat.Luminance16Alpha8IccSgix:
+                    case PixelFormat.RgbaInteger:
+                    case PixelFormat.BgraInteger:
+                        return true;
+                }
+                return false;
+            }
         }
 
         public static List<Image> LoadImage(string file)
@@ -198,14 +217,6 @@ namespace OpenTKImageViewer
             }
 
             return images;
-        }
-
-        public static int Test(int a, int b)
-        {
-            int id = open("hello");
-
-            release(id);
-            return 0;
         }
 
         public static void SavePng(string filename, int width, int height, int components, byte[] data)
