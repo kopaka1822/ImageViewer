@@ -290,7 +290,6 @@ namespace OpenTKImageViewer
                 if (error.Length == 0)
                     error = exception.Message + ": " + exception.StackTrace;
             }
-
         }
 
 
@@ -744,7 +743,7 @@ namespace OpenTKImageViewer
                 return;
 
             // do the export
-            glControl.MakeCurrent();
+            EnableOpenGl();
             int width;
             int height;
             var data = Context.GetCurrentImageData(ew.SelectedMipmap, ew.SelectedLayer, ew.SelectedFormat,

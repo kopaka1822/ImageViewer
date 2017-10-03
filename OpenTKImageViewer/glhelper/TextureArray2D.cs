@@ -165,8 +165,10 @@ namespace OpenTKImageViewer.glhelper
                 GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureHeight, out height);
                 float[] buffer = new float[width * height * 4 * nFaces];
 
+                Utility.GLCheck();
                 // get data
                 GL.GetTexImage(TextureTarget.Texture2DArray, level, PixelFormat.Rgba, PixelType.Float, buffer);
+                Utility.GLCheck();
                 target.SetLevel(buffer, level, width, height);
             }
             GL.BindTexture(TextureTarget.Texture2DArray, 0);
