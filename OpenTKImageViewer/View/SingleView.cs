@@ -80,7 +80,7 @@ namespace OpenTKImageViewer.View
         public override void Draw()
         {
             checkersShader.Bind(transform * aspectRatio);
-            base.Draw();
+            DeawQuad();
             glhelper.Utility.GLCheck();
 
             GL.Enable(EnableCap.Blend);
