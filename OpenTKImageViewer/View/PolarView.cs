@@ -70,13 +70,15 @@ namespace OpenTKImageViewer.View
             polarDirection.Y = (float) (Math.Acos(viewDir.Y) / Math.PI);
 
             // s computation
-            var normalizedDirection = new Vector3(viewDir.X, 0.0f, viewDir.Z).Normalized();
-            if (normalizedDirection.X >= 0)
-                polarDirection.X = (float) (Math.Acos(-normalizedDirection.Z) / (2.0 * Math.PI));
-            else
-                polarDirection.X = (float) ((Math.Acos(normalizedDirection.Z) + Math.PI) / (2.0 * Math.PI));
- 
-            //window.StatusBar.SetMouseCoordinates((int)(mousePoint.X * 100.0), (int)(mousePoint.Y * 100.0));
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            polarDirection.X = viewDir.X == 0.0 ? (float)(Math.PI / 2 * Math.Sign(viewDir.Z)) : (float)(Math.Atan2(viewDir.Z, viewDir.X));
+            polarDirection.X = (float) (polarDirection.X / (2.0 * Math.PI) + 0.25);
+
+            if (polarDirection.X < 0.0)
+                polarDirection.X += 1.0f;
+            if (polarDirection.Y < 0.0)
+                polarDirection.Y += 1.0f;
+
             window.StatusBar.SetMouseCoordinates((int)(polarDirection.X * Context.GetWidth((int)Context.ActiveMipmap)), 
                 (int)(polarDirection.Y * Context.GetHeight((int)Context.ActiveMipmap)));
         }
