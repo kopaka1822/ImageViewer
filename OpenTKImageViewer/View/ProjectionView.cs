@@ -48,7 +48,7 @@ namespace OpenTKImageViewer.View
                 Init();
 
             // recalculate zoom to degrees
-            var angle = 2.0 * Math.Atan(1.0 / (2.0 * (double)zoom));
+            var angle = 4.0 * Math.Atan(1.0 / (2.0 * (double)zoom));
 
             boxScroll.Text = Math.Round((Decimal)(angle / Math.PI * 180.0), 2).ToString(CultureInfo.InvariantCulture) + "°";
         }
@@ -60,7 +60,7 @@ namespace OpenTKImageViewer.View
 
         private void SetZoomFarplane(float dec)
         {
-            zoom = Math.Min(Math.Max(dec, 0.5f), 100.0f);
+            zoom = Math.Min(Math.Max(dec, 0.6f), 100.0f);
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace OpenTKImageViewer.View
         public override void SetZoom(float dec)
         {
             var degree = dec * Math.PI / 180.0;
-            SetZoomFarplane((float)(1.0 / (2.0 * Math.Tan(degree / 2.0))));
+            SetZoomFarplane((float)(1.0 / (2.0 * Math.Tan(degree / 4.0))));
         }
 
         protected Matrix4 GetTransform()
