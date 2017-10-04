@@ -90,12 +90,16 @@ namespace OpenTKImageViewer.View.Shader
                    "vec3 normalizedDirection = normalize(raydir);\n" +
                    "polarDirection.t = acos(normalizedDirection.y)/PI;\n" +
                    // s computation
-                   "normalizedDirection  = normalize(vec3(raydir.x, 0.0, raydir.z));\n" +
+                   "polarDirection.s = normalizedDirection.x == 0.0 ? " +
+                        "PI/2*sign(normalizedDirection.z) :" +
+                        "atan(normalizedDirection.z, normalizedDirection.x);\n" +
+                   "polarDirection.s = polarDirection.s / (2*PI) + 0.25;\n" +
+                  /* "normalizedDirection  = normalize(vec3(raydir.x, 0.0, raydir.z));\n" +
 
                    "if(normalizedDirection.x >= 0)\n" +
                    "polarDirection.s = acos(-normalizedDirection.z)/(2*PI);\n" +
                    "else\n" +
-                   "polarDirection.s = (acos(normalizedDirection.z) + PI)/(2*PI);\n" +
+                   "polarDirection.s = (acos(normalizedDirection.z) + PI)/(2*PI);\n" +*/
 
                    "vec4 color = textureLod(tex, vec3(polarDirection.st, layer), level);\n" +
                    ApplyGrayscale() +
