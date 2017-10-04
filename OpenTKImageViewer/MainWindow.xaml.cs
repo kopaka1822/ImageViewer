@@ -183,9 +183,9 @@ namespace OpenTKImageViewer
 
         private void EnableDebugCallback()
         {
-            GL.Enable(EnableCap.DebugOutput);
-            GL.Arb.DebugMessageCallback(OpenGlDebug, IntPtr.Zero);
-            GL.Arb.DebugMessageControl(All.DontCare, All.DontCare, All.DontCare, 0, new int[0], true);
+            //GL.Enable(EnableCap.DebugOutput);
+            //GL.Arb.DebugMessageCallback(OpenGlDebug, IntPtr.Zero);
+            //GL.Arb.DebugMessageControl(All.DontCare, All.DontCare, All.DontCare, 0, new int[0], true);
         }
 
         public static void OpenGlDebug(DebugSource source, DebugType type, int id, DebugSeverity severity, int length,
@@ -744,19 +744,20 @@ namespace OpenTKImageViewer
 
             // do the export
             EnableOpenGl();
-            int width;
-            int height;
-            var data = Context.GetCurrentImageData(ew.SelectedMipmap, ew.SelectedLayer, ew.SelectedFormat,
-                ew.SelectedPixelType, out width, out height);
-
-            if (data == null)
-            {
-                App.ShowErrorDialog(this, "error retrieving file from gpu");
-                return;
-            }
 
             try
             {
+                int width;
+                int height;
+                var data = Context.GetCurrentImageData(ew.SelectedMipmap, ew.SelectedLayer, ew.SelectedFormat,
+                    ew.SelectedPixelType, out width, out height);
+
+                if (data == null)
+                {
+                    App.ShowErrorDialog(this, "error retrieving file from gpu");
+                    return;
+                }
+
                 switch (format)
                 {
                     case ExportWindow.FileFormat.Png:
