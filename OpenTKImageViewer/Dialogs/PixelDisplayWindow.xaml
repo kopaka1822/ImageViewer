@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="Pixel Display" Height="160" Width="200"
+        Title="Pixel Display" Height="180" Width="250"
         ResizeMode="NoResize" Background="#eee"
         Icon="../Icons/app.png">
     <Border Padding="5">
@@ -25,6 +25,35 @@
                     <ComboBoxItem Content="decimal"/>
                 </ComboBox>
             </Grid>
+
+            <!-- Display Color -->
+            <Grid Margin="0 0 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Display Color:"/>
+                <ComboBox Grid.Column="1" 
+                          x:Name="BoxDisplayColor"
+                          SelectedIndex="0">
+                    <ComboBoxItem Content="before Tonemapping"/>
+                    <ComboBoxItem Content="after Tonemapping"/>
+                </ComboBox>
+            </Grid>
+
+            <!-- Radius -->
+            <Grid Margin="0 0 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Radius:"/>
+                <xctk:IntegerUpDown Grid.Column="1" 
+                                    Value="0"
+                                    x:Name="NumRadius"
+                                    Minimum="0"
+                                    Maximum="10"/>
+            </Grid>
             
             <!-- Alpha -->
             <Grid Margin="0 0 0 5">
@@ -37,21 +66,8 @@
                           x:Name="BoxAlpha"/>
             </Grid>
 
-            <!-- Radius -->
-            <Grid Margin="0 0 0 15">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Radius:"/>
-                <xctk:IntegerUpDown Grid.Column="1" 
-                                    Value="0"
-                                    x:Name="NumRadius"
-                                    Minimum="0"/>
-            </Grid>
-
             <!-- Buttons -->
-            <Grid HorizontalAlignment="Right">
+            <Grid HorizontalAlignment="Right" Margin="0 10 0 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>

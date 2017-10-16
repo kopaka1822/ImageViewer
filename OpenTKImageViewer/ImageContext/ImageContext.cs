@@ -57,7 +57,9 @@ namespace OpenTKImageViewer.ImageContext
         private bool linearInterpolation = false;
         private GrayscaleMode grayscale = GrayscaleMode.Disabled;
         private bool recomputeImages = true;
+        private bool recomputeCpuTexture = false;
         private IStepable tonemappingStepable = null;
+        private bool displayColorBeforeTonemapping = true;
 
         #endregion
 
@@ -114,6 +116,22 @@ namespace OpenTKImageViewer.ImageContext
         public ImageFormula ImageFormula1 { get; } = new ImageFormula();
         public TonemapperManager Tonemapper { get; } = new TonemapperManager();
 
+        // this will determine if the cpu cached textures will be acquired directly after combining the images or after tonemapping
+        public bool DisplayColorBeforeTonemapping {
+            get => displayColorBeforeTonemapping;
+            set
+            {
+                if (value != displayColorBeforeTonemapping)
+                {
+                    displayColorBeforeTonemapping = value;
+                    if (value)
+                        recomputeImages = true;
+                    else
+                        // since the images after the tonemapping is requested nothing needs to be recomputed
+                        recomputeCpuTexture = true;
+                }
+            }
+        }
         public CpuTexture CpuCachedTexture { get; private set; } = null;
 
         #endregion
@@ -255,11 +273,23 @@ namespace OpenTKImageViewer.ImageContext
 
             imageCombineShader1.Update();
 
+            // update cpu texture (from before tonemapping to after tonemapping)
+            if (recomputeCpuTexture)
+            {
+                CpuCachedTexture = textures[0].GetFloatPixels(GetNumMipmaps(), GetNumLayers());
+                recomputeCpuTexture = false;
+            }
+
             // update images?
             if (recomputeImages)
             {
                 recomputeImages = false;
                 RecomputeCombinedImage(textures[0]);
+
+                // retrieve the complete image for the cpu
+                if (DisplayColorBeforeTonemapping)
+                    CpuCachedTexture = textures[0].GetFloatPixels(GetNumMipmaps(), GetNumLayers());
+
                 // set new stepable
                 tonemappingStepable = Tonemapper.GetApplyShaderStepable(textures, this);
             }
@@ -275,7 +305,8 @@ namespace OpenTKImageViewer.ImageContext
                     tonemappingStepable = null;
 
                     // retrieve the complete image for the cpu
-                    CpuCachedTexture = textures[0].GetFloatPixels(GetNumMipmaps(), GetNumLayers());
+                    if(!DisplayColorBeforeTonemapping)
+                        CpuCachedTexture = textures[0].GetFloatPixels(GetNumMipmaps(), GetNumLayers());
                     return true;
                 }
                 return false;

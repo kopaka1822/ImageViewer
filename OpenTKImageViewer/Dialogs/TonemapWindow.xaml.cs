@@ -140,7 +140,6 @@ namespace OpenTKImageViewer.Dialogs
                         };
                         para.ValueChanged += (sender, args) =>
                         {
-
                             e.Value = para.CurrentValue;
                         };
                         list.Add(e);
