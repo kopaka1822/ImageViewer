@@ -71,6 +71,9 @@ namespace OpenTKImageViewer.Dialogs
             parent.DisableOpenGl();
         }
 
+        /// <summary>
+        /// Updates the list of used tonemappers
+        /// </summary>
         private void UpdateList()
         {
             ListBoxMapper.Items.Clear();
@@ -114,8 +117,7 @@ namespace OpenTKImageViewer.Dialogs
                         // use num up down
                         var e = new IntegerUpDown
                         {
-                            Value = (int) para.CurrentValue, Margin = margin,
-                            //Maximum = (int)para.Max, Minimum = (int)para.Min
+                            Value = (int) para.CurrentValue, Margin = margin
                         };
                         e.ValueChanged += (sender, args) =>
                         {
@@ -129,9 +131,9 @@ namespace OpenTKImageViewer.Dialogs
                     {
                         var e = new DecimalUpDown
                         {
-                            Value = para.CurrentValue, Margin = margin,
-                            //Maximum = para.Max, Minimum = para.Min
+                            Value = para.CurrentValue, Margin = margin
                         };
+
                         e.ValueChanged += (sender, args) =>
                         {
                             if (e.Value != null) para.CurrentValue =(decimal)e.Value;
@@ -140,7 +142,6 @@ namespace OpenTKImageViewer.Dialogs
                         {
 
                             e.Value = para.CurrentValue;
-                            e.Text = para.CurrentValue.ToString(CultureInfo.InvariantCulture);
                         };
                         list.Add(e);
                     }

@@ -8,7 +8,7 @@ namespace OpenTKImageViewer.Equation
 {
     class NumberToken : ValueToken
     {
-        private float value;
+        private readonly float value;
 
         public NumberToken(float number)
         {

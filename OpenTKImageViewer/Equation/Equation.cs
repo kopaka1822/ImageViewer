@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Deployment.Internal;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -101,7 +102,7 @@ namespace OpenTKImageViewer.Equation
             }
 
             double value;
-            if(!Double.TryParse(identifier, out value))
+            if(!Double.TryParse(identifier, NumberStyles.Float, new CultureInfo("en-US"), out value))
                 throw new Exception($"Invalid Number: {identifier}");
             return new NumberToken((float)value);
         }
