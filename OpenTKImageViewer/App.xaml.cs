@@ -47,10 +47,22 @@ namespace OpenTKImageViewer
 
         public static void ShowErrorDialog(Window owner, string message)
         {
+#if DEBUG
+            var res = MessageBoxResult.None;
+            message += ". Do you want to debug the application?";
+            if (owner != null)
+                res = MessageBox.Show(owner, message, "Error", MessageBoxButton.YesNo, MessageBoxImage.Error);
+            else
+                res = MessageBox.Show(message, "Error", MessageBoxButton.YesNo, MessageBoxImage.Error);
+            if (res == MessageBoxResult.Yes)
+                Debugger.Break();
+#else
             if(owner != null)
                 MessageBox.Show(owner, message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             else
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+#endif
+
         }
 
         public static void ShowInfoDialog(Window owner, string message)

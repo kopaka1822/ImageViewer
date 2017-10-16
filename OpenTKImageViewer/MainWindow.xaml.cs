@@ -152,8 +152,8 @@ namespace OpenTKImageViewer
                 var windowsFormsHost = sender as WindowsFormsHost;
                 if (windowsFormsHost != null) windowsFormsHost.Child = glControl;
 
-                glControl.MakeCurrent();
-                EnableDebugCallback();
+                EnableOpenGl();
+
                 GL.Enable(EnableCap.TextureCubeMapSeamless);
                 GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
                 GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
@@ -170,6 +170,7 @@ namespace OpenTKImageViewer
                 };
                 glControl.AllowDrop = true;
 
+                DisableOpenGl();
                 // create context menu
                 //glControl.ContextMenu = new ContextMenu();
                 //var item = glControl.ContextMenu.MenuItems.Add("Copy RGBA");
@@ -181,19 +182,9 @@ namespace OpenTKImageViewer
             }
         }
 
-        private void EnableDebugCallback()
+        private void DisableDebugCallback()
         {
-            //GL.Enable(EnableCap.DebugOutput);
-            //GL.Arb.DebugMessageCallback(OpenGlDebug, IntPtr.Zero);
-            //GL.Arb.DebugMessageControl(All.DontCare, All.DontCare, All.DontCare, 0, new int[0], true);
-        }
-
-        public static void OpenGlDebug(DebugSource source, DebugType type, int id, DebugSeverity severity, int length,
-            IntPtr message, IntPtr userParam)
-        {
-            //string str = Marshal.PtrToStringAuto(message, length);
-            string str = Marshal.PtrToStringAnsi(message, length);
-            App.ShowErrorDialog(null, str);
+            GL.Disable(EnableCap.DebugOutput);
         }
 
         /// <summary>
@@ -230,8 +221,8 @@ namespace OpenTKImageViewer
 
             try
             {
-                glControl.MakeCurrent();
-                EnableDebugCallback();
+                EnableOpenGl();
+                glhelper.Utility.GLCheck();
 
                 GL.Viewport(0, 0, (int)(GetClientWidth()), 
                     (int)(GetClientHeight()));
@@ -244,13 +235,18 @@ namespace OpenTKImageViewer
                     glhelper.Utility.GLCheck();
                     if (progressWindow != null)
                     {
+                        DisableOpenGl();
+                        
                         // should be finished
                         progressWindow.SetProgress(1.0f);
                         progressWindow.Close();
                         progressWindow = null;
                         EnableWindowInteractions();
+
+                        EnableOpenGl();
                     }
 
+                    glhelper.Utility.GLCheck();
                     imageViews[CurrentView]?.Update(this);
                     glhelper.Utility.GLCheck();
 
@@ -259,10 +255,13 @@ namespace OpenTKImageViewer
                 }
                 else
                 {
+                    glhelper.Utility.GLCheck();
                     if (progressWindow == null)
                     {
+                        DisableOpenGl();
                         progressWindow = new ProgressWindow();
                         progressWindow.Show();
+
                         // disable all interactions with open windows
                         DisableWindowInteractions();
 
@@ -274,6 +273,7 @@ namespace OpenTKImageViewer
                             App.ShowInfoDialog((TonemapDialog==null)?(Window)this:(Window)TonemapDialog, "Operation aborted. The displayed picture may contain errors.");
                             EnableWindowInteractions();
                         };
+                        EnableOpenGl();
                     }
                     
                     // image is not ready yet
@@ -290,6 +290,7 @@ namespace OpenTKImageViewer
                 if (error.Length == 0)
                     error = exception.Message + ": " + exception.StackTrace;
             }
+            DisableOpenGl();
         }
 
 
@@ -744,7 +745,6 @@ namespace OpenTKImageViewer
 
             // do the export
             EnableOpenGl();
-
             try
             {
                 int width;
@@ -774,8 +774,8 @@ namespace OpenTKImageViewer
             catch (Exception exception)
             {
                 App.ShowErrorDialog(this, exception.Message);
-                return;
             }
+            DisableOpenGl();
         }
 
         private void BoxScroll_OnKeyDown(object sender, KeyEventArgs e)
@@ -807,7 +807,22 @@ namespace OpenTKImageViewer
         public void EnableOpenGl()
         {
             glControl?.MakeCurrent();
-            EnableDebugCallback();
+            glhelper.Utility.EnableDebugCallback();
+        }
+
+        public void DisableOpenGl()
+        {
+            GL.Flush();
+            DisableDebugCallback();
+            try
+            {
+
+                glControl?.Context.MakeCurrent(null);
+            }
+            catch (GraphicsContextException)
+            {
+                // happens sometimes..
+            }
         }
     }
 }

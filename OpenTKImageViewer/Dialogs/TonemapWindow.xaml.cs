@@ -68,6 +68,7 @@ namespace OpenTKImageViewer.Dialogs
             {
                 App.ShowErrorDialog(this, exception.Message);
             }
+            parent.DisableOpenGl();
         }
 
         private void UpdateList()
@@ -298,7 +299,15 @@ namespace OpenTKImageViewer.Dialogs
         {
             // aplly current set of settings
             parent.EnableOpenGl();
-            parent.Context.Tonemapper.Apply(toneSettings);
+            try
+            {
+                parent.Context.Tonemapper.Apply(toneSettings);
+            }
+            catch (Exception exception)
+            {
+                App.ShowErrorDialog(parent, exception.Message);
+            }
+            parent.DisableOpenGl();
         }
 
         private void ListBoxMapper_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
