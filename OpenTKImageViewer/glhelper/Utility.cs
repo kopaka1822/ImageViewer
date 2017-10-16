@@ -21,10 +21,17 @@ namespace OpenTKImageViewer.glhelper
         public static void OpenGlDebug(DebugSource source, DebugType type, int id, DebugSeverity severity, int length,
             IntPtr message, IntPtr userParam)
         {
-            //string str = Marshal.PtrToStringAuto(message, length);
-            
             string str = Marshal.PtrToStringAnsi(message, length);
-            App.ShowErrorDialog(null, $"{source}({severity}): {str}");
+            if (type != DebugType.DebugTypeOther)
+            {
+                App.ShowErrorDialog(null, $"{source}({severity}): {str}");
+            }
+            else
+            {
+#if DEBUG
+                App.ShowInfoDialog(null, $"{source}({severity}): {str}");
+#endif
+            }
         }
 
         public static void EnableDebugCallback()

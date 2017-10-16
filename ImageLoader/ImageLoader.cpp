@@ -82,14 +82,14 @@ void image_info(int id, uint32_t& openglInternalFormat, uint32_t& openglExternal
 	openglExternalFormat = it->second->format.openglExternalFormat;
 	isCompressed = it->second->format.isCompressed;
 
-	nImages = it->second->layer.size();
+	nImages = static_cast<int>(it->second->layer.size());
 	nMipmaps = 0;
 	nFaces = 0;
 	if(nImages > 0)
 	{
-		nFaces = it->second->layer.at(0).faces.size();
+		nFaces = static_cast<int>(it->second->layer.at(0).faces.size());
 		if (nFaces > 0)
-			nMipmaps = it->second->layer.at(0).faces.at(0).mipmaps.size();
+			nMipmaps = static_cast<int>(it->second->layer.at(0).faces.at(0).mipmaps.size());
 	}
 }
 
@@ -127,13 +127,13 @@ unsigned char* image_get_mipmap(int id, int image, int face, int mipmap, uint32_
 	if (unsigned(mipmap) >= it->second->layer.at(image).faces.at(face).mipmaps.size())
 		return nullptr;
 
-	size = it->second->layer.at(image).faces.at(face).mipmaps[mipmap].bytes.size();
+	size = static_cast<int>(it->second->layer.at(image).faces.at(face).mipmaps[mipmap].bytes.size());
 	return it->second->layer.at(image).faces.at(face).mipmaps[mipmap].bytes.data();
 }
 
 const char* get_error(int& length)
 {
-	length = s_error.length();
+	length = static_cast<int>(s_error.length());
 	return s_error.data();
 }
 
