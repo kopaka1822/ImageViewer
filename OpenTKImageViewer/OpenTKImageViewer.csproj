@@ -133,6 +133,9 @@
     <Compile Include="Dialogs\PixelDisplayWindow.xaml.cs">
       <DependentUpon>PixelDisplayWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\PixelInformationWindow.xaml.cs">
+      <DependentUpon>PixelInformationWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\ProgressWindow.xaml.cs">
       <DependentUpon>ProgressWindow.xaml</DependentUpon>
     </Compile>
@@ -192,6 +195,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\PixelDisplayWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\PixelInformationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -294,6 +301,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\displayconfig.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

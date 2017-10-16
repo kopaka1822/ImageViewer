@@ -1,0 +1,98 @@
+﻿<Window x:Class="OpenTKImageViewer.Dialogs.PixelInformationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
+        mc:Ignorable="d"
+        Title="Pixel Information" 
+        Height="200" Width="170"
+        ResizeMode="NoResize" Background="#eee"
+        Icon="../Icons/eyedropper.png">
+    <Border Padding="5">
+        <StackPanel>
+            
+            <!-- RED -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="50"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Red:"/>
+                <TextBox Text="255" Grid.Column="1" x:Name="BoxRedBit"/>
+                <TextBox Text="1.0" Grid.Column="3" x:Name="BoxRedFloat"/>
+            </Grid>
+
+            <!-- GREEN -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="50"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Green:"/>
+                <TextBox Text="255" Grid.Column="1" x:Name="BoxGreenBit"/>
+                <TextBox Text="1.0" Grid.Column="3" x:Name="BoxGreenFloat"/>
+            </Grid>
+
+            <!-- BLUE -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="50"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Blue:"/>
+                <TextBox Text="255" Grid.Column="1" x:Name="BoxBlueBit"/>
+                <TextBox Text="1.0" Grid.Column="3" x:Name="BoxBlueFloat"/>
+            </Grid>
+
+            <!-- ALPHA -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="50"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Alpha:"/>
+                <TextBox Text="255" Grid.Column="1" x:Name="BoxAlphaBit"/>
+                <TextBox Text="1.0" Grid.Column="3" x:Name="BoxAlphaFloat"/>
+            </Grid>
+
+            <!-- ALPHA -->
+            <Grid Margin="0 10 0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="HEX:"/>
+                <TextBox Text="FFFFFFFF" Grid.Column="1" x:Name="BoxHex"/>
+            </Grid>
+
+            <!-- BIT -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="8 bit:"/>
+                <TextBox Text="255, 255, 255, 255" Grid.Column="1" x:Name="BoxBit"/>
+            </Grid>
+
+            <!-- FLOAT -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="decimal:"/>
+                <TextBox Text="1.0, 1.0, 1.0, 1.0" Grid.Column="1" x:Name="BoxFloat"/>
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>

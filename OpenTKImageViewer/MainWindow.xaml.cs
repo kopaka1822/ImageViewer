@@ -171,10 +171,21 @@ namespace OpenTKImageViewer
                 glControl.AllowDrop = true;
 
                 DisableOpenGl();
+
                 // create context menu
-                //glControl.ContextMenu = new ContextMenu();
-                //var item = glControl.ContextMenu.MenuItems.Add("Copy RGBA");
-                
+                glControl.ContextMenuStrip = new ContextMenuStrip();
+                var colorItem = glControl.ContextMenuStrip.Items.Add("Show Pixel Color");
+                colorItem.Image = System.Drawing.Image.FromFile(Environment.CurrentDirectory + "/Icons/eyedropper.png");
+                colorItem.Click += (o, args) =>
+                {
+                    var color = StatusBar.GetCurrentPixelColor();
+                    var dia = new PixelInformationWindow(color.X, color.Y, color.Z, color.W);
+                    dia.ShowDialog();
+                };
+
+                var pixelDisplayItem = glControl.ContextMenuStrip.Items.Add("Pixel Display");
+                pixelDisplayItem.Image = System.Drawing.Image.FromFile(Environment.CurrentDirectory + "/Icons/displayconfig.png");
+                pixelDisplayItem.Click += (o, args) => MenuItem_Click_PixelDisplay(o, null);
             }
             catch (Exception exception)
             {

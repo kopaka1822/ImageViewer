@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="Pixel Display" Height="180" Width="250"
         ResizeMode="NoResize" Background="#eee"
-        Icon="../Icons/app.png">
+        Icon="../Icons/displayconfig.png">
     <Border Padding="5">
         <StackPanel>
             <!-- FORMAT -->

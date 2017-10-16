@@ -33,6 +33,8 @@ namespace OpenTKImageViewer.UI
 
         private readonly MainWindow window;
         private int pixelRadius = 0;
+        private int lastMouseX = 0;
+        private int lastMouseY = 0;
 
         private LayerModeType layerMode = LayerModeType.None;
         public LayerModeType LayerMode
@@ -105,10 +107,23 @@ namespace OpenTKImageViewer.UI
         public void SetMouseCoordinates(int x, int y)
         {
             window.TextMousePosition.Text = $"{x}, {y}";
+            lastMouseX = x;
+            lastMouseY = y;
             if (window.Context.CpuCachedTexture != null)
             {
                 window.TextMousePositionColor.Text = GetColorString(GetPixelColor(x,y));
             }
+        }
+
+        /// <summary>
+        /// retrieves the pixel color for the last captured mouse position
+        /// </summary>
+        /// <returns></returns>
+        public Vector4 GetCurrentPixelColor()
+        {
+            if(window.Context.CpuCachedTexture == null)
+                return new Vector4(0.0f);
+            return GetPixelColor(lastMouseX, lastMouseY);
         }
 
         private Vector4 GetPixelColor(int x, int y)

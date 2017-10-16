@@ -51,7 +51,7 @@
                 </MenuItem>
                 <MenuItem Header="_Pixel Display" Click="MenuItem_Click_PixelDisplay">
                     <MenuItem.Icon>
-                        <Image Source="Icons/eyedropper.png"/>
+                        <Image Source="Icons/displayconfig.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
@@ -105,7 +105,7 @@
                             <ContextMenu>
                                 <MenuItem Header="_Pixel Display" Click="MenuItem_Click_PixelDisplay">
                                     <MenuItem.Icon>
-                                        <Image Source="Icons/eyedropper.png"/>
+                                        <Image Source="Icons/displayconfig.png"/>
                                     </MenuItem.Icon>
                                 </MenuItem>
                             </ContextMenu>
