@@ -54,21 +54,19 @@ namespace OpenTKImageViewer.View
 
         }
 
-        // TODO adjust for cross view
-        public override void UpdateMouseDisplay(MainWindow window)
+        /// <summary>
+        /// transforms mouse coordinates into opengl space
+        /// </summary>
+        /// <param name="window">window with current mouse coordinates</param>
+        /// <returns>vector with correct x and y coordinates</returns>
+        protected Vector4 GetOpenGLMouseCoordinates(MainWindow window)
         {
             var mousePoint = window.StatusBar.GetCanonicalMouseCoordinates();
             // Matrix Coordinate system is reversed (left handed)
             var vec = new Vector4((float)mousePoint.X, (float)mousePoint.Y, 0.0f, 1.0f);//new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
-            var transMouse = vec * (GetOrientation() * transform * aspectRatio).Inverted();
-
-            transMouse = MouseToTextureCoordinates(transMouse,
-                Context.GetWidth((int)Context.ActiveMipmap),
-                Context.GetHeight((int)Context.ActiveMipmap));
-
-            window.StatusBar.SetMouseCoordinates((int)(transMouse.X), (int)(transMouse.Y));
+            return vec * (GetOrientation() * transform * aspectRatio).Inverted();
         }
-
+        
         /// <summary>
         /// set zoom in percent
         /// </summary>

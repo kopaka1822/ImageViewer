@@ -25,5 +25,16 @@ namespace OpenTKImageViewer.View
         {
             DrawLayer(Matrix4.Identity, Context.ActiveLayer);
         }
+
+        public override void UpdateMouseDisplay(MainWindow window)
+        {
+            var transMouse = GetOpenGLMouseCoordinates(window);
+
+            transMouse = MouseToTextureCoordinates(transMouse,
+                Context.GetWidth((int)Context.ActiveMipmap),
+                Context.GetHeight((int)Context.ActiveMipmap));
+
+            window.StatusBar.SetMouseCoordinates((int)(transMouse.X), (int)(transMouse.Y));
+        }
     }
 }
