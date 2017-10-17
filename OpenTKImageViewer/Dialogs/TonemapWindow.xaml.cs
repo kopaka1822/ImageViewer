@@ -51,8 +51,10 @@ namespace OpenTKImageViewer.Dialogs
         {
             var ofd = new OpenFileDialog();
             ofd.Multiselect = false;
+            ofd.InitialDirectory = parent.ParentApp.GetShaderPath(ofd);
 
             if (ofd.ShowDialog() != true) return;
+            parent.ParentApp.SetShaderPath(ofd);
 
             // load shader
             parent.EnableOpenGl();

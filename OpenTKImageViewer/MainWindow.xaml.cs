@@ -49,7 +49,7 @@ namespace OpenTKImageViewer
     {
 
         #region VARIABLES
-        private readonly App parent;
+        public readonly App ParentApp;
         private GLControl glControl;
 
         private string error = "";
@@ -81,9 +81,9 @@ namespace OpenTKImageViewer
 
         #region INITIALIZATION
 
-        public MainWindow(App parent, ImageContext.ImageContext context)
+        public MainWindow(App parentApp, ImageContext.ImageContext context)
         {
-            this.parent = parent;
+            this.ParentApp = parentApp;
             this.Context = context;
             this.ZIndex = 0;
 
@@ -451,7 +451,7 @@ namespace OpenTKImageViewer
             }
             catch (Exception)
             {
-                parent.SpawnWindow(images);
+                ParentApp.SpawnWindow(images);
             }
         }
 
@@ -468,7 +468,7 @@ namespace OpenTKImageViewer
             }
 
             if (Context.GetNumImages() > 1)
-                parent.OpenDialog(App.UniqueDialog.Image);
+                ParentApp.OpenDialog(App.UniqueDialog.Image);
 
 
             if (resetViews)
@@ -499,17 +499,20 @@ namespace OpenTKImageViewer
         {
             var ofd = new Microsoft.Win32.OpenFileDialog();
             ofd.Multiselect = false;
+            ofd.InitialDirectory = ParentApp.GetImagePath(ofd);
 
             if (ofd.ShowDialog() == true)
             {
+                ParentApp.SetImagePath(ofd);
                 if (Context.GetNumImages() == 0)
                 {
                     ImportImage(ofd.FileName);
                 }
                 else
                 {
-                    parent.SpawnWindow(ofd.FileName);
+                    ParentApp.SpawnWindow(ofd.FileName);
                 }
+
             }
         }
 
@@ -517,9 +520,11 @@ namespace OpenTKImageViewer
         {
             var ofd = new Microsoft.Win32.OpenFileDialog();
             ofd.Multiselect = false;
+            ofd.InitialDirectory = ParentApp.GetImagePath(ofd);
 
             if (ofd.ShowDialog() != true) return;
             // load image and import if possible
+            ParentApp.SetImagePath(ofd);
             ImportImage(ofd.FileName);
         }
 
@@ -633,7 +638,7 @@ namespace OpenTKImageViewer
 
         private void MenuItem_Click_Images(object sender, RoutedEventArgs e)
         {
-            parent.OpenDialog(App.UniqueDialog.Image);
+            ParentApp.OpenDialog(App.UniqueDialog.Image);
         }
 
         private void MenuItem_Click_Tonemapper(object sender, RoutedEventArgs e)
@@ -711,7 +716,7 @@ namespace OpenTKImageViewer
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
             TonemapDialog?.Close();
-            parent.UnregisterWindow(this);
+            ParentApp.UnregisterWindow(this);
         }
 
         private void MainWindow_OnActivated(object sender, EventArgs e)
@@ -720,7 +725,7 @@ namespace OpenTKImageViewer
             {
                 TonemapDialog.Topmost = true;
             }
-            parent.SetActiveWindow(this);
+            ParentApp.SetActiveWindow(this);
         }
 
         private void MainWindow_OnDeactivated(object sender, EventArgs e)
@@ -729,7 +734,7 @@ namespace OpenTKImageViewer
             {
                 TonemapDialog.Topmost = false;
             }
-            parent.UpdateDialogVisibility();
+            ParentApp.UpdateDialogVisibility();
         }
 
         private void MenuItem_Click_Export(object sender, RoutedEventArgs e)

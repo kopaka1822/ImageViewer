@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.Remoting.Contexts;
 using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.Win32;
 using OpenTKImageViewer.Dialogs;
 using OpenTKImageViewer.Utility;
 
@@ -233,6 +234,52 @@ namespace OpenTKImageViewer
                 }
                 uniqueDialogs.Remove(dialog);
             }
+        }
+
+        /// <summary>
+        /// gets the default path for image files
+        /// </summary>
+        /// <param name="fd"></param>
+        /// <returns></returns>
+        public string GetImagePath(FileDialog fd)
+        {
+            if (appSettings.GetConfig().ImagePath.Length > 0)
+            {
+                return appSettings.GetConfig().ImagePath;
+            }
+            return fd.InitialDirectory;
+        }
+
+        /// <summary>
+        /// sets the new path for image files depending on the selected one in the file dialog
+        /// </summary>
+        /// <param name="fd"></param>
+        public void SetImagePath(FileDialog fd)
+        {
+            appSettings.GetConfig().ImagePath = System.IO.Path.GetDirectoryName(fd.FileName);
+        }
+
+        /// <summary>
+        /// gets the default path for tonemapper shader files
+        /// </summary>
+        /// <param name="fd"></param>
+        /// <returns></returns>
+        public string GetShaderPath(FileDialog fd)
+        {
+            if (appSettings.GetConfig().TonemapperPath.Length > 0)
+            {
+                return appSettings.GetConfig().TonemapperPath;
+            }
+            return fd.InitialDirectory;
+        }
+
+        /// <summary>
+        /// sets the new path for tonemapper shader files depending on the selected one in the file dialog
+        /// </summary>
+        /// <param name="fd"></param>
+        public void SetShaderPath(FileDialog fd)
+        {
+            appSettings.GetConfig().TonemapperPath = System.IO.Path.GetDirectoryName(fd.FileName);
         }
     }
 }
