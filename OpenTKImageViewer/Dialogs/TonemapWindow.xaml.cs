@@ -117,7 +117,7 @@ namespace OpenTKImageViewer.Dialogs
                         // use num up down
                         var e = new IntegerUpDown
                         {
-                            Value = (int) para.CurrentValue, Margin = margin
+                            Value = (int) para.CurrentValue, Margin = margin, CultureInfo = new CultureInfo("en-US")
                         };
                         e.ValueChanged += (sender, args) =>
                         {
@@ -131,7 +131,7 @@ namespace OpenTKImageViewer.Dialogs
                     {
                         var e = new DecimalUpDown
                         {
-                            Value = para.CurrentValue, Margin = margin
+                            Value = para.CurrentValue, Margin = margin, CultureInfo = new CultureInfo("en-US")
                         };
 
                         e.ValueChanged += (sender, args) =>
