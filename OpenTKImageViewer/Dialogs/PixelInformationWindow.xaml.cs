@@ -68,5 +68,15 @@ namespace OpenTKImageViewer.Dialogs
         {
             return ((int) (c * 255)).ToString(new CultureInfo("en-US"));
         }
+
+        private void OnDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var box = sender as TextBox;
+            if(box == null)
+                return;
+            box.SelectionStart = 0;
+            box.SelectionLength = box.Text.Length;
+            Clipboard.SetText(box.Text);
+        }
     }
 }
