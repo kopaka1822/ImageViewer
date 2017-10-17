@@ -46,7 +46,7 @@ namespace OpenTKImageViewer.View
             Context.BindFinalTextureAs2DSamplerArray(shader.GetTextureLocation());
 
             // draw via vertex array
-            DeawQuad();
+            DrawQuad();
 
             GL.Disable(EnableCap.Blend);
         }

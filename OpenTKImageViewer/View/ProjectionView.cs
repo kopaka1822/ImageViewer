@@ -104,7 +104,7 @@ namespace OpenTKImageViewer.View
         protected void DrawCheckers()
         {
             checkersShader.Bind(Matrix4.Identity);
-            DeawQuad();
+            DrawQuad();
         }
     }
 }

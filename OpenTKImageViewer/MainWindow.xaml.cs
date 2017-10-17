@@ -122,6 +122,7 @@ namespace OpenTKImageViewer
                 if (Context.GetNumLayers() == 6)
                 {
                     imageViews.Add(ImageViewType.CubeMap, new CubeView(Context, BoxScroll));
+                    imageViews.Add(ImageViewType.CubeCrossView, new CubeCrossView(Context, BoxScroll));
                     CurrentView = ImageViewType.CubeMap;
                 }
                 else if (Context.GetNumLayers() == 1)

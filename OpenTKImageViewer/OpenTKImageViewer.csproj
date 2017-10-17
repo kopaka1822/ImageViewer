@@ -166,9 +166,11 @@
     <Compile Include="UI\StatusBarControl.cs" />
     <Compile Include="Utility\IStepable.cs" />
     <Compile Include="Utility\StepList.cs" />
+    <Compile Include="View\CubeCrossView.cs" />
     <Compile Include="View\CubeView.cs" />
     <Compile Include="View\EmptyView.cs" />
     <Compile Include="View\IImageView.cs" />
+    <Compile Include="View\PlainView.cs" />
     <Compile Include="View\PolarView.cs" />
     <Compile Include="View\ProjectionView.cs" />
     <Compile Include="View\Shader\CheckersShader.cs" />

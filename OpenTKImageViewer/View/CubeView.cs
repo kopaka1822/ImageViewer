@@ -43,7 +43,7 @@ namespace OpenTKImageViewer.View
             shader.SetGrayscale(Context.Grayscale);
             Context.BindFinalTextureAsCubeMap(shader.GetTextureLocation());
             // draw via vertex array
-            DeawQuad();
+            DrawQuad();
 
             GL.Disable(EnableCap.Blend);
         }

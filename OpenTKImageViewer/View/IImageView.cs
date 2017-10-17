@@ -12,7 +12,8 @@ namespace OpenTKImageViewer.View
         Empty,
         Single,
         CubeMap,
-        Polar
+        Polar,
+        CubeCrossView
     }
 
     interface IImageView

@@ -20,7 +20,7 @@ namespace OpenTKImageViewer.View
                 vertexArrayId = GL.GenVertexArray();
         }
 
-        protected void DeawQuad()
+        protected void DrawQuad()
         {
             Debug.Assert(vertexArrayId != 0);
             GL.BindVertexArray(vertexArrayId);
