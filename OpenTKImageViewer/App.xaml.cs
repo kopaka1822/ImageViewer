@@ -8,6 +8,7 @@ using System.Runtime.Remoting.Contexts;
 using System.Threading.Tasks;
 using System.Windows;
 using OpenTKImageViewer.Dialogs;
+using OpenTKImageViewer.Utility;
 
 namespace OpenTKImageViewer
 {
@@ -27,10 +28,13 @@ namespace OpenTKImageViewer
         private MainWindow activeWindow = null; // the last window that was active
         private Dictionary<UniqueDialog, Window> uniqueDialogs = new Dictionary<UniqueDialog, Window>();
         private ulong lastZIndex = 1;
+        private Settings appSettings = null;
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+            appSettings = new Settings(Environment.CurrentDirectory + "/config.json");
+
             if (e.Args.Length == 0)
             {
                 SpawnWindow((string)null);
@@ -43,6 +47,12 @@ namespace OpenTKImageViewer
                     SpawnWindow(s);
                 }
             }
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            appSettings.Save();
+            base.OnExit(e);
         }
 
         public static void ShowErrorDialog(Window owner, string message)

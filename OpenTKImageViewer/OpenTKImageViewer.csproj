@@ -71,6 +71,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=1.2.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.Next.1.2.2336.6514-pre\lib\net20\OpenTK.dll</HintPath>
     </Reference>
@@ -165,6 +168,7 @@
     <Compile Include="Tonemapping\ToneShader.cs" />
     <Compile Include="UI\StatusBarControl.cs" />
     <Compile Include="Utility\IStepable.cs" />
+    <Compile Include="Utility\Settings.cs" />
     <Compile Include="Utility\StepList.cs" />
     <Compile Include="View\CubeCrossView.cs" />
     <Compile Include="View\CubeView.cs" />
