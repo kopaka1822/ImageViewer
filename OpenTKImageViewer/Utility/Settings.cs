@@ -16,10 +16,12 @@ namespace OpenTKImageViewer.Utility
             {
                 ImagePath = "";
                 TonemapperPath = "";
+                ExportPath = "";
             }
 
             public string ImagePath;
             public string TonemapperPath;
+            public string ExportPath;
         }
 
         private readonly Config config = null;

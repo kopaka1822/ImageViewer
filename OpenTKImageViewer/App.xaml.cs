@@ -281,5 +281,28 @@ namespace OpenTKImageViewer
         {
             appSettings.GetConfig().TonemapperPath = System.IO.Path.GetDirectoryName(fd.FileName);
         }
+
+        /// <summary>
+        /// gets the default path for exporting files
+        /// </summary>
+        /// <param name="fd"></param>
+        /// <returns></returns>
+        public string GetExportPath(FileDialog fd)
+        {
+            if (appSettings.GetConfig().ExportPath.Length > 0)
+            {
+                return appSettings.GetConfig().ExportPath;
+            }
+            return fd.InitialDirectory;
+        }
+
+        /// <summary>
+        /// sets the new path for exporting files depending on the selected one in the file dialog
+        /// </summary>
+        /// <param name="fd"></param>
+        public void SetExportPath(FileDialog fd)
+        {
+            appSettings.GetConfig().ExportPath = System.IO.Path.GetDirectoryName(fd.FileName);
+        }
     }
 }

@@ -745,9 +745,11 @@ namespace OpenTKImageViewer
             // open save file dialog
             Microsoft.Win32.SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|HDR (*.hdr)|*.hdr";
+            sfd.InitialDirectory = ParentApp.GetExportPath(sfd);
             if (sfd.ShowDialog() == false)
                 return;
 
+            ParentApp.SetExportPath(sfd);
             // obtain format
             ExportWindow.FileFormat format = ExportWindow.FileFormat.Png;
             if(sfd.FileName.EndsWith(".bmp"))
