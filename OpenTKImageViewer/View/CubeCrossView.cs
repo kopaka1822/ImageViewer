@@ -20,18 +20,18 @@ namespace OpenTKImageViewer.View
 
         public override void Draw()
         {
-            // back
-            DrawLayer(Matrix4.CreateTranslation(-2.0f, 0.0f, 0.0f), 5);
-            // left
-            DrawLayer(Matrix4.Identity, 1);
-            // up
-            DrawLayer(Matrix4.CreateTranslation(2.0f, 2.0f, 0.0f), 3);
-            // down
-            DrawLayer(Matrix4.CreateTranslation(2.0f, -2.0f, 0.0f), 2);
-            // front
-            DrawLayer(Matrix4.CreateTranslation(2.0f, 0.0f, 0.0f), 4);
-            // right
-            DrawLayer(Matrix4.CreateTranslation(4.0f, 0.0f, 0.0f), 0);
+            // -x
+            DrawLayer(Matrix4.CreateTranslation(-2.0f, 0.0f, 0.0f), 1);
+            // +y
+            DrawLayer(Matrix4.CreateTranslation(0.0f, 2.0f, 0.0f), 3);
+            // -y
+            DrawLayer(Matrix4.CreateTranslation(0.0f, -2.0f, 0.0f), 2);
+            // +z
+            DrawLayer(Matrix4.CreateTranslation(0.0f, 0.0f, 0.0f), 4);
+            // +x
+            DrawLayer(Matrix4.CreateTranslation(2.0f, 0.0f, 0.0f), 0);
+            // -z
+            DrawLayer(Matrix4.CreateTranslation(4.0f, 0.0f, 0.0f), 5);
         }
     }
 }
