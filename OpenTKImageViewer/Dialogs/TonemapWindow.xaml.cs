@@ -61,11 +61,22 @@ namespace OpenTKImageViewer.Dialogs
             if (ofd.ShowDialog() != true) return;
             parent.ParentApp.SetShaderPath(ofd);
 
+            LoadTonemapper(ofd.FileName);
+        }
+
+        /// <summary>
+        /// attempts to load a tonemapper
+        /// </summary>
+        /// <param name="filename">paht + filename of the tonemapper</param>
+        /// <returns>true if tonemapper was succesfully loaded</returns>
+        public bool LoadTonemapper(string filename)
+        {
             // load shader
+            bool success = true;
             parent.EnableOpenGl();
             try
             {
-                var param = parent.Context.Tonemapper.LoadShader(ofd.FileName);
+                var param = parent.Context.Tonemapper.LoadShader(filename);
 
                 toneSettings.Add(param);
                 ListBoxMapper.Items.Add(GenerateItem(param));
@@ -74,8 +85,10 @@ namespace OpenTKImageViewer.Dialogs
             catch (Exception exception)
             {
                 App.ShowErrorDialog(this, exception.Message);
+                success = false;
             }
             parent.DisableOpenGl();
+            return success;
         }
 
         /// <summary>

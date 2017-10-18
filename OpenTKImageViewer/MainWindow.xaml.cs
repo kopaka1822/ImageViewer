@@ -482,6 +482,15 @@ namespace OpenTKImageViewer
             {
                 imageViews.Clear();
                 CreateImageViews();
+                if (Context.HasHdr())
+                {
+                    // open tonemapper with gamma shader
+                    bool wasOpen = TonemapDialog != null;
+                    ShowTonemapper();
+                    if (!TonemapDialog.LoadTonemapper(Environment.CurrentDirectory + "\\Tonemapper\\gamma.comp") &&
+                        !wasOpen)
+                        TonemapDialog.Close();
+                }
             }
         }
 
@@ -649,6 +658,11 @@ namespace OpenTKImageViewer
         }
 
         private void MenuItem_Click_Tonemapper(object sender, RoutedEventArgs e)
+        {
+            ShowTonemapper();
+        }
+
+        private void ShowTonemapper()
         {
             if (TonemapDialog == null)
                 TonemapDialog = new TonemapWindow(this);
