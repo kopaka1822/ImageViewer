@@ -18,7 +18,7 @@ namespace OpenTKImageViewer.Dialogs
     /// <summary>
     /// Interaction logic for MipMapWindow.xaml
     /// </summary>
-    public partial class MipMapWindow : Window, IUniqueDialog
+    public partial class MipMapWindow : Window
     {
         private App parent;
         private MainWindow activeWindow;
@@ -26,14 +26,7 @@ namespace OpenTKImageViewer.Dialogs
         public MipMapWindow(App parent)
         {
             this.parent = parent;
-            IsClosing = false;
             InitializeComponent();
-        }
-
-        private void MipMapWindow_OnClosing(object sender, CancelEventArgs e)
-        {
-            IsClosing = true;
-            parent.CloseDialog(App.UniqueDialog.Mipmaps);
         }
 
         public bool IsClosing { get; set; }

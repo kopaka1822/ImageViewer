@@ -19,28 +19,20 @@ namespace OpenTKImageViewer.Dialogs
     /// <summary>
     /// Interaction logic for LayerWindow.xaml
     /// </summary>
-    public partial class LayerWindow : Window, IUniqueDialog
+    public partial class LayerWindow : Window
     {
         class ModeBoxItem : ComboBoxItem
         {
             public ImageViewType ViewType { get; set; }
         }
-
-        public bool IsClosing { get; set; }
+        
         private readonly App parent;
         private MainWindow activeWindow;
 
         public LayerWindow(App parent)
         {
             this.parent = parent;
-            IsClosing = false;
             InitializeComponent();
-        }
-
-        private void LayerWindow_OnClosing(object sender, CancelEventArgs e)
-        {
-            IsClosing = true;
-            parent.CloseDialog(App.UniqueDialog.Layer);
         }
 
         public void UpdateContent(MainWindow window)

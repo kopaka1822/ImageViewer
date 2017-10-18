@@ -18,32 +18,22 @@ namespace OpenTKImageViewer.Dialogs
     /// <summary>
     /// Interaction logic for ImageWindow.xaml
     /// </summary>
-    public partial class ImageWindow : Window, IUniqueDialog
+    public partial class ImageWindow : Window
     {
-        private readonly App parent;
-        public bool IsClosing { get; set; }
-        private MainWindow activeWindow;
+        private MainWindow parent;
 
-        public ImageWindow(App parent)
+        public ImageWindow(MainWindow parent)
         {
             this.parent = parent;
-            IsClosing = false;
             InitializeComponent();
             EquationBox1.FontFamily = new FontFamily("Consolas");
+            parent.Context.ChangedImages += OnChangedImages;
+            RefreshImageList();
         }
 
-        public void UpdateContent(MainWindow window)
+        protected override void OnClosing(CancelEventArgs e)
         {
-            if (!ReferenceEquals(window, activeWindow))
-            {
-                if (activeWindow != null)
-                    activeWindow.Context.ChangedImages -= OnChangedImages;
-                if (window != null)
-                    window.Context.ChangedImages += OnChangedImages;
-            }
-
-            activeWindow = window;
-            RefreshImageList();
+            parent.ImageDialog = null;
         }
 
         private void OnChangedImages(object sender, EventArgs e)
@@ -54,28 +44,20 @@ namespace OpenTKImageViewer.Dialogs
         private void RefreshImageList()
         {
             ImageList.Items.Clear();
-            if (activeWindow != null)
-            {
-                // refresh image list
-                foreach (var item in activeWindow.GenerateImageItems())
-                    ImageList.Items.Add(item);
+            
+            // refresh image list
+            foreach (var item in parent.GenerateImageItems())
+                ImageList.Items.Add(item);
 
-                EquationBox1.Text = activeWindow.Context.ImageFormula1.Original;
-            }
-        }
-
-        private void ImageWindow_OnClosing(object sender, CancelEventArgs e)
-        {
-            IsClosing = true;
-            parent.CloseDialog(App.UniqueDialog.Image);
+            EquationBox1.Text = parent.Context.ImageFormula1.Original;
+            
         }
 
         private void ButtonApply_OnClick(object sender, RoutedEventArgs e)
         {
-            if (activeWindow == null) return;
             try
             {
-                activeWindow.Context.ImageFormula1.ApplyFormula(EquationBox1.Text, activeWindow.Context.GetNumImages());
+                parent.Context.ImageFormula1.ApplyFormula(EquationBox1.Text, parent.Context.GetNumImages());
             }
             catch (Exception exception)
             {

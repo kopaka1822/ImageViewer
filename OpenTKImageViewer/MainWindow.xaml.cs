@@ -78,6 +78,7 @@ namespace OpenTKImageViewer
         }
 
         public TonemapWindow TonemapDialog { get; set; } = null;
+        public ImageWindow ImageDialog { get; set; } = null;
 
         #endregion
 
@@ -327,6 +328,10 @@ namespace OpenTKImageViewer
         {
             if (TonemapDialog != null)
                 TonemapDialog.IsEnabled = false;
+
+            if (ImageDialog != null)
+                ImageDialog.IsEnabled = false;
+
             IsEnabled = false;
         }
 
@@ -334,6 +339,9 @@ namespace OpenTKImageViewer
         {
             if (TonemapDialog != null)
                 TonemapDialog.IsEnabled = true;
+
+            if (ImageDialog != null)
+                ImageDialog.IsEnabled = true;
             IsEnabled = true;
         }
 
@@ -475,8 +483,8 @@ namespace OpenTKImageViewer
                 Context.AddImage(image);
             }
 
-            if (Context.GetNumImages() > 1)
-                ParentApp.OpenDialog(App.UniqueDialog.Image);
+            if(Context.GetNumImages() > 1)
+                ShowImagesWindow();
 
 
             if (isFirstImage)
@@ -655,7 +663,16 @@ namespace OpenTKImageViewer
 
         private void MenuItem_Click_Images(object sender, RoutedEventArgs e)
         {
-            ParentApp.OpenDialog(App.UniqueDialog.Image);
+            ShowImagesWindow();
+        }
+
+        private void ShowImagesWindow()
+        {
+            if(ImageDialog == null)
+                ImageDialog = new ImageWindow(this);
+            ImageDialog.Show();
+            ImageDialog.Activate();
+            ImageDialog.Topmost = true;
         }
 
         private void MenuItem_Click_Tonemapper(object sender, RoutedEventArgs e)
@@ -738,25 +755,28 @@ namespace OpenTKImageViewer
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
             TonemapDialog?.Close();
+            ImageDialog?.Close();
             ParentApp.UnregisterWindow(this);
         }
 
         private void MainWindow_OnActivated(object sender, EventArgs e)
         {
             if (TonemapDialog != null)
-            {
                 TonemapDialog.Topmost = true;
-            }
+
+            if (ImageDialog != null)
+                ImageDialog.Topmost = true;
+
             ParentApp.SetActiveWindow(this);
         }
 
         private void MainWindow_OnDeactivated(object sender, EventArgs e)
         {
             if (TonemapDialog != null)
-            {
                 TonemapDialog.Topmost = false;
-            }
-            ParentApp.UpdateDialogVisibility();
+            
+            if (ImageDialog != null)
+                ImageDialog.Topmost = false;
         }
 
         private void MenuItem_Click_Export(object sender, RoutedEventArgs e)

@@ -27,7 +27,6 @@ namespace OpenTKImageViewer
 
         private List<MainWindow> openWindows = new List<MainWindow>();
         private MainWindow activeWindow = null; // the last window that was active
-        private Dictionary<UniqueDialog, Window> uniqueDialogs = new Dictionary<UniqueDialog, Window>();
         private ulong lastZIndex = 1;
         private Settings appSettings = null;
 
@@ -124,10 +123,6 @@ namespace OpenTKImageViewer
             openWindows.Add(wnd);
 
             wnd.Show();
-
-            // open relevant dialoges
-            if (wnd.Context.GetNumImages() > 1)
-                OpenDialog(UniqueDialog.Image);
         }
 
         public void UnregisterWindow(MainWindow window)
@@ -160,82 +155,13 @@ namespace OpenTKImageViewer
             Debug.Assert(openWindows.IndexOf(window) >= 0);
             activeWindow = window;
             window.ZIndex = lastZIndex++;
-
-            // refresh dialogs
-            foreach (var w in uniqueDialogs)
-            {
-                IUniqueDialog dia = w.Value as IUniqueDialog;
-                dia?.UpdateContent(activeWindow);
-            }
-
-            UpdateDialogVisibility();
-        }
-
-        public void UpdateDialogVisibility()
-        {
-            bool topmost = false;
-            foreach (var openWindow in openWindows)
-            {
-                if (openWindow.IsActive)
-                {
-                    topmost = true;
-                    break;
-                }
-            }
-
-            foreach (var w in uniqueDialogs)
-                w.Value.Topmost = topmost;
         }
 
         public MainWindow GetActiveWindow()
         {
             return activeWindow;
         }
-
-        public void OpenDialog(UniqueDialog dialog)
-        {
-            Window window;
-            if (!uniqueDialogs.TryGetValue(dialog, out window))
-            {
-                // add dialog
-                switch (dialog)
-                {
-                    case UniqueDialog.Layer:
-                        window = new LayerWindow(this);
-                        break;
-                    case UniqueDialog.Mipmaps:
-                        window = new MipMapWindow(this);
-                        break;
-                    case UniqueDialog.Image:
-                        window = new ImageWindow(this);
-                        break;
-                }
-                IUniqueDialog dia = (IUniqueDialog)window;
-                dia?.UpdateContent(activeWindow);
-                window?.Show();
-
-                if (window != null)
-                    uniqueDialogs.Add(dialog, window);
-
-            }
-            window?.Focus();
-        }
-
-        public void CloseDialog(UniqueDialog dialog)
-        {
-            Window window;
-            if (uniqueDialogs.TryGetValue(dialog, out window))
-            {
-                IUniqueDialog dia = window as IUniqueDialog;
-                if (dia != null)
-                {
-                    if (!dia.IsClosing)
-                        window.Close();
-                }
-                uniqueDialogs.Remove(dialog);
-            }
-        }
-
+        
         /// <summary>
         /// gets the default path for image files
         /// </summary>

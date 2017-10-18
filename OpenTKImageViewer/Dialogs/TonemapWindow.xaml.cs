@@ -25,7 +25,6 @@ namespace OpenTKImageViewer.Dialogs
     /// </summary>
     public partial class TonemapWindow : Window
     {
-        public bool IsClosing { get; set; } = false;
         private readonly MainWindow parent;
         private readonly List<ToneParameter> toneSettings;
 
@@ -42,7 +41,6 @@ namespace OpenTKImageViewer.Dialogs
 
         private void TonemapWindow_OnClosing(object sender, CancelEventArgs e)
         {
-            IsClosing = true;
             parent.TonemapDialog = null;
             parent.Context.Tonemapper.RemoveUnusedShader();
         }

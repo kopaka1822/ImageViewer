@@ -232,7 +232,6 @@
     <Compile Include="glhelper\VertexBufferObject.cs" />
     <Compile Include="ImageContext\ImageContext.cs" />
     <Compile Include="ImageLoader.cs" />
-    <Compile Include="Dialogs\IUniqueDialog.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
