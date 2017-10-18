@@ -265,6 +265,9 @@ namespace OpenTKImageViewer.UI
         private void OnImageChange()
         {
             PixelShowAlpha = window.Context.HasAlpha();
+            // change to decimal display if hdr image was added
+            if (window.Context.HasHdr())
+                PixelDisplay = StatusBarControl.PixelDisplayType.Float;
         }
     }
 }

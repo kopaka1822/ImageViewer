@@ -175,14 +175,31 @@ namespace OpenTKImageViewer.ImageContext
             return images[image].image.Filename;
         }
 
+        /// <summary>
+        /// checks if all images are grayscale images
+        /// </summary>
+        /// <returns>true if all images are grayscale images</returns>
         public bool HasOnlyGrayscale()
         {
             return images.All(imageData => imageData.image.IsGrayscale());
         }
 
+        /// <summary>
+        /// checks if any image has alpha channel
+        /// </summary>
+        /// <returns>true if any image has alpha channel</returns>
         public bool HasAlpha()
         {
             return images.Any(imageData => imageData.image.HasAlpha());
+        }
+
+        /// <summary>
+        /// checks if any image is hdr
+        /// </summary>
+        /// <returns>true if any image is hdr</returns>
+        public bool HasHdr()
+        {
+            return images.Any(imageData => imageData.image.IsHdr());
         }
 
         public byte[] GetCurrentImageData(int level, int layer, PixelFormat format, PixelType type, out int width,

@@ -152,6 +152,10 @@ namespace OpenTKImageViewer
                 return 0;
             }
 
+            /// <summary>
+            /// checks if the image is grayscale
+            /// </summary>
+            /// <returns>true if only one component is used</returns>
             public bool IsGrayscale()
             {
                 PixelFormat pixelFormat = (PixelFormat) OpenglExternalFormat;
@@ -177,6 +181,10 @@ namespace OpenTKImageViewer
                 return false;
             }
 
+            /// <summary>
+            /// checks for availability of the alpha components
+            /// </summary>
+            /// <returns>true if image has an alpha component</returns>
             public bool HasAlpha()
             {
                 var pixelFormat = (PixelFormat)OpenglExternalFormat;
@@ -191,6 +199,40 @@ namespace OpenTKImageViewer
                     case PixelFormat.Luminance16Alpha8IccSgix:
                     case PixelFormat.RgbaInteger:
                     case PixelFormat.BgraInteger:
+                        return true;
+                }
+                return false;
+            }
+
+            /// <summary>
+            /// checks for high dimension range
+            /// </summary>
+            /// <returns>true if the image type is bigger than byte (range > [0-255])</returns>
+            public bool IsHdr()
+            {
+                var type = (PixelType) OpenglType;
+                switch (type)
+                {
+                    case PixelType.Short:
+                    case PixelType.UnsignedShort:
+                    case PixelType.Int:
+                    case PixelType.UnsignedInt:
+                    case PixelType.Float:
+                    case PixelType.HalfFloat:
+                    case PixelType.UnsignedShort4444:
+                    case PixelType.UnsignedShort5551:
+                    case PixelType.UnsignedInt8888:
+                    case PixelType.UnsignedInt1010102:
+                    case PixelType.UnsignedShort565:
+                    case PixelType.UnsignedShort565Reversed:
+                    case PixelType.UnsignedShort4444Reversed:
+                    case PixelType.UnsignedShort1555Reversed:
+                    case PixelType.UnsignedInt8888Reversed:
+                    case PixelType.UnsignedInt2101010Reversed:
+                    case PixelType.UnsignedInt248:
+                    case PixelType.UnsignedInt10F11F11FRev:
+                    case PixelType.UnsignedInt5999Rev:
+                    case PixelType.Float32UnsignedInt248Rev:
                         return true;
                 }
                 return false;

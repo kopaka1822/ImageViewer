@@ -461,7 +461,7 @@ namespace OpenTKImageViewer
         /// <param name="images"></param>
         private void ImportImage(List<ImageLoader.Image> images)
         {
-            bool resetViews = Context.GetNumImages() == 0;
+            bool isFirstImage = Context.GetNumImages() == 0;
             foreach (var image in images)
             {
                 Context.AddImage(image);
@@ -471,7 +471,7 @@ namespace OpenTKImageViewer
                 ParentApp.OpenDialog(App.UniqueDialog.Image);
 
 
-            if (resetViews)
+            if (isFirstImage)
             {
                 imageViews.Clear();
                 CreateImageViews();
