@@ -15,13 +15,16 @@ namespace OpenTKImageViewer.ImageContext
         private bool contentChanged = false;
         private const int LocalSize = 8;
         private const int TextureBindingStart = 3;
-        private ImageFormula formula;
+        private readonly ImageFormula colorFormula;
+        private readonly ImageFormula alphaFormula;
 
-        public ImageCombineShader(ImageContext context, ImageFormula formula)
+        public ImageCombineShader(ImageContext context, ImageFormula formula, ImageFormula alphaFormula)
         {
             this.context = context;
-            this.formula = formula;
-            formula.Changed += (sender, args) => contentChanged = true;
+            this.colorFormula = formula;
+            this.alphaFormula = alphaFormula;
+            colorFormula.Changed += (sender, args) => contentChanged = true;
+            alphaFormula.Changed += (sender, args) => contentChanged = true;
         }
 
         /// <summary>
@@ -120,7 +123,7 @@ namespace OpenTKImageViewer.ImageContext
 
         private string GetImageColor()
         {
-            return formula.Converted;
+            return $"vec4(({colorFormula.Converted}).rgb, ({alphaFormula.Converted}).a)";
         }
 
         private string GetTextureGetters()

@@ -43,7 +43,7 @@ namespace OpenTKImageViewer.ImageContext
             AlphaFormula.Changed += (sender, args) => RecomputeImage = true;
 
             // TODO modify combine shader to take alpha and rgb part
-            combineShader = new ImageCombineShader(context, CombineFormula);
+            combineShader = new ImageCombineShader(context, CombineFormula, AlphaFormula);
         }
 
         /// <summary>
