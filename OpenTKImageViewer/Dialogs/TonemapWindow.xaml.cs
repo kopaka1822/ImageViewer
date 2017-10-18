@@ -138,6 +138,7 @@ namespace OpenTKImageViewer.Dialogs
                             Margin = margin
                         };
                         box.Checked += (sender, args) => para.CurrentValue = BoolToDecimal(box.IsChecked);
+                        box.Unchecked += (sender, args) => para.CurrentValue = BoolToDecimal(box.IsChecked);
                         para.ValueChanged += (sender, args) => box.IsChecked = para.CurrentValue != (decimal)0.0;
                         list.Add(box);
                     }
