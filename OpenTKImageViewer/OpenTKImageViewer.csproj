@@ -314,5 +314,8 @@
   <ItemGroup>
     <Resource Include="Icons\multiview.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\tonemap.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

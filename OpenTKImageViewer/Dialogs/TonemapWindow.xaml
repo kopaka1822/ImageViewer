@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Tonemapper" Height="300" Width="600"
         ResizeMode="NoResize" Background="#eee"
-        Icon="../Icons/app.png"
+        Icon="../Icons/tonemap.png"
         Closing="TonemapWindow_OnClosing">
     <Grid>
         <Grid.ColumnDefinitions>

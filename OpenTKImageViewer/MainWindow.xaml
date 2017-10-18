@@ -62,7 +62,11 @@
                         <Image Source="Icons/multiview.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Tone Mapping" Click="MenuItem_Click_Tonemapper"/>
+                <MenuItem Header="Tonemapper" Click="MenuItem_Click_Tonemapper">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/tonemap.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>
 
