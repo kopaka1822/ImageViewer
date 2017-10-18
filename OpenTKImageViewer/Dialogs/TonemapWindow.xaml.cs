@@ -26,8 +26,8 @@ namespace OpenTKImageViewer.Dialogs
     public partial class TonemapWindow : Window
     {
         public bool IsClosing { get; set; } = false;
-        private MainWindow parent;
-        private List<ToneParameter> toneSettings;
+        private readonly MainWindow parent;
+        private readonly List<ToneParameter> toneSettings;
 
         public TonemapWindow(MainWindow parent)
         {
@@ -47,6 +47,11 @@ namespace OpenTKImageViewer.Dialogs
             parent.Context.Tonemapper.RemoveUnusedShader();
         }
 
+        /// <summary>
+        /// adding a tonemapping shader
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonAdd_OnClick(object sender, RoutedEventArgs e)
         {
             var ofd = new OpenFileDialog();
@@ -87,70 +92,86 @@ namespace OpenTKImageViewer.Dialogs
                 ListBoxMapper.SelectedIndex = 0;
         }
 
-        private void DisplayItem(ToneParameter p)
+        /// <summary>
+        /// displays the shader dialog on the right side (title, parameters etc.)
+        /// </summary>
+        /// <param name="parameters">Shader with parameters</param>
+        private void DisplayItem(ToneParameter parameters)
         {
+            // clear previous stack pannel
             var list = StackPanelMapper.Children;
             list.Clear();
 
             var margin = new Thickness(0.0, 0.0, 0.0, 2.0);
 
-            list.Add(new TextBlock {Text = p.Shader.Name, Margin = margin, TextWrapping = TextWrapping.Wrap, FontSize = 18.0});
-            if(p.Shader.Description.Length > 0)
-                list.Add(new TextBlock { Text = p.Shader.Description, Margin = new Thickness(0.0, 0.0, 0.0, 10.0), TextWrapping = TextWrapping.Wrap});
+            // add title and description
+            list.Add(new TextBlock {Text = parameters.Shader.Name, Margin = margin, TextWrapping = TextWrapping.Wrap, FontSize = 18.0});
+            if(parameters.Shader.Description.Length > 0)
+                list.Add(new TextBlock { Text = parameters.Shader.Description, Margin = new Thickness(0.0, 0.0, 0.0, 10.0), TextWrapping = TextWrapping.Wrap});
 
-            // Display settings
-            foreach (var para in p.Parameters)
+            // Display all settings
+            foreach (var para in parameters.Parameters)
             {
+                // parameter name
                 list.Add(new TextBlock {Text = para.Name + ":", Margin = margin, TextWrapping = TextWrapping.Wrap});
 
+                // parameter input (check box ord number box)
                 switch (para.Type)
                 {
                     case ShaderLoader.ParameterType.Bool:
                     {
                         // check Box
-                        var e = new CheckBox {IsChecked = GetBoolValue(para), Margin = margin};
-                        e.Checked += (sender, args) => para.CurrentValue = BoolToDecimal(e.IsChecked);
-                        para.ValueChanged += (sender, args) => e.IsChecked = para.CurrentValue != (decimal)0.0;
-                        list.Add(e);
+                        var box = new CheckBox
+                        {
+                            IsChecked = GetBoolValue(para),
+                            Margin = margin
+                        };
+                        box.Checked += (sender, args) => para.CurrentValue = BoolToDecimal(box.IsChecked);
+                        para.ValueChanged += (sender, args) => box.IsChecked = para.CurrentValue != (decimal)0.0;
+                        list.Add(box);
                     }
                         break;
                     case ShaderLoader.ParameterType.Int:
                     {
                         // use num up down
-                        var e = new IntegerUpDown
+                        var numBox = new IntegerUpDown
                         {
-                            Value = (int) para.CurrentValue, Margin = margin, CultureInfo = new CultureInfo("en-US")
+                            Value = (int) para.CurrentValue,
+                            Margin = margin,
+                            CultureInfo = new CultureInfo("en-US")
                         };
-                        e.ValueChanged += (sender, args) =>
+                        numBox.ValueChanged += (sender, args) =>
                         {
-                            if (e.Value != null) para.CurrentValue = (decimal)e.Value;
+                            if (numBox.Value != null) para.CurrentValue = (decimal)numBox.Value;
                         };
-                        para.ValueChanged += (sender, args) => e.Value = (int)para.CurrentValue;
-                        list.Add(e);
+                        para.ValueChanged += (sender, args) => numBox.Value = (int)para.CurrentValue;
+                        list.Add(numBox);
                     }
                         break;
-                    default:
+                    case ShaderLoader.ParameterType.Float:
                     {
-                        var e = new DecimalUpDown
+                        var numBox = new DecimalUpDown
                         {
-                            Value = para.CurrentValue, Margin = margin, CultureInfo = new CultureInfo("en-US")
+                            Value = para.CurrentValue,
+                            Margin = margin,
+                            CultureInfo = new CultureInfo("en-US")
                         };
 
-                        e.ValueChanged += (sender, args) =>
+                        numBox.ValueChanged += (sender, args) =>
                         {
-                            if (e.Value != null) para.CurrentValue =(decimal)e.Value;
+                            if (numBox.Value != null) para.CurrentValue =(decimal)numBox.Value;
                         };
                         para.ValueChanged += (sender, args) =>
                         {
-                            e.Value = para.CurrentValue;
+                            numBox.Value = para.CurrentValue;
                         };
-                        list.Add(e);
+                        list.Add(numBox);
                     }
                         break;
                 }
             }
 
-            // default button
+            // restore default button
             var btn = new Button
             {
                 Content = "Restore Defaults",
@@ -158,7 +179,7 @@ namespace OpenTKImageViewer.Dialogs
                 Margin = new Thickness(0.0, 8.0, 0.0, 0.0),
                 Padding = new Thickness(2)
             };
-            btn.Click += (sender, args) => p.RestoreDefaults();
+            btn.Click += (sender, args) => parameters.RestoreDefaults();
             list.Add(btn);
         }
 
@@ -175,8 +196,14 @@ namespace OpenTKImageViewer.Dialogs
             return (bool)b ? 1 : 0;
         }
 
-        private ListBoxItem GenerateItem(ToneParameter p)
+        /// <summary>
+        /// generates list item for the left side of the window
+        /// </summary>
+        /// <param name="parameter">Shader with parameters</param>
+        /// <returns></returns>
+        private ListBoxItem GenerateItem(ToneParameter parameter)
         {
+            // load images
             var imgUp = new Image
             {
                 Source = new BitmapImage(new Uri(Environment.CurrentDirectory + "/Icons/arrow_up.png"))
@@ -190,6 +217,7 @@ namespace OpenTKImageViewer.Dialogs
                 Source = new BitmapImage(new Uri(Environment.CurrentDirectory + "/Icons/cancel.png"))
             };
 
+            // create buttons
             var btnUp = new Button
             {
                 Height = 8,
@@ -209,6 +237,7 @@ namespace OpenTKImageViewer.Dialogs
                 Content = imgDelete
             };
 
+            // stack panel for up and down button
             var upDownPanel = new StackPanel
             {
                 HorizontalAlignment = HorizontalAlignment.Right
@@ -216,8 +245,9 @@ namespace OpenTKImageViewer.Dialogs
             upDownPanel.Children.Add(btnUp);
             upDownPanel.Children.Add(btnDown);
 
-            var text = new TextBlock {Text = p.Shader.Name };
+            var text = new TextBlock {Text = parameter.Shader.Name };
             
+            // grid with name, remove, up/down
             var grid = new Grid {Width = 210.0};
             grid.ColumnDefinitions.Add(new ColumnDefinition{Width = new GridLength(1.0, GridUnitType.Star)});
             grid.ColumnDefinitions.Add(new ColumnDefinition{Width = new GridLength(1.0, GridUnitType.Auto)});
@@ -231,7 +261,7 @@ namespace OpenTKImageViewer.Dialogs
             grid.Children.Add(upDownPanel);
 
             // add callbacks
-            var item = new ListBoxItem { Content = grid, ToolTip = p.Shader.Description };
+            var item = new ListBoxItem { Content = grid, ToolTip = parameter.Shader.Description };
 
             btnUp.Click += (sender, args) => ItemMoveUp(item);
             btnDown.Click += (sender, args) => ItemMoveDown(item);
@@ -240,6 +270,11 @@ namespace OpenTKImageViewer.Dialogs
             return item;
         }
 
+        /// <summary>
+        /// tries to match the item object with an object in the left list
+        /// </summary>
+        /// <param name="item">list box item</param>
+        /// <returns>item index or -1 if not found</returns>
         private int GetItemIndex(ListBoxItem item)
         {
             for (int i = 0; i < ListBoxMapper.Items.Count; ++i)
@@ -250,6 +285,11 @@ namespace OpenTKImageViewer.Dialogs
             return -1;
         }
 
+        /// <summary>
+        /// swaps two items in the left list
+        /// </summary>
+        /// <param name="idx1">index of first item</param>
+        /// <param name="idx2">index of second item</param>
         private void SwapItems(int idx1, int idx2)
         {
             Debug.Assert(idx1 < idx2);
@@ -271,6 +311,10 @@ namespace OpenTKImageViewer.Dialogs
             toneSettings[idx2] = tmp2;
         }
 
+        /// <summary>
+        /// moves an item in the left list up (if possible)
+        /// </summary>
+        /// <param name="item">item object</param>
         private void ItemMoveUp(ListBoxItem item)
         {
             var idx = GetItemIndex(item);
@@ -280,6 +324,10 @@ namespace OpenTKImageViewer.Dialogs
             ListBoxMapper.SelectedIndex = idx - 1;
         }
 
+        /// <summary>
+        /// moves an item in the left list down (if possible)
+        /// </summary>
+        /// <param name="item">item object</param>
         private void ItemMoveDown(ListBoxItem item)
         {
             var idx = GetItemIndex(item);
@@ -289,6 +337,10 @@ namespace OpenTKImageViewer.Dialogs
             ListBoxMapper.SelectedIndex = idx + 1;
         }
 
+        /// <summary>
+        /// deletes an item in the left list
+        /// </summary>
+        /// <param name="item">item object</param>
         private void ItemDelete(ListBoxItem item)
         {
             var idx = GetItemIndex(item);
@@ -297,6 +349,11 @@ namespace OpenTKImageViewer.Dialogs
             toneSettings.RemoveAt(idx);
         }
 
+        /// <summary>
+        /// applies the new tonemapper configuration
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonApply_OnClick(object sender, RoutedEventArgs e)
         {
             // aplly current set of settings
@@ -312,6 +369,11 @@ namespace OpenTKImageViewer.Dialogs
             parent.DisableOpenGl();
         }
 
+        /// <summary>
+        /// display the new selected item on the right side or nothing if nothing is selected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ListBoxMapper_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ListBoxMapper.SelectedIndex >= 0)
