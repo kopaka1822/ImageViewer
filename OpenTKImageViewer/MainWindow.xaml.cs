@@ -39,6 +39,7 @@ using MenuItem = System.Windows.Controls.MenuItem;
 using MessageBox = System.Windows.MessageBox;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
+using WindowState = System.Windows.WindowState;
 
 namespace OpenTKImageViewer
 {
@@ -88,6 +89,12 @@ namespace OpenTKImageViewer
             this.ZIndex = 0;
 
             InitializeComponent();
+
+            this.Width = parentApp.GetConfig().WindowSizeX;
+            this.Height = parentApp.GetConfig().WindowSizeY;
+            if (parentApp.GetConfig().IsMaximized)
+                WindowState = WindowState.Maximized;
+            
 
             StatusBar = new StatusBarControl(this);
             CreateImageViews();
@@ -842,6 +849,16 @@ namespace OpenTKImageViewer
             {
                 // happens sometimes..
             }
+        }
+
+        private void MainWindow_OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ParentApp.GetConfig().IsMaximized = WindowState == WindowState.Maximized;
+            if(WindowState == WindowState.Maximized)
+                return;
+
+            ParentApp.GetConfig().WindowSizeX = (int)Width;
+            ParentApp.GetConfig().WindowSizeY = (int)Height;
         }
     }
 }

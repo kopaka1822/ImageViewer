@@ -304,5 +304,14 @@ namespace OpenTKImageViewer
         {
             appSettings.GetConfig().ExportPath = System.IO.Path.GetDirectoryName(fd.FileName);
         }
+
+        /// <summary>
+        /// retrieves current configuration
+        /// </summary>
+        /// <returns>a reference to the current configuration</returns>
+        public Settings.Config GetConfig()
+        {
+            return appSettings.GetConfig();
+        }
     }
 }

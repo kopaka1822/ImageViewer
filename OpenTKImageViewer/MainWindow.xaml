@@ -13,7 +13,8 @@
         MinWidth="250" MinHeight="200"
         Activated="MainWindow_OnActivated"
         Deactivated="MainWindow_OnDeactivated"
-        Icon="Icons/app.png">
+        Icon="Icons/app.png"
+        SizeChanged="MainWindow_OnSizeChanged">
     <DockPanel>
         <!--<StackPanel>-->
         <Menu DockPanel.Dock="Top" Background="#fff" Padding="0 0 0 2">

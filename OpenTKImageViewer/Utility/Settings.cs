@@ -12,16 +12,12 @@ namespace OpenTKImageViewer.Utility
     {
         public class Config
         {
-            public Config()
-            {
-                ImagePath = "";
-                TonemapperPath = "";
-                ExportPath = "";
-            }
-
-            public string ImagePath;
-            public string TonemapperPath;
-            public string ExportPath;
+            public string ImagePath = "";
+            public string TonemapperPath = "";
+            public string ExportPath = "";
+            public int WindowSizeX = 800;
+            public int WindowSizeY = 600;
+            public bool IsMaximized = false;
         }
 
         private readonly Config config = null;
