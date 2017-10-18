@@ -109,7 +109,7 @@ namespace OpenTKImageViewer.UI
             window.TextMousePosition.Text = $"{x}, {y}";
             lastMouseX = x;
             lastMouseY = y;
-            if (window.Context.CpuCachedTexture != null)
+            if (window.Context.GetCpuTexture() != null)
             {
                 window.TextMousePositionColor.Text = GetColorString(GetPixelColor(x,y));
             }
@@ -121,17 +121,18 @@ namespace OpenTKImageViewer.UI
         /// <returns></returns>
         public Vector4 GetCurrentPixelColor()
         {
-            if(window.Context.CpuCachedTexture == null)
+            if(window.Context.GetCpuTexture() == null)
                 return new Vector4(0.0f);
             return GetPixelColor(lastMouseX, lastMouseY);
         }
 
         private Vector4 GetPixelColor(int x, int y)
         {
+            var cpuTex = window.Context.GetCpuTexture();
             var sum = new Vector4(0.0f);
             for(var curX = x - PixelRadius; curX < x + PixelRadius + 1; ++curX)
             for (var curY = y - PixelRadius; curY < y + PixelRadius + 1; ++curY)
-                sum += window.Context.CpuCachedTexture.GetPixel(curX, curY, (int) window.Context.ActiveLayer,
+                sum += cpuTex.GetPixel(curX, curY, (int) window.Context.ActiveLayer,
                     (int) window.Context.ActiveMipmap);
 
             var w = 1 + 2 * PixelRadius;

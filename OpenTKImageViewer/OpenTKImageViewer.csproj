@@ -160,7 +160,9 @@
     <Compile Include="glhelper\CpuTexture.cs" />
     <Compile Include="glhelper\TextureArray2D.cs" />
     <Compile Include="ImageContext\ImageCombineShader.cs" />
+    <Compile Include="ImageContext\ImageConfiguration.cs" />
     <Compile Include="ImageContext\ImageFormula.cs" />
+    <Compile Include="ImageContext\TextureCache.cs" />
     <Compile Include="ImageContext\TonemapperManager.cs" />
     <Compile Include="Tonemapping\ShaderLoader.cs" />
     <Compile Include="Tonemapping\TonemapperControl.cs" />

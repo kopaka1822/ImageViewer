@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
         mc:Ignorable="d"
-        Title="Images" Height="530" Width="200"
+        Title="Images" Height="580" Width="260"
         ResizeMode="NoResize" Background="#eee"
         Icon="../Icons/multiview.png">
 
@@ -25,7 +25,7 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Visible: "/>
-                        <CheckBox Grid.Column="1"/>
+                        <CheckBox Grid.Column="1" x:Name="BoxVisible1"/>
                     </Grid>
                     <Grid Margin="0 0 0 5">
                         <Grid.ColumnDefinitions>
@@ -33,10 +33,28 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Apply Tonemapper: "/>
-                        <CheckBox Grid.Column="1"/>
+                        <CheckBox Grid.Column="1" x:Name="BoxTonemapper1"/>
                     </Grid>
-                    <TextBox Text="Image1 + Image2" Margin="0 0 0 5"
-                         x:Name="EquationBox1"/>
+                    <Grid Margin="0 0 0 5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="RGB: "/>
+                        <TextBox Grid.Column="1"
+                                 Text="Image1 + Image2" Margin="0 0 0 5"
+                                 x:Name="EquationBox1"/>
+                    </Grid>
+                    <Grid Margin="0 0 0 5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Alpha: "/>
+                        <TextBox Grid.Column="1"
+                                 Text="Image1 + Image2" Margin="0 0 0 5"
+                                 x:Name="EquationBoxAlpha1"/>
+                    </Grid>
                 </StackPanel>
             </GroupBox>
 
@@ -48,7 +66,7 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Visible: "/>
-                        <CheckBox Grid.Column="1"/>
+                        <CheckBox Grid.Column="1" x:Name="BoxVisible2"/>
                     </Grid>
                     <Grid Margin="0 0 0 5">
                         <Grid.ColumnDefinitions>
@@ -56,10 +74,28 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Apply Tonemapper: "/>
-                        <CheckBox Grid.Column="1"/>
+                        <CheckBox Grid.Column="1" x:Name="BoxTonemapper2"/>
                     </Grid>
-                    <TextBox Text="Image1 + Image2" Margin="0 0 0 5"
-                             x:Name="EquationBox2"/>
+                    <Grid Margin="0 0 0 5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="RGB: "/>
+                        <TextBox Grid.Column="1"
+                                 Text="Image1 + Image2" Margin="0 0 0 5"
+                                 x:Name="EquationBox2"/>
+                    </Grid>
+                    <Grid Margin="0 0 0 5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Alpha: "/>
+                        <TextBox Grid.Column="1"
+                                 Text="Image1 + Image2" Margin="0 0 0 5"
+                                 x:Name="EquationBoxAlpha2"/>
+                    </Grid>
                 </StackPanel>
             </GroupBox>
 

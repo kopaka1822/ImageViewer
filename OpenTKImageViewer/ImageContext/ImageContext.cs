@@ -52,14 +52,10 @@ namespace OpenTKImageViewer.ImageContext
         private readonly List<ImageData> images = new List<ImageData>();
         private uint activeMipmap = 0;
         private uint activeLayer = 0;
-        private TextureArray2D[] textures;
-        private readonly ImageCombineShader imageCombineShader1;
         private bool linearInterpolation = false;
         private GrayscaleMode grayscale = GrayscaleMode.Disabled;
-        private bool recomputeImages = true;
-        private bool recomputeCpuTexture = false;
-        private IStepable tonemappingStepable = null;
         private bool displayColorBeforeTonemapping = true;
+        private readonly ImageConfiguration[] finalTextures = new ImageConfiguration[2];
 
         #endregion
 
@@ -113,7 +109,6 @@ namespace OpenTKImageViewer.ImageContext
             }
         }
 
-        public ImageFormula ImageFormula1 { get; } = new ImageFormula();
         public TonemapperManager Tonemapper { get; } = new TonemapperManager();
 
         // this will determine if the cpu cached textures will be acquired directly after combining the images or after tonemapping
@@ -125,18 +120,34 @@ namespace OpenTKImageViewer.ImageContext
                 {
                     displayColorBeforeTonemapping = value;
                     if (value)
-                        recomputeImages = true;
+                        foreach (var imageConfiguration in finalTextures)
+                        {
+                            imageConfiguration.RecomputeImage = true;
+                        }
                     else
                         // since the images after the tonemapping is requested nothing needs to be recomputed
-                        recomputeCpuTexture = true;
+                        foreach (var imageConfiguration in finalTextures)
+                        {
+                            imageConfiguration.RecomputeCpuTexture = true;
+                        }
                 }
             }
         }
-        public CpuTexture CpuCachedTexture { get; private set; } = null;
 
+        public TextureCache TextureCache { get; }
         #endregion
 
         #region Public Getter
+
+        public ImageConfiguration GetImageConfiguration(int id)
+        {
+            return finalTextures[id];
+        }
+
+        public TextureArray2D GetImageTexture(int id)
+        {
+            return images[id].TextureArray2D;
+        }
 
         public int GetNumImages()
         {
@@ -202,15 +213,22 @@ namespace OpenTKImageViewer.ImageContext
             return images.Any(imageData => imageData.image.IsHdr());
         }
 
+        // TODO update
         public byte[] GetCurrentImageData(int level, int layer, PixelFormat format, PixelType type, out int width,
             out int height)
         {
             width = GetWidth(level);
             height = GetHeight(level);
-            if (textures?[0] == null)
+            if (finalTextures[0] == null)
                 return null;
 
-            return textures[0].GetData(level, layer, format, type, out width, out height);
+            return finalTextures[0].Texture.GetData(level, layer, format, type, out width, out height);
+        }
+
+        public CpuTexture GetCpuTexture()
+        {
+            // TODO determine active texture
+            return finalTextures[0].CpuCachedTexture;
         }
 
         #endregion
@@ -251,14 +269,15 @@ namespace OpenTKImageViewer.ImageContext
                 Grayscale = GrayscaleMode.Red;
         }
 
+        // TODO update
         public void BindFinalTextureAs2DSamplerArray(int slot)
         {
-            textures?[0]?.Bind(slot, LinearInterpolation);
+            finalTextures[0].Texture?.Bind(slot, LinearInterpolation);
         }
 
         public void BindFinalTextureAsCubeMap(int slot)
         {
-            textures?[0]?.BindAsCubemap(slot, LinearInterpolation);
+            finalTextures[0].Texture ?.BindAsCubemap(slot, LinearInterpolation);
         }
 
         /// <summary>
@@ -277,63 +296,29 @@ namespace OpenTKImageViewer.ImageContext
                     imageData.TextureArray2D = new TextureArray2D(imageData.image);
             }
 
-            // create destination images
-            if (textures == null)
+            foreach (var imageConfiguration in finalTextures)
             {
-                // create image
-                // 1 image for the final result. 1 image for ping pong buffering
-                textures = new TextureArray2D[2];
-                for(int i = 0; i < textures.Length; ++i)
-                    textures[i] = new TextureArray2D(GetNumLayers(), GetNumMipmaps(),
-                    SizedInternalFormat.Rgba32f, GetWidth(0), GetHeight(0));
-            }
-
-            imageCombineShader1.Update();
-
-            // update cpu texture (from before tonemapping to after tonemapping)
-            if (recomputeCpuTexture)
-            {
-                CpuCachedTexture = textures[0].GetFloatPixels(GetNumMipmaps(), GetNumLayers());
-                recomputeCpuTexture = false;
-            }
-
-            // update images?
-            if (recomputeImages)
-            {
-                recomputeImages = false;
-                RecomputeCombinedImage(textures[0]);
-
-                // retrieve the complete image for the cpu
-                if (DisplayColorBeforeTonemapping)
-                    CpuCachedTexture = textures[0].GetFloatPixels(GetNumMipmaps(), GetNumLayers());
-
-                // set new stepable
-                tonemappingStepable = Tonemapper.GetApplyShaderStepable(textures, this);
-            }
-
-            if (tonemappingStepable != null)
-            {
-                if(tonemappingStepable.HasStep())
-                    tonemappingStepable.NextStep();
-
-                if (!tonemappingStepable.HasStep())
-                {
-                    // finished stepping
-                    tonemappingStepable = null;
-
-                    // retrieve the complete image for the cpu
-                    if(!DisplayColorBeforeTonemapping)
-                        CpuCachedTexture = textures[0].GetFloatPixels(GetNumMipmaps(), GetNumLayers());
-                    return true;
-                }
-                return false;
+                if (!imageConfiguration.Update())
+                    return false; // something has to be updated and cannot be drawn
             }
 
             return true;
         }
 
+        private IStepable FindStepable()
+        {
+            foreach (var imageConfiguration in finalTextures)
+            {
+                if (imageConfiguration.TonemappingStepable != null)
+                    return imageConfiguration.TonemappingStepable;
+            }
+            return null;
+        }
+
         public float GetImageProcess()
         {
+            // find first stepable
+            var tonemappingStepable = FindStepable();
             if (tonemappingStepable == null)
                 return 1.0f;
             return (float)tonemappingStepable.CurrentStep();
@@ -341,6 +326,7 @@ namespace OpenTKImageViewer.ImageContext
 
         public string GetImageLoadingDescription()
         {
+            var tonemappingStepable = FindStepable();
             if (tonemappingStepable == null)
                 return "";
             return tonemappingStepable.GetDescription();
@@ -348,6 +334,7 @@ namespace OpenTKImageViewer.ImageContext
 
         public bool IsImageProcessing()
         {
+            var tonemappingStepable = FindStepable();
             return tonemappingStepable != null;
         }
 
@@ -356,7 +343,10 @@ namespace OpenTKImageViewer.ImageContext
             if (!IsImageProcessing()) return;
 
             // TODO restore old image?
-            tonemappingStepable = null;
+            foreach (var imageConfiguration in finalTextures)
+            {
+                imageConfiguration.AbortImageCalculation();
+            }
         }
 
         #endregion
@@ -399,35 +389,31 @@ namespace OpenTKImageViewer.ImageContext
 
         public ImageContext(List<ImageLoader.Image> images)
         {
-            // on changed events
-            Tonemapper.ChangedSettings += (sender, args) => recomputeImages = true;
-            ImageFormula1.Changed += (sender, args) => recomputeImages = true;
+            TextureCache = new TextureCache(this);
 
-            imageCombineShader1 = new ImageCombineShader(this, ImageFormula1);
+            for (var i = 0; i < finalTextures.Length; ++i)
+            {
+                finalTextures[i] = new ImageConfiguration(this)
+                // only first is active by default
+                { Active = i == 0};
+            }
+                
+
+            // on changed events
+            Tonemapper.ChangedSettings += (sender, args) =>
+            {
+                foreach (var toneConfiguration in finalTextures)
+                {
+                    // only recompute if tonemappers would be used
+                    if (toneConfiguration.UseTonemapper)
+                        toneConfiguration.RecomputeImage = true;
+                }
+            };
             if (images != null)
             {
                 foreach (var image in images)
                 {
                     AddImage(image);
-                }
-            }
-        }
-
-        private void RecomputeCombinedImage(TextureArray2D target)
-        {
-            if (images.Count == 0)
-                return;
-
-            for (int layer = 0; layer < GetNumLayers(); ++layer)
-            {
-                for (int level = 0; level < GetNumMipmaps(); ++level)
-                {
-                    for (int image = 0; image < GetNumImages(); ++image)
-                    {
-                        images[image].TextureArray2D.Bind(imageCombineShader1.GetSourceImageBinding(image), false);
-                    }
-                    
-                    imageCombineShader1.Run(layer, level, GetWidth(level), GetHeight(level), target);
                 }
             }
         }
