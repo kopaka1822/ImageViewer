@@ -57,7 +57,11 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="_Windows">
-                <MenuItem Header="Images" Click="MenuItem_Click_Images"/>
+                <MenuItem Header="Images" Click="MenuItem_Click_Images">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/multiview.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem Header="Tone Mapping" Click="MenuItem_Click_Tonemapper"/>
             </MenuItem>
         </Menu>

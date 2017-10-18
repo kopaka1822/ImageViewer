@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
         mc:Ignorable="d"
-        Title="Images" Height="320" Width="200"
+        Title="Images" Height="530" Width="200"
         ResizeMode="NoResize" Background="#eee"
         Closing="ImageWindow_OnClosing"
-        Icon="../Icons/app.png">
+        Icon="../Icons/multiview.png">
 
     <Border Padding="5">
         <StackPanel>
@@ -17,9 +17,58 @@
             <ListBox SelectedIndex="0" x:Name="ImageList"
                      ScrollViewer.VerticalScrollBarVisibility="Visible"                       
                      MinHeight="180" MaxHeight="180"/>
-            <TextBlock Text="Equation:" Margin="0 2 0 2"/>
-            <TextBox Text="Image1 + Image2" Margin="0 0 0 5"
-                     x:Name="EquationBox1"/>
+
+            <GroupBox Header="Equation 1" Margin="0 0 0 5">
+                <StackPanel>
+                    <Grid Margin="0 5 0 5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Visible: "/>
+                        <CheckBox Grid.Column="1"/>
+                    </Grid>
+                    <Grid Margin="0 0 0 5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Apply Tonemapper: "/>
+                        <CheckBox Grid.Column="1"/>
+                    </Grid>
+                    <TextBox Text="Image1 + Image2" Margin="0 0 0 5"
+                         x:Name="EquationBox1"/>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Equation 2" Margin="0 0 0 5">
+                <StackPanel>
+                    <Grid Margin="0 5 0 5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Visible: "/>
+                        <CheckBox Grid.Column="1"/>
+                    </Grid>
+                    <Grid Margin="0 0 0 5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Apply Tonemapper: "/>
+                        <CheckBox Grid.Column="1"/>
+                    </Grid>
+                    <TextBox Text="Image1 + Image2" Margin="0 0 0 5"
+                             x:Name="EquationBox2"/>
+                </StackPanel>
+            </GroupBox>
+
+            <TextBlock Text="Split Mode:" Margin="0 0 0 5"/>
+            <ComboBox Margin="0 0 0 5" SelectedIndex="0">
+                <ComboBoxItem Content="Vertical"/>
+                <ComboBoxItem Content="Horizontal"/>
+            </ComboBox>
 
             <Button Content="Apply" MinWidth="100" HorizontalAlignment="Right"
                     Click="ButtonApply_OnClick"/>

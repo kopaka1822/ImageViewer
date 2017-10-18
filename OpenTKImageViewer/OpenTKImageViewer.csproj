@@ -311,5 +311,8 @@
   <ItemGroup>
     <Resource Include="Icons\displayconfig.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\multiview.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
