@@ -29,7 +29,7 @@ namespace OpenTKImageViewer.View
             shader = new PolarViewShader();
         }
 
-        public override void Draw()
+        public override void Draw(int activeImage)
         {
             DrawCheckers();
 
@@ -43,7 +43,7 @@ namespace OpenTKImageViewer.View
             shader.SetLayer((float)Context.ActiveLayer);
             shader.SetFarplane(GetZoom());
             shader.SetGrayscale(Context.Grayscale);
-            Context.BindFinalTextureAs2DSamplerArray(shader.GetTextureLocation());
+            Context.BindFinalTextureAs2DSamplerArray(activeImage, shader.GetTextureLocation());
 
             // draw via vertex array
             DrawQuad();

@@ -16,7 +16,7 @@ namespace OpenTKImageViewer.View
             window.StatusBar.LayerMode = StatusBarControl.LayerModeType.None;
         }
 
-        public void Draw()
+        public void Draw(int activeImage)
         {
             
         }

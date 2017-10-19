@@ -27,7 +27,7 @@ namespace OpenTKImageViewer.View
             GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
         }
 
-        public virtual void Draw()
+        public virtual void Draw(int activeImage)
         {
             
         }

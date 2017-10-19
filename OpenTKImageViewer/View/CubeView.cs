@@ -29,7 +29,7 @@ namespace OpenTKImageViewer.View
             shader = new CubeViewShader();
         }
 
-        public override void Draw()
+        public override void Draw(int activeImage)
         {
             DrawCheckers();
 
@@ -41,7 +41,7 @@ namespace OpenTKImageViewer.View
             shader.SetFarplane(GetZoom());
             shader.SetLevel((float)Context.ActiveMipmap);
             shader.SetGrayscale(Context.Grayscale);
-            Context.BindFinalTextureAsCubeMap(shader.GetTextureLocation());
+            Context.BindFinalTextureAsCubeMap(activeImage, shader.GetTextureLocation());
             // draw via vertex array
             DrawQuad();
 

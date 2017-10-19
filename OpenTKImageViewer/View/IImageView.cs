@@ -19,7 +19,7 @@ namespace OpenTKImageViewer.View
     interface IImageView
     {
         void Update(MainWindow window);
-        void Draw();
+        void Draw(int activeImage);
         void OnDrag(Vector diff, MainWindow window);
         void OnScroll(double diff, Point mouse);
         void UpdateMouseDisplay(MainWindow window);

@@ -21,9 +21,9 @@ namespace OpenTKImageViewer.View
         {
         }
 
-        public override void Draw()
+        public override void Draw(int activeImage)
         {
-            DrawLayer(Matrix4.Identity, Context.ActiveLayer);
+            DrawLayer(Matrix4.Identity, Context.ActiveLayer, activeImage);
         }
 
         public override void UpdateMouseDisplay(MainWindow window)

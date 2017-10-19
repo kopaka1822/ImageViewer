@@ -100,7 +100,9 @@
             </GroupBox>
 
             <TextBlock Text="Split Mode:" Margin="0 0 0 5"/>
-            <ComboBox Margin="0 0 0 5" SelectedIndex="0">
+            <ComboBox Margin="0 0 0 5" SelectedIndex="0"
+                      x:Name="BoxSplitView"
+                      SelectionChanged="BoxSplitView_OnSelectionChanged">
                 <ComboBoxItem Content="Vertical"/>
                 <ComboBoxItem Content="Horizontal"/>
             </ComboBox>

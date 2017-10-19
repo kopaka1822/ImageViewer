@@ -61,6 +61,14 @@ namespace OpenTKImageViewer.ImageContext
 
         #region Public Properties
 
+        public enum SplitViewMode
+        {
+            Vertical,
+            Horizontal
+        }
+
+        public SplitViewMode SplitView { get; set; } = SplitViewMode.Vertical;
+
         public bool LinearInterpolation
         {
             get => linearInterpolation;
@@ -269,15 +277,35 @@ namespace OpenTKImageViewer.ImageContext
                 Grayscale = GrayscaleMode.Red;
         }
 
-        // TODO update
-        public void BindFinalTextureAs2DSamplerArray(int slot)
+        /// <summary>
+        /// returns number of visible final textures (selected in the image dialog)
+        /// </summary>
+        /// <returns>[0,2]</returns>
+        public int GetNumActiveImages()
         {
-            finalTextures[0].Texture?.Bind(slot, LinearInterpolation);
+            return finalTextures.Count(imageConfiguration => imageConfiguration.Active);
         }
 
-        public void BindFinalTextureAsCubeMap(int slot)
+        /// <summary>
+        /// bind the final texture
+        /// </summary>
+        /// <param name="image">id of the finals image (0 or 1)</param>
+        /// <param name="slot">binding slot</param>
+        public void BindFinalTextureAs2DSamplerArray(int image, int slot)
         {
-            finalTextures[0].Texture ?.BindAsCubemap(slot, LinearInterpolation);
+            Debug.Assert(finalTextures[image].Active);
+            finalTextures[image].Texture?.Bind(slot, LinearInterpolation);
+        }
+
+        /// <summary>
+        /// bind the final texture
+        /// </summary>
+        /// <param name="image">id of the finals image (0 or 1)</param>
+        /// <param name="slot">binding slot</param>
+        public void BindFinalTextureAsCubeMap(int image,  int slot)
+        {
+            Debug.Assert(finalTextures[image].Active);
+            finalTextures[image].Texture ?.BindAsCubemap(slot, LinearInterpolation);
         }
 
         /// <summary>

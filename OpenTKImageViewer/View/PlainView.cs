@@ -79,7 +79,7 @@ namespace OpenTKImageViewer.View
             transform[1, 1] = dec;
         }
 
-        protected void DrawLayer(Matrix4 offset, uint layer)
+        protected void DrawLayer(Matrix4 offset, uint layer, int imageId)
         {
             var finalTrans = offset * transform * aspectRatio;
 
@@ -95,7 +95,7 @@ namespace OpenTKImageViewer.View
             shader.SetLevel((float)Context.ActiveMipmap);
             shader.SetLayer((float)layer);
             shader.SetGrayscale(Context.Grayscale);
-            Context.BindFinalTextureAs2DSamplerArray(shader.GetTextureLocation());
+            Context.BindFinalTextureAs2DSamplerArray(imageId, shader.GetTextureLocation());
             glhelper.Utility.GLCheck();
 
             // draw via vertex array

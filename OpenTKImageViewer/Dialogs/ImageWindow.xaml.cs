@@ -109,6 +109,11 @@ namespace OpenTKImageViewer.Dialogs
                 parent.Context.GetImageConfiguration(1), parent.Context);
 
             parent.Context.ChangedImages += OnChangedImages;
+            BoxSplitView.SelectedIndex = (int) parent.Context.SplitView;
+
+            if (parent.Context.GetNumActiveImages() != 2)
+                BoxSplitView.IsEnabled = false;
+
             RefreshImageList();
         }
 
@@ -135,16 +140,35 @@ namespace OpenTKImageViewer.Dialogs
         {
             try
             {
+                Debug.Assert(BoxVisible1.IsChecked != null);
+                Debug.Assert(BoxVisible2.IsChecked != null);
+                if((bool)!BoxVisible1.IsChecked && (bool)!BoxVisible2.IsChecked)
+                    throw new Exception("At least one image has to be visible");
+
+                BoxSplitView.IsEnabled = (bool)BoxVisible1.IsChecked && (bool)BoxVisible2.IsChecked;
+
                 foreach (var equationBox in equationBoxes)
                 {
                     equationBox.Apply();
                 }
+                
                 parent.RedrawFrame();
             }
             catch (Exception exception)
             {
                 App.ShowErrorDialog(this, exception.Message);
             }
+        }
+
+        private void BoxSplitView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(BoxSplitView.SelectedIndex == -1)
+                return;
+            var mode = (ImageContext.ImageContext.SplitViewMode) BoxSplitView.SelectedIndex;
+            parent.Context.SplitView = mode;
+
+            if (parent.Context.GetNumActiveImages() == 2)
+                parent.RedrawFrame();
         }
     }
 }

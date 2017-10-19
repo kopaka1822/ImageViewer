@@ -272,7 +272,33 @@ namespace OpenTKImageViewer
                     imageViews[CurrentView]?.Update(this);
                     glhelper.Utility.GLCheck();
 
-                    imageViews[CurrentView]?.Draw();
+                    if (Context.GetNumActiveImages() == 2)
+                    {
+                        // draw both images with scissor test
+                        GL.Enable(EnableCap.ScissorTest);
+
+                        if(Context.SplitView == ImageContext.ImageContext.SplitViewMode.Vertical)
+                            GL.Scissor(0, 0, (int)MousePosition.X, (int)GetClientHeight());
+                        else
+                            GL.Scissor(0, (int)GetClientHeight() - (int)MousePosition.Y, (int)GetClientWidth(), (int)GetClientHeight());
+
+                        imageViews[CurrentView]?.Draw(0);
+
+                        if (Context.SplitView == ImageContext.ImageContext.SplitViewMode.Vertical)
+                            GL.Scissor((int)MousePosition.X, 0, (int)GetClientWidth(), (int)GetClientHeight());
+                        else
+                            GL.Scissor(0, 0, (int)GetClientWidth(), (int)GetClientHeight() - (int)MousePosition.Y);
+
+                        imageViews[CurrentView]?.Draw(1);
+
+                        GL.Disable(EnableCap.ScissorTest);
+                    }
+                    else if(Context.GetNumImages() == 1)
+                    {
+                        // draw the active image without scissor testing
+                        int activeImage = (Context.GetImageConfiguration(0).Active ? 0 : 1);
+                        imageViews[CurrentView]?.Draw(activeImage);
+                    }
                     glControl.SwapBuffers();
                 }
                 else
@@ -380,6 +406,10 @@ namespace OpenTKImageViewer
             }
             MousePosition = newPosition;
             imageViews[CurrentView]?.UpdateMouseDisplay(this);
+
+            // redraw frame on mouse move when viewing 2 pictures on the same time
+            if(Context.GetNumActiveImages() == 2)
+                RedrawFrame();
         }
 
         private void WinFormsHost_OnMouseDown(System.Windows.Forms.MouseEventArgs args)

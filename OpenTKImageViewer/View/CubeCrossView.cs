@@ -18,20 +18,20 @@ namespace OpenTKImageViewer.View
 
         }
 
-        public override void Draw()
+        public override void Draw(int activeImage)
         {
             // -x
-            DrawLayer(Matrix4.CreateTranslation(-2.0f, 0.0f, 0.0f), 1);
+            DrawLayer(Matrix4.CreateTranslation(-2.0f, 0.0f, 0.0f), 1, activeImage);
             // +y
-            DrawLayer(Matrix4.CreateTranslation(0.0f, 2.0f, 0.0f), 3);
+            DrawLayer(Matrix4.CreateTranslation(0.0f, 2.0f, 0.0f), 3, activeImage);
             // -y
-            DrawLayer(Matrix4.CreateTranslation(0.0f, -2.0f, 0.0f), 2);
+            DrawLayer(Matrix4.CreateTranslation(0.0f, -2.0f, 0.0f), 2, activeImage);
             // +z
-            DrawLayer(Matrix4.CreateTranslation(0.0f, 0.0f, 0.0f), 4);
+            DrawLayer(Matrix4.CreateTranslation(0.0f, 0.0f, 0.0f), 4, activeImage);
             // +x
-            DrawLayer(Matrix4.CreateTranslation(2.0f, 0.0f, 0.0f), 0);
+            DrawLayer(Matrix4.CreateTranslation(2.0f, 0.0f, 0.0f), 0, activeImage);
             // -z
-            DrawLayer(Matrix4.CreateTranslation(4.0f, 0.0f, 0.0f), 5);
+            DrawLayer(Matrix4.CreateTranslation(4.0f, 0.0f, 0.0f), 5, activeImage);
         }
 
         public override void UpdateMouseDisplay(MainWindow window)
