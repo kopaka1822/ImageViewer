@@ -109,7 +109,8 @@ namespace OpenTKImageViewer.UI
             window.TextMousePosition.Text = $"{x}, {y}";
             lastMouseX = x;
             lastMouseY = y;
-            if (window.Context.GetCpuTexture() != null)
+            var activeId = window.Context.GetFirstActiveTexture();
+            if (activeId != -1 && window.Context.GetCpuTexture(activeId) != null)
             {
                 window.TextMousePositionColor.Text = GetColorString(GetPixelColor(x,y));
             }
@@ -121,14 +122,22 @@ namespace OpenTKImageViewer.UI
         /// <returns></returns>
         public Vector4 GetCurrentPixelColor()
         {
-            if(window.Context.GetCpuTexture() == null)
+            var activeId = window.Context.GetFirstActiveTexture();
+            if (activeId == -1 || window.Context.GetCpuTexture(activeId) == null)
                 return new Vector4(0.0f);
             return GetPixelColor(lastMouseX, lastMouseY);
         }
 
+        /// <summary>
+        /// gets the pixel color (with radius if specified) from the first active texture.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         private Vector4 GetPixelColor(int x, int y)
         {
-            var cpuTex = window.Context.GetCpuTexture();
+            var activeId = window.Context.GetFirstActiveTexture();
+            var cpuTex = window.Context.GetCpuTexture(activeId);
             var sum = new Vector4(0.0f);
             for(var curX = x - PixelRadius; curX < x + PixelRadius + 1; ++curX)
             for (var curY = y - PixelRadius; curY < y + PixelRadius + 1; ++curY)

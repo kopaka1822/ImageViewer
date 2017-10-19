@@ -221,22 +221,35 @@ namespace OpenTKImageViewer.ImageContext
             return images.Any(imageData => imageData.image.IsHdr());
         }
 
-        // TODO update
-        public byte[] GetCurrentImageData(int level, int layer, PixelFormat format, PixelType type, out int width,
+        /// <summary>
+        /// returns a byte array with the requested texture data
+        /// </summary>
+        /// <param name="imageId">which image equation (0 or 1)</param>
+        /// <param name="level">mipmap level</param>
+        /// <param name="layer">which face</param>
+        /// <param name="format">desired format</param>
+        /// <param name="type">desired pixel type</param>
+        /// <param name="width">out: width of the image</param>
+        /// <param name="height">out: height of the image</param>
+        /// <returns></returns>
+        public byte[] GetCurrentImageData(int imageId ,int level, int layer, PixelFormat format, PixelType type, out int width,
             out int height)
         {
             width = GetWidth(level);
             height = GetHeight(level);
-            if (finalTextures[0] == null)
+            if (finalTextures[imageId] == null)
                 return null;
 
-            return finalTextures[0].Texture.GetData(level, layer, format, type, out width, out height);
+            return finalTextures[imageId].Texture.GetData(level, layer, format, type, out width, out height);
         }
 
-        public CpuTexture GetCpuTexture()
+        /// <summary>
+        /// cpu cached texture of the final image
+        /// </summary>
+        /// <returns>which image equation (0 or 1)</returns>
+        public CpuTexture GetCpuTexture(int imageId)
         {
-            // TODO determine active texture
-            return finalTextures[0].CpuCachedTexture;
+            return finalTextures[imageId].CpuCachedTexture;
         }
 
         #endregion
@@ -289,23 +302,23 @@ namespace OpenTKImageViewer.ImageContext
         /// <summary>
         /// bind the final texture
         /// </summary>
-        /// <param name="image">id of the finals image (0 or 1)</param>
+        /// <param name="imageId">id of the finals image (0 or 1)</param>
         /// <param name="slot">binding slot</param>
-        public void BindFinalTextureAs2DSamplerArray(int image, int slot)
+        public void BindFinalTextureAs2DSamplerArray(int imageId, int slot)
         {
-            Debug.Assert(finalTextures[image].Active);
-            finalTextures[image].Texture?.Bind(slot, LinearInterpolation);
+            Debug.Assert(finalTextures[imageId].Active);
+            finalTextures[imageId].Texture?.Bind(slot, LinearInterpolation);
         }
 
         /// <summary>
         /// bind the final texture
         /// </summary>
-        /// <param name="image">id of the finals image (0 or 1)</param>
+        /// <param name="imageId">id of the finals image (0 or 1)</param>
         /// <param name="slot">binding slot</param>
-        public void BindFinalTextureAsCubeMap(int image,  int slot)
+        public void BindFinalTextureAsCubeMap(int imageId,  int slot)
         {
-            Debug.Assert(finalTextures[image].Active);
-            finalTextures[image].Texture ?.BindAsCubemap(slot, LinearInterpolation);
+            Debug.Assert(finalTextures[imageId].Active);
+            finalTextures[imageId].Texture ?.BindAsCubemap(slot, LinearInterpolation);
         }
 
         /// <summary>
@@ -343,6 +356,18 @@ namespace OpenTKImageViewer.ImageContext
             return null;
         }
 
+        /// <summary>
+        /// finds the first final texture that is marked active
+        /// </summary>
+        /// <returns>id of the active texture or -1 if nothing is active</returns>
+        public int GetFirstActiveTexture()
+        {
+            for(int i = 0; i < finalTextures.Length; ++i)
+                if (finalTextures[i].Active)
+                    return i;
+            return -1;
+        }
+
         public float GetImageProcess()
         {
             // find first stepable
@@ -369,8 +394,7 @@ namespace OpenTKImageViewer.ImageContext
         public void AbortImageProcessing()
         {
             if (!IsImageProcessing()) return;
-
-            // TODO restore old image?
+            
             foreach (var imageConfiguration in finalTextures)
             {
                 imageConfiguration.AbortImageCalculation();

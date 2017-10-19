@@ -815,6 +815,25 @@ namespace OpenTKImageViewer
             if(Context.GetNumImages() == 0)
                 return;
 
+            // make sure only one imag is visible
+            while (Context.GetNumActiveImages() == 2)
+            {
+                ShowImagesWindow();
+                var res = MessageBox.Show(this, 
+                    "Two images are marked visible in the Image Dialog. Please mark only one image as visible when exporting.", 
+                    "Info", 
+                    MessageBoxButton.OKCancel, 
+                    MessageBoxImage.Warning);
+                if (res == MessageBoxResult.Cancel)
+                    return;
+            }
+            var activeImageId = Context.GetFirstActiveTexture();
+            if (activeImageId == -1)
+            {
+                App.ShowErrorDialog(this, "No image is marked visible");
+                return;
+            }
+
             // open save file dialog
             Microsoft.Win32.SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|HDR (*.hdr)|*.hdr";
@@ -841,7 +860,7 @@ namespace OpenTKImageViewer
             {
                 int width;
                 int height;
-                var data = Context.GetCurrentImageData(ew.SelectedMipmap, ew.SelectedLayer, ew.SelectedFormat,
+                var data = Context.GetCurrentImageData(activeImageId, ew.SelectedMipmap, ew.SelectedLayer, ew.SelectedFormat,
                     ew.SelectedPixelType, out width, out height);
 
                 if (data == null)
