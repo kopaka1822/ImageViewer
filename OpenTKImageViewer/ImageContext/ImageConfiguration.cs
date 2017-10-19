@@ -21,7 +21,7 @@ namespace OpenTKImageViewer.ImageContext
 
         public bool UseTonemapper
         {
-            get => useTonemapper;
+            get { return useTonemapper; }
             set {
                 if (value == useTonemapper) return;
                 useTonemapper = value;

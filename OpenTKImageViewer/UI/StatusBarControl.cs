@@ -39,7 +39,7 @@ namespace OpenTKImageViewer.UI
         private LayerModeType layerMode = LayerModeType.None;
         public LayerModeType LayerMode
         {
-            get => layerMode;
+            get { return layerMode; }
             set
             {
                 layerMode = value;
@@ -50,7 +50,7 @@ namespace OpenTKImageViewer.UI
         public PixelDisplayType PixelDisplay { get; set; } = PixelDisplayType.Bit;
         public int PixelRadius
         {
-            get => pixelRadius;
+            get { return pixelRadius; }
             set
             {
                 if (value >= 1)

@@ -65,7 +65,7 @@ namespace OpenTKImageViewer.Dialogs
         /// <summary>
         /// attempts to load a tonemapper
         /// </summary>
-        /// <param name="filename">paht + filename of the tonemapper</param>
+        /// <param name="filename">path + filename of the tonemapper</param>
         /// <returns>true if tonemapper was succesfully loaded</returns>
         public bool LoadTonemapper(string filename)
         {

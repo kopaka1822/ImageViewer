@@ -71,7 +71,7 @@ namespace OpenTKImageViewer.ImageContext
 
         public bool LinearInterpolation
         {
-            get => linearInterpolation;
+            get { return linearInterpolation; }
             set
             {
                 if (value == linearInterpolation) return;
@@ -82,7 +82,7 @@ namespace OpenTKImageViewer.ImageContext
 
         public GrayscaleMode Grayscale
         {
-            get => grayscale;
+            get { return grayscale; }
             set
             {
                 if (value == grayscale) return;
@@ -121,7 +121,7 @@ namespace OpenTKImageViewer.ImageContext
 
         // this will determine if the cpu cached textures will be acquired directly after combining the images or after tonemapping
         public bool DisplayColorBeforeTonemapping {
-            get => displayColorBeforeTonemapping;
+            get { return displayColorBeforeTonemapping; }
             set
             {
                 if (value != displayColorBeforeTonemapping)

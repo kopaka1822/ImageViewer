@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ namespace OpenTKImageViewer.Tonemapping
             private decimal currentValue = 0;
             public decimal CurrentValue
             {
-                get => currentValue;
+                get { return currentValue; }
                 set
                 {
                     var val = Math.Min(Max, Math.Max(Min, value));
@@ -156,7 +157,7 @@ namespace OpenTKImageViewer.Tonemapping
             if (type == ParameterType.Bool)
                 return argument.ToLower().Equals("true") ? 1 : 0;
             decimal val;
-            if(!Decimal.TryParse(argument, out val))
+            if(!Decimal.TryParse(argument, NumberStyles.Any, new CultureInfo("en-US"), out val))
                 throw new Exception("cannot convert arument to decimal");
             return val;
         }
@@ -184,7 +185,7 @@ namespace OpenTKImageViewer.Tonemapping
         private static string[] GetParameters(string s)
         {
             string[] pars = s.Split(',');
-            // remove some whitespaces
+            // remove some white spaces
             for (int i = 0; i < pars.Length; ++i)
             {
                 pars[i] = pars[i].TrimStart(' ');
