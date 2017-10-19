@@ -72,6 +72,32 @@ namespace OpenTKImageViewer.Dialogs
                 configuration.AlphaFormula.ApplyFormula(BoxAlphaEquation.Text, context.GetNumImages());
             }
 
+            /// <summary>
+            /// compares the box content with the currently applied setting
+            /// </summary>
+            /// <returns>true if changes were made</returns>
+            public bool HasChanges()
+            {
+                // visibility changed
+                if (BoxVisible.IsChecked != configuration.Active)
+                    return true;
+
+                // nothing has changed if it is not active
+                if (!configuration.Active)
+                    return false;
+
+                if (BoxTonemapper.IsChecked != configuration.UseTonemapper)
+                    return true;
+
+                if (BoxRgbEquation.Text != configuration.CombineFormula.Original)
+                    return true;
+
+                if (BoxAlphaEquation.Text != configuration.AlphaFormula.Original)
+                    return true;
+
+                return false;
+            }
+
             private void LoadConfigurationValues()
             {
                 // enable editing
@@ -97,11 +123,15 @@ namespace OpenTKImageViewer.Dialogs
 
         private readonly MainWindow parent;
         private readonly EquationBox[] equationBoxes = new EquationBox[2];
+        private readonly Brush buttonDefaultColor;
+        private readonly Brush buttonHighlightColor = new SolidColorBrush(Color.FromRgb(128,190,255));
 
         public ImageWindow(MainWindow parent)
         {
             this.parent = parent;
             InitializeComponent();
+
+            this.buttonDefaultColor = ButtonApply.Background;
 
             equationBoxes[0] = new EquationBox(BoxVisible1, BoxTonemapper1, EquationBox1, EquationBoxAlpha1,
                 parent.Context.GetImageConfiguration(0), parent.Context);
@@ -113,6 +143,17 @@ namespace OpenTKImageViewer.Dialogs
 
             if (parent.Context.GetNumActiveImages() != 2)
                 BoxSplitView.IsEnabled = false;
+
+            // proper button highlighting
+            foreach (var equationBox in equationBoxes)
+            {
+                equationBox.BoxVisible.Checked += (sender, args) => OnChangedFormulas();
+                equationBox.BoxTonemapper.Checked += (sender, args) => OnChangedFormulas();
+                equationBox.BoxVisible.Unchecked += (sender, args) => OnChangedFormulas();
+                equationBox.BoxTonemapper.Unchecked += (sender, args) => OnChangedFormulas();
+                equationBox.BoxRgbEquation.TextChanged += (sender, args) => OnChangedFormulas();
+                equationBox.BoxAlphaEquation.TextChanged += (sender, args) => OnChangedFormulas();
+            }
 
             RefreshImageList();
         }
@@ -136,6 +177,14 @@ namespace OpenTKImageViewer.Dialogs
                 ImageList.Items.Add(item);
         }
 
+        private void OnChangedFormulas()
+        {
+            if(equationBoxes[0].HasChanges() || equationBoxes[1].HasChanges())
+                ButtonApply.Background = buttonHighlightColor;
+            else
+                ButtonApply.Background = buttonDefaultColor;
+        }
+
         private void ButtonApply_OnClick(object sender, RoutedEventArgs e)
         {
             try
@@ -151,7 +200,8 @@ namespace OpenTKImageViewer.Dialogs
                 {
                     equationBox.Apply();
                 }
-                
+
+                ButtonApply.Background = buttonDefaultColor;
                 parent.RedrawFrame();
             }
             catch (Exception exception)

@@ -108,7 +108,8 @@
             </ComboBox>
 
             <Button Content="Apply" MinWidth="100" HorizontalAlignment="Right"
-                    Click="ButtonApply_OnClick"/>
+                    Click="ButtonApply_OnClick"
+                    x:Name="ButtonApply"/>
         </StackPanel>
     </Border>
 </Window>
