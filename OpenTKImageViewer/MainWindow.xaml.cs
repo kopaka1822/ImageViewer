@@ -221,6 +221,30 @@ namespace OpenTKImageViewer
 
         #region OpenGL
 
+        /// <summary>
+        /// enables the opengl context from this window
+        /// </summary>
+        public void EnableOpenGl()
+        {
+            glControl?.MakeCurrent();
+            glhelper.Utility.EnableDebugCallback();
+        }
+
+        public void DisableOpenGl()
+        {
+            GL.Flush();
+            DisableDebugCallback();
+            try
+            {
+
+                glControl?.Context.MakeCurrent(null);
+            }
+            catch (GraphicsContextException)
+            {
+                // happens sometimes..
+            }
+        }
+
         public double GetDpiScalingX()
         {
             PresentationSource source = PresentationSource.FromVisual(this);
@@ -351,6 +375,16 @@ namespace OpenTKImageViewer
 
         #region WINDOW INTERACTION
 
+        private void MainWindow_OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ParentApp.GetConfig().IsMaximized = WindowState == WindowState.Maximized;
+            if (WindowState == WindowState.Maximized)
+                return;
+
+            ParentApp.GetConfig().WindowSizeX = (int)Width;
+            ParentApp.GetConfig().WindowSizeY = (int)Height;
+        }
+
         private void DisableWindowInteractions()
         {
             if (TonemapDialog != null)
@@ -414,15 +448,15 @@ namespace OpenTKImageViewer
 
         private void WinFormsHost_OnMouseDown(System.Windows.Forms.MouseEventArgs args)
         {
-            mouseDown = ((args.Button & MouseButtons.Left) | (args.Button & MouseButtons.Right)) != 0;
-            //MousePosition = new Point(args.X * GetDpiScalingX(), args.Y * GetDpiScalingY());
+            if(args.Button == MouseButtons.Left)
+                mouseDown = true;
             MousePosition = new Point(args.X, args.Y);
         }
 
         private void WinFormsHost_OnMouseUp(System.Windows.Forms.MouseEventArgs args)
         {
-            mouseDown = ((args.Button & MouseButtons.Left) | (args.Button & MouseButtons.Right)) == 0;
-            //MousePosition = new Point(args.X * GetDpiScalingX(), args.Y * GetDpiScalingY());
+            if(args.Button == MouseButtons.Left)
+                mouseDown = false;
             MousePosition = new Point(args.X, args.Y);
         }
 
@@ -459,6 +493,33 @@ namespace OpenTKImageViewer
             }
             RedrawFrame();
             e.Handled = true;
+        }
+
+        private void MainWindow_OnClosing(object sender, CancelEventArgs e)
+        {
+            TonemapDialog?.Close();
+            ImageDialog?.Close();
+            ParentApp.UnregisterWindow(this);
+        }
+
+        private void MainWindow_OnActivated(object sender, EventArgs e)
+        {
+            if (TonemapDialog != null)
+                TonemapDialog.Topmost = true;
+
+            if (ImageDialog != null)
+                ImageDialog.Topmost = true;
+
+            ParentApp.SetActiveWindow(this);
+        }
+
+        private void MainWindow_OnDeactivated(object sender, EventArgs e)
+        {
+            if (TonemapDialog != null)
+                TonemapDialog.Topmost = false;
+
+            if (ImageDialog != null)
+                ImageDialog.Topmost = false;
         }
 
         #endregion
@@ -582,6 +643,85 @@ namespace OpenTKImageViewer
             // load image and import if possible
             ParentApp.SetImagePath(ofd);
             ImportImage(ofd.FileName);
+        }
+
+        private void MenuItem_Click_Export(object sender, RoutedEventArgs e)
+        {
+            if (Context.GetNumImages() == 0)
+                return;
+
+            // make sure only one imag is visible
+            while (Context.GetNumActiveImages() == 2)
+            {
+                ShowImagesWindow();
+                var res = MessageBox.Show(this,
+                    "Two images are marked visible in the Image Dialog. Please mark only one image as visible when exporting.",
+                    "Info",
+                    MessageBoxButton.OKCancel,
+                    MessageBoxImage.Warning);
+                if (res == MessageBoxResult.Cancel)
+                    return;
+            }
+            var activeImageId = Context.GetFirstActiveTexture();
+            if (activeImageId == -1)
+            {
+                App.ShowErrorDialog(this, "No image is marked visible");
+                return;
+            }
+
+            // open save file dialog
+            Microsoft.Win32.SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|HDR (*.hdr)|*.hdr";
+            sfd.InitialDirectory = ParentApp.GetExportPath(sfd);
+            if (sfd.ShowDialog() == false)
+                return;
+
+            ParentApp.SetExportPath(sfd);
+            // obtain format
+            ExportWindow.FileFormat format = ExportWindow.FileFormat.Png;
+            if (sfd.FileName.EndsWith(".bmp"))
+                format = ExportWindow.FileFormat.Bmp;
+            else if (sfd.FileName.EndsWith(".hdr"))
+                format = ExportWindow.FileFormat.Hdr;
+
+            // open dialog
+            ExportWindow ew = new ExportWindow(this, sfd.FileName, format);
+            if (ew.ShowDialog() == false)
+                return;
+
+            // do the export
+            EnableOpenGl();
+            try
+            {
+                int width;
+                int height;
+                var data = Context.GetCurrentImageData(activeImageId, ew.SelectedMipmap, ew.SelectedLayer, ew.SelectedFormat,
+                    ew.SelectedPixelType, out width, out height);
+
+                if (data == null)
+                {
+                    App.ShowErrorDialog(this, "error retrieving file from gpu");
+                    return;
+                }
+
+                switch (format)
+                {
+                    case ExportWindow.FileFormat.Png:
+                        ImageLoader.SavePng(sfd.FileName, width, height, TextureArray2D.GetPixelFormatCount(ew.SelectedFormat), data);
+                        break;
+                    case ExportWindow.FileFormat.Bmp:
+                        ImageLoader.SaveBmp(sfd.FileName, width, height, TextureArray2D.GetPixelFormatCount(ew.SelectedFormat), data);
+                        break;
+                    case ExportWindow.FileFormat.Hdr:
+                        ImageLoader.SaveHdr(sfd.FileName, width, height, TextureArray2D.GetPixelFormatCount(ew.SelectedFormat), data);
+                        break;
+                }
+            }
+            catch (Exception exception)
+            {
+                App.ShowErrorDialog(this, exception.Message);
+            }
+            DisableOpenGl();
         }
 
         #endregion
@@ -783,112 +923,7 @@ namespace OpenTKImageViewer
 
         #endregion
 
-        private void MainWindow_OnClosing(object sender, CancelEventArgs e)
-        {
-            TonemapDialog?.Close();
-            ImageDialog?.Close();
-            ParentApp.UnregisterWindow(this);
-        }
-
-        private void MainWindow_OnActivated(object sender, EventArgs e)
-        {
-            if (TonemapDialog != null)
-                TonemapDialog.Topmost = true;
-
-            if (ImageDialog != null)
-                ImageDialog.Topmost = true;
-
-            ParentApp.SetActiveWindow(this);
-        }
-
-        private void MainWindow_OnDeactivated(object sender, EventArgs e)
-        {
-            if (TonemapDialog != null)
-                TonemapDialog.Topmost = false;
-            
-            if (ImageDialog != null)
-                ImageDialog.Topmost = false;
-        }
-
-        private void MenuItem_Click_Export(object sender, RoutedEventArgs e)
-        {
-            if(Context.GetNumImages() == 0)
-                return;
-
-            // make sure only one imag is visible
-            while (Context.GetNumActiveImages() == 2)
-            {
-                ShowImagesWindow();
-                var res = MessageBox.Show(this, 
-                    "Two images are marked visible in the Image Dialog. Please mark only one image as visible when exporting.", 
-                    "Info", 
-                    MessageBoxButton.OKCancel, 
-                    MessageBoxImage.Warning);
-                if (res == MessageBoxResult.Cancel)
-                    return;
-            }
-            var activeImageId = Context.GetFirstActiveTexture();
-            if (activeImageId == -1)
-            {
-                App.ShowErrorDialog(this, "No image is marked visible");
-                return;
-            }
-
-            // open save file dialog
-            Microsoft.Win32.SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|HDR (*.hdr)|*.hdr";
-            sfd.InitialDirectory = ParentApp.GetExportPath(sfd);
-            if (sfd.ShowDialog() == false)
-                return;
-
-            ParentApp.SetExportPath(sfd);
-            // obtain format
-            ExportWindow.FileFormat format = ExportWindow.FileFormat.Png;
-            if(sfd.FileName.EndsWith(".bmp"))
-                format = ExportWindow.FileFormat.Bmp;
-            else if(sfd.FileName.EndsWith(".hdr"))
-                format = ExportWindow.FileFormat.Hdr;
-
-            // open dialog
-            ExportWindow ew = new ExportWindow(this, sfd.FileName, format);
-            if (ew.ShowDialog() == false)
-                return;
-
-            // do the export
-            EnableOpenGl();
-            try
-            {
-                int width;
-                int height;
-                var data = Context.GetCurrentImageData(activeImageId, ew.SelectedMipmap, ew.SelectedLayer, ew.SelectedFormat,
-                    ew.SelectedPixelType, out width, out height);
-
-                if (data == null)
-                {
-                    App.ShowErrorDialog(this, "error retrieving file from gpu");
-                    return;
-                }
-
-                switch (format)
-                {
-                    case ExportWindow.FileFormat.Png:
-                        ImageLoader.SavePng(sfd.FileName, width, height, TextureArray2D.GetPixelFormatCount(ew.SelectedFormat), data);
-                        break;
-                    case ExportWindow.FileFormat.Bmp:
-                        ImageLoader.SaveBmp(sfd.FileName, width, height, TextureArray2D.GetPixelFormatCount(ew.SelectedFormat), data);
-                        break;
-                    case ExportWindow.FileFormat.Hdr:
-                        ImageLoader.SaveHdr(sfd.FileName, width, height, TextureArray2D.GetPixelFormatCount(ew.SelectedFormat), data);
-                        break;
-                }
-            }
-            catch (Exception exception)
-            {
-                App.ShowErrorDialog(this, exception.Message);
-            }
-            DisableOpenGl();
-        }
-
+        #region STATUS BAR 
         private void BoxScroll_OnKeyDown(object sender, KeyEventArgs e)
         {
             if (e.IsDown && e.Key == Key.Return)
@@ -909,41 +944,6 @@ namespace OpenTKImageViewer
                 e.Handled = true;
             }
         }
-
-
-
-        /// <summary>
-        /// enables the opengl context from this window
-        /// </summary>
-        public void EnableOpenGl()
-        {
-            glControl?.MakeCurrent();
-            glhelper.Utility.EnableDebugCallback();
-        }
-
-        public void DisableOpenGl()
-        {
-            GL.Flush();
-            DisableDebugCallback();
-            try
-            {
-
-                glControl?.Context.MakeCurrent(null);
-            }
-            catch (GraphicsContextException)
-            {
-                // happens sometimes..
-            }
-        }
-
-        private void MainWindow_OnSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            ParentApp.GetConfig().IsMaximized = WindowState == WindowState.Maximized;
-            if(WindowState == WindowState.Maximized)
-                return;
-
-            ParentApp.GetConfig().WindowSizeX = (int)Width;
-            ParentApp.GetConfig().WindowSizeY = (int)Height;
-        }
+#endregion
     }
 }
