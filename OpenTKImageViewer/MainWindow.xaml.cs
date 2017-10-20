@@ -293,7 +293,7 @@ namespace OpenTKImageViewer
 
                         GL.Disable(EnableCap.ScissorTest);
                     }
-                    else if(Context.GetNumImages() == 1)
+                    else if(Context.GetNumActiveImages() == 1)
                     {
                         // draw the active image without scissor testing
                         int activeImage = (Context.GetImageConfiguration(0).Active ? 0 : 1);
