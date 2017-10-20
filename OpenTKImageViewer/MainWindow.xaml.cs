@@ -489,7 +489,21 @@ namespace OpenTKImageViewer
                     Context.ActiveMipmap += 1;
                     break;
             }
-            Context.Tonemapper.InvokeKey(e.Key);
+
+            if(Context.Tonemapper.HasKeyToInvoke(e.Key))
+            {
+                // if tonemapper dialog is open, apply tonemapper dialog and then apply settings
+                if(TonemapDialog != null)
+                {
+                    Context.Tonemapper.ApplyAndInvoke(TonemapDialog.GetCurrentSettings(), e.Key);
+                }
+                else
+                {
+                    // just invoke key
+                    Context.Tonemapper.InvokeKey(e.Key);
+                }
+            }
+
 
             RedrawFrame();
             e.Handled = true;

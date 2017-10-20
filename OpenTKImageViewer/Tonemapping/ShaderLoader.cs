@@ -25,6 +25,16 @@ namespace OpenTKImageViewer.Tonemapping
             Set
         }
 
+        /// <summary>
+        /// tricky method to remove trailing 0's in a decimal
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private static decimal Normalize(decimal value)
+        {
+            return value / 1.000000000000000000000000000000000m;
+        }
+
         public class Keybinding
         {
             public Keybinding(decimal value, ModificationType modType, System.Windows.Input.Key key)
@@ -54,9 +64,10 @@ namespace OpenTKImageViewer.Tonemapping
                         parameter.CurrentValue = Value;
                         break;
                 }
+                parameter.CurrentValue = Normalize(parameter.CurrentValue);
                 return oldValue != parameter.CurrentValue;
             }
-            
+
             public decimal Value { get; }
             public ModificationType ModType { get; }
             public System.Windows.Input.Key Key { get; }
@@ -79,13 +90,13 @@ namespace OpenTKImageViewer.Tonemapping
                 set
                 {
                     var val = Math.Min(Max, Math.Max(Min, value));
-                    if (currentValue != val)
+                    var prevVal = currentValue;
+                    currentValue = val;
+                    if (prevVal != val)
                     {
-
-                        currentValue = val;
                         OnValueChanged();
                     }
-                    else if(value != val)
+                    else if(value != prevVal)
                         // in order to clamp the numeric up down values correctly
                         OnValueChanged();
                 }

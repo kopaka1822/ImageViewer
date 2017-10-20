@@ -34,6 +34,16 @@ namespace OpenTKImageViewer.ImageContext
             return new ToneParameter(loader.Parameters, shader);
         }
 
+        public bool HasKeyToInvoke(System.Windows.Input.Key key)
+        {
+            foreach (var set in settings)
+                foreach (var param in set.Parameters)
+                    foreach (var binding in param.Keybindings)
+                        if (binding.Key == key)
+                            return true;
+            return false;
+        }
+
         /// <summary>
         /// tries to invoke the key on the current parameter set
         /// </summary>
@@ -41,20 +51,42 @@ namespace OpenTKImageViewer.ImageContext
         /// <returns></returns>
         public void InvokeKey(System.Windows.Input.Key key)
         {
+            if (invokeKey(key))
+                OnChangedSettings();
+        }
+
+        public bool invokeKey(System.Windows.Input.Key key)
+        {
             bool changed = false;
             foreach (var set in settings)
                 foreach (var param in set.Parameters)
                     if (param.InvokeKey(key))
                         changed = true;
-            if (changed)
-                OnChangedSettings();
+            return changed;
         }
 
         public void Apply(List<ToneParameter> p)
         {
             // create copy
             settings = CloneSettings(p);
-            
+            RemoveUnusedShader();
+
+            OnChangedSettings();
+        }
+
+        /// <summary>
+        /// for the special case if a key is pressed and the tonemapper dialog is still open
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name=""></param>
+        public void ApplyAndInvoke(List<ToneParameter> p, System.Windows.Input.Key key)
+        {
+            // set settings to original settings
+            settings = p;
+            // use the invoke to change the settings in this reference
+            invokeKey(key);
+            // save the copy of the final settings
+            settings = CloneSettings(settings);
             RemoveUnusedShader();
             OnChangedSettings();
         }

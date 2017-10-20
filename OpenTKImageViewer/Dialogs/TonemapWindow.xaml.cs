@@ -39,6 +39,11 @@ namespace OpenTKImageViewer.Dialogs
             UpdateList();
         }
 
+        public List<ToneParameter> GetCurrentSettings()
+        {
+            return toneSettings;
+        }
+
         private void TonemapWindow_OnClosing(object sender, CancelEventArgs e)
         {
             parent.TonemapDialog = null;
