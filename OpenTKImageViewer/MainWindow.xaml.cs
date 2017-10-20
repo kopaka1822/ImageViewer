@@ -488,9 +488,9 @@ namespace OpenTKImageViewer
                 case Key.Down:
                     Context.ActiveMipmap += 1;
                     break;
-                default:
-                    return;
             }
+            Context.Tonemapper.InvokeKey(e.Key);
+
             RedrawFrame();
             e.Handled = true;
         }

@@ -50,6 +50,23 @@ The source image can be accesed via "readonly image2D src_image"
 The destination image can be accesed via "writeonly image2D dst_image"
 
 ----------------------------------------
+Keybinding:
+
+To quickly change parameters within the application you can create keybindings.
+
+#keybinding Displayed Name, Keycode, Value, Operation
+Displayed Name: Name of the affected parameter (same as #parameter name)
+Keycode: C# keycode for the corresponding keybinding
+Value: (decimal) value to modify the old parameter
+Operation: how to modify the parameter. Valid types: add, multiply, set
+
+When pressing the key, the new parameter value will be: parameterValue (operation) Value
+Example:
+#keybinding gamma, P, 0.5, multiply
+=> after pressing P the gamma value will be multiplied by 0.5
+#keybinding gamma, I, 10.0, set
+=> after pressing I the gamma value will be set to 10.0
+
 Examples:
 See gamma.comp for a simple example.
 See blur.comp for a simple seperatable shader example (Gaussian Blur) 

@@ -1,8 +1,11 @@
 #setting title, Gamma Correction
-#setting description, Nonlinear operation used to encode and decode luminance or tristimulus values in video or still image systems. Formula: Factor * (V ^ Gamma).
+#setting description, Nonlinear operation used to encode and decode luminance or tristimulus values in video or still image systems. Formula: (Factor * V) ^ Gamma.
 
 #param Gamma, 3, float, 0.45454545, 0
 #param Factor, 2, float, 1.0, 0
+
+#keybinding Factor, Add, 2.0, multiply
+#keybinding Factor, Subtract, 0.5, multiply
 
 layout(location = 3) uniform float gamma;
 layout(location = 2) uniform float factor;
@@ -13,6 +16,6 @@ void main()
 	if(pixelCoord.x < imageSize(src_image).x && pixelCoord.y < imageSize(src_image).y)
 	{
 		vec4 color = imageLoad(src_image, pixelCoord);
-		imageStore(dst_image, pixelCoord, vec4(factor * pow(color.rgb, vec3(gamma)), color.a));
+		imageStore(dst_image, pixelCoord, vec4(pow(factor * color.rgb, vec3(gamma)), color.a));
 	}
 }

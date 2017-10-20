@@ -34,6 +34,22 @@ namespace OpenTKImageViewer.ImageContext
             return new ToneParameter(loader.Parameters, shader);
         }
 
+        /// <summary>
+        /// tries to invoke the key on the current parameter set
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public void InvokeKey(System.Windows.Input.Key key)
+        {
+            bool changed = false;
+            foreach (var set in settings)
+                foreach (var param in set.Parameters)
+                    if (param.InvokeKey(key))
+                        changed = true;
+            if (changed)
+                OnChangedSettings();
+        }
+
         public void Apply(List<ToneParameter> p)
         {
             // create copy
