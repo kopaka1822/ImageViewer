@@ -75,6 +75,7 @@ namespace OpenTKImageViewer.Tonemapping
         public string ShaderSource { get; private set; } = "";
         public List<Parameter> Parameters { get; private set; } = new List<Parameter>();
         public bool IsSepa { get; private set; }= false;
+        public bool IsSingleInvocation { get; private set; } = true;
         public string Name { get; private set; }
         public string Description { get; private set; }
         public string Filename { get; }
@@ -176,6 +177,9 @@ namespace OpenTKImageViewer.Tonemapping
                     break;
                 case "description":
                     Description = p[1];
+                    break;
+                case "singleinvocation":
+                    IsSingleInvocation = p[1].ToLower().Equals("true");
                     break;
                 default:
                     throw new Exception("unknown setting " + p[0]);

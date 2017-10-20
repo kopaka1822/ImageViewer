@@ -1,6 +1,8 @@
 #setting title, Median Filter
 #setting description, Removes noise from an image.
 #setting sepa, true
+// shader takes a while with bigger radii
+#setting singleinvocation, false
 
 #param Radius, 2, Int, 5, 1, 50
 

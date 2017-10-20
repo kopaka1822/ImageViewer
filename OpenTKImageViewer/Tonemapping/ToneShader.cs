@@ -15,17 +15,20 @@ namespace OpenTKImageViewer.Tonemapping
     {
         private readonly Program program;
 
-        private static readonly int LocalSize = 32;
+        private static readonly int LocalSize = 8;
+        private static readonly int MinWorkGroupSize = 4;
 
         public string Name { get; }
         public string Description { get; }
         public bool IsSepa { get; }
+        public bool IsSingleInvocation { get; }
 
         public ToneShader(ShaderLoader loader)
         {
             this.IsSepa = loader.IsSepa;
             this.Name = loader.Name;
             this.Description = loader.Description;
+            this.IsSingleInvocation = loader.IsSingleInvocation;
 
             // generate missing source
             Shader shader = new Shader(ShaderType.ComputeShader,
@@ -90,33 +93,22 @@ namespace OpenTKImageViewer.Tonemapping
             GL.DispatchCompute(width / LocalSize + 1, height / LocalSize + 1, 1);
         }
 
-        private class DispatchStepper : IStepable
+        private class DispatchStepper
         {
             private readonly Program program;
             private readonly List<ShaderLoader.Parameter> parameters;
             private readonly bool isSepa;
             private readonly int iteration;
-            private int width;
-            private int height;
-            private int curX = 0;
-            private int curY = 0;
 
-            public DispatchStepper(Program program, List<ShaderLoader.Parameter> parameters, bool isSepa, int iteration, int imgWidth, int imgHeight)
+            protected DispatchStepper(Program program, List<ShaderLoader.Parameter> parameters, bool isSepa, int iteration)
             {
                 this.program = program;
                 this.parameters = parameters;
                 this.isSepa = isSepa;
                 this.iteration = iteration;
-                width = imgWidth / LocalSize + (imgWidth % LocalSize !=0 ? 1 : 0);
-                height = imgHeight / LocalSize + (imgHeight % LocalSize != 0 ? 1 : 0);
             }
 
-            public bool HasStep()
-            {
-                return curY < height;
-            }
-
-            public void NextStep()
+            protected void BindProgramAndUniforms()
             {
                 program.Bind();
                 // set parameter
@@ -140,10 +132,117 @@ namespace OpenTKImageViewer.Tonemapping
                     Debug.Assert(iteration == 1 || iteration == 0);
                     GL.Uniform2(0, iteration, 1 - iteration);
                 }
+            }
+
+            /// <summary>
+            /// converts amount of pixels into number of work groups (division through local size)
+            /// </summary>
+            /// <param name="pixels"></param>
+            /// <returns></returns>
+            protected static int GetNumWorkGroups(int pixels)
+            {
+                return pixels / LocalSize + (pixels % LocalSize != 0 ? 1 : 0);
+            }
+
+            /// <summary>
+            /// converts amount of pixels into minimal number of shader invocations 
+            /// (depending on LocalSize and MinWorkGroupSize)
+            /// </summary>
+            /// <param name="pixels"></param>
+            /// <returns></returns>
+            protected static int GetNumMinimalInvocations(int pixels)
+            {
+                return pixels / (LocalSize * MinWorkGroupSize) + (pixels % (LocalSize * MinWorkGroupSize) != 0 ? 1 : 0);
+            }
+        }
+
+        /// <summary>
+        /// Stepper for dispatching the shader if only single invocations are used
+        /// </summary>
+        private class SingleDispatchStepper : DispatchStepper, IStepable
+        {
+            private int width;
+            private int height;
+            private int curStep = 0;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="program">corresponding shader</param>
+            /// <param name="parameters">parameters</param>
+            /// <param name="isSepa">is shader seperatable</param>
+            /// <param name="iteration">which sepa iteration</param>
+            /// <param name="imgWidth">width of the image</param>
+            /// <param name="imgHeight">height of the image</param>
+            public SingleDispatchStepper(Program program, List<ShaderLoader.Parameter> parameters, bool isSepa, int iteration, int imgWidth, int imgHeight)
+                : base(program, parameters, isSepa, iteration)
+            {
+                width = GetNumWorkGroups(imgWidth);
+                height = GetNumWorkGroups(imgHeight);
+            }
+
+            public float CurrentStep()
+            {
+                // there is only one step (0 = 0%, 1 = 1%)
+                return (float)curStep;
+            }
+
+            public string GetDescription()
+            {
+                return "";
+            }
+
+            public int GetNumSteps()
+            {
+                return 1;
+            }
+
+            public bool HasStep()
+            {
+                return curStep == 0;
+            }
+
+            public void NextStep()
+            {
+                Debug.Assert(curStep == 0);
+                BindProgramAndUniforms();
+
+                // pixel position (starts always at 0 0 in single invocation)
+                GL.Uniform2(1, 0, 0);
+                GL.DispatchCompute(width, height, 1);
+
+                curStep++;
+            }
+        }
+        /// <summary>
+        /// Stepper for Dispatching if the shader is run in multiple invocations
+        /// </summary>
+        private class MultiDispatchStepper : DispatchStepper, IStepable
+        {
+            private int width;
+            private int height;
+            private int curX = 0;
+            private int curY = 0;
+
+            public MultiDispatchStepper(Program program, List<ShaderLoader.Parameter> parameters, bool isSepa, int iteration, int imgWidth, int imgHeight)
+                : base(program, parameters, isSepa, iteration)
+            {
+                width = GetNumMinimalInvocations(imgWidth);
+                height = GetNumMinimalInvocations(imgHeight);
+            }
+
+            public bool HasStep()
+            {
+                return curY < height;
+            }
+
+            public void NextStep()
+            {
+                BindProgramAndUniforms();
 
                 // pixel position
-                GL.Uniform2(1, curX * LocalSize, curY * LocalSize);
-                GL.DispatchCompute(1, 1, 1);
+                GL.Uniform2(1, curX * (LocalSize * MinWorkGroupSize), curY * (LocalSize * MinWorkGroupSize));
+                GL.DispatchCompute(MinWorkGroupSize, MinWorkGroupSize, 1);
 
                 if (++curX < width)
                     return;
@@ -170,7 +269,9 @@ namespace OpenTKImageViewer.Tonemapping
 
         public IStepable GetDispatchStepable(int width, int height, List<ShaderLoader.Parameter> parameters, int iteration)
         {
-            return new DispatchStepper(program, parameters, IsSepa, iteration, width, height);
+            if (IsSingleInvocation)
+                return new SingleDispatchStepper(program, parameters, IsSepa, iteration, width, height);
+            return new MultiDispatchStepper(program, parameters, IsSepa, iteration, width, height);
         }
 
         private string GetShaderHeader()

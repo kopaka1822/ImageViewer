@@ -19,6 +19,11 @@ the shader will be executed twice. In the first run, the unform variable
 "ivec2 filterDirection" will be set to ivec2(1,0). In the second run, the
 variable will be set to ivec2(0,1). The default value is false.
 
+#settings singleinvocation, true/false
+Specifies if the shader is called with a single invocation. Set this value to
+false if the shader takes several seconds to complete in order to avoid application crashes.
+The default value is true.
+
 ---
 Parameters:
 
