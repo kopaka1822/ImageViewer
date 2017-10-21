@@ -51,8 +51,9 @@ namespace OpenTKImageViewer.ImageContext
         /// </summary>
         /// <param name="slot"></param>
         /// <param name="layer"></param>
+        /// <param name="level">mipmap level</param>
         /// <returns></returns>
-        public bool BindPixelDisplayTextue(int slot, int layer)
+        public bool BindPixelDisplayTextue(int slot, int layer, int level)
         {
             if (Texture == null || !Active)
                 return false;
@@ -69,7 +70,7 @@ namespace OpenTKImageViewer.ImageContext
                         RecomputeCombinedImage(combinedTexture);
                     }
 
-                    combinedTexture.BindAsTexture2D(slot, false, layer);
+                    combinedTexture.BindAsTexture2D(slot, false, layer, level);
                     return true;
                 }
                 // just use the final texture since no tonemappers were used
@@ -83,7 +84,7 @@ namespace OpenTKImageViewer.ImageContext
             }
 
             // bind the final product
-            Texture.BindAsTexture2D(slot, false, layer);
+            Texture.BindAsTexture2D(slot, false, layer, level);
 
             return true;
         }

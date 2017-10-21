@@ -12,7 +12,7 @@ namespace OpenTKImageViewer.glhelper
     {
         private int id = 0;
         private int cubeId = 0;
-        private int[] layerId;
+        private int[] tex2DId;
 
         private readonly SizedInternalFormat internalFormat;
         private readonly int nMipmaps;
@@ -92,22 +92,30 @@ namespace OpenTKImageViewer.glhelper
         /// </summary>
         private void CreateTexture2DViews()
         {
-            if(layerId != null)
+            if(tex2DId != null)
                 return;
 
-            layerId = new int[nLayer];
-            GL.GenTextures(nLayer, layerId);
+            tex2DId = new int[nLayer * nMipmaps];
+            GL.GenTextures(nLayer, tex2DId);
             for (int curLayer = 0; curLayer < nLayer; ++curLayer)
             {
-                GL.TextureView(layerId[curLayer], TextureTarget.Texture2D, id,
-                    (PixelInternalFormat)internalFormat, 0, nMipmaps, curLayer, 1);
+                for (int curMipmap = 0; curMipmap < nMipmaps; ++curMipmap)
+                {
+                    GL.TextureView(tex2DId[GetTextureIndex(curLayer, curMipmap)], TextureTarget.Texture2D, id,
+                        (PixelInternalFormat)internalFormat, curMipmap, 1, curLayer, 1);
 
-                Utility.GLCheck();
-                GL.BindTexture(TextureTarget.Texture2D, layerId[curLayer]);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
-                Utility.GLCheck();
+                    Utility.GLCheck();
+                    GL.BindTexture(TextureTarget.Texture2D, tex2DId[GetTextureIndex(curLayer, curMipmap)]);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
+                    Utility.GLCheck();
+                }
             }
+        }
+
+        private int GetTextureIndex(int layer, int level)
+        {
+            return layer * nLayer + level;
         }
 
         /// <summary>
@@ -195,10 +203,11 @@ namespace OpenTKImageViewer.glhelper
         /// <param name="slot">binding slot</param>
         /// <param name="linearFiltering">linear filter or nearest neighbor</param>
         /// <param name="layer">which layer of the texture</param>
-        public void BindAsTexture2D(int slot, bool linearFiltering, int layer)
+        /// <param name="level">mipmap level</param>
+        public void BindAsTexture2D(int slot, bool linearFiltering, int layer, int level)
         {
             CreateTexture2DViews();
-            BindAs(slot, TextureTarget.Texture2D, layerId[layer], linearFiltering);
+            BindAs(slot, TextureTarget.Texture2D, tex2DId[GetTextureIndex(layer, level)], linearFiltering);
         }
 
         /// <summary>

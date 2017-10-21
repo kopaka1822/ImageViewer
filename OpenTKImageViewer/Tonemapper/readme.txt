@@ -46,7 +46,10 @@ with: "ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;"
 
 Source and Destination Image:
 
-The source image can be accesed via "readonly image2D src_image"
+The source image can be accesed via "uniform sampler2D src_image"
+level of detail should be 0 (for texelFetch etc.)
+access with texture(...) will give linear interpolated values
+
 The destination image can be accesed via "writeonly image2D dst_image"
 
 ----------------------------------------

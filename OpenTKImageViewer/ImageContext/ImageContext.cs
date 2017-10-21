@@ -230,9 +230,9 @@ namespace OpenTKImageViewer.ImageContext
         /// <param name="layer"></param>
         /// <param name="level"></param>
         /// <returns></returns>
-        public bool BindPixelDisplayTexture(int imageId, int slot, int layer)
+        public bool BindPixelDisplayTexture(int imageId, int slot, int layer, int level)
         {
-            return finalTextures[imageId].BindPixelDisplayTextue(slot, layer);
+            return finalTextures[imageId].BindPixelDisplayTextue(slot, layer, level);
         }
 
         #endregion

@@ -19,26 +19,22 @@ vec3 getPixel(int x, int y)
 {
 	x = clamp(x, 0, imageSize(src_image).x - 1);
 	y = clamp(y, 0, imageSize(src_image).y - 1);
-	return imageLoad(src_image, ivec2(x,y)).rgb;
+	return texelFetch(src_image, ivec2(x,y), 0).rgb;
 }
 
 void main()
 {
 	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
-	if(pixelCoord.x < imageSize(src_image).x && pixelCoord.y < imageSize(src_image).y)
-	{
 	
-		vec3 pixelSum = vec3(0.0);
-		float weightSum = 0.0;
+	vec3 pixelSum = vec3(0.0);
+	float weightSum = 0.0;
+	
+	for(int d = -blur_radius; d <= blur_radius; d++)
+	{			
+		float w = kernel(d);
+		weightSum += w;
+		ivec2 pos = d * filterDirection + pixelCoord;
+		pixelSum += w * getPixel(pos.x, pos.y);
 		
-		for(int d = -blur_radius; d <= blur_radius; d++)
-		{			
-			float w = kernel(d);
-			weightSum += w;
-			ivec2 pos = d * filterDirection + pixelCoord;
-			pixelSum += w * getPixel(pos.x, pos.y);
-			
-		}
-		imageStore(dst_image, pixelCoord, vec4(pixelSum / weightSum,1.0));
 	}
 }

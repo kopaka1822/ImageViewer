@@ -10,9 +10,8 @@ layout(location = 3) uniform float maximum;
 void main()
 {
 	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
-	if(pixelCoord.x < imageSize(src_image).x && pixelCoord.y < imageSize(src_image).y)
-	{
-		vec4 color = imageLoad(src_image, pixelCoord);
-		imageStore(dst_image, pixelCoord, vec4(clamp(color.rgb, vec3(minimum), vec3(maximum)), color.a));
-	}
+
+	vec4 color = texelFetch(src_image, pixelCoord, 0);
+	imageStore(dst_image, pixelCoord, vec4(clamp(color.rgb, vec3(minimum), vec3(maximum)), color.a));
+	
 }

@@ -41,15 +41,13 @@ namespace OpenTKImageViewer.UI
         /// <param name="x">x coordinate</param>
         /// <param name="y">y coordinate</param>
         /// <param name="radius">summation radius (0 = only this pixel)</param>
-        /// <param name="level">mipmap level</param>
         /// <returns></returns>
-        public Vector4 GetPixelColor(int x, int y, int radius, int level)
+        public Vector4 GetPixelColor(int x, int y, int radius)
         {
             // set variables
             shaderProgram.Bind();
             SetPixelRadius(radius);
             SetPixelCoord(x,y);
-            SetTextureLevel(level);
 
             // buffer binding and dispatch
             GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufferId);
@@ -64,11 +62,6 @@ namespace OpenTKImageViewer.UI
             
             glhelper.Utility.GLCheck();
             return new Vector4(data[0], data[1], data[2], data[3]);
-        }
-
-        private static void SetTextureLevel(int level)
-        {
-            GL.Uniform1(2, level);
         }
 
         private static void SetPixelRadius(int radius)
@@ -88,17 +81,16 @@ namespace OpenTKImageViewer.UI
                    "layout(binding = 0) uniform sampler2D src;\n" +
                    "layout(location = 0) uniform ivec2 pixelCoord;\n" +
                    "layout(location = 1) uniform int pixelRadius;\n" +
-                   "layout(location = 2) uniform int lod;\n" +
                    "\n" +
                    "layout(std430, binding = 1) buffer pixelDstBuffer { vec4 pixelDst; };" +
                    "void main(){\n" +
                    "vec4 sum = vec4(0.0);\n" +
-                   "ivec2 size = textureSize(src, lod);\n" +
+                   "ivec2 size = textureSize(src, 0);\n" +
                    "for(int x = pixelCoord.x - pixelRadius; x <= pixelCoord.x + pixelRadius; ++x)\n" +
                    "for(int y = pixelCoord.y - pixelRadius; y <= pixelCoord.y + pixelRadius; ++y)\n" +
                    "    sum += texelFetch(src, ivec2(   clamp(x,0,size.x-1),\n" +
                                                         // y coords are reverted
-                   "                                    clamp(size.y - y - 1,0,size.y-1)), lod);\n" +
+                   "                                    clamp(size.y - y - 1,0,size.y-1)), 0);\n" +
                    
                    "int width = 1 + 2 * pixelRadius;\n" +
                    "pixelDst = sum / ivec4(width * width);\n" +

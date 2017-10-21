@@ -279,7 +279,7 @@ namespace OpenTKImageViewer.Tonemapping
         {
             return "#version 430\n" +
                    $"layout(local_size_x = {LocalSize}, local_size_y = {LocalSize}) in;\n" +
-                   "layout(rgba32f, binding = 0) uniform readonly image2D src_image;\n" +
+                   "layout(binding = 0) uniform sampler2D src_image;\n" +
                    "layout(rgba32f, binding = 1) uniform writeonly image2D dst_image;\n" +
                    "layout(location = 1) uniform ivec2 pixelOffset;\n" +
                    (IsSepa?"layout(location = 0) uniform ivec2 filterDirection;\n":"");

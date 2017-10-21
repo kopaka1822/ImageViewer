@@ -23,13 +23,11 @@ layout(location = 9) uniform bool setChAlpha;
 void main()
 {
 	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
-	if(pixelCoord.x < imageSize(src_image).x && pixelCoord.y < imageSize(src_image).y)
-	{
-		vec4 color = imageLoad(src_image, pixelCoord);
-		if(setChRed) color.r = chRed;
-		if(setChGreen) color.g = chGreen;
-		if(setChBlue) color.b = chBlue;
-		if(setChAlpha) color.a = chAlpha;
-		imageStore(dst_image, pixelCoord, color);
-	}
+	vec4 color = texelFetch(src_image, pixelCoord, 0);
+	if(setChRed) color.r = chRed;
+	if(setChGreen) color.g = chGreen;
+	if(setChBlue) color.b = chBlue;
+	if(setChAlpha) color.a = chAlpha;
+	imageStore(dst_image, pixelCoord, color);
+	
 }

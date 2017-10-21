@@ -44,7 +44,7 @@ int doti(ivec2 x, ivec2 y)
 void main()
 {
 	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
-	ivec2 imgSize = imageSize(src_image);
+	ivec2 imgSize = textureSize(src_image, 0);
 	if(pixelCoord.x < imgSize.x && pixelCoord.y < imgSize.y)
 	{
 		// fill buffer
@@ -58,14 +58,14 @@ void main()
 		int i = start;
 		while(i <= end)
 		{
-			buf[i - start] = imageLoad(src_image, pixelCoord + (midpoint - i) * filterDirection);
+			buf[i - start] = texelFetch(src_image, pixelCoord + (midpoint - i) * filterDirection, 0);
 			++i;
 		}
 		
 		// sort the buffer
 		bubbleSort(buflen);
 		
-		float alpha = imageLoad(src_image, pixelCoord).a;
+		float alpha = texelFetch(src_image, pixelCoord, 0).a;
 		imageStore(dst_image, pixelCoord, vec4(buf[buflen/2].rgb, alpha));
 	}
 }

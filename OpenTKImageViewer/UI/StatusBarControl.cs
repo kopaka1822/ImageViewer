@@ -151,12 +151,13 @@ namespace OpenTKImageViewer.UI
 
             if(!window.Context.BindPixelDisplayTexture(activeId, 
                 pixelShader.GetTextureLocation(), 
-                (int)window.Context.ActiveLayer))
+                (int)window.Context.ActiveLayer,
+                (int)window.Context.ActiveMipmap))
                 return new Vector4(0.0f);
 
             // use the pixel shader to get the result
 
-            return pixelShader.GetPixelColor(x, y, PixelRadius, (int) window.Context.ActiveMipmap);
+            return pixelShader.GetPixelColor(x, y, PixelRadius);
         }
 
         private string GetColorString(Vector4 v)
