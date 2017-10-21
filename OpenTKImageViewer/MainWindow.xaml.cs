@@ -335,10 +335,8 @@ namespace OpenTKImageViewer
                     glhelper.Utility.GLCheck();
                     if (progressWindow == null)
                     {
-                        // disable all interactions with open windows
-                        DisableWindowInteractions();
-
                         DisableOpenGl();
+                        
                         progressWindow = new ProgressWindow();
                         progressWindow.Show();
 
@@ -350,6 +348,10 @@ namespace OpenTKImageViewer
                             App.ShowInfoDialog((TonemapDialog==null)?(Window)this:(Window)TonemapDialog, "Operation aborted. The displayed picture may contain errors.");
                             EnableWindowInteractions();
                         };
+
+
+                        // disable all interactions with open windows
+                        DisableWindowInteractions();
                         EnableOpenGl();
                     }
                     
@@ -359,7 +361,6 @@ namespace OpenTKImageViewer
                     progressWindow.SetProgress(Context.GetImageProcess());
                     progressWindow.SetDescription(Context.GetImageLoadingDescription());
                     GL.Finish();
-                    //GL.Flush();
                 }
             }
             catch (Exception exception)
