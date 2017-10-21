@@ -335,12 +335,12 @@ namespace OpenTKImageViewer
                     glhelper.Utility.GLCheck();
                     if (progressWindow == null)
                     {
+                        // disable all interactions with open windows
+                        DisableWindowInteractions();
+
                         DisableOpenGl();
                         progressWindow = new ProgressWindow();
                         progressWindow.Show();
-
-                        // disable all interactions with open windows
-                        DisableWindowInteractions();
 
                         progressWindow.SetDescription("applying tonemappers");
 
@@ -364,6 +364,9 @@ namespace OpenTKImageViewer
             }
             catch (Exception exception)
             {
+#if DEBUG
+                Debugger.Break();
+#endif
                 if (error.Length == 0)
                     error = exception.Message + ": " + exception.StackTrace;
             }
