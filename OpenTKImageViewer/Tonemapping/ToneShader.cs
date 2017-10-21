@@ -91,6 +91,7 @@ namespace OpenTKImageViewer.Tonemapping
             }
 
             GL.DispatchCompute(width / LocalSize + 1, height / LocalSize + 1, 1);
+            Program.Unbind();
         }
 
         private class DispatchStepper

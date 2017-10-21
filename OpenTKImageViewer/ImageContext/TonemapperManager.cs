@@ -275,5 +275,14 @@ namespace OpenTKImageViewer.ImageContext
         {
             ChangedSettings?.Invoke(this, EventArgs.Empty);
         }
+
+        /// <summary>
+        /// checks if tonemappers are active
+        /// </summary>
+        /// <returns>true if at least one tonemapper is active in the current setting</returns>
+        public bool HasTonemapper()
+        {
+            return settings.Count > 0;
+        }
     }
 }

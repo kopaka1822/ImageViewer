@@ -43,6 +43,11 @@ namespace OpenTKImageViewer.glhelper
             GL.UseProgram(id);
         }
 
+        public static void Unbind()
+        {
+            GL.UseProgram(0);
+        }
+
         public void Dispose()
         {
             if (id != 0)

@@ -17,7 +17,6 @@ namespace OpenTKImageViewer.ImageContext
         // helper array for tonemapping
         private TextureArray2D[] pingpong;
         public bool RecomputeImage { get; set; } = true;
-        public bool RecomputeCpuTexture { get; set; } = true;
 
         public bool UseTonemapper
         {
@@ -29,11 +28,12 @@ namespace OpenTKImageViewer.ImageContext
             }
         }
         public IStepable TonemappingStepable { get; private set; }= null;
+        // texture after combinding before tonemapping
+        private TextureArray2D combinedTexture;
+        // texture after tonemapping
         public TextureArray2D Texture { get; private set; }
         public ImageFormula CombineFormula { get; } = new ImageFormula();
         public ImageFormula AlphaFormula { get; } = new ImageFormula();
-        public bool IsEnabled { get; set; } = true;
-        public CpuTexture CpuCachedTexture { get; private set; }
         public bool Active { get; set; } = true;
 
         public ImageConfiguration(ImageContext context)
@@ -43,6 +43,49 @@ namespace OpenTKImageViewer.ImageContext
             AlphaFormula.Changed += (sender, args) => RecomputeImage = true;
             
             combineShader = new ImageCombineShader(context, CombineFormula, AlphaFormula);
+        }
+
+        /// <summary>
+        /// binds the texture that should be used for pixel displaying
+        /// (depending on DisplayColorBeforeTonemapping)
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <param name="layer"></param>
+        /// <returns></returns>
+        public bool BindPixelDisplayTextue(int slot, int layer)
+        {
+            if (Texture == null || !Active)
+                return false;
+
+            if (parent.DisplayColorBeforeTonemapping)
+            {
+                if (UseTonemapper && parent.Tonemapper.HasTonemapper())
+                {
+                    // since tonemappers were used the final texture differs from the combined
+                    if (combinedTexture == null)
+                    {
+                        // recalculate the combined texture
+                        combinedTexture = parent.TextureCache.GetAvailableTexture();
+                        RecomputeCombinedImage(combinedTexture);
+                    }
+
+                    combinedTexture.BindAsTexture2D(slot, false, layer);
+                    return true;
+                }
+                // just use the final texture since no tonemappers were used
+            }
+
+            if (combinedTexture != null)
+            {
+                // we can get rid of this texture since we use the final one for displaying now
+                parent.TextureCache.StoreUnusuedTexture(combinedTexture);
+                combinedTexture = null;
+            }
+
+            // bind the final product
+            Texture.BindAsTexture2D(slot, false, layer);
+
+            return true;
         }
 
         /// <summary>
@@ -56,25 +99,22 @@ namespace OpenTKImageViewer.ImageContext
 
             // update shader contents or make initial creation
             combineShader.Update();
-
-            // update cpu texture (from before tonemapping to after tonemapping)
-            if (RecomputeCpuTexture && Texture != null)
-            {
-                CpuCachedTexture = Texture.GetFloatPixels(parent.GetNumMipmaps(), parent.GetNumLayers());
-                RecomputeCpuTexture = false;
-            }
             
             if (RecomputeImage)
             {
                 RecomputeImage = false;
+                // put the last used combined texture back in the cache (will probably be changed)
+                if (combinedTexture != null)
+                {
+                    parent.TextureCache.StoreUnusuedTexture(combinedTexture);
+                    combinedTexture = null;
+                }
+
+                // aqcuire texture if necessary
                 if (Texture == null)
-                    Texture = parent.TextureCache.GetAvailableTexture();
+                    Texture = parent.TextureCache.GetAvailableTexture();                
 
                 RecomputeCombinedImage(Texture);
-
-                // retrieve the complete image for the cpu
-                if (parent.DisplayColorBeforeTonemapping || !UseTonemapper)
-                    CpuCachedTexture = Texture.GetFloatPixels(parent.GetNumMipmaps(), parent.GetNumLayers());
 
                 if (UseTonemapper)
                 {
@@ -102,10 +142,7 @@ namespace OpenTKImageViewer.ImageContext
                     Texture = pingpong[0];
                     parent.TextureCache.StoreUnusuedTexture(pingpong[1]);
                     pingpong = null;
-
-                    // retrieve the complete image for the cpu
-                    if (!parent.DisplayColorBeforeTonemapping && Texture != null)
-                        CpuCachedTexture = Texture.GetFloatPixels(parent.GetNumMipmaps(), parent.GetNumLayers());
+                    
                     return true;
                 }
                 return false;

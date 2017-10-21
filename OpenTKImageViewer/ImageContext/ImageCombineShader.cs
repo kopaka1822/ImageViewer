@@ -62,6 +62,7 @@ namespace OpenTKImageViewer.ImageContext
             SetLevel(level);
             SetLayer(layer);
             GL.DispatchCompute(width / LocalSize + 1, height / LocalSize + 1, 1);
+            Program.Unbind();
         }
 
         public int GetDestinationImageBinding()

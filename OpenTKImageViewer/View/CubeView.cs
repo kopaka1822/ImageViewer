@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
+using OpenTKImageViewer.glhelper;
 using OpenTKImageViewer.UI;
 using OpenTKImageViewer.View.Shader;
 
@@ -46,6 +47,7 @@ namespace OpenTKImageViewer.View
             DrawQuad();
 
             GL.Disable(EnableCap.Blend);
+            Program.Unbind();
         }
 
         protected override Matrix4 GetOrientation()

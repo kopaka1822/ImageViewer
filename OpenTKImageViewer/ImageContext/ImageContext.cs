@@ -54,7 +54,6 @@ namespace OpenTKImageViewer.ImageContext
         private uint activeLayer = 0;
         private bool linearInterpolation = false;
         private GrayscaleMode grayscale = GrayscaleMode.Disabled;
-        private bool displayColorBeforeTonemapping = true;
         private readonly ImageConfiguration[] finalTextures = new ImageConfiguration[2];
 
         #endregion
@@ -120,27 +119,7 @@ namespace OpenTKImageViewer.ImageContext
         public TonemapperManager Tonemapper { get; } = new TonemapperManager();
 
         // this will determine if the cpu cached textures will be acquired directly after combining the images or after tonemapping
-        public bool DisplayColorBeforeTonemapping {
-            get { return displayColorBeforeTonemapping; }
-            set
-            {
-                if (value != displayColorBeforeTonemapping)
-                {
-                    displayColorBeforeTonemapping = value;
-                    if (value)
-                        foreach (var imageConfiguration in finalTextures)
-                        {
-                            imageConfiguration.RecomputeImage = true;
-                        }
-                    else
-                        // since the images after the tonemapping is requested nothing needs to be recomputed
-                        foreach (var imageConfiguration in finalTextures)
-                        {
-                            imageConfiguration.RecomputeCpuTexture = true;
-                        }
-                }
-            }
-        }
+        public bool DisplayColorBeforeTonemapping { get; set; } = true;
 
         public TextureCache TextureCache { get; }
         #endregion
@@ -244,12 +223,16 @@ namespace OpenTKImageViewer.ImageContext
         }
 
         /// <summary>
-        /// cpu cached texture of the final image
+        /// binds the texture that should be used for pixel displaying (status bar).
         /// </summary>
-        /// <returns>which image equation (0 or 1)</returns>
-        public CpuTexture GetCpuTexture(int imageId)
+        /// <param name="imageId"></param>
+        /// <param name="slot"></param>
+        /// <param name="layer"></param>
+        /// <param name="level"></param>
+        /// <returns></returns>
+        public bool BindPixelDisplayTexture(int imageId, int slot, int layer)
         {
-            return finalTextures[imageId].CpuCachedTexture;
+            return finalTextures[imageId].BindPixelDisplayTextue(slot, layer);
         }
 
         #endregion
@@ -411,27 +394,27 @@ namespace OpenTKImageViewer.ImageContext
         public event ChangedFilteringHandler ChangedFiltering;
         public event ChangedGrayscaleHandler ChangedGrayscale;
 
-        protected virtual void OnChangedLayer()
+        private void OnChangedLayer()
         {
             ChangedLayer?.Invoke(this, EventArgs.Empty);
         }
 
-        protected virtual void OnChangedMipmap()
+        private void OnChangedMipmap()
         {
             ChangedMipmap?.Invoke(this, EventArgs.Empty);
         }
 
-        protected virtual void OnChangedImages()
+        private void OnChangedImages()
         {
             ChangedImages?.Invoke(this, EventArgs.Empty);
         }
 
-        protected virtual void OnChangedFiltering()
+        private void OnChangedFiltering()
         {
             ChangedFiltering?.Invoke(this, EventArgs.Empty);
         }
 
-        protected virtual void OnChangedGrayscale()
+        private void OnChangedGrayscale()
         {
             ChangedGrayscale?.Invoke(this, EventArgs.Empty);
         }

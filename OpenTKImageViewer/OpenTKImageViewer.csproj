@@ -157,7 +157,6 @@
     <Compile Include="Equation\Token\SingleCharToken.cs" />
     <Compile Include="Equation\Token\Token.cs" />
     <Compile Include="Equation\Token\ValueToken.cs" />
-    <Compile Include="glhelper\CpuTexture.cs" />
     <Compile Include="glhelper\TextureArray2D.cs" />
     <Compile Include="ImageContext\ImageCombineShader.cs" />
     <Compile Include="ImageContext\ImageConfiguration.cs" />

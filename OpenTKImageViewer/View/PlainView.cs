@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
+using OpenTKImageViewer.glhelper;
 using OpenTKImageViewer.UI;
 using OpenTKImageViewer.View.Shader;
 
@@ -103,6 +104,7 @@ namespace OpenTKImageViewer.View
             glhelper.Utility.GLCheck();
 
             GL.Disable(EnableCap.Blend);
+            Program.Unbind();
         }
 
         private Matrix4 GetAspectRatio(float clientWidth, float clientHeight)

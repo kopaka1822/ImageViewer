@@ -92,7 +92,7 @@ namespace OpenTKImageViewer.glhelper
         /// </summary>
         private void CreateTexture2DViews()
         {
-            if(layerId == null)
+            if(layerId != null)
                 return;
 
             layerId = new int[nLayer];
@@ -214,37 +214,6 @@ namespace OpenTKImageViewer.glhelper
         }
 
         /// <summary>
-        /// retries data from all layers and wraps it around a cpu texture
-        /// </summary>
-        /// <param name="nLevel">number of levels</param>
-        /// <param name="nFaces">number of faces</param>
-        /// <returns></returns>
-        public CpuTexture GetFloatPixels(int nLevel, int nFaces)
-        {
-            var target = new CpuTexture(nLevel, nFaces);
-
-            GL.BindTexture(TextureTarget.Texture2DArray, 0);
-            GL.BindTexture(TextureTarget.Texture2DArray, id);
-
-            for (int level = 0; level < nLevel; ++level)
-            {
-                // retrieve width and height of the level
-                int width;
-                int height;
-                GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureWidth, out width);
-                GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureHeight, out height);
-                float[] buffer = new float[width * height * 4 * nFaces];
-
-                Utility.ReadTexture(id, level, PixelFormat.Rgba, PixelType.Float, ref buffer, 0, 0, width, height * nFaces);
-
-                target.SetLevel(buffer, level, width, height);
-            }
-            GL.BindTexture(TextureTarget.Texture2DArray, 0);
-
-            return target;
-        }
-
-        /// <summary>
         /// reads data from gpu
         /// </summary>
         /// <param name="level">requested level</param>
@@ -258,22 +227,20 @@ namespace OpenTKImageViewer.glhelper
         {
             // retrieve width and height of the level
             GL.BindTexture(TextureTarget.Texture2DArray, id);
-            int numLayer;
             GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureWidth, out width);
             GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureHeight, out height);
-            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureDepth, out numLayer);
 
-            Debug.Assert((uint)layer < numLayer);
+            Debug.Assert((uint)layer < nLayer);
 
-            int bufferSize = width * height * GetPixelTypeSize(type) * GetPixelFormatCount(format) * numLayer;
+            int bufferSize = width * height * GetPixelTypeSize(type) * GetPixelFormatCount(format) * nLayer;
             byte[] buffer = new byte[bufferSize];
-            //GL.GetTexImage(TextureTarget.Texture2DArray, level, format, type, buffer);
-            Utility.ReadTexture(id, level, format, type, ref buffer, 0, 0, width, height * numLayer);
 
-            if (numLayer > 1 && layer >= 0)
+            Utility.ReadTexture(id, level, format, type, ref buffer, 0, 0, width, height * nLayer);
+
+            if (nLayer > 1 && layer >= 0)
             {
                 // get data from the layer
-                int layerSize = bufferSize / numLayer;
+                int layerSize = bufferSize / nLayer;
                 byte[] layerBuffer = new byte[layerSize];
                 for (int i = 0; i < layerSize; ++i)
                     layerBuffer[i] = buffer[layer * layerSize + i];
@@ -285,13 +252,13 @@ namespace OpenTKImageViewer.glhelper
             if (layer >= 0)
             {
                 // only this layer
-                MirrorHorizontally(buffer, width * GetPixelTypeSize(type) * GetPixelFormatCount(format), height, layer * (bufferSize / numLayer));
+                MirrorHorizontally(buffer, width * GetPixelTypeSize(type) * GetPixelFormatCount(format), height, layer * (bufferSize / nLayer));
             }
             else
             {
                 // all layer
-                for(int curLayer = 0; curLayer < numLayer; ++curLayer)
-                    MirrorHorizontally(buffer, width * GetPixelTypeSize(type) * GetPixelFormatCount(format), height, curLayer * (bufferSize / numLayer));
+                for(int curLayer = 0; curLayer < nLayer; ++curLayer)
+                    MirrorHorizontally(buffer, width * GetPixelTypeSize(type) * GetPixelFormatCount(format), height, curLayer * (bufferSize / nLayer));
             }
 
             return buffer;

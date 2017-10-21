@@ -35,6 +35,8 @@ namespace OpenTKImageViewer.UI
         private int pixelRadius = 0;
         private int lastMouseX = 0;
         private int lastMouseY = 0;
+        private PixelValueShader pixelShader;
+        private Vector4 lastPixelColor = new Vector4(0.0f);
 
         private LayerModeType layerMode = LayerModeType.None;
         public LayerModeType LayerMode
@@ -79,6 +81,15 @@ namespace OpenTKImageViewer.UI
             window.ComboBoxMipmap.SelectionChanged += ComboBoxMipmapOnSelectionChanged;
         }
 
+        /// <summary>
+        /// initialize the opengl relevant classes
+        /// </summary>
+        public void InitOpenGl()
+        {
+            if(pixelShader == null)
+                pixelShader = new PixelValueShader();
+        }
+
         private void ComboBoxMipmapOnSelectionChanged(object o, SelectionChangedEventArgs selectionChangedEventArgs)
         {
             if (window.ComboBoxMipmap.SelectedIndex >= 0)
@@ -110,10 +121,9 @@ namespace OpenTKImageViewer.UI
             lastMouseX = x;
             lastMouseY = y;
             var activeId = window.Context.GetFirstActiveTexture();
-            if (activeId != -1 && window.Context.GetCpuTexture(activeId) != null)
-            {
-                window.TextMousePositionColor.Text = GetColorString(GetPixelColor(x,y));
-            }
+
+            lastPixelColor = GetPixelColor(x, y);
+            window.TextMousePositionColor.Text = GetColorString(lastPixelColor);
         }
 
         /// <summary>
@@ -122,10 +132,7 @@ namespace OpenTKImageViewer.UI
         /// <returns></returns>
         public Vector4 GetCurrentPixelColor()
         {
-            var activeId = window.Context.GetFirstActiveTexture();
-            if (activeId == -1 || window.Context.GetCpuTexture(activeId) == null)
-                return new Vector4(0.0f);
-            return GetPixelColor(lastMouseX, lastMouseY);
+            return lastPixelColor;
         }
 
         /// <summary>
@@ -136,16 +143,20 @@ namespace OpenTKImageViewer.UI
         /// <returns></returns>
         private Vector4 GetPixelColor(int x, int y)
         {
+            if(pixelShader == null)
+                return new Vector4(0.0f);
             var activeId = window.Context.GetFirstActiveTexture();
-            var cpuTex = window.Context.GetCpuTexture(activeId);
-            var sum = new Vector4(0.0f);
-            for(var curX = x - PixelRadius; curX < x + PixelRadius + 1; ++curX)
-            for (var curY = y - PixelRadius; curY < y + PixelRadius + 1; ++curY)
-                sum += cpuTex.GetPixel(curX, curY, (int) window.Context.ActiveLayer,
-                    (int) window.Context.ActiveMipmap);
+            if(activeId == -1)
+                return new Vector4(0.0f);
 
-            var w = 1 + 2 * PixelRadius;
-            return sum / (w * w);
+            if(!window.Context.BindPixelDisplayTexture(activeId, 
+                pixelShader.GetTextureLocation(), 
+                (int)window.Context.ActiveLayer))
+                return new Vector4(0.0f);
+
+            // use the pixel shader to get the result
+
+            return pixelShader.GetPixelColor(x, y, PixelRadius, (int) window.Context.ActiveMipmap);
         }
 
         private string GetColorString(Vector4 v)

@@ -89,14 +89,13 @@ namespace OpenTKImageViewer
             this.ParentApp = parentApp;
             this.Context = context;
             this.ZIndex = 0;
-
+            
             InitializeComponent();
 
             this.Width = parentApp.GetConfig().WindowSizeX;
             this.Height = parentApp.GetConfig().WindowSizeY;
             if (parentApp.GetConfig().IsMaximized)
                 WindowState = WindowState.Maximized;
-            
 
             StatusBar = new StatusBarControl(this);
             CreateImageViews();
@@ -120,7 +119,12 @@ namespace OpenTKImageViewer
             SetGrayscale(context.Grayscale);
             context.ChangedGrayscale += (sender, args) => SetGrayscale(context.Grayscale);
 
-            context.ChangedMipmap += (sender, args) => imageViews[currentImageView]?.UpdateMouseDisplay(this);
+            context.ChangedMipmap += (sender, args) =>
+            {
+                EnableOpenGl();
+                imageViews[currentImageView]?.UpdateMouseDisplay(this);
+                DisableOpenGl();
+            };
         }
 
         private void CreateImageViews()
@@ -275,6 +279,7 @@ namespace OpenTKImageViewer
                 GL.ClearColor(0.9333f, 0.9333f, 0.9333f, 1.0f);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+                StatusBar.InitOpenGl();
                 if (Context.Update())
                 {
                     // image is ready
@@ -438,7 +443,10 @@ namespace OpenTKImageViewer
                 }
             }
             MousePosition = newPosition;
+
+            EnableOpenGl();
             imageViews[CurrentView]?.UpdateMouseDisplay(this);
+            DisableOpenGl();
 
             // redraw frame on mouse move when viewing 2 pictures on the same time
             if(Context.GetNumActiveImages() == 2)
@@ -467,7 +475,9 @@ namespace OpenTKImageViewer
         private void WinFormsHost_OnMouseWheel(System.Windows.Forms.MouseEventArgs args)
         {
             imageViews[currentImageView]?.OnScroll(args.Delta, new Point(args.X, args.Y));
+            EnableOpenGl();
             imageViews[CurrentView]?.UpdateMouseDisplay(this);
+            DisableOpenGl();
             RedrawFrame();
         }
         
