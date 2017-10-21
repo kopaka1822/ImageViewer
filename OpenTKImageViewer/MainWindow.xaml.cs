@@ -357,9 +357,10 @@ namespace OpenTKImageViewer
                     
                     // image is not ready yet
                     glhelper.Utility.GLCheck();
-                    RedrawFrame();
                     progressWindow.SetProgress(Context.GetImageProcess());
                     progressWindow.SetDescription(Context.GetImageLoadingDescription());
+
+                    RedrawFrame();
                     GL.Finish();
                 }
             }

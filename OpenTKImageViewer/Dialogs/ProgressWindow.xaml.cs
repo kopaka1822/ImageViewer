@@ -37,6 +37,7 @@ namespace OpenTKImageViewer.Dialogs
         {
             percent = Math.Max(0.0, Math.Min(1.0, percent));
             ProgressBar.Value = percent * 100.0f;
+            ProgressBar.InvalidateVisual();
         }
 
         public void SetDescription(string text)
