@@ -10,35 +10,38 @@ namespace OpenTKImageViewer.glhelper
 {
     public class TextureArray2D
     {
-        private int id;
+        private int id = 0;
         private int cubeId = 0;
+        private int[] layerId;
+
         private readonly SizedInternalFormat internalFormat;
-        private readonly bool hasMipmaps;
+        private readonly int nMipmaps;
+        private readonly int nLayer;
 
         public TextureArray2D(int numLayers, int numMipmaps, SizedInternalFormat internalFormat, int width, int height)
         {
             id = GL.GenTexture();
             this.internalFormat = internalFormat;
-            hasMipmaps = numMipmaps > 1;
+            this.nMipmaps = numMipmaps;
+            this.nLayer = numLayers;
             GL.BindTexture(TextureTarget.Texture2DArray, id);
 
             GL.TexStorage3D(TextureTarget3d.Texture2DArray, numMipmaps,
                 internalFormat, width,
                 height, numLayers);
             Utility.GLCheck();
-
-            if(numLayers == 6)
-                CreateCubeMapView(numMipmaps, (PixelInternalFormat)internalFormat);
         }
 
         public TextureArray2D(ImageLoader.Image image)
         {
             id = GL.GenTexture();
-            hasMipmaps = image.GetNumMipmaps() > 1;
+            this.nMipmaps = image.GetNumMipmaps();
+            this.nLayer = image.Layers.Count;
+            this.internalFormat = (SizedInternalFormat)image.OpenglInternalFormat;
+
             GL.BindTexture(TextureTarget.Texture2DArray, id);
 
             // create storage
-            internalFormat = (SizedInternalFormat)image.OpenglInternalFormat;
 
             GL.TexStorage3D(TextureTarget3d.Texture2DArray, image.GetNumMipmaps(),
                 internalFormat, image.GetWidth(0),
@@ -84,11 +87,41 @@ namespace OpenTKImageViewer.glhelper
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLevel, image.GetNumMipmaps());
         }
 
-        private void CreateCubeMapView(int numLevels, PixelInternalFormat pixelInternalFormat)
+        /// <summary>
+        /// creates texture 2d views if they were not already created
+        /// </summary>
+        private void CreateTexture2DViews()
         {
+            if(layerId == null)
+                return;
+
+            layerId = new int[nLayer];
+            GL.GenTextures(nLayer, layerId);
+            for (int curLayer = 0; curLayer < nLayer; ++curLayer)
+            {
+                GL.TextureView(layerId[curLayer], TextureTarget.Texture2D, id,
+                    (PixelInternalFormat)internalFormat, 0, nMipmaps, curLayer, 1);
+
+                Utility.GLCheck();
+                GL.BindTexture(TextureTarget.Texture2D, layerId[curLayer]);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
+                Utility.GLCheck();
+            }
+        }
+
+        /// <summary>
+        /// creates cube map view if it was not already created
+        /// </summary>
+        private void CreateCubeMapView()
+        {
+            if(cubeId != 0)
+                return;
+
+            Debug.Assert(nLayer == 6);
             cubeId = GL.GenTexture();
             GL.TextureView(cubeId, TextureTarget.TextureCubeMap, id,
-                pixelInternalFormat, 0, numLevels, 0, 6);
+                (PixelInternalFormat)internalFormat, 0, nMipmaps, 0, 6);
             GL.BindTexture(TextureTarget.TextureCubeMap, cubeId);
 
             Utility.GLCheck();
@@ -100,6 +133,13 @@ namespace OpenTKImageViewer.glhelper
             Utility.GLCheck();
         }
 
+        /// <summary>
+        /// binds specified texture
+        /// </summary>
+        /// <param name="slot">binding slot</param>
+        /// <param name="target">texture target</param>
+        /// <param name="texId">texture id</param>
+        /// <param name="linearFiltering">linear filter or nearest neighbor</param>
         private void BindAs(int slot, TextureTarget target, int texId, bool linearFiltering)
         {
             GL.ActiveTexture(TextureUnit.Texture0 + slot);
@@ -113,7 +153,7 @@ namespace OpenTKImageViewer.glhelper
 
         private int GetMinFilter(bool linearFiltering)
         {
-            if (hasMipmaps)
+            if (nMipmaps > 0)
             {
                 if (linearFiltering) return (int) TextureMinFilter.LinearMipmapNearest; // sharps switching between mipmaps
                 return (int) TextureMinFilter.NearestMipmapNearest;
@@ -128,16 +168,46 @@ namespace OpenTKImageViewer.glhelper
             return (int) TextureMagFilter.Nearest;
         }
 
+        /// <summary>
+        /// binds texture as texture array 2d
+        /// </summary>
+        /// <param name="slot">binding slot</param>
+        /// <param name="linearFiltering">linear filter or nearest neighbor</param>
         public void Bind(int slot, bool linearFiltering)
         {
             BindAs(slot, TextureTarget.Texture2DArray, id, linearFiltering);
         }
 
+        /// <summary>
+        /// binds texture as cube map
+        /// </summary>
+        /// <param name="slot">binding slot</param>
+        /// <param name="linearFiltering">linear filter or nearest neighbor</param>
         public void BindAsCubemap(int slot, bool linearFiltering)
         {
+            CreateCubeMapView();
             BindAs(slot, TextureTarget.TextureCubeMap, cubeId, linearFiltering);
         }
 
+        /// <summary>
+        /// binds texture as texture2D
+        /// </summary>
+        /// <param name="slot">binding slot</param>
+        /// <param name="linearFiltering">linear filter or nearest neighbor</param>
+        /// <param name="layer">which layer of the texture</param>
+        public void BindAsTexture2D(int slot, bool linearFiltering, int layer)
+        {
+            CreateTexture2DViews();
+            BindAs(slot, TextureTarget.Texture2D, layerId[layer], linearFiltering);
+        }
+
+        /// <summary>
+        /// binds the texture as image
+        /// </summary>
+        /// <param name="slot">binding slot</param>
+        /// <param name="level">which level</param>
+        /// <param name="layer">which layer</param>
+        /// <param name="access">texture access</param>
         public void BindAsImage(int slot, int level, int layer, TextureAccess access)
         {
             GL.BindImageTexture(slot, id, level, false, layer, access, internalFormat);

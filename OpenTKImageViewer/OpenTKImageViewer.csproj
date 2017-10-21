@@ -168,6 +168,7 @@
     <Compile Include="Tonemapping\TonemapperControl.cs" />
     <Compile Include="Tonemapping\ToneParameter.cs" />
     <Compile Include="Tonemapping\ToneShader.cs" />
+    <Compile Include="UI\PixelValueShader.cs" />
     <Compile Include="UI\StatusBarControl.cs" />
     <Compile Include="Utility\IStepable.cs" />
     <Compile Include="Utility\Settings.cs" />

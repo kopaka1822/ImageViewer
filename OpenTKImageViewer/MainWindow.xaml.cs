@@ -424,7 +424,6 @@ namespace OpenTKImageViewer
 
         private void WinFormsHost_OnMouseMove(System.Windows.Forms.MouseEventArgs args)
         {
-            //var newPosition = new Point(args.X * GetDpiScalingX(), args.Y * GetDpiScalingY());
             var newPosition = new Point(args.X, args.Y);
             
             if (mouseDown)
