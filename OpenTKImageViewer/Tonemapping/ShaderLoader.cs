@@ -171,7 +171,23 @@ namespace OpenTKImageViewer.Tonemapping
                     else if (line.StartsWith("#setting"))
                     {
                         var whole = line.Substring("#setting".Length);
-                        HandleSetting(GetParameters(whole), whole);
+                        var parameters = GetParameters(whole);
+                        // get the second parameter as one string (without , seperation)
+                        try
+                        {
+                            var idx = whole.IndexOf(",", StringComparison.Ordinal);
+                            whole = whole.Substring(idx + 1);
+                        }
+                        catch (Exception)
+                        {
+                            // no second parameter available
+                            whole = "";
+                        }
+                        
+                        whole = whole.TrimStart(' ');
+                        whole = whole.TrimEnd(' ');
+
+                        HandleSetting(parameters, whole);
                         ShaderSource += "\n"; // remember line for error information
                     }
                     else if(line.StartsWith("#keybinding"))
@@ -282,6 +298,11 @@ namespace OpenTKImageViewer.Tonemapping
             return val;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="p">komma seperated parameters</param>
+        /// <param name="wholeString">the second parameter wihtout seperation of kommas (for description)</param>
         private void HandleSetting(string[] p, string wholeString)
         {
             if(p.Length < 2)
