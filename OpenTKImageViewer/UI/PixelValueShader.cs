@@ -25,7 +25,7 @@ namespace OpenTKImageViewer.UI
             bufferId = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufferId);
             GL.BufferStorage(BufferTarget.ShaderStorageBuffer,  new IntPtr(sizeof(float) * 4), 
-                IntPtr.Zero, BufferStorageFlags.MapReadBit);
+                IntPtr.Zero, BufferStorageFlags.MapReadBit | BufferStorageFlags.ClientStorageBit);
         }
 
         public int GetTextureLocation()
@@ -77,7 +77,7 @@ namespace OpenTKImageViewer.UI
         private static string GetComputeSource()
         {
             return "#version 430 core\n" +
-                   "layout(local_size_x = 1);\n" +
+                   "layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;\n" +
                    "layout(binding = 0) uniform sampler2D src;\n" +
                    "layout(location = 0) uniform ivec2 pixelCoord;\n" +
                    "layout(location = 1) uniform int pixelRadius;\n" +
