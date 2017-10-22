@@ -51,6 +51,15 @@ namespace OpenTKImageViewer.View
             
         }
 
+        public virtual void Dispose()
+        {
+            if (vertexArrayId != 0)
+            {
+                GL.DeleteVertexArray(vertexArrayId);
+                vertexArrayId = 0;
+            }
+        }
+
         /// <summary>
         /// transforms mouse coordinates from range [-1, 1] to [0, imageSize] and clamps the range if input exceeds [-1, 1]
         /// </summary>

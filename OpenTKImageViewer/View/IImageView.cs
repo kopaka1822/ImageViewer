@@ -24,5 +24,6 @@ namespace OpenTKImageViewer.View
         void OnScroll(double diff, Point mouse);
         void UpdateMouseDisplay(MainWindow window);
         void SetZoom(float dec);
+        void Dispose();
     }
 }

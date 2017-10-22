@@ -181,5 +181,14 @@ namespace OpenTKImageViewer.ImageContext
                 pingpong = null;
             }
         }
+
+        public void Dispose()
+        {
+            Texture?.Dispose();
+            combinedTexture?.Dispose();
+            pingpong?[0]?.Dispose();
+            pingpong?[1]?.Dispose();
+            combineShader.Dispose();
+        }
     }
 }

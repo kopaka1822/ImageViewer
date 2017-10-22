@@ -274,6 +274,23 @@ namespace OpenTKImageViewer.ImageContext
         }
 
         /// <summary>
+        /// disposes all opengl resources
+        /// </summary>
+        public void Dispose()
+        {
+            foreach (var img in images)
+            {
+                img.TextureArray2D.Dispose();
+            }
+            foreach (var imageConfiguration in finalTextures)
+            {
+                imageConfiguration.Dispose();
+            }
+            Tonemapper.Dispose();
+            TextureCache.Clear();
+        }
+
+        /// <summary>
         /// returns number of visible final textures (selected in the image dialog)
         /// </summary>
         /// <returns>[0,2]</returns>

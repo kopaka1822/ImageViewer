@@ -34,6 +34,14 @@ namespace OpenTKImageViewer.View
             this.boxScroll = boxScroll;
         }
 
+        public override void Dispose()
+        {
+            checkersShader?.Dispose();
+            shader?.Dispose();
+
+            base.Dispose();
+        }
+
         private void Init()
         {
             shader = new SingleViewShader();

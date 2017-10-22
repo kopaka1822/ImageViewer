@@ -96,5 +96,10 @@ namespace OpenTKImageViewer.UI
                    "pixelDst = sum / ivec4(width * width);\n" +
                    "}";
         }
+
+        public void Dispose()
+        {
+            shaderProgram?.Dispose();
+        }
     }
 }

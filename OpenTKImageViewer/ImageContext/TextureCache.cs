@@ -35,5 +35,15 @@ namespace OpenTKImageViewer.ImageContext
         {
             textures.Push(tex);
         }
+
+        // removes all cached resources
+        public void Clear()
+        {
+            foreach (var textureArray2D in textures)
+            {
+                textureArray2D.Dispose();
+            }
+            textures.Clear();
+        }
     }
 }

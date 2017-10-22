@@ -55,7 +55,7 @@ namespace OpenTKImageViewer.ImageContext
                 OnChangedSettings();
         }
 
-        public bool invokeKey(System.Windows.Input.Key key)
+        private bool invokeKey(System.Windows.Input.Key key)
         {
             bool changed = false;
             foreach (var set in settings)
@@ -78,7 +78,7 @@ namespace OpenTKImageViewer.ImageContext
         /// for the special case if a key is pressed and the tonemapper dialog is still open
         /// </summary>
         /// <param name="p"></param>
-        /// <param name=""></param>
+        /// <param name="key"></param>
         public void ApplyAndInvoke(List<ToneParameter> p, System.Windows.Input.Key key)
         {
             // set settings to original settings
@@ -284,6 +284,21 @@ namespace OpenTKImageViewer.ImageContext
         public bool HasTonemapper()
         {
             return settings.Count > 0;
+        }
+
+        /// <summary>
+        /// gets rid of all opengl resources
+        /// </summary>
+        public void Dispose()
+        {
+            if (shaders != null)
+            {
+                foreach (var toneShader in shaders)
+                {
+                    toneShader.Dispose();
+                }
+                shaders = null;
+            }
         }
     }
 }

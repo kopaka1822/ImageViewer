@@ -39,5 +39,10 @@ namespace OpenTKImageViewer.View.Shader
                    "else if(grayscale == uint(3)) color = color.bbbb;\n" +
                    "else if(grayscale == uint(4)) color = color.aaaa;\n";
         }
+
+        public void Dispose()
+        {
+            ShaderProgram?.Dispose();
+        }
     }
 }

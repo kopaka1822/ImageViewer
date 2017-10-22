@@ -24,6 +24,13 @@ namespace OpenTKImageViewer.View
         {
         }
 
+        public override void Dispose()
+        {
+            shader?.Dispose();
+
+            base.Dispose();
+        }
+
         protected override void Init()
         {
             base.Init();

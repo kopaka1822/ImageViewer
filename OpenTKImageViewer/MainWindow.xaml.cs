@@ -972,6 +972,30 @@ namespace OpenTKImageViewer
                 e.Handled = true;
             }
         }
-#endregion
+
+        #endregion
+
+
+        protected override void OnClosed(EventArgs e)
+        {
+            // delete all opengl resources
+            EnableOpenGl();
+
+            DisposeViews();
+            Context.Dispose();
+            StatusBar.Dispose();
+            
+            DisableOpenGl();
+            glControl.Dispose();
+            base.OnClosed(e);
+        }
+
+        private void DisposeViews()
+        {
+            foreach (var imageView in imageViews)
+            {
+                imageView.Value.Dispose();
+            }
+        }
     }
 }

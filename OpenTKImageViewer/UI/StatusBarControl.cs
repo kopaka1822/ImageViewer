@@ -291,5 +291,10 @@ namespace OpenTKImageViewer.UI
             if (window.Context.HasHdr())
                 PixelDisplay = StatusBarControl.PixelDisplayType.Float;
         }
+
+        public void Dispose()
+        {
+            pixelShader?.Dispose();
+        }
     }
 }

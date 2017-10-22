@@ -138,5 +138,10 @@ namespace OpenTKImageViewer.ImageContext
             }
             return res;
         }
+
+        public void Dispose()
+        {
+            program?.Dispose();
+        }
     }
 }

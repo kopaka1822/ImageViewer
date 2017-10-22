@@ -40,5 +40,10 @@ namespace OpenTKImageViewer.View
         {
             
         }
+
+        public void Dispose()
+        {
+            
+        }
     }
 }
