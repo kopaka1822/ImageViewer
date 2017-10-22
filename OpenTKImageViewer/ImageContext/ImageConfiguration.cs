@@ -100,34 +100,6 @@ namespace OpenTKImageViewer.ImageContext
 
             // update shader contents or make initial creation
             combineShader.Update();
-            
-            if (RecomputeImage)
-            {
-                RecomputeImage = false;
-                // put the last used combined texture back in the cache (will probably be changed)
-                if (combinedTexture != null)
-                {
-                    parent.TextureCache.StoreUnusuedTexture(combinedTexture);
-                    combinedTexture = null;
-                }
-
-                // aqcuire texture if necessary
-                if (Texture == null)
-                    Texture = parent.TextureCache.GetAvailableTexture();                
-
-                RecomputeCombinedImage(Texture);
-
-                if (UseTonemapper)
-                {
-                    // set up ping pong array
-                    pingpong = new TextureArray2D[2];
-                    pingpong[0] = Texture;
-                    pingpong[1] = parent.TextureCache.GetAvailableTexture();
-
-                    // create stepable
-                    TonemappingStepable = parent.Tonemapper.GetApplyShaderStepable(pingpong, parent);
-                }
-            }
 
             if (TonemappingStepable != null)
             {
@@ -147,6 +119,36 @@ namespace OpenTKImageViewer.ImageContext
                     return true;
                 }
                 return false;
+            }
+
+            if (RecomputeImage)
+            {
+                RecomputeImage = false;
+                // put the last used combined texture back in the cache (will probably be changed)
+                if (combinedTexture != null)
+                {
+                    parent.TextureCache.StoreUnusuedTexture(combinedTexture);
+                    combinedTexture = null;
+                }
+
+                // aqcuire texture if necessary
+                if (Texture == null)
+                    Texture = parent.TextureCache.GetAvailableTexture();
+
+                RecomputeCombinedImage(Texture);
+
+                if (UseTonemapper)
+                {
+                    // set up ping pong array
+                    pingpong = new TextureArray2D[2];
+                    pingpong[0] = Texture;
+                    pingpong[1] = parent.TextureCache.GetAvailableTexture();
+
+                    // create stepable
+                    TonemappingStepable = parent.Tonemapper.GetApplyShaderStepable(pingpong, parent);
+
+                    return false;
+                }
             }
 
             return true;

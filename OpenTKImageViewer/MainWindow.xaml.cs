@@ -357,8 +357,8 @@ namespace OpenTKImageViewer
                     
                     // image is not ready yet
                     glhelper.Utility.GLCheck();
-                    progressWindow.SetProgress(Context.GetImageProcess());
-                    progressWindow.SetDescription(Context.GetImageLoadingDescription());
+                    progressWindow?.SetProgress(Context.GetImageProcess());
+                    progressWindow?.SetDescription(Context.GetImageLoadingDescription());
 
                     RedrawFrame();
                     GL.Finish();
@@ -413,6 +413,7 @@ namespace OpenTKImageViewer
 
             if (ImageDialog != null)
                 ImageDialog.IsEnabled = true;
+            
             IsEnabled = true;
         }
 
