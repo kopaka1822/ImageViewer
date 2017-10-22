@@ -201,8 +201,10 @@ namespace OpenTKImageViewer.ImageContext
                 float extraSteps = 0.0f;
                 if (curStepable != null)
                     extraSteps += curStepable.CurrentStep();
-
-                return ((float)numExecuted + extraSteps) / GetNumSteps();
+                var numSteps = GetNumSteps();
+                if (numSteps == 0)
+                    return 1.0f;
+                return ((float)numExecuted + extraSteps) / numSteps;
             }
 
             public int GetNumSteps()

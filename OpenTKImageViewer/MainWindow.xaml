@@ -14,7 +14,8 @@
         Activated="MainWindow_OnActivated"
         Deactivated="MainWindow_OnDeactivated"
         Icon="Icons/app.png"
-        SizeChanged="MainWindow_OnSizeChanged">
+        SizeChanged="MainWindow_OnSizeChanged"
+        IsEnabled="{Binding Path=(local:MainWindow.IsInteractionEnabled)}">
     <DockPanel>
         <!--<StackPanel>-->
         <Menu DockPanel.Dock="Top" Background="#fff" Padding="0 0 0 2">

@@ -80,6 +80,7 @@ namespace OpenTKImageViewer
         public TonemapWindow TonemapDialog { get; set; } = null;
         public ImageWindow ImageDialog { get; set; } = null;
 
+        public System.Boolean IsInteractionEnabled { get; set; } = true;
         #endregion
 
         #region INITIALIZATION
@@ -402,8 +403,9 @@ namespace OpenTKImageViewer
 
             if (ImageDialog != null)
                 ImageDialog.IsEnabled = false;
-
-            IsEnabled = false;
+                
+            //IsEnabled = false;
+            IsInteractionEnabled = false;
         }
 
         private void EnableWindowInteractions()
@@ -414,7 +416,8 @@ namespace OpenTKImageViewer
             if (ImageDialog != null)
                 ImageDialog.IsEnabled = true;
             
-            IsEnabled = true;
+            //IsEnabled = true;
+            IsInteractionEnabled = true;
         }
 
         private void WinFormsHost_OnDrop(System.Windows.Forms.DragEventArgs args)
