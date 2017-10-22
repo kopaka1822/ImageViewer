@@ -7,7 +7,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace OpenTKImageViewer.glhelper
 {
-    public class Mesh
+    public class Mesh : IGlObject
     {
         private VertexArrayObject vao;
         private readonly PrimitiveType type;
@@ -44,6 +44,11 @@ namespace OpenTKImageViewer.glhelper
             vao.AddVertexBuffer(vbo, 0, 2);
 
             return new Mesh(vao, PrimitiveType.TriangleStrip, 4);
+        }
+
+        public void Dispose()
+        {
+            
         }
     }
 }

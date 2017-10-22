@@ -7,7 +7,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace OpenTKImageViewer.glhelper
 {
-    public class Shader
+    public class Shader : IGlObject
     {
         public int Id { get; private set; }
         public string Source { get; set; }

@@ -7,7 +7,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace OpenTKImageViewer.glhelper
 {
-    public class VertexBufferObject
+    public class VertexBufferObject : IGlObject
     {
         public int Id { get; private set; }
         public VertexBufferObject(float[] data)
@@ -15,6 +15,15 @@ namespace OpenTKImageViewer.glhelper
             Id = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, Id);
             GL.BufferData(BufferTarget.ArrayBuffer, sizeof(float) * data.Length, data, BufferUsageHint.StaticDraw);
+        }
+
+        public void Dispose()
+        {
+            if (Id != 0)
+            {
+                GL.DeleteBuffer(Id);
+                Id = 0;
+            }
         }
     }
 }

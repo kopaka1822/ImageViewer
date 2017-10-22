@@ -8,7 +8,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace OpenTKImageViewer.glhelper
 {
-    public class TextureArray2D
+    public class TextureArray2D : IGlObject
     {
         private int id = 0;
         private int cubeId = 0;
@@ -86,6 +86,7 @@ namespace OpenTKImageViewer.glhelper
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureBaseLevel, 0);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLevel, image.GetNumMipmaps());
         }
+        
 
         /// <summary>
         /// creates texture 2d views if they were not already created
@@ -340,6 +341,25 @@ namespace OpenTKImageViewer.glhelper
                     return 4;
                 default:
                     throw new Exception("invalid pixel type used: " + t);
+            }
+        }
+
+        public void Dispose()
+        {
+            if (tex2DId != null)
+            {
+                GL.DeleteTextures(nLayer * nMipmaps, tex2DId);
+                tex2DId = null;
+            }
+            if (cubeId != 0)
+            {
+                GL.DeleteTexture(cubeId);
+                cubeId = 0;
+            }
+            if (id != 0)
+            {
+                GL.DeleteTexture(id);
+                id = 0;
             }
         }
     }

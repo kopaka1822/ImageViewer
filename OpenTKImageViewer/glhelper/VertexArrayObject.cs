@@ -7,7 +7,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace OpenTKImageViewer.glhelper
 {
-    public class VertexArrayObject
+    public class VertexArrayObject : IGlObject
     {
         private int id;
         private List<VertexBufferObject> vbos = new List<VertexBufferObject>();
@@ -29,7 +29,7 @@ namespace OpenTKImageViewer.glhelper
                 false,
                 0,
                 0);
-            //GL.DisableVertexAttribArray(0);
+
             vbos.Add(buffer);
         }
 
@@ -38,6 +38,23 @@ namespace OpenTKImageViewer.glhelper
             GL.BindVertexArray(id);
             GL.EnableVertexAttribArray(0);
             GL.DrawArrays(mode, 0, count);
+        }
+
+        public void Dispose()
+        {
+            if (id != 0)
+            {
+                GL.DeleteVertexArray(id);
+                id = 0;
+            }
+            if (vbos != null)
+            {
+                foreach (var vertexBufferObject in vbos)
+                {
+                    vertexBufferObject.Dispose();
+                }
+                vbos = null;
+            }
         }
     }
 }

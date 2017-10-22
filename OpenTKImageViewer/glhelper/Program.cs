@@ -8,7 +8,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace OpenTKImageViewer.glhelper
 {
-    public class Program
+    public class Program : IGlObject
     {
         private int id;
 
