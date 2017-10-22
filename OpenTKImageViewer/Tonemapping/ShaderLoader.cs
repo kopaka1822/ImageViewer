@@ -170,7 +170,8 @@ namespace OpenTKImageViewer.Tonemapping
                     }
                     else if (line.StartsWith("#setting"))
                     {
-                        HandleSetting(GetParameters(line.Substring("#setting".Length)));
+                        var whole = line.Substring("#setting".Length);
+                        HandleSetting(GetParameters(whole), whole);
                         ShaderSource += "\n"; // remember line for error information
                     }
                     else if(line.StartsWith("#keybinding"))
@@ -281,7 +282,7 @@ namespace OpenTKImageViewer.Tonemapping
             return val;
         }
 
-        private void HandleSetting(string[] p)
+        private void HandleSetting(string[] p, string wholeString)
         {
             if(p.Length < 2)
                 throw new Exception("not enough arguments for #setting provided");
@@ -291,10 +292,10 @@ namespace OpenTKImageViewer.Tonemapping
                     IsSepa = p[1].ToLower().Equals("true");
                     break;
                 case "title":
-                    Name = p[1];
+                    Name = wholeString;
                     break;
                 case "description":
-                    Description = p[1];
+                    Description = wholeString;
                     break;
                 case "singleinvocation":
                     IsSingleInvocation = p[1].ToLower().Equals("true");
