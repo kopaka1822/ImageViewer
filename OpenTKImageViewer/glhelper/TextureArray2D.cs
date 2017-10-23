@@ -97,7 +97,7 @@ namespace OpenTKImageViewer.glhelper
                 return;
 
             tex2DId = new int[nLayer * nMipmaps];
-            GL.GenTextures(nLayer, tex2DId);
+            GL.GenTextures(nLayer * nMipmaps, tex2DId);
             for (int curLayer = 0; curLayer < nLayer; ++curLayer)
             {
                 for (int curMipmap = 0; curMipmap < nMipmaps; ++curMipmap)
@@ -116,7 +116,7 @@ namespace OpenTKImageViewer.glhelper
 
         private int GetTextureIndex(int layer, int level)
         {
-            return layer * nLayer + level;
+            return layer * nMipmaps + level;
         }
 
         /// <summary>
