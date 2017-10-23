@@ -16,11 +16,11 @@
                    FontSize="16"/>
             <ProgressBar Minimum="0" 
                          Maximum="100" 
-                         Value="75"
+                         Value="0"
                          Height="20"
                          Margin="0 0 0 10"
                          x:Name="ProgressBar"/>
-            <TextBlock Text="executing ..."
+            <TextBlock Text="loading..."
                        x:Name="TextDescription"
                        TextWrapping="Wrap"/>
             <Button Content="_Abort" 

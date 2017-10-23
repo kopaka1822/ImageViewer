@@ -21,17 +21,13 @@ namespace OpenTKImageViewer.glhelper
         public static void OpenGlDebug(DebugSource source, DebugType type, int id, DebugSeverity severity, int length,
             IntPtr message, IntPtr userParam)
         {
-            // NVIDIA: "shader will be recompiled due to GL state mismatches"
-
-            if (id == 131218)
-                return;
             
 
             string str = Marshal.PtrToStringAnsi(message, length);
-            if (str ==
-                "API_ID_RECOMPILE_FRAGMENT_SHADER performance warning has been generated. Fragment shader recompiled due to state change."
-            )
-                return;
+            //if (str ==
+            //    "API_ID_RECOMPILE_FRAGMENT_SHADER performance warning has been generated. Fragment shader recompiled due to state change."
+            //)
+            //    return;
 
             if (type != DebugType.DebugTypeOther)
             {
@@ -49,7 +45,9 @@ namespace OpenTKImageViewer.glhelper
         {
             GL.Enable(EnableCap.DebugOutput);
 
-            GL.Arb.DebugMessageControl(All.DontCare, All.DebugTypeError, All.DebugSeverityHigh, 0, new int[0], true);
+            GL.Arb.DebugMessageControl(All.DontCare, All.DontCare, All.DontCare, 0, (int[])null, false);
+            GL.Arb.DebugMessageControl(All.DontCare, All.DontCare, All.DebugSeverityMedium, 0, (int[])null, true);
+            GL.Arb.DebugMessageControl(All.DontCare, All.DontCare, All.DebugSeverityHigh, 0, (int[])null, true);
             GL.Arb.DebugMessageCallback(OpenGlDebug, IntPtr.Zero);
         }
 
