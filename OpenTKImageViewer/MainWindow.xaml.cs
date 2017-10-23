@@ -192,7 +192,7 @@ namespace OpenTKImageViewer
                 glControl.ContextMenuStrip = new ContextMenuStrip();
                 var colorItem = glControl.ContextMenuStrip.Items.Add("Show Pixel Color");
                 {
-                    var sri = System.Windows.Application.GetResourceStream(new Uri(@"pack://application:,,,/OpenTKImageViewer;component/Icons/eyedropper.png", UriKind.Absolute));
+                    var sri = System.Windows.Application.GetResourceStream(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/eyedropper.png", UriKind.Absolute));
                     if(sri != null)
                         colorItem.Image = System.Drawing.Image.FromStream(sri.Stream);
                 }
@@ -205,7 +205,7 @@ namespace OpenTKImageViewer
 
                 var pixelDisplayItem = glControl.ContextMenuStrip.Items.Add("Pixel Display");
                 {
-                    var sri = System.Windows.Application.GetResourceStream(new Uri(@"pack://application:,,,/OpenTKImageViewer;component/Icons/displayconfig.png", UriKind.Absolute));
+                    var sri = System.Windows.Application.GetResourceStream(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/displayconfig.png", UriKind.Absolute));
                     if(sri != null)
                         pixelDisplayItem.Image = System.Drawing.Image.FromStream(sri.Stream);
                 }

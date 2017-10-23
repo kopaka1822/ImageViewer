@@ -18,6 +18,9 @@ namespace OpenTKImageViewer
     /// </summary>
     public partial class App : Application
     {
+        // change this if the assembly name was changed
+        public static readonly string AppName = "Texture Viewer";
+
         public enum UniqueDialog
         {
             Layer,
