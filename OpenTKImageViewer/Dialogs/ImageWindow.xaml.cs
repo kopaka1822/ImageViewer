@@ -33,9 +33,11 @@ namespace OpenTKImageViewer.Dialogs
             public readonly TextBox BoxAlphaEquation;
             private ImageConfiguration configuration;
             private ImageContext.ImageContext context;
+            private MainWindow window;
 
             public EquationBox(CheckBox boxVisible, CheckBox boxTonemapper, TextBox boxRgbEquation,
-                TextBox boxAlphaEquation, ImageConfiguration configuration, ImageContext.ImageContext context)
+                TextBox boxAlphaEquation, ImageConfiguration configuration, ImageContext.ImageContext context,
+                MainWindow window)
             {
                 BoxVisible = boxVisible;
                 BoxTonemapper = boxTonemapper;
@@ -43,6 +45,7 @@ namespace OpenTKImageViewer.Dialogs
                 BoxAlphaEquation = boxAlphaEquation;
                 this.configuration = configuration;
                 this.context = context;
+                this.window = window;
 
                 // little setup
                 BoxRgbEquation.FontFamily = new FontFamily("Consolas");
@@ -86,6 +89,15 @@ namespace OpenTKImageViewer.Dialogs
                 if (!configuration.Active)
                     return false;
 
+                return HasFormulaChanges();
+            }
+
+            /// <summary>
+            /// compares the box contents (except the visibility) with the currently applied setting
+            /// </summary>
+            /// <returns></returns>
+            private bool HasFormulaChanges()
+            {
                 if (BoxTonemapper.IsChecked != configuration.UseTonemapper)
                     return true;
 
@@ -118,6 +130,19 @@ namespace OpenTKImageViewer.Dialogs
                 BoxTonemapper.IsEnabled = enabled;
                 BoxRgbEquation.IsEnabled = enabled;
                 BoxAlphaEquation.IsEnabled = enabled;
+
+                if(enabled && !HasFormulaChanges())
+                {
+                    // since the formula has not changed => display
+                    configuration.Active = true;
+                    window.RedrawFrame();
+                }
+                else if(!enabled)
+                {
+                    // disabling is easy
+                    configuration.Active = false;
+                    window.RedrawFrame();
+                }
             }
         }
 
@@ -134,9 +159,9 @@ namespace OpenTKImageViewer.Dialogs
             this.buttonDefaultColor = ButtonApply.Background;
 
             equationBoxes[0] = new EquationBox(BoxVisible1, BoxTonemapper1, EquationBox1, EquationBoxAlpha1,
-                parent.Context.GetImageConfiguration(0), parent.Context);
+                parent.Context.GetImageConfiguration(0), parent.Context, parent);
             equationBoxes[1] = new EquationBox(BoxVisible2, BoxTonemapper2, EquationBox2, EquationBoxAlpha2,
-                parent.Context.GetImageConfiguration(1), parent.Context);
+                parent.Context.GetImageConfiguration(1), parent.Context, parent);
 
             parent.Context.ChangedImages += OnChangedImages;
             BoxSplitView.SelectedIndex = (int) parent.Context.SplitView;
@@ -183,6 +208,8 @@ namespace OpenTKImageViewer.Dialogs
                 ButtonApply.Background = buttonHighlightColor;
             else
                 ButtonApply.Background = buttonDefaultColor;
+            
+            BoxSplitView.IsEnabled = (bool)BoxVisible1.IsChecked && (bool)BoxVisible2.IsChecked;
         }
 
         private void ButtonApply_OnClick(object sender, RoutedEventArgs e)
@@ -194,7 +221,6 @@ namespace OpenTKImageViewer.Dialogs
                 if((bool)!BoxVisible1.IsChecked && (bool)!BoxVisible2.IsChecked)
                     throw new Exception("At least one image has to be visible");
 
-                BoxSplitView.IsEnabled = (bool)BoxVisible1.IsChecked && (bool)BoxVisible2.IsChecked;
 
                 foreach (var equationBox in equationBoxes)
                 {
@@ -202,6 +228,7 @@ namespace OpenTKImageViewer.Dialogs
                 }
 
                 ButtonApply.Background = buttonDefaultColor;
+
                 parent.RedrawFrame();
             }
             catch (Exception exception)
