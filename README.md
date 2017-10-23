@@ -78,3 +78,12 @@ void main()
 }
 ```
 
+Compare pictures side by side. In this example the image before (right) and after (left) tonemapping:
+
+![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/leanna_compare.png)
+
+You can even import more than one image and combine them into one with a user defined function:
+
+![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/image_formula.png)
+
+I0 and I1 are the pixels from the first and the second image. RGB values are in range [0,1] and you can combine them with following operators: * + - / ^. Numerical constants can be used as well.
