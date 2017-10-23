@@ -315,17 +315,22 @@ namespace OpenTKImageViewer
                         // draw both images with scissor test
                         GL.Enable(EnableCap.ScissorTest);
 
-                        if(Context.SplitView == ImageContext.ImageContext.SplitViewMode.Vertical)
-                            GL.Scissor(0, 0, (int)MousePosition.X, (int)GetClientHeight());
+                        // clamp mouse position to not go outside the window
+                        var scissorPos = new Point(MousePosition.X, MousePosition.Y);
+                        scissorPos.X = Math.Min(GetClientWidth()- 1.0f, Math.Max(0.0, scissorPos.X));
+                        scissorPos.Y = Math.Min(GetClientWidth() - 1.0f, Math.Max(0.0, scissorPos.Y));
+
+                        if (Context.SplitView == ImageContext.ImageContext.SplitViewMode.Vertical)
+                            GL.Scissor(0, 0, (int)scissorPos.X, (int)GetClientHeight());
                         else
-                            GL.Scissor(0, (int)GetClientHeight() - (int)MousePosition.Y, (int)GetClientWidth(), (int)GetClientHeight());
+                            GL.Scissor(0, (int)GetClientHeight() - (int)scissorPos.Y, (int)GetClientWidth(), (int)GetClientHeight());
 
                         imageViews[CurrentView]?.Draw(0);
 
                         if (Context.SplitView == ImageContext.ImageContext.SplitViewMode.Vertical)
-                            GL.Scissor((int)MousePosition.X, 0, (int)GetClientWidth(), (int)GetClientHeight());
+                            GL.Scissor((int)scissorPos.X, 0, (int)GetClientWidth(), (int)GetClientHeight());
                         else
-                            GL.Scissor(0, 0, (int)GetClientWidth(), (int)GetClientHeight() - (int)MousePosition.Y);
+                            GL.Scissor(0, 0, (int)GetClientWidth(), (int)GetClientHeight() - (int)scissorPos.Y);
 
                         imageViews[CurrentView]?.Draw(1);
 
@@ -447,7 +452,10 @@ namespace OpenTKImageViewer
         private void WinFormsHost_OnMouseMove(System.Windows.Forms.MouseEventArgs args)
         {
             var newPosition = new Point(args.X, args.Y);
-            
+            // clamp values
+            //newPosition.X = Math.Min(GetClientWidth(), Math.Max(0.0, newPosition.X));
+            //newPosition.Y = Math.Min(GetClientWidth(), Math.Max(0.0, newPosition.Y));
+
             if (mouseDown)
             {
                 // drag event
@@ -459,6 +467,7 @@ namespace OpenTKImageViewer
                     RedrawFrame();
                 }
             }
+
             MousePosition = newPosition;
 
             EnableOpenGl();
