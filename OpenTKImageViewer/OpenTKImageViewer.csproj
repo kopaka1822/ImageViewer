@@ -267,14 +267,30 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Tonemapper\absolute.comp" />
-    <None Include="Tonemapper\blur.comp" />
-    <None Include="Tonemapper\clamp.comp" />
-    <None Include="Tonemapper\gamma.comp" />
-    <None Include="Tonemapper\highlight.comp" />
-    <None Include="Tonemapper\luminance.comp" />
-    <None Include="Tonemapper\median.comp" />
-    <None Include="Tonemapper\set_color.comp" />
+    <None Include="Tonemapper\absolute.comp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Tonemapper\blur.comp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Tonemapper\clamp.comp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Tonemapper\gamma.comp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Tonemapper\highlight.comp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Tonemapper\luminance.comp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Tonemapper\median.comp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Tonemapper\set_color.comp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -331,7 +347,9 @@
     <Resource Include="Icons\tonemap.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Tonemapper\readme.txt" />
+    <None Include="Tonemapper\readme.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Icons\Resize.png" />
