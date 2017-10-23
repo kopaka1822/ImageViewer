@@ -223,15 +223,15 @@ namespace OpenTKImageViewer.Dialogs
             // load images
             var imgUp = new Image
             {
-                Source = new BitmapImage(new Uri(Environment.CurrentDirectory + "/Icons/arrow_up.png"))
+                Source = new BitmapImage(new Uri(@"pack://application:,,,/OpenTKImageViewer;component/Icons/arrow_up.png", UriKind.Absolute))
             };
             var imgDown = new Image
             {
-                Source = new BitmapImage(new Uri(Environment.CurrentDirectory + "/Icons/arrow_down.png"))
+                Source = new BitmapImage(new Uri(@"pack://application:,,,/OpenTKImageViewer;component/Icons/arrow_down.png", UriKind.Absolute))
             };
             var imgDelete = new Image
             {
-                Source = new BitmapImage(new Uri(Environment.CurrentDirectory + "/Icons/cancel.png"))
+                Source = new BitmapImage(new Uri(@"pack://application:,,,/OpenTKImageViewer;component/Icons/cancel.png", UriKind.Absolute))
             };
 
             // create buttons

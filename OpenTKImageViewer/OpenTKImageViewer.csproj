@@ -264,6 +264,14 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="Tonemapper\absolute.comp" />
+    <None Include="Tonemapper\blur.comp" />
+    <None Include="Tonemapper\clamp.comp" />
+    <None Include="Tonemapper\gamma.comp" />
+    <None Include="Tonemapper\highlight.comp" />
+    <None Include="Tonemapper\luminance.comp" />
+    <None Include="Tonemapper\median.comp" />
+    <None Include="Tonemapper\set_color.comp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -318,6 +326,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\tonemap.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Tonemapper\readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\Resize.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
