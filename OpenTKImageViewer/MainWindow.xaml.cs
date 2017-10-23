@@ -191,7 +191,11 @@ namespace OpenTKImageViewer
                 // create context menu
                 glControl.ContextMenuStrip = new ContextMenuStrip();
                 var colorItem = glControl.ContextMenuStrip.Items.Add("Show Pixel Color");
-                colorItem.Image = System.Drawing.Image.FromFile(Environment.CurrentDirectory + "/Icons/eyedropper.png");
+                {
+                    var sri = System.Windows.Application.GetResourceStream(new Uri(@"pack://application:,,,/OpenTKImageViewer;component/Icons/eyedropper.png", UriKind.Absolute));
+                    if(sri != null)
+                        colorItem.Image = System.Drawing.Image.FromStream(sri.Stream);
+                }
                 colorItem.Click += (o, args) =>
                 {
                     var color = StatusBar.GetCurrentPixelColor();
@@ -200,7 +204,11 @@ namespace OpenTKImageViewer
                 };
 
                 var pixelDisplayItem = glControl.ContextMenuStrip.Items.Add("Pixel Display");
-                pixelDisplayItem.Image = System.Drawing.Image.FromFile(Environment.CurrentDirectory + "/Icons/displayconfig.png");
+                {
+                    var sri = System.Windows.Application.GetResourceStream(new Uri(@"pack://application:,,,/OpenTKImageViewer;component/Icons/displayconfig.png", UriKind.Absolute));
+                    if(sri != null)
+                        pixelDisplayItem.Image = System.Drawing.Image.FromStream(sri.Stream);
+                }
                 pixelDisplayItem.Click += (o, args) => MenuItem_Click_PixelDisplay(o, null);
             }
             catch (Exception exception)
