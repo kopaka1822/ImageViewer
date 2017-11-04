@@ -16,6 +16,7 @@ namespace OpenTKImageViewer.Equation.Token
             Operation3,
             BracketOpen,
             BracketClose,
+            Seperator,
             Function
         }
 

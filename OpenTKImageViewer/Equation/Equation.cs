@@ -60,6 +60,9 @@ namespace OpenTKImageViewer.Equation
                     case '-':
                         nextToken = new SingleCharToken(Token.Token.Type.Operation3, '-');
                         break;
+                    case ',':
+                        nextToken = new SingleCharToken(Token.Token.Type.Seperator, ',');
+                        break;
                     case '(':
                         if (current.Length > 0)
                         {
@@ -140,6 +143,7 @@ namespace OpenTKImageViewer.Equation
             rules.Add(new RuleSign());
             rules.Add(new BracketRule());
             rules.Add(new UnaryFunctionRule());
+            rules.Add(new TertiaryFunctionRule());
 
             return rules;
         }
