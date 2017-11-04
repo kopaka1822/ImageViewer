@@ -1,6 +1,10 @@
 # Image Viewer and Tonemapper
 
-An image viewer for anyone realted to computer graphics.
+An image viewer for anyone related to computer graphics.
+
+## Download
+
+x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/blob/Release/Build/Texture%20Viewer.zip?raw=true)
 
 ## File Formats
 

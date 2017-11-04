@@ -8,7 +8,7 @@ namespace OpenTKImageViewer.Equation.Markov
 {
     public static class MarkovProcess
     {
-        public static List<Token> Run(List<MarkovRule> rules, List<Token> tokens)
+        public static List<Token.Token> Run(List<MarkovRule> rules, List<Token.Token> tokens)
         {
             bool foundRules = true;
             markovloop:
@@ -22,9 +22,9 @@ namespace OpenTKImageViewer.Equation.Markov
                         if (TokensMatch(markovRule, tokens, i))
                         {
                             // apply the rule
-                            List<Token> firstPart = tokens.GetRange(0, i);
-                            List<Token> middle = tokens.GetRange(i, markovRule.Tokens.Count);
-                            List<Token> lastPart = tokens.GetRange(i + markovRule.Tokens.Count,
+                            List<Token.Token> firstPart = tokens.GetRange(0, i);
+                            List<Token.Token> middle = tokens.GetRange(i, markovRule.Tokens.Count);
+                            List<Token.Token> lastPart = tokens.GetRange(i + markovRule.Tokens.Count,
                                 tokens.Count - i - markovRule.Tokens.Count);
 
                             middle = markovRule.Apply(middle);
@@ -44,7 +44,7 @@ namespace OpenTKImageViewer.Equation.Markov
             return tokens;
         }
 
-        private static bool TokensMatch(MarkovRule rule, List<Token> tokens, int startIndex)
+        private static bool TokensMatch(MarkovRule rule, List<Token.Token> tokens, int startIndex)
         {
             for(var i = 0; i < rule.Tokens.Count; ++i)
             {

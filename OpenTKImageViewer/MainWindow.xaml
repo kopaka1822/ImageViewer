@@ -102,14 +102,18 @@
                 </StatusBarItem>
 
                 <!-- MOUSE POSITION COLOR -->
-                <StatusBarItem Width="140" HorizontalAlignment="Left" BorderBrush="DarkGray" BorderThickness="0 0 1 0">
+                <StatusBarItem Width="140" HorizontalAlignment="Left" BorderBrush="DarkGray" BorderThickness="0 0 1 0" x:Name="StatusBarColorConatiner">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Image Source="Icons/eyedropper.png" Width="16" Height="16" Margin="0 0 5 0"/>
-                        <TextBlock x:Name="TextMousePositionColor" Text="0.000 0.000 0.000" Grid.Column="1"/>
+                        <TextBlock 
+                            x:Name="TextMousePositionColor" 
+                            Text="0.00 0.00 0.00" 
+                            Grid.Column="1"
+                            FontFamily="Consolas"/>
                         
                         <Grid.ContextMenu>
                             <ContextMenu>

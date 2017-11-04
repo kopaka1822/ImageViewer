@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using OpenTK;
 using OpenTKImageViewer.View;
+using Point = System.Windows.Point;
 
 namespace OpenTKImageViewer.UI
 {
@@ -35,6 +37,7 @@ namespace OpenTKImageViewer.UI
         private int pixelRadius = 0;
         private int lastMouseX = 0;
         private int lastMouseY = 0;
+        private int pixelDecimalPlaces = 3;
         private PixelValueShader pixelShader;
         private Vector4 lastPixelColor = new Vector4(0.0f);
 
@@ -57,6 +60,15 @@ namespace OpenTKImageViewer.UI
             {
                 if (value >= 1)
                     pixelRadius = value;
+            }
+        }
+
+        public int PixelDecimalPlaces
+        {
+            get { return pixelDecimalPlaces; }
+            set
+            {
+                pixelDecimalPlaces = Math.Min(10, Math.Max(3, value));
             }
         }
 
@@ -123,7 +135,9 @@ namespace OpenTKImageViewer.UI
             var activeId = window.Context.GetFirstActiveTexture();
 
             lastPixelColor = GetPixelColor(x, y);
-            window.TextMousePositionColor.Text = GetColorString(lastPixelColor);
+            var text = GetColorString(lastPixelColor);
+            window.TextMousePositionColor.Text = text;
+            window.StatusBarColorConatiner.Width = ((PixelShowAlpha ? 4 : 3) * 7 * (PixelDecimalPlaces + 3) + 48);
         }
 
         /// <summary>
@@ -164,8 +178,28 @@ namespace OpenTKImageViewer.UI
         {
             if(PixelDisplay == PixelDisplayType.Bit)
                 return $"{(int)(v.X * 255.0f)} {(int)(v.Y * 255.0f)} {(int)(v.Z * 255.0f)}" + (PixelShowAlpha?$" {(int)(v.W * 255.0f)}":"");
+            var x = ScalarToString((decimal) v.X);
+            var y = ScalarToString((decimal) v.Y);
+            var z = ScalarToString((decimal) v.Z);
+            var a = ScalarToString((decimal) v.W);
+            return $"{x} {y} {z}" + (PixelShowAlpha?$" {a}":"");
+        }
 
-            return $"{v.X:0.00} {v.Y:0.00} {v.Z:0.00}" + (PixelShowAlpha?$" {v.W:0.00}":"");
+        private string ScalarToString(decimal val)
+        {
+            var s = decimal.Round(val, PixelDecimalPlaces, MidpointRounding.ToEven).ToString();
+            // adjust string
+            if (!s.StartsWith("-"))
+            {
+                // empty space instead "-"
+                s = " " + s;
+            }
+            // # Decimal Placs + (+/-) in front + "." space
+            while (s.Length <= PixelDecimalPlaces + 2)
+            {
+                s += " ";
+            }
+            return s;
         }
 
         /// <summary>

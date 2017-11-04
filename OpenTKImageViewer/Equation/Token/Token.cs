@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenTKImageViewer.Equation
+namespace OpenTKImageViewer.Equation.Token
 {
     public class Token
     {
@@ -15,7 +15,9 @@ namespace OpenTKImageViewer.Equation
             Operation2,
             Operation3,
             BracketOpen,
-            BracketClose
+            BracketClose,
+            Seperator,
+            Function
         }
 
         public Type TokenType { get; private set; }

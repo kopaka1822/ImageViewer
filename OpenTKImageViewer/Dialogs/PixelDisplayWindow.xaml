@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="Pixel Display" Height="180" Width="250"
+        Title="Pixel Display" Height="220" Width="260"
         ResizeMode="NoResize" Background="#eee"
         Icon="../Icons/displayconfig.png">
     <Border Padding="5">
@@ -14,7 +14,7 @@
             <!-- FORMAT -->
             <Grid Margin="0 0 0 5">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="90"/>
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Format:"/>
@@ -29,7 +29,7 @@
             <!-- Display Color -->
             <Grid Margin="0 0 0 5">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="90"/>
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Display Color:"/>
@@ -41,10 +41,24 @@
                 </ComboBox>
             </Grid>
 
+            <!-- Decimal Places -->
+            <Grid Margin="0 0 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="90"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Decimal Places:"/>
+                <xctk:IntegerUpDown Grid.Column="1" 
+                                    Value="3"
+                                    x:Name="NumDecimalCount"
+                                    Minimum="3"
+                                    Maximum="10"/>
+            </Grid>
+            
             <!-- Radius -->
             <Grid Margin="0 0 0 5">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="90"/>
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Radius:"/>
@@ -58,7 +72,7 @@
             <!-- Alpha -->
             <Grid Margin="0 0 0 5">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="90"/>
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Show Alpha:"/>

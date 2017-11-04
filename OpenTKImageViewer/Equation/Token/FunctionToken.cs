@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 namespace OpenTKImageViewer.Equation.Token
 {
-    public class SingleCharToken : Token
+    public class FunctionToken : Token
     {
-        public char Symbol { get; private set; }
-        public SingleCharToken(Type type, char symbol) : base(type)
+        public readonly string FuncName;
+
+        public FunctionToken(string name) : 
+            base(Type.Function)
         {
-            this.Symbol = symbol;
+            this.FuncName = name;
         }
     }
 }
