@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OpenTKImageViewer.Equation
+namespace OpenTKImageViewer.Equation.Token
 {
     class ImageToken : ValueToken
     {

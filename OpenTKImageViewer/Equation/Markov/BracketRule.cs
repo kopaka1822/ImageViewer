@@ -10,18 +10,18 @@ namespace OpenTKImageViewer.Equation.Markov
     {
         public BracketRule()
         {
-            Tokens = new List<Token.Type>
+            Tokens = new List<Token.Token.Type>
             {
-                Token.Type.BracketOpen,
-                Token.Type.Value,
-                Token.Type.BracketClose
+                Token.Token.Type.BracketOpen,
+                Token.Token.Type.Value,
+                Token.Token.Type.BracketClose
             };
         }
 
-        public override List<Token> Apply(List<Token> match)
+        public override List<Token.Token> Apply(List<Token.Token> match)
         {
             // brackets will be implicitly given through the token structure
-            return new List<Token> {match[1]};
+            return new List<Token.Token> {match[1]};
         }
     }
 }

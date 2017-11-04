@@ -148,8 +148,10 @@
     <Compile Include="Dialogs\TonemapWindow.xaml.cs">
       <DependentUpon>TonemapWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Equation\Markov\UnaryFunctionRule.cs" />
     <Compile Include="Equation\Token\CombinedValueToken.cs" />
     <Compile Include="Equation\Equation.cs" />
+    <Compile Include="Equation\Token\FunctionToken.cs" />
     <Compile Include="Equation\Token\ImageToken.cs" />
     <Compile Include="Equation\Markov\BracketRule.cs" />
     <Compile Include="Equation\Markov\MarkovProcess.cs" />
@@ -159,6 +161,7 @@
     <Compile Include="Equation\Token\NumberToken.cs" />
     <Compile Include="Equation\Token\SingleCharToken.cs" />
     <Compile Include="Equation\Token\Token.cs" />
+    <Compile Include="Equation\Token\UnaryFunctionToken.cs" />
     <Compile Include="Equation\Token\ValueToken.cs" />
     <Compile Include="glhelper\IGlObject.cs" />
     <Compile Include="glhelper\TextureArray2D.cs" />

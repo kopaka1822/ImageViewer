@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTKImageViewer.Equation.Markov;
+using OpenTKImageViewer.Equation.Token;
 
 namespace OpenTKImageViewer.Equation
 {
@@ -31,39 +32,48 @@ namespace OpenTKImageViewer.Equation
             return finalToken.ToOpenGl();
         }
 
-        private List<Token> GetToken(string formula)
+        private List<Token.Token> GetToken(string formula)
         {
-            List<Token> tokens = new List<Token>();
+            List<Token.Token> tokens = new List<Token.Token>();
 
             string current = "";
             foreach (char c in formula)
             {
-                Token nextToken = null;
+                Token.Token nextToken = null;
                 bool finishCurrent = true;
                 switch (c)
                 {
                     case ' ':
                         break;
                     case '^':
-                        nextToken = new SingleCharToken(Token.Type.Operation1, '^'); 
+                        nextToken = new SingleCharToken(Token.Token.Type.Operation1, '^'); 
                         break;
                     case '/':
-                        nextToken = new SingleCharToken(Token.Type.Operation2, '/');
+                        nextToken = new SingleCharToken(Token.Token.Type.Operation2, '/');
                         break;
                     case '*':
-                        nextToken = new SingleCharToken(Token.Type.Operation2, '*');
+                        nextToken = new SingleCharToken(Token.Token.Type.Operation2, '*');
                         break;
                     case '+':
-                        nextToken = new SingleCharToken(Token.Type.Operation3, '+');
+                        nextToken = new SingleCharToken(Token.Token.Type.Operation3, '+');
                         break;
                     case '-':
-                        nextToken = new SingleCharToken(Token.Type.Operation3, '-');
+                        nextToken = new SingleCharToken(Token.Token.Type.Operation3, '-');
                         break;
                     case '(':
-                        nextToken = new SingleCharToken(Token.Type.BracketOpen, '-');
+                        if (current.Length > 0)
+                        {
+                            // this is a function
+                            nextToken = new FunctionToken(current);
+                            current = "";
+                        }
+                        else
+                        {
+                            nextToken = new SingleCharToken(Token.Token.Type.BracketOpen, '-');
+                        }
                         break;
                     case ')':
-                        nextToken = new SingleCharToken(Token.Type.BracketClose, '-');
+                        nextToken = new SingleCharToken(Token.Token.Type.BracketClose, '-');
                         break;
                     default:
                         current += c;
@@ -87,7 +97,7 @@ namespace OpenTKImageViewer.Equation
             return tokens;
         }
 
-        private Token MakeTokenFromString(string identifier)
+        private Token.Token MakeTokenFromString(string identifier)
         {
             Debug.Assert(identifier.Length > 0);
             if (identifier.StartsWith("I"))
@@ -107,14 +117,14 @@ namespace OpenTKImageViewer.Equation
             return new NumberToken((float)value);
         }
 
-        private void Compile(List<Token> tokens)
+        private void Compile(List<Token.Token> tokens)
         {
             tokens = MarkovProcess.Run(GetRules(), tokens);
 
             if(tokens.Count != 1)
                 throw new Exception("Could not resolve all tokens to an expression");
 
-            if(tokens[0].TokenType != Token.Type.Value)
+            if(tokens[0].TokenType != Token.Token.Type.Value)
                 throw new Exception("Please enter a valid formula");
 
             finalToken = (ValueToken)tokens[0];
@@ -124,11 +134,12 @@ namespace OpenTKImageViewer.Equation
         {
             List<MarkovRule> rules = new List<MarkovRule>();
 
-            rules.Add(new RuleValueOperationValue(Token.Type.Operation1));
-            rules.Add(new RuleValueOperationValue(Token.Type.Operation2));
-            rules.Add(new RuleValueOperationValue(Token.Type.Operation3));
+            rules.Add(new RuleValueOperationValue(Token.Token.Type.Operation1));
+            rules.Add(new RuleValueOperationValue(Token.Token.Type.Operation2));
+            rules.Add(new RuleValueOperationValue(Token.Token.Type.Operation3));
             rules.Add(new RuleSign());
             rules.Add(new BracketRule());
+            rules.Add(new UnaryFunctionRule());
 
             return rules;
         }
