@@ -445,7 +445,7 @@ namespace OpenTKImageViewer.ImageContext
 
             for (var i = 0; i < finalTextures.Length; ++i)
             {
-                finalTextures[i] = new ImageConfiguration(this)
+                finalTextures[i] = new ImageConfiguration(this, i)
                 // only first is active by default
                 { Active = i == 0};
             }

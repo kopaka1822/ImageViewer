@@ -32,16 +32,24 @@ namespace OpenTKImageViewer.ImageContext
         private TextureArray2D combinedTexture;
         // texture after tonemapping
         public TextureArray2D Texture { get; private set; }
-        public ImageFormula CombineFormula { get; } = new ImageFormula();
-        public ImageFormula AlphaFormula { get; } = new ImageFormula();
+        public ImageFormula CombineFormula { get; }
+        public ImageFormula AlphaFormula { get; }
         public bool Active { get; set; } = true;
 
-        public ImageConfiguration(ImageContext context)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="defaultImage">default image for the image equation (0 == "I0")</param>
+        public ImageConfiguration(ImageContext context, int defaultImage)
         {
+            this.CombineFormula = new ImageFormula(defaultImage);
+            this.AlphaFormula = new ImageFormula(defaultImage);
+
             parent = context;
             CombineFormula.Changed += (sender, args) => RecomputeImage = true;
             AlphaFormula.Changed += (sender, args) => RecomputeImage = true;
-            
+
             combineShader = new ImageCombineShader(context, CombineFormula, AlphaFormula);
         }
 
