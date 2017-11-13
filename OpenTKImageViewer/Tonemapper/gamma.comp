@@ -14,7 +14,7 @@ void main()
 {
 	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
 
-	vec4 color = texelFetch(src_image, pixelCoord, 0);
+	vec4 color = max(vec4(0), texelFetch(src_image, pixelCoord, 0));
 	imageStore(dst_image, pixelCoord, vec4(pow(factor * color.rgb, vec3(gamma)), color.a));
 	
 }
