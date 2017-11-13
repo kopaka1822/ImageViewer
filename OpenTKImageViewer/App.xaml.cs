@@ -126,6 +126,8 @@ namespace OpenTKImageViewer
             openWindows.Add(wnd);
 
             wnd.Show();
+            // open tonemap dialog etc.
+            wnd.HandleImageAdd(true);
         }
 
         public void UnregisterWindow(MainWindow window)

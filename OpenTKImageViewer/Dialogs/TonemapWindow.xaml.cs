@@ -373,6 +373,14 @@ namespace OpenTKImageViewer.Dialogs
         /// <param name="e"></param>
         private void ButtonApply_OnClick(object sender, RoutedEventArgs e)
         {
+            ApplyTonemapper();
+        }
+
+        /// <summary>
+        /// applies the new tonemapper configuration
+        /// </summary>
+        public void ApplyTonemapper()
+        {
             // aplly current set of settings
             parent.EnableOpenGl();
             try

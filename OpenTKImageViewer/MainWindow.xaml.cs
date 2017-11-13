@@ -623,10 +623,21 @@ namespace OpenTKImageViewer
             {
                 Context.AddImage(image);
             }
+            
+            HandleImageAdd(isFirstImage);
+        }
 
-            if(Context.GetNumImages() > 1)
+        /// <summary>
+        /// this should be called after an image was added.
+        /// This will open an image dialog if multiple images are now present
+        /// and a tonemapper dialog if it is the first image and the first
+        /// image is a hdr image
+        /// </summary>
+        /// <param name="isFirstImage"></param>
+        public void HandleImageAdd(bool isFirstImage)
+        {
+            if (Context.GetNumImages() > 1)
                 ShowImagesWindow();
-
 
             if (isFirstImage)
             {
@@ -637,9 +648,20 @@ namespace OpenTKImageViewer
                     // open tonemapper with gamma shader
                     bool wasOpen = TonemapDialog != null;
                     ShowTonemapper();
-                    if (!TonemapDialog.LoadTonemapper(Environment.CurrentDirectory + "\\Tonemapper\\gamma.comp") &&
-                        !wasOpen)
+
+                    var appDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+                    // try to apply the tonemapper
+                    if (TonemapDialog.LoadTonemapper(appDirectory + "\\Tonemapper\\gamma.comp"))
+                    {
+                        // apply
+                        TonemapDialog.ApplyTonemapper();
+                    }
+
+                    if(!wasOpen)
                         TonemapDialog.Close();
+
+                    
                 }
             }
         }
