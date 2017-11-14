@@ -1,20 +1,25 @@
 #setting title, Highlighting
-#setting description, Highlights certain colors. Only compares rgb.
+#setting description, Highlights certain colors. Uses RGB average.
 
-#param Negative Values (blue), 2, bool, false
-#param Values > 1 (red), 3, bool, false
+#param Negative Values (blue), 2, bool, true
+#param Positive Values (red), 3, bool, true
+#param Oversaturated Values (green), 4, bool, false
 
 layout(location = 2) uniform bool negative;
-layout(location = 3) uniform bool grOne;
+layout(location = 3) uniform bool positive;
+layout(location = 4) uniform bool grOne;
 
 void main()
 {
 	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
 	vec4 color = texelFetch(src_image, pixelCoord, 0);
-	if( negative && (color.r < 0.0 || color.g < 0.0 || color.b < 0.0))
-		color = vec4(0.0, 0.0, 1.0, 1.0);
-	if( grOne && (color.r > 1.0 || color.g > 1.0 || color.b > 1.0))
-		color = vec4(1.0, 0.0, 0.0, 1.0);
+	float average = (color.r + color.g + color.b) / 3.0;
+	if( negative && (average < 0.0) )
+		color = vec4(0.0, 0.0, -average, 1.0);
+	if( positive && (average > 0.0) )
+		color = vec4(average, 0.0, 0.0, 1.0);
+	if( grOne && (average > 1.0) )
+		color = vec4(0.0, average, 0.0, 1.0);
 	imageStore(dst_image, pixelCoord, color);
 
 }
