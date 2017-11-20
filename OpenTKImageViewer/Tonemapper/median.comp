@@ -54,13 +54,13 @@ void main()
 		start = max(0,start);
 		end = min(doti(imgSize, filterDirection) - 1, end);
 		
-		int buflen = end - start;
 		int i = start;
 		while(i <= end)
 		{
 			buf[i - start] = texelFetch(src_image, pixelCoord + (midpoint - i) * filterDirection, 0);
 			++i;
 		}
+		int buflen = end - start + 1;
 		
 		// sort the buffer
 		bubbleSort(buflen);
