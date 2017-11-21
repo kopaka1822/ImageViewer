@@ -754,8 +754,14 @@ namespace OpenTKImageViewer
             else if (sfd.FileName.EndsWith(".hdr"))
                 format = ExportWindow.FileFormat.Hdr;
 
+            OpenTK.Graphics.OpenGL4.PixelFormat defaultFormat = OpenTK.Graphics.OpenGL4.PixelFormat.Rgb;
+            if (Context.HasAlpha())
+                defaultFormat = OpenTK.Graphics.OpenGL4.PixelFormat.Rgba;
+            else if (Context.HasOnlyGrayscale())
+                defaultFormat = OpenTK.Graphics.OpenGL4.PixelFormat.Red;
+
             // open dialog
-            ExportWindow ew = new ExportWindow(this, sfd.FileName, format);
+            ExportWindow ew = new ExportWindow(this, sfd.FileName, format, defaultFormat);
             if (ew.ShowDialog() == false)
                 return;
 
