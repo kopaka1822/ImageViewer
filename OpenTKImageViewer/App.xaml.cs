@@ -32,11 +32,13 @@ namespace OpenTKImageViewer
         private MainWindow activeWindow = null; // the last window that was active
         private ulong lastZIndex = 1;
         private Settings appSettings = null;
+        public string ExecutionPath { get; private set; }
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            appSettings = new Settings(Environment.CurrentDirectory + "/config.json");
+            ExecutionPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            appSettings = new Settings(ExecutionPath + "/config.json");
 
             if (e.Args.Length == 0)
             {

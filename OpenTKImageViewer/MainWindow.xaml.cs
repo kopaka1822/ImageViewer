@@ -649,10 +649,9 @@ namespace OpenTKImageViewer
                     bool wasOpen = TonemapDialog != null;
                     ShowTonemapper();
 
-                    var appDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
                     // try to apply the tonemapper
-                    if (TonemapDialog.LoadTonemapper(appDirectory + "\\Tonemapper\\gamma.comp"))
+                    if (TonemapDialog.LoadTonemapper(ParentApp.ExecutionPath + "\\Tonemapper\\gamma.comp"))
                     {
                         // apply
                         TonemapDialog.ApplyTonemapper();
