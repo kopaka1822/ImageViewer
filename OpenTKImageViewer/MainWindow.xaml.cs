@@ -919,7 +919,6 @@ namespace OpenTKImageViewer
                 ImageDialog = new ImageWindow(this);
             ImageDialog.Show();
             ImageDialog.Activate();
-            ImageDialog.Topmost = true;
         }
 
         private void MenuItem_Click_Tonemapper(object sender, RoutedEventArgs e)
@@ -933,7 +932,6 @@ namespace OpenTKImageViewer
                 TonemapDialog = new TonemapWindow(this);
             TonemapDialog.Show();
             TonemapDialog.Activate();
-            TonemapDialog.Topmost = true;
         }
 
         #endregion
