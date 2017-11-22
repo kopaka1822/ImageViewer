@@ -155,8 +155,24 @@ namespace OpenTKImageViewer.Dialogs
                         {
                             Value = (int) para.CurrentValue,
                             Margin = margin,
-                            CultureInfo = App.GetCulture()
+                            CultureInfo = App.GetCulture(),
+                            Increment = 0
                         };
+
+                        // custom handler for up down button
+                        numBox.Spinned += (sender, args) =>
+                        {
+                            if (args.Direction == SpinDirection.Increase)
+                            {
+                                para.InvokeAction(ShaderLoader.ActionType.OnAdd);
+                            }
+                            else if (args.Direction == SpinDirection.Decrease)
+                            {
+                                para.InvokeAction(ShaderLoader.ActionType.OnSubtract);
+                            }
+                        };
+
+                        // default value change handler
                         numBox.ValueChanged += (sender, args) =>
                         {
                             if (numBox.Value != null) para.CurrentValue = (decimal)numBox.Value;
@@ -171,9 +187,24 @@ namespace OpenTKImageViewer.Dialogs
                         {
                             Value = para.CurrentValue,
                             Margin = margin,
-                            CultureInfo = App.GetCulture()
+                            CultureInfo = App.GetCulture(),
+                            Increment = 0
                         };
 
+                        // custom handler for up down button
+                        numBox.Spinned += (sender, args) =>
+                        {
+                            if (args.Direction == SpinDirection.Increase)
+                            {
+                                para.InvokeAction(ShaderLoader.ActionType.OnAdd);
+                            }
+                            else if(args.Direction == SpinDirection.Decrease)
+                            {
+                                para.InvokeAction(ShaderLoader.ActionType.OnSubtract);
+                            }
+                        };
+
+                        // default value change handler
                         numBox.ValueChanged += (sender, args) =>
                         {
                             if (numBox.Value != null) para.CurrentValue =(decimal)numBox.Value;

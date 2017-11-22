@@ -2,6 +2,9 @@
 #setting description, Nonlinear operation used to encode and decode luminance or tristimulus values in video or still image systems. Formula: (Factor * V) ^ (1/Gamma).
 
 #param Gamma, 3, float, 2.2, 0
+#paramprop Gamma, onSubtract, 0.5, multiply
+#paramprop Gamma, onAdd, 2.0, multiply
+
 #param Factor, 2, float, 1.0, 0
 
 #keybinding Factor, Add, 2.0, multiply

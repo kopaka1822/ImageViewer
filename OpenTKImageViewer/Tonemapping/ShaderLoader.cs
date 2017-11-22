@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace OpenTKImageViewer.Tonemapping
 {
@@ -16,6 +17,13 @@ namespace OpenTKImageViewer.Tonemapping
             Float,
             Int,
             Bool
+        }
+
+        public enum ActionType
+        {
+            OnAdd, // number box up button
+            OnSubtract, // number box down button
+            Unknown
         }
 
         public enum ModificationType
@@ -35,13 +43,15 @@ namespace OpenTKImageViewer.Tonemapping
             return value / 1.000000000000000000000000000000000m;
         }
 
-        public class Keybinding
+        public class ParameterAction
         {
-            public Keybinding(decimal value, ModificationType modType, System.Windows.Input.Key key)
+            private readonly decimal value;
+            private readonly ModificationType modType;
+
+            public ParameterAction(decimal value, ModificationType modType)
             {
-                this.Value = value;
-                this.ModType = modType;
-                this.Key = key;
+                this.value = value;
+                this.modType = modType;
             }
 
             /// <summary>
@@ -52,25 +62,21 @@ namespace OpenTKImageViewer.Tonemapping
             public bool Invoke(Parameter parameter)
             {
                 var oldValue = parameter.CurrentValue;
-                switch (ModType)
+                switch (modType)
                 {
                     case ModificationType.Add:
-                        parameter.CurrentValue += Value;
+                        parameter.CurrentValue += value;
                         break;
                     case ModificationType.Multiply:
-                        parameter.CurrentValue *= Value;
+                        parameter.CurrentValue *= value;
                         break;
                     case ModificationType.Set:
-                        parameter.CurrentValue = Value;
+                        parameter.CurrentValue = value;
                         break;
                 }
                 parameter.CurrentValue = Normalize(parameter.CurrentValue);
                 return oldValue != parameter.CurrentValue;
             }
-
-            public decimal Value { get; }
-            public ModificationType ModType { get; }
-            public System.Windows.Input.Key Key { get; }
         }
 
         public class Parameter
@@ -81,7 +87,8 @@ namespace OpenTKImageViewer.Tonemapping
             public decimal Min { get; set; }
             public decimal Max { get; set; }
             public decimal Default { get; set; }
-            public List<Keybinding> Keybindings { get; set; } = new List<Keybinding>();
+            public Dictionary<System.Windows.Input.Key, ParameterAction> Keybindings { get; private set; } = new Dictionary<Key, ParameterAction>();
+            public Dictionary<ActionType, ParameterAction> Actions { get; private set; } = new Dictionary<ActionType, ParameterAction>();
 
             private decimal currentValue = 0;
             public decimal CurrentValue
@@ -103,9 +110,16 @@ namespace OpenTKImageViewer.Tonemapping
             }
 
             public event ChangedValueHandler ValueChanged;
-                
+
+            public Parameter()
+            {
+                // default actions
+                Actions[ActionType.OnAdd] = new ParameterAction(1, ModificationType.Add);
+                Actions[ActionType.OnSubtract] = new ParameterAction(-1, ModificationType.Add);
+            }
+
             /// <summary>
-            /// deep copy of parameter (except the keybindings)
+            /// deep copy of parameter (except the keybindings and actions)
             /// </summary>
             /// <returns>deep copy</returns>
             public Parameter Clone()
@@ -119,17 +133,21 @@ namespace OpenTKImageViewer.Tonemapping
                     Max = Max,
                     Default = Default,
                     currentValue = currentValue,
-                    Keybindings = Keybindings
+                    Keybindings = Keybindings,
+                    Actions = Actions
                 };
             }
 
             public bool InvokeKey(System.Windows.Input.Key key)
             {
-                bool changed = false;
-                foreach (var binding in Keybindings)
-                    if (binding.Key == key && binding.Invoke(this))
-                        changed = true;
-                return changed;
+                if (!Keybindings.TryGetValue(key, out ParameterAction pa)) return false;
+                return pa.Invoke(this);
+            }
+
+            public bool InvokeAction(ActionType action)
+            {
+                if (!Actions.TryGetValue(action, out ParameterAction pa)) return false;
+                return pa.Invoke(this);
             }
 
             protected virtual void OnValueChanged()
@@ -163,7 +181,12 @@ namespace OpenTKImageViewer.Tonemapping
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
-                    if (line.StartsWith("#param"))
+                    if (line.StartsWith("#paramprop"))
+                    {
+                        HandleParamprop(GetParameters(line.Substring("#paramprop".Length)));
+                        ShaderSource += "\n"; // remember line for error information
+                    }
+                    else if (line.StartsWith("#param"))
                     {
                         HandleParam(GetParameters(line.Substring("#param".Length)));
                         ShaderSource += "\n"; // remember line for error information
@@ -212,42 +235,58 @@ namespace OpenTKImageViewer.Tonemapping
             }
         }
 
+        private void HandleParamprop(string[] pars)
+        {
+            if(pars.Length < 2)
+                throw new Exception("not enough arguments for #paramprops provided");
+            var matchingParam = FindMatchingParameter(pars[0]);
+
+            if(!Enum.TryParse(pars[1], true, out ActionType atype))
+                throw new Exception("unknown paramprops action " + pars[1]);
+            switch (atype)
+            {
+                case ActionType.OnAdd:
+                case ActionType.OnSubtract:
+                    {
+                        if (pars.Length < 4)
+                            throw new Exception("not enough arguments for #paramprops provided");
+
+                        decimal value = GetDecimalValue(pars[2], matchingParam.Type);
+                        ModificationType modType = GetModificationType(pars[3]);
+                        var action = new ParameterAction(value, modType);
+                        matchingParam.Actions[atype] = action;
+                    }
+                    break;
+                default:
+                    throw new Exception("unknown paramprops action " + pars[1]);
+            }
+        }
+
+        private ModificationType GetModificationType(string type)
+        {
+            switch (type)
+            {
+                case "add":
+                    return ModificationType.Add;
+                case "multiply":
+                    return ModificationType.Multiply;
+                case "set":
+                    return ModificationType.Set;
+                default:
+                    throw new Exception("invalid keybinding operation");
+            }
+        }
+
         private void HandleKeybinding(string[] pars)
         {
             if (pars.Length < 4)
                 throw new Exception("not enough arguments for #keybinding provided");
-
-            var name = pars[0];
-            Parameter matchingParam = null;
-            // find parameter with the same name
-            foreach (var parameter in Parameters)
-            {
-                if (parameter.Name == name)
-                {
-                    matchingParam = parameter;
-                    break;
-                }
-            }
-            if (matchingParam == null)
-                throw new Exception("could not match keybinding with name: " + name + " to any parameter");
+            
+            var matchingParam = FindMatchingParameter(pars[0]);
 
             decimal value = GetDecimalValue(pars[2], matchingParam.Type);
 
-            ModificationType modType;
-            switch(pars[3].ToLower())
-            {
-                case "add":
-                    modType = ModificationType.Add;
-                    break;
-                case "multiply":
-                    modType = ModificationType.Multiply;
-                    break;
-                case "set":
-                    modType = ModificationType.Set;
-                    break;
-                default:
-                    throw new Exception("invalid keybinding operation");
-            }
+            ModificationType modType = GetModificationType(pars[3]);
 
             // try to parse key
             System.Windows.Input.Key key;
@@ -255,8 +294,8 @@ namespace OpenTKImageViewer.Tonemapping
                 throw new Exception("could not match key in keybinding");
 
             // create new keybinding
-            var binding = new Keybinding(value, modType, key);
-            matchingParam.Keybindings.Add(binding);
+            var binding = new ParameterAction(value, modType);
+            matchingParam.Keybindings[key] = binding;
         }
 
         private void HandleParam(string[] pars)
@@ -337,6 +376,18 @@ namespace OpenTKImageViewer.Tonemapping
             }
 
             return pars;
+        }
+
+        private Parameter FindMatchingParameter(string name)
+        {
+            foreach (var parameter in Parameters)
+            {
+                if (parameter.Name == name)
+                {
+                    return parameter;
+                }
+            }
+            throw new Exception("could not match keybinding with name: " + name + " to any parameter");
         }
     }
 }
