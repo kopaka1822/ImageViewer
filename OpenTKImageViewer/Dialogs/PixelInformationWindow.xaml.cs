@@ -55,18 +55,39 @@ namespace OpenTKImageViewer.Dialogs
 
         private static string ToHex(float c)
         {
-            var b = (byte) (c * 255);
-            return b.ToString("X2");
+            try
+            {
+                var b = (byte) (c * 255);
+                return b.ToString("X2");
+            }
+            catch (Exception)
+            {
+                return c.ToString(App.GetCulture());
+            }
         }
 
         private static string ToFloat(float c)
         {
-            return ((decimal)c).ToString(new CultureInfo("en-US"));
+            try
+            {
+                return ((decimal) c).ToString(App.GetCulture());
+            }
+            catch (Exception)
+            {
+                return c.ToString(App.GetCulture());
+            }
         }
 
         private static string ToBit(float c)
         {
-            return ((int) (c * 255)).ToString(new CultureInfo("en-US"));
+            try
+            {
+                return ((int) (c * 255)).ToString(App.GetCulture());
+            }
+            catch (Exception)
+            {
+                return c.ToString(App.GetCulture());
+            }
         }
 
         private void OnDoubleClick(object sender, MouseButtonEventArgs e)

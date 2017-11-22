@@ -155,7 +155,7 @@ namespace OpenTKImageViewer.Dialogs
                         {
                             Value = (int) para.CurrentValue,
                             Margin = margin,
-                            CultureInfo = new CultureInfo("en-US")
+                            CultureInfo = App.GetCulture()
                         };
                         numBox.ValueChanged += (sender, args) =>
                         {
@@ -171,7 +171,7 @@ namespace OpenTKImageViewer.Dialogs
                         {
                             Value = para.CurrentValue,
                             Margin = margin,
-                            CultureInfo = new CultureInfo("en-US")
+                            CultureInfo = App.GetCulture()
                         };
 
                         numBox.ValueChanged += (sender, args) =>

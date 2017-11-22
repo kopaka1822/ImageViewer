@@ -1012,7 +1012,7 @@ namespace OpenTKImageViewer
                     text = text.Substring(0, text.Length - 1);
 
                 decimal dec;
-                if (Decimal.TryParse(text, NumberStyles.Any, new CultureInfo("en-US"), out dec))
+                if (Decimal.TryParse(text, NumberStyles.Any, App.GetCulture(), out dec))
                 {
                     imageViews[CurrentView]?.SetZoom((float)dec);
                     RedrawFrame();

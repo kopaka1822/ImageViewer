@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Remoting.Contexts;
 using System.Threading.Tasks;
@@ -245,6 +246,12 @@ namespace OpenTKImageViewer
         public Settings.Config GetConfig()
         {
             return appSettings.GetConfig();
+        }
+
+        private static readonly CultureInfo CultureInfo = new CultureInfo("en-US");
+        public static CultureInfo GetCulture()
+        {
+            return CultureInfo;
         }
     }
 }

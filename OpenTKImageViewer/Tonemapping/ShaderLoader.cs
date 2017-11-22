@@ -293,7 +293,7 @@ namespace OpenTKImageViewer.Tonemapping
             if (type == ParameterType.Bool)
                 return argument.ToLower().Equals("true") ? 1 : 0;
             decimal val;
-            if(!Decimal.TryParse(argument, NumberStyles.Any, new CultureInfo("en-US"), out val))
+            if(!Decimal.TryParse(argument, NumberStyles.Any, App.GetCulture(), out val))
                 throw new Exception("cannot convert arument to decimal");
             return val;
         }

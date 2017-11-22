@@ -58,7 +58,7 @@ namespace OpenTKImageViewer.View
 
             aspectRatio = GetAspectRatio(window.GetClientWidth(), window.GetClientHeight());
 
-            boxScroll.Text = Math.Round((Decimal)(transform[0, 0] * 100.0f), 2).ToString(CultureInfo.InvariantCulture) + "%";
+            boxScroll.Text = Math.Round((Decimal)(transform[0, 0] * 100.0f), 2).ToString(App.GetCulture()) + "%";
 
 
         }
