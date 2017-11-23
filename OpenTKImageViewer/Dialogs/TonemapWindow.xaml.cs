@@ -27,6 +27,8 @@ namespace OpenTKImageViewer.Dialogs
     {
         private readonly MainWindow parent;
         private readonly List<ToneParameter> toneSettings;
+        private ListBoxItem draggedItem = null;
+        private ToneParameter previousDisplayedItem = null;
 
         public TonemapWindow(MainWindow parent)
         {
@@ -37,7 +39,41 @@ namespace OpenTKImageViewer.Dialogs
             toneSettings = parent.Context.Tonemapper.GetSettings();
 
             UpdateList();
+            //ListBoxMapper.PreviewMouseLeftButtonDown += ItemOnMouseDown;
+            ListBoxMapper.PreviewMouseLeftButtonUp += OnListMouseUp;
         }
+
+        private void OnListMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            // release item that was dragged
+            draggedItem = null;
+        }
+
+        private void ItemOnMouseDown(object sender, MouseButtonEventArgs args)
+        {
+            // determine if an elemt is being dragged
+            draggedItem = sender as ListBoxItem;
+        }
+
+        private void ItemOnMouseEnter(object sender, MouseEventArgs args)
+        {
+            if (draggedItem == null)
+                return;
+            var target = sender as ListBoxItem;
+            if(ReferenceEquals(draggedItem, target) || target == null)
+                return;
+            
+            // swap both elements
+            var idx1 = ListBoxMapper.Items.IndexOf(target);
+            var idx2 = ListBoxMapper.Items.IndexOf(draggedItem);
+            if (idx2 == -1 || idx2 == -1)
+                return; // not in list?
+
+            SwapItems(idx1, idx2);
+            draggedItem.IsSelected = true;
+        }
+
+
 
         public List<ToneParameter> GetCurrentSettings()
         {
@@ -102,7 +138,8 @@ namespace OpenTKImageViewer.Dialogs
             ListBoxMapper.Items.Clear();
             foreach (var toneParameter in toneSettings)
             {
-                ListBoxMapper.Items.Add(GenerateItem(toneParameter));
+                var item = GenerateItem(toneParameter);
+                ListBoxMapper.Items.Add(item);
             }
             if (ListBoxMapper.Items.Count > 0)
                 ListBoxMapper.SelectedIndex = 0;
@@ -114,6 +151,10 @@ namespace OpenTKImageViewer.Dialogs
         /// <param name="parameters">Shader with parameters</param>
         private void DisplayItem(ToneParameter parameters)
         {
+            if (ReferenceEquals(parameters, previousDisplayedItem))
+                return;
+            previousDisplayedItem = parameters;
+
             // clear previous stack pannel
             var list = StackPanelMapper.Children;
             list.Clear();
@@ -252,32 +293,17 @@ namespace OpenTKImageViewer.Dialogs
         private ListBoxItem GenerateItem(ToneParameter parameter)
         {
             // load images
-            var imgUp = new Image
-            {
-                Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/arrow_up.png", UriKind.Absolute))
-            };
-            var imgDown = new Image
-            {
-                Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/arrow_down.png", UriKind.Absolute))
-            };
             var imgDelete = new Image
             {
                 Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/cancel.png", UriKind.Absolute))
             };
 
-            // create buttons
-            var btnUp = new Button
+            var imgArrow = new Image
             {
-                Height = 8,
-                Width = 16,
-                Content = imgUp
+                Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/list_move.png", UriKind.Absolute))
             };
-            var btnDown = new Button
-            {
-                Height = 8,
-                Width = 16,
-                Content = imgDown
-            };
+            imgArrow.Margin = new Thickness(0.0, 0.0, 5.0, 0.0);
+
             var btnDelete = new Button
             {
                 Height = 16,
@@ -285,34 +311,24 @@ namespace OpenTKImageViewer.Dialogs
                 Content = imgDelete
             };
 
-            // stack panel for up and down button
-            var upDownPanel = new StackPanel
-            {
-                HorizontalAlignment = HorizontalAlignment.Right
-            };
-            upDownPanel.Children.Add(btnUp);
-            upDownPanel.Children.Add(btnDown);
-
             var text = new TextBlock {Text = parameter.Shader.Name };
             
             // grid with name, remove, up/down
             var grid = new Grid {Width = 210.0};
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Auto) });
             grid.ColumnDefinitions.Add(new ColumnDefinition{Width = new GridLength(1.0, GridUnitType.Star)});
             grid.ColumnDefinitions.Add(new ColumnDefinition{Width = new GridLength(1.0, GridUnitType.Auto)});
-            grid.ColumnDefinitions.Add(new ColumnDefinition{Width = new GridLength(1.0, GridUnitType.Auto)});
 
-            Grid.SetColumn(text, 0);
+            Grid.SetColumn(imgArrow, 0);
+            grid.Children.Add(imgArrow);
+            Grid.SetColumn(text, 1);
             grid.Children.Add(text);
-            Grid.SetColumn(btnDelete, 1);
+            Grid.SetColumn(btnDelete, 2);
             grid.Children.Add(btnDelete);
-            Grid.SetColumn(upDownPanel, 2);
-            grid.Children.Add(upDownPanel);
 
             // add callbacks
             var item = new ListBoxItem { Content = grid, ToolTip = parameter.Shader.Description };
 
-            btnUp.Click += (sender, args) => ItemMoveUp(item);
-            btnDown.Click += (sender, args) => ItemMoveDown(item);
             btnDelete.Click += (sender, args) => ItemDelete(item);
 
             return item;
@@ -340,6 +356,12 @@ namespace OpenTKImageViewer.Dialogs
         /// <param name="idx2">index of second item</param>
         private void SwapItems(int idx1, int idx2)
         {
+            if (idx1 > idx2)
+            {
+                var tmp = idx1;
+                idx1 = idx2;
+                idx2 = tmp;
+            }
             Debug.Assert(idx1 < idx2);
 
             // remember values
@@ -357,32 +379,6 @@ namespace OpenTKImageViewer.Dialogs
             var tmp2 = toneSettings[idx1];
             toneSettings[idx1] = toneSettings[idx2];
             toneSettings[idx2] = tmp2;
-        }
-
-        /// <summary>
-        /// moves an item in the left list up (if possible)
-        /// </summary>
-        /// <param name="item">item object</param>
-        private void ItemMoveUp(ListBoxItem item)
-        {
-            var idx = GetItemIndex(item);
-            if (idx < 1) return;
-            
-            SwapItems(idx - 1, idx);
-            ListBoxMapper.SelectedIndex = idx - 1;
-        }
-
-        /// <summary>
-        /// moves an item in the left list down (if possible)
-        /// </summary>
-        /// <param name="item">item object</param>
-        private void ItemMoveDown(ListBoxItem item)
-        {
-            var idx = GetItemIndex(item);
-            if (idx < 0 || idx == ListBoxMapper.Items.Count - 1) return;
-            
-            SwapItems(idx, idx + 1);
-            ListBoxMapper.SelectedIndex = idx + 1;
         }
 
         /// <summary>
