@@ -62,6 +62,8 @@ namespace OpenTKImageViewer
         private ImageViewType currentImageView;
         private ProgressWindow progressWindow = null;
 
+        private Rect windowRect;
+
         public StatusBarControl StatusBar { get; }
         public ImageContext.ImageContext Context { get; set; }
         public ImageViewType CurrentView
@@ -92,6 +94,7 @@ namespace OpenTKImageViewer
             this.ZIndex = 0;
             
             InitializeComponent();
+            windowRect = new Rect(Left, Top, Width, Height);
 
             this.Width = parentApp.GetConfig().WindowSizeX;
             this.Height = parentApp.GetConfig().WindowSizeY;
@@ -100,7 +103,6 @@ namespace OpenTKImageViewer
 
             StatusBar = new StatusBarControl(this);
             CreateImageViews();
-
 
             // redraw if context changes
             context.ChangedMipmap += (sender, args) => RedrawFrame();
@@ -402,11 +404,18 @@ namespace OpenTKImageViewer
         private void MainWindow_OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
             ParentApp.GetConfig().IsMaximized = WindowState == WindowState.Maximized;
-            if (WindowState == WindowState.Maximized)
-                return;
+            if (WindowState != WindowState.Maximized)
+            {
 
-            ParentApp.GetConfig().WindowSizeX = (int)Width;
-            ParentApp.GetConfig().WindowSizeY = (int)Height;
+                ParentApp.GetConfig().WindowSizeX = (int)Width;
+                ParentApp.GetConfig().WindowSizeY = (int)Height;
+            }
+
+            // put dialogs back on screen of they were shifted out by OnLocationChange
+            if (ImageDialog != null)
+                ShiftWindowOntoScreen(ImageDialog);
+            if (TonemapDialog != null)
+                ShiftWindowOntoScreen(TonemapDialog);
         }
 
         private void DisableWindowInteractions()
@@ -569,6 +578,34 @@ namespace OpenTKImageViewer
 
             if (ImageDialog != null)
                 ImageDialog.Topmost = false;
+        }
+
+        private void MainWindow_OnLocationChanged(object sender, EventArgs e)
+        {
+            var newRect = new Rect(Left, Top, Width, Height);
+
+            bool isResize = newRect.Width != windowRect.Width || newRect.Height != windowRect.Height;
+            if(!isResize)
+            {
+                double dx = newRect.X - windowRect.X;
+                double dy = newRect.Y - windowRect.Y;
+
+                // move dialogs
+                if (TonemapDialog != null)
+                    MoveDialog(TonemapDialog, dx, dy);
+
+                if (ImageDialog != null)
+                    MoveDialog(ImageDialog, dx, dy);
+            }
+            
+
+            windowRect = newRect;
+        }
+
+        private void MoveDialog(Window dialog, double dx, double dy)
+        {
+            dialog.Left += dx;
+            dialog.Top += dy;
         }
 
         #endregion
@@ -919,6 +956,7 @@ namespace OpenTKImageViewer
                 ImageDialog = new ImageWindow(this);
             ImageDialog.Show();
             ImageDialog.Activate();
+            ShiftWindowOntoScreen(ImageDialog);
         }
 
         private void MenuItem_Click_Tonemapper(object sender, RoutedEventArgs e)
@@ -932,6 +970,7 @@ namespace OpenTKImageViewer
                 TonemapDialog = new TonemapWindow(this);
             TonemapDialog.Show();
             TonemapDialog.Activate();
+            ShiftWindowOntoScreen(TonemapDialog);
         }
 
         #endregion
@@ -1043,5 +1082,29 @@ namespace OpenTKImageViewer
                 imageView.Value.Dispose();
             }
         }
-    }
+
+        public static void ShiftWindowOntoScreen(Window window)
+        {
+            // Note that "window.BringIntoView()" does not work.                            
+            if (window.Top < SystemParameters.VirtualScreenTop)
+            {
+                window.Top = SystemParameters.VirtualScreenTop;
+            }
+
+            if (window.Left < SystemParameters.VirtualScreenLeft)
+            {
+                window.Left = SystemParameters.VirtualScreenLeft;
+            }
+
+            if (window.Left + window.Width > SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth)
+            {
+                window.Left = SystemParameters.VirtualScreenWidth + SystemParameters.VirtualScreenLeft - window.Width;
+            }
+
+            if (window.Top + window.Height > SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight)
+            {
+                window.Top = SystemParameters.VirtualScreenHeight + SystemParameters.VirtualScreenTop - window.Height;
+            }
+        }
+        }
 }

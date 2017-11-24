@@ -15,6 +15,7 @@
         Deactivated="MainWindow_OnDeactivated"
         Icon="Icons/app.png"
         SizeChanged="MainWindow_OnSizeChanged"
+        LocationChanged="MainWindow_OnLocationChanged"
         IsEnabled="{Binding Path=(local:MainWindow.IsInteractionEnabled)}">
     <DockPanel>
         <!--<StackPanel>-->

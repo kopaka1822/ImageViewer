@@ -130,12 +130,6 @@
     <Compile Include="Dialogs\ImageWindow.xaml.cs">
       <DependentUpon>ImageWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\LayerWindow.xaml.cs">
-      <DependentUpon>LayerWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\MipMapWindow.xaml.cs">
-      <DependentUpon>MipMapWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Dialogs\PixelDisplayWindow.xaml.cs">
       <DependentUpon>PixelDisplayWindow.xaml</DependentUpon>
     </Compile>
@@ -201,14 +195,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\ImageWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\LayerWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\MipMapWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

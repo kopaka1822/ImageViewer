@@ -8,7 +8,8 @@
         Title="Pixel Information" 
         Height="220" Width="280"
         ResizeMode="NoResize" Background="#eee"
-        Icon="../Icons/eyedropper.png">
+        Icon="../Icons/eyedropper.png"
+        >
     <Border Padding="5">
         <StackPanel>
             <TextBlock Text="Double click box to copy content to clipboard"

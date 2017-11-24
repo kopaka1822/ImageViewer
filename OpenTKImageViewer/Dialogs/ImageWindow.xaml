@@ -7,7 +7,9 @@
         mc:Ignorable="d"
         Title="Images" Height="580" Width="260"
         ResizeMode="NoResize" Background="#eee"
-        Icon="../Icons/multiview.png">
+        Icon="../Icons/multiview.png"
+        ShowInTaskbar="False"
+        >
 
     <Border Padding="5">
         <StackPanel>
