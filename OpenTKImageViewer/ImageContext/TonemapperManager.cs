@@ -153,8 +153,8 @@ namespace OpenTKImageViewer.ImageContext
                 var p = settings[curParameter];
 
                 // ping
-                //pingpong[0].BindAsImage(p.Shader.GetSourceImageLocation(), curLevel, curLayer, TextureAccess.ReadOnly);
-                pingpong[0].BindAsTexture2D(p.Shader.GetSourceImageLocation(), true, curLayer, curLevel);
+                pingpong[0].BindAsTexture2D(p.Shader.GetSourceImageLocation(), curLayer, curLevel);
+                context.BindSampler(p.Shader.GetSourceImageLocation(), pingpong[0].HasMipmaps(), true);
                 // pong
                 pingpong[1].BindAsImage(p.Shader.GetDestinationImageLocation(), curLevel, curLayer, TextureAccess.WriteOnly);
                 if (curStepable == null)

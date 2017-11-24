@@ -78,7 +78,8 @@ namespace OpenTKImageViewer.ImageContext
                         RecomputeCombinedImage(combinedTexture);
                     }
 
-                    combinedTexture.BindAsTexture2D(slot, false, layer, level);
+                    combinedTexture.BindAsTexture2D(slot, layer, level);
+                    parent.BindSampler(slot, combinedTexture.HasMipmaps(), false);
                     return true;
                 }
                 // just use the final texture since no tonemappers were used
@@ -92,8 +93,8 @@ namespace OpenTKImageViewer.ImageContext
             }
 
             // bind the final product
-            Texture.BindAsTexture2D(slot, false, layer, level);
-
+            Texture.BindAsTexture2D(slot, layer, level);
+            parent.BindSampler(slot, Texture.HasMipmaps(), false);
             return true;
         }
 
@@ -173,7 +174,8 @@ namespace OpenTKImageViewer.ImageContext
                 {
                     for (int image = 0; image < parent.GetNumImages(); ++image)
                     {
-                        parent.GetImageTexture(image).Bind(combineShader.GetSourceImageBinding(image), false);
+                        parent.GetImageTexture(image).Bind(combineShader.GetSourceImageBinding(image));
+                        parent.BindSampler(combineShader.GetSourceImageBinding(image), parent.GetImageTexture(image).HasMipmaps(), false);
                     }
 
                     combineShader.Run(layer, level, parent.GetWidth(level), parent.GetHeight(level), target);
