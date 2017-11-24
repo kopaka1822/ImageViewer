@@ -292,10 +292,10 @@ namespace OpenTKImageViewer.ImageContext
             }
             Tonemapper.Dispose();
             TextureCache.Clear();
-            samplerLinear.Dispose();
-            samplerLinearMip.Dispose();
-            samplerNearest.Dispose();
-            samplerNearestMip.Dispose();
+            samplerLinear?.Dispose();
+            samplerLinearMip?.Dispose();
+            samplerNearest?.Dispose();
+            samplerNearestMip?.Dispose();
         }
 
         /// <summary>

@@ -82,6 +82,10 @@ namespace OpenTKImageViewer.Dialogs
 
         private void TonemapWindow_OnClosing(object sender, CancelEventArgs e)
         {
+            // set last relative coordinates
+            parent.ParentApp.GetConfig().LastTonemapDialogX = (int)(Left - parent.Left);
+            parent.ParentApp.GetConfig().LastTonemapDialogY = (int)(Top - parent.Top);
+
             parent.TonemapDialog = null;
             parent.Context.Tonemapper.RemoveUnusedShader();
         }

@@ -185,6 +185,9 @@ namespace OpenTKImageViewer.Dialogs
 
         protected override void OnClosing(CancelEventArgs e)
         {
+            // set last relative coordinates
+            parent.ParentApp.GetConfig().LastImageDialogX = (int)(Left - parent.Left);
+            parent.ParentApp.GetConfig().LastImageDialogY = (int)(Top - parent.Top);
             parent.ImageDialog = null;
         }
 

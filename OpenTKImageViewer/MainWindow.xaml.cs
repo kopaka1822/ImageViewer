@@ -952,10 +952,16 @@ namespace OpenTKImageViewer
 
         private void ShowImagesWindow()
         {
-            if(ImageDialog == null)
+            bool wasNull = ImageDialog == null;
+            if (ImageDialog == null)
                 ImageDialog = new ImageWindow(this);
             ImageDialog.Show();
             ImageDialog.Activate();
+            if (wasNull)
+            {
+                ImageDialog.Left = Left + ParentApp.GetConfig().LastImageDialogX;
+                ImageDialog.Top = Top + ParentApp.GetConfig().LastImageDialogY;
+            }
             ShiftWindowOntoScreen(ImageDialog);
         }
 
@@ -966,10 +972,16 @@ namespace OpenTKImageViewer
 
         private void ShowTonemapper()
         {
+            bool wasNull = TonemapDialog == null;
             if (TonemapDialog == null)
                 TonemapDialog = new TonemapWindow(this);
             TonemapDialog.Show();
             TonemapDialog.Activate();
+            if(wasNull)
+            {
+                TonemapDialog.Left = Left + ParentApp.GetConfig().LastTonemapDialogX;
+                TonemapDialog.Top = Top + ParentApp.GetConfig().LastTonemapDialogY;
+            }
             ShiftWindowOntoScreen(TonemapDialog);
         }
 
