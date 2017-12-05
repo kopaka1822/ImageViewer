@@ -140,13 +140,15 @@ namespace OpenTKImageViewer.Tonemapping
 
             public bool InvokeKey(System.Windows.Input.Key key)
             {
-                if (!Keybindings.TryGetValue(key, out ParameterAction pa)) return false;
+                ParameterAction pa;
+                if (!Keybindings.TryGetValue(key, out pa)) return false;
                 return pa.Invoke(this);
             }
 
             public bool InvokeAction(ActionType action)
             {
-                if (!Actions.TryGetValue(action, out ParameterAction pa)) return false;
+                ParameterAction pa;
+                if (!Actions.TryGetValue(action, out pa)) return false;
                 return pa.Invoke(this);
             }
 
@@ -241,7 +243,8 @@ namespace OpenTKImageViewer.Tonemapping
                 throw new Exception("not enough arguments for #paramprops provided");
             var matchingParam = FindMatchingParameter(pars[0]);
 
-            if(!Enum.TryParse(pars[1], true, out ActionType atype))
+            ActionType atype;
+            if (!Enum.TryParse(pars[1], true, out atype))
                 throw new Exception("unknown paramprops action " + pars[1]);
             switch (atype)
             {
