@@ -539,7 +539,8 @@ namespace OpenTKImageViewer
                 // if tonemapper dialog is open, apply tonemapper dialog and then apply settings
                 if(TonemapDialog != null)
                 {
-                    Context.Tonemapper.ApplyAndInvoke(TonemapDialog.GetCurrentSettings(), e.Key);
+                    TonemapDialog.GetCurrentSettings().InvokeKey(e.Key);
+                    Context.Tonemapper.Apply(TonemapDialog.GetCurrentSettings());
                 }
                 else
                 {

@@ -16,8 +16,35 @@ namespace OpenTKImageViewer.ImageContext
 
     public class TonemapperManager
     {
+        public class Settings
+        {
+            public List<ToneParameter> ToneParameters = new List<ToneParameter>();
+            public int ExportPosition = 0;
+
+        
+            public Settings Clone()
+            {
+                var res = new Settings {ExportPosition = ExportPosition};
+                foreach (var toneParameter in ToneParameters)
+                {
+                    res.ToneParameters.Add(toneParameter.Clone());
+                }
+                return res;
+            }
+
+            public bool InvokeKey(System.Windows.Input.Key key)
+            {
+                var changed = false;
+                foreach (var set in ToneParameters)
+                foreach (var param in set.Parameters)
+                    if (param.InvokeKey(key))
+                        changed = true;
+                return changed;
+            }
+        }
+
         private List<ToneShader> shaders = new List<ToneShader>();
-        private List<ToneParameter> settings = new List<ToneParameter>();
+        private Settings settings = new Settings();
 
         public event ChangedTonemappingSettingsHandler ChangedSettings;
 
@@ -36,12 +63,7 @@ namespace OpenTKImageViewer.ImageContext
 
         public bool HasKeyToInvoke(System.Windows.Input.Key key)
         {
-            foreach (var set in settings)
-                foreach (var param in set.Parameters)
-                    foreach (var binding in param.Keybindings)
-                        if (binding.Key == key)
-                            return true;
-            return false;
+            return settings.ToneParameters.Any(set => set.Parameters.Any(param => param.Keybindings.Any(binding => binding.Key == key)));
         }
 
         /// <summary>
@@ -51,81 +73,23 @@ namespace OpenTKImageViewer.ImageContext
         /// <returns></returns>
         public void InvokeKey(System.Windows.Input.Key key)
         {
-            if (invokeKey(key))
+            if (settings.InvokeKey(key))
                 OnChangedSettings();
         }
 
-        private bool invokeKey(System.Windows.Input.Key key)
-        {
-            bool changed = false;
-            foreach (var set in settings)
-                foreach (var param in set.Parameters)
-                    if (param.InvokeKey(key))
-                        changed = true;
-            return changed;
-        }
-
-        public void Apply(List<ToneParameter> p)
+        public void Apply(Settings s)
         {
             // create copy
-            settings = CloneSettings(p);
+            settings = s.Clone();
             RemoveUnusedShader();
 
             OnChangedSettings();
-        }
-
-        /// <summary>
-        /// for the special case if a key is pressed and the tonemapper dialog is still open
-        /// </summary>
-        /// <param name="p"></param>
-        /// <param name="key"></param>
-        public void ApplyAndInvoke(List<ToneParameter> p, System.Windows.Input.Key key)
-        {
-            // set settings to original settings
-            settings = p;
-            // use the invoke to change the settings in this reference
-            invokeKey(key);
-            // save the copy of the final settings
-            settings = CloneSettings(settings);
-            RemoveUnusedShader();
-            OnChangedSettings();
-        }
-        
-        /// <summary>
-        /// applies the current set of shaders to the images. ping will point to the final image
-        /// </summary>
-        /// <param name="ping">the source image</param>
-        /// <param name="pong">another buffer image with the same format as ping</param>
-        /// <param name="context">image context</param>
-        public void ApplyShader(ref TextureArray2D ping, ref TextureArray2D pong, ImageContext context)
-        {
-            foreach (var p in settings)
-            {
-                int numIterations = p.Shader.IsSepa ? 2 : 1;
-                for (int iteration = 0; iteration < numIterations; ++iteration)
-                {
-                    for (int level = 0; level < context.GetNumMipmaps(); ++level)
-                    {
-                        for (int layer = 0; layer < context.GetNumLayers(); ++layer)
-                        {
-                            ping.BindAsImage(p.Shader.GetSourceImageLocation(), level, layer, TextureAccess.ReadOnly);
-                            pong.BindAsImage(p.Shader.GetDestinationImageLocation(), level, layer, TextureAccess.WriteOnly);
-                            p.Shader.Dispatch(context.GetWidth(level), context.GetHeight(level), p.Parameters, iteration);
-                        }
-                    }
-
-                    // swap active image (final image is always ping)
-                    var temp = ping;
-                    ping = pong;
-                    pong = temp;
-                }
-            }
         }
 
         private class ShaderStepper : IStepable
         {
             private readonly ImageContext context;
-            private readonly List<ToneParameter> settings;
+            private readonly Settings settings;
             private readonly TextureArray2D[] pingpong;
             private IStepable curStepable = null;
 
@@ -136,7 +100,7 @@ namespace OpenTKImageViewer.ImageContext
 
             private int numExecuted = 0;
 
-            public ShaderStepper(ImageContext context, List<ToneParameter> settings, TextureArray2D[] pingpong)
+            public ShaderStepper(ImageContext context, Settings settings, TextureArray2D[] pingpong)
             {
                 this.context = context;
                 this.settings = settings;
@@ -145,12 +109,12 @@ namespace OpenTKImageViewer.ImageContext
 
             public bool HasStep()
             {
-                return curParameter < settings.Count;
+                return curParameter < settings.ToneParameters.Count;
             }
 
             public void NextStep()
             {
-                var p = settings[curParameter];
+                var p = settings.ToneParameters[curParameter];
 
                 // ping
                 pingpong[0].BindAsTexture2D(p.Shader.GetSourceImageLocation(), curLayer, curLevel);
@@ -210,7 +174,7 @@ namespace OpenTKImageViewer.ImageContext
             public int GetNumSteps()
             {
                 int iterations = 0;
-                foreach (var p in settings)
+                foreach (var p in settings.ToneParameters)
                 {
                     int numIterations = p.Shader.IsSepa ? 2 : 1;
                     iterations += numIterations * context.GetNumMipmaps() * context.GetNumLayers();
@@ -222,7 +186,7 @@ namespace OpenTKImageViewer.ImageContext
             {
                 if (!HasStep())
                     return "";
-                var p = settings[curParameter];
+                var p = settings.ToneParameters[curParameter];
                 return "executing " + p.Shader.Name;
             }
         }
@@ -242,23 +206,9 @@ namespace OpenTKImageViewer.ImageContext
         /// creates deep copy of settings (except for the shader refence that will be kept)
         /// </summary>
         /// <returns></returns>
-        public List<ToneParameter> GetSettings()
+        public Settings GetSettings()
         {
-            return CloneSettings(settings);
-        }
-
-        /// <summary>
-        /// creates deep copy of the list (except for the shader refence that will be kept)
-        /// </summary>
-        /// <returns></returns>
-        private static List<ToneParameter> CloneSettings(List<ToneParameter> p)
-        {
-            var res = new List<ToneParameter>();
-            foreach (var toneParameter in p)
-            {
-                res.Add(toneParameter.Clone());
-            }
-            return res;
+            return settings.Clone();
         }
 
         public void RemoveUnusedShader()
@@ -266,7 +216,7 @@ namespace OpenTKImageViewer.ImageContext
             shaders.RemoveAll(
                 shader =>
                 {
-                    if (settings.Any(toneParameter => ReferenceEquals(toneParameter.Shader, shader)))
+                    if (settings.ToneParameters.Any(toneParameter => ReferenceEquals(toneParameter.Shader, shader)))
                         return false;
 
                     shader.Dispose();
@@ -285,7 +235,7 @@ namespace OpenTKImageViewer.ImageContext
         /// <returns>true if at least one tonemapper is active in the current setting</returns>
         public bool HasTonemapper()
         {
-            return settings.Count > 0;
+            return settings.ToneParameters.Count > 0;
         }
 
         /// <summary>

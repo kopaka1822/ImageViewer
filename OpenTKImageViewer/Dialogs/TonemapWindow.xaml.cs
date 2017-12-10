@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Microsoft.Win32;
+using OpenTKImageViewer.ImageContext;
 using OpenTKImageViewer.Tonemapping;
 using Xceed.Wpf.Toolkit;
 
@@ -26,7 +27,7 @@ namespace OpenTKImageViewer.Dialogs
     public partial class TonemapWindow : Window
     {
         private readonly MainWindow parent;
-        private readonly List<ToneParameter> toneSettings;
+        private readonly TonemapperManager.Settings toneSettings;
         private ListBoxItem draggedItem = null;
         private ToneParameter previousDisplayedItem = null;
 
@@ -75,7 +76,7 @@ namespace OpenTKImageViewer.Dialogs
 
 
 
-        public List<ToneParameter> GetCurrentSettings()
+        public TonemapperManager.Settings GetCurrentSettings()
         {
             return toneSettings;
         }
@@ -121,7 +122,7 @@ namespace OpenTKImageViewer.Dialogs
             {
                 var param = parent.Context.Tonemapper.LoadShader(filename);
 
-                toneSettings.Add(param);
+                toneSettings.ToneParameters.Add(param);
                 ListBoxMapper.Items.Add(GenerateItem(param));
                 ListBoxMapper.SelectedIndex = ListBoxMapper.Items.Count - 1;
             }
@@ -140,7 +141,7 @@ namespace OpenTKImageViewer.Dialogs
         private void UpdateList()
         {
             ListBoxMapper.Items.Clear();
-            foreach (var toneParameter in toneSettings)
+            foreach (var toneParameter in toneSettings.ToneParameters)
             {
                 var item = GenerateItem(toneParameter);
                 ListBoxMapper.Items.Add(item);
@@ -380,9 +381,9 @@ namespace OpenTKImageViewer.Dialogs
             ListBoxMapper.Items.Insert(idx1, box2);
             ListBoxMapper.Items.Insert(idx2, box1);
 
-            var tmp2 = toneSettings[idx1];
-            toneSettings[idx1] = toneSettings[idx2];
-            toneSettings[idx2] = tmp2;
+            var tmp2 = toneSettings.ToneParameters[idx1];
+            toneSettings.ToneParameters[idx1] = toneSettings.ToneParameters[idx2];
+            toneSettings.ToneParameters[idx2] = tmp2;
         }
 
         /// <summary>
@@ -394,7 +395,7 @@ namespace OpenTKImageViewer.Dialogs
             var idx = GetItemIndex(item);
             if (idx < 0) return;
             ListBoxMapper.Items.RemoveAt(idx);
-            toneSettings.RemoveAt(idx);
+            toneSettings.ToneParameters.RemoveAt(idx);
         }
 
         /// <summary>
@@ -434,7 +435,7 @@ namespace OpenTKImageViewer.Dialogs
         {
             if (ListBoxMapper.SelectedIndex >= 0)
             {
-                DisplayItem(toneSettings[ListBoxMapper.SelectedIndex]);
+                DisplayItem(toneSettings.ToneParameters[ListBoxMapper.SelectedIndex]);
             } else StackPanelMapper.Children.Clear();
         }
     }
