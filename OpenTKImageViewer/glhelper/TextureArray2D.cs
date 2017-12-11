@@ -205,6 +205,25 @@ namespace OpenTKImageViewer.glhelper
         }
 
         /// <summary>
+        /// retrieves the texture data from the gpu in float rgba format (all layers)
+        /// </summary>
+        /// <param name="level">mip map level</param>
+        /// <returns></returns>
+        public float[] GetFloatData(int level)
+        {
+            // retrieve width and height of the level
+            int width, height;
+            GL.BindTexture(TextureTarget.Texture2DArray, id);
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureWidth, out width);
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureHeight, out height);
+
+            float[] buffer = new float[4 * width * height * nLayer];
+            Utility.ReadTexture(id, level, PixelFormat.Rgba, PixelType.Float, ref buffer);
+
+            return buffer;
+        }
+
+        /// <summary>
         /// reads data from gpu
         /// </summary>
         /// <param name="level">requested level</param>
@@ -226,7 +245,7 @@ namespace OpenTKImageViewer.glhelper
             int bufferSize = width * height * GetPixelTypeSize(type) * GetPixelFormatCount(format) * nLayer;
             byte[] buffer = new byte[bufferSize];
 
-            Utility.ReadTexture(id, level, format, type, ref buffer, 0, 0, width, height * nLayer);
+            Utility.ReadTexture(id, level, format, type, ref buffer);
 
             if (nLayer > 1 && layer >= 0)
             {

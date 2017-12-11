@@ -227,6 +227,20 @@ namespace OpenTKImageViewer.ImageContext
         }
 
         /// <summary>
+        /// returns a float array with the rgba data from the image
+        /// </summary>
+        /// <param name="imageId">which image equation (0 or 1)</param>
+        /// <param name="level">mip map level</param>
+        /// <returns></returns>
+        public float[] GetCurrentImageFloatData(int imageId, int level)
+        {
+            if (finalTextures[imageId] == null)
+                return null;
+
+            return finalTextures[imageId].Texture.GetFloatData(level);
+        }
+
+        /// <summary>
         /// binds the texture that should be used for pixel displaying (status bar).
         /// </summary>
         /// <param name="imageId"></param>

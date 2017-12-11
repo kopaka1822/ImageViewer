@@ -212,6 +212,13 @@ namespace OpenTKImageViewer
                         pixelDisplayItem.Image = System.Drawing.Image.FromStream(sri.Stream);
                 }
                 pixelDisplayItem.Click += (o, args) => MenuItem_Click_PixelDisplay(o, null);
+
+                var imageStatisitcsItem = glControl.ContextMenuStrip.Items.Add("Image Statistics");
+                imageStatisitcsItem.Click += (o, args) =>
+                {
+                    var dia = new StatisticsWindow(this);
+                    dia.ShowDialog();
+                };
             }
             catch (Exception exception)
             {
