@@ -55,6 +55,11 @@ namespace OpenTKImageViewer.Dialogs
                 BoxVisible.Checked += BoxVisibleOnCheckedChange;
                 BoxVisible.Unchecked += BoxVisibleOnCheckedChange;
 
+                configuration.CombineFormula.Changed +=
+                    (sender, args) => BoxRgbEquation.Text = configuration.CombineFormula.Original;
+                configuration.AlphaFormula.Changed +=
+                    (sender, args) => BoxAlphaEquation.Text = configuration.AlphaFormula.Original;
+
                 LoadConfigurationValues();
             }
 
