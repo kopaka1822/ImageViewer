@@ -212,9 +212,10 @@ namespace OpenTKImageViewer.glhelper
         public float[] GetFloatData(int level)
         {
             // retrieve width and height of the level
+            int width, height;
             GL.BindTexture(TextureTarget.Texture2DArray, id);
-            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureWidth, out int width);
-            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureHeight, out int height);
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureWidth, out width);
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureHeight, out height);
 
             float[] buffer = new float[4 * width * height * nLayer];
             Utility.ReadTexture(id, level, PixelFormat.Rgba, PixelType.Float, ref buffer);
