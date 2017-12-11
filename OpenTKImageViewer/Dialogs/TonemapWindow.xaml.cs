@@ -150,6 +150,22 @@ namespace OpenTKImageViewer.Dialogs
             ListBoxMapper.Items.Insert(toneSettings.ExportPosition, GenerateExportPositionItem());
         }
 
+        private void DisplayExportPointInfo()
+        {
+            // clear previous stack pannel
+            var list = StackPanelMapper.Children;
+            list.Clear();
+
+            var margin = new Thickness(0.0, 0.0, 0.0, 2.0);
+            list.Add(new TextBlock { Text = "Export Position", Margin = margin, FontSize = 18.0 });
+            list.Add(new TextBlock
+            {
+                Text = "Exported images and pixel statistics are given for this point in the pipeline. Further operators are only applied for display.",
+                Margin = margin,
+                TextWrapping = TextWrapping.Wrap
+            });
+        }
+
         /// <summary>
         /// displays the shader dialog on the right side (title, parameters etc.)
         /// </summary>
@@ -481,11 +497,8 @@ namespace OpenTKImageViewer.Dialogs
                 }
                 else
                 {
-                    // display nothing or info box?
-                    // TODO make prettier
-
-                    // clear previous stack pannel
-                    StackPanelMapper.Children.Clear();
+                    previousDisplayedItem = null;
+                    DisplayExportPointInfo();
                 }
 
             } else StackPanelMapper.Children.Clear();

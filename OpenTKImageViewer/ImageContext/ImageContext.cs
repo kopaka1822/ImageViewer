@@ -122,9 +122,6 @@ namespace OpenTKImageViewer.ImageContext
 
         public TonemapperManager Tonemapper { get; } = new TonemapperManager();
 
-        // this will determine if the cpu cached textures will be acquired directly after combining the images or after tonemapping
-        public bool DisplayColorBeforeTonemapping { get; set; } = true;
-
         public TextureCache TextureCache { get; }
         #endregion
 
