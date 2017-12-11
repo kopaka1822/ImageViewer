@@ -202,7 +202,7 @@ namespace OpenTKImageViewer.ImageContext
         }
 
         /// <summary>
-        /// returns a byte array with the requested texture data. (this will use the export image)
+        /// returns a byte array with the requested texture data. (this will use the final image)
         /// </summary>
         /// <param name="imageId">which image equation (0 or 1)</param>
         /// <param name="level">mipmap level</param>
@@ -220,7 +220,7 @@ namespace OpenTKImageViewer.ImageContext
             if (finalTextures[imageId] == null)
                 return null;
 
-            return finalTextures[imageId].GetExportTexture().GetData(level, layer, format, type, out width, out height);
+            return finalTextures[imageId].GetStatisticsTexture().GetData(level, layer, format, type, out width, out height);
         }
 
         /// <summary>
@@ -231,9 +231,9 @@ namespace OpenTKImageViewer.ImageContext
         /// <param name="layer"></param>
         /// <param name="level"></param>
         /// <returns></returns>
-        public bool BindExportTexture(int imageId, int slot, int layer, int level)
+        public bool BindStatisticsTexture(int imageId, int slot, int layer, int level)
         {
-            return finalTextures[imageId].BindExportTexture(slot, layer, level);
+            return finalTextures[imageId].BindStatisticsTexture(slot, layer, level);
         }
 
         #endregion

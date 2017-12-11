@@ -147,20 +147,20 @@ namespace OpenTKImageViewer.Dialogs
             if (ListBoxMapper.Items.Count > 0)
                 ListBoxMapper.SelectedIndex = 0;
 
-            ListBoxMapper.Items.Insert(toneSettings.ExportPosition, GenerateExportPositionItem());
+            ListBoxMapper.Items.Insert(toneSettings.StatisticsPosition, GenerateStatisticsPositionItem());
         }
 
-        private void DisplayExportPointInfo()
+        private void DisplayStatisticsPointInfo()
         {
             // clear previous stack pannel
             var list = StackPanelMapper.Children;
             list.Clear();
 
             var margin = new Thickness(0.0, 0.0, 0.0, 2.0);
-            list.Add(new TextBlock { Text = "Export Position", Margin = margin, FontSize = 18.0 });
+            list.Add(new TextBlock { Text = "Image Statistics" , Margin = margin, FontSize = 18.0 });
             list.Add(new TextBlock
             {
-                Text = "Exported images and pixel statistics are given for this point in the pipeline. Further operators are only applied for display.",
+                Text = "Pixel statistics are taken from this point in the pipeline (includes the pixel color on the status bar). Further operators are applied for display and export.",
                 Margin = margin,
                 TextWrapping = TextWrapping.Wrap
             });
@@ -355,7 +355,7 @@ namespace OpenTKImageViewer.Dialogs
             }
         }
 
-        private ListBoxItem GenerateExportPositionItem()
+        private ListBoxItem GenerateStatisticsPositionItem()
         {
             var imgArrow = new Image
             {
@@ -363,7 +363,7 @@ namespace OpenTKImageViewer.Dialogs
             };
             imgArrow.Margin = new Thickness(0.0, 0.0, 5.0, 0.0);
 
-            var text = new TextBlock { Text = "Export Position" };
+            var text = new TextBlock { Text = "Image Statistics" };
 
             // grid with name, remove, up/down
             var grid = new Grid { Width = 210.0 };
@@ -375,7 +375,7 @@ namespace OpenTKImageViewer.Dialogs
             Grid.SetColumn(text, 1);
             grid.Children.Add(text);
 
-            return new ListBoxItem { Content = grid, ToolTip = "The exported image will inlcude all tonemappers until this point." };
+            return new ListBoxItem { Content = grid, ToolTip = "Pixel statistics are taken from this point in the pipeline (includes the pixel color on the status bar). Further operators are applied for display and export." };
         }
 
         /// <summary>
@@ -426,7 +426,7 @@ namespace OpenTKImageViewer.Dialogs
         private void UpdateSettingsFromItemList()
         {
             toneSettings.ToneParameters.Clear();
-            toneSettings.ExportPosition = 0;
+            toneSettings.StatisticsPosition = 0;
             for (var i = 0; i < ListBoxMapper.Items.Count; ++i)
             {
                 var tone = ListBoxMapper.Items[i] as ToneParameterItem;
@@ -436,7 +436,7 @@ namespace OpenTKImageViewer.Dialogs
                 }
                 else
                 {
-                    toneSettings.ExportPosition = i;
+                    toneSettings.StatisticsPosition = i;
                 }
             }
         }
@@ -498,7 +498,7 @@ namespace OpenTKImageViewer.Dialogs
                 else
                 {
                     previousDisplayedItem = null;
-                    DisplayExportPointInfo();
+                    DisplayStatisticsPointInfo();
                 }
 
             } else StackPanelMapper.Children.Clear();

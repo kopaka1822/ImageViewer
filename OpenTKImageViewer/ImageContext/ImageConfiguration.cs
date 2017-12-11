@@ -29,8 +29,8 @@ namespace OpenTKImageViewer.ImageContext
         }
         public IStepable TonemappingStepable { get; private set; }= null;
 
-        // texture until the export point. this will can be null if export texture would be equal to the display texture
-        private TextureArray2D ExportTexture = null;
+        // texture until the statistics point. this will can be null if statistics texture would be equal to the display texture
+        private TextureArray2D statisticsTexture = null;
         // texture after tonemapping
         public TextureArray2D DisplayTexture { get; private set; }
         public ImageFormula CombineFormula { get; }
@@ -55,31 +55,31 @@ namespace OpenTKImageViewer.ImageContext
         }
 
         /// <summary>
-        /// returns the texture that shpuld be used for pixel displaying and exporting
+        /// returns the texture that shpuld be used for pixel displaying
         /// </summary>
         /// <returns></returns>
-        public TextureArray2D GetExportTexture()
+        public TextureArray2D GetStatisticsTexture()
         {
-            // if the export texture is null, the display texture should be used. otherwise use the export texture
+            // if the statistics texture is null, the display texture should be used. otherwise use the statistics texture
             var tex = DisplayTexture;
-            if (ExportTexture != null)
-                tex = ExportTexture;
+            if (statisticsTexture != null)
+                tex = statisticsTexture;
             return tex;
         }
 
         /// <summary>
-        /// binds the texture that should be used for pixel displaying and exporting
+        /// binds the texture that should be used for pixel displaying
         /// </summary>
         /// <param name="slot"></param>
         /// <param name="layer"></param>
         /// <param name="level">mipmap level</param>
         /// <returns></returns>
-        public bool BindExportTexture(int slot, int layer, int level)
+        public bool BindStatisticsTexture(int slot, int layer, int level)
         {
             if (DisplayTexture == null || !Active)
                 return false;
 
-            var tex = GetExportTexture();
+            var tex = GetStatisticsTexture();
 
             // bind the final product
             tex.BindAsTexture2D(slot, layer, level);
@@ -112,8 +112,8 @@ namespace OpenTKImageViewer.ImageContext
                     // retrieve final picture
                     DisplayTexture = pingpong[0];
                     parent.TextureCache.StoreUnusuedTexture(pingpong[1]);
-                    // retrieve the export texture if available
-                    ExportTexture = pingpong[2];
+                    // retrieve the statistics texture if available
+                    statisticsTexture = pingpong[2];
                     pingpong = null;
                     
                     return true;
@@ -125,11 +125,11 @@ namespace OpenTKImageViewer.ImageContext
             {
                 RecomputeImage = false;
 
-                // dispose old export texture since it will probably be changed
-                if(ExportTexture != null)
+                // dispose old statistics texture since it will probably be changed
+                if (statisticsTexture != null)
                 {
-                    parent.TextureCache.StoreUnusuedTexture(ExportTexture);
-                    ExportTexture = null;
+                    parent.TextureCache.StoreUnusuedTexture(statisticsTexture);
+                    statisticsTexture = null;
                 }
 
                 // aqcuire texture if necessary
@@ -144,7 +144,7 @@ namespace OpenTKImageViewer.ImageContext
                     pingpong = new TextureArray2D[3];
                     pingpong[0] = DisplayTexture;
                     pingpong[1] = parent.TextureCache.GetAvailableTexture();
-                    // this will be used for the export texture
+                    // this will be used for the statistics texture
                     pingpong[2] = null;
 
                     // create stepable
@@ -191,7 +191,7 @@ namespace OpenTKImageViewer.ImageContext
         public void Dispose()
         {
             DisplayTexture?.Dispose();
-            ExportTexture?.Dispose();
+            statisticsTexture?.Dispose();
             pingpong?[0]?.Dispose();
             pingpong?[1]?.Dispose();
             combineShader.Dispose();

@@ -19,12 +19,12 @@ namespace OpenTKImageViewer.ImageContext
         public class Settings
         {
             public List<ToneParameter> ToneParameters = new List<ToneParameter>();
-            public int ExportPosition = 0;
+            public int StatisticsPosition = 0;
 
         
             public Settings Clone()
             {
-                var res = new Settings {ExportPosition = ExportPosition};
+                var res = new Settings {StatisticsPosition = StatisticsPosition};
                 foreach (var toneParameter in ToneParameters)
                 {
                     res.ToneParameters.Add(toneParameter.Clone());
@@ -147,9 +147,9 @@ namespace OpenTKImageViewer.ImageContext
                 
                 curLevel = 0;
 
-                if(curParameter == settings.ExportPosition && curSepaIteration == 0)
+                if(curParameter == settings.StatisticsPosition && curSepaIteration == 0)
                 {
-                    // save pingpong[0] before drawing in it again! pingpong[0] should be used as export point
+                    // save pingpong[0] before drawing in it again! pingpong[0] should be used as statistics point
                     pingpong[2] = pingpong[0];
                     // use a new texture for drawing
                     pingpong[0] = context.TextureCache.GetAvailableTexture();
@@ -206,8 +206,7 @@ namespace OpenTKImageViewer.ImageContext
         /// <summary>
         /// applies the current set of shaders to the images. pingpong[0] will point to the final image
         /// </summary>
-        /// <param name="pingpong">source [0] and destination [1] image. [2] should be null and is later used for the export image</param>
-        /// <param name="ExportTexture">the image that will used for exporting. will remain unchanged if export point is after the last shader</param>
+        /// <param name="pingpong">source [0] and destination [1] image. [2] should be null and is later used for the statistics image</param>
         /// <param name="context">image context</param>
         /// <returns>Stepable container</returns>
         public IStepable GetApplyShaderStepable(TextureArray2D[] pingpong, ImageContext context)
