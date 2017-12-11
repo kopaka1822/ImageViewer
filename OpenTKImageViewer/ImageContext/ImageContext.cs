@@ -232,12 +232,12 @@ namespace OpenTKImageViewer.ImageContext
         /// <param name="imageId">which image equation (0 or 1)</param>
         /// <param name="level">mip map level</param>
         /// <returns></returns>
-        public float[] GetCurrentImageFloatData(int imageId, int level)
+        public float[] GetStatisticsImageFloatData(int imageId, int level)
         {
             if (finalTextures[imageId] == null)
                 return null;
 
-            return finalTextures[imageId].Texture.GetFloatData(level);
+            return finalTextures[imageId].GetStatisticsTexture().GetFloatData(level);
         }
 
         /// <summary>

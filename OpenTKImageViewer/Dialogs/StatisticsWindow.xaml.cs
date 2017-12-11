@@ -19,7 +19,7 @@ namespace OpenTKImageViewer.Dialogs
     /// </summary>
     public partial class StatisticsWindow : Window
     {
-        float[] textureData = null;
+        readonly float[] textureData = null;
 
         public StatisticsWindow(MainWindow parent)
         {
@@ -32,7 +32,7 @@ namespace OpenTKImageViewer.Dialogs
             
             parent.EnableOpenGl();
 
-            textureData = parent.Context.GetCurrentImageFloatData(parent.Context.GetFirstActiveTexture(), 0);
+            textureData = parent.Context.GetStatisticsImageFloatData(parent.Context.GetFirstActiveTexture(), (int)parent.Context.ActiveMipmap);
 
             parent.DisableOpenGl();
 
