@@ -102,6 +102,8 @@ namespace OpenTKImageViewer.ImageContext
 
             public ShaderStepper(ImageContext context, Settings settings, TextureArray2D[] pingpong)
             {
+                Debug.Assert(pingpong.Length >= 3);
+
                 this.context = context;
                 this.settings = settings;
                 this.pingpong = pingpong;
@@ -145,6 +147,14 @@ namespace OpenTKImageViewer.ImageContext
                 
                 curLevel = 0;
 
+                if(curParameter == settings.ExportPosition && curSepaIteration == 0)
+                {
+                    // save pingpong[0] before drawing in it again! pingpong[0] should be used as export point
+                    pingpong[2] = pingpong[0];
+                    // use a new texture for drawing
+                    pingpong[0] = context.TextureCache.GetAvailableTexture();
+                }
+
                 // swap ping pong images
                 var temp = pingpong[0];
                 pingpong[0] = pingpong[1];
@@ -156,6 +166,8 @@ namespace OpenTKImageViewer.ImageContext
                     return;
                 }
                 curSepaIteration = 0;
+
+                // finished with this iteration
 
                 ++curParameter;
             }
@@ -194,7 +206,8 @@ namespace OpenTKImageViewer.ImageContext
         /// <summary>
         /// applies the current set of shaders to the images. pingpong[0] will point to the final image
         /// </summary>
-        /// <param name="pingpong">source [0] and destination [1] image</param>
+        /// <param name="pingpong">source [0] and destination [1] image. [2] should be null and is later used for the export image</param>
+        /// <param name="ExportTexture">the image that will used for exporting. will remain unchanged if export point is after the last shader</param>
         /// <param name="context">image context</param>
         /// <returns>Stepable container</returns>
         public IStepable GetApplyShaderStepable(TextureArray2D[] pingpong, ImageContext context)

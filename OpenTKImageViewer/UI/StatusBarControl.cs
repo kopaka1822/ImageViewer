@@ -166,7 +166,7 @@ namespace OpenTKImageViewer.UI
             if(activeId == -1)
                 return new Vector4(0.0f);
 
-            if(!window.Context.BindPixelDisplayTexture(activeId, 
+            if(!window.Context.BindExportTexture(activeId, 
                 pixelShader.GetTextureLocation(), 
                 (int)window.Context.ActiveLayer,
                 (int)window.Context.ActiveMipmap))

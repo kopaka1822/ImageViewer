@@ -28,10 +28,11 @@ namespace OpenTKImageViewer.ImageContext
             }
         }
         public IStepable TonemappingStepable { get; private set; }= null;
-        // texture after combinding before tonemapping
-        private TextureArray2D combinedTexture;
+
+        // texture until the export point. this will can be null if export texture would be equal to the display texture
+        private TextureArray2D ExportTexture = null;
         // texture after tonemapping
-        public TextureArray2D Texture { get; private set; }
+        public TextureArray2D DisplayTexture { get; private set; }
         public ImageFormula CombineFormula { get; }
         public ImageFormula AlphaFormula { get; }
         public bool Active { get; set; } = true;
@@ -54,47 +55,35 @@ namespace OpenTKImageViewer.ImageContext
         }
 
         /// <summary>
-        /// binds the texture that should be used for pixel displaying
-        /// (depending on DisplayColorBeforeTonemapping)
+        /// returns the texture that shpuld be used for pixel displaying and exporting
+        /// </summary>
+        /// <returns></returns>
+        public TextureArray2D GetExportTexture()
+        {
+            // if the export texture is null, the display texture should be used. otherwise use the export texture
+            var tex = DisplayTexture;
+            if (ExportTexture != null)
+                tex = ExportTexture;
+            return tex;
+        }
+
+        /// <summary>
+        /// binds the texture that should be used for pixel displaying and exporting
         /// </summary>
         /// <param name="slot"></param>
         /// <param name="layer"></param>
         /// <param name="level">mipmap level</param>
         /// <returns></returns>
-        public bool BindPixelDisplayTextue(int slot, int layer, int level)
+        public bool BindExportTexture(int slot, int layer, int level)
         {
-            if (Texture == null || !Active)
+            if (DisplayTexture == null || !Active)
                 return false;
 
-            if (parent.DisplayColorBeforeTonemapping)
-            {
-                if (UseTonemapper && parent.Tonemapper.HasTonemapper())
-                {
-                    // since tonemappers were used the final texture differs from the combined
-                    if (combinedTexture == null)
-                    {
-                        // recalculate the combined texture
-                        combinedTexture = parent.TextureCache.GetAvailableTexture();
-                        RecomputeCombinedImage(combinedTexture);
-                    }
-
-                    combinedTexture.BindAsTexture2D(slot, layer, level);
-                    parent.BindSampler(slot, combinedTexture.HasMipmaps(), false);
-                    return true;
-                }
-                // just use the final texture since no tonemappers were used
-            }
-
-            if (combinedTexture != null)
-            {
-                // we can get rid of this texture since we use the final one for displaying now
-                parent.TextureCache.StoreUnusuedTexture(combinedTexture);
-                combinedTexture = null;
-            }
+            var tex = GetExportTexture();
 
             // bind the final product
-            Texture.BindAsTexture2D(slot, layer, level);
-            parent.BindSampler(slot, Texture.HasMipmaps(), false);
+            tex.BindAsTexture2D(slot, layer, level);
+            parent.BindSampler(slot, DisplayTexture.HasMipmaps(), false);
             return true;
         }
 
@@ -121,8 +110,10 @@ namespace OpenTKImageViewer.ImageContext
                     TonemappingStepable = null;
 
                     // retrieve final picture
-                    Texture = pingpong[0];
+                    DisplayTexture = pingpong[0];
                     parent.TextureCache.StoreUnusuedTexture(pingpong[1]);
+                    // retrieve the export texture if available
+                    ExportTexture = pingpong[2];
                     pingpong = null;
                     
                     return true;
@@ -133,28 +124,31 @@ namespace OpenTKImageViewer.ImageContext
             if (RecomputeImage)
             {
                 RecomputeImage = false;
-                // put the last used combined texture back in the cache (will probably be changed)
-                if (combinedTexture != null)
+
+                // dispose old export texture since it will probably be changed
+                if(ExportTexture != null)
                 {
-                    parent.TextureCache.StoreUnusuedTexture(combinedTexture);
-                    combinedTexture = null;
+                    parent.TextureCache.StoreUnusuedTexture(ExportTexture);
+                    ExportTexture = null;
                 }
 
                 // aqcuire texture if necessary
-                if (Texture == null)
-                    Texture = parent.TextureCache.GetAvailableTexture();
+                if (DisplayTexture == null)
+                    DisplayTexture = parent.TextureCache.GetAvailableTexture();
 
-                RecomputeCombinedImage(Texture);
+                RecomputeCombinedImage(DisplayTexture);
 
                 if (UseTonemapper)
                 {
                     // set up ping pong array
-                    pingpong = new TextureArray2D[2];
-                    pingpong[0] = Texture;
+                    pingpong = new TextureArray2D[3];
+                    pingpong[0] = DisplayTexture;
                     pingpong[1] = parent.TextureCache.GetAvailableTexture();
+                    // this will be used for the export texture
+                    pingpong[2] = null;
 
                     // create stepable
-                    TonemappingStepable = parent.Tonemapper.GetApplyShaderStepable(pingpong, parent);
+                    TonemappingStepable = parent.Tonemapper.GetApplyShaderStepable(pingpong,parent);
 
                     return false;
                 }
@@ -188,7 +182,7 @@ namespace OpenTKImageViewer.ImageContext
             TonemappingStepable = null;
             if (pingpong != null)
             {
-                Texture = pingpong[0];
+                DisplayTexture = pingpong[0];
                 parent.TextureCache.StoreUnusuedTexture(pingpong[1]);
                 pingpong = null;
             }
@@ -196,8 +190,8 @@ namespace OpenTKImageViewer.ImageContext
 
         public void Dispose()
         {
-            Texture?.Dispose();
-            combinedTexture?.Dispose();
+            DisplayTexture?.Dispose();
+            ExportTexture?.Dispose();
             pingpong?[0]?.Dispose();
             pingpong?[1]?.Dispose();
             combineShader.Dispose();

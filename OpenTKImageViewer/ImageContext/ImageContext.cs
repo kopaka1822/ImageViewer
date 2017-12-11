@@ -205,7 +205,7 @@ namespace OpenTKImageViewer.ImageContext
         }
 
         /// <summary>
-        /// returns a byte array with the requested texture data
+        /// returns a byte array with the requested texture data. (this will use the export image)
         /// </summary>
         /// <param name="imageId">which image equation (0 or 1)</param>
         /// <param name="level">mipmap level</param>
@@ -223,7 +223,7 @@ namespace OpenTKImageViewer.ImageContext
             if (finalTextures[imageId] == null)
                 return null;
 
-            return finalTextures[imageId].Texture.GetData(level, layer, format, type, out width, out height);
+            return finalTextures[imageId].GetExportTexture().GetData(level, layer, format, type, out width, out height);
         }
 
         /// <summary>
@@ -234,9 +234,9 @@ namespace OpenTKImageViewer.ImageContext
         /// <param name="layer"></param>
         /// <param name="level"></param>
         /// <returns></returns>
-        public bool BindPixelDisplayTexture(int imageId, int slot, int layer, int level)
+        public bool BindExportTexture(int imageId, int slot, int layer, int level)
         {
-            return finalTextures[imageId].BindPixelDisplayTextue(slot, layer, level);
+            return finalTextures[imageId].BindExportTexture(slot, layer, level);
         }
 
         #endregion
@@ -315,10 +315,10 @@ namespace OpenTKImageViewer.ImageContext
         public void BindFinalTextureAs2DSamplerArray(int imageId, int slot)
         {
             Debug.Assert(finalTextures[imageId].Active);
-            if (finalTextures[imageId].Texture == null)
+            if (finalTextures[imageId].DisplayTexture == null)
                 return;
-            finalTextures[imageId].Texture.Bind(slot);
-            BindSampler(slot, finalTextures[imageId].Texture.HasMipmaps());
+            finalTextures[imageId].DisplayTexture.Bind(slot);
+            BindSampler(slot, finalTextures[imageId].DisplayTexture.HasMipmaps());
         }
 
         /// <summary>
@@ -329,10 +329,10 @@ namespace OpenTKImageViewer.ImageContext
         public void BindFinalTextureAsCubeMap(int imageId,  int slot)
         {
             Debug.Assert(finalTextures[imageId].Active);
-            if (finalTextures[imageId].Texture == null)
+            if (finalTextures[imageId].DisplayTexture == null)
                 return;
-            finalTextures[imageId].Texture.BindAsCubemap(slot);
-            BindSampler(slot, finalTextures[imageId].Texture.HasMipmaps());
+            finalTextures[imageId].DisplayTexture.BindAsCubemap(slot);
+            BindSampler(slot, finalTextures[imageId].DisplayTexture.HasMipmaps());
         }
 
         public void BindSampler(int unit, bool hasMipmaps)

@@ -96,8 +96,6 @@ namespace OpenTKImageViewer.Dialogs
         /// <param name="e"></param>
         private void ButtonAdd_OnClick(object sender, RoutedEventArgs e)
         {
-            App.ShowInfoDialog(this, toneSettings.ExportPosition.ToString());
-
             var ofd = new OpenFileDialog();
             ofd.Multiselect = false;
             ofd.InitialDirectory = parent.ParentApp.GetShaderPath(ofd);
