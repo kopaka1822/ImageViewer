@@ -220,7 +220,10 @@ namespace OpenTKImageViewer.ImageContext
             if (finalTextures[imageId] == null)
                 return null;
 
-            return finalTextures[imageId].GetStatisticsTexture().GetData(level, layer, format, type, out width, out height);
+            if (finalTextures[imageId].DisplayTexture == null)
+                return null;
+
+            return finalTextures[imageId].DisplayTexture.GetData(level, layer, format, type, out width, out height);
         }
 
         /// <summary>
