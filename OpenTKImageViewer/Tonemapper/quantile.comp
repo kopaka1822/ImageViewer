@@ -1,0 +1,72 @@
+#setting title, Quantile Filter
+#setting description, Computes a sorted list of pixels, removes the 'q' smallest and largest values and computes the average of the remaining. Additionally, only values which are brighter as this average by an inverse factor of threshold are replaced.
+
+#param Radius, 2, Int, 1, 1, 6
+#param Quantile, 3, Int, 2, 1, 84
+#param Threshold, 4, float, 0.2, 0.0, 1.0
+#paramprop Threshold, onAdd, 0.05, add
+#paramprop Threshold, onSubtract, -0.05, add
+
+layout(location = 2) uniform int RADIUS;
+layout(location = 3) uniform int QUANTIL;
+layout(location = 4) uniform float THRESHOLD;
+
+
+vec4 buf[169];
+
+void bubbleSort(int numLength)
+{
+	int i = 0;
+	int j = 0;
+	int flag = 1;
+	for(i = 1; (i <= numLength) && (flag != 0); i++)
+	{
+		flag = 0;
+		for (j=0; j < (numLength - i); j++)
+		{
+			if (buf[j+1].w > buf[j].w)
+			{
+				vec4 temp = buf[j];
+				buf[j] = buf[j+1];
+				buf[j+1] = temp;
+				flag = 1;
+			}
+		}
+	}
+}
+			
+void main()
+{
+	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
+	ivec2 imgSize = textureSize(src_image, 0);
+	if(pixelCoord.x < imgSize.x && pixelCoord.y < imgSize.y)
+	{
+		// fill buffer
+		int count = 0;
+		for(int y = max(0, pixelCoord.y - RADIUS); y <= min(pixelCoord.y + RADIUS, imgSize.y-1); ++y)
+		for(int x = max(0, pixelCoord.x - RADIUS); x <= min(pixelCoord.x + RADIUS, imgSize.x-1); ++x)
+		{
+			buf[count].rgb = texelFetch(src_image, ivec2(x,y), 0).rgb;
+			buf[count].w = dot(buf[count].rgb, vec3(1.0/3.0));
+			++count;
+		}
+		
+		// sort the buffer
+		bubbleSort(count);
+		
+		// Compute average
+		vec3 sum = vec3(0.0);
+		for(int i = QUANTIL; i < count-QUANTIL; ++i)
+			sum += buf[i].rgb;
+		sum /= max(1, count - QUANTIL * 2);
+		
+		vec4 centerColor = texelFetch(src_image, pixelCoord, 0);
+		float centerAvg = dot(centerColor.rgb, vec3(1.0/3.0));
+		float sumAvg = dot(sum, vec3(1.0/3.0));
+		//float factor = min(centerAvg / sumAvg, sumAvg / centerAvg);
+		float factor = sumAvg / centerAvg;
+		if(factor < THRESHOLD)
+			centerColor.rgb = sum;
+		imageStore(dst_image, pixelCoord, centerColor);
+	}
+}
