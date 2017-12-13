@@ -395,7 +395,7 @@ namespace OpenTKImageViewer.ImageContext
                 samplerLinear = new Sampler(TextureMinFilter.Linear, TextureMagFilter.Linear);
                 samplerLinearMip = new Sampler(TextureMinFilter.LinearMipmapLinear, TextureMagFilter.Linear);
                 samplerNearest = new Sampler(TextureMinFilter.Nearest, TextureMagFilter.Nearest);
-                samplerNearestMip = new Sampler(TextureMinFilter.Nearest, TextureMagFilter.Nearest);
+                samplerNearestMip = new Sampler(TextureMinFilter.NearestMipmapNearest, TextureMagFilter.Nearest);
             }
 
             foreach (var imageConfiguration in finalTextures)
