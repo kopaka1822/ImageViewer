@@ -222,6 +222,8 @@ namespace OpenTKImageViewer
                 imageStatisitcsItem.Click += (o, args) =>
                 {
                     var dia = new StatisticsWindow(this);
+                    dia.Left = this.Left + 0.5 * (this.Width - dia.Width);
+                    dia.Top = this.Top + 0.5 * (this.Height - dia.Height);
                     dia.ShowDialog();
                 };
             }
