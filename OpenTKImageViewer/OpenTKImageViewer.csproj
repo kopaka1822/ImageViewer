@@ -359,5 +359,8 @@
   <ItemGroup>
     <Resource Include="Icons\list_move.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\statistics.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
