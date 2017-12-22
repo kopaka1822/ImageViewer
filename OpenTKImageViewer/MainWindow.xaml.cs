@@ -532,26 +532,10 @@ namespace OpenTKImageViewer
         
         private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.Key)
-            {
-                case Key.Right:
-                    Context.ActiveLayer += 1;
-                    break;
-                case Key.Left:
-                    Context.ActiveLayer -= 1;
-                    break;
-                case Key.Up:
-                    Context.ActiveMipmap -= 1;
-                    break;
-                case Key.Down:
-                    Context.ActiveMipmap += 1;
-                    break;
-            }
-
-            if(Context.Tonemapper.HasKeyToInvoke(e.Key))
+            if (Context.Tonemapper.HasKeyToInvoke(e.Key))
             {
                 // if tonemapper dialog is open, apply tonemapper dialog and then apply settings
-                if(TonemapDialog != null)
+                if (TonemapDialog != null)
                 {
                     TonemapDialog.GetCurrentSettings().InvokeKey(e.Key);
                     Context.Tonemapper.Apply(TonemapDialog.GetCurrentSettings());
@@ -562,10 +546,31 @@ namespace OpenTKImageViewer
                     Context.Tonemapper.InvokeKey(e.Key);
                 }
             }
+            else // no keybinding key to invoke
+            {
+                // standart keybindings
+                switch (e.Key)
+                {
+                    case Key.Right:
+                        Context.ActiveLayer += 1;
+                        break;
+                    case Key.Left:
+                        Context.ActiveLayer -= 1;
+                        break;
+                    case Key.Up:
+                        Context.ActiveMipmap -= 1;
+                        break;
+                    case Key.Down:
+                        Context.ActiveMipmap += 1;
+                        break;
+                    default:
+                        // nothing was changed
+                        return;
+                }
+            }
 
-
-            RedrawFrame();
             e.Handled = true;
+            RedrawFrame();
         }
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
