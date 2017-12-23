@@ -292,6 +292,24 @@ namespace OpenTKImageViewer.ImageContext
         }
 
         /// <summary>
+        /// deletes an image including opengl data (context must be active)
+        /// </summary>
+        /// <param name="imageId"></param>
+        public void DeleteImage(int imageId)
+        {
+            if (IsImageProcessing())
+                throw new Exception("Images cannot be deleted while an operation is running");
+
+            if (imageId < 0 || imageId >= images.Count)
+                return;
+
+            // delete old data
+            images[imageId].TextureArray2D?.Dispose();
+            images.RemoveAt(imageId);
+            OnChangedImages();
+        }
+
+        /// <summary>
         /// disposes all opengl resources
         /// </summary>
         public void Dispose()

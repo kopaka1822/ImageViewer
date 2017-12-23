@@ -106,9 +106,15 @@ namespace OpenTKImageViewer
 
             // redraw if context changes
             context.ChangedMipmap += (sender, args) => RedrawFrame();
-            //context.ImageFormula1.Changed += (sender, args) => RedrawFrame();
-            // TODO redraw frame when forula changed
-            context.ChangedImages += (sender, args) => RedrawFrame();
+            
+            context.ChangedImages += (sender, args) =>
+            {
+                RedrawFrame();
+                if (context.GetNumImages() == 0)
+                {
+                    CreateImageViews();
+                }
+            };
             context.ChangedLayer += (sender, args) => RedrawFrame();
             context.ChangedFiltering += (sender, args) => RedrawFrame();
             context.ChangedGrayscale += (sender, args) => RedrawFrame();
@@ -132,6 +138,7 @@ namespace OpenTKImageViewer
 
         private void CreateImageViews()
         {
+            imageViews.Clear();
             if (Context.GetNumImages() > 0)
             {
                 imageViews.Add(ImageViewType.Single, new SingleView(Context, BoxScroll));
@@ -1040,30 +1047,6 @@ namespace OpenTKImageViewer
                 res.Add(imageView.Key);
             }
             return res;
-        }
-
-        private string RemoveFilePath(string file)
-        {
-            var idx = file.LastIndexOf("\\", StringComparison.Ordinal);
-            if (idx > 0)
-            {
-                return file.Substring(idx + 1);
-            }
-            return file;
-        }
-
-        public ListBoxItem[] GenerateImageItems()
-        {
-            var items = new ListBoxItem[Context.GetNumImages()];
-            for (int curImage = 0; curImage < Context.GetNumImages(); ++curImage)
-            {
-                items[curImage] = new ListBoxItem
-                {
-                    Content = $"Image {curImage} - {RemoveFilePath(Context.GetFilename(curImage))}",
-                    ToolTip = Context.GetFilename(curImage)
-                };
-            }
-            return items;
         }
 
         #endregion

@@ -25,6 +25,15 @@ namespace OpenTKImageViewer.ImageContext
             this.alphaFormula = alphaFormula;
             colorFormula.Changed += (sender, args) => contentChanged = true;
             alphaFormula.Changed += (sender, args) => contentChanged = true;
+
+            var lastImageCount = context.GetNumImages();
+            context.ChangedImages += (sender, args) =>
+            {
+                // recalculate formula if number of images was decreased (is formula still correct?)
+                if(lastImageCount > context.GetNumImages())
+                    contentChanged = true;
+                lastImageCount = context.GetNumImages();
+            };
         }
 
         /// <summary>
