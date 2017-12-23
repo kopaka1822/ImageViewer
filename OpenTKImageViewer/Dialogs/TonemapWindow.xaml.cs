@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Microsoft.Win32;
+using OpenTKImageViewer.ImageContext;
 using OpenTKImageViewer.Tonemapping;
 using Xceed.Wpf.Toolkit;
 
@@ -26,7 +27,9 @@ namespace OpenTKImageViewer.Dialogs
     public partial class TonemapWindow : Window
     {
         private readonly MainWindow parent;
-        private readonly List<ToneParameter> toneSettings;
+        private readonly TonemapperManager.Settings toneSettings;
+        private ListBoxItem draggedItem = null;
+        private ToneParameter previousDisplayedItem = null;
 
         public TonemapWindow(MainWindow parent)
         {
@@ -37,15 +40,51 @@ namespace OpenTKImageViewer.Dialogs
             toneSettings = parent.Context.Tonemapper.GetSettings();
 
             UpdateList();
+
+            ListBoxMapper.PreviewMouseLeftButtonUp += OnListMouseUp;
         }
 
-        public List<ToneParameter> GetCurrentSettings()
+        private void OnListMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            // release item that was dragged
+            draggedItem = null;
+        }
+
+        private void ItemOnMouseDown(object sender, MouseButtonEventArgs args)
+        {
+            // determine if an elemt is being dragged
+            draggedItem = sender as ListBoxItem;
+        }
+
+        private void ItemOnMouseEnter(object sender, MouseEventArgs args)
+        {
+            if (draggedItem == null)
+                return;
+            var target = sender as ListBoxItem;
+            if(ReferenceEquals(draggedItem, target) || target == null)
+                return;
+            
+            // swap both elements
+            var idx1 = ListBoxMapper.Items.IndexOf(target);
+            var idx2 = ListBoxMapper.Items.IndexOf(draggedItem);
+            if (idx2 == -1 || idx2 == -1)
+                return; // not in list?
+
+            SwapItems(idx1, idx2);
+            draggedItem.IsSelected = true;
+        }
+
+        public TonemapperManager.Settings GetCurrentSettings()
         {
             return toneSettings;
         }
 
         private void TonemapWindow_OnClosing(object sender, CancelEventArgs e)
         {
+            // set last relative coordinates
+            parent.ParentApp.GetConfig().LastTonemapDialogX = (int)(Left - parent.Left);
+            parent.ParentApp.GetConfig().LastTonemapDialogY = (int)(Top - parent.Top);
+
             parent.TonemapDialog = null;
             parent.Context.Tonemapper.RemoveUnusedShader();
         }
@@ -81,8 +120,8 @@ namespace OpenTKImageViewer.Dialogs
             {
                 var param = parent.Context.Tonemapper.LoadShader(filename);
 
-                toneSettings.Add(param);
-                ListBoxMapper.Items.Add(GenerateItem(param));
+                toneSettings.ToneParameters.Add(param);
+                ListBoxMapper.Items.Add(new ToneParameterItem(param, this));
                 ListBoxMapper.SelectedIndex = ListBoxMapper.Items.Count - 1;
             }
             catch (Exception exception)
@@ -100,12 +139,31 @@ namespace OpenTKImageViewer.Dialogs
         private void UpdateList()
         {
             ListBoxMapper.Items.Clear();
-            foreach (var toneParameter in toneSettings)
+            foreach (var toneParameter in toneSettings.ToneParameters)
             {
-                ListBoxMapper.Items.Add(GenerateItem(toneParameter));
+                var item = new ToneParameterItem(toneParameter, this);
+                ListBoxMapper.Items.Add(item);
             }
             if (ListBoxMapper.Items.Count > 0)
                 ListBoxMapper.SelectedIndex = 0;
+
+            ListBoxMapper.Items.Insert(toneSettings.StatisticsPosition, GenerateStatisticsPositionItem());
+        }
+
+        private void DisplayStatisticsPointInfo()
+        {
+            // clear previous stack pannel
+            var list = StackPanelMapper.Children;
+            list.Clear();
+
+            var margin = new Thickness(0.0, 0.0, 0.0, 2.0);
+            list.Add(new TextBlock { Text = "Image Statistics" , Margin = margin, FontSize = 18.0 });
+            list.Add(new TextBlock
+            {
+                Text = "Pixel statistics are taken from this point in the pipeline (includes the pixel color on the status bar). Further operators are applied for display and export.",
+                Margin = margin,
+                TextWrapping = TextWrapping.Wrap
+            });
         }
 
         /// <summary>
@@ -114,6 +172,10 @@ namespace OpenTKImageViewer.Dialogs
         /// <param name="parameters">Shader with parameters</param>
         private void DisplayItem(ToneParameter parameters)
         {
+            if (ReferenceEquals(parameters, previousDisplayedItem))
+                return;
+            previousDisplayedItem = parameters;
+
             // clear previous stack pannel
             var list = StackPanelMapper.Children;
             list.Clear();
@@ -155,8 +217,24 @@ namespace OpenTKImageViewer.Dialogs
                         {
                             Value = (int) para.CurrentValue,
                             Margin = margin,
-                            CultureInfo = new CultureInfo("en-US")
+                            CultureInfo = App.GetCulture(),
+                            Increment = 0
                         };
+
+                        // custom handler for up down button
+                        numBox.Spinned += (sender, args) =>
+                        {
+                            if (args.Direction == SpinDirection.Increase)
+                            {
+                                para.InvokeAction(ShaderLoader.ActionType.OnAdd);
+                            }
+                            else if (args.Direction == SpinDirection.Decrease)
+                            {
+                                para.InvokeAction(ShaderLoader.ActionType.OnSubtract);
+                            }
+                        };
+
+                        // default value change handler
                         numBox.ValueChanged += (sender, args) =>
                         {
                             if (numBox.Value != null) para.CurrentValue = (decimal)numBox.Value;
@@ -171,9 +249,24 @@ namespace OpenTKImageViewer.Dialogs
                         {
                             Value = para.CurrentValue,
                             Margin = margin,
-                            CultureInfo = new CultureInfo("en-US")
+                            CultureInfo = App.GetCulture(),
+                            Increment = 0
                         };
 
+                        // custom handler for up down button
+                        numBox.Spinned += (sender, args) =>
+                        {
+                            if (args.Direction == SpinDirection.Increase)
+                            {
+                                para.InvokeAction(ShaderLoader.ActionType.OnAdd);
+                            }
+                            else if(args.Direction == SpinDirection.Decrease)
+                            {
+                                para.InvokeAction(ShaderLoader.ActionType.OnSubtract);
+                            }
+                        };
+
+                        // default value change handler
                         numBox.ValueChanged += (sender, args) =>
                         {
                             if (numBox.Value != null) para.CurrentValue =(decimal)numBox.Value;
@@ -213,78 +306,76 @@ namespace OpenTKImageViewer.Dialogs
             return (bool)b ? 1 : 0;
         }
 
-        /// <summary>
-        /// generates list item for the left side of the window
-        /// </summary>
-        /// <param name="parameter">Shader with parameters</param>
-        /// <returns></returns>
-        private ListBoxItem GenerateItem(ToneParameter parameter)
+        class ToneParameterItem : ListBoxItem
         {
-            // load images
-            var imgUp = new Image
-            {
-                Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/arrow_up.png", UriKind.Absolute))
-            };
-            var imgDown = new Image
-            {
-                Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/arrow_down.png", UriKind.Absolute))
-            };
-            var imgDelete = new Image
-            {
-                Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/cancel.png", UriKind.Absolute))
-            };
+            public ToneParameter Parameter { get; private set; }
 
-            // create buttons
-            var btnUp = new Button
+            public ToneParameterItem(ToneParameter parameter, TonemapWindow parent)
             {
-                Height = 8,
-                Width = 16,
-                Content = imgUp
-            };
-            var btnDown = new Button
-            {
-                Height = 8,
-                Width = 16,
-                Content = imgDown
-            };
-            var btnDelete = new Button
-            {
-                Height = 16,
-                Width = 16,
-                Content = imgDelete
-            };
+                Parameter = parameter;
+                // load images
+                var imgDelete = new Image
+                {
+                    Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/cancel.png", UriKind.Absolute))
+                };
 
-            // stack panel for up and down button
-            var upDownPanel = new StackPanel
-            {
-                HorizontalAlignment = HorizontalAlignment.Right
-            };
-            upDownPanel.Children.Add(btnUp);
-            upDownPanel.Children.Add(btnDown);
+                var imgArrow = new Image
+                {
+                    Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/list_move.png", UriKind.Absolute))
+                };
+                imgArrow.Margin = new Thickness(0.0, 0.0, 5.0, 0.0);
 
-            var text = new TextBlock {Text = parameter.Shader.Name };
-            
+                var btnDelete = new Button
+                {
+                    Height = 16,
+                    Width = 16,
+                    Content = imgDelete
+                };
+
+                var text = new TextBlock { Text = parameter.Shader.Name };
+
+                // grid with name, remove, up/down
+                var grid = new Grid { Width = 210.0 };
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Auto) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Star) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Auto) });
+
+                Grid.SetColumn(imgArrow, 0);
+                grid.Children.Add(imgArrow);
+                Grid.SetColumn(text, 1);
+                grid.Children.Add(text);
+                Grid.SetColumn(btnDelete, 2);
+                grid.Children.Add(btnDelete);
+
+                // add callbacks
+                Content = grid;
+                ToolTip = parameter.Shader.Description;
+
+                btnDelete.Click += (sender, args) => parent.ItemDelete(this);
+            }
+        }
+
+        private ListBoxItem GenerateStatisticsPositionItem()
+        {
+            var imgArrow = new Image
+            {
+                Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/list_move.png", UriKind.Absolute))
+            };
+            imgArrow.Margin = new Thickness(0.0, 0.0, 5.0, 0.0);
+
+            var text = new TextBlock { Text = "Image Statistics" };
+
             // grid with name, remove, up/down
-            var grid = new Grid {Width = 210.0};
-            grid.ColumnDefinitions.Add(new ColumnDefinition{Width = new GridLength(1.0, GridUnitType.Star)});
-            grid.ColumnDefinitions.Add(new ColumnDefinition{Width = new GridLength(1.0, GridUnitType.Auto)});
-            grid.ColumnDefinitions.Add(new ColumnDefinition{Width = new GridLength(1.0, GridUnitType.Auto)});
+            var grid = new Grid { Width = 210.0 };
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Auto) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Star) });
 
-            Grid.SetColumn(text, 0);
+            Grid.SetColumn(imgArrow, 0);
+            grid.Children.Add(imgArrow);
+            Grid.SetColumn(text, 1);
             grid.Children.Add(text);
-            Grid.SetColumn(btnDelete, 1);
-            grid.Children.Add(btnDelete);
-            Grid.SetColumn(upDownPanel, 2);
-            grid.Children.Add(upDownPanel);
 
-            // add callbacks
-            var item = new ListBoxItem { Content = grid, ToolTip = parameter.Shader.Description };
-
-            btnUp.Click += (sender, args) => ItemMoveUp(item);
-            btnDown.Click += (sender, args) => ItemMoveDown(item);
-            btnDelete.Click += (sender, args) => ItemDelete(item);
-
-            return item;
+            return new ListBoxItem { Content = grid, ToolTip = "Pixel statistics are taken from this point in the pipeline (includes the pixel color on the status bar). Further operators are applied for display and export." };
         }
 
         /// <summary>
@@ -309,7 +400,12 @@ namespace OpenTKImageViewer.Dialogs
         /// <param name="idx2">index of second item</param>
         private void SwapItems(int idx1, int idx2)
         {
-            Debug.Assert(idx1 < idx2);
+            if (idx1 > idx2)
+            {
+                var tmp = idx1;
+                idx1 = idx2;
+                idx2 = tmp;
+            }
 
             // remember values
             var box1  = ListBoxMapper.Items[idx1];
@@ -323,35 +419,26 @@ namespace OpenTKImageViewer.Dialogs
             ListBoxMapper.Items.Insert(idx1, box2);
             ListBoxMapper.Items.Insert(idx2, box1);
 
-            var tmp2 = toneSettings[idx1];
-            toneSettings[idx1] = toneSettings[idx2];
-            toneSettings[idx2] = tmp2;
+            // adjust settings
+            UpdateSettingsFromItemList();
         }
 
-        /// <summary>
-        /// moves an item in the left list up (if possible)
-        /// </summary>
-        /// <param name="item">item object</param>
-        private void ItemMoveUp(ListBoxItem item)
+        private void UpdateSettingsFromItemList()
         {
-            var idx = GetItemIndex(item);
-            if (idx < 1) return;
-            
-            SwapItems(idx - 1, idx);
-            ListBoxMapper.SelectedIndex = idx - 1;
-        }
-
-        /// <summary>
-        /// moves an item in the left list down (if possible)
-        /// </summary>
-        /// <param name="item">item object</param>
-        private void ItemMoveDown(ListBoxItem item)
-        {
-            var idx = GetItemIndex(item);
-            if (idx < 0 || idx == ListBoxMapper.Items.Count - 1) return;
-            
-            SwapItems(idx, idx + 1);
-            ListBoxMapper.SelectedIndex = idx + 1;
+            toneSettings.ToneParameters.Clear();
+            toneSettings.StatisticsPosition = 0;
+            for (var i = 0; i < ListBoxMapper.Items.Count; ++i)
+            {
+                var tone = ListBoxMapper.Items[i] as ToneParameterItem;
+                if (tone != null)
+                {
+                    toneSettings.ToneParameters.Add(tone.Parameter);
+                }
+                else
+                {
+                    toneSettings.StatisticsPosition = i;
+                }
+            }
         }
 
         /// <summary>
@@ -363,7 +450,7 @@ namespace OpenTKImageViewer.Dialogs
             var idx = GetItemIndex(item);
             if (idx < 0) return;
             ListBoxMapper.Items.RemoveAt(idx);
-            toneSettings.RemoveAt(idx);
+            UpdateSettingsFromItemList();
         }
 
         /// <summary>
@@ -372,6 +459,14 @@ namespace OpenTKImageViewer.Dialogs
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void ButtonApply_OnClick(object sender, RoutedEventArgs e)
+        {
+            ApplyTonemapper();
+        }
+
+        /// <summary>
+        /// applies the new tonemapper configuration
+        /// </summary>
+        public void ApplyTonemapper()
         {
             // aplly current set of settings
             parent.EnableOpenGl();
@@ -395,7 +490,17 @@ namespace OpenTKImageViewer.Dialogs
         {
             if (ListBoxMapper.SelectedIndex >= 0)
             {
-                DisplayItem(toneSettings[ListBoxMapper.SelectedIndex]);
+                var tone = ListBoxMapper.Items[ListBoxMapper.SelectedIndex] as ToneParameterItem;
+                if (tone != null)
+                {
+                    DisplayItem(tone.Parameter);
+                }
+                else
+                {
+                    previousDisplayedItem = null;
+                    DisplayStatisticsPointInfo();
+                }
+
             } else StackPanelMapper.Children.Clear();
         }
     }

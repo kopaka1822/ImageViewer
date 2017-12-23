@@ -31,6 +31,7 @@ Select preferred mipmap level and layer (face) of DDS and KTX textures:
 
 View cubemaps in crossview:
 
+
 ![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/cross_view.png)
 
 View and navigate through cubemaps in a projection view:
@@ -91,3 +92,32 @@ You can even import more than one image and combine them into one with a user de
 ![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/image_formula.png)
 
 I0 and I1 are the pixels from the first and the second image. RGB values are in range [0,1] and you can combine them with following operators: * + - / ^. Numerical constants can be used as well.
+The following function from GLSL can be used as well:
+* abs(value)
+* sin(value)
+* cos(value)
+* tan(value)
+* asin(value)
+* acos(value)
+* atan(value)
+* exp(value)
+* log(value)
+* exp2(value)
+* log2(value)
+* sqrt(value)
+* sign(value)
+* floor(value)
+* ceil(value)
+* fract(value)
+* normalize(value)
+* length(value)
+
+Additionaly you can use:
+* red(value)
+* green(value)
+* blue(value)
+* alpha(value)
+
+to extract a single color channel as value.
+
+`rgb(value, value, value)` may be used to construct an rgb value width alpha component 1.0

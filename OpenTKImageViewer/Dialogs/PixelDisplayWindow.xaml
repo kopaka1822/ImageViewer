@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="Pixel Display" Height="220" Width="260"
+        Title="Pixel Display" Height="180" Width="260"
         ResizeMode="NoResize" Background="#eee"
         Icon="../Icons/displayconfig.png">
     <Border Padding="5">
@@ -23,21 +23,6 @@
                           SelectedIndex="0">
                     <ComboBoxItem Content="8 bit"/>
                     <ComboBoxItem Content="decimal"/>
-                </ComboBox>
-            </Grid>
-
-            <!-- Display Color -->
-            <Grid Margin="0 0 0 5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="90"/>
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Display Color:"/>
-                <ComboBox Grid.Column="1" 
-                          x:Name="BoxDisplayColor"
-                          SelectedIndex="0">
-                    <ComboBoxItem Content="before Tonemapping"/>
-                    <ComboBoxItem Content="after Tonemapping"/>
                 </ComboBox>
             </Grid>
 

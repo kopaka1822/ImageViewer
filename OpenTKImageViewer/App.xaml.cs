@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Remoting.Contexts;
 using System.Threading.Tasks;
@@ -32,11 +33,13 @@ namespace OpenTKImageViewer
         private MainWindow activeWindow = null; // the last window that was active
         private ulong lastZIndex = 1;
         private Settings appSettings = null;
+        public string ExecutionPath { get; private set; }
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            appSettings = new Settings(Environment.CurrentDirectory + "/config.json");
+            ExecutionPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            appSettings = new Settings(ExecutionPath + "/config.json");
 
             if (e.Args.Length == 0)
             {
@@ -126,6 +129,8 @@ namespace OpenTKImageViewer
             openWindows.Add(wnd);
 
             wnd.Show();
+            // open tonemap dialog etc.
+            wnd.HandleImageAdd(true);
         }
 
         public void UnregisterWindow(MainWindow window)
@@ -241,6 +246,12 @@ namespace OpenTKImageViewer
         public Settings.Config GetConfig()
         {
             return appSettings.GetConfig();
+        }
+
+        private static readonly CultureInfo CultureInfo = new CultureInfo("en-US");
+        public static CultureInfo GetCulture()
+        {
+            return CultureInfo;
         }
     }
 }

@@ -115,7 +115,7 @@ namespace OpenTKImageViewer.Equation
             }
 
             double value;
-            if(!Double.TryParse(identifier, NumberStyles.Float, new CultureInfo("en-US"), out value))
+            if(!Double.TryParse(identifier, NumberStyles.Float, App.GetCulture(), out value))
                 throw new Exception($"Invalid Number: {identifier}");
             return new NumberToken((float)value);
         }

@@ -55,6 +55,10 @@ namespace OpenTKImageViewer.ImageContext
         private bool linearInterpolation = false;
         private GrayscaleMode grayscale = GrayscaleMode.Disabled;
         private readonly ImageConfiguration[] finalTextures = new ImageConfiguration[2];
+        private Sampler samplerLinear;
+        private Sampler samplerLinearMip;
+        private Sampler samplerNearest;
+        private Sampler samplerNearestMip;
 
         #endregion
 
@@ -117,9 +121,6 @@ namespace OpenTKImageViewer.ImageContext
         }
 
         public TonemapperManager Tonemapper { get; } = new TonemapperManager();
-
-        // this will determine if the cpu cached textures will be acquired directly after combining the images or after tonemapping
-        public bool DisplayColorBeforeTonemapping { get; set; } = true;
 
         public TextureCache TextureCache { get; }
         #endregion
@@ -201,7 +202,7 @@ namespace OpenTKImageViewer.ImageContext
         }
 
         /// <summary>
-        /// returns a byte array with the requested texture data
+        /// returns a byte array with the requested texture data. (this will use the final image)
         /// </summary>
         /// <param name="imageId">which image equation (0 or 1)</param>
         /// <param name="level">mipmap level</param>
@@ -219,7 +220,24 @@ namespace OpenTKImageViewer.ImageContext
             if (finalTextures[imageId] == null)
                 return null;
 
-            return finalTextures[imageId].Texture.GetData(level, layer, format, type, out width, out height);
+            if (finalTextures[imageId].DisplayTexture == null)
+                return null;
+
+            return finalTextures[imageId].DisplayTexture.GetData(level, layer, format, type, out width, out height);
+        }
+
+        /// <summary>
+        /// returns a float array with the rgba data from the image
+        /// </summary>
+        /// <param name="imageId">which image equation (0 or 1)</param>
+        /// <param name="level">mip map level</param>
+        /// <returns></returns>
+        public float[] GetStatisticsImageFloatData(int imageId, int level)
+        {
+            if (finalTextures[imageId] == null)
+                return null;
+
+            return finalTextures[imageId].GetStatisticsTexture().GetFloatData(level);
         }
 
         /// <summary>
@@ -230,9 +248,9 @@ namespace OpenTKImageViewer.ImageContext
         /// <param name="layer"></param>
         /// <param name="level"></param>
         /// <returns></returns>
-        public bool BindPixelDisplayTexture(int imageId, int slot, int layer, int level)
+        public bool BindStatisticsTexture(int imageId, int slot, int layer, int level)
         {
-            return finalTextures[imageId].BindPixelDisplayTextue(slot, layer, level);
+            return finalTextures[imageId].BindStatisticsTexture(slot, layer, level);
         }
 
         #endregion
@@ -274,6 +292,24 @@ namespace OpenTKImageViewer.ImageContext
         }
 
         /// <summary>
+        /// deletes an image including opengl data (context must be active)
+        /// </summary>
+        /// <param name="imageId"></param>
+        public void DeleteImage(int imageId)
+        {
+            if (IsImageProcessing())
+                throw new Exception("Images cannot be deleted while an operation is running");
+
+            if (imageId < 0 || imageId >= images.Count)
+                return;
+
+            // delete old data
+            images[imageId].TextureArray2D?.Dispose();
+            images.RemoveAt(imageId);
+            OnChangedImages();
+        }
+
+        /// <summary>
         /// disposes all opengl resources
         /// </summary>
         public void Dispose()
@@ -288,6 +324,10 @@ namespace OpenTKImageViewer.ImageContext
             }
             Tonemapper.Dispose();
             TextureCache.Clear();
+            samplerLinear?.Dispose();
+            samplerLinearMip?.Dispose();
+            samplerNearest?.Dispose();
+            samplerNearestMip?.Dispose();
         }
 
         /// <summary>
@@ -307,7 +347,10 @@ namespace OpenTKImageViewer.ImageContext
         public void BindFinalTextureAs2DSamplerArray(int imageId, int slot)
         {
             Debug.Assert(finalTextures[imageId].Active);
-            finalTextures[imageId].Texture?.Bind(slot, LinearInterpolation);
+            if (finalTextures[imageId].DisplayTexture == null)
+                return;
+            finalTextures[imageId].DisplayTexture.Bind(slot);
+            BindSampler(slot, finalTextures[imageId].DisplayTexture.HasMipmaps());
         }
 
         /// <summary>
@@ -318,7 +361,34 @@ namespace OpenTKImageViewer.ImageContext
         public void BindFinalTextureAsCubeMap(int imageId,  int slot)
         {
             Debug.Assert(finalTextures[imageId].Active);
-            finalTextures[imageId].Texture ?.BindAsCubemap(slot, LinearInterpolation);
+            if (finalTextures[imageId].DisplayTexture == null)
+                return;
+            finalTextures[imageId].DisplayTexture.BindAsCubemap(slot);
+            BindSampler(slot, finalTextures[imageId].DisplayTexture.HasMipmaps());
+        }
+
+        public void BindSampler(int unit, bool hasMipmaps)
+        {
+            BindSampler(unit, hasMipmaps, LinearInterpolation);
+        }
+
+        public void BindSampler(int unit, bool hasMipmaps, bool linear)
+        {
+            if(hasMipmaps)
+            {
+                if (linear)
+                    samplerLinearMip.Bind(unit);
+                else
+                    samplerNearestMip.Bind(unit);
+            }
+            else
+            {
+                if (linear)
+                    samplerLinear.Bind(unit);
+                else
+                    samplerNearest.Bind(unit);
+            }
+
         }
 
         /// <summary>
@@ -335,6 +405,15 @@ namespace OpenTKImageViewer.ImageContext
             {
                 if (imageData.TextureArray2D == null)
                     imageData.TextureArray2D = new TextureArray2D(imageData.image);
+            }
+
+            // create sampler object
+            if(samplerLinear == null)
+            {
+                samplerLinear = new Sampler(TextureMinFilter.Linear, TextureMagFilter.Linear);
+                samplerLinearMip = new Sampler(TextureMinFilter.LinearMipmapLinear, TextureMagFilter.Linear);
+                samplerNearest = new Sampler(TextureMinFilter.Nearest, TextureMagFilter.Nearest);
+                samplerNearestMip = new Sampler(TextureMinFilter.NearestMipmapNearest, TextureMagFilter.Nearest);
             }
 
             foreach (var imageConfiguration in finalTextures)
@@ -445,7 +524,7 @@ namespace OpenTKImageViewer.ImageContext
 
             for (var i = 0; i < finalTextures.Length; ++i)
             {
-                finalTextures[i] = new ImageConfiguration(this)
+                finalTextures[i] = new ImageConfiguration(this, i)
                 // only first is active by default
                 { Active = i == 0};
             }

@@ -18,6 +18,11 @@ namespace OpenTKImageViewer.Utility
             public int WindowSizeX = 800;
             public int WindowSizeY = 600;
             public bool IsMaximized = false;
+            // relative coordinates to the main window
+            public int LastImageDialogX = 0;
+            public int LastImageDialogY = 0;
+            public int LastTonemapDialogX = 0;
+            public int LastTonemapDialogY = 0;
         }
 
         private readonly Config config = null;

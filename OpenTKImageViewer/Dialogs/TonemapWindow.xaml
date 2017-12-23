@@ -8,7 +8,8 @@
         Title="Tonemapper" Height="300" Width="600"
         ResizeMode="NoResize" Background="#eee"
         Icon="../Icons/tonemap.png"
-        Closing="TonemapWindow_OnClosing">
+        Closing="TonemapWindow_OnClosing"
+        ShowInTaskbar="False">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250"/>
@@ -24,6 +25,12 @@
                          Margin="0 0 0 10"
                          x:Name="ListBoxMapper"
                          SelectionChanged="ListBoxMapper_OnSelectionChanged">
+                    <ListBox.ItemContainerStyle>
+                        <Style>
+                            <EventSetter Event="ListBox.PreviewMouseLeftButtonDown" Handler="ItemOnMouseDown"/>
+                            <EventSetter Event="ListBox.MouseEnter" Handler="ItemOnMouseEnter"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
                 </ListBox>
 
                 <Grid HorizontalAlignment="Right">

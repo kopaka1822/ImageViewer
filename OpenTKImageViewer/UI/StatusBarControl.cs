@@ -129,6 +129,9 @@ namespace OpenTKImageViewer.UI
 
         public void SetMouseCoordinates(int x, int y)
         {
+            if (lastMouseX == x && lastMouseY == y)
+                return;
+
             window.TextMousePosition.Text = $"{x}, {y}";
             lastMouseX = x;
             lastMouseY = y;
@@ -163,7 +166,7 @@ namespace OpenTKImageViewer.UI
             if(activeId == -1)
                 return new Vector4(0.0f);
 
-            if(!window.Context.BindPixelDisplayTexture(activeId, 
+            if(!window.Context.BindStatisticsTexture(activeId, 
                 pixelShader.GetTextureLocation(), 
                 (int)window.Context.ActiveLayer,
                 (int)window.Context.ActiveMipmap))
@@ -178,22 +181,34 @@ namespace OpenTKImageViewer.UI
         {
             if(PixelDisplay == PixelDisplayType.Bit)
                 return $"{(int)(v.X * 255.0f)} {(int)(v.Y * 255.0f)} {(int)(v.Z * 255.0f)}" + (PixelShowAlpha?$" {(int)(v.W * 255.0f)}":"");
-            var x = ScalarToString((decimal) v.X);
-            var y = ScalarToString((decimal) v.Y);
-            var z = ScalarToString((decimal) v.Z);
-            var a = ScalarToString((decimal) v.W);
+            var x = ScalarToString(v.X);
+            var y = ScalarToString(v.Y);
+            var z = ScalarToString(v.Z);
+            var a = ScalarToString(v.W);
             return $"{x} {y} {z}" + (PixelShowAlpha?$" {a}":"");
         }
 
-        private string ScalarToString(decimal val)
+        private string ScalarToString(float val)
         {
-            var s = decimal.Round(val, PixelDecimalPlaces, MidpointRounding.ToEven).ToString();
+            string s;
+            try
+            {
+                decimal dec = (decimal) val;
+                s = decimal.Round(dec, PixelDecimalPlaces, MidpointRounding.ToEven).ToString(App.GetCulture());
+            }
+            catch (Exception)
+            {
+                // float cannot be expressed as a decimal (e.g. NaN, ininity)
+                s = val.ToString(App.GetCulture());
+            }
+
             // adjust string
             if (!s.StartsWith("-"))
             {
                 // empty space instead "-"
                 s = " " + s;
             }
+
             // # Decimal Placs + (+/-) in front + "." space
             while (s.Length <= PixelDecimalPlaces + 2)
             {

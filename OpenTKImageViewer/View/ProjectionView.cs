@@ -57,7 +57,7 @@ namespace OpenTKImageViewer.View
             // recalculate zoom to degrees
             var angle = 4.0 * Math.Atan(1.0 / (2.0 * (double)zoom));
 
-            boxScroll.Text = Math.Round((Decimal)(angle / Math.PI * 180.0), 2).ToString(CultureInfo.InvariantCulture) + "°";
+            boxScroll.Text = Math.Round((Decimal)(angle / Math.PI * 180.0), 2).ToString(App.GetCulture()) + "°";
         }
 
         private Matrix4 GetAspectRatio(float clientWidth, float clientHeight)

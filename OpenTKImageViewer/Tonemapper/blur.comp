@@ -37,4 +37,6 @@ void main()
 		pixelSum += w * getPixel(pos.x, pos.y);
 		
 	}
+	
+	imageStore(dst_image, pixelCoord, vec4(pixelSum / weightSum, 1.0));
 }

@@ -55,6 +55,11 @@ namespace OpenTKImageViewer.Dialogs
                 BoxVisible.Checked += BoxVisibleOnCheckedChange;
                 BoxVisible.Unchecked += BoxVisibleOnCheckedChange;
 
+                configuration.CombineFormula.Changed +=
+                    (sender, args) => BoxRgbEquation.Text = configuration.CombineFormula.Original;
+                configuration.AlphaFormula.Changed +=
+                    (sender, args) => BoxAlphaEquation.Text = configuration.AlphaFormula.Original;
+
                 LoadConfigurationValues();
             }
 
@@ -185,6 +190,9 @@ namespace OpenTKImageViewer.Dialogs
 
         protected override void OnClosing(CancelEventArgs e)
         {
+            // set last relative coordinates
+            parent.ParentApp.GetConfig().LastImageDialogX = (int)(Left - parent.Left);
+            parent.ParentApp.GetConfig().LastImageDialogY = (int)(Top - parent.Top);
             parent.ImageDialog = null;
         }
 
@@ -198,8 +206,78 @@ namespace OpenTKImageViewer.Dialogs
             ImageList.Items.Clear();
 
             // refresh image list
-            foreach (var item in parent.GenerateImageItems())
+            foreach (var item in GenerateImageItems())
                 ImageList.Items.Add(item);
+        }
+
+        private string RemoveFilePath(string file)
+        {
+            var idx = file.LastIndexOf("\\", StringComparison.Ordinal);
+            if (idx > 0)
+            {
+                return file.Substring(idx + 1);
+            }
+            return file;
+        }
+
+        private ListBoxItem[] GenerateImageItems()
+        {
+            var items = new ListBoxItem[parent.Context.GetNumImages()];
+            for (int curImage = 0; curImage < parent.Context.GetNumImages(); ++curImage)
+            {
+                items[curImage] = CreateListItem(curImage);
+            }
+            return items;
+        }
+
+        private ListBoxItem CreateListItem(int imageId)
+        {
+            // load images
+            var imgDelete = new Image
+            {
+                Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/cancel.png", UriKind.Absolute))
+            };
+
+            var btnDelete = new Button
+            {
+                Height = 16,
+                Width = 16,
+                Content = imgDelete
+            };
+
+            var text = new TextBlock
+            {
+                Text = $"Image {imageId} - {RemoveFilePath(parent.Context.GetFilename(imageId))}",
+            };
+
+            var grid = new Grid { Width = 200.0 };
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Star) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Auto) });
+
+            Grid.SetColumn(text, 0);
+            grid.Children.Add(text);
+            Grid.SetColumn(btnDelete, 1);
+            grid.Children.Add(btnDelete);
+
+            btnDelete.Click += (sender, args) => OnImageDelete(imageId);
+
+            return new ListBoxItem
+            {
+                Content = grid,
+                ToolTip = parent.Context.GetFilename(imageId),
+            };
+        }
+
+        /// <summary>
+        /// called if an image should be deleted (triggered from list box)
+        /// </summary>
+        /// <param name="imageId"></param>
+        private void OnImageDelete(int imageId)
+        {
+            // anable to delete opengl data
+            parent.EnableOpenGl();
+            parent.Context.DeleteImage(imageId);
+            parent.DisableOpenGl();
         }
 
         private void OnChangedFormulas()

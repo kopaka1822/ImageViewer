@@ -10,8 +10,14 @@ namespace OpenTKImageViewer.ImageContext
     
     public class ImageFormula
     {
-        public string Original { get; private set; } = "I0";
-        public string Converted { get; private set; } = "GetTexture0()";
+        public ImageFormula(int defaultImage)
+        {
+            this.Original = "I" + defaultImage;
+            this.Converted = $"GetTexture{defaultImage}()";
+        }
+
+        public string Original { get; private set; }
+        public string Converted { get; private set; }
 
         public event ChangedFormularHandler Changed;
 

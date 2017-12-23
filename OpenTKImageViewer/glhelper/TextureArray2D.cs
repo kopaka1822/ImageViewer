@@ -79,14 +79,18 @@ namespace OpenTKImageViewer.glhelper
             }
             
             Utility.GLCheck();
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureParameterName.ClampToEdge);
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureParameterName.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinLod, 0.0f);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLod, (float)image.GetNumMipmaps());
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureBaseLevel, 0);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLevel, image.GetNumMipmaps());
         }
         
+        public bool HasMipmaps()
+        {
+            if (nMipmaps > 1)
+                return true;
+            return false;
+        }
 
         /// <summary>
         /// creates texture 2d views if they were not already created
@@ -148,67 +152,44 @@ namespace OpenTKImageViewer.glhelper
         /// <param name="slot">binding slot</param>
         /// <param name="target">texture target</param>
         /// <param name="texId">texture id</param>
-        /// <param name="linearFiltering">linear filter or nearest neighbor</param>
-        private void BindAs(int slot, TextureTarget target, int texId, bool linearFiltering)
+        private void BindAs(int slot, TextureTarget target, int texId)
         {
             GL.ActiveTexture(TextureUnit.Texture0 + slot);
             Utility.GLCheck();
             GL.BindTexture(target, texId);
             
-            GL.TexParameter(target, TextureParameterName.TextureMinFilter, GetMinFilter(linearFiltering));
-            GL.TexParameter(target, TextureParameterName.TextureMagFilter, GetMagFilter(linearFiltering));
-            Utility.GLCheck();
-        }
-
-        private int GetMinFilter(bool linearFiltering)
-        {
-            if (nMipmaps > 0)
-            {
-                if (linearFiltering) return (int) TextureMinFilter.LinearMipmapNearest; // sharps switching between mipmaps
-                return (int) TextureMinFilter.NearestMipmapNearest;
-            }
-            if (linearFiltering) return (int) TextureMinFilter.Linear;
-            return (int) TextureMinFilter.Nearest;
-        }
-
-        private int GetMagFilter(bool linearFiltering)
-        {
-            if (linearFiltering) return (int) TextureMagFilter.Linear;
-            return (int) TextureMagFilter.Nearest;
+           Utility.GLCheck();
         }
 
         /// <summary>
         /// binds texture as texture array 2d
         /// </summary>
         /// <param name="slot">binding slot</param>
-        /// <param name="linearFiltering">linear filter or nearest neighbor</param>
-        public void Bind(int slot, bool linearFiltering)
+        public void Bind(int slot)
         {
-            BindAs(slot, TextureTarget.Texture2DArray, id, linearFiltering);
+            BindAs(slot, TextureTarget.Texture2DArray, id);
         }
 
         /// <summary>
         /// binds texture as cube map
         /// </summary>
         /// <param name="slot">binding slot</param>
-        /// <param name="linearFiltering">linear filter or nearest neighbor</param>
-        public void BindAsCubemap(int slot, bool linearFiltering)
+        public void BindAsCubemap(int slot)
         {
             CreateCubeMapView();
-            BindAs(slot, TextureTarget.TextureCubeMap, cubeId, linearFiltering);
+            BindAs(slot, TextureTarget.TextureCubeMap, cubeId);
         }
 
         /// <summary>
         /// binds texture as texture2D
         /// </summary>
         /// <param name="slot">binding slot</param>
-        /// <param name="linearFiltering">linear filter or nearest neighbor</param>
         /// <param name="layer">which layer of the texture</param>
         /// <param name="level">mipmap level</param>
-        public void BindAsTexture2D(int slot, bool linearFiltering, int layer, int level)
+        public void BindAsTexture2D(int slot, int layer, int level)
         {
             CreateTexture2DViews();
-            BindAs(slot, TextureTarget.Texture2D, tex2DId[GetTextureIndex(layer, level)], linearFiltering);
+            BindAs(slot, TextureTarget.Texture2D, tex2DId[GetTextureIndex(layer, level)]);
         }
 
         /// <summary>
@@ -221,6 +202,25 @@ namespace OpenTKImageViewer.glhelper
         public void BindAsImage(int slot, int level, int layer, TextureAccess access)
         {
             GL.BindImageTexture(slot, id, level, false, layer, access, internalFormat);
+        }
+
+        /// <summary>
+        /// retrieves the texture data from the gpu in float rgba format (all layers)
+        /// </summary>
+        /// <param name="level">mip map level</param>
+        /// <returns></returns>
+        public float[] GetFloatData(int level)
+        {
+            // retrieve width and height of the level
+            int width, height;
+            GL.BindTexture(TextureTarget.Texture2DArray, id);
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureWidth, out width);
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureHeight, out height);
+
+            float[] buffer = new float[4 * width * height * nLayer];
+            Utility.ReadTexture(id, level, PixelFormat.Rgba, PixelType.Float, ref buffer);
+
+            return buffer;
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace OpenTKImageViewer.glhelper
             int bufferSize = width * height * GetPixelTypeSize(type) * GetPixelFormatCount(format) * nLayer;
             byte[] buffer = new byte[bufferSize];
 
-            Utility.ReadTexture(id, level, format, type, ref buffer, 0, 0, width, height * nLayer);
+            Utility.ReadTexture(id, level, format, type, ref buffer);
 
             if (nLayer > 1 && layer >= 0)
             {

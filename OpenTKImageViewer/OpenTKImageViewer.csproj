@@ -130,12 +130,6 @@
     <Compile Include="Dialogs\ImageWindow.xaml.cs">
       <DependentUpon>ImageWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\LayerWindow.xaml.cs">
-      <DependentUpon>LayerWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\MipMapWindow.xaml.cs">
-      <DependentUpon>MipMapWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Dialogs\PixelDisplayWindow.xaml.cs">
       <DependentUpon>PixelDisplayWindow.xaml</DependentUpon>
     </Compile>
@@ -144,6 +138,9 @@
     </Compile>
     <Compile Include="Dialogs\ProgressWindow.xaml.cs">
       <DependentUpon>ProgressWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\StatisticsWindow.xaml.cs">
+      <DependentUpon>StatisticsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\TonemapWindow.xaml.cs">
       <DependentUpon>TonemapWindow.xaml</DependentUpon>
@@ -166,6 +163,7 @@
     <Compile Include="Equation\Token\UnaryFunctionToken.cs" />
     <Compile Include="Equation\Token\ValueToken.cs" />
     <Compile Include="glhelper\IGlObject.cs" />
+    <Compile Include="glhelper\Sampler.cs" />
     <Compile Include="glhelper\TextureArray2D.cs" />
     <Compile Include="ImageContext\ImageCombineShader.cs" />
     <Compile Include="ImageContext\ImageConfiguration.cs" />
@@ -203,14 +201,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\LayerWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\MipMapWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Dialogs\PixelDisplayWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -220,6 +210,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\ProgressWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\StatisticsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -361,6 +355,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="app.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\list_move.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\statistics.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

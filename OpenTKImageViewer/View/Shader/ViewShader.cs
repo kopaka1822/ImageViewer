@@ -34,10 +34,10 @@ namespace OpenTKImageViewer.View.Shader
         /// <returns></returns>
         protected static string ApplyGrayscale()
         {
-            return "if(grayscale == uint(1)) color = color.rrrr;\n" +
-                   "else if(grayscale == uint(2)) color = color.gggg;\n" +
-                   "else if(grayscale == uint(3)) color = color.bbbb;\n" +
-                   "else if(grayscale == uint(4)) color = color.aaaa;\n";
+            return "if(grayscale == uint(1)) color = vec4(color.rrr,1.0);\n" +
+                   "else if(grayscale == uint(2)) color = vec4(color.ggg,1.0);\n" +
+                   "else if(grayscale == uint(3)) color = vec4(color.bbb,1.0);\n" +
+                   "else if(grayscale == uint(4)) color = vec4(color.aaa,1.0);\n";
         }
 
         public void Dispose()

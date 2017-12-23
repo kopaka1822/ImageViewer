@@ -39,6 +39,22 @@ Maximum: (Optional) Maximum allowed value of the variable.
 
 Note: Uniform locations 0 and 1 are reserved and should not be used.
 
+Additional properties can be specified via:
+#paramprop Displayed Name, Action, ...
+Displayed Name: Name of the affected parameter (same as #parameter name)
+Action: Event that happened. Currently following actions are defined:
+    
+	OnAdd:        this action will be activated when the up button on the property 
+	              number box (in the tonampper dialog) is pushed. Aditional parameters
+				  are Value, Operation. See Keybindings for an explanation.
+    
+	onSubtract:   this action will be activated when the down button on the property 
+	              number box (in the tonampper dialog) is pushed. Aditional parameters
+				  are Value, Operation. See Keybindings for an explanation.
+
+Example:
+#paramprop gamma, onAdd, 2.0, multiply
+
 ----------------------------------------
 Inputs and Outputs:
 The shader will be called per pixel of the image. The pixel positon can be determined

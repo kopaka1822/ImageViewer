@@ -51,7 +51,8 @@ namespace OpenTKImageViewer.Dialogs
 
         public OpenTK.Graphics.OpenGL4.PixelType SelectedPixelType { get; set; }
 
-        public ExportWindow(MainWindow parent, string filename, FileFormat format)
+        public ExportWindow(MainWindow parent, string filename, 
+            FileFormat format, GlFormat defaultFormat)
         {
             this.parent = parent;
             InitializeComponent();
@@ -60,7 +61,7 @@ namespace OpenTKImageViewer.Dialogs
 
             GenerateLayerItems();
             GenerateMipmapItems();
-            GenerateFormatItems(format);
+            GenerateFormatItems(format, defaultFormat);
         }
 
         void UpdateBoxDesing(ComboBox box)
@@ -98,19 +99,30 @@ namespace OpenTKImageViewer.Dialogs
             UpdateBoxDesing(BoxMipmaps);
         }
 
-        private void GenerateFormatItems(FileFormat format)
+        private void GenerateFormatItems(FileFormat format, GlFormat defaultFormat)
         {
+            int defaultIndex = -1;
             BoxFormat.Items.Clear();
+
+            int idx = 0;
             foreach (var supportedFormat in GetSupportedFormats(format))
             {
+                if (supportedFormat == defaultFormat)
+                    defaultIndex = idx;
+
                 BoxFormat.Items.Add(new FormatComboBox
                 {
                     Content = supportedFormat.ToString().ToUpper(),
                     Format = supportedFormat
                 });
+
+                ++idx;
             }
             // select last item
-            BoxFormat.SelectedIndex = BoxFormat.Items.Count - 1;
+            if (defaultIndex < 0)
+                BoxFormat.SelectedIndex = BoxFormat.Items.Count - 1;
+            else
+                BoxFormat.SelectedIndex = defaultIndex;
             UpdateBoxDesing(BoxFormat);
         }
 

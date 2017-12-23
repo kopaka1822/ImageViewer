@@ -1,0 +1,102 @@
+﻿<Window x:Class="OpenTKImageViewer.Dialogs.StatisticsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
+        mc:Ignorable="d"
+        Title="Statistics" Height="280" Width="280"
+        ResizeMode="NoResize" Background="#eee" ShowInTaskbar="False" Icon="/Texture Viewer;component/Icons/statistics.png" WindowStartupLocation="Manual"
+        >
+    <Border Padding="5">
+        <StackPanel>
+            <TextBlock Text="Double click box to copy content to clipboard"
+            Margin="0 0 0 5"
+            TextWrapping="Wrap"/>
+            
+            
+            <TextBlock Text="Average:"/>
+            <!-- luminance -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Luminance:"/>
+                <TextBox Text="1.0" Grid.Column="1" x:Name="boxAvgLumi"  MouseDoubleClick="OnDoubleClick"/>
+            </Grid>
+
+            <!-- red -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Red:"/>
+                <TextBox Text="1.0" Grid.Column="1" x:Name="boxAvgRed"  MouseDoubleClick="OnDoubleClick"/>
+            </Grid>
+
+            <!-- green -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Green:"/>
+                <TextBox Text="1.0" Grid.Column="1" x:Name="boxAvgGreen"  MouseDoubleClick="OnDoubleClick"/>
+            </Grid>
+
+            <!-- blue -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Blue:"/>
+                <TextBox Text="1.0" Grid.Column="1" x:Name="boxAvgBlue"  MouseDoubleClick="OnDoubleClick"/>
+            </Grid>
+
+
+          <TextBlock Text="Root of Average:"/>
+          <!-- luminance -->
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="100"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Luminance:"/>
+                <TextBox Text="1.0" Grid.Column="1" x:Name="boxRootLumi"  MouseDoubleClick="OnDoubleClick"/>
+          </Grid>
+
+          <!-- red -->
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="100"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Red:"/>
+                <TextBox Text="1.0" Grid.Column="1" x:Name="boxRootRed"  MouseDoubleClick="OnDoubleClick"/>
+          </Grid>
+
+          <!-- green -->
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="100"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Green:"/>
+                <TextBox Text="1.0" Grid.Column="1" x:Name="boxRootGreen"  MouseDoubleClick="OnDoubleClick"/>
+          </Grid>
+
+          <!-- blue -->
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="100"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Blue:"/>
+                <TextBox Text="1.0" Grid.Column="1" x:Name="boxRootBlue"  MouseDoubleClick="OnDoubleClick"/>
+          </Grid>
+        </StackPanel>
+    </Border>
+</Window>
