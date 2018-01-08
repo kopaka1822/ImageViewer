@@ -94,6 +94,7 @@ namespace OpenTKImageViewer.View.Shader
                         "PI/2*sign(normalizedDirection.z) :" +
                         "atan(normalizedDirection.z, normalizedDirection.x);\n" +
                    "polarDirection.s = polarDirection.s / (2*PI) + 0.25;\n" +
+                   "if( polarDirection.s < 0.0) polarDirection.s += 1.0;\n" +
                    "vec4 color = textureLod(tex, vec3(polarDirection.st, layer), level);\n" +
                    ApplyGrayscale() +
                    "fragColor = color;\n" +

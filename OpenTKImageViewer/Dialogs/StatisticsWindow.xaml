@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:OpenTKImageViewer.Dialogs"
         mc:Ignorable="d"
         Title="Statistics" Height="280" Width="280"
-        ResizeMode="NoResize" Background="#eee"
+        ResizeMode="NoResize" Background="#eee" ShowInTaskbar="False" Icon="/Texture Viewer;component/Icons/statistics.png" WindowStartupLocation="Manual"
         >
     <Border Padding="5">
         <StackPanel>

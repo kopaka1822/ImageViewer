@@ -106,9 +106,15 @@ namespace OpenTKImageViewer
 
             // redraw if context changes
             context.ChangedMipmap += (sender, args) => RedrawFrame();
-            //context.ImageFormula1.Changed += (sender, args) => RedrawFrame();
-            // TODO redraw frame when forula changed
-            context.ChangedImages += (sender, args) => RedrawFrame();
+            
+            context.ChangedImages += (sender, args) =>
+            {
+                RedrawFrame();
+                if (context.GetNumImages() == 0)
+                {
+                    CreateImageViews();
+                }
+            };
             context.ChangedLayer += (sender, args) => RedrawFrame();
             context.ChangedFiltering += (sender, args) => RedrawFrame();
             context.ChangedGrayscale += (sender, args) => RedrawFrame();
@@ -132,6 +138,7 @@ namespace OpenTKImageViewer
 
         private void CreateImageViews()
         {
+            imageViews.Clear();
             if (Context.GetNumImages() > 0)
             {
                 imageViews.Add(ImageViewType.Single, new SingleView(Context, BoxScroll));
@@ -214,9 +221,16 @@ namespace OpenTKImageViewer
                 pixelDisplayItem.Click += (o, args) => MenuItem_Click_PixelDisplay(o, null);
 
                 var imageStatisitcsItem = glControl.ContextMenuStrip.Items.Add("Image Statistics");
+                {
+                    var sri = System.Windows.Application.GetResourceStream(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/statistics.png", UriKind.Absolute));
+                    if (sri != null)
+                        imageStatisitcsItem.Image = System.Drawing.Image.FromStream(sri.Stream);
+                }
                 imageStatisitcsItem.Click += (o, args) =>
                 {
                     var dia = new StatisticsWindow(this);
+                    dia.Left = this.Left + 0.5 * (this.Width - dia.Width);
+                    dia.Top = this.Top + 0.5 * (this.Height - dia.Height);
                     dia.ShowDialog();
                 };
             }
@@ -525,26 +539,10 @@ namespace OpenTKImageViewer
         
         private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.Key)
-            {
-                case Key.Right:
-                    Context.ActiveLayer += 1;
-                    break;
-                case Key.Left:
-                    Context.ActiveLayer -= 1;
-                    break;
-                case Key.Up:
-                    Context.ActiveMipmap -= 1;
-                    break;
-                case Key.Down:
-                    Context.ActiveMipmap += 1;
-                    break;
-            }
-
-            if(Context.Tonemapper.HasKeyToInvoke(e.Key))
+            if (Context.Tonemapper.HasKeyToInvoke(e.Key))
             {
                 // if tonemapper dialog is open, apply tonemapper dialog and then apply settings
-                if(TonemapDialog != null)
+                if (TonemapDialog != null)
                 {
                     TonemapDialog.GetCurrentSettings().InvokeKey(e.Key);
                     Context.Tonemapper.Apply(TonemapDialog.GetCurrentSettings());
@@ -555,10 +553,31 @@ namespace OpenTKImageViewer
                     Context.Tonemapper.InvokeKey(e.Key);
                 }
             }
+            else // no keybinding key to invoke
+            {
+                // standart keybindings
+                switch (e.Key)
+                {
+                    case Key.Right:
+                        Context.ActiveLayer += 1;
+                        break;
+                    case Key.Left:
+                        Context.ActiveLayer -= 1;
+                        break;
+                    case Key.Up:
+                        Context.ActiveMipmap -= 1;
+                        break;
+                    case Key.Down:
+                        Context.ActiveMipmap += 1;
+                        break;
+                    default:
+                        // nothing was changed
+                        return;
+                }
+            }
 
-
-            RedrawFrame();
             e.Handled = true;
+            RedrawFrame();
         }
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
@@ -1028,30 +1047,6 @@ namespace OpenTKImageViewer
                 res.Add(imageView.Key);
             }
             return res;
-        }
-
-        private string RemoveFilePath(string file)
-        {
-            var idx = file.LastIndexOf("\\", StringComparison.Ordinal);
-            if (idx > 0)
-            {
-                return file.Substring(idx + 1);
-            }
-            return file;
-        }
-
-        public ListBoxItem[] GenerateImageItems()
-        {
-            var items = new ListBoxItem[Context.GetNumImages()];
-            for (int curImage = 0; curImage < Context.GetNumImages(); ++curImage)
-            {
-                items[curImage] = new ListBoxItem
-                {
-                    Content = $"Image {curImage} - {RemoveFilePath(Context.GetFilename(curImage))}",
-                    ToolTip = Context.GetFilename(curImage)
-                };
-            }
-            return items;
         }
 
         #endregion

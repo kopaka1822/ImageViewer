@@ -25,6 +25,15 @@ namespace OpenTKImageViewer.ImageContext
             this.alphaFormula = alphaFormula;
             colorFormula.Changed += (sender, args) => contentChanged = true;
             alphaFormula.Changed += (sender, args) => contentChanged = true;
+
+            var lastImageCount = context.GetNumImages();
+            context.ChangedImages += (sender, args) =>
+            {
+                // recalculate formula if number of images was decreased (is formula still correct?)
+                if(lastImageCount > context.GetNumImages())
+                    contentChanged = true;
+                lastImageCount = context.GetNumImages();
+            };
         }
 
         /// <summary>
@@ -35,15 +44,26 @@ namespace OpenTKImageViewer.ImageContext
         {
             if (program != null && !contentChanged) return;
 
-            contentChanged = false;
             program?.Dispose();
 
             // compile new shader
             var computeShader = new Shader(ShaderType.ComputeShader);
             computeShader.Source = GenerateShaderSource();
-            computeShader.Compile();
+            try
+            {
+                computeShader.Compile();
+            }
+            catch (Exception)
+            {
+                // change to default formula (probably tried to use I1 with only one image because it is the default for the second formula)
+                colorFormula.ApplyFormula("I0", context.GetNumImages());
+                alphaFormula.ApplyFormula("I0", context.GetNumImages());
+                computeShader.Source = GenerateShaderSource();
+                computeShader.Compile();
+            }
 
             program = new Program(new List<Shader>{computeShader}, true);
+            contentChanged = false;
         }
 
         /// <summary>

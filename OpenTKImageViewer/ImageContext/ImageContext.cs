@@ -292,6 +292,24 @@ namespace OpenTKImageViewer.ImageContext
         }
 
         /// <summary>
+        /// deletes an image including opengl data (context must be active)
+        /// </summary>
+        /// <param name="imageId"></param>
+        public void DeleteImage(int imageId)
+        {
+            if (IsImageProcessing())
+                throw new Exception("Images cannot be deleted while an operation is running");
+
+            if (imageId < 0 || imageId >= images.Count)
+                return;
+
+            // delete old data
+            images[imageId].TextureArray2D?.Dispose();
+            images.RemoveAt(imageId);
+            OnChangedImages();
+        }
+
+        /// <summary>
         /// disposes all opengl resources
         /// </summary>
         public void Dispose()
@@ -395,7 +413,7 @@ namespace OpenTKImageViewer.ImageContext
                 samplerLinear = new Sampler(TextureMinFilter.Linear, TextureMagFilter.Linear);
                 samplerLinearMip = new Sampler(TextureMinFilter.LinearMipmapLinear, TextureMagFilter.Linear);
                 samplerNearest = new Sampler(TextureMinFilter.Nearest, TextureMagFilter.Nearest);
-                samplerNearestMip = new Sampler(TextureMinFilter.Nearest, TextureMagFilter.Nearest);
+                samplerNearestMip = new Sampler(TextureMinFilter.NearestMipmapNearest, TextureMagFilter.Nearest);
             }
 
             foreach (var imageConfiguration in finalTextures)

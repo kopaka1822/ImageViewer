@@ -16,8 +16,8 @@ namespace OpenTKImageViewer.ImageContext
             this.Converted = $"GetTexture{defaultImage}()";
         }
 
-        public string Original { get; private set; } = "I0";
-        public string Converted { get; private set; } = "GetTexture0()";
+        public string Original { get; private set; }
+        public string Converted { get; private set; }
 
         public event ChangedFormularHandler Changed;
 
