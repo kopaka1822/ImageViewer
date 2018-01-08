@@ -143,6 +143,7 @@ namespace OpenTKImageViewer.Equation
             rules.Add(new BracketRule());
             rules.Add(new RuleSign());
             rules.Add(new UnaryFunctionRule());
+            rules.Add(new BinaryFunctionRule());
             rules.Add(new TertiaryFunctionRule());
 
             return rules;
