@@ -17,7 +17,7 @@ namespace OpenTKImageViewer.Equation.Token
 
         public override string ToOpenGl()
         {
-            return $"vec4(float({value}))";
+            return $"vec4(float({value.ToString(App.GetCulture())}))";
         }
     }
 }

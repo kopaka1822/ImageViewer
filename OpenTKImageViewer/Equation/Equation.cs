@@ -107,7 +107,7 @@ namespace OpenTKImageViewer.Equation
             {
                 // image identifier
                 int number;
-                if(!Int32.TryParse(identifier.Substring(1), out number))
+                if(!Int32.TryParse(identifier.Substring(1), NumberStyles.Integer, App.GetCulture(), out number))
                     throw new Exception($"Invalid Image Identifier: {identifier}");
                 if(number < 0 || number >= maxTextureUnits)
                     throw new Exception("Invalid Image Range: " + identifier);
