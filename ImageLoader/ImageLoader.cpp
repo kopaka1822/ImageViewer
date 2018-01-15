@@ -7,6 +7,7 @@
 #include "Pfm.h"
 #include <algorithm>
 #include <fstream>
+#include "openexr.h"
 
 static int s_currentID = 1;
 static std::unordered_map<int, std::unique_ptr<ImageResource>> s_resources;
@@ -45,6 +46,10 @@ int open(const char* filename)
 		else if (hasEnding(fname, ".dds") || hasEnding(fname, ".ktx"))
 		{
 			res = gli_load(filename);
+		}
+		else if (hasEnding(fname, ".exr"))
+		{
+			res = openexr_load(filename);
 		}
 		else
 		{

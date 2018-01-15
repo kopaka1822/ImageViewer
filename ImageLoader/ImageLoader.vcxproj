@@ -68,7 +68,8 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -121,6 +122,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestDebug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>../dependencies/gli/external;../dependencies/gli;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -179,7 +181,8 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -231,6 +234,7 @@
     <ClInclude Include="ImageMipmap.h" />
     <ClInclude Include="ImageResource.h" />
     <ClInclude Include="ImageSaver.h" />
+    <ClInclude Include="openexr.h" />
     <ClInclude Include="Pfm.h" />
     <ClInclude Include="stb_loader.h" />
   </ItemGroup>
@@ -239,6 +243,7 @@
     <ClCompile Include="ImageLoader.cpp" />
     <ClCompile Include="ImageSaver.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="openexr.cpp" />
     <ClCompile Include="Pfm.cpp" />
     <ClCompile Include="stb_loader.cpp" />
   </ItemGroup>
