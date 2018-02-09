@@ -377,7 +377,7 @@ namespace OpenTKImageViewer
                         progressWindow = new ProgressWindow();
                         progressWindow.Show();
 
-                        progressWindow.SetDescription("applying tonemappers");
+                        progressWindow.SetDescription("applying filters");
 
                         progressWindow.Abort += (o, args) =>
                         {
