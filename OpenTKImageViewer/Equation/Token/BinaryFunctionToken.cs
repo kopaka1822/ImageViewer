@@ -33,6 +33,10 @@ namespace OpenTKImageViewer.Equation.Token
             {
                 case "min":
                 case "max":
+                case "atan":
+                case "pow":
+                case "mod":
+                case "step":
                     return true;
             }
             return false;
