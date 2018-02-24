@@ -64,7 +64,7 @@
                         <Image Source="Icons/multiview.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Tonemapper" Click="MenuItem_Click_Tonemapper">
+                <MenuItem Header="Filter" Click="MenuItem_Click_Tonemapper">
                     <MenuItem.Icon>
                         <Image Source="Icons/tonemap.png"/>
                     </MenuItem.Icon>

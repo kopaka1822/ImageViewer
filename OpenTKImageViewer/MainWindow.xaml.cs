@@ -377,7 +377,7 @@ namespace OpenTKImageViewer
                         progressWindow = new ProgressWindow();
                         progressWindow.Show();
 
-                        progressWindow.SetDescription("applying tonemappers");
+                        progressWindow.SetDescription("applying filters");
 
                         progressWindow.Abort += (o, args) =>
                         {
@@ -805,7 +805,7 @@ namespace OpenTKImageViewer
 
             // open save file dialog
             Microsoft.Win32.SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|HDR (*.hdr)|*.hdr";
+            sfd.Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|HDR (*.hdr)|*.hdr|Portable float map (*.pfm)|*.pfm";
             sfd.InitialDirectory = ParentApp.GetExportPath(sfd);
             if (sfd.ShowDialog() == false)
                 return;
@@ -817,6 +817,8 @@ namespace OpenTKImageViewer
                 format = ExportWindow.FileFormat.Bmp;
             else if (sfd.FileName.EndsWith(".hdr"))
                 format = ExportWindow.FileFormat.Hdr;
+            else if (sfd.FileName.EndsWith(".pfm"))
+                format = ExportWindow.FileFormat.Pfm;
 
             OpenTK.Graphics.OpenGL4.PixelFormat defaultFormat = OpenTK.Graphics.OpenGL4.PixelFormat.Rgb;
             if (Context.HasAlpha())
@@ -824,7 +826,7 @@ namespace OpenTKImageViewer
             else if (Context.HasOnlyGrayscale())
                 defaultFormat = OpenTK.Graphics.OpenGL4.PixelFormat.Red;
 
-            // open dialog
+            // open dialog with export settings (RGB...)
             ExportWindow ew = new ExportWindow(this, sfd.FileName, format, defaultFormat);
             if (ew.ShowDialog() == false)
                 return;
@@ -854,6 +856,9 @@ namespace OpenTKImageViewer
                         break;
                     case ExportWindow.FileFormat.Hdr:
                         ImageLoader.SaveHdr(sfd.FileName, width, height, TextureArray2D.GetPixelFormatCount(ew.SelectedFormat), data);
+                        break;
+                    case ExportWindow.FileFormat.Pfm:
+                        ImageLoader.SavePfm(sfd.FileName, width, height, TextureArray2D.GetPixelFormatCount(ew.SelectedFormat), data);
                         break;
                 }
             }

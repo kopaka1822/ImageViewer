@@ -18,7 +18,7 @@ namespace OpenTKImageViewer.Equation.Token
 
         public override string ToOpenGl()
         {
-            return $"GetTexture{id}()";
+            return $"GetTexture{id.ToString(App.GetCulture())}()";
         }
     }
 }

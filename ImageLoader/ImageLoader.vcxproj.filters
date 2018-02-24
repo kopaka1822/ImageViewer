@@ -57,6 +57,9 @@
     <ClInclude Include="ImageSaver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="openexr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImageLoader.cpp">
@@ -75,6 +78,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ImageSaver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="openexr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

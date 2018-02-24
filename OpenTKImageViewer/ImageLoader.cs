@@ -40,6 +40,9 @@ namespace OpenTKImageViewer
         [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern bool save_hdr(string filename, int width, int height, int components, byte[] data);
 
+        [DllImport(DLLFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool save_pfm(string filename, int width, int height, int components, byte[] data);
+
         private static string GetError()
         {
             int length;
@@ -276,6 +279,12 @@ namespace OpenTKImageViewer
         public static void SaveHdr(string filename, int width, int height, int components, byte[] data)
         {
             if (!save_hdr(filename, width, height, components, data))
+                throw new Exception("saving image failed: " + GetError());
+        }
+
+        public static void SavePfm(string filename, int width, int height, int components, byte[] data)
+        {
+            if (!save_pfm(filename, width, height, components, data))
                 throw new Exception("saving image failed: " + GetError());
         }
     }

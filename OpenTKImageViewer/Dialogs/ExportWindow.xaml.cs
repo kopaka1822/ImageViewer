@@ -25,7 +25,8 @@ namespace OpenTKImageViewer.Dialogs
         {
             Png,
             Bmp,
-            Hdr
+            Hdr,
+            Pfm
         }
 
         public class FormatComboBox : ComboBoxItem
@@ -147,6 +148,7 @@ namespace OpenTKImageViewer.Dialogs
                     res.Add(GlFormat.Rgb);
                     break;
                 case FileFormat.Hdr:
+                case FileFormat.Pfm:
                     res.Add(GlFormat.Red);
                     res.Add(GlFormat.Green);
                     res.Add(GlFormat.Blue);
@@ -174,6 +176,7 @@ namespace OpenTKImageViewer.Dialogs
                 case FileFormat.Png:
                     return PixelType.UnsignedByte;
                 case FileFormat.Hdr:
+                case FileFormat.Pfm:
                     return PixelType.Float;
             }
             return PixelType.Byte;

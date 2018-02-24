@@ -145,8 +145,10 @@
     <Compile Include="Dialogs\TonemapWindow.xaml.cs">
       <DependentUpon>TonemapWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Equation\Markov\BinaryFunctionRule.cs" />
     <Compile Include="Equation\Markov\TertiaryFunctionRule.cs" />
     <Compile Include="Equation\Markov\UnaryFunctionRule.cs" />
+    <Compile Include="Equation\Token\BinaryFunctionToken.cs" />
     <Compile Include="Equation\Token\CombinedValueToken.cs" />
     <Compile Include="Equation\Equation.cs" />
     <Compile Include="Equation\Token\FunctionToken.cs" />
@@ -275,6 +277,12 @@
     <None Include="Tonemapper\clamp.comp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Tonemapper\denoise.comp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Tonemapper\enhance.comp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Tonemapper\gamma.comp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -285,6 +293,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Tonemapper\median.comp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Tonemapper\quantile.comp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Tonemapper\set_color.comp">

@@ -247,7 +247,7 @@ namespace OpenTKImageViewer.Dialogs
 
             var text = new TextBlock
             {
-                Text = $"Image {imageId} - {RemoveFilePath(parent.Context.GetFilename(imageId))}",
+                Text = $"I{imageId} - {RemoveFilePath(parent.Context.GetFilename(imageId))}",
             };
 
             var grid = new Grid { Width = 200.0 };

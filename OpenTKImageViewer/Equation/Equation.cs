@@ -72,11 +72,11 @@ namespace OpenTKImageViewer.Equation
                         }
                         else
                         {
-                            nextToken = new SingleCharToken(Token.Token.Type.BracketOpen, '-');
+                            nextToken = new SingleCharToken(Token.Token.Type.BracketOpen, '(');
                         }
                         break;
                     case ')':
-                        nextToken = new SingleCharToken(Token.Token.Type.BracketClose, '-');
+                        nextToken = new SingleCharToken(Token.Token.Type.BracketClose, ')');
                         break;
                     default:
                         current += c;
@@ -107,7 +107,7 @@ namespace OpenTKImageViewer.Equation
             {
                 // image identifier
                 int number;
-                if(!Int32.TryParse(identifier.Substring(1), out number))
+                if(!Int32.TryParse(identifier.Substring(1), NumberStyles.Integer, App.GetCulture(), out number))
                     throw new Exception($"Invalid Image Identifier: {identifier}");
                 if(number < 0 || number >= maxTextureUnits)
                     throw new Exception("Invalid Image Range: " + identifier);
@@ -140,9 +140,10 @@ namespace OpenTKImageViewer.Equation
             rules.Add(new RuleValueOperationValue(Token.Token.Type.Operation1));
             rules.Add(new RuleValueOperationValue(Token.Token.Type.Operation2));
             rules.Add(new RuleValueOperationValue(Token.Token.Type.Operation3));
-            rules.Add(new RuleSign());
             rules.Add(new BracketRule());
+            rules.Add(new RuleSign());
             rules.Add(new UnaryFunctionRule());
+            rules.Add(new BinaryFunctionRule());
             rules.Add(new TertiaryFunctionRule());
 
             return rules;
