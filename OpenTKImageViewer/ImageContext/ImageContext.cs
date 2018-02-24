@@ -515,6 +515,11 @@ namespace OpenTKImageViewer.ImageContext
 
         private void OnChangedImages(int previousCount)
         {
+            if (this.images.Count == 0)
+            {
+                // clear some images
+                TextureCache.Clear();
+            }
             ChangedImages?.Invoke(this, new ChangedImagesEvent(previousCount, this.images.Count));
         }
 
