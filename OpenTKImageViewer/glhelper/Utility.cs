@@ -29,11 +29,14 @@ namespace OpenTKImageViewer.glhelper
             //)
             //    return;
 
-            if (type != DebugType.DebugTypeOther && type != DebugType.DebugTypePerformance)
+            if (type != DebugType.DebugTypeOther && // trivial information (buffer is in vram etc.)
+                type != DebugType.DebugTypePerformance && // shader recompile
+                source != DebugSource.DebugSourceShaderCompiler) // shader compilation error will be handled elsewhere
             {
                 App.ShowErrorDialog(null, $"{source}({severity}): {str}");
             }
-            else
+            // shader compiler will be handled the old way (getProgramInfoLog etc.)
+            else if(source != DebugSource.DebugSourceShaderCompiler)
             {
 #if DEBUG
                 App.ShowInfoDialog(null, $"{source}({severity}): {str}");
