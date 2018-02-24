@@ -112,6 +112,8 @@ The following function from GLSL can be used as well:
 * fract(value)
 * normalize(value)
 * length(value)
+* min(value1, value2)
+* max(value1, value2)
 
 Additionaly you can use:
 * red(value)
