@@ -11,11 +11,22 @@ using OpenTKImageViewer.Utility;
 
 namespace OpenTKImageViewer.ImageContext
 {
+    public class ChangedImagesEvent : EventArgs
+    {
+        public ChangedImagesEvent(int previous, int current)
+        {
+            this.PreviousCount = previous;
+            CurrentCount = current;
+        }
+        public int PreviousCount { get; }
+        public int CurrentCount { get; }
+    }
+
     public delegate void ChangedLayerHandler(object sender, EventArgs e);
 
     public delegate void ChangedMipmapHanlder(object sender, EventArgs e);
 
-    public delegate void ChangedImagesHandler(object sender, EventArgs e);
+    public delegate void ChangedImagesHandler(object sender, ChangedImagesEvent e);
 
     public delegate void ChangedFilteringHandler(object sender, EventArgs e);
 
@@ -285,8 +296,9 @@ namespace OpenTKImageViewer.ImageContext
                 }
             }
 
+            var prevCount = images.Count;
             images.Add(new ImageData(image));
-            OnChangedImages();
+            OnChangedImages(prevCount);
             if(HasOnlyGrayscale())
                 Grayscale = GrayscaleMode.Red;
         }
@@ -305,8 +317,9 @@ namespace OpenTKImageViewer.ImageContext
 
             // delete old data
             images[imageId].TextureArray2D?.Dispose();
+            var prevCount = images.Count;
             images.RemoveAt(imageId);
-            OnChangedImages();
+            OnChangedImages(prevCount);
         }
 
         /// <summary>
@@ -500,9 +513,14 @@ namespace OpenTKImageViewer.ImageContext
             ChangedMipmap?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnChangedImages()
+        private void OnChangedImages(int previousCount)
         {
-            ChangedImages?.Invoke(this, EventArgs.Empty);
+            if (this.images.Count == 0)
+            {
+                // clear some images
+                TextureCache.Clear();
+            }
+            ChangedImages?.Invoke(this, new ChangedImagesEvent(previousCount, this.images.Count));
         }
 
         private void OnChangedFiltering()
