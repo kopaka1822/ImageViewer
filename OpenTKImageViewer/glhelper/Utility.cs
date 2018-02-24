@@ -29,7 +29,7 @@ namespace OpenTKImageViewer.glhelper
             //)
             //    return;
 
-            if (type != DebugType.DebugTypeOther)
+            if (type != DebugType.DebugTypeOther && type != DebugType.DebugTypePerformance)
             {
                 App.ShowErrorDialog(null, $"{source}({severity}): {str}");
             }
