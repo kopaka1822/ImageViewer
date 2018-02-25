@@ -54,9 +54,10 @@ namespace OpenTKImageViewer.glhelper
             GL.Arb.DebugMessageCallback(OpenGlDebug, IntPtr.Zero);
         }
 
-        public static void ReadTexture<T>(int textureId, int level, PixelFormat format, PixelType type, ref T[] buffer) where T : struct
+        public static void ReadTexture<T>(TextureTarget target ,int textureId, int level, PixelFormat format, PixelType type, ref T[] buffer) where T : struct
         {
-            GL.GetTextureImage(textureId, level, format, type, buffer.Length * Marshal.SizeOf(buffer[0]), buffer);
+            GL.BindTexture(target, textureId);
+            GL.GetTexImage(target, level, format, type, buffer);
             Utility.GLCheck();
         }
     }
