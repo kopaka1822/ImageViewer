@@ -325,5 +325,10 @@ namespace OpenTKImageViewer.Dialogs
             if (parent.Context.GetNumActiveImages() == 2)
                 parent.RedrawFrame();
         }
+
+        private void ButtonImportImage_Click(object sender, RoutedEventArgs e)
+        {
+            parent.ShowImportDialog();
+        }
     }
 }

@@ -766,6 +766,11 @@ namespace OpenTKImageViewer
 
         private void MenuItem_Click_Import(object sender, RoutedEventArgs e)
         {
+           ShowImportDialog();
+        }
+
+        public void ShowImportDialog()
+        {
             var ofd = new Microsoft.Win32.OpenFileDialog();
             ofd.Multiselect = false;
             ofd.InitialDirectory = ParentApp.GetImagePath(ofd);
