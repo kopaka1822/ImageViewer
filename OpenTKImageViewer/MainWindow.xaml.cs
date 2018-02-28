@@ -228,10 +228,7 @@ namespace OpenTKImageViewer
                 }
                 imageStatisitcsItem.Click += (o, args) =>
                 {
-                    var dia = new StatisticsWindow(this);
-                    dia.Left = this.Left + 0.5 * (this.Width - dia.Width);
-                    dia.Top = this.Top + 0.5 * (this.Height - dia.Height);
-                    dia.ShowDialog();
+                    ShowImageStatistics();
                 };
             }
             catch (Exception exception)
@@ -1017,6 +1014,19 @@ namespace OpenTKImageViewer
             ShiftWindowOntoScreen(TonemapDialog);
         }
 
+        private void MenuItem_Click_ImageStatistics(object sender, RoutedEventArgs e)
+        {
+            ShowImageStatistics();
+        }
+
+        private void ShowImageStatistics()
+        {
+            var dia = new StatisticsWindow(this);
+            dia.Left = this.Left + 0.5 * (this.Width - dia.Width);
+            dia.Top = this.Top + 0.5 * (this.Height - dia.Height);
+            dia.ShowDialog();
+        }
+
         #endregion
 
         #endregion
@@ -1126,5 +1136,5 @@ namespace OpenTKImageViewer
                 window.Top = SystemParameters.VirtualScreenHeight + SystemParameters.VirtualScreenTop - window.Height;
             }
         }
-        }
+    }
 }

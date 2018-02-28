@@ -69,6 +69,11 @@
                         <Image Source="Icons/tonemap.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem Header="_Image Statistics" Click="MenuItem_Click_ImageStatistics">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/statistics.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
         </Menu>
 
