@@ -60,6 +60,7 @@ Inputs and Outputs:
 The shader will be called per pixel of the image. The pixel positon can be determined
 with: "ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;"
 
+
 Source and Destination Image:
 
 The source image can be accesed via "uniform sampler2D src_image"
@@ -67,6 +68,17 @@ level of detail should be 0 (for texelFetch etc.)
 access with texture(...) will give linear interpolated values
 
 The destination image can be accesed via "writeonly image2D dst_image"
+
+
+Original Images:
+
+The original (imported) images can be accessed via 
+"uniform sampler2D textureX" where X is the index of the image
+starting with 0. The level of detail should be 0 and using texture(textureX, ...) 
+will result in linear interpolated values.
+ 
+Example:
+texelFetch(texture2, pixelCoord, 0) can be used to access the 3rd imported image
 
 ----------------------------------------
 Keybinding:
