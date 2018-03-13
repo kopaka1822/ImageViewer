@@ -79,10 +79,8 @@
 
         <Grid DockPanel.Dock="Bottom">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="16*"/>
-                <ColumnDefinition Width="39*"/>
-                <ColumnDefinition Width="34*"/>
-                <ColumnDefinition Width="705*"/>
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="67*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -93,10 +91,10 @@
                               Initialized="WinFormsHost_OnInitialized"
                               SizeChanged="WinFormsHost_OnSizeChanged"
                               Focusable="True"
-                              AllowDrop="True" Grid.ColumnSpan="4" Margin="0,0,0.286,-0.143" Grid.RowSpan="2"
+                              AllowDrop="True" Grid.ColumnSpan="2"
                               />
             <!-- STATUS BAR -->
-            <StatusBar BorderBrush="DarkGray" BorderThickness="0 1 0 0" Grid.ColumnSpan="4" Margin="0,522,0.286,-0.143" Grid.RowSpan="2">
+            <StatusBar Grid.Row="1" BorderBrush="DarkGray" BorderThickness="0 1 0 0" Grid.ColumnSpan="2">
                 <!-- MOUSE POSITION -->
                 <StatusBarItem Width="100" HorizontalAlignment="Left" BorderBrush="DarkGray" BorderThickness="0 0 1 0">
                     <Grid>
