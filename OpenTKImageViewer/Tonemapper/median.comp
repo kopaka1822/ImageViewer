@@ -1,19 +1,13 @@
 #setting title, Median Filter
-#setting description, Removes noise from an image.
-#setting sepa, true
-// shader takes a while with bigger radii
+#setting description, Chooses the pixel with the average luminance within the filter radius.
 #setting singleinvocation, false
 
-#param Radius, 2, Int, 5, 1, 50
+#param Radius, 2, Int, 1, 1, 6
 
-layout(location = 2) uniform int radius;
+layout(location = 2) uniform int RADIUS;
 
-float get(vec4 color)
-{
-	return dot(color.rgb, vec3(0.299, 0.587, 0.114));
-}
 
-vec4 buf[101];
+vec4 buf[169];
 
 void bubbleSort(int numLength)
 {
@@ -23,9 +17,9 @@ void bubbleSort(int numLength)
 	for(i = 1; (i <= numLength) && (flag != 0); i++)
 	{
 		flag = 0;
-		for (j=0; j < (numLength -1); j++)
+		for (j=0; j < (numLength - i); j++)
 		{
-			if (get(buf[j+1]) > get(buf[j]))
+			if (buf[j+1].w > buf[j].w)
 			{
 				vec4 temp = buf[j];
 				buf[j] = buf[j+1];
@@ -35,11 +29,6 @@ void bubbleSort(int numLength)
 		}
 	}
 }
-
-int doti(ivec2 x, ivec2 y)
-{
-	return x.x * y.x + x.y * y.y;
-}
 			
 void main()
 {
@@ -47,25 +36,20 @@ void main()
 	ivec2 imgSize = textureSize(src_image, 0);
 	if(pixelCoord.x < imgSize.x && pixelCoord.y < imgSize.y)
 	{
+		float alpha = texelFetch(src_image, pixelCoord, 0).a;
 		// fill buffer
-		int midpoint = doti(pixelCoord, filterDirection);
-		int start = doti(pixelCoord,filterDirection) - radius;
-		int end = doti(pixelCoord,filterDirection) + radius;
-		start = max(0,start);
-		end = min(doti(imgSize, filterDirection) - 1, end);
-		
-		int i = start;
-		while(i <= end)
+		int count = 0;
+		for(int y = max(0, pixelCoord.y - RADIUS); y <= min(pixelCoord.y + RADIUS, imgSize.y-1); ++y)
+		for(int x = max(0, pixelCoord.x - RADIUS); x <= min(pixelCoord.x + RADIUS, imgSize.x-1); ++x)
 		{
-			buf[i - start] = texelFetch(src_image, pixelCoord + (midpoint - i) * filterDirection, 0);
-			++i;
+			buf[count].rgb = texelFetch(src_image, ivec2(x,y), 0).rgb;
+			buf[count].w = dot(vec3(0.299, 0.587, 0.114), buf[count].rgb);
+			++count;
 		}
-		int buflen = end - start + 1;
 		
 		// sort the buffer
-		bubbleSort(buflen);
-		
-		float alpha = texelFetch(src_image, pixelCoord, 0).a;
-		imageStore(dst_image, pixelCoord, vec4(buf[buflen/2].rgb, alpha));
+		bubbleSort(count);
+	
+		imageStore(dst_image, pixelCoord, vec4(buf[count/2].rgb, alpha));
 	}
 }
