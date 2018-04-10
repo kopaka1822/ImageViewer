@@ -14,6 +14,7 @@ namespace OpenTKImageViewer.Tonemapping
     public class ToneShader
     {
         private readonly Program program;
+        private readonly int maxTextureBindings;
 
         private static readonly int LocalSize = 8;
         private static readonly int MinWorkGroupSize = 4;
@@ -29,12 +30,13 @@ namespace OpenTKImageViewer.Tonemapping
             this.Name = loader.Name;
             this.Description = loader.Description;
             this.IsSingleInvocation = loader.IsSingleInvocation;
+            this.maxTextureBindings = GL.GetInteger(GetPName.MaxTextureImageUnits);
 
             // generate missing source
             Shader shader = new Shader(ShaderType.ComputeShader,
                 GetShaderHeader() +
-                            "#line 1\n" +
-                            loader.ShaderSource);
+                "#line 1\n" +
+                loader.ShaderSource);
 
             shader.Compile();
 
@@ -51,12 +53,28 @@ namespace OpenTKImageViewer.Tonemapping
             return 0;
         }
 
+        /// <summary>
+        /// returns the binding point for the original images (the imported images)
+        /// </summary>
+        /// <param name="index">original image index (starting with 0)</param>
+        /// <param name="context"></param>
+        /// <returns>binding point for the original images or -1 if the image can not be nound due to bounding point maximum</returns>
+        public int GetOriginalImageLocation(int index)
+        {
+            // up to context.MaxTextureBindings textures can be bound at once
+            // one texture is used for the source image => context.MaxTextureBindings - 1 slots for the original images
+            if (index > maxTextureBindings - 1)
+                return -1;
+            return index + 1;
+        }
+
         public int GetDestinationImageLocation()
         {
             return 1;
         }
 
-        public void Dispatch(int width, int height, List<ShaderLoader.Parameter> parameters) => Dispatch(width, height, parameters, 0);
+        public void Dispatch(int width, int height, List<ShaderLoader.Parameter> parameters) =>
+            Dispatch(width, height, parameters, 0);
 
         /// <summary>
         /// dispatching command for sepa shader
@@ -74,11 +92,11 @@ namespace OpenTKImageViewer.Tonemapping
                 switch (parameter.Type)
                 {
                     case ShaderLoader.ParameterType.Float:
-                        GL.Uniform1(parameter.Location, (float)parameter.CurrentValue);
+                        GL.Uniform1(parameter.Location, (float) parameter.CurrentValue);
                         break;
                     case ShaderLoader.ParameterType.Int:
                     case ShaderLoader.ParameterType.Bool:
-                        GL.Uniform1(parameter.Location, (int)parameter.CurrentValue);
+                        GL.Uniform1(parameter.Location, (int) parameter.CurrentValue);
                         break;
                 }
             }
@@ -101,7 +119,8 @@ namespace OpenTKImageViewer.Tonemapping
             private readonly bool isSepa;
             private readonly int iteration;
 
-            protected DispatchStepper(Program program, List<ShaderLoader.Parameter> parameters, bool isSepa, int iteration)
+            protected DispatchStepper(Program program, List<ShaderLoader.Parameter> parameters, bool isSepa,
+                int iteration)
             {
                 this.program = program;
                 this.parameters = parameters;
@@ -118,11 +137,11 @@ namespace OpenTKImageViewer.Tonemapping
                     switch (parameter.Type)
                     {
                         case ShaderLoader.ParameterType.Float:
-                            GL.Uniform1(parameter.Location, (float)parameter.CurrentValue);
+                            GL.Uniform1(parameter.Location, (float) parameter.CurrentValue);
                             break;
                         case ShaderLoader.ParameterType.Int:
                         case ShaderLoader.ParameterType.Bool:
-                            GL.Uniform1(parameter.Location, (int)parameter.CurrentValue);
+                            GL.Uniform1(parameter.Location, (int) parameter.CurrentValue);
                             break;
                     }
                 }
@@ -175,7 +194,8 @@ namespace OpenTKImageViewer.Tonemapping
             /// <param name="iteration">which sepa iteration</param>
             /// <param name="imgWidth">width of the image</param>
             /// <param name="imgHeight">height of the image</param>
-            public SingleDispatchStepper(Program program, List<ShaderLoader.Parameter> parameters, bool isSepa, int iteration, int imgWidth, int imgHeight)
+            public SingleDispatchStepper(Program program, List<ShaderLoader.Parameter> parameters, bool isSepa,
+                int iteration, int imgWidth, int imgHeight)
                 : base(program, parameters, isSepa, iteration)
             {
                 width = GetNumWorkGroups(imgWidth);
@@ -185,7 +205,7 @@ namespace OpenTKImageViewer.Tonemapping
             public float CurrentStep()
             {
                 // there is only one step (0 = 0%, 1 = 1%)
-                return (float)curStep;
+                return (float) curStep;
             }
 
             public string GetDescription()
@@ -215,6 +235,7 @@ namespace OpenTKImageViewer.Tonemapping
                 curStep++;
             }
         }
+
         /// <summary>
         /// Stepper for Dispatching if the shader is run in multiple invocations
         /// </summary>
@@ -225,7 +246,8 @@ namespace OpenTKImageViewer.Tonemapping
             private int curX = 0;
             private int curY = 0;
 
-            public MultiDispatchStepper(Program program, List<ShaderLoader.Parameter> parameters, bool isSepa, int iteration, int imgWidth, int imgHeight)
+            public MultiDispatchStepper(Program program, List<ShaderLoader.Parameter> parameters, bool isSepa,
+                int iteration, int imgWidth, int imgHeight)
                 : base(program, parameters, isSepa, iteration)
             {
                 width = GetNumMinimalInvocations(imgWidth);
@@ -254,7 +276,7 @@ namespace OpenTKImageViewer.Tonemapping
 
             public float CurrentStep()
             {
-                return (float)(curY * width + curX) / GetNumSteps();
+                return (float) (curY * width + curX) / GetNumSteps();
             }
 
             public int GetNumSteps()
@@ -268,7 +290,8 @@ namespace OpenTKImageViewer.Tonemapping
             }
         }
 
-        public IStepable GetDispatchStepable(int width, int height, List<ShaderLoader.Parameter> parameters, int iteration)
+        public IStepable GetDispatchStepable(int width, int height, List<ShaderLoader.Parameter> parameters,
+            int iteration)
         {
             if (IsSingleInvocation)
                 return new SingleDispatchStepper(program, parameters, IsSepa, iteration, width, height);
@@ -280,10 +303,18 @@ namespace OpenTKImageViewer.Tonemapping
             return "#version 430\n" +
                    $"layout(local_size_x = {LocalSize}, local_size_y = {LocalSize}) in;\n" +
                    "layout(binding = 0) uniform sampler2D src_image;\n" +
+                   GetTextureBindings(maxTextureBindings - 1) +
                    "layout(rgba32f, binding = 1) uniform writeonly image2D dst_image;\n" +
                    "layout(location = 1) uniform ivec2 pixelOffset;\n" +
-                   (IsSepa?"layout(location = 0) uniform ivec2 filterDirection;\n":"");
+                   (IsSepa ? "layout(location = 0) uniform ivec2 filterDirection;\n" : "");
+        }
 
+        private string GetTextureBindings(int numBindings)
+        {
+            string res = "";
+            for (int i = 0; i < numBindings; ++i)
+                res += $"layout(binding = {i + 1}) uniform sampler2D texture{i};\n";
+            return res;
         }
     }
 }

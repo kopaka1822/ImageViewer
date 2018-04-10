@@ -218,7 +218,7 @@ namespace OpenTKImageViewer.glhelper
             GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureHeight, out height);
 
             float[] buffer = new float[4 * width * height * nLayer];
-            Utility.ReadTexture(id, level, PixelFormat.Rgba, PixelType.Float, ref buffer);
+            Utility.ReadTexture(TextureTarget.Texture2DArray, id, level, PixelFormat.Rgba, PixelType.Float, ref buffer);
 
             return buffer;
         }
@@ -245,7 +245,7 @@ namespace OpenTKImageViewer.glhelper
             int bufferSize = width * height * GetPixelTypeSize(type) * GetPixelFormatCount(format) * nLayer;
             byte[] buffer = new byte[bufferSize];
 
-            Utility.ReadTexture(id, level, format, type, ref buffer);
+            Utility.ReadTexture(TextureTarget.Texture2DArray, id, level, format, type, ref buffer);
 
             if (nLayer > 1 && layer >= 0)
             {

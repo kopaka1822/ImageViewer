@@ -29,11 +29,14 @@ namespace OpenTKImageViewer.glhelper
             //)
             //    return;
 
-            if (type != DebugType.DebugTypeOther)
+            if (type != DebugType.DebugTypeOther && // trivial information (buffer is in vram etc.)
+                type != DebugType.DebugTypePerformance && // shader recompile
+                source != DebugSource.DebugSourceShaderCompiler) // shader compilation error will be handled elsewhere
             {
                 App.ShowErrorDialog(null, $"{source}({severity}): {str}");
             }
-            else
+            // shader compiler will be handled the old way (getProgramInfoLog etc.)
+            else if(source != DebugSource.DebugSourceShaderCompiler)
             {
 #if DEBUG
                 App.ShowInfoDialog(null, $"{source}({severity}): {str}");
@@ -51,9 +54,10 @@ namespace OpenTKImageViewer.glhelper
             GL.Arb.DebugMessageCallback(OpenGlDebug, IntPtr.Zero);
         }
 
-        public static void ReadTexture<T>(int textureId, int level, PixelFormat format, PixelType type, ref T[] buffer) where T : struct
+        public static void ReadTexture<T>(TextureTarget target ,int textureId, int level, PixelFormat format, PixelType type, ref T[] buffer) where T : struct
         {
-            GL.GetTextureImage(textureId, level, format, type, buffer.Length * Marshal.SizeOf(buffer[0]), buffer);
+            GL.BindTexture(target, textureId);
+            GL.GetTexImage(target, level, format, type, buffer);
             Utility.GLCheck();
         }
     }

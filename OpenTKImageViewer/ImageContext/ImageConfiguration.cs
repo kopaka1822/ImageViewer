@@ -50,6 +50,25 @@ namespace OpenTKImageViewer.ImageContext
             parent = context;
             CombineFormula.Changed += (sender, args) => RecomputeImage = true;
             AlphaFormula.Changed += (sender, args) => RecomputeImage = true;
+            parent.ChangedImages += (sender, args) =>
+            {
+                if (args.CurrentCount < args.PreviousCount)
+                    RecomputeImage = true;
+                if (args.CurrentCount == 0)
+                {
+                    // clear all image data
+                    if (DisplayTexture != null)
+                    {
+                        DisplayTexture.Dispose();
+                        DisplayTexture = null;
+                    }
+                    if (statisticsTexture != null)
+                    {
+                        statisticsTexture.Dispose();
+                        statisticsTexture = null;
+                    }
+                }
+            };
 
             combineShader = new ImageCombineShader(context, CombineFormula, AlphaFormula);
         }

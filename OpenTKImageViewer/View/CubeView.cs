@@ -59,7 +59,7 @@ namespace OpenTKImageViewer.View
 
         protected override Matrix4 GetOrientation()
         {
-            return Matrix4.CreateScale(1.0f, -1.0f, 1.0f);
+            return Matrix4.CreateScale(1.0f, 1.0f, 1.0f);
         }
         
         public override void UpdateMouseDisplay(MainWindow window)

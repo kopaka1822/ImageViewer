@@ -64,9 +64,14 @@
                         <Image Source="Icons/multiview.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Tonemapper" Click="MenuItem_Click_Tonemapper">
+                <MenuItem Header="Filter" Click="MenuItem_Click_Tonemapper">
                     <MenuItem.Icon>
                         <Image Source="Icons/tonemap.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Image Statistics" Click="MenuItem_Click_ImageStatistics">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/statistics.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
@@ -88,7 +93,7 @@
                               Focusable="True"
                               AllowDrop="True" Grid.ColumnSpan="2"
                               />
-                <!-- STATUS BAR -->
+            <!-- STATUS BAR -->
             <StatusBar Grid.Row="1" BorderBrush="DarkGray" BorderThickness="0 1 0 0" Grid.ColumnSpan="2">
                 <!-- MOUSE POSITION -->
                 <StatusBarItem Width="100" HorizontalAlignment="Left" BorderBrush="DarkGray" BorderThickness="0 0 1 0">
@@ -115,7 +120,7 @@
                             Text="0.00 0.00 0.00" 
                             Grid.Column="1"
                             FontFamily="Consolas"/>
-                        
+
                         <Grid.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="_Pixel Display" Click="MenuItem_Click_PixelDisplay">

@@ -247,7 +247,7 @@ namespace OpenTKImageViewer.Dialogs
 
             var text = new TextBlock
             {
-                Text = $"Image {imageId} - {RemoveFilePath(parent.Context.GetFilename(imageId))}",
+                Text = $"I{imageId} - {RemoveFilePath(parent.Context.GetFilename(imageId))}",
             };
 
             var grid = new Grid { Width = 200.0 };
@@ -324,6 +324,11 @@ namespace OpenTKImageViewer.Dialogs
 
             if (parent.Context.GetNumActiveImages() == 2)
                 parent.RedrawFrame();
+        }
+
+        private void ButtonImportImage_Click(object sender, RoutedEventArgs e)
+        {
+            parent.ShowImportDialog();
         }
     }
 }

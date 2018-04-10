@@ -228,10 +228,7 @@ namespace OpenTKImageViewer
                 }
                 imageStatisitcsItem.Click += (o, args) =>
                 {
-                    var dia = new StatisticsWindow(this);
-                    dia.Left = this.Left + 0.5 * (this.Width - dia.Width);
-                    dia.Top = this.Top + 0.5 * (this.Height - dia.Height);
-                    dia.ShowDialog();
+                    ShowImageStatistics();
                 };
             }
             catch (Exception exception)
@@ -377,7 +374,7 @@ namespace OpenTKImageViewer
                         progressWindow = new ProgressWindow();
                         progressWindow.Show();
 
-                        progressWindow.SetDescription("applying tonemappers");
+                        progressWindow.SetDescription("applying filters");
 
                         progressWindow.Abort += (o, args) =>
                         {
@@ -769,6 +766,11 @@ namespace OpenTKImageViewer
 
         private void MenuItem_Click_Import(object sender, RoutedEventArgs e)
         {
+           ShowImportDialog();
+        }
+
+        public void ShowImportDialog()
+        {
             var ofd = new Microsoft.Win32.OpenFileDialog();
             ofd.Multiselect = false;
             ofd.InitialDirectory = ParentApp.GetImagePath(ofd);
@@ -1017,6 +1019,19 @@ namespace OpenTKImageViewer
             ShiftWindowOntoScreen(TonemapDialog);
         }
 
+        private void MenuItem_Click_ImageStatistics(object sender, RoutedEventArgs e)
+        {
+            ShowImageStatistics();
+        }
+
+        private void ShowImageStatistics()
+        {
+            var dia = new StatisticsWindow(this);
+            dia.Left = this.Left + 0.5 * (this.Width - dia.Width);
+            dia.Top = this.Top + 0.5 * (this.Height - dia.Height);
+            dia.ShowDialog();
+        }
+
         #endregion
 
         #endregion
@@ -1126,5 +1141,5 @@ namespace OpenTKImageViewer
                 window.Top = SystemParameters.VirtualScreenHeight + SystemParameters.VirtualScreenTop - window.Height;
             }
         }
-        }
+    }
 }
