@@ -88,9 +88,12 @@
                 </Grid.ColumnDefinitions>
                 
                 <WindowsFormsHost
+                    x:Name="OpenGlHost"
                     DockPanel.Dock="Left"
                     Focusable="True"
                     AllowDrop="True"
+                    Initialized="OpenGlHost_OnInitialized"
+                    SizeChanged="OpenGlHost_OnSizeChanged"
                 />
 
                 <TabControl
@@ -310,7 +313,8 @@
             <!--STATUS BAR-->
             <StatusBar 
                 Grid.Row="1" 
-                BorderThickness="0 1 0 0">
+                BorderThickness="0 1 0 0"
+                BorderBrush="DarkGray">
                 <!-- MOUSE POSITION -->
                 <StatusBarItem 
                     Width="100" 
