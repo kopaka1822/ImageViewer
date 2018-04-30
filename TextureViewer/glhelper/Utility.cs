@@ -2,21 +2,21 @@
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL4;
 
-namespace OpenTKImageViewer.glhelper
+namespace TextureViewer.glhelper
 {
     public static class Utility
     {
-        public static void GLCheck()
+        public static void GlCheck()
         {
             var glerr = GL.GetError();
             if (glerr != ErrorCode.NoError)
-              throw new Exception(glerr.ToString());
+                throw new Exception(glerr.ToString());
         }
 
         public static void OpenGlDebug(DebugSource source, DebugType type, int id, DebugSeverity severity, int length,
             IntPtr message, IntPtr userParam)
         {
-            
+
 
             string str = Marshal.PtrToStringAnsi(message, length);
             //if (str ==
@@ -31,7 +31,7 @@ namespace OpenTKImageViewer.glhelper
                 App.ShowErrorDialog(null, $"{source}({severity}): {str}");
             }
             // shader compiler will be handled the old way (getProgramInfoLog etc.)
-            else if(source != DebugSource.DebugSourceShaderCompiler)
+            else if (source != DebugSource.DebugSourceShaderCompiler)
             {
 #if DEBUG
                 App.ShowInfoDialog(null, $"{source}({severity}): {str}");
@@ -49,11 +49,11 @@ namespace OpenTKImageViewer.glhelper
             GL.Arb.DebugMessageCallback(OpenGlDebug, IntPtr.Zero);
         }
 
-        public static void ReadTexture<T>(TextureTarget target ,int textureId, int level, PixelFormat format, PixelType type, ref T[] buffer) where T : struct
+        public static void ReadTexture<T>(TextureTarget target, int textureId, int level, PixelFormat format, PixelType type, ref T[] buffer) where T : struct
         {
             GL.BindTexture(target, textureId);
             GL.GetTexImage(target, level, format, type, buffer);
-            Utility.GLCheck();
+            Utility.GlCheck();
         }
     }
 }

@@ -155,7 +155,7 @@ namespace TextureViewer
         public void EnableOpenGl()
         {
             glControl?.MakeCurrent();
-            //glhelper.Utility.EnableDebugCallback();
+            glhelper.Utility.EnableDebugCallback();
         }
 
         /// <summary>
@@ -169,7 +169,6 @@ namespace TextureViewer
 
             try
             {
-
                 glControl?.Context.MakeCurrent(null);
             }
             catch (GraphicsContextException)
@@ -178,6 +177,10 @@ namespace TextureViewer
             }
         }
 
+        /// <summary>
+        /// actual width in pixels
+        /// </summary>
+        /// <returns></returns>
         private int GetOpenGlHostWidth()
         {
             PresentationSource source = PresentationSource.FromVisual(this);
@@ -185,6 +188,10 @@ namespace TextureViewer
             return (int)(OpenGlHost.ActualWidth * scaling);
         }
 
+        /// <summary>
+        /// actual height in pixels
+        /// </summary>
+        /// <returns></returns>
         private int GetOpenGlHostHeight()
         {
             PresentationSource source = PresentationSource.FromVisual(this);
