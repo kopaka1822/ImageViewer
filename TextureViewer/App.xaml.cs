@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,6 +15,19 @@ namespace TextureViewer
     /// </summary>
     public partial class App : Application
     {
+        // change this if the assembly name was changed
+        public static readonly string AppName = "Texture Viewer";
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+        }
+
         /// <summary>
         /// displays error dialog (with debug option in debug mode)
         /// </summary>
@@ -50,6 +64,12 @@ namespace TextureViewer
                 MessageBox.Show(owner, message, "Info", MessageBoxButton.OK, MessageBoxImage.Information);
             else
                 MessageBox.Show(message, "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private static readonly CultureInfo CultureInfo = new CultureInfo("en-US");
+        public static CultureInfo GetCulture()
+        {
+            return CultureInfo;
         }
     }
 }
