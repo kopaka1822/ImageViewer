@@ -57,7 +57,6 @@ namespace OpenTKImageViewer.Tonemapping
         /// returns the binding point for the original images (the imported images)
         /// </summary>
         /// <param name="index">original image index (starting with 0)</param>
-        /// <param name="context"></param>
         /// <returns>binding point for the original images or -1 if the image can not be nound due to bounding point maximum</returns>
         public int GetOriginalImageLocation(int index)
         {

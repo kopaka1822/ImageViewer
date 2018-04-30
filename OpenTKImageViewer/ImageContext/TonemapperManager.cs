@@ -122,15 +122,14 @@ namespace OpenTKImageViewer.ImageContext
             public void NextStep()
             {
                 var p = settings.ToneParameters[curParameter];
-                
-                // TODO make this conditinal
+
                 // bind original images 
                 for (int i = 0; i < context.GetNumImages(); ++i)
                 {
                     var slot = p.Shader.GetOriginalImageLocation(i);
                     if (slot == -1)
                         break;
-                    
+
                     context.BindSampler(slot, context.GetImageTexture(i).HasMipmaps(), true);
                     context.GetImageTexture(i).BindAsTexture2D(slot, curLayer, curLevel);
                 }
