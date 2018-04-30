@@ -60,6 +60,11 @@
                         <Image Source="Icons/grayscale.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem Header="_Pixel Display">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/displayconfig.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem Header="_Image Statistics">
                     <MenuItem.Icon>
                         <Image Source="Icons/statistics.png"/>
@@ -97,191 +102,206 @@
                     >
                     <TabItem 
                         Header="Images">
-                        <Border Padding="5">
-                            <StackPanel>
-                                <!--Image Label + Import Button-->
-                                <Grid  Margin="0 0 0 2">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <Border Padding="5">
+                                <StackPanel>
+                                    <!--Image Label + Import Button-->
+                                    <Grid  Margin="0 0 0 2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock 
+                                            Text="Images:" 
+                                            VerticalAlignment="Center"/>
+                                        <Button 
+                                            Grid.Column="1" 
+                                            Width="110" 
+                                            HorizontalAlignment="Right">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="21"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Image 
+                                                    Source="Icons/import.png"
+                                                    Margin="0 0 5 0"/>
+                                                <TextBlock 
+                                                    Grid.Column="1" 
+                                                    Text="Import Image"/>
+                                            </Grid>
+                                        </Button>
+                                    </Grid>
+
+                                    <ListBox 
+                                        SelectedIndex="0" 
+                                        ScrollViewer.VerticalScrollBarVisibility="Visible"                       
+                                        Height="180"
+                                        Margin="0 0 0 5"/>
+
+                                    <Button
+                                        Content="Apply"
+                                        Width="80"
+                                        HorizontalAlignment="Right"
+                                        Margin="0 0 0 5"/>
+
+                                    <Separator Height="2"/>
+
+                                    <!--Equation 1-->
+                                    <GroupBox 
+                                        Header="Equation 1" 
+                                        Margin="0 0 0 5">
+                                        <StackPanel>
+                                            <Grid Margin="0 5 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="70"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Visible: "/>
+                                                <CheckBox Grid.Column="1"/>
+                                            </Grid>
+                                            <Grid Margin="0 0 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="70"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Use Filter: "/>
+                                                <CheckBox Grid.Column="1"/>
+                                            </Grid>
+                                            <Grid Margin="0 0 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="RGB: "/>
+                                                <TextBox 
+                                                    Grid.Column="1"
+                                                    Text="Image1 + Image2" 
+                                                    Margin="0 0 0 5"/>
+                                            </Grid>
+                                            <Grid Margin="0 0 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Alpha: "/>
+                                                <TextBox 
+                                                    Grid.Column="1"
+                                                    Text="Image1 + Image2"
+                                                    Margin="0 0 0 5"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </GroupBox>
+
+                                    <!--Equation 2-->
+                                    <GroupBox 
+                                        Header="Equation 2" 
+                                        Margin="0 0 0 5">
+                                        <StackPanel>
+                                            <Grid Margin="0 5 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="70"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Visible: "/>
+                                                <CheckBox Grid.Column="1"/>
+                                            </Grid>
+                                            <Grid Margin="0 0 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="70"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Use Filter: "/>
+                                                <CheckBox Grid.Column="1"/>
+                                            </Grid>
+                                            <Grid Margin="0 0 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="RGB: "/>
+                                                <TextBox 
+                                                    Grid.Column="1"
+                                                    Text="Image1 + Image2" 
+                                                    Margin="0 0 0 5"/>
+                                            </Grid>
+                                            <Grid Margin="0 0 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Alpha: " Height="23" VerticalAlignment="Top"/>
+                                                <TextBox 
+                                                    Grid.Column="1"
+                                                    Text="Image1 + Image2"
+                                                    Margin="0 0 0 5"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </GroupBox>
+
+                                    <!--Split Mode-->
                                     <TextBlock 
-                                        Text="Images:" 
-                                        VerticalAlignment="Center"/>
-                                    <Button 
-                                        Grid.Column="1" 
-                                        Width="110" 
-                                        HorizontalAlignment="Right">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="21"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Image 
-                                                Source="Icons/import.png"
-                                                Margin="0 0 5 0"/>
-                                            <TextBlock 
-                                                Grid.Column="1" 
-                                                Text="Import Image"/>
-                                        </Grid>
-                                    </Button>
-                                </Grid>
-
-                                <ListBox 
-                                    SelectedIndex="0" 
-                                    ScrollViewer.VerticalScrollBarVisibility="Visible"                       
-                                    Height="180"/>
-                                
-                                <!--Equation 1-->
-                                <GroupBox 
-                                    Header="Equation 1" 
-                                    Margin="0 0 0 5">
-                                    <StackPanel>
-                                        <Grid Margin="0 5 0 5">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="70"/>
-                                                <ColumnDefinition/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Visible: "/>
-                                            <CheckBox Grid.Column="1"/>
-                                        </Grid>
-                                        <Grid Margin="0 0 0 5">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="70"/>
-                                                <ColumnDefinition/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Use Filter: "/>
-                                            <CheckBox Grid.Column="1"/>
-                                        </Grid>
-                                        <Grid Margin="0 0 0 5">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="40"/>
-                                                <ColumnDefinition/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="RGB: "/>
-                                            <TextBox 
-                                                Grid.Column="1"
-                                                Text="Image1 + Image2" 
-                                                Margin="0 0 0 5"/>
-                                        </Grid>
-                                        <Grid Margin="0 0 0 5">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="40"/>
-                                                <ColumnDefinition/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Alpha: "/>
-                                            <TextBox 
-                                                Grid.Column="1"
-                                                Text="Image1 + Image2"
-                                                Margin="0 0 0 5"/>
-                                        </Grid>
-                                    </StackPanel>
-                                </GroupBox>
-
-                                <!--Equation 2-->
-                                <GroupBox 
-                                    Header="Equation 2" 
-                                    Margin="0 0 0 5">
-                                    <StackPanel>
-                                        <Grid Margin="0 5 0 5">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="70"/>
-                                                <ColumnDefinition/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Visible: "/>
-                                            <CheckBox Grid.Column="1"/>
-                                        </Grid>
-                                        <Grid Margin="0 0 0 5">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="70"/>
-                                                <ColumnDefinition/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Use Filter: "/>
-                                            <CheckBox Grid.Column="1"/>
-                                        </Grid>
-                                        <Grid Margin="0 0 0 5">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="40"/>
-                                                <ColumnDefinition/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="RGB: "/>
-                                            <TextBox 
-                                                Grid.Column="1"
-                                                Text="Image1 + Image2" 
-                                                Margin="0 0 0 5"/>
-                                        </Grid>
-                                        <Grid Margin="0 0 0 5">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="40"/>
-                                                <ColumnDefinition/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="Alpha: " Height="23" VerticalAlignment="Top"/>
-                                            <TextBox 
-                                                Grid.Column="1"
-                                                Text="Image1 + Image2"
-                                                Margin="0 0 0 5"/>
-                                        </Grid>
-                                    </StackPanel>
-                                </GroupBox>
-                                
-                                <!--Split Mode-->
-                                <TextBlock 
-                                    Text="Split Mode:" 
-                                    Margin="0 0 0 5"/>
-                                <ComboBox 
-                                    Margin="0 0 0 5" 
-                                    SelectedIndex="0">
-                                    <ComboBoxItem Content="Vertical"/>
-                                    <ComboBoxItem Content="Horizontal"/>
-                                </ComboBox>
-                            </StackPanel>
-                        </Border>
+                                        Text="Split Mode:" 
+                                        Margin="0 0 0 5"/>
+                                    <ComboBox 
+                                        Margin="0 0 0 5" 
+                                        SelectedIndex="0">
+                                        <ComboBoxItem Content="Vertical"/>
+                                        <ComboBoxItem Content="Horizontal"/>
+                                    </ComboBox>
+                                </StackPanel>
+                            </Border>
+                        </ScrollViewer>
                     </TabItem>
 
                     <TabItem Header="Filter">
-                        <Border Padding="5">
-                            <StackPanel>
-                                <!--Filter Label + Import Button-->
-                                <Grid  Margin="0 0 0 2">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock 
-                                        Text="Filter:" 
-                                        VerticalAlignment="Center"/>
-                                    <Button 
-                                        Grid.Column="1" 
-                                        Width="110" 
-                                        HorizontalAlignment="Right">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="21"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Image 
-                                                Source="Icons/tonemap.png"
-                                                Margin="0 0 5 0"/>
-                                            <TextBlock 
-                                                Grid.Column="1" 
-                                                Text="Add Filter"/>
-                                        </Grid>
-                                    </Button>
-                                </Grid>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <Border Padding="5">
+                                <StackPanel>
+                                    <!--Filter Label + Import Button-->
+                                    <Grid  Margin="0 0 0 2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock 
+                                            Text="Filter:" 
+                                            VerticalAlignment="Center"/>
+                                        <Button 
+                                            Grid.Column="1" 
+                                            Width="110" 
+                                            HorizontalAlignment="Right">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="21"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Image 
+                                                    Source="Icons/tonemap.png"
+                                                    Margin="0 0 5 0"/>
+                                                <TextBlock 
+                                                    Grid.Column="1" 
+                                                    Text="Add Filter"/>
+                                            </Grid>
+                                        </Button>
+                                    </Grid>
 
-                                <ListBox 
-                                    Height="180"
-                                    ScrollViewer.VerticalScrollBarVisibility="Visible"
-                                    Margin="0 0 0 10">
-                                </ListBox>
-
-                                <Button 
-                                    HorizontalAlignment="Right"
-                                    Content="_Add" 
-                                    Margin="0 0 10 0" 
-                                    Width="60"/>
-                            </StackPanel>
-                        </Border>
+                                    <ListBox 
+                                        Height="180"
+                                        ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                        Margin="0 0 0 5">
+                                    </ListBox>
+                                    
+                                    <Button
+                                        Content="Apply"
+                                        Width="80"
+                                        HorizontalAlignment="Right"
+                                        Margin="0 0 0 5"/>
+                                    
+                                    <Separator Height="2"/>
+                                </StackPanel>
+                            </Border>
+                        </ScrollViewer>
                     </TabItem>
                 </TabControl>
             </Grid>
