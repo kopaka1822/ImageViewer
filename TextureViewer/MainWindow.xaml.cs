@@ -36,6 +36,7 @@ namespace TextureViewer
             InitializeComponent();
         }
 
+        #region OPENGL_HOST_INIT_PAINT
 
         private void OpenGlHost_OnInitialized(object sender, EventArgs e)
         {
@@ -79,6 +80,101 @@ namespace TextureViewer
             }
         }
 
+        private void OpenGLHost_OnPaint(object sender, PaintEventArgs e)
+        {
+            // TODO proper error handling
+
+            try
+            {
+                EnableOpenGl();
+
+                GL.Viewport(0, 0, GetOpenGlHostWidth(), GetOpenGlHostHeight());
+                GL.ClearColor(0.9333f, 0.9333f, 0.9333f, 1.0f);
+                GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+                glControl.SwapBuffers();
+                //RedrawFrame();
+                //GL.Finish();
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
+            finally
+            {
+                DisableOpenGl();
+            }
+        }
+
+        /// <summary>
+        /// makes the window opengl context current
+        /// </summary>
+        private void EnableOpenGl()
+        {
+            glControl?.MakeCurrent();
+            glhelper.Utility.EnableDebugCallback();
+        }
+
+        /// <summary>
+        /// flushes commands and makes a null opengl context current
+        /// </summary>
+        private void DisableOpenGl()
+        {
+            GL.Flush();
+            if (debugGl)
+                GL.Disable(EnableCap.DebugOutput);
+
+            try
+            {
+                glControl?.Context.MakeCurrent(null);
+            }
+            catch (GraphicsContextException)
+            {
+                // happens sometimes..
+            }
+        }
+
+        /// <summary>
+        /// the frame will be redrawn as soon as possible
+        /// </summary>
+        public void RedrawFrame()
+        {
+            glControl?.Invalidate();
+        }
+
+
+
+        /// <summary>
+        /// actual width in pixels
+        /// </summary>
+        /// <returns></returns>
+        private int GetOpenGlHostWidth()
+        {
+            PresentationSource source = PresentationSource.FromVisual(this);
+            var scaling = source.CompositionTarget.TransformToDevice.M11;
+            return (int)(OpenGlHost.ActualWidth * scaling);
+        }
+
+        /// <summary>
+        /// actual height in pixels
+        /// </summary>
+        /// <returns></returns>
+        private int GetOpenGlHostHeight()
+        {
+            PresentationSource source = PresentationSource.FromVisual(this);
+            var scaling = source.CompositionTarget.TransformToDevice.M22;
+            return (int)(OpenGlHost.ActualHeight * scaling);
+        }
+
+        #endregion
+
+        #region OPENGL_HOST_INTERACTION 
+
+        private void OpenGlHost_OnSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            RedrawFrame();
+        }
+
         private void OpenGlHost_OnDragDrop(object sender, DragEventArgs e)
         {
             
@@ -115,93 +211,7 @@ namespace TextureViewer
 
         }
 
-        private void OpenGLHost_OnPaint(object sender, PaintEventArgs e)
-        {
-            // TODO proper error handling
+        #endregion
 
-            try
-            {
-                EnableOpenGl();
-
-                GL.Viewport(0, 0, GetOpenGlHostWidth(), GetOpenGlHostHeight());
-                GL.ClearColor(0.9333f, 0.9333f, 0.9333f, 1.0f);
-                GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-                glControl.SwapBuffers();
-                //RedrawFrame();
-                //GL.Finish();
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception.Message);
-            }
-            finally
-            {
-                DisableOpenGl();
-            }
-        }
-
-        /// <summary>
-        /// the frame will be redrawn as soon as possible
-        /// </summary>
-        public void RedrawFrame()
-        {
-            glControl?.Invalidate();
-        }
-
-        /// <summary>
-        /// makes the window opengl context current
-        /// </summary>
-        public void EnableOpenGl()
-        {
-            glControl?.MakeCurrent();
-            glhelper.Utility.EnableDebugCallback();
-        }
-
-        /// <summary>
-        /// flushes commands and makes a null opengl context current
-        /// </summary>
-        public void DisableOpenGl()
-        {
-            GL.Flush();
-            if(debugGl)
-                GL.Disable(EnableCap.DebugOutput);
-
-            try
-            {
-                glControl?.Context.MakeCurrent(null);
-            }
-            catch (GraphicsContextException)
-            {
-                // happens sometimes..
-            }
-        }
-
-        /// <summary>
-        /// actual width in pixels
-        /// </summary>
-        /// <returns></returns>
-        private int GetOpenGlHostWidth()
-        {
-            PresentationSource source = PresentationSource.FromVisual(this);
-            var scaling = source.CompositionTarget.TransformToDevice.M11;
-            return (int)(OpenGlHost.ActualWidth * scaling);
-        }
-
-        /// <summary>
-        /// actual height in pixels
-        /// </summary>
-        /// <returns></returns>
-        private int GetOpenGlHostHeight()
-        {
-            PresentationSource source = PresentationSource.FromVisual(this);
-            var scaling = source.CompositionTarget.TransformToDevice.M22;
-            return (int)(OpenGlHost.ActualHeight * scaling);
-        }
-
-        private void OpenGlHost_OnSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            RedrawFrame();
-        }
     }
 }
