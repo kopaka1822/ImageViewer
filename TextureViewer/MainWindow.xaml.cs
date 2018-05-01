@@ -33,13 +33,10 @@ namespace TextureViewer
         private bool debugGl = true;
         private GLControl glControl;
 
-        private WindowViewModel viewModel;
-
         public MainWindow()
         {
             InitializeComponent();
-
-            viewModel = new WindowViewModel(this);
+            DataContext = new WindowViewModel();
         }
 
         #region OPENGL_HOST_INIT_PAINT

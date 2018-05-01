@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TextureViewer"
+        xmlns:modelViews="clr-namespace:TextureViewer.ModelViews"
         mc:Ignorable="d"
         Title="Texture Viewer" Height="600" Width="800"
         Background="#eee"
@@ -142,7 +142,8 @@
                                         SelectedIndex="0" 
                                         ScrollViewer.VerticalScrollBarVisibility="Visible"                       
                                         Height="180"
-                                        Margin="0 0 0 5"/>
+                                        Margin="0 0 0 5"
+                                        ItemsSource="{Binding ImageList}"/>
 
                                     <Button
                                         Content="Apply"
@@ -465,3 +466,4 @@
         </Grid>
     </DockPanel>
 </Window>
+

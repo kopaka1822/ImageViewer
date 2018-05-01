@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,15 +18,14 @@ namespace TextureViewer.ModelViews
         private readonly Images imagesModel = new Images();
         private readonly ImagesViewModel imagesViewModel;
 
-        public WindowViewModel(MainWindow window)
+        public WindowViewModel()
         {
             imagesViewModel = new ImagesViewModel(imagesModel);
             ImportCommand = new ImportImageCommand(imagesViewModel);
-
-            window.DataContext = this;
-
         }
 
         public ICommand ImportCommand { get; }
+
+        public ObservableCollection<string> ImageList { get; } = new ObservableCollection<string>() {"hello", "there"};
     }
 }
