@@ -116,7 +116,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>..\OpenTKImageViewer\bin\x64\Debug\</OutDir>
+    <OutDir>..\TextureViewer\bin\Debug</OutDir>
     <TargetExt>.dll</TargetExt>
     <IncludePath>../dependencies/gli/external;../dependencies/gli;$(IncludePath)</IncludePath>
   </PropertyGroup>
@@ -132,7 +132,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\OpenTKImageViewer\bin\x64\Release\</OutDir>
+    <OutDir>..\TextureViewer\bin\Release</OutDir>
     <TargetExt>.dll</TargetExt>
     <IncludePath>../dependencies/gli/external;../dependencies/gli;$(IncludePath)</IncludePath>
   </PropertyGroup>

@@ -22,7 +22,9 @@
                         <Image Source="Icons/open.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="_Import">
+                <MenuItem 
+                    Header="_Import"
+                    Command="{Binding ImportCommand}">
                     <MenuItem.Icon>
                         <Image Source="Icons/import.png"/>
                     </MenuItem.Icon>

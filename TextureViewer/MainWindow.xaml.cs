@@ -18,6 +18,8 @@ using System.Windows.Shapes;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
+using TextureViewer.Models;
+using TextureViewer.ModelViews;
 using DragEventArgs = System.Windows.Forms.DragEventArgs;
 using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
@@ -31,9 +33,13 @@ namespace TextureViewer
         private bool debugGl = true;
         private GLControl glControl;
 
+        private WindowViewModel viewModel;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            viewModel = new WindowViewModel(this);
         }
 
         #region OPENGL_HOST_INIT_PAINT
