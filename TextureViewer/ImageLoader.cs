@@ -47,7 +47,7 @@ namespace TextureViewer
         }
 
         [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
-        public static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
+        private static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
 
         public class Resource
         {

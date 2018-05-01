@@ -11,7 +11,7 @@ using TextureViewer.Annotations;
 
 namespace TextureViewer.Models
 {
-    public class Images: INotifyPropertyChanged
+    public class ImagesModel: INotifyPropertyChanged
     {
         private class ImageData
         {
@@ -34,7 +34,7 @@ namespace TextureViewer.Models
 
         private readonly List<ImageData> images;
 
-        public Images()
+        public ImagesModel()
         {
             images = new List<ImageData>();
         }

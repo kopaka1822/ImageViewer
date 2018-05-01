@@ -85,7 +85,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\Images.cs" />
+    <Compile Include="Models\DisplayModel.cs" />
+    <Compile Include="Models\ImagesModel.cs" />
+    <Compile Include="ModelViews\DisplayViewModel.cs" />
     <Compile Include="ModelViews\ImagesViewModel.cs" />
     <Compile Include="ModelViews\WindowViewModel.cs" />
     <Compile Include="Properties\Annotations.cs" />

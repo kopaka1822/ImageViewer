@@ -413,7 +413,8 @@
                     Width="150" 
                     HorizontalAlignment="Left" 
                     BorderBrush="DarkGray" 
-                    BorderThickness="0 0 1 0">
+                    BorderThickness="0 0 1 0"
+                    Visibility="{Binding Display.EnableLayers}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -426,7 +427,9 @@
                             Margin="0 0 5 0"/>
                         <ComboBox 
                             Grid.Column="1" 
-                            Width="120"/>
+                            Width="120"
+                            SelectedItem="{Binding Display.SelectedLayer}"
+                            ItemsSource="{Binding Display.AvailableLayers}"/>
                     </Grid>
                 </StatusBarItem>
 
@@ -435,7 +438,8 @@
                     Width="150" 
                     HorizontalAlignment="Left" 
                     BorderBrush="DarkGray" 
-                    BorderThickness="0 0 1 0">
+                    BorderThickness="0 0 1 0"
+                    Visibility="{Binding Display.EnableMipMaps}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -448,7 +452,10 @@
                             Margin="0 0 5 0"/>
                         <ComboBox 
                             Grid.Column="1" 
-                            Width="120"/>
+                            Width="120"
+                            SelectedItem="{Binding Display.SelectedMipMap}"
+                            ItemsSource="{Binding Display.AvailableMipMaps}"
+                            IsSynchronizedWithCurrentItem="True"/>
                     </Grid>
                 </StatusBarItem>
                 

@@ -15,17 +15,22 @@ namespace TextureViewer.ModelViews
     /// </summary>
     public class WindowViewModel
     {
-        private readonly Images imagesModel = new Images();
+        private readonly ImagesModel imagesModel = new ImagesModel();
+        private readonly DisplayModel displayModel = new DisplayModel();
         private readonly ImagesViewModel imagesViewModel;
+        private readonly DisplayViewModel displayViewModel;
 
         public WindowViewModel()
         {
             imagesViewModel = new ImagesViewModel(imagesModel);
+            displayViewModel = new DisplayViewModel(displayModel, imagesModel);
             ImportCommand = new ImportImageCommand(imagesViewModel);
         }
 
         public ICommand ImportCommand { get; }
 
         public ObservableCollection<string> ImageList { get; } = new ObservableCollection<string>() {"hello", "there"};
+
+        public DisplayViewModel Display => displayViewModel;
     }
 }

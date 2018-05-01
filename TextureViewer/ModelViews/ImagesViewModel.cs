@@ -9,9 +9,9 @@ namespace TextureViewer.ModelViews
 {
     public class ImagesViewModel
     {
-        public Images Images { get; }
+        public ImagesModel Images { get; }
 
-        public ImagesViewModel(Images images)
+        public ImagesViewModel(ImagesModel images)
         {
             this.Images = images;
         }
