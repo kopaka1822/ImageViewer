@@ -21,15 +21,6 @@ namespace TextureViewer.Models
             Alpha
         }
 
-        public enum ViewMode
-        {
-            Empty,
-            Single,
-            CubeMap,
-            Polar,
-            CubeCrossView
-        }
-
         private readonly ImagesModel imagesModel;
 
         public DisplayModel(ImagesModel imagesModel)
@@ -100,18 +91,6 @@ namespace TextureViewer.Models
                 if (value == grayscale) return;
                 grayscale = value;
                 OnPropertyChanged(nameof(Grayscale));
-            }
-        }
-
-        private ViewMode activeView = ViewMode.Empty;
-        public ViewMode ActiveView
-        {
-            get => activeView;
-            set
-            {
-                if (value == activeView) return;
-                activeView = value;
-                OnPropertyChanged(nameof(ActiveView));
             }
         }
 

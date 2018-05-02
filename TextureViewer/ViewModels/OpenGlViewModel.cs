@@ -14,6 +14,8 @@ namespace TextureViewer.ViewModels
         private readonly GLControl glControl;
         private readonly MainWindow window;
 
+        public bool IsEnabled { get; private set; } = false;
+
         public OpenGlViewModel(MainWindow window)
         {
             this.window = window;
@@ -123,7 +125,9 @@ namespace TextureViewer.ViewModels
         public void Enable()
         {
             glControl?.MakeCurrent();
-            glhelper.Utility.EnableDebugCallback();
+            if(debugGl)
+                glhelper.Utility.EnableDebugCallback();
+            IsEnabled = true;
         }
 
         /// <summary>
@@ -143,6 +147,8 @@ namespace TextureViewer.ViewModels
             {
                 // happens sometimes..
             }
+
+            IsEnabled = false;
         }
 
         /// <summary>

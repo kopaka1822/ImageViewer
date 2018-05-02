@@ -73,6 +73,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Commands\ResizeWindowCommand.cs" />
+    <Compile Include="Controller\TextureViews\ITextureView.cs" />
+    <Compile Include="Controller\TextureViews\PlainTextureView.cs" />
+    <Compile Include="Controller\TextureViews\SingleTextureView.cs" />
+    <Compile Include="Controller\TextureViews\VertexArrayTextureView.cs" />
+    <Compile Include="Controller\ViewModeController.cs" />
+    <Compile Include="Models\ViewModeModel.cs" />
+    <Compile Include="Utility\Color.cs" />
     <Compile Include="ViewModels\OpenGlViewModel.cs" />
     <Compile Include="Settings.cs" />
     <Page Include="MainWindow.xaml">
