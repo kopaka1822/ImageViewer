@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using TextureViewer.ModelViews;
+using TextureViewer.ViewModels;
 
 namespace TextureViewer.Commands
 {

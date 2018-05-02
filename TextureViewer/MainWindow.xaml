@@ -7,12 +7,11 @@
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
         Title="Texture Viewer" 
-        Width="{Binding Source={x:Static properties:Settings.Default}, Path=WindowSizeX}" 
-        Height="{Binding Source={x:Static properties:Settings.Default}, Path=WindowSizeY}" 
         Background="#eee"
         MinWidth="250" 
         MinHeight="200"
-        Icon="Icons/app.png">
+        Icon="Icons/app.png"
+        >
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="SizeChanged">
             <i:InvokeCommandAction Command="{Binding ResizeCommand}"/>
@@ -109,7 +108,6 @@
                     Focusable="True"
                     AllowDrop="True"
                     Initialized="OpenGlHost_OnInitialized"
-                    SizeChanged="OpenGlHost_OnSizeChanged"
                 />
 
                 <TabControl

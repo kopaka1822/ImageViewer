@@ -73,6 +73,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Commands\ResizeWindowCommand.cs" />
+    <Compile Include="ViewModels\OpenGlViewModel.cs" />
     <Compile Include="Settings.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -93,9 +94,9 @@
   <ItemGroup>
     <Compile Include="Models\DisplayModel.cs" />
     <Compile Include="Models\ImagesModel.cs" />
-    <Compile Include="ModelViews\DisplayViewModel.cs" />
-    <Compile Include="ModelViews\ImagesViewModel.cs" />
-    <Compile Include="ModelViews\WindowViewModel.cs" />
+    <Compile Include="ViewModels\DisplayViewModel.cs" />
+    <Compile Include="ViewModels\ImagesViewModel.cs" />
+    <Compile Include="ViewModels\WindowViewModel.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
