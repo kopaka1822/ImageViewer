@@ -41,23 +41,29 @@
             <MenuItem Header="_View">
                 <MenuItem 
                     Header="Linear Interpolation" 
-                    IsCheckable="True"/>
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.LinearInterpolation}"/>
                 <MenuItem Header="_Grayscale">
                     <MenuItem 
                         Header="_Disabled" 
-                        IsCheckable="True"/>
+                        IsCheckable="True"
+                        IsChecked="{Binding Display.IsGrayscaleDisabled}"/>
                     <MenuItem 
                         Header="_Red" 
-                        IsCheckable="True"/>
+                        IsCheckable="True"
+                        IsChecked="{Binding Display.IsGrayscaleRed}"/>
                     <MenuItem 
                         Header="_Green" 
-                        IsCheckable="True"/>
+                        IsCheckable="True"
+                        IsChecked="{Binding Display.IsGrayscaleGreen}"/>
                     <MenuItem 
                         Header="_Blue" 
-                        IsCheckable="True"/>
+                        IsCheckable="True"
+                        IsChecked="{Binding Display.IsGrayscaleBlue}"/>
                     <MenuItem 
                         Header="_Alpha" 
-                        IsCheckable="True"/>
+                        IsCheckable="True"
+                        IsChecked="{Binding Display.IsGrayscaleAlpha}"/>
                     <MenuItem.Icon>
                         <Image Source="Icons/grayscale.png"/>
                     </MenuItem.Icon>
@@ -308,6 +314,10 @@
                                 </StackPanel>
                             </Border>
                         </ScrollViewer>
+                    </TabItem>
+                    
+                    <TabItem Header="Statistics">
+                        
                     </TabItem>
                 </TabControl>
             </Grid>

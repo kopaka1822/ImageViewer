@@ -24,7 +24,27 @@ namespace TextureViewer.ModelViews
             this.displayModel = displayModel;
             this.imagesModel = imagesModel;
 
+            displayModel.PropertyChanged += DisplayModelOnPropertyChanged;
             imagesModel.PropertyChanged += ImagesModelOnPropertyChanged;
+        }
+
+        private void DisplayModelOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(DisplayModel.LinearInterpolation):
+                    OnPropertyChanged(nameof(LinearInterpolation));
+                    break;
+
+                case nameof(DisplayModel.Grayscale):
+                    // assume that everything has changed
+                    OnPropertyChanged(nameof(IsGrayscaleDisabled));
+                    OnPropertyChanged(nameof(IsGrayscaleRed));
+                    OnPropertyChanged(nameof(IsGrayscaleGreen));
+                    OnPropertyChanged(nameof(IsGrayscaleBlue));
+                    OnPropertyChanged(nameof(IsGrayscaleAlpha));
+                    break;
+            }
         }
 
         private void ImagesModelOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -37,6 +57,62 @@ namespace TextureViewer.ModelViews
                     CreateLayersList();
                     break;
               
+            }
+        }
+
+        public bool LinearInterpolation
+        {
+            get => displayModel.LinearInterpolation;
+            set => displayModel.LinearInterpolation = value;
+        }
+
+        public bool IsGrayscaleDisabled
+        {
+            get => displayModel.Grayscale == DisplayModel.GrayscaleMode.Disabled;
+            set
+            {
+                if (value)
+                    displayModel.Grayscale = DisplayModel.GrayscaleMode.Disabled;
+            }
+        }
+
+        public bool IsGrayscaleRed
+        {
+            get => displayModel.Grayscale == DisplayModel.GrayscaleMode.Red;
+            set
+            {
+                if (value)
+                    displayModel.Grayscale = DisplayModel.GrayscaleMode.Red;
+            }
+        }
+
+        public bool IsGrayscaleGreen
+        {
+            get => displayModel.Grayscale == DisplayModel.GrayscaleMode.Green;
+            set
+            {
+                if (value)
+                    displayModel.Grayscale = DisplayModel.GrayscaleMode.Green;
+            }
+        }
+
+        public bool IsGrayscaleBlue
+        {
+            get => displayModel.Grayscale == DisplayModel.GrayscaleMode.Blue;
+            set
+            {
+                if (value)
+                    displayModel.Grayscale = DisplayModel.GrayscaleMode.Blue;
+            }
+        }
+
+        public bool IsGrayscaleAlpha
+        {
+            get => displayModel.Grayscale == DisplayModel.GrayscaleMode.Alpha;
+            set
+            {
+                if(value)
+                    displayModel.Grayscale = DisplayModel.GrayscaleMode.Alpha;
             }
         }
 
@@ -53,6 +129,7 @@ namespace TextureViewer.ModelViews
             set
             {
                 if (selectedMipMap == value) return;
+                // determine active mipmap
                 selectedMipMap = value;
                 OnPropertyChanged(nameof(SelectedMipMap));
             }
@@ -65,6 +142,7 @@ namespace TextureViewer.ModelViews
             set
             {
                 if (selectedLayer == value) return;
+                // determine active layer
                 selectedLayer = value;
                 OnPropertyChanged(nameof(SelectedLayer));
             }

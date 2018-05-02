@@ -16,12 +16,13 @@ namespace TextureViewer.ModelViews
     public class WindowViewModel
     {
         private readonly ImagesModel imagesModel = new ImagesModel();
-        private readonly DisplayModel displayModel = new DisplayModel();
+        private readonly DisplayModel displayModel;
         private readonly ImagesViewModel imagesViewModel;
         private readonly DisplayViewModel displayViewModel;
 
         public WindowViewModel()
         {
+            displayModel = new DisplayModel(imagesModel);
             imagesViewModel = new ImagesViewModel(imagesModel);
             displayViewModel = new DisplayViewModel(displayModel, imagesModel);
             ImportCommand = new ImportImageCommand(imagesViewModel);

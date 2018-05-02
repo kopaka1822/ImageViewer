@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -29,12 +30,36 @@ namespace TextureViewer.Models
             CubeCrossView
         }
 
+        private readonly ImagesModel imagesModel;
+
+        public DisplayModel(ImagesModel imagesModel)
+        {
+            this.imagesModel = imagesModel;
+            this.imagesModel.PropertyChanged += ImagesModelOnPropertyChanged;
+        }
+
+        private void ImagesModelOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(ImagesModel.NumMipmaps):
+                    // reset active mipmap
+                    ActiveMipmap = 0;
+                    break;
+                case nameof(ImagesModel.NumLayers):
+                    // reset active layer
+                    ActiveLayer = 0;
+                    break;
+            }
+        }
+
         private int activeLayer = 0;
         public int ActiveLayer
         {
             get => activeLayer;
             set
             {
+                Debug.Assert(value == 0 || (value >= 0 && value < imagesModel.NumLayers));
                 if (value == activeLayer) return;
                 activeLayer = value;
                 OnPropertyChanged(nameof(ActiveLayer));
@@ -47,6 +72,7 @@ namespace TextureViewer.Models
             get => activeMipmap;
             set
             {
+                Debug.Assert(value == 0 || (value >= 0 && value < imagesModel.NumMipmaps));
                 if (value == activeMipmap) return;
                 activeMipmap = value;
                 OnPropertyChanged(nameof(ActiveMipmap));
