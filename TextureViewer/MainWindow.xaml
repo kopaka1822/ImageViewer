@@ -73,11 +73,6 @@
                         <Image Source="Icons/displayconfig.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="_Image Statistics">
-                    <MenuItem.Icon>
-                        <Image Source="Icons/statistics.png"/>
-                    </MenuItem.Icon>
-                </MenuItem>
             </MenuItem>
             <!--END VIEW-->
 
@@ -317,7 +312,37 @@
                     </TabItem>
                     
                     <TabItem Header="Statistics">
-                        
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <Border Padding="5">
+                                <StackPanel>
+                                    <TextBlock 
+                                        Text="Double click box to copy content to clipboard"
+                                        Margin="0 0 0 5"
+                                        TextWrapping="Wrap"/>
+
+                                    <TextBlock Text="Average:"/>
+                                    <TextBlock Text="Luminance:"/>
+                                    <TextBox Text="1.0"/>
+                                    <TextBlock Text="Red:"/>
+                                    <TextBox Text="1.0"/>
+                                    <TextBlock Text="Green:"/>
+                                    <TextBox Text="1.0"/>
+                                    <TextBlock Text="Blue:"/>
+                                    <TextBox Text="1.0"/>
+
+                                    <TextBlock Text="Root of Average:"/>
+                                    <TextBlock Text="Luminance:"/>
+                                    <TextBox Text="1.0"/>
+                                    <TextBlock Text="Red:"/>
+                                    <TextBox Text="1.0"/>
+                                    <TextBlock Text="Green:"/>
+                                    <TextBox Text="1.0"/>
+                                    <TextBlock Text="Blue:"/>
+                                    <TextBox Text="1.0"/>
+
+                                </StackPanel>
+                            </Border>
+                        </ScrollViewer>
                     </TabItem>
                 </TabControl>
             </Grid>

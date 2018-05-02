@@ -119,8 +119,8 @@ namespace TextureViewer.ModelViews
         public ObservableCollection<string> AvailableMipMaps { get; } = new ObservableCollection<string>();
         public ObservableCollection<string> AvailableLayers { get; } = new ObservableCollection<string>();
 
-        public Visibility EnableMipMaps => AvailableMipMaps.Count > 1 ? Visibility.Visible : Visibility.Hidden;
-        public Visibility EnableLayers => AvailableLayers.Count > 1 ? Visibility.Visible : Visibility.Hidden;
+        public Visibility EnableMipMaps => AvailableMipMaps.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility EnableLayers => AvailableLayers.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
 
         private string selectedMipMap = emptyMipMap;
         public string SelectedMipMap
