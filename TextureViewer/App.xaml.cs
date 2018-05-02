@@ -18,14 +18,40 @@ namespace TextureViewer
         // change this if the assembly name was changed
         public static readonly string AppName = "Texture Viewer";
 
+        private readonly List<MainWindow> openWindows = new List<MainWindow>();
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            if (e.Args.Length == 0)
+            {
+                // open empty window
+                SpawnWindow(null);
+            }
+            else
+            {
+                // open a window for each file
+                foreach (var s in e.Args)
+                {
+                    SpawnWindow(s);
+                }
+            }
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
+            TextureViewer.Properties.Settings.Default.Save();
+
             base.OnExit(e);
+        }
+
+        public void SpawnWindow(string filename)
+        {
+            var wnd = new MainWindow(this);
+            openWindows.Add(wnd);
+
+            wnd.Show();
         }
 
         /// <summary>

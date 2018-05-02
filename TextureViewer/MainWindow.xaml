@@ -3,13 +3,22 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:modelViews="clr-namespace:TextureViewer.ModelViews"
+        xmlns:properties="clr-namespace:TextureViewer.Properties"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
-        Title="Texture Viewer" Height="600" Width="800"
+        Title="Texture Viewer" 
+        Width="{Binding Source={x:Static properties:Settings.Default}, Path=WindowSizeX}" 
+        Height="{Binding Source={x:Static properties:Settings.Default}, Path=WindowSizeY}" 
         Background="#eee"
-        MinWidth="250" MinHeight="200"
-        Icon="Icons/app.png"
-        >
+        MinWidth="250" 
+        MinHeight="200"
+        Icon="Icons/app.png">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="SizeChanged">
+            <i:InvokeCommandAction Command="{Binding ResizeCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
     <DockPanel>
         <Menu 
             DockPanel.Dock="Top" 
@@ -17,7 +26,9 @@
             Padding="0 0 0 2">
 
             <MenuItem Header="File">
-                <MenuItem Header="_Open">
+                <MenuItem 
+                    Header="_Open"
+                    Command="{Binding OpenCommand}">
                     <MenuItem.Icon>
                         <Image Source="Icons/open.png"/>
                     </MenuItem.Icon>
@@ -30,7 +41,9 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
-                <MenuItem Header="_Export">
+                <MenuItem 
+                    Header="_Export"
+                    Command="{Binding ExportCommand}">
                     <MenuItem.Icon>
                         <Image Source="Icons/save.png"/>
                     </MenuItem.Icon>
