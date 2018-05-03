@@ -17,16 +17,33 @@ namespace TextureViewer.Models
     {
         private OpenGlController glController;
 
+        private struct Dimension
+        {
+            public int Width;
+            public int Height;
+        }
+
+        private Dimension[] dimensions = null;
+
         private class ImageData
         {
-            // TODO should image data be saved?
-            public ImageLoader.Image Image { get; }
             public TextureArray2D TextureArray { get; }
+            public int NumMipmaps { get; }
+            public int NumLayers { get; }
+            public bool IsGrayscale { get; }
+            public bool HasAlpha { get; }
+            public bool IsHdr { get; }
+            public string Filename { get; }
 
             public ImageData(ImageLoader.Image image)
             {
-                this.Image = image;
                 this.TextureArray = new TextureArray2D(image);
+                NumMipmaps = image.NumMipmaps;
+                NumLayers = image.NumLayers;
+                IsGrayscale = image.IsGrayscale();
+                HasAlpha = image.HasAlpha();
+                IsHdr = image.IsHdr();
+                Filename = image.Filename;
             }
 
             /// <summary>
@@ -50,37 +67,39 @@ namespace TextureViewer.Models
         #region Public Members
 
         public int NumImages => images.Count;
-        public int NumMipmaps => images.Count == 0 ? 0 : images[0].Image.NumMipmaps;
-        public int NumLayers => images.Count == 0 ? 0 : images[0].Image.NumLayers;
+        public int NumMipmaps => images.Count == 0 ? 0 : images[0].NumMipmaps;
+        public int NumLayers => images.Count == 0 ? 0 : images[0].NumLayers;
         /// <summary>
         /// true if all images are grayscale
         /// </summary>
-        public bool IsGrayscale => images.All(imageData => imageData.Image.IsGrayscale());
+        public bool IsGrayscale => images.All(imageData => imageData.IsGrayscale);
         /// <summary>
         /// true if any image has an alpha channel
         /// </summary>
-        public bool IsAlpha => images.Any(imageData => imageData.Image.HasAlpha());
+        public bool IsAlpha => images.Any(imageData => imageData.HasAlpha);
         /// <summary>
         /// true if any image is hdr
         /// </summary>
-        public bool IsHdr => images.Any(imageData => imageData.Image.IsHdr());
+        public bool IsHdr => images.Any(imageData => imageData.IsHdr);
 
         public int GetWidth(int mipmap)
         {
             Debug.Assert(images.Count != 0);
-            return images[0].Image.GetWidth(mipmap);
+            Debug.Assert(mipmap < NumMipmaps && mipmap >= 0);
+            return dimensions[mipmap].Width;
         }
 
         public int GetHeight(int mipmap)
         {
             Debug.Assert(images.Count != 0);
-            return images[0].Image.GetHeight(mipmap);
+            Debug.Assert(mipmap < NumMipmaps && mipmap >= 0);
+            return dimensions[mipmap].Height;
         }
 
         public string GetFilename(int image)
         {
             Debug.Assert((uint)(image) < images.Count);
-            return images[image].Image.Filename;
+            return images[image].Filename;
         }
 
         /// <summary>
@@ -97,6 +116,17 @@ namespace TextureViewer.Models
                 if (images.Count == 0)
                 {
                     images.Add(new ImageData(image));
+
+                    // intialize dimensions
+                    dimensions = new Dimension[image.NumMipmaps];
+                    for (var i = 0; i < image.NumMipmaps; ++i)
+                    {
+                        dimensions[i] = new Dimension()
+                        {
+                            Height = image.GetHeight(i),
+                            Width = image.GetWidth(i)
+                        };
+                    }
 
                     // a lot has changed
                     OnPropertyChanged(nameof(NumImages));
