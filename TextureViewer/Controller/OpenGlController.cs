@@ -4,11 +4,12 @@ using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
+using TextureViewer.Models;
 using DragEventArgs = System.Windows.Forms.DragEventArgs;
 
-namespace TextureViewer.ViewModels
+namespace TextureViewer.Controller
 {
-    public class OpenGlViewModel
+    public class OpenGlController
     {
         private bool debugGl = true;
         private readonly GLControl glControl;
@@ -16,7 +17,9 @@ namespace TextureViewer.ViewModels
 
         public bool IsEnabled { get; private set; } = false;
 
-        public OpenGlViewModel(MainWindow window)
+        public OpenGlModel Model { get; private set; }
+
+        public OpenGlController(MainWindow window)
         {
             this.window = window;
             try
@@ -49,10 +52,32 @@ namespace TextureViewer.ViewModels
                 GL.Enable(EnableCap.TextureCubeMapSeamless);
                 GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
                 GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
+
+                // create data model
+                Model = new OpenGlModel(this);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+            }
+            finally
+            {
+                Disable();
+            }
+        }
+
+        public void Dispose()
+        {
+            Enable();
+
+            try
+            {
+                Model?.Dispose();
+                Model = null;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
             finally
             {
@@ -104,6 +129,9 @@ namespace TextureViewer.ViewModels
                 GL.Viewport(0, 0, GetOpenGlHostWidth(), GetOpenGlHostHeight());
                 GL.ClearColor(0.9333f, 0.9333f, 0.9333f, 1.0f);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+                Model.CheckersShader.Bind(Matrix4.Identity);
+                Model.Vao.DrawQuad();
 
                 glControl.SwapBuffers();
                 //RedrawFrame();

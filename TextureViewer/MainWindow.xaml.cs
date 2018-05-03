@@ -1,27 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Forms;
-using System.Windows.Forms.Integration;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL4;
-using TextureViewer.Models;
+using TextureViewer.Controller;
 using TextureViewer.ViewModels;
-using DragEventArgs = System.Windows.Forms.DragEventArgs;
-using MouseEventArgs = System.Windows.Forms.MouseEventArgs;
 
 namespace TextureViewer
 {
@@ -31,7 +11,7 @@ namespace TextureViewer
     public partial class MainWindow : Window
     {
         private App parent;
-        private OpenGlViewModel glModelView;
+        private OpenGlController glController;
 
         public MainWindow(App parent)
         {
@@ -50,7 +30,7 @@ namespace TextureViewer
         /// <param name="e"></param>
         private void OpenGlHost_OnInitialized(object sender, EventArgs e)
         {
-            glModelView = new OpenGlViewModel(this);
+            glController = new OpenGlController(this);
         }
     }
 }

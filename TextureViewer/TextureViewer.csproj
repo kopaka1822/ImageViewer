@@ -75,12 +75,15 @@
     <Compile Include="Commands\ResizeWindowCommand.cs" />
     <Compile Include="Controller\TextureViews\ITextureView.cs" />
     <Compile Include="Controller\TextureViews\PlainTextureView.cs" />
+    <Compile Include="Controller\TextureViews\Shader\CheckersShader.cs" />
     <Compile Include="Controller\TextureViews\SingleTextureView.cs" />
-    <Compile Include="Controller\TextureViews\VertexArrayTextureView.cs" />
-    <Compile Include="Controller\ViewModeController.cs" />
+    <Compile Include="glhelper\Program.cs" />
+    <Compile Include="glhelper\Shader.cs" />
+    <Compile Include="glhelper\VertexArray.cs" />
+    <Compile Include="Models\OpenGlModel.cs" />
     <Compile Include="Models\ViewModeModel.cs" />
     <Compile Include="Utility\Color.cs" />
-    <Compile Include="ViewModels\OpenGlViewModel.cs" />
+    <Compile Include="Controller\OpenGlController.cs" />
     <Compile Include="Settings.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
