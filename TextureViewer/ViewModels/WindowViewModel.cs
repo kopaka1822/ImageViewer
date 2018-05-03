@@ -10,7 +10,7 @@ namespace TextureViewer.ViewModels
     /// </summary>
     public class WindowViewModel
     {
-        private readonly ImagesModel imagesModel = new ImagesModel();
+        private readonly ImagesModel imagesModel;
         private readonly DisplayModel displayModel;
         private readonly ImagesViewModel imagesViewModel;
         private readonly App app;
@@ -20,6 +20,7 @@ namespace TextureViewer.ViewModels
         {
             this.app = app;
             this.window = window;
+            this.imagesModel = new ImagesModel(window.GlController);
             displayModel = new DisplayModel(imagesModel);
             imagesViewModel = new ImagesViewModel(imagesModel);
             Display = new DisplayViewModel(displayModel, imagesModel);

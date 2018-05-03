@@ -11,7 +11,7 @@ namespace TextureViewer
     public partial class MainWindow : Window
     {
         private App parent;
-        private OpenGlController glController;
+        public OpenGlController GlController { get; private set; }
 
         public MainWindow(App parent)
         {
@@ -30,7 +30,7 @@ namespace TextureViewer
         /// <param name="e"></param>
         private void OpenGlHost_OnInitialized(object sender, EventArgs e)
         {
-            glController = new OpenGlController(this);
+            GlController = new OpenGlController(this);
         }
     }
 }

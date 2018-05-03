@@ -8,18 +8,25 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using TextureViewer.Annotations;
+using TextureViewer.Controller;
+using TextureViewer.glhelper;
 
 namespace TextureViewer.Models
 {
     public class ImagesModel: INotifyPropertyChanged
     {
+        private OpenGlController glController;
+
         private class ImageData
         {
+            // TODO should image data be saved?
             public ImageLoader.Image Image { get; }
+            public TextureArray2D TextureArray { get; }
 
             public ImageData(ImageLoader.Image image)
             {
                 this.Image = image;
+                this.TextureArray = new TextureArray2D(image);
             }
 
             /// <summary>
@@ -28,14 +35,15 @@ namespace TextureViewer.Models
             /// </summary>
             public void Dispose()
             {
-                // TODO dispose Opengl resource
+                TextureArray.Dispose();
             }
         }
 
         private readonly List<ImageData> images;
 
-        public ImagesModel()
+        public ImagesModel(OpenGlController glController)
         {
+            this.glController = glController;
             images = new List<ImageData>();
         }
 
@@ -82,6 +90,8 @@ namespace TextureViewer.Models
         /// <param name="imgs">images that should be added</param>
         public void AddImages(List<ImageLoader.Image> imgs)
         {
+            Debug.Assert(!glController.IsEnabled);
+            glController.Enable();
             foreach (var image in imgs)
             {
                 if (images.Count == 0)
@@ -129,8 +139,7 @@ namespace TextureViewer.Models
                         OnPropertyChanged(nameof(IsHdr));
                 }
             }
-
-            
+            glController.Disable();
         }
 
         /// <summary>
@@ -146,8 +155,12 @@ namespace TextureViewer.Models
             var isGrayscale = IsGrayscale;
             var isHdr = IsHdr;
 
+            Debug.Assert(!glController.IsEnabled);
+            glController.Enable();
             // delete old data
             images[imageId].Dispose();
+            glController.Disable();
+
             images.RemoveAt(imageId);
             OnPropertyChanged(nameof(NumImages));
 
