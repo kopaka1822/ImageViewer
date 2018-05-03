@@ -60,14 +60,14 @@ namespace TextureViewer.Models
         }
 
         private Matrix4 aspectRatio = Matrix4.Identity;
-        public Matrix4 AspectRation
+        public Matrix4 AspectRatio
         {
             get => aspectRatio;
             set
             {
                 if (aspectRatio.Equals(value)) return;
                 aspectRatio = value;
-                OnPropertyChanged(nameof(AspectRation));
+                OnPropertyChanged(nameof(AspectRatio));
             }
         }
 

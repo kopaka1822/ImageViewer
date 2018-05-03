@@ -19,10 +19,10 @@ namespace TextureViewer.Models
         public VertexArray Vao { get; }
         public CheckersShader CheckersShader { get; }
 
-        private Sampler samplerLinear;
-        private Sampler samplerLinearMip;
-        private Sampler samplerNearest;
-        private Sampler samplerNearestMip;
+        private readonly Sampler samplerLinear;
+        private readonly Sampler samplerLinearMip;
+        private readonly Sampler samplerNearest;
+        private readonly Sampler samplerNearestMip;
 
         public OpenGlModel(OpenGlController controller)
         {

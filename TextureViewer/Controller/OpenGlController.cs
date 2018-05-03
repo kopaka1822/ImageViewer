@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Forms;
 using OpenTK;
@@ -14,14 +15,19 @@ namespace TextureViewer.Controller
         private bool debugGl = true;
         private readonly GLControl glControl;
         private readonly MainWindow window;
+        private readonly ViewModeModel viewModeModel = new ViewModeModel();
+        private readonly ImagesModel imagesModel;
 
         public bool IsEnabled { get; private set; } = false;
 
         public OpenGlModel Model { get; private set; }
 
-        public OpenGlController(MainWindow window)
+        public OpenGlController(MainWindow window, ImagesModel imagesModel)
         {
             this.window = window;
+            this.imagesModel = imagesModel;
+            imagesModel.PropertyChanged += ImagesModelOnPropertyChanged;
+
             try
             {
                 var flags = GraphicsContextFlags.Default;
@@ -36,7 +42,7 @@ namespace TextureViewer.Controller
                 glControl.Paint += Paint;
 
                 window.OpenGlHost.Child = glControl;
-                window.OpenGlHost.SizeChanged += (sender, args) => RedrawFrame();
+                window.OpenGlHost.SizeChanged += OpenGlHostOnSizeChanged;
 
                 glControl.MouseMove += OnMouseMove;
                 glControl.MouseWheel += OnMouseWheel;
@@ -46,6 +52,9 @@ namespace TextureViewer.Controller
                 glControl.DragDrop += OnDragDrop;
                 glControl.DragOver += (o, args) => args.Effect = System.Windows.Forms.DragDropEffects.Copy;
                 glControl.AllowDrop = true;
+
+                // set initial aspect ratio
+                viewModeModel.AspectRatio = CalculateAspectRatio();
 
                 Enable();
 
@@ -63,6 +72,23 @@ namespace TextureViewer.Controller
             finally
             {
                 Disable();
+            }
+        }
+
+        private void OpenGlHostOnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
+        {
+            RedrawFrame();
+            viewModeModel.AspectRatio = CalculateAspectRatio();
+        }
+
+        private void ImagesModelOnPropertyChanged(object sender1, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(ImagesModel.NumImages):
+                    // recalculate if image dimensions change
+                    viewModeModel.AspectRatio = CalculateAspectRatio();
+                    break;
             }
         }
 
@@ -207,6 +233,15 @@ namespace TextureViewer.Controller
             PresentationSource source = PresentationSource.FromVisual(window);
             var scaling = source.CompositionTarget.TransformToDevice.M22;
             return (int)(window.OpenGlHost.ActualHeight * scaling);
+        }
+
+        private Matrix4 CalculateAspectRatio()
+        {
+            // images present?
+            if (imagesModel.NumImages == 0)
+                return Matrix4.Identity;
+
+            return Matrix4.CreateScale(imagesModel.GetWidth(0) / (float)GetOpenGlHostWidth(), imagesModel.GetHeight(0) / (float)GetOpenGlHostHeight(), 1.0f);
         }
     }
 }

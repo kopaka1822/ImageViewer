@@ -32,5 +32,10 @@ namespace TextureViewer.Controller.TextureViews
         {
             
         }
+
+        private Matrix4 GetOrientation()
+        {
+            return Matrix4.CreateScale(1.0f, -1.0f, 1.0f);
+        }
     }
 }
