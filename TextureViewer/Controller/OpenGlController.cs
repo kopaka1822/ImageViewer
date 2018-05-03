@@ -15,7 +15,7 @@ namespace TextureViewer.Controller
         private bool debugGl = true;
         private readonly GLControl glControl;
         private readonly MainWindow window;
-        private readonly ViewModeModel viewModeModel = new ViewModeModel();
+        //private readonly ViewModeModel viewModeModel = new ViewModeModel();
         private readonly ImagesModel imagesModel;
 
         public bool IsEnabled { get; private set; } = false;
@@ -54,7 +54,7 @@ namespace TextureViewer.Controller
                 glControl.AllowDrop = true;
 
                 // set initial aspect ratio
-                viewModeModel.AspectRatio = CalculateAspectRatio();
+                //viewModeModel.AspectRatio = CalculateAspectRatio();
 
                 Enable();
 
@@ -63,7 +63,7 @@ namespace TextureViewer.Controller
                 GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
 
                 // create data model
-                Model = new OpenGlModel(this);
+                //Model = new OpenGlModel(this);
             }
             catch (Exception e)
             {
@@ -78,7 +78,7 @@ namespace TextureViewer.Controller
         private void OpenGlHostOnSizeChanged(object sender, SizeChangedEventArgs sizeChangedEventArgs)
         {
             RedrawFrame();
-            viewModeModel.AspectRatio = CalculateAspectRatio();
+            //viewModeModel.AspectRatio = CalculateAspectRatio();
         }
 
         private void ImagesModelOnPropertyChanged(object sender1, PropertyChangedEventArgs args)
@@ -87,7 +87,7 @@ namespace TextureViewer.Controller
             {
                 case nameof(ImagesModel.NumImages):
                     // recalculate if image dimensions change
-                    viewModeModel.AspectRatio = CalculateAspectRatio();
+                    //viewModeModel.AspectRatio = CalculateAspectRatio();
                     break;
             }
         }
@@ -179,7 +179,7 @@ namespace TextureViewer.Controller
         public void Enable()
         {
             glControl?.MakeCurrent();
-            if(debugGl)
+            if (debugGl)
                 glhelper.Utility.EnableDebugCallback();
             IsEnabled = true;
         }

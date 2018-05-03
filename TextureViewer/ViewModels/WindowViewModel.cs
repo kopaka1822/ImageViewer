@@ -10,9 +10,7 @@ namespace TextureViewer.ViewModels
     /// </summary>
     public class WindowViewModel
     {
-        private readonly ImagesModel imagesModel;
-        private readonly DisplayModel displayModel;
-        private readonly ImagesViewModel imagesViewModel;
+        private readonly Models.Models models;
         private readonly App app;
         private readonly MainWindow window;
 
@@ -20,11 +18,12 @@ namespace TextureViewer.ViewModels
         {
             this.app = app;
             this.window = window;
-            this.imagesModel = new ImagesModel(window.GlController);
-            displayModel = new DisplayModel(imagesModel);
-            imagesViewModel = new ImagesViewModel(imagesModel);
-            Display = new DisplayViewModel(displayModel, imagesModel);
-            ImportCommand = new ImportImageCommand(imagesViewModel);
+            this.models = new Models.Models(window);
+            
+            
+            Images = new ImagesViewModel(models.Images);
+            Display = new DisplayViewModel(models.Display, models.Images);
+            ImportCommand = new ImportImageCommand(Images);
             ResizeCommand = new ResizeWindowCommand(window);
         }
 
@@ -36,5 +35,6 @@ namespace TextureViewer.ViewModels
         public ObservableCollection<string> ImageList { get; } = new ObservableCollection<string>() {"hello", "there"};
 
         public DisplayViewModel Display { get; }
+        public ImagesViewModel Images { get; }
     }
 }

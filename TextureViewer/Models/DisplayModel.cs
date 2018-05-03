@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK;
 using TextureViewer.Annotations;
 
 namespace TextureViewer.Models
@@ -21,7 +22,53 @@ namespace TextureViewer.Models
             Alpha
         }
 
+        public enum ViewMode
+        {
+            Empty,
+            Single,
+            CubeMap,
+            Polar,
+            CubeCrossView
+        }
+
         private readonly ImagesModel imagesModel;
+
+        private ViewMode activeView = ViewMode.Empty;
+        public ViewMode ActiveView
+        {
+            get => activeView;
+            set
+            {
+                if (value == activeView) return;
+                activeView = value;
+                OnPropertyChanged(nameof(ActiveView));
+            }
+        }
+
+        private float zoom = 1.0f;
+        public float Zoom
+        {
+            get => zoom;
+            set
+            {
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                if (value == zoom) return;
+                zoom = value;
+                OnPropertyChanged(nameof(Zoom));
+            }
+        }
+
+        private Matrix4 aspectRatio = Matrix4.Identity;
+        public Matrix4 AspectRatio
+        {
+            get => aspectRatio;
+            set
+            {
+                if (aspectRatio.Equals(value)) return;
+                aspectRatio = value;
+                OnPropertyChanged(nameof(AspectRatio));
+            }
+        }
 
         public DisplayModel(ImagesModel imagesModel)
         {

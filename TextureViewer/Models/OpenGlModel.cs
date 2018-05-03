@@ -24,9 +24,9 @@ namespace TextureViewer.Models
         private readonly Sampler samplerNearest;
         private readonly Sampler samplerNearestMip;
 
-        public OpenGlModel(OpenGlController controller)
+        public OpenGlModel(OpenGlContext context)
         {
-            Debug.Assert(controller.IsEnabled);
+            Debug.Assert(context.IsEnabled);
             Vao = new VertexArray();
             CheckersShader = new CheckersShader();
             samplerLinear = new Sampler(TextureMinFilter.Linear, TextureMagFilter.Linear);

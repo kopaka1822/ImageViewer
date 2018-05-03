@@ -15,14 +15,13 @@ namespace TextureViewer.Models
 {
     public class ImagesModel: INotifyPropertyChanged
     {
-        private OpenGlController glController;
-
         private struct Dimension
         {
             public int Width;
             public int Height;
         }
 
+        private OpenGlContext context;
         private Dimension[] dimensions = null;
 
         private class ImageData
@@ -58,9 +57,9 @@ namespace TextureViewer.Models
 
         private readonly List<ImageData> images;
 
-        public ImagesModel(OpenGlController glController)
+        public ImagesModel(OpenGlContext context)
         {
-            this.glController = glController;
+            this.context = context;
             images = new List<ImageData>();
         }
 
@@ -123,10 +122,11 @@ namespace TextureViewer.Models
         /// Throws an exception if the image cannot be added
         /// </summary>
         /// <param name="imgs">images that should be added</param>
+        /// <param name="glController"></param>
         public void AddImages(List<ImageLoader.Image> imgs)
         {
-            Debug.Assert(!glController.IsEnabled);
-            glController.Enable();
+            Debug.Assert(!context.IsEnabled);
+            context.Enable();
             foreach (var image in imgs)
             {
                 if (images.Count == 0)
@@ -185,13 +185,14 @@ namespace TextureViewer.Models
                         OnPropertyChanged(nameof(IsHdr));
                 }
             }
-            glController.Disable();
+            context.Disable();
         }
 
         /// <summary>
         /// deletes an image including all opengl data
         /// </summary>
         /// <param name="imageId"></param>
+        /// <param name="glController"></param>
         public void DeleteImage(int imageId)
         {
             Debug.Assert(imageId >= 0 && imageId < NumImages);
@@ -201,11 +202,11 @@ namespace TextureViewer.Models
             var isGrayscale = IsGrayscale;
             var isHdr = IsHdr;
 
-            Debug.Assert(!glController.IsEnabled);
-            glController.Enable();
+            Debug.Assert(!context.IsEnabled);
+            context.Enable();
             // delete old data
             images[imageId].Dispose();
-            glController.Disable();
+            context.Disable();
 
             images.RemoveAt(imageId);
             OnPropertyChanged(nameof(NumImages));

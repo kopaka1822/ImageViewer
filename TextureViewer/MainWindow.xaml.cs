@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using TextureViewer.Controller;
 using TextureViewer.ViewModels;
@@ -11,13 +12,16 @@ namespace TextureViewer
     public partial class MainWindow : Window
     {
         private App parent;
-        public OpenGlController GlController { get; private set; }
+        public WindowViewModel ViewModel { get; private set; }
 
         public MainWindow(App parent)
         {
             this.parent = parent;
+
             InitializeComponent();
-            DataContext = new WindowViewModel(parent, this);
+
+            Debug.Assert(ViewModel != null);
+            DataContext = ViewModel;
 
             Width = Properties.Settings.Default.WindowSizeX;
             Height = Properties.Settings.Default.WindowSizeY;
@@ -30,7 +34,8 @@ namespace TextureViewer
         /// <param name="e"></param>
         private void OpenGlHost_OnInitialized(object sender, EventArgs e)
         {
-            GlController = new OpenGlController(this);
+            // initialize data models
+            ViewModel = new WindowViewModel(parent, this);
         }
     }
 }
