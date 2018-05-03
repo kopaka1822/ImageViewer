@@ -82,6 +82,11 @@ namespace TextureViewer.Models
         /// </summary>
         public bool IsHdr => images.Any(imageData => imageData.IsHdr);
 
+        /// <summary>
+        /// width of the mipmap
+        /// </summary>
+        /// <param name="mipmap"></param>
+        /// <returns></returns>
         public int GetWidth(int mipmap)
         {
             Debug.Assert(images.Count != 0);
@@ -89,6 +94,11 @@ namespace TextureViewer.Models
             return dimensions[mipmap].Width;
         }
 
+        /// <summary>
+        /// height of the mipmap
+        /// </summary>
+        /// <param name="mipmap"></param>
+        /// <returns></returns>
         public int GetHeight(int mipmap)
         {
             Debug.Assert(images.Count != 0);
@@ -100,6 +110,12 @@ namespace TextureViewer.Models
         {
             Debug.Assert((uint)(image) < images.Count);
             return images[image].Filename;
+        }
+
+        public TextureArray2D GetTexture(int image)
+        {
+            Debug.Assert((uint)(image) < images.Count);
+            return images[image].TextureArray;
         }
 
         /// <summary>
