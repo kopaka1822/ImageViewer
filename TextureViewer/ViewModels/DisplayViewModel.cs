@@ -9,15 +9,35 @@ namespace TextureViewer.ViewModels
 {
     public class DisplayViewModel : INotifyPropertyChanged
     {
+        public class ComboBoxItem <T>
+        {
+            private readonly string name;
+            public T Cargo { get; }
+
+            public ComboBoxItem(string name, T cargo)
+            {
+                this.name = name;
+                Cargo = cargo;
+            }
+
+            public override string ToString()
+            {
+                return name;
+            }
+        }
+
         private readonly Models.Models models;
-        private static readonly string emptyMipMap = "No Mipmap";
-        private static readonly string emptyLayer = "No Layer";
+        private static readonly ComboBoxItem<int> EmptyMipMap = new ComboBoxItem<int>("No Mipmap", -1);
+        private static readonly ComboBoxItem<int> EmptyLayer = new ComboBoxItem<int>("No Layer", -1);
+        private static readonly ComboBoxItem<DisplayModel.ViewMode> EmptyViewMode = new ComboBoxItem<DisplayModel.ViewMode>("Empty", DisplayModel.ViewMode.Empty);
 
         public DisplayViewModel(Models.Models models)
         {
             this.models = models;
             models.Display.PropertyChanged += DisplayModelOnPropertyChanged;
             models.Images.PropertyChanged += ImagesModelOnPropertyChanged;
+
+            CreateViewModes();
         }
 
         private void DisplayModelOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -35,6 +55,33 @@ namespace TextureViewer.ViewModels
                     OnPropertyChanged(nameof(IsGrayscaleGreen));
                     OnPropertyChanged(nameof(IsGrayscaleBlue));
                     OnPropertyChanged(nameof(IsGrayscaleAlpha));
+                    break;
+
+                case nameof(DisplayModel.ActiveLayer):
+                    SelectedLayer = AvailableLayers.Count != 0 
+                        ? AvailableLayers[models.Display.ActiveLayer] 
+                        : EmptyLayer;
+                    break;
+
+                case nameof(DisplayModel.ActiveMipmap):
+                    SelectedMipMap = AvailableMipMaps.Count != 0
+                        ? AvailableMipMaps[models.Display.ActiveMipmap]
+                        : EmptyMipMap;
+                    break;
+
+                case nameof(DisplayModel.AvailableViews):
+                    CreateViewModes();
+                    break;
+
+                case nameof(DisplayModel.ActiveView):
+                    var selected = EmptyViewMode;
+                    foreach (var item in AvailableViewModes)
+                    {
+                        if (item.Cargo == models.Display.ActiveView)
+                            selected = item;
+                    }
+
+                    SelectedViewMode = selected;
                     break;
             }
         }
@@ -108,35 +155,57 @@ namespace TextureViewer.ViewModels
             }
         }
 
-        public ObservableCollection<string> AvailableMipMaps { get; } = new ObservableCollection<string>();
-        public ObservableCollection<string> AvailableLayers { get; } = new ObservableCollection<string>();
+        public ObservableCollection<ComboBoxItem<int>> AvailableMipMaps { get; } = new ObservableCollection<ComboBoxItem<int>>();
+        public ObservableCollection<ComboBoxItem<int>> AvailableLayers { get; } = new ObservableCollection<ComboBoxItem<int>>();
+
+        public ObservableCollection<ComboBoxItem<DisplayModel.ViewMode>> AvailableViewModes { get; } =
+            new ObservableCollection<ComboBoxItem<DisplayModel.ViewMode>>();
 
         public Visibility EnableMipMaps => AvailableMipMaps.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
         public Visibility EnableLayers => AvailableLayers.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility EnableViewModes => AvailableViewModes.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
 
-        private string selectedMipMap = emptyMipMap;
-        public string SelectedMipMap
+        private ComboBoxItem<int> selectedMipMap = EmptyMipMap;
+        public ComboBoxItem<int> SelectedMipMap
         {
             get => selectedMipMap;
             set
             {
-                if (selectedMipMap == value) return;
+                if (value == null || selectedMipMap == value) return;
                 // determine active mipmap
                 selectedMipMap = value;
                 OnPropertyChanged(nameof(SelectedMipMap));
+                if (selectedMipMap.Cargo != -1)
+                    models.Display.ActiveMipmap = selectedMipMap.Cargo;
             }
         }
 
-        private string selectedLayer = emptyLayer;
-        public string SelectedLayer
+        private ComboBoxItem<int> selectedLayer = EmptyLayer;
+        public ComboBoxItem<int> SelectedLayer
         {
             get => selectedLayer;
             set
             {
-                if (selectedLayer == value) return;
+                if (value == null || selectedLayer == value) return;
                 // determine active layer
                 selectedLayer = value;
                 OnPropertyChanged(nameof(SelectedLayer));
+                if (selectedLayer.Cargo != -1)
+                    models.Display.ActiveLayer = selectedLayer.Cargo;
+            }
+        }
+
+        private ComboBoxItem<DisplayModel.ViewMode> selectedViewMode = EmptyViewMode;
+        public ComboBoxItem<DisplayModel.ViewMode> SelectedViewMode
+        {
+            get => selectedViewMode;
+            set
+            {
+                if (value == null || selectedViewMode == value) return;
+                // determine new view mode
+                selectedViewMode = value;
+                OnPropertyChanged(nameof(SelectedViewMode));
+                models.Display.ActiveView = selectedViewMode.Cargo;
             }
         }
 
@@ -146,10 +215,10 @@ namespace TextureViewer.ViewModels
             AvailableMipMaps.Clear();
             for (var curMip = 0; curMip < models.Images.NumMipmaps; ++curMip)
             {
-                AvailableMipMaps.Add(models.Images.GetWidth(curMip) + "x" + models.Images.GetHeight(curMip));
+                AvailableMipMaps.Add(new ComboBoxItem<int>(models.Images.GetWidth(curMip) + "x" + models.Images.GetHeight(curMip), curMip));
             }
 
-            SelectedMipMap = AvailableMipMaps.Count != 0 ? AvailableMipMaps[0] : emptyMipMap;
+            SelectedMipMap = AvailableMipMaps.Count != 0 ? AvailableMipMaps[0] : EmptyMipMap;
 
             OnPropertyChanged(nameof(AvailableMipMaps));
             if(isEnabled != EnableMipMaps)
@@ -162,14 +231,36 @@ namespace TextureViewer.ViewModels
             AvailableLayers.Clear();
             for (var layer = 0; layer < models.Images.NumLayers; ++layer)
             {
-                AvailableLayers.Add("Layer " + layer);
+                AvailableLayers.Add(new ComboBoxItem<int>("Layer " + layer, layer));
             }
 
-            SelectedLayer = AvailableLayers.Count != 0 ? AvailableLayers[0] : emptyLayer;
+            SelectedLayer = AvailableLayers.Count != 0 ? AvailableLayers[0] : EmptyLayer;
 
             OnPropertyChanged(nameof(AvailableLayers));
             if(isEnabled != EnableLayers)
                 OnPropertyChanged(nameof(EnableLayers));
+        }
+
+        private void CreateViewModes()
+        {
+            var isEnabled = EnableViewModes;
+            AvailableViewModes.Clear();
+
+            ComboBoxItem<DisplayModel.ViewMode> selected = EmptyViewMode;
+            foreach (var view in models.Display.AvailableViews)
+            {
+                var box = new ComboBoxItem<DisplayModel.ViewMode>(view.ToString(), view);
+                if (view == models.Display.ActiveView)
+                    selected = box;
+
+                AvailableViewModes.Add(box);
+            }
+
+            SelectedViewMode = selected;
+
+            OnPropertyChanged(nameof(AvailableViewModes));
+            if(isEnabled != EnableViewModes)
+                OnPropertyChanged(nameof(EnableViewModes));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

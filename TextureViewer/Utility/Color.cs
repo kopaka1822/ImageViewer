@@ -16,9 +16,9 @@ namespace TextureViewer.Utility
             Alpha = alpha;
         }
 
-        public float Red { get; }
-        public float Green { get; }
-        public float Blue { get; }
-        public float Alpha { get; }
+        public float Red { get; set; }
+        public float Green { get; set; }
+        public float Blue { get; set; }
+        public float Alpha { get; set; }
     }
 }

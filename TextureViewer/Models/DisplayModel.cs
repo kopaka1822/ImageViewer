@@ -47,7 +47,7 @@ namespace TextureViewer.Models
             {
                 if (value == activeView) return;
                 // active view must be in available views
-                Debug.Assert(availableViews.Contains(value);
+                Debug.Assert(availableViews.Contains(value));
                 activeView = value;
                 OnPropertyChanged(nameof(ActiveView));
             }
