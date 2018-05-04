@@ -23,7 +23,7 @@ namespace TextureViewer.ViewModels
             
             Images = new ImagesViewModel(models);
             Display = new DisplayViewModel(models);
-            ImportCommand = new ImportImageCommand(Images);
+            ImportCommand = new ImportImageCommand(models.Images, this.window);
             ResizeCommand = new ResizeWindowCommand(window);
         }
 
@@ -31,8 +31,6 @@ namespace TextureViewer.ViewModels
         public ICommand OpenCommand { get; }
         public ICommand ExportCommand { get; }
         public ICommand ResizeCommand { get; }
-
-        public ObservableCollection<string> ImageList { get; } = new ObservableCollection<string>() {"hello", "there"};
 
         public DisplayViewModel Display { get; }
         public ImagesViewModel Images { get; }

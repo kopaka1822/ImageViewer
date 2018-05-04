@@ -34,7 +34,7 @@ namespace TextureViewer.ViewModels
 
                 var text = new TextBlock
                 {
-                    Text = $"I{Id} - {RemoveFilePath(filename)}",
+                    Text = $"I{Id} - {System.IO.Path.GetFileNameWithoutExtension(filename)}",
                 };
 
                 var grid = new Grid {  };
@@ -51,16 +51,6 @@ namespace TextureViewer.ViewModels
                 Content = grid;
                 ToolTip = filename;
                 HorizontalContentAlignment = HorizontalAlignment.Stretch;
-            }
-
-            private static string RemoveFilePath(string file)
-            {
-                var idx = file.LastIndexOf("\\", StringComparison.Ordinal);
-                if (idx > 0)
-                {
-                    return file.Substring(idx + 1);
-                }
-                return file;
             }
         }
 
@@ -98,31 +88,6 @@ namespace TextureViewer.ViewModels
 
             OnPropertyChanged(nameof(ImageListItems));
             OnPropertyChanged(nameof(SelectedImageListItem));
-        }
-
-        /// <summary>
-        /// opens a file dialoge to import images
-        /// </summary>
-        public void ImportImage()
-        {
-            // TODO add multi select
-            var ofd = new Microsoft.Win32.OpenFileDialog {Multiselect = false};
-            // TODO set initial directory
-
-            if (ofd.ShowDialog() != true) return;
-
-            // TODO set new inital directory
-            // load image
-            try
-            {
-                var imgs = ImageLoader.LoadImage(ofd.FileName);
-                models.Images.AddImages(imgs);
-            }
-            catch (Exception e)
-            {
-                // TODO put window reference here
-                App.ShowErrorDialog(null, e.Message);
-            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
