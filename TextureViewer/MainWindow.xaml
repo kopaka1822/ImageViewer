@@ -155,9 +155,10 @@
                                         ScrollViewer.VerticalScrollBarVisibility="Visible"                       
                                         Height="180"
                                         Margin="0 0 0 5"
-                                        ItemsSource="{Binding ImageList}"/>
+                                        ItemsSource="{Binding Images.ImageListItems}"
+                                        SelectedItem="{Binding Images.SelectedImageListItem}"/>
 
-                                    <Button
+                                        <Button
                                         Content="Apply"
                                         Width="80"
                                         HorizontalAlignment="Right"
