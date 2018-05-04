@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 using TextureViewer.Annotations;
 
 namespace TextureViewer.Models
@@ -33,6 +34,11 @@ namespace TextureViewer.Models
 
         private readonly ImagesModel imagesModel;
 
+        /// <summary>
+        /// indicates if the grascale mode was set by the application for the first image
+        /// </summary>
+        private bool autoEnabledGrayscale = false;
+
         private ViewMode activeView = ViewMode.Empty;
         public ViewMode ActiveView
         {
@@ -40,7 +46,25 @@ namespace TextureViewer.Models
             set
             {
                 if (value == activeView) return;
+                // active view must be in available views
+                Debug.Assert(availableViews.Contains(value);
                 activeView = value;
+                OnPropertyChanged(nameof(ActiveView));
+            }
+        }
+
+        private List<ViewMode> availableViews = new List<ViewMode>(){ViewMode.Empty};
+        public List<ViewMode> AvailableViews
+        {
+            get => availableViews;
+            private set
+            {
+                availableViews = value;
+                // active view must be within available views
+                Debug.Assert(availableViews.Count != 0);
+                activeView = availableViews[0];
+
+                OnPropertyChanged(nameof(AvailableViews));
                 OnPropertyChanged(nameof(ActiveView));
             }
         }
@@ -51,9 +75,10 @@ namespace TextureViewer.Models
             get => zoom;
             set
             {
+                var clamped = Math.Min(Math.Max(value, 0.01f), 100.0f);
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if (value == zoom) return;
-                zoom = value;
+                if (clamped == zoom) return;
+                zoom = clamped;
                 OnPropertyChanged(nameof(Zoom));
             }
         }
@@ -67,27 +92,6 @@ namespace TextureViewer.Models
                 if (aspectRatio.Equals(value)) return;
                 aspectRatio = value;
                 OnPropertyChanged(nameof(AspectRatio));
-            }
-        }
-
-        public DisplayModel(ImagesModel imagesModel)
-        {
-            this.imagesModel = imagesModel;
-            this.imagesModel.PropertyChanged += ImagesModelOnPropertyChanged;
-        }
-
-        private void ImagesModelOnPropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
-            switch (args.PropertyName)
-            {
-                case nameof(ImagesModel.NumMipmaps):
-                    // reset active mipmap
-                    ActiveMipmap = 0;
-                    break;
-                case nameof(ImagesModel.NumLayers):
-                    // reset active layer
-                    ActiveLayer = 0;
-                    break;
             }
         }
 
@@ -138,6 +142,67 @@ namespace TextureViewer.Models
                 if (value == grayscale) return;
                 grayscale = value;
                 OnPropertyChanged(nameof(Grayscale));
+            }
+        }
+
+        public DisplayModel(ImagesModel imagesModel)
+        {
+            this.imagesModel = imagesModel;
+            this.imagesModel.PropertyChanged += ImagesModelOnPropertyChanged;
+        }
+
+        private void ImagesModelOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(ImagesModel.NumImages):
+                    // was the image resettet?
+                    if (imagesModel.NumImages == 0)
+                    {
+                        ActiveMipmap = 0;
+                        ActiveLayer = 0;
+                        // this will reset active view as well
+                        AvailableViews = new List<ViewMode> { ViewMode.Empty };
+                    }
+                    else if (imagesModel.PrevNumImages == 0)
+                    {
+                        // first image was added
+                        var modes = new List<ViewMode> { ViewMode.Single };
+                        if (imagesModel.NumLayers == 6)
+                        {
+                            // cube map should be the default view
+                            modes.Insert(0, ViewMode.CubeMap);
+                            modes.Insert(1, ViewMode.CubeCrossView);
+                        }
+                        else if (imagesModel.NumLayers == 1)
+                        {
+                            modes.Add(ViewMode.Polar);
+                        }
+
+                        AvailableViews = modes;
+
+                        // enable grayscale?
+                        if (imagesModel.IsGrayscale)
+                        {
+                            autoEnabledGrayscale = true;
+                            Grayscale = GrayscaleMode.Red;
+                        }
+                        else
+                        {
+                            autoEnabledGrayscale = false;
+                        }
+                    }
+                    else // more images were added to the existing ones
+                    {
+                        if (!imagesModel.IsGrayscale && Grayscale == GrayscaleMode.Red && autoEnabledGrayscale)
+                        {
+                            // disable grayscale since not all images are grayscale anymore
+                            Grayscale = GrayscaleMode.Disabled;
+                            // forget this setting
+                            autoEnabledGrayscale = false;
+                        }
+                    }
+                    break;
             }
         }
 

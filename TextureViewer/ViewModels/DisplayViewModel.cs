@@ -9,18 +9,15 @@ namespace TextureViewer.ViewModels
 {
     public class DisplayViewModel : INotifyPropertyChanged
     {
-        private DisplayModel displayModel;
-        private ImagesModel imagesModel;
+        private readonly Models.Models models;
         private static readonly string emptyMipMap = "No Mipmap";
         private static readonly string emptyLayer = "No Layer";
 
-        public DisplayViewModel(DisplayModel displayModel, ImagesModel imagesModel)
+        public DisplayViewModel(Models.Models models)
         {
-            this.displayModel = displayModel;
-            this.imagesModel = imagesModel;
-
-            displayModel.PropertyChanged += DisplayModelOnPropertyChanged;
-            imagesModel.PropertyChanged += ImagesModelOnPropertyChanged;
+            this.models = models;
+            models.Display.PropertyChanged += DisplayModelOnPropertyChanged;
+            models.Images.PropertyChanged += ImagesModelOnPropertyChanged;
         }
 
         private void DisplayModelOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -57,57 +54,57 @@ namespace TextureViewer.ViewModels
 
         public bool LinearInterpolation
         {
-            get => displayModel.LinearInterpolation;
-            set => displayModel.LinearInterpolation = value;
+            get => models.Display.LinearInterpolation;
+            set => models.Display.LinearInterpolation = value;
         }
 
         public bool IsGrayscaleDisabled
         {
-            get => displayModel.Grayscale == DisplayModel.GrayscaleMode.Disabled;
+            get => models.Display.Grayscale == DisplayModel.GrayscaleMode.Disabled;
             set
             {
                 if (value)
-                    displayModel.Grayscale = DisplayModel.GrayscaleMode.Disabled;
+                    models.Display.Grayscale = DisplayModel.GrayscaleMode.Disabled;
             }
         }
 
         public bool IsGrayscaleRed
         {
-            get => displayModel.Grayscale == DisplayModel.GrayscaleMode.Red;
+            get => models.Display.Grayscale == DisplayModel.GrayscaleMode.Red;
             set
             {
                 if (value)
-                    displayModel.Grayscale = DisplayModel.GrayscaleMode.Red;
+                    models.Display.Grayscale = DisplayModel.GrayscaleMode.Red;
             }
         }
 
         public bool IsGrayscaleGreen
         {
-            get => displayModel.Grayscale == DisplayModel.GrayscaleMode.Green;
+            get => models.Display.Grayscale == DisplayModel.GrayscaleMode.Green;
             set
             {
                 if (value)
-                    displayModel.Grayscale = DisplayModel.GrayscaleMode.Green;
+                    models.Display.Grayscale = DisplayModel.GrayscaleMode.Green;
             }
         }
 
         public bool IsGrayscaleBlue
         {
-            get => displayModel.Grayscale == DisplayModel.GrayscaleMode.Blue;
+            get => models.Display.Grayscale == DisplayModel.GrayscaleMode.Blue;
             set
             {
                 if (value)
-                    displayModel.Grayscale = DisplayModel.GrayscaleMode.Blue;
+                    models.Display.Grayscale = DisplayModel.GrayscaleMode.Blue;
             }
         }
 
         public bool IsGrayscaleAlpha
         {
-            get => displayModel.Grayscale == DisplayModel.GrayscaleMode.Alpha;
+            get => models.Display.Grayscale == DisplayModel.GrayscaleMode.Alpha;
             set
             {
                 if(value)
-                    displayModel.Grayscale = DisplayModel.GrayscaleMode.Alpha;
+                    models.Display.Grayscale = DisplayModel.GrayscaleMode.Alpha;
             }
         }
 
@@ -147,9 +144,9 @@ namespace TextureViewer.ViewModels
         {
             var isEnabled = EnableMipMaps;
             AvailableMipMaps.Clear();
-            for (var curMip = 0; curMip < imagesModel.NumMipmaps; ++curMip)
+            for (var curMip = 0; curMip < models.Images.NumMipmaps; ++curMip)
             {
-                AvailableMipMaps.Add(imagesModel.GetWidth(curMip) + "x" + imagesModel.GetHeight(curMip));
+                AvailableMipMaps.Add(models.Images.GetWidth(curMip) + "x" + models.Images.GetHeight(curMip));
             }
 
             SelectedMipMap = AvailableMipMaps.Count != 0 ? AvailableMipMaps[0] : emptyMipMap;
@@ -163,7 +160,7 @@ namespace TextureViewer.ViewModels
         {
             var isEnabled = EnableLayers;
             AvailableLayers.Clear();
-            for (var layer = 0; layer < imagesModel.NumLayers; ++layer)
+            for (var layer = 0; layer < models.Images.NumLayers; ++layer)
             {
                 AvailableLayers.Add("Layer " + layer);
             }

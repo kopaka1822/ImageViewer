@@ -81,6 +81,12 @@ namespace TextureViewer.Models
         /// </summary>
         public bool IsHdr => images.Any(imageData => imageData.IsHdr);
 
+        // helper for many other models
+        /// <summary>
+        /// previous number of images
+        /// </summary>
+        public int PrevNumImages { get; private set; } = 0;
+
         /// <summary>
         /// width of the mipmap
         /// </summary>
@@ -145,6 +151,7 @@ namespace TextureViewer.Models
                     }
 
                     // a lot has changed
+                    PrevNumImages = NumImages - 1;
                     OnPropertyChanged(nameof(NumImages));
                     OnPropertyChanged(nameof(NumLayers));
                     OnPropertyChanged(nameof(NumMipmaps));
@@ -176,6 +183,7 @@ namespace TextureViewer.Models
 
                     images.Add(new ImageData(image));
 
+                    PrevNumImages = NumImages - 1;
                     OnPropertyChanged(nameof(NumImages));
                     if(isAlpha != IsAlpha)
                         OnPropertyChanged(nameof(isAlpha));
@@ -209,6 +217,8 @@ namespace TextureViewer.Models
             context.Disable();
 
             images.RemoveAt(imageId);
+
+            PrevNumImages = NumImages + 1;
             OnPropertyChanged(nameof(NumImages));
 
             if (isAlpha != IsAlpha)

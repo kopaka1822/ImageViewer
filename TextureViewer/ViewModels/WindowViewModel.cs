@@ -21,8 +21,8 @@ namespace TextureViewer.ViewModels
             this.models = new Models.Models(window);
             
             
-            Images = new ImagesViewModel(models.Images);
-            Display = new DisplayViewModel(models.Display, models.Images);
+            Images = new ImagesViewModel(models);
+            Display = new DisplayViewModel(models);
             ImportCommand = new ImportImageCommand(Images);
             ResizeCommand = new ResizeWindowCommand(window);
         }

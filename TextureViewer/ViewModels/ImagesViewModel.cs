@@ -5,11 +5,11 @@ namespace TextureViewer.ViewModels
 {
     public class ImagesViewModel
     {
-        public ImagesModel Images { get; }
+        private readonly Models.Models models;
 
-        public ImagesViewModel(ImagesModel images)
+        public ImagesViewModel(Models.Models models)
         {
-            this.Images = images;
+            this.models = models;
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace TextureViewer.ViewModels
             try
             {
                 var imgs = ImageLoader.LoadImage(ofd.FileName);
-                Images.AddImages(imgs);
+                models.Images.AddImages(imgs);
             }
             catch (Exception e)
             {
