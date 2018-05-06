@@ -26,21 +26,28 @@ namespace TextureViewer.Controller
             switch (args.PropertyName)
             {
                 case nameof(DisplayModel.ActiveView):
+                    var disable = models.GlContext.Enable();
+
+                    currentView.Dispose();
+                    currentView = null;
                     switch (models.Display.ActiveView)
                     {
-                        case DisplayModel.ViewMode.Empty:
-                            currentView = new EmptyView();
-                            break;
                         case DisplayModel.ViewMode.Single:
                             currentView = new SingleTextureView(models);
                             break;
-                        case DisplayModel.ViewMode.CubeMap:
+                        //case DisplayModel.ViewMode.CubeMap:
                             break;
-                        case DisplayModel.ViewMode.Polar:
+                        //case DisplayModel.ViewMode.Polar:
                             break;
-                        case DisplayModel.ViewMode.CubeCrossView:
+                        //case DisplayModel.ViewMode.CubeCrossView:
+                            break;
+                        default:
+                            currentView = new EmptyView();
                             break;
                     }
+
+                    models.GlContext.RedrawFrame();
+                    if(disable) models.GlContext.Disable();
                     break;
             }
         }

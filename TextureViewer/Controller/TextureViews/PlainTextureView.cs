@@ -30,7 +30,7 @@ namespace TextureViewer.Controller.TextureViews
 
         public void Dispose()
         {
-            
+            shader.Dispose();
         }
 
         public void DrawLayer(Matrix4 offset, int layer)
