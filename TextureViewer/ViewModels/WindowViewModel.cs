@@ -24,7 +24,7 @@ namespace TextureViewer.ViewModels
             // model views
             Images = new ImagesViewModel(models);
             Display = new DisplayViewModel(models);
-            Equations = new EquationsViewModel(models.Equations);
+            Equations = new EquationsViewModel(models);
 
             // commands
             ImportCommand = new ImportImageCommand(models);

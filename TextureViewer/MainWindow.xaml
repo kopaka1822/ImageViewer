@@ -160,10 +160,11 @@
                                         SelectedItem="{Binding Images.SelectedImageListItem}"/>
 
                                         <Button
-                                        Content="Apply"
-                                        Width="80"
-                                        HorizontalAlignment="Right"
-                                        Margin="0 0 0 5"/>
+                                            Command="{Binding Equations.Apply}"
+                                            Content="Apply"
+                                            Width="80"
+                                            HorizontalAlignment="Right"
+                                            Margin="0 0 0 5"/>
 
                                     <Separator Height="2"/>
 
@@ -201,7 +202,7 @@
                                                 <TextBlock Text="RGB: "/>
                                                 <TextBox 
                                                     Grid.Column="1"
-                                                    Text="Image1 + Image2" 
+                                                    Text="{Binding Equations.Equation1.ColorFormula, UpdateSourceTrigger=PropertyChanged}"
                                                     Margin="0 0 0 5"
                                                     IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
                                             </Grid>
@@ -213,7 +214,7 @@
                                                 <TextBlock Text="Alpha: "/>
                                                 <TextBox 
                                                     Grid.Column="1"
-                                                    Text="Image1 + Image2"
+                                                    Text="{Binding Equations.Equation1.AlphaFormula, UpdateSourceTrigger=PropertyChanged}"
                                                     Margin="0 0 0 5"
                                                     IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
                                             </Grid>
@@ -254,7 +255,7 @@
                                                 <TextBlock Text="RGB: "/>
                                                 <TextBox 
                                                     Grid.Column="1"
-                                                    Text="Image1 + Image2" 
+                                                    Text="{Binding Equations.Equation2.ColorFormula, UpdateSourceTrigger=PropertyChanged}"
                                                     Margin="0 0 0 5"
                                                     IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
                                             </Grid>
@@ -266,7 +267,7 @@
                                                 <TextBlock Text="Alpha: " Height="23" VerticalAlignment="Top"/>
                                                 <TextBox 
                                                     Grid.Column="1"
-                                                    Text="Image1 + Image2"
+                                                    Text="{Binding Equations.Equation2.AlphaFormula, UpdateSourceTrigger=PropertyChanged}"
                                                     Margin="0 0 0 5"
                                                     IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
                                             </Grid>
