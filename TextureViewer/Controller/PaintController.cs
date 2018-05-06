@@ -14,6 +14,7 @@ namespace TextureViewer.Controller
     public class PaintController
     {
         private readonly Models.Models models;
+        private readonly ViewModeController viewModeController;
 
         public PaintController(Models.Models models)
         {
@@ -21,6 +22,8 @@ namespace TextureViewer.Controller
 
             this.models.GlContext.GlControl.Paint += OnPaint;
             this.models.GlContext.PropertyChanged += GlContextOnPropertyChanged;
+
+            this.viewModeController = new ViewModeController(models);
         }
 
         private void GlContextOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -44,8 +47,9 @@ namespace TextureViewer.Controller
                 GL.ClearColor(0.9333f, 0.9333f, 0.9333f, 1.0f);
                 GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-                models.GlData.CheckersShader.Bind(Matrix4.Identity);
-                models.GlData.Vao.DrawQuad();
+                //models.GlData.CheckersShader.Bind(Matrix4.Identity);
+                //models.GlData.Vao.DrawQuad();
+                viewModeController.Paint();
 
                 context.GlControl.SwapBuffers();
             }

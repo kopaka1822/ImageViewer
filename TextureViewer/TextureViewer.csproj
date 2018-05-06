@@ -74,9 +74,12 @@
     </ApplicationDefinition>
     <Compile Include="Commands\ResizeWindowCommand.cs" />
     <Compile Include="Controller\PaintController.cs" />
+    <Compile Include="Controller\TextureViews\EmptyView.cs" />
     <Compile Include="Controller\TextureViews\ITextureView.cs" />
     <Compile Include="Controller\TextureViews\PlainTextureView.cs" />
     <Compile Include="Controller\TextureViews\Shader\CheckersShader.cs" />
+    <Compile Include="Controller\TextureViews\Shader\SingleViewShader.cs" />
+    <Compile Include="Controller\TextureViews\Shader\ViewShader.cs" />
     <Compile Include="Controller\TextureViews\SingleTextureView.cs" />
     <Compile Include="Controller\ViewModeController.cs" />
     <Compile Include="glhelper\Program.cs" />
