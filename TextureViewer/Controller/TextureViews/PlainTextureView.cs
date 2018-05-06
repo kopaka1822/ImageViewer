@@ -33,9 +33,31 @@ namespace TextureViewer.Controller.TextureViews
             shader.Dispose();
         }
 
+        public void OnScroll(float amount, Vector2 mouse)
+        {
+            // modify zoom
+            var step = amount < 0.0f ? 1.0f / 1.001f : 1.001f;
+            var value = (float)Math.Pow(step, Math.Abs(amount));
+
+            models.Display.Zoom = models.Display.Zoom * value;
+        }
+
+        public void OnDrag(Vector2 diff)
+        {
+            // window to client
+            transform *= Matrix4.CreateTranslation(
+                diff.X * 2.0f / models.Images.GetWidth(0),
+                diff.Y * -2.0f / models.Images.GetHeight(0),
+                0.0f);
+        }
+
         public void DrawLayer(Matrix4 offset, int layer)
         {
-            var finalTransform = offset * transform * models.Display.AspectRatio;
+            var finalTransform = offset * 
+                                  
+                                 Matrix4.CreateScale(models.Display.Zoom, models.Display.Zoom, 1.0f) *
+                                 transform *
+                                 models.Display.AspectRatio;
 
             // draw the checkers background
             models.GlData.CheckersShader.Bind(finalTransform);
