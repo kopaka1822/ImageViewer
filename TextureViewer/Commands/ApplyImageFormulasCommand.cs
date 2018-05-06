@@ -12,7 +12,7 @@ namespace TextureViewer.Commands
 {
     public class ApplyImageFormulasCommand : ICommand
     {
-        private EquationsViewModel equations;
+        private readonly EquationsViewModel equations;
 
         public ApplyImageFormulasCommand(EquationsViewModel equations)
         {
