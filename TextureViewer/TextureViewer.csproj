@@ -88,7 +88,6 @@
     <Compile Include="Models\OpenGlContext.cs" />
     <Compile Include="Models\OpenGlModel.cs" />
     <Compile Include="Utility\Color.cs" />
-    <Compile Include="Controller\OpenGlController.cs" />
     <Compile Include="Settings.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
