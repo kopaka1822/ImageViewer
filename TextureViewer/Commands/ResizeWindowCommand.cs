@@ -28,6 +28,10 @@ namespace TextureViewer.Commands
             Properties.Settings.Default.WindowSizeY = (int)models.App.Window.Height;
         }
 
-        public event EventHandler CanExecuteChanged;
+        public event EventHandler CanExecuteChanged
+        {
+            add { }
+            remove { }
+        }
     }
 }

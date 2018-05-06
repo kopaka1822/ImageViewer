@@ -36,11 +36,11 @@ namespace TextureViewer.Controller
                             currentView = new SingleTextureView(models);
                             break;
                         //case DisplayModel.ViewMode.CubeMap:
-                            break;
+                            //break;
                         //case DisplayModel.ViewMode.Polar:
-                            break;
+                            //break;
                         //case DisplayModel.ViewMode.CubeCrossView:
-                            break;
+                            //break;
                         default:
                             currentView = new EmptyView();
                             break;
