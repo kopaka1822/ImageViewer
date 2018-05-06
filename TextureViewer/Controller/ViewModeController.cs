@@ -12,7 +12,7 @@ namespace TextureViewer.Controller
 {
     public class ViewModeController
     {
-        private Models.Models models;
+        private readonly Models.Models models;
         private ITextureView currentView = new EmptyView();
 
         public ViewModeController(Models.Models models)

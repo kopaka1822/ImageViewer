@@ -25,7 +25,7 @@ namespace TextureViewer.Models
             GlData = new OpenGlModel(GlContext);
             Images = new ImagesModel(GlContext);
             Display = new DisplayModel(Images);
-            Equations = new ImageEquationsModel();
+            Equations = new ImageEquationsModel(Images);
 
             GlContext.Disable();
         }

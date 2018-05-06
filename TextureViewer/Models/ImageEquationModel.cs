@@ -11,9 +11,11 @@ namespace TextureViewer.Models
 {
     public class ImageEquationModel : INotifyPropertyChanged
     {
-        public ImageEquationModel(bool visible)
+        public ImageEquationModel(bool visible, int defaultImage, ImagesModel images)
         {
             this.visible = visible;
+            ColorFormula = new FormulaModel(defaultImage, images, this);
+            AlphaFormula = new FormulaModel(defaultImage, images, this);
         }
 
         private bool visible;
@@ -40,8 +42,8 @@ namespace TextureViewer.Models
             }
         }
 
-        // TODO add formula
-
+        public FormulaModel ColorFormula { get; }
+        public FormulaModel AlphaFormula { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
