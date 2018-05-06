@@ -88,6 +88,8 @@
     <Compile Include="glhelper\TextureArray2D.cs" />
     <Compile Include="glhelper\VertexArray.cs" />
     <Compile Include="Models\AppModel.cs" />
+    <Compile Include="Models\ImageEquationModel.cs" />
+    <Compile Include="Models\ImageEquationsModel.cs" />
     <Compile Include="Models\Models.cs" />
     <Compile Include="Models\OpenGlContext.cs" />
     <Compile Include="Models\OpenGlModel.cs" />
@@ -113,6 +115,8 @@
     <Compile Include="Models\DisplayModel.cs" />
     <Compile Include="Models\ImagesModel.cs" />
     <Compile Include="ViewModels\DisplayViewModel.cs" />
+    <Compile Include="ViewModels\EquationsViewModel.cs" />
+    <Compile Include="ViewModels\EquationViewModel.cs" />
     <Compile Include="ViewModels\ImagesViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel.cs" />
     <Compile Include="Properties\Annotations.cs" />

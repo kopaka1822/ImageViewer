@@ -178,7 +178,9 @@
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Text="Visible: "/>
-                                                <CheckBox Grid.Column="1"/>
+                                                <CheckBox 
+                                                    Grid.Column="1"
+                                                    IsChecked="{Binding Equations.Equation1.IsVisible}"/>
                                             </Grid>
                                             <Grid Margin="0 0 0 5">
                                                 <Grid.ColumnDefinitions>
@@ -186,7 +188,10 @@
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Text="Use Filter: "/>
-                                                <CheckBox Grid.Column="1"/>
+                                                <CheckBox 
+                                                    Grid.Column="1"
+                                                    IsChecked="{Binding Equations.Equation1.UseFilter}"
+                                                    IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
                                             </Grid>
                                             <Grid Margin="0 0 0 5">
                                                 <Grid.ColumnDefinitions>
@@ -197,7 +202,8 @@
                                                 <TextBox 
                                                     Grid.Column="1"
                                                     Text="Image1 + Image2" 
-                                                    Margin="0 0 0 5"/>
+                                                    Margin="0 0 0 5"
+                                                    IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
                                             </Grid>
                                             <Grid Margin="0 0 0 5">
                                                 <Grid.ColumnDefinitions>
@@ -208,7 +214,8 @@
                                                 <TextBox 
                                                     Grid.Column="1"
                                                     Text="Image1 + Image2"
-                                                    Margin="0 0 0 5"/>
+                                                    Margin="0 0 0 5"
+                                                    IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
                                             </Grid>
                                         </StackPanel>
                                     </GroupBox>
@@ -224,7 +231,9 @@
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Text="Visible: "/>
-                                                <CheckBox Grid.Column="1"/>
+                                                <CheckBox 
+                                                    Grid.Column="1"
+                                                    IsChecked="{Binding Equations.Equation2.IsVisible}"/>
                                             </Grid>
                                             <Grid Margin="0 0 0 5">
                                                 <Grid.ColumnDefinitions>
@@ -232,7 +241,10 @@
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Text="Use Filter: "/>
-                                                <CheckBox Grid.Column="1"/>
+                                                <CheckBox 
+                                                    Grid.Column="1"
+                                                    IsChecked="{Binding Equations.Equation2.UseFilter}"
+                                                    IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
                                             </Grid>
                                             <Grid Margin="0 0 0 5">
                                                 <Grid.ColumnDefinitions>
@@ -243,7 +255,8 @@
                                                 <TextBox 
                                                     Grid.Column="1"
                                                     Text="Image1 + Image2" 
-                                                    Margin="0 0 0 5"/>
+                                                    Margin="0 0 0 5"
+                                                    IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
                                             </Grid>
                                             <Grid Margin="0 0 0 5">
                                                 <Grid.ColumnDefinitions>
@@ -254,7 +267,8 @@
                                                 <TextBox 
                                                     Grid.Column="1"
                                                     Text="Image1 + Image2"
-                                                    Margin="0 0 0 5"/>
+                                                    Margin="0 0 0 5"
+                                                    IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
                                             </Grid>
                                         </StackPanel>
                                     </GroupBox>

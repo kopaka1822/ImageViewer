@@ -24,18 +24,22 @@ namespace TextureViewer.ViewModels
             // model views
             Images = new ImagesViewModel(models);
             Display = new DisplayViewModel(models);
+            Equations = new EquationsViewModel(models.Equations);
 
             // commands
             ImportCommand = new ImportImageCommand(models);
             ResizeCommand = new ResizeWindowCommand(models);
         }
 
+        // view models
+        public DisplayViewModel Display { get; }
+        public ImagesViewModel Images { get; }
+        public EquationsViewModel Equations { get; }
+
+        // commands
         public ICommand ImportCommand { get; }
         public ICommand OpenCommand { get; }
         public ICommand ExportCommand { get; }
         public ICommand ResizeCommand { get; }
-
-        public DisplayViewModel Display { get; }
-        public ImagesViewModel Images { get; }
     }
 }
