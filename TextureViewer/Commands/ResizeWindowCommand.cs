@@ -9,11 +9,11 @@ namespace TextureViewer.Commands
 {
     public class ResizeWindowCommand : ICommand
     {
-        private MainWindow window;
+        private readonly Models.Models models;
 
-        public ResizeWindowCommand(MainWindow window)
+        public ResizeWindowCommand(Models.Models models)
         {
-            this.window = window;
+            this.models = models;
         }
 
         public bool CanExecute(object parameter)
@@ -24,8 +24,8 @@ namespace TextureViewer.Commands
         public void Execute(object parameter)
         {
             // update settings
-            Properties.Settings.Default.WindowSizeX = (int) window.Width;
-            Properties.Settings.Default.WindowSizeY = (int) window.Height;
+            Properties.Settings.Default.WindowSizeX = (int) models.App.Window.Width;
+            Properties.Settings.Default.WindowSizeY = (int)models.App.Window.Height;
         }
 
         public event EventHandler CanExecuteChanged;

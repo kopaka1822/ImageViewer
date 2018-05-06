@@ -12,13 +12,11 @@ namespace TextureViewer.Commands
 {
     public class ImportImageCommand : ICommand
     {
-        private readonly ImagesModel images;
-        private readonly Window window;
+        private readonly Models.Models models;
 
-        public ImportImageCommand(ImagesModel images, Window window)
+        public ImportImageCommand(Models.Models models)
         {
-            this.images = images;
-            this.window = window;
+            this.models = models;
         }
 
         public bool CanExecute(object parameter)
@@ -48,11 +46,11 @@ namespace TextureViewer.Commands
                 try
                 {
                     var imgs = ImageLoader.LoadImage(filename);
-                    images.AddImages(imgs);
+                    models.Images.AddImages(imgs);
                 }
                 catch (Exception e)
                 {
-                    App.ShowErrorDialog(window, e.Message);
+                    App.ShowErrorDialog(models.App.Window, e.Message);
                 }
             }  
         }

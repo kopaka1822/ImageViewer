@@ -84,6 +84,7 @@
     <Compile Include="glhelper\Shader.cs" />
     <Compile Include="glhelper\TextureArray2D.cs" />
     <Compile Include="glhelper\VertexArray.cs" />
+    <Compile Include="Models\AppModel.cs" />
     <Compile Include="Models\Models.cs" />
     <Compile Include="Models\OpenGlContext.cs" />
     <Compile Include="Models\OpenGlModel.cs" />

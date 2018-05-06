@@ -14,9 +14,11 @@ namespace TextureViewer.Models
         /// <summary>
         /// window after the opengl host was initialized
         /// </summary>
+        /// <param name="app"></param>
         /// <param name="window"></param>
-        public Models(MainWindow window)
+        public Models(App app, MainWindow window)
         {
+            this.App = new AppModel(app, window);
             GlContext = new OpenGlContext(window);
             GlContext.Enable();
 
@@ -37,9 +39,10 @@ namespace TextureViewer.Models
             GlContext.Disable();
         }
 
-        public OpenGlContext GlContext { get; private set; }
-        public OpenGlModel GlData { get; private set; }
-        public ImagesModel Images { get; private set; }
-        public DisplayModel Display { get; private set; }
+        public OpenGlContext GlContext { get; }
+        public OpenGlModel GlData { get; }
+        public ImagesModel Images { get; }
+        public DisplayModel Display { get; }
+        public AppModel App { get; }
     }
 }

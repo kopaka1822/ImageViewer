@@ -12,15 +12,11 @@ namespace TextureViewer.ViewModels
     public class WindowViewModel
     {
         private readonly Models.Models models;
-        private readonly App app;
-        private readonly MainWindow window;
         private readonly PaintController paintController;
 
         public WindowViewModel(App app, MainWindow window)
         {
-            this.app = app;
-            this.window = window;
-            this.models = new Models.Models(window);
+            this.models = new Models.Models(app, window);
 
             // controller
             this.paintController = new PaintController(models);
@@ -30,8 +26,8 @@ namespace TextureViewer.ViewModels
             Display = new DisplayViewModel(models);
 
             // commands
-            ImportCommand = new ImportImageCommand(models.Images, this.window);
-            ResizeCommand = new ResizeWindowCommand(window);
+            ImportCommand = new ImportImageCommand(models);
+            ResizeCommand = new ResizeWindowCommand(models);
         }
 
         public ICommand ImportCommand { get; }
