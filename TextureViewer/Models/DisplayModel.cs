@@ -33,6 +33,7 @@ namespace TextureViewer.Models
         }
 
         private readonly ImagesModel imagesModel;
+        private readonly OpenGlContext glContext;
 
         /// <summary>
         /// indicates if the grascale mode was set by the application for the first image
@@ -145,10 +146,22 @@ namespace TextureViewer.Models
             }
         }
 
-        public DisplayModel(ImagesModel imagesModel)
+        public DisplayModel(ImagesModel imagesModel, OpenGlContext glContext)
         {
             this.imagesModel = imagesModel;
+            this.glContext = glContext;
             this.imagesModel.PropertyChanged += ImagesModelOnPropertyChanged;
+            this.glContext.PropertyChanged += GlContextOnPropertyChanged;
+        }
+
+        private void GlContextOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(OpenGlContext.ClientSize):
+                    RecomputeAspectRatio();
+                    break;
+            }
         }
 
         private void ImagesModelOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -191,6 +204,9 @@ namespace TextureViewer.Models
                         {
                             autoEnabledGrayscale = false;
                         }
+
+                        // initial aspect ratio calculation for that image
+                        RecomputeAspectRatio();
                     }
                     else // more images were added to the existing ones
                     {
@@ -203,6 +219,17 @@ namespace TextureViewer.Models
                         }
                     }
                     break;
+            }
+        }
+
+        private void RecomputeAspectRatio()
+        {
+            if (imagesModel.NumImages > 0)
+            {
+                AspectRatio = Matrix4.CreateScale(
+                    (float)imagesModel.GetWidth(0) / (float)glContext.ClientSize.Width,
+                    (float)imagesModel.GetHeight(0) / (float)glContext.ClientSize.Height,
+                    1.0f);
             }
         }
 

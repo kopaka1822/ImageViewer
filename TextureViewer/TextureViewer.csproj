@@ -74,7 +74,9 @@
     </ApplicationDefinition>
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
     <Compile Include="Commands\ResizeWindowCommand.cs" />
+    <Compile Include="Controller\ImageCombineController.cs" />
     <Compile Include="Controller\PaintController.cs" />
+    <Compile Include="Controller\ProgressController.cs" />
     <Compile Include="Controller\TextureViews\EmptyView.cs" />
     <Compile Include="Controller\TextureViews\ITextureView.cs" />
     <Compile Include="Controller\TextureViews\PlainTextureView.cs" />
@@ -108,6 +110,7 @@
     <Compile Include="glhelper\TextureArray2D.cs" />
     <Compile Include="glhelper\VertexArray.cs" />
     <Compile Include="Models\AppModel.cs" />
+    <Compile Include="Models\FinalImageModel.cs" />
     <Compile Include="Models\FormulaModel.cs" />
     <Compile Include="Models\ImageEquationModel.cs" />
     <Compile Include="Models\ImageEquationsModel.cs" />
