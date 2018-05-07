@@ -117,6 +117,7 @@
     <Compile Include="Models\Models.cs" />
     <Compile Include="Models\OpenGlContext.cs" />
     <Compile Include="Models\OpenGlModel.cs" />
+    <Compile Include="Models\ProgressModel.cs" />
     <Compile Include="Utility\Color.cs" />
     <Compile Include="Settings.cs" />
     <Page Include="MainWindow.xaml">
@@ -142,6 +143,7 @@
     <Compile Include="ViewModels\EquationsViewModel.cs" />
     <Compile Include="ViewModels\EquationViewModel.cs" />
     <Compile Include="ViewModels\ImagesViewModel.cs" />
+    <Compile Include="ViewModels\ProgressViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

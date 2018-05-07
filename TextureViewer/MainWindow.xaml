@@ -529,9 +529,11 @@
                 <StatusBarItem 
                     Width="Auto"
                     HorizontalContentAlignment="Stretch"
-                    VerticalContentAlignment="Stretch">
+                    VerticalContentAlignment="Stretch"
+                    Visibility="{Binding Progress.EnableProgress}">
+
                     <ProgressBar
-                        Value="50">
+                        Value="{Binding Progress.ProgressValue}">
 
                     </ProgressBar>
                 </StatusBarItem>

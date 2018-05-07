@@ -16,7 +16,7 @@ namespace TextureViewer.Controller.TextureViews
         protected readonly Models.Models models;
 
         private Matrix4 transform = Matrix4.Identity;
-        private SingleViewShader shader;
+        private readonly SingleViewShader shader;
 
         public PlainTextureView(Models.Models models)
         {

@@ -26,6 +26,7 @@ namespace TextureViewer.Models
             Images = new ImagesModel(GlContext);
             Display = new DisplayModel(Images, GlContext);
             Equations = new ImageEquationsModel(Images);
+            Progress = new ProgressModel();
 
             GlContext.Disable();
         }
@@ -46,5 +47,6 @@ namespace TextureViewer.Models
         public DisplayModel Display { get; }
         public AppModel App { get; }
         public ImageEquationsModel Equations { get; }
+        public ProgressModel Progress { get; }
     }
 }
