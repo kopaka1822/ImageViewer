@@ -139,6 +139,7 @@
   <ItemGroup>
     <Compile Include="Models\DisplayModel.cs" />
     <Compile Include="Models\ImagesModel.cs" />
+    <Compile Include="Utility\IStepable.cs" />
     <Compile Include="ViewModels\DisplayViewModel.cs" />
     <Compile Include="ViewModels\EquationsViewModel.cs" />
     <Compile Include="ViewModels\EquationViewModel.cs" />
