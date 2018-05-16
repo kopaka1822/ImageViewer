@@ -74,6 +74,10 @@
     </ApplicationDefinition>
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
     <Compile Include="Commands\ResizeWindowCommand.cs" />
+    <Compile Include="Controller\ImageCombination\FinalImageStepable.cs" />
+    <Compile Include="Controller\ImageCombination\ImageCombineBuilder.cs" />
+    <Compile Include="Controller\ImageCombination\ImageCombineShader.cs" />
+    <Compile Include="Controller\ImageCombination\ImageCombineStepable.cs" />
     <Compile Include="Controller\ImageCombineController.cs" />
     <Compile Include="Controller\PaintController.cs" />
     <Compile Include="Controller\ProgressController.cs" />
@@ -111,6 +115,7 @@
     <Compile Include="glhelper\VertexArray.cs" />
     <Compile Include="Models\AppModel.cs" />
     <Compile Include="Models\FinalImageModel.cs" />
+    <Compile Include="Models\FinalImagesModel.cs" />
     <Compile Include="Models\FormulaModel.cs" />
     <Compile Include="Models\ImageEquationModel.cs" />
     <Compile Include="Models\ImageEquationsModel.cs" />
@@ -118,6 +123,7 @@
     <Compile Include="Models\OpenGlContext.cs" />
     <Compile Include="Models\OpenGlModel.cs" />
     <Compile Include="Models\ProgressModel.cs" />
+    <Compile Include="Models\TextureCacheModel.cs" />
     <Compile Include="Utility\Color.cs" />
     <Compile Include="Settings.cs" />
     <Page Include="MainWindow.xaml">
@@ -140,6 +146,7 @@
     <Compile Include="Models\DisplayModel.cs" />
     <Compile Include="Models\ImagesModel.cs" />
     <Compile Include="Utility\IStepable.cs" />
+    <Compile Include="Utility\StepList.cs" />
     <Compile Include="ViewModels\DisplayViewModel.cs" />
     <Compile Include="ViewModels\EquationsViewModel.cs" />
     <Compile Include="ViewModels\EquationViewModel.cs" />

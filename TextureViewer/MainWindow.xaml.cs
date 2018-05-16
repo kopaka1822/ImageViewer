@@ -34,8 +34,17 @@ namespace TextureViewer
         /// <param name="e"></param>
         private void OpenGlHost_OnInitialized(object sender, EventArgs e)
         {
-            // initialize data models
-            ViewModel = new WindowViewModel(parent, this);
+            try
+            {
+                // initialize data models
+                ViewModel = new WindowViewModel(parent, this);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                throw;
+            }
+
         }
     }
 }

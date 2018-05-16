@@ -11,8 +11,11 @@ namespace TextureViewer.Models
 {
     public class ImageEquationModel : INotifyPropertyChanged
     {
+        private ImagesModel images;
+
         public ImageEquationModel(bool visible, int defaultImage, ImagesModel images)
         {
+            this.images = images;
             this.visible = visible;
             ColorFormula = new FormulaModel(defaultImage, images, this);
             AlphaFormula = new FormulaModel(defaultImage, images, this);

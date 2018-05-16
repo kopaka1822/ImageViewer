@@ -83,10 +83,9 @@ namespace TextureViewer.Models
             {
                 case nameof(ImagesModel.NumImages):
                     // image count increased
-                    if (images.PrevNumImages < images.NumImages) return;
-
-                    // image count decreased (evaluate formula)
-                    ReevaluateFormula();
+                    if (images.PrevNumImages > images.NumImages)
+                        // image count decreased (evaluate formula)
+                        ReevaluateFormula();
                     break;
             }
         }

@@ -81,6 +81,15 @@ namespace TextureViewer.Models
         /// </summary>
         public bool IsHdr => images.Any(imageData => imageData.IsHdr);
 
+        /// <summary>
+        /// width for the biggest mipmap (or 0 if no images are present)
+        /// </summary>
+        public int Width => images.Count != 0 ? GetWidth(0) : 0;
+        /// <summary>
+        /// height for the biggest mipmap (or 0 if no images are present)
+        /// </summary>
+        public int Height => images.Count != 0 ? GetHeight(0) : 0;
+
         // helper for many other models
         /// <summary>
         /// previous number of images
@@ -158,6 +167,8 @@ namespace TextureViewer.Models
                     OnPropertyChanged(nameof(IsAlpha));
                     OnPropertyChanged(nameof(IsGrayscale));
                     OnPropertyChanged(nameof(IsHdr));
+                    OnPropertyChanged(nameof(Width));
+                    OnPropertyChanged(nameof(Height));
                 }
                 else // test if image compatible with previous images
                 {
@@ -233,6 +244,8 @@ namespace TextureViewer.Models
                 // everything was resettet
                 OnPropertyChanged(nameof(NumLayers));
                 OnPropertyChanged(nameof(NumMipmaps));
+                OnPropertyChanged(nameof(Width));
+                OnPropertyChanged(nameof(Height));
             }
         }
 

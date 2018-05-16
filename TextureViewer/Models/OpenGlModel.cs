@@ -18,13 +18,14 @@ namespace TextureViewer.Models
     {
         public VertexArray Vao { get; }
         public CheckersShader CheckersShader { get; }
+        public TextureCacheModel TextureCache { get; }
 
         private readonly Sampler samplerLinear;
         private readonly Sampler samplerLinearMip;
         private readonly Sampler samplerNearest;
         private readonly Sampler samplerNearestMip;
 
-        public OpenGlModel(OpenGlContext context)
+        public OpenGlModel(OpenGlContext context, ImagesModel images)
         {
             Debug.Assert(context.IsEnabled);
             Vao = new VertexArray();
@@ -33,6 +34,7 @@ namespace TextureViewer.Models
             samplerLinearMip = new Sampler(TextureMinFilter.LinearMipmapLinear, TextureMagFilter.Linear);
             samplerNearest = new Sampler(TextureMinFilter.Nearest, TextureMagFilter.Nearest);
             samplerNearestMip = new Sampler(TextureMinFilter.NearestMipmapNearest, TextureMagFilter.Nearest);
+            TextureCache = new TextureCacheModel(images, context);
         }
 
         /// <summary>
@@ -67,6 +69,7 @@ namespace TextureViewer.Models
             samplerLinearMip.Dispose();
             samplerNearest.Dispose();
             samplerNearestMip.Dispose();
+            TextureCache.Clear();
         }
     }
 }

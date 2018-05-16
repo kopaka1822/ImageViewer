@@ -9,7 +9,7 @@ namespace TextureViewer.Utility
     /// <summary>
     /// work that was split into several steps
     /// </summary>
-    interface IStepable
+    public interface IStepable
     {
         // total amount of steps
         int GetNumSteps();

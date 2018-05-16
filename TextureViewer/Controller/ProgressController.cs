@@ -15,10 +15,16 @@ namespace TextureViewer.Controller
     {
         private readonly Models.Models models;
         private readonly Queue<IStepable> workList = new Queue<IStepable>();
+        private readonly List<ImageCombineController> imageController;
 
         public ProgressController(Models.Models models)
         {
             this.models = models;
+            this.imageController = new List<ImageCombineController>();
+            for (var i = 0; i < models.Equations.NumEquations; ++i)
+            {
+                imageController.Add(new ImageCombineController(models.Equations.Get(i), models.FinalImages.Get(i), models));
+            }
         }
 
         void DispatchWork(IStepable work)
@@ -32,6 +38,14 @@ namespace TextureViewer.Controller
         /// <returns></returns>
         public bool HasWork()
         {
+            // check if the other controllers have something
+            foreach (var ctrl in imageController)
+            {
+                var work = ctrl.GetWork();
+                if(work != null)
+                    DispatchWork(work);
+            }
+
             return workList.Count > 0;
         }
 

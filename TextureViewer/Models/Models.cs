@@ -22,11 +22,12 @@ namespace TextureViewer.Models
             GlContext = new OpenGlContext(window);
             GlContext.Enable();
 
-            GlData = new OpenGlModel(GlContext);
             Images = new ImagesModel(GlContext);
+            GlData = new OpenGlModel(GlContext, Images);
             Display = new DisplayModel(Images, GlContext);
             Equations = new ImageEquationsModel(Images);
             Progress = new ProgressModel();
+            FinalImages = new FinalImagesModel(GlData.TextureCache);
 
             GlContext.Disable();
         }
@@ -35,6 +36,7 @@ namespace TextureViewer.Models
         {
             GlContext.Enable();
 
+            FinalImages.Dispose();
             Images.Dispose();
             GlData.Dispose();
 
@@ -48,5 +50,6 @@ namespace TextureViewer.Models
         public AppModel App { get; }
         public ImageEquationsModel Equations { get; }
         public ProgressModel Progress { get; }
+        public FinalImagesModel FinalImages { get; }
     }
 }

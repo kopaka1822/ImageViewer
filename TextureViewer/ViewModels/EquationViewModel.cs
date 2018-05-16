@@ -37,6 +37,7 @@ namespace TextureViewer.ViewModels
         {
             model.ColorFormula.Formula = colorFormula;
             model.AlphaFormula.Formula = alphaFormula;
+            model.UseFilter = useFilter;
         }
 
         private void ColorFormulaOnPropertyChanged(object sender, PropertyChangedEventArgs args)
