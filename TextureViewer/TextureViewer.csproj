@@ -81,6 +81,7 @@
     <Compile Include="Controller\ImageCombineController.cs" />
     <Compile Include="Controller\PaintController.cs" />
     <Compile Include="Controller\ProgressController.cs" />
+    <Compile Include="Controller\TextureViews\CubeCrossTextureView.cs" />
     <Compile Include="Controller\TextureViews\EmptyView.cs" />
     <Compile Include="Controller\TextureViews\ITextureView.cs" />
     <Compile Include="Controller\TextureViews\PlainTextureView.cs" />

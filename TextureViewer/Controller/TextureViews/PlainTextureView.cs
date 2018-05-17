@@ -74,7 +74,7 @@ namespace TextureViewer.Controller.TextureViews
 
             shader.Bind();
             shader.SetTransform(finalTransform);
-            shader.SetLayer(models.Display.ActiveLayer);
+            shader.SetLayer(layer);
             shader.SetMipmap(models.Display.ActiveMipmap);
             shader.SetGrayscale(models.Display.Grayscale);
             
