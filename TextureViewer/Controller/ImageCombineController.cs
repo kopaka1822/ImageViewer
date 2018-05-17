@@ -26,7 +26,7 @@ namespace TextureViewer.Controller
             this.finalImage = finalImage;
             this.models = models;
             equation.ColorFormula.PropertyChanged += FormulaOnPropertyChanged;
-            equation.ColorFormula.PropertyChanged += FormulaOnPropertyChanged;
+            equation.AlphaFormula.PropertyChanged += FormulaOnPropertyChanged;
             equation.PropertyChanged += EquationOnPropertyChanged;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }

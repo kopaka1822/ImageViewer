@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using OpenTK.Graphics.OpenGL4;
 using TextureViewer.Models;
 using TextureViewer.Utility;
 
@@ -43,6 +39,7 @@ namespace TextureViewer.Controller.ImageCombination
         public void NextStep()
         {
             Debug.Assert(curStep == 0);
+            Debug.Assert(models.GlContext.IsEnabled);
 
             // make the combine shader
             var shader = new ImageCombineShader(
@@ -51,17 +48,17 @@ namespace TextureViewer.Controller.ImageCombination
                 models.Images.NumImages
             );
 
-            // bind source images
-            for (int i = 0; i < models.Images.NumImages; ++i)
-            {
-                models.Images.GetTexture(i).Bind(shader.GetSourceImageBinding(i));
-            }
-
             // determine the final image
             finalImage.Reset();
 
             // render into the primary texture
             var target = builder.GetPrimaryTexture();
+
+            // bind source images
+            for (int i = 0; i < models.Images.NumImages; ++i)
+            {
+                models.Images.GetTexture(i).Bind(shader.GetSourceImageBinding(i));
+            }
 
             for (var layer = 0; layer < models.Images.NumLayers; ++layer)
             {
@@ -70,6 +67,8 @@ namespace TextureViewer.Controller.ImageCombination
                     shader.Run(layer, mipmap, models.Images.GetWidth(mipmap), models.Images.GetHeight(mipmap), target);
                 }
             }
+
+            GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
 
             shader.Dispose();
 

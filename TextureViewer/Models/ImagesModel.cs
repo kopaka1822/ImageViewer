@@ -225,7 +225,6 @@ namespace TextureViewer.Models
             context.Enable();
             // delete old data
             images[imageId].Dispose();
-            context.Disable();
 
             images.RemoveAt(imageId);
 
@@ -247,6 +246,8 @@ namespace TextureViewer.Models
                 OnPropertyChanged(nameof(Width));
                 OnPropertyChanged(nameof(Height));
             }
+
+            context.Disable();
         }
 
         /// <summary>

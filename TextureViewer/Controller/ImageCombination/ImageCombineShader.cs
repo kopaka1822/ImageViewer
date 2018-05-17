@@ -110,7 +110,7 @@ namespace TextureViewer.Controller.ImageCombination
             return res;
         }
 
-        private static string GetImageColor(string alphaFormula, string colorFormula)
+        private static string GetImageColor(string colorFormula, string alphaFormula)
         {
             return $"vec4(({colorFormula}).rgb, ({alphaFormula}).a)";
         }

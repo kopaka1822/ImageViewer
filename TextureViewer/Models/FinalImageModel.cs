@@ -14,10 +14,27 @@ namespace TextureViewer.Models
     public class FinalImageModel
     {
         private readonly TextureCacheModel textureCache;
+        private readonly ImagesModel images;
 
-        public FinalImageModel(TextureCacheModel textureCache)
+        public FinalImageModel(TextureCacheModel textureCache, ImagesModel images)
         {
             this.textureCache = textureCache;
+            this.images = images;
+            this.images.PropertyChanged += ImagesOnPropertyChanged;
+        }
+
+        private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(ImagesModel.NumImages):
+                    if (images.NumImages == 0)
+                    {
+                        // dispose all textures
+                        Reset();
+                    }
+                    break;
+            }
         }
 
         /// <summary>

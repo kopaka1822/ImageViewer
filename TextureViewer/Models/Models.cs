@@ -27,7 +27,7 @@ namespace TextureViewer.Models
             Display = new DisplayModel(Images, GlContext);
             Equations = new ImageEquationsModel(Images);
             Progress = new ProgressModel();
-            FinalImages = new FinalImagesModel(GlData.TextureCache);
+            FinalImages = new FinalImagesModel(GlData.TextureCache, Images);
 
             GlContext.Disable();
         }

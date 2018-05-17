@@ -13,12 +13,12 @@ namespace TextureViewer.Models
 
         public int NumImages => images.Length;
 
-        public FinalImagesModel(TextureCacheModel cache)
+        public FinalImagesModel(TextureCacheModel cache, ImagesModel images)
         {
-            images = new FinalImageModel[2]
+            this.images = new FinalImageModel[2]
             {
-                new FinalImageModel(cache),
-                new FinalImageModel(cache)
+                new FinalImageModel(cache, images),
+                new FinalImageModel(cache, images)
             };
         }
 

@@ -76,9 +76,8 @@ namespace TextureViewer.Controller.TextureViews
             shader.SetMipmap(models.Display.ActiveMipmap);
             shader.SetGrayscale(models.Display.Grayscale);
             
-            // TODO bind the correct image
             models.GlData.BindSampler(0, false, models.Display.LinearInterpolation);
-            models.Images.GetTexture(0).Bind(0);
+            texture.Bind(0);
 
             models.GlData.Vao.DrawQuad();
 
