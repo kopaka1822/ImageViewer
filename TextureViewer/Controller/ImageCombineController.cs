@@ -28,6 +28,22 @@ namespace TextureViewer.Controller
             equation.ColorFormula.PropertyChanged += FormulaOnPropertyChanged;
             equation.ColorFormula.PropertyChanged += FormulaOnPropertyChanged;
             equation.PropertyChanged += EquationOnPropertyChanged;
+            this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
+        }
+
+        private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(ImagesModel.NumImages):
+                    if (models.Images.PrevNumImages == 0)
+                    {
+                        recomputeImage = true;
+                        // issue redraw to do work
+                        models.GlContext.RedrawFrame();
+                    }
+                    break;
+            }
         }
 
         /// <summary>
@@ -36,7 +52,7 @@ namespace TextureViewer.Controller
         /// <returns>null if nothing needs to be recomputet, IStepable Instance otherwise</returns>
         public IStepable GetWork()
         {
-            if (!recomputeImage) return null;
+            if (!recomputeImage || !equation.Visible) return null;
             recomputeImage = false;
             return MakeStepable();
         }
@@ -45,10 +61,14 @@ namespace TextureViewer.Controller
         {
             switch (args.PropertyName)
             {
-                case nameof(ImageEquationModel.UseFilter):
+                case nameof(ImageEquationModel.Visible):
                     recomputeImage = true;
                     // issue redraw to do work
                     models.GlContext.RedrawFrame();
+                    break;
+                case nameof(ImageEquationModel.UseFilter):
+                    if(equation.Visible)
+                        models.GlContext.RedrawFrame();
                     break;
             }
         }

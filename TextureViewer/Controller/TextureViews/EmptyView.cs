@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK;
+using TextureViewer.glhelper;
 
 namespace TextureViewer.Controller.TextureViews
 {
     public class EmptyView : ITextureView
     {
-        public void Draw()
+        public void Draw(TextureArray2D texture)
         {
-            
+            Debug.Assert(texture == null);
         }
 
         public void Dispose()

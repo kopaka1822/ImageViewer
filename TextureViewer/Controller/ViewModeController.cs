@@ -107,7 +107,12 @@ namespace TextureViewer.Controller
 
         public void Paint()
         {
-            currentView.Draw();
+            // draw visible equations
+            // TODO correct this
+            if (models.Equations.Get(0).Visible)
+            {
+                currentView.Draw(models.FinalImages.Get(0).Texture);
+            }
         }
     }
 }

@@ -22,6 +22,8 @@ namespace TextureViewer.Controller.ImageCombination
                 Source = GenerateShaderSource(colorFormula, alphaFormula, Math.Max(numImages, 1))
             };
 
+            computeShader.Compile();
+
             shader = new Program(new List<Shader>{computeShader}, true);
         }
 

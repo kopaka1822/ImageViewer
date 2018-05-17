@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,13 +19,13 @@ namespace TextureViewer.Controller.TextureViews
         private Matrix4 transform = Matrix4.Identity;
         private readonly SingleViewShader shader;
 
-        public PlainTextureView(Models.Models models)
+        protected PlainTextureView(Models.Models models)
         {
             this.models = models;
             shader = new SingleViewShader();
         }
 
-        public virtual void Draw()
+        public virtual void Draw(TextureArray2D texture)
         {
         }
 
@@ -51,8 +52,10 @@ namespace TextureViewer.Controller.TextureViews
                 0.0f);
         }
 
-        public void DrawLayer(Matrix4 offset, int layer)
+        protected void DrawLayer(Matrix4 offset, int layer, TextureArray2D texture)
         {
+            Debug.Assert(texture != null);
+
             var finalTransform = offset * 
                                   
                                  Matrix4.CreateScale(models.Display.Zoom, models.Display.Zoom, 1.0f) *

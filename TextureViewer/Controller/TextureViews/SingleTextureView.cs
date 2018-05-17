@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK;
+using TextureViewer.glhelper;
 using TextureViewer.Models;
 
 namespace TextureViewer.Controller.TextureViews
@@ -14,9 +15,9 @@ namespace TextureViewer.Controller.TextureViews
         {
         }
 
-        public override void Draw()
+        public override void Draw(TextureArray2D texture)
         {
-            DrawLayer(Matrix4.Identity, models.Display.ActiveLayer);
+            DrawLayer(Matrix4.Identity, models.Display.ActiveLayer, texture);
         }
     }
 }
