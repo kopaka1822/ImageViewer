@@ -16,7 +16,7 @@ namespace TextureViewer.Controller.TextureViews
     {
         protected readonly Models.Models models;
 
-        private Matrix4 transform = Matrix4.Identity;
+        private Vector3 translation = Vector3.Zero;
         private readonly SingleViewShader shader;
 
         protected PlainTextureView(Models.Models models)
@@ -40,16 +40,18 @@ namespace TextureViewer.Controller.TextureViews
             var step = amount < 0.0f ? 1.0f / 1.001f : 1.001f;
             var value = (float)Math.Pow(step, Math.Abs(amount));
 
+            // modify translation as well
+            translation.X *= value;
+            translation.Y *= value;
+
             models.Display.Zoom = models.Display.Zoom * value;
         }
 
         public void OnDrag(Vector2 diff)
         {
             // window to client
-            transform *= Matrix4.CreateTranslation(
-                diff.X * 2.0f / models.Images.GetWidth(0),
-                diff.Y * -2.0f / models.Images.GetHeight(0),
-                0.0f);
+            translation.X += diff.X * 2.0f / models.Images.GetWidth(0);
+            translation.Y -= diff.Y * 2.0f / models.Images.GetHeight(0);
         }
 
         protected void DrawLayer(Matrix4 offset, int layer, TextureArray2D texture)
@@ -59,7 +61,7 @@ namespace TextureViewer.Controller.TextureViews
             var finalTransform = offset * 
                                   
                                  Matrix4.CreateScale(models.Display.Zoom, models.Display.Zoom, 1.0f) *
-                                 transform *
+                                 Matrix4.CreateTranslation(translation) *
                                  models.Display.AspectRatio;
 
             // draw the checkers background

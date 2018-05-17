@@ -49,9 +49,21 @@ namespace TextureViewer.Controller
             mousePosition = new Vector2(args.X, args.Y);
         }
 
+        private Vector2 ConvertToCanonical(Vector2 windowCoord)
+        {
+            return new Vector2(
+                (float)(windowCoord.X * 2.0 / models.GlContext.ClientSize.Width - 1.0),
+                (float)(windowCoord.Y * -2.0 / models.GlContext.ClientSize.Height + 1.0)
+            );
+        }
+
         private void GlControlOnMouseWheel(object sender, MouseEventArgs mouseEventArgs)
         {
-            currentView.OnScroll((float)mouseEventArgs.Delta, new Vector2((float)mouseEventArgs.X, (float)mouseEventArgs.Y));
+            // convert to canonical coordinates
+            currentView.OnScroll(
+                (float)mouseEventArgs.Delta, 
+                ConvertToCanonical(new Vector2((float)mouseEventArgs.X, (float)mouseEventArgs.Y))
+            );
             models.GlContext.RedrawFrame();
         }
 
@@ -70,7 +82,7 @@ namespace TextureViewer.Controller
             }
 
             mousePosition = newPosition;
-
+            // TODO only redraw on certain conditions
             models.GlContext.RedrawFrame();
         }
 
