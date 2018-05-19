@@ -52,7 +52,7 @@ namespace TextureViewer.Controller
         /// <returns>null if nothing needs to be recomputet, IStepable Instance otherwise</returns>
         public IStepable GetWork()
         {
-            if (!recomputeImage || !equation.Visible) return null;
+            if (!recomputeImage || !equation.Visible || models.Images.NumImages == 0) return null;
             recomputeImage = false;
             return MakeStepable();
         }
