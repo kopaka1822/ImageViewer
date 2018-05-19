@@ -42,11 +42,16 @@ namespace TextureViewer.Controller.TextureViews
             var step = amount < 0.0f ? 1.0f / 1.001f : 1.001f;
             var value = (float)Math.Pow(step, Math.Abs(amount));
 
+            var oldZoom = models.Display.Zoom;
+
+
+            models.Display.Zoom = models.Display.Zoom * value;
+
+            // do this because zoom is clamped and may not have changed at all
+            value = models.Display.Zoom / oldZoom;
             // modify translation as well
             translation.X *= value;
             translation.Y *= value;
-
-            models.Display.Zoom = models.Display.Zoom * value;
         }
 
         public void OnDrag(Vector2 diff)

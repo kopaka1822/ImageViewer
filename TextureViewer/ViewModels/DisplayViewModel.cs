@@ -264,7 +264,8 @@ namespace TextureViewer.ViewModels
 
         public string Zoom
         {
-            get => (models.Display.Zoom * 100.0f).ToString() + "%";
+            get => Math.Round((Decimal) (models.Display.Zoom * 100.0f), 2).ToString(App.GetCulture()) + "%";
+                //(models.Display.Zoom * 100.0f).ToString() + "%";
             set
             {
                 if (value == null) return;
