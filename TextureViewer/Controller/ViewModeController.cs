@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using OpenTK;
+using OpenTK.Graphics.OpenGL4;
 using TextureViewer.Controller.TextureViews;
 using TextureViewer.Models;
 
@@ -17,7 +19,7 @@ namespace TextureViewer.Controller
         private readonly Models.Models models;
         private ITextureView currentView = new EmptyView();
         private bool mouseDown = false;
-        private Vector2 mousePosition = Vector2.Zero;
+        private Point mousePosition = new Point(0);
 
         public ViewModeController(Models.Models models)
         {
@@ -39,14 +41,14 @@ namespace TextureViewer.Controller
         {
             if (args.Button == MouseButtons.Left)
                 mouseDown = false;
-            mousePosition = new Vector2(args.X, args.Y);
+            mousePosition = new Point(args.X, args.Y);
         }
 
         private void GlControlOnMouseDown(object sender, MouseEventArgs args)
         {
             if (args.Button == MouseButtons.Left)
                 mouseDown = true;
-            mousePosition = new Vector2(args.X, args.Y);
+            mousePosition = new Point(args.X, args.Y);
         }
 
         private Vector2 ConvertToCanonical(Vector2 windowCoord)
@@ -69,15 +71,15 @@ namespace TextureViewer.Controller
 
         private void GlControlOnMouseMove(object sender, MouseEventArgs args)
         {
-            var newPosition = new Vector2(args.X, args.Y);
+            var newPosition = new Point(args.X, args.Y);
 
             if (mouseDown)
             {
                 // drag event
-                var diff = newPosition - mousePosition;
+                var diff = new Point(newPosition.X - mousePosition.X, newPosition.Y - mousePosition.Y);
                 if (Math.Abs(diff.X) > 0.01 || Math.Abs(diff.Y) > 0.01)
                 {
-                    currentView.OnDrag(diff);
+                    currentView.OnDrag(new Vector2(diff.X, diff.Y));
                 }
             }
 
@@ -121,10 +123,41 @@ namespace TextureViewer.Controller
         public void Paint()
         {
             // draw visible equations
-            // TODO correct this
-            if (models.Equations.Get(0).Visible)
+            var visible = models.Equations.GetVisibles();
+            if (visible.Count == 1)
             {
-                currentView.Draw(models.FinalImages.Get(0).Texture);
+                // draw a single image
+                currentView.Draw(models.FinalImages.Get(visible[0]).Texture);
+            }
+            else if (visible.Count == 2)
+            {
+                // draw two images in split view
+                GL.Enable(EnableCap.ScissorTest);
+
+                var clientX = models.GlContext.ClientSize.Width;
+                var clientY = models.GlContext.ClientSize.Height;
+                // clamp mouse position to avoid out of range
+                var scissorsPos = new Point(mousePosition.X, mousePosition.Y);
+                scissorsPos.X = Math.Min(clientX - 1, Math.Max(0, scissorsPos.X));
+                scissorsPos.Y = Math.Min(clientY - 1, Math.Max(0, scissorsPos.Y));
+
+                if(models.Display.Split == DisplayModel.SplitMode.Vertical)
+                    GL.Scissor(0, 0, scissorsPos.X, clientY);
+                else
+                    GL.Scissor(0, clientY - scissorsPos.Y, clientX, clientY);
+
+                // first part
+                currentView.Draw(models.FinalImages.Get(visible[0]).Texture);
+
+                if (models.Display.Split == DisplayModel.SplitMode.Vertical)
+                    GL.Scissor(scissorsPos.X, 0, clientX, clientY);
+                else
+                    GL.Scissor(0, 0, clientX, clientY - scissorsPos.Y);
+
+                // second part
+                currentView.Draw(models.FinalImages.Get(visible[1]).Texture);
+
+                GL.Disable(EnableCap.ScissorTest);
             }
         }
     }

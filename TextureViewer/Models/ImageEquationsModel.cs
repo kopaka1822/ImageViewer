@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,6 +30,22 @@ namespace TextureViewer.Models
         {
             Debug.Assert(id >= 0 && id < NumEquations);
             return equations[id];
+        }
+
+        /// <summary>
+        /// returns the ids of all visible equations
+        /// </summary>
+        /// <returns></returns>
+        public List<int> GetVisibles()
+        {
+            var res = new List<int>();
+            for (var i = 0; i < equations.Length; ++i)
+            {
+                if(equations[i].Visible)
+                    res.Add(i);
+            }
+
+            return res;
         }
     }
 }

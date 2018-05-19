@@ -32,6 +32,12 @@ namespace TextureViewer.Models
             CubeCrossView
         }
 
+        public enum SplitMode
+        {
+            Vertical,
+            Horizontal
+        }
+
         private readonly ImagesModel imagesModel;
         private readonly OpenGlContext glContext;
 
@@ -143,6 +149,18 @@ namespace TextureViewer.Models
                 if (value == grayscale) return;
                 grayscale = value;
                 OnPropertyChanged(nameof(Grayscale));
+            }
+        }
+
+        private SplitMode splitMode = SplitMode.Vertical;
+        public SplitMode Split
+        {
+            get => splitMode;
+            set
+            {
+                if (value == splitMode) return;
+                splitMode = value;
+                OnPropertyChanged(nameof(Split));
             }
         }
 
