@@ -137,10 +137,10 @@ namespace TextureViewer.Equation
             rules.Add(new RuleValueOperationValue(Token.Token.Type.Operation2));
             rules.Add(new RuleValueOperationValue(Token.Token.Type.Operation3));
             rules.Add(new BracketRule());
-            rules.Add(new RuleSign());
             rules.Add(new UnaryFunctionRule());
             rules.Add(new BinaryFunctionRule());
             rules.Add(new TertiaryFunctionRule());
+            rules.Add(new RuleSign());
 
             return rules;
         }
