@@ -43,7 +43,8 @@ namespace TextureViewer.Controller.TextureViews.Shader
 
         public void SetAperture(float aperture)
         {
-            float farplane = (float)Math.Tan(aperture / 2.0);
+            // distance from camera. ray direction in the edges will be vec3(+-1, +-1, farplane)
+            float farplane = (float)(1.0 / Math.Tan(aperture / 2.0));
             GL.Uniform1(5, farplane);
         }
 

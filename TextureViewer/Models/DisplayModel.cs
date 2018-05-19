@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using TextureViewer.Annotations;
+using TextureViewer.Models;
 
 namespace TextureViewer.Models
 {
@@ -97,9 +98,9 @@ namespace TextureViewer.Models
             get => aperture;
             set
             {
-                var clamped = Math.Min(Math.Max(value, 0.06f), (float)Math.PI * 0.99f);
+                var clamped = Math.Min(Math.Max(value, 0.06f), (float)Math.PI * 0.90f);
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if (clamped == value) return;
+                if (clamped == aperture) return;
                 aperture = clamped;
                 OnPropertyChanged(nameof(Aperture));
             }
@@ -306,5 +307,24 @@ namespace TextureViewer.Models
         }
 
         #endregion
+    }
+}
+
+/// <summary>
+/// extension methods for view mode enumeration
+/// </summary>
+public static class ViewModeExtension
+{
+    public static bool IsDegree(this DisplayModel.ViewMode vm)
+    {
+        switch (vm)
+        {
+            case DisplayModel.ViewMode.CubeCrossView:
+            case DisplayModel.ViewMode.Single:
+            case DisplayModel.ViewMode.Empty:
+                return false;
+            default:
+                return true;
+        }
     }
 }

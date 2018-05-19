@@ -140,6 +140,7 @@ namespace TextureViewer.Controller
                 case nameof(DisplayModel.ActiveLayer):
                 case nameof(DisplayModel.ActiveMipmap):
                 case nameof(DisplayModel.Zoom):
+                case nameof(DisplayModel.Aperture):
                     models.GlContext.RedrawFrame();
                     break;
             }

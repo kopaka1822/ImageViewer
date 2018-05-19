@@ -43,7 +43,7 @@ namespace TextureViewer.Controller.TextureViews
             shader.SetGrayscale(models.Display.Grayscale);
 
             var transform = GetTransform();
-            float farplane = (float)Math.Tan(models.Display.Aperture / 2.0);
+            float farplane = (float)(1.0 / Math.Tan(models.Display.Aperture / 2.0));
             var rayDir = transform * new Vector4(1.0f, 1.0f, farplane, 0.0f);
 
             models.GlData.BindSampler(shader.GetTextureLocation(), true, models.Display.LinearInterpolation);

@@ -98,6 +98,7 @@ namespace TextureViewer.ViewModels
                     SelectedViewMode = selected;
 
                     OnPropertyChanged(nameof(ChooseLayers));
+                    OnPropertyChanged(nameof(Zoom));
                     break;
 
                 case nameof(DisplayModel.Split):
@@ -109,6 +110,7 @@ namespace TextureViewer.ViewModels
                     OnPropertyChanged(nameof(TexelPosition));
                     break;
 
+                case nameof(DisplayModel.Aperture):
                 case nameof(DisplayModel.Zoom):
                     OnPropertyChanged(nameof(Zoom));
                     break;
@@ -264,8 +266,10 @@ namespace TextureViewer.ViewModels
 
         public string Zoom
         {
-            get => Math.Round((Decimal) (models.Display.Zoom * 100.0f), 2).ToString(App.GetCulture()) + "%";
-                //(models.Display.Zoom * 100.0f).ToString() + "%";
+            get => models.Display.ActiveView.IsDegree() ?
+                        Math.Round((Decimal)(models.Display.Aperture  * 180.0 / Math.PI), 2 ).ToString(App.GetCulture()) + "°" :
+                        Math.Round((Decimal) (models.Display.Zoom * 100.0f), 2).ToString(App.GetCulture()) + "%";
+               
             set
             {
                 if (value == null) return;
@@ -276,7 +280,14 @@ namespace TextureViewer.ViewModels
                 // extract float
                 if (float.TryParse(value, NumberStyles.Float, App.GetCulture(), out float converted))
                 {
-                    models.Display.Zoom = converted * 0.01f;
+                    if (models.Display.ActiveView.IsDegree())
+                    {
+                        models.Display.Aperture = (float)(converted * Math.PI / 180.0);
+                    }
+                    else
+                    {
+                        models.Display.Zoom = converted * 0.01f;
+                    }
                 }
                 else
                 {

@@ -35,13 +35,17 @@ namespace TextureViewer.Controller.TextureViews
 
         public void OnScroll(float amount, Vector2 mouse)
         {
-            //throw new NotImplementedException();
+            // modify zoom
+            var step = amount > 0.0f ? 1.0f / 1.001f : 1.001f;
+            var value = (float)Math.Pow(step, Math.Abs(amount));
+
+            models.Display.Aperture *= value;
         }
 
         public void OnDrag(Vector2 diff)
         {
-            pitch += (float)diff.X * 0.01f / models.Display.Aperture;
-            roll += (float)diff.Y * 0.01f / models.Display.Aperture;
+            pitch += (float)diff.X * 0.01f * models.Display.Aperture;
+            roll += (float)diff.Y * 0.01f * models.Display.Aperture;
         }
 
         public Point GetTexelPosition(Vector2 mouse)
