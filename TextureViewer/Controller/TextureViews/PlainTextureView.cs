@@ -93,7 +93,7 @@ namespace TextureViewer.Controller.TextureViews
             shader.SetMipmap(models.Display.ActiveMipmap);
             shader.SetGrayscale(models.Display.Grayscale);
             
-            models.GlData.BindSampler(0, false, models.Display.LinearInterpolation);
+            models.GlData.BindSampler(0, true, models.Display.LinearInterpolation);
             texture.Bind(0);
 
             models.GlData.Vao.DrawQuad();
