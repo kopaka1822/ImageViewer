@@ -98,7 +98,7 @@ namespace TextureViewer.Models
             get => aperture;
             set
             {
-                var clamped = Math.Min(Math.Max(value, 0.06f), (float)Math.PI * 0.90f);
+                var clamped = Math.Min(Math.Max(value, 0.01f), (float)Math.PI * 0.90f);
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (clamped == aperture) return;
                 aperture = clamped;

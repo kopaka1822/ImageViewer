@@ -39,12 +39,8 @@ namespace TextureViewer.Controller.TextureViews
             shader.SetTransform(GetTransform());
             shader.SetMipmap((float)models.Display.ActiveMipmap);
             shader.SetLayer((float)models.Display.ActiveLayer);
-            shader.SetAperture(models.Display.Aperture);
+            shader.SetFarplane(CalcFarplane());
             shader.SetGrayscale(models.Display.Grayscale);
-
-            var transform = GetTransform();
-            float farplane = (float)(1.0 / Math.Tan(models.Display.Aperture / 2.0));
-            var rayDir = transform * new Vector4(1.0f, 1.0f, farplane, 0.0f);
 
             models.GlData.BindSampler(shader.GetTextureLocation(), true, models.Display.LinearInterpolation);
             texture.Bind(shader.GetTextureLocation());
