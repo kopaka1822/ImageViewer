@@ -82,12 +82,14 @@
     <Compile Include="Controller\PaintController.cs" />
     <Compile Include="Controller\ProgressController.cs" />
     <Compile Include="Controller\TextureViews\CubeCrossTextureView.cs" />
+    <Compile Include="Controller\TextureViews\CubeTextureView.cs" />
     <Compile Include="Controller\TextureViews\EmptyView.cs" />
     <Compile Include="Controller\TextureViews\ITextureView.cs" />
     <Compile Include="Controller\TextureViews\PlainTextureView.cs" />
     <Compile Include="Controller\TextureViews\PolarTextureView.cs" />
     <Compile Include="Controller\TextureViews\ProjectionTextureView.cs" />
     <Compile Include="Controller\TextureViews\Shader\CheckersShader.cs" />
+    <Compile Include="Controller\TextureViews\Shader\CubeViewShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\PolarViewShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\SingleViewShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\ViewShader.cs" />
