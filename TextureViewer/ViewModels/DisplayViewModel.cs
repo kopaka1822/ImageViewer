@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using TextureViewer.Annotations;
@@ -106,6 +107,10 @@ namespace TextureViewer.ViewModels
 
                 case nameof(DisplayModel.TexelPosition):
                     OnPropertyChanged(nameof(TexelPosition));
+                    break;
+
+                case nameof(DisplayModel.Zoom):
+                    OnPropertyChanged(nameof(Zoom));
                     break;
             }
         }
@@ -254,6 +259,28 @@ namespace TextureViewer.ViewModels
                 selectedViewMode = value;
                 OnPropertyChanged(nameof(SelectedViewMode));
                 models.Display.ActiveView = selectedViewMode.Cargo;
+            }
+        }
+
+        public string Zoom
+        {
+            get => (models.Display.Zoom * 100.0f).ToString() + "%";
+            set
+            {
+                if (value == null) return;
+
+                value = value.Trim();
+                if (value.Length > 0 && (value.EndsWith("%") || value.EndsWith("°")))
+                    value = value.Remove(value.Length - 1, 1);
+                // extract float
+                if (float.TryParse(value, NumberStyles.Float, App.GetCulture(), out float converted))
+                {
+                    models.Display.Zoom = converted * 0.01f;
+                }
+                else
+                {
+                    // TODO do something
+                }
             }
         }
 

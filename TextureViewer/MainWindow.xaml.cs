@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
 using TextureViewer.Controller;
 using TextureViewer.ViewModels;
 
@@ -45,6 +48,23 @@ namespace TextureViewer
                 throw;
             }
 
+        }
+
+        /// <summary>
+        /// helper to update a text box if enter is pressed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UpdateOnEnter(object sender, KeyEventArgs e)
+        {
+            // only update on enter
+            if (e.Key != Key.Enter) return;
+
+            var box = (DependencyObject) sender;
+            var prop = TextBox.TextProperty;
+
+            var binding = BindingOperations.GetBindingExpression(box, prop);
+            binding?.UpdateSource();
         }
     }
 }
