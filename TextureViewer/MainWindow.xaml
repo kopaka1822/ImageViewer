@@ -279,11 +279,10 @@
                                         Text="Split Mode:" 
                                         Margin="0 0 0 5"/>
                                     <ComboBox 
-                                        Margin="0 0 0 5" 
-                                        SelectedIndex="0">
-                                        <ComboBoxItem Content="Vertical"/>
-                                        <ComboBoxItem Content="Horizontal"/>
-                                    </ComboBox>
+                                        Margin="0 0 0 5"
+                                        IsEnabled="{Binding Display.EnableSplitMode}"
+                                        SelectedItem="{Binding Display.SelectedSplitMode}"
+                                        ItemsSource="{Binding Display.AvailableSplitModes}"/>
                                 </StackPanel>
                             </Border>
                         </ScrollViewer>

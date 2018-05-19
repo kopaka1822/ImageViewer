@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -34,10 +35,22 @@ namespace TextureViewer.ViewModels
         public DisplayViewModel(Models.Models models)
         {
             this.models = models;
+            this.selectedSplitMode = AvailableSplitModes[models.Display.Split == DisplayModel.SplitMode.Vertical ? 0 : 1];
             models.Display.PropertyChanged += DisplayModelOnPropertyChanged;
             models.Images.PropertyChanged += ImagesModelOnPropertyChanged;
+            models.Equations.PropertyChanged += EquationsOnPropertyChanged;
 
             CreateViewModes();
+        }
+
+        private void EquationsOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(ImageEquationsModel.NumVisible):
+                    OnPropertyChanged(nameof(EnableSplitMode));
+                    break;
+            }
         }
 
         private void DisplayModelOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -82,6 +95,11 @@ namespace TextureViewer.ViewModels
                     }
 
                     SelectedViewMode = selected;
+                    break;
+
+                case nameof(DisplayModel.Split):
+                    SelectedSplitMode =
+                        AvailableSplitModes[models.Display.Split == DisplayModel.SplitMode.Vertical ? 0 : 1];
                     break;
             }
         }
@@ -158,12 +176,19 @@ namespace TextureViewer.ViewModels
         public ObservableCollection<ComboBoxItem<int>> AvailableMipMaps { get; } = new ObservableCollection<ComboBoxItem<int>>();
         public ObservableCollection<ComboBoxItem<int>> AvailableLayers { get; } = new ObservableCollection<ComboBoxItem<int>>();
 
+        public ObservableCollection<ComboBoxItem<DisplayModel.SplitMode>> AvailableSplitModes { get; } = new ObservableCollection<ComboBoxItem<DisplayModel.SplitMode>>
+        {
+            new ComboBoxItem<DisplayModel.SplitMode>("Vertical", DisplayModel.SplitMode.Vertical),
+            new ComboBoxItem<DisplayModel.SplitMode>("Horizontal", DisplayModel.SplitMode.Horizontal)
+        };
+
         public ObservableCollection<ComboBoxItem<DisplayModel.ViewMode>> AvailableViewModes { get; } =
             new ObservableCollection<ComboBoxItem<DisplayModel.ViewMode>>();
 
         public Visibility EnableMipMaps => AvailableMipMaps.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
         public Visibility EnableLayers => AvailableLayers.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
         public Visibility EnableViewModes => AvailableViewModes.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+        public bool EnableSplitMode => models.Equations.GetVisibles().Count > 1;
 
         private ComboBoxItem<int> selectedMipMap = EmptyMipMap;
         public ComboBoxItem<int> SelectedMipMap
@@ -192,6 +217,19 @@ namespace TextureViewer.ViewModels
                 OnPropertyChanged(nameof(SelectedLayer));
                 if (selectedLayer.Cargo != -1)
                     models.Display.ActiveLayer = selectedLayer.Cargo;
+            }
+        }
+
+        private ComboBoxItem<DisplayModel.SplitMode> selectedSplitMode;
+        public ComboBoxItem<DisplayModel.SplitMode> SelectedSplitMode
+        {
+            get => selectedSplitMode;
+            set
+            {
+                if (value == null || selectedSplitMode == value) return;
+                selectedSplitMode = value;
+                OnPropertyChanged(nameof(SelectedSplitMode));
+                models.Display.Split = value.Cargo;
             }
         }
 
