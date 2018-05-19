@@ -95,6 +95,8 @@ namespace TextureViewer.ViewModels
                     }
 
                     SelectedViewMode = selected;
+
+                    OnPropertyChanged(nameof(ChooseLayers));
                     break;
 
                 case nameof(DisplayModel.Split):
@@ -193,6 +195,10 @@ namespace TextureViewer.ViewModels
         public Visibility EnableLayers => AvailableLayers.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
         public Visibility EnableViewModes => AvailableViewModes.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
         public bool EnableSplitMode => models.Equations.GetVisibles().Count > 1;
+
+        // layers are fixed for cube maps
+        public bool ChooseLayers => models.Display.ActiveView == DisplayModel.ViewMode.Single ||
+                                    models.Display.ActiveView == DisplayModel.ViewMode.Polar;
 
         private ComboBoxItem<int> selectedMipMap = EmptyMipMap;
         public ComboBoxItem<int> SelectedMipMap

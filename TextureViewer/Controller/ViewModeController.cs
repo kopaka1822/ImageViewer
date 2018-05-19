@@ -125,6 +125,11 @@ namespace TextureViewer.Controller
                     models.GlContext.RedrawFrame();
                     if(disable) models.GlContext.Disable();
                     break;
+
+                case nameof(DisplayModel.ActiveLayer):
+                case nameof(DisplayModel.ActiveMipmap):
+                    models.GlContext.RedrawFrame();
+                    break;
             }
         }
 

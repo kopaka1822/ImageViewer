@@ -493,6 +493,7 @@
                         <ComboBox 
                             Grid.Column="1" 
                             Width="120"
+                            IsEnabled="{Binding Display.ChooseLayers}"
                             SelectedItem="{Binding Display.SelectedLayer}"
                             ItemsSource="{Binding Display.AvailableLayers}"/>
                     </Grid>
