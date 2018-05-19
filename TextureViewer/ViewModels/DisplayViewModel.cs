@@ -101,6 +101,10 @@ namespace TextureViewer.ViewModels
                     SelectedSplitMode =
                         AvailableSplitModes[models.Display.Split == DisplayModel.SplitMode.Vertical ? 0 : 1];
                     break;
+
+                case nameof(DisplayModel.TexelPosition):
+                    OnPropertyChanged(nameof(TexelPosition));
+                    break;
             }
         }
 
@@ -300,6 +304,8 @@ namespace TextureViewer.ViewModels
             if(isEnabled != EnableViewModes)
                 OnPropertyChanged(nameof(EnableViewModes));
         }
+
+        public string TexelPosition => models.Display.TexelPosition.X + ", " + models.Display.TexelPosition.Y;
 
         public event PropertyChangedEventHandler PropertyChanged;
 

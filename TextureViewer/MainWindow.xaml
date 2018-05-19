@@ -397,7 +397,7 @@
                             Height="16" 
                             Margin="0 0 5 0"/>
                         <TextBlock 
-                            Text="0, 0" 
+                            Text="{Binding Display.TexelPosition}" 
                             Grid.Column="1"/>
                     </Grid>
                 </StatusBarItem>

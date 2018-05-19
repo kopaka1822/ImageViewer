@@ -66,6 +66,10 @@ namespace TextureViewer.Controller
                 (float)mouseEventArgs.Delta, 
                 ConvertToCanonical(new Vector2((float)mouseEventArgs.X, (float)mouseEventArgs.Y))
             );
+
+            models.Display.TexelPosition = currentView.GetTexelPosition(
+                ConvertToCanonical(new Vector2((float)mouseEventArgs.X, (float)mouseEventArgs.Y)));
+
             models.GlContext.RedrawFrame();
         }
 
@@ -84,6 +88,10 @@ namespace TextureViewer.Controller
             }
 
             mousePosition = newPosition;
+
+            models.Display.TexelPosition = currentView.GetTexelPosition(
+                ConvertToCanonical(new Vector2((float)args.X, (float)args.Y)));
+
             // TODO only redraw on certain conditions
             models.GlContext.RedrawFrame();
         }

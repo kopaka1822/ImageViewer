@@ -148,6 +148,7 @@
     <Compile Include="Models\ImagesModel.cs" />
     <Compile Include="Utility\IStepable.cs" />
     <Compile Include="Utility\StepList.cs" />
+    <Compile Include="Utility\Utility.cs" />
     <Compile Include="ViewModels\DisplayViewModel.cs" />
     <Compile Include="ViewModels\EquationsViewModel.cs" />
     <Compile Include="ViewModels\EquationViewModel.cs" />

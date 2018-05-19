@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -161,6 +162,19 @@ namespace TextureViewer.Models
                 if (value == splitMode) return;
                 splitMode = value;
                 OnPropertyChanged(nameof(Split));
+            }
+        }
+
+        private Point texelPosition = new Point(0, 0);
+        // the mouse position on the texture
+        public Point TexelPosition
+        {
+            get => texelPosition;
+            set
+            {
+                if (value == null || value.Equals(texelPosition)) return;
+                texelPosition = value;
+                OnPropertyChanged(nameof(TexelPosition));
             }
         }
 
