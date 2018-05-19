@@ -110,9 +110,10 @@ namespace TextureViewer.Controller
                         case DisplayModel.ViewMode.Single:
                             currentView = new SingleTextureView(models);
                             break;
+                        case DisplayModel.ViewMode.Polar:
+                            currentView = new PolarTextureView(models);
+                            break;
                         case DisplayModel.ViewMode.CubeMap:
-                            //break;
-                        //case DisplayModel.ViewMode.Polar:
                             //break;
                         case DisplayModel.ViewMode.CubeCrossView:
                             currentView = new CubeCrossTextureView(models);

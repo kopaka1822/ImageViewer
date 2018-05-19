@@ -91,6 +91,20 @@ namespace TextureViewer.Models
             }
         }
 
+        private float aperture = (float)Math.PI / 2.0f;
+        public float Aperture
+        {
+            get => aperture;
+            set
+            {
+                var clamped = Math.Min(Math.Max(value, 0.06f), (float)Math.PI * 0.99f);
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                if (clamped == value) return;
+                aperture = clamped;
+                OnPropertyChanged(nameof(Aperture));
+            }
+        }
+
         private Matrix4 aspectRatio = Matrix4.Identity;
         public Matrix4 AspectRatio
         {
