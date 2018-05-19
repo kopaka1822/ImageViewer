@@ -41,8 +41,9 @@ namespace TextureViewer.Controller.TextureViews.Shader
             GL.Uniform1(4, (uint)mode);
         }
 
-        public void SetFarplane(float farplane)
+        public void SetAperture(float aperture)
         {
+            float farplane = (float)Math.Tan(aperture / 2.0);
             GL.Uniform1(5, farplane);
         }
 

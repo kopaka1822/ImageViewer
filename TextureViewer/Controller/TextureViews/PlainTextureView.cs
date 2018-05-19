@@ -70,7 +70,7 @@ namespace TextureViewer.Controller.TextureViews
         {
             return Matrix4.CreateScale(models.Display.Zoom, models.Display.Zoom, 1.0f) *
                    Matrix4.CreateTranslation(translation) *
-                   models.Display.AspectRatio;
+                   models.Display.ImageAspectRatio;
         }
 
         protected void DrawLayer(Matrix4 offset, int layer, TextureArray2D texture)
@@ -93,8 +93,8 @@ namespace TextureViewer.Controller.TextureViews
             shader.SetMipmap(models.Display.ActiveMipmap);
             shader.SetGrayscale(models.Display.Grayscale);
             
-            models.GlData.BindSampler(0, true, models.Display.LinearInterpolation);
-            texture.Bind(0);
+            models.GlData.BindSampler(shader.GetTextureLocation(), true, models.Display.LinearInterpolation);
+            texture.Bind(shader.GetTextureLocation());
 
             models.GlData.Vao.DrawQuad();
 

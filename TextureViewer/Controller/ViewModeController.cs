@@ -103,28 +103,38 @@ namespace TextureViewer.Controller
                 case nameof(DisplayModel.ActiveView):
                     var disable = models.GlContext.Enable();
 
-                    currentView.Dispose();
-                    currentView = null;
-                    switch (models.Display.ActiveView)
+                    try
                     {
-                        case DisplayModel.ViewMode.Single:
-                            currentView = new SingleTextureView(models);
-                            break;
-                        case DisplayModel.ViewMode.Polar:
-                            currentView = new PolarTextureView(models);
-                            break;
-                        case DisplayModel.ViewMode.CubeMap:
+                        currentView.Dispose();
+                        currentView = null;
+                        switch (models.Display.ActiveView)
+                        {
+                            case DisplayModel.ViewMode.Single:
+                                currentView = new SingleTextureView(models);
+                                break;
+                            case DisplayModel.ViewMode.Polar:
+                                currentView = new PolarTextureView(models);
+                                break;
+                            case DisplayModel.ViewMode.CubeMap:
                             //break;
-                        case DisplayModel.ViewMode.CubeCrossView:
-                            currentView = new CubeCrossTextureView(models);
-                            break;
-                        default:
-                            currentView = new EmptyView();
-                            break;
-                    }
+                            case DisplayModel.ViewMode.CubeCrossView:
+                                currentView = new CubeCrossTextureView(models);
+                                break;
+                            default:
+                                currentView = new EmptyView();
+                                break;
+                        }
 
-                    models.GlContext.RedrawFrame();
-                    if(disable) models.GlContext.Disable();
+                        models.GlContext.RedrawFrame();
+                    }
+                    catch (Exception e)
+                    {
+                        App.ShowErrorDialog(models.App.Window, e.Message);
+                    }
+                    finally
+                    {
+                        if (disable) models.GlContext.Disable();
+                    }                  
                     break;
 
                 case nameof(DisplayModel.ActiveLayer):

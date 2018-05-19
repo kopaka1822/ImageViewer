@@ -52,7 +52,7 @@ namespace TextureViewer.Controller.TextureViews
 
         protected Matrix4 GetTransform()
         {
-            return models.Display.AspectRatio * GetRotation() * GetOrientation();
+            return models.Display.ClientAspectRatio * GetRotation() * GetOrientation();
         }
 
         protected abstract Matrix4 GetOrientation();

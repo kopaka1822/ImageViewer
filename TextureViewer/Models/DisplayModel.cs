@@ -105,15 +105,27 @@ namespace TextureViewer.Models
             }
         }
 
-        private Matrix4 aspectRatio = Matrix4.Identity;
-        public Matrix4 AspectRatio
+        private Matrix4 imageAspectRatio = Matrix4.Identity;
+        public Matrix4 ImageAspectRatio
         {
-            get => aspectRatio;
+            get => imageAspectRatio;
             set
             {
-                if (aspectRatio.Equals(value)) return;
-                aspectRatio = value;
-                OnPropertyChanged(nameof(AspectRatio));
+                if (imageAspectRatio.Equals(value)) return;
+                imageAspectRatio = value;
+                OnPropertyChanged(nameof(ImageAspectRatio));
+            }
+        }
+
+        private Matrix4 clientAspectRatio = Matrix4.Identity;
+        public Matrix4 ClientAspectRatio
+        {
+            get => clientAspectRatio;
+            set
+            {
+                if (clientAspectRatio.Equals(value)) return;
+                clientAspectRatio = value;
+                OnPropertyChanged(nameof(ClientAspectRatio));
             }
         }
 
@@ -272,11 +284,15 @@ namespace TextureViewer.Models
         {
             if (imagesModel.NumImages > 0)
             {
-                AspectRatio = Matrix4.CreateScale(
+                ImageAspectRatio = Matrix4.CreateScale(
                     (float)imagesModel.GetWidth(0) / (float)glContext.ClientSize.Width,
                     (float)imagesModel.GetHeight(0) / (float)glContext.ClientSize.Height,
                     1.0f);
             }
+
+            ClientAspectRatio = Matrix4.CreateScale(
+                (float)glContext.ClientSize.Width / (float)glContext.ClientSize.Height, 1.0f, 1.0f
+            );
         }
 
         #region INotifyPropertyChanged Members
