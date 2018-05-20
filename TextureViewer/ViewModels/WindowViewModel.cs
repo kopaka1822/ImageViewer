@@ -32,6 +32,7 @@ namespace TextureViewer.ViewModels
             ImportCommand = new ImportImageCommand(models);
             ResizeCommand = new ResizeWindowCommand(models);
             OpenCommand = new OpenImageCommand(models);
+            ExportCommand = new ExportImageCommand(models);
         }
 
         /// <summary>

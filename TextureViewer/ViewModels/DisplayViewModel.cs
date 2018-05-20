@@ -6,28 +6,12 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using TextureViewer.Annotations;
 using TextureViewer.Models;
+using TextureViewer.Utility.UI;
 
 namespace TextureViewer.ViewModels
 {
     public class DisplayViewModel : INotifyPropertyChanged
     {
-        public class ComboBoxItem <T>
-        {
-            private readonly string name;
-            public T Cargo { get; }
-
-            public ComboBoxItem(string name, T cargo)
-            {
-                this.name = name;
-                Cargo = cargo;
-            }
-
-            public override string ToString()
-            {
-                return name;
-            }
-        }
-
         private readonly Models.Models models;
         private static readonly ComboBoxItem<int> EmptyMipMap = new ComboBoxItem<int>("No Mipmap", -1);
         private static readonly ComboBoxItem<int> EmptyLayer = new ComboBoxItem<int>("No Layer", -1);
