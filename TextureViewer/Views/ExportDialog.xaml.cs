@@ -19,5 +19,15 @@ namespace TextureViewer.Views
 
             InitializeComponent();
         }
+
+        private void ButtonExport_OnClick(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+        }
+
+        private void ButtonCancel_OnClick(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
+        }
     }
 }

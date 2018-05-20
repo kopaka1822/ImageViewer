@@ -65,6 +65,21 @@ namespace TextureViewer.Models
             return res;
         }
 
+        /// <summary>
+        /// returns the id of the first visible equation.
+        /// Throws exception if nothing is visible
+        /// </summary>
+        /// <returns></returns>
+        public int GetFirstVisible()
+        {
+            for (var i = 0; i < equations.Length; ++i)
+            {
+                if (equations[i].Visible)
+                    return i;
+            }
+            throw new Exception("no image is visible");
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

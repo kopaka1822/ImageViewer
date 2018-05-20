@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Win32;
 using OpenTK.Graphics.OpenGL4;
+using TextureViewer.glhelper;
 using TextureViewer.Models.Dialog;
 using TextureViewer.Views;
 
@@ -69,7 +70,49 @@ namespace TextureViewer.Commands
             var dia = new ExportDialog(models, sfd.FileName, pixelFormat, format);
             if (dia.ShowDialog() != true) return;
 
+            var info = dia.Model;
 
+            models.GlContext.Enable();
+            try
+            {
+                // obtain data from gpu
+                var visibleId = models.Equations.GetFirstVisible();
+
+                var texture = models.FinalImages.Get(visibleId).Texture;
+                if (texture == null)
+                    throw new Exception("texture is not computed");
+
+                var data = texture.GetData(info.Mipmap, info.Layer, info.PixelFormat, info.PixelType, 
+                    out var width, out var height);
+                if(data == null)
+                    throw new Exception("error retrieving image from gpu");
+
+                var numComponents = TextureArray2D.GetPixelFormatCount(info.PixelFormat);
+
+                switch (format)
+                {
+                    case ExportModel.FileFormat.Png:
+                        ImageLoader.SavePng(info.Filename, width, height, numComponents, data);
+                        break;
+                    case ExportModel.FileFormat.Bmp:
+                        ImageLoader.SaveBmp(info.Filename, width, height, numComponents, data);
+                        break;
+                    case ExportModel.FileFormat.Hdr:
+                        ImageLoader.SaveHdr(info.Filename, width, height, numComponents, data);
+                        break;
+                    case ExportModel.FileFormat.Pfm:
+                        ImageLoader.SavePfm(info.Filename, width, height, numComponents, data);
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                App.ShowErrorDialog(models.App.Window, e.Message);
+            }
+            finally
+            {
+                models.GlContext.Disable();
+            }
         }
 
         public event EventHandler CanExecuteChanged
