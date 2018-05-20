@@ -27,15 +27,13 @@ namespace TextureViewer
             if (e.Args.Length == 0)
             {
                 // open empty window
-                SpawnWindow(null);
+                SpawnWindow();
             }
             else
             {
-                // open a window for each file
-                foreach (var s in e.Args)
-                {
-                    SpawnWindow(s);
-                }
+                // import images into one window
+                var wnd = SpawnWindow();
+                wnd.ImportImages(e.Args);
             }
         }
 
@@ -46,12 +44,16 @@ namespace TextureViewer
             base.OnExit(e);
         }
 
-        public void SpawnWindow(string filename)
+        public MainWindow SpawnWindow()
         {
             var wnd = new MainWindow(this);
             openWindows.Add(wnd);
 
             wnd.Show();
+
+            wnd.Closed += (sender, args) => openWindows.Remove(wnd);
+
+            return wnd;
         }
 
         /// <summary>

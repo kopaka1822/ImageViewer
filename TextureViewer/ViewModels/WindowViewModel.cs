@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 using TextureViewer.Commands;
 using TextureViewer.Controller;
@@ -30,6 +31,24 @@ namespace TextureViewer.ViewModels
             // commands
             ImportCommand = new ImportImageCommand(models);
             ResizeCommand = new ResizeWindowCommand(models);
+            OpenCommand = new OpenImageCommand(models);
+        }
+
+        /// <summary>
+        /// tries to import an image. Displays an error on failure
+        /// </summary>
+        /// <param name="filename"></param>
+        public void ImportImage(string filename)
+        {
+            try
+            {
+                var imgs = ImageLoader.LoadImage(filename);
+                models.Images.AddImages(imgs);
+            }
+            catch (Exception e)
+            {
+                App.ShowErrorDialog(models.App.Window, e.Message);
+            }
         }
 
         // view models

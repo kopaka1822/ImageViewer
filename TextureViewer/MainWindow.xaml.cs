@@ -50,6 +50,14 @@ namespace TextureViewer
 
         }
 
+        public void ImportImages(string[] files)
+        {
+            foreach (var file in files)
+            {
+                ViewModel.ImportImage(file);
+            }
+        }
+
         /// <summary>
         /// helper to update a text box if enter is pressed
         /// </summary>

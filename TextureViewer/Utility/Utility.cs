@@ -37,5 +37,24 @@ namespace TextureViewer.Utility
 
             return new Point((int)(coord.X), (int)(coord.Y));
         }
+
+        /// <summary>
+        /// opens the file dialog for images
+        /// </summary>
+        /// <returns>string with filenames or null if aborted</returns>
+        public static string[] ShowImportImageDialog()
+        {
+            var ofd = new Microsoft.Win32.OpenFileDialog
+            {
+                Multiselect = true,
+                InitialDirectory = Properties.Settings.Default.ImagePath
+            };
+
+            if (ofd.ShowDialog() != true) return null;
+
+            // set new image path in settings
+            Properties.Settings.Default.ImagePath = System.IO.Path.GetDirectoryName(ofd.FileName);
+            return ofd.FileNames;
+        }
     }
 }

@@ -29,18 +29,10 @@ namespace TextureViewer.Commands
         /// </summary>
         public void Execute(object parameter)
         {
-            var ofd = new Microsoft.Win32.OpenFileDialog
-            {
-                Multiselect = true,
-                InitialDirectory = Properties.Settings.Default.ImagePath
-            };
+            var files = Utility.Utility.ShowImportImageDialog();
+            if (files == null) return;
 
-            if (ofd.ShowDialog() != true) return;
-
-            // set new image path in settings
-            Properties.Settings.Default.ImagePath = System.IO.Path.GetDirectoryName(ofd.FileName);
-
-            foreach (var filename in ofd.FileNames)
+            foreach (var filename in files)
             {
                 // load image
                 try
