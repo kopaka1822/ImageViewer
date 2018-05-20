@@ -14,10 +14,10 @@ namespace TextureViewer.Views
 
         public ExportDialog(Models.Models models, string filename, PixelFormat defaultPixelFormat, ExportModel.FileFormat format)
         {
-            InitializeComponent();
-
             Model = new ExportModel(filename, defaultPixelFormat, format);
             DataContext = new ExportViewModel(models, Model);
+
+            InitializeComponent();
         }
     }
 }

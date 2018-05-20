@@ -58,9 +58,9 @@ namespace TextureViewer.ViewModels.Dialog
             }
         }
 
-        public ObservableCollection<ComboBoxItem<int>> AvailableLayers = new ObservableCollection<ComboBoxItem<int>>();
-        public ObservableCollection<ComboBoxItem<int>> AvailableMipmaps = new ObservableCollection<ComboBoxItem<int>>();
-        public ObservableCollection<ComboBoxItem<PixelFormat>> AvailableFormat = new ObservableCollection<ComboBoxItem<PixelFormat>>();
+        public ObservableCollection<ComboBoxItem<int>> AvailableLayers { get; } = new ObservableCollection<ComboBoxItem<int>>();
+        public ObservableCollection<ComboBoxItem<int>> AvailableMipmaps { get; } = new ObservableCollection<ComboBoxItem<int>>();
+        public ObservableCollection<ComboBoxItem<PixelFormat>> AvailableFormat { get; } = new ObservableCollection<ComboBoxItem<PixelFormat>>();
 
         public bool EnableLayers => AvailableLayers.Count > 1;
         public bool EnableMipmaps => AvailableMipmaps.Count > 1;
