@@ -72,7 +72,7 @@ namespace TextureViewer.Models.Shader
 
         private static string GetComputeSource()
         {
-            return "#version 430 core\n" +
+            return OpenGlContext.ShaderVersion + "\n" +
                    "layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;\n" +
                    "layout(binding = 0) uniform sampler2D src;\n" +
                    "layout(location = 0) uniform ivec2 pixelCoord;\n" +

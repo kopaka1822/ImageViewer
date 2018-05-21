@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.glhelper;
+using TextureViewer.Models;
 
 namespace TextureViewer.Controller.TextureViews.Shader
 {
@@ -25,7 +26,7 @@ namespace TextureViewer.Controller.TextureViews.Shader
 
         protected static string GetVersion()
         {
-            return "#version 430 core\n";
+            return OpenGlContext.ShaderVersion + "\n";
         }
 
         /// <summary>

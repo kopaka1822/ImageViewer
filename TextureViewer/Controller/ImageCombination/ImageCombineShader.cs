@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.glhelper;
+using TextureViewer.Models;
 
 namespace TextureViewer.Controller.ImageCombination
 {
@@ -80,7 +81,7 @@ namespace TextureViewer.Controller.ImageCombination
 
         private static string GenerateShaderSource(string colorFormula, string alphaFormula, int numImages)
         {
-            return "#version 430 core\n" +
+            return OpenGlContext.ShaderVersion + "\n" +
                    $"layout(local_size_x = {LocalSize}, local_size_y = {LocalSize}) in;\n" +
                    // output image
                    "layout(rgba32f, binding = 0) uniform writeonly image2D out_image;\n" +

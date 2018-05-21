@@ -23,9 +23,17 @@ namespace TextureViewer.Models
             public int Height { get; set; }
         }
 
+#if DEBUG
         private bool debugGl = true;
+#else
+        private bool debugGl = false;
+#endif
 
         public GLControl GlControl { get; }
+
+        public static int MajorVersion { get; } = 4;
+        public static int MinorVersion { get; } = 3;
+        public static string ShaderVersion { get; } = "#version 430 core";
 
         public OpenGlContext(MainWindow window)
         {
@@ -35,8 +43,8 @@ namespace TextureViewer.Models
                 if (debugGl)
                     flags |= GraphicsContextFlags.Debug;
 
-                // init opengl for version 4.2
-                GlControl = new GLControl(new GraphicsMode(new ColorFormat(32), 32), 4, 2, flags)
+                // init opengl
+                GlControl = new GLControl(new GraphicsMode(new ColorFormat(32), 32), MajorVersion, MinorVersion, flags)
                 {
                     Dock = DockStyle.Fill
                 };
