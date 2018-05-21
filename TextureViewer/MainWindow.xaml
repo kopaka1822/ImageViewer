@@ -304,7 +304,8 @@
                                         <Button 
                                             Grid.Column="1" 
                                             Width="110" 
-                                            HorizontalAlignment="Right">
+                                            HorizontalAlignment="Right"
+                                            Command="{Binding AddFilterCommand}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="21"/>
