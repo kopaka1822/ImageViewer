@@ -28,6 +28,7 @@ namespace TextureViewer.Models
 #else
         private bool debugGl = false;
 #endif
+        private bool issuedRedraw = false;
 
         public GLControl GlControl { get; }
 
@@ -75,6 +76,8 @@ namespace TextureViewer.Models
                     };
                 };
 
+                // reset redraw state
+                GlControl.Paint += (sender, args) => issuedRedraw = false;
                 GlControl.DragOver += (o, args) => args.Effect = System.Windows.Forms.DragDropEffects.Copy;
                 GlControl.AllowDrop = true;
 
@@ -150,7 +153,9 @@ namespace TextureViewer.Models
         /// </summary>
         public void RedrawFrame()
         {
+            if (issuedRedraw) return;
             GlControl?.Invalidate();
+            issuedRedraw = true;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
