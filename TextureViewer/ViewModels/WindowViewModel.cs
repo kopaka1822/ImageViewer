@@ -29,9 +29,10 @@ namespace TextureViewer.ViewModels
             Progress = new ProgressViewModel(models);
 
             // commands
-            ImportCommand = new ImportImageCommand(models);
+            var import = new ImportImageCommand(models);
+            ImportCommand = import;
             ResizeCommand = new ResizeWindowCommand(models);
-            OpenCommand = new OpenImageCommand(models);
+            OpenCommand = new OpenImageCommand(models, import);
             ExportCommand = new ExportImageCommand(models);
         }
 
