@@ -12,7 +12,7 @@ using TextureViewer.glhelper;
 
 namespace TextureViewer.Models
 {
-    public class FinalImageModel
+    public class FinalImageModel : INotifyPropertyChanged
     {
         private readonly TextureCacheModel textureCache;
         private readonly ImagesModel images;
@@ -50,6 +50,21 @@ namespace TextureViewer.Models
         private TextureArray2D statisticsTexture = null;
 
         /// <summary>
+        /// pixel color at the current texel location
+        /// </summary>
+        private Color pixelColor = new Color();
+        public Color PixelColor
+        {
+            get => pixelColor;
+            set
+            {
+                if (value.Equals(pixelColor)) return;
+                pixelColor = value;
+                OnPropertyChanged(nameof(PixelColor));
+            }
+        }
+
+        /// <summary>
         /// resets the model to the initial state (empty textures)
         /// </summary>
         public void Reset()
@@ -85,12 +100,23 @@ namespace TextureViewer.Models
             {
                 statisticsTexture = statTexture;
             }
+
+            OnPropertyChanged(nameof(Texture));
+            OnPropertyChanged(nameof(StatisticsTexture));
         }
 
         public void Dispose()
         {
             Texture?.Dispose();
             statisticsTexture?.Dispose();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

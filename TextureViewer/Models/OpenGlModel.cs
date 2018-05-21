@@ -8,6 +8,7 @@ using OpenTK.Graphics.OpenGL4;
 using TextureViewer.Controller;
 using TextureViewer.Controller.TextureViews.Shader;
 using TextureViewer.glhelper;
+using TextureViewer.Models.Shader;
 
 namespace TextureViewer.Models
 {
@@ -19,6 +20,7 @@ namespace TextureViewer.Models
         public VertexArray Vao { get; }
         public CheckersShader CheckersShader { get; }
         public TextureCacheModel TextureCache { get; }
+        public PixelValueShader GetPixelShader { get; }
 
         private readonly Sampler samplerLinear;
         private readonly Sampler samplerLinearMip;
@@ -35,6 +37,7 @@ namespace TextureViewer.Models
             samplerNearest = new Sampler(TextureMinFilter.Nearest, TextureMagFilter.Nearest);
             samplerNearestMip = new Sampler(TextureMinFilter.NearestMipmapNearest, TextureMagFilter.Nearest);
             TextureCache = new TextureCacheModel(images, context);
+            GetPixelShader = new PixelValueShader();
         }
 
         /// <summary>
@@ -70,6 +73,7 @@ namespace TextureViewer.Models
             samplerNearest.Dispose();
             samplerNearestMip.Dispose();
             TextureCache.Clear();
+            GetPixelShader.Dispose();
         }
     }
 }

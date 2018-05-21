@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -15,11 +16,13 @@ namespace TextureViewer.ViewModels
     {
         private readonly ImageEquationModel model;
         private readonly Models.Models models;
+        private readonly int imageId;
 
-        public EquationViewModel(ImageEquationModel model, Models.Models models)
+        public EquationViewModel(ImageEquationModel model, Models.Models models, int imageId)
         {
             this.model = model;
             this.models = models;
+            this.imageId = imageId;
             this.colorFormula = model.ColorFormula.Formula;
             this.alphaFormula = model.AlphaFormula.Formula;
             this.useFilter = model.UseFilter;
@@ -27,6 +30,28 @@ namespace TextureViewer.ViewModels
             this.model.PropertyChanged += ModelOnPropertyChanged;
             this.model.ColorFormula.PropertyChanged += ColorFormulaOnPropertyChanged;
             this.model.AlphaFormula.PropertyChanged += AlphaFormulaOnPropertyChanged;
+            this.models.Display.PropertyChanged += DisplayOnPropertyChanged;
+            this.models.FinalImages.Get(imageId).PropertyChanged += FinalImageOnPropertyChanged;
+        }
+
+        private void FinalImageOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(FinalImageModel.StatisticsTexture):
+                    RecomputeTexelColor();
+                    break;
+            }
+        }
+
+        private void DisplayOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(DisplayModel.TexelPosition):
+                    RecomputeTexelColor();
+                    break;
+            }
         }
 
         /// <summary>
@@ -66,9 +91,15 @@ namespace TextureViewer.ViewModels
             {
                 case nameof(ImageEquationModel.Visible):
                     OnPropertyChanged(nameof(IsVisible));
+                    OnPropertyChanged(nameof(Visibility));
+                    if(model.Visible)
+                        RecomputeTexelColor();
                     return;
                 case nameof(ImageEquationModel.UseFilter):
                     UseFilter = model.UseFilter;
+                    return;
+                case nameof(ImageEquationModel.TexelColor):
+                    OnPropertyChanged(nameof(TexelColor));
                     return;
             }
         }
@@ -88,6 +119,8 @@ namespace TextureViewer.ViewModels
                 UseFilter = model.UseFilter;
             }
         }
+
+        public Visibility Visibility => model.Visible ? Visibility.Visible : Visibility.Collapsed;
 
         private bool useFilter;
         public bool UseFilter
@@ -122,6 +155,38 @@ namespace TextureViewer.ViewModels
                 if (value == null || value.Equals(alphaFormula)) return;
                 alphaFormula = value;
                 OnPropertyChanged(nameof(AlphaFormula));
+            }
+        }
+
+        public string TexelColor => model.TexelColor.ToDecimalString(true, 3);
+
+        private void RecomputeTexelColor()
+        {
+            if (!model.Visible) return;
+            // check if the texture was already computed
+            var texture = models.FinalImages.Get(imageId).StatisticsTexture;
+            if (texture == null) return;
+
+            var shader = models.GlData.GetPixelShader;
+
+            var disableGl = models.GlContext.Enable();
+            try
+            {
+                models.GlData.BindSampler(shader.GetTextureLocation(), true, false);
+                texture.BindAsTexture2D(shader.GetTextureLocation(), models.Display.ActiveLayer,
+                    models.Display.ActiveMipmap);
+
+                models.Equations.Get(imageId).TexelColor =
+                    shader.GetPixelColor(models.Display.TexelPosition.X, models.Display.TexelPosition.Y, 0);
+            }
+            catch (Exception e)
+            {
+                App.ShowErrorDialog(models.App.Window, e.Message);
+            }
+            finally
+            {
+                if(disableGl)
+                    models.GlContext.Disable();
             }
         }
 

@@ -27,7 +27,7 @@ namespace TextureViewer.ViewModels
             viewModels = new EquationViewModel[models.Equations.NumEquations];
             for (var i = 0; i < viewModels.Length; ++i)
             {
-                viewModels[i] = new EquationViewModel(models.Equations.Get(i), models);
+                viewModels[i] = new EquationViewModel(models.Equations.Get(i), models, i);
                 viewModels[i].PropertyChanged += OnPropertyChanged;
             }
         }

@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using TextureViewer.Annotations;
+using TextureViewer.Utility;
 
 namespace TextureViewer.Models
 {
@@ -47,6 +48,18 @@ namespace TextureViewer.Models
 
         public FormulaModel ColorFormula { get; }
         public FormulaModel AlphaFormula { get; }
+
+        private Color texelColor = Color.ZERO;
+        public Color TexelColor
+        {
+            get => texelColor;
+            set
+            {
+                if (texelColor.Equals(value)) return;
+                texelColor = value;
+                OnPropertyChanged(nameof(TexelColor));
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

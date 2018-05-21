@@ -137,6 +137,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Utility\UI\ComboBoxItem.cs" />
     <Compile Include="ViewModels\Dialog\ExportViewModel.cs" />
+    <Compile Include="Models\Shader\PixelValueShader.cs" />
     <Compile Include="Views\ExportDialog.xaml.cs">
       <DependentUpon>ExportDialog.xaml</DependentUpon>
     </Compile>
