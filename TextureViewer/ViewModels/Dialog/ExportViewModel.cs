@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.Annotations;
 using TextureViewer.Models.Dialog;
-using TextureViewer.Utility.UI;
+using TextureViewer.Views;
 
 namespace TextureViewer.ViewModels.Dialog
 {

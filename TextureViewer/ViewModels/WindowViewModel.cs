@@ -27,6 +27,7 @@ namespace TextureViewer.ViewModels
             Display = new DisplayViewModel(models);
             Equations = new EquationsViewModel(models);
             Progress = new ProgressViewModel(models);
+            Filter = new FiltersViewModel(models);
 
             // commands
             var import = new ImportImageCommand(models);
@@ -59,6 +60,7 @@ namespace TextureViewer.ViewModels
         public ImagesViewModel Images { get; }
         public EquationsViewModel Equations { get; }
         public ProgressViewModel Progress { get; }
+        public FiltersViewModel Filter { get; }
 
         // commands
         public ICommand ImportCommand { get; }

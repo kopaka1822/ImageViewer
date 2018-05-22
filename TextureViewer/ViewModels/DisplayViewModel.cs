@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using TextureViewer.Annotations;
 using TextureViewer.Models;
-using TextureViewer.Utility.UI;
+using TextureViewer.Views;
 
 namespace TextureViewer.ViewModels
 {

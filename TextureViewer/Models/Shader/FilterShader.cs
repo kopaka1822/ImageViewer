@@ -27,7 +27,7 @@ namespace TextureViewer.Models.Shader
 
             var shader = new glhelper.Shader(ShaderType.ComputeShader,
                 GetShaderHeader() +
-                "#line1\n" +
+                "#line 1\n" +
                 shaderSource);
 
             shader.Compile();

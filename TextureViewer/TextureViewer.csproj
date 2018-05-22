@@ -146,6 +146,7 @@
     <Compile Include="Models\Filter\FilterModel.cs" />
     <Compile Include="Models\Filter\FilterParameterModel.cs" />
     <Compile Include="Models\Filter\FilterParameterModelBase.cs" />
+    <Compile Include="Models\Filter\FiltersModel.cs" />
     <Compile Include="Models\Filter\FloatFilterParameterModel.cs" />
     <Compile Include="Models\Filter\IFilterParameter.cs" />
     <Compile Include="Models\Filter\IntFilterParameterModel.cs" />
@@ -160,15 +161,19 @@
     <Compile Include="Models\OpenGlContext.cs" />
     <Compile Include="Models\OpenGlModel.cs" />
     <Compile Include="Models\ProgressModel.cs" />
+    <Compile Include="Models\Shader\FilterShader.cs" />
     <Compile Include="Models\TextureCacheModel.cs" />
     <Compile Include="Utility\Color.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="Utility\UI\ComboBoxItem.cs" />
+    <Compile Include="Views\ComboBoxItem.cs" />
     <Compile Include="ViewModels\Dialog\ExportViewModel.cs" />
     <Compile Include="Models\Shader\PixelValueShader.cs" />
+    <Compile Include="ViewModels\FiltersViewModel.cs" />
     <Compile Include="Views\ExportDialog.xaml.cs">
       <DependentUpon>ExportDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\FilterListBoxItem.cs" />
+    <Compile Include="Views\ImageListBoxItem.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -288,6 +293,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\cancel.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\list_move.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

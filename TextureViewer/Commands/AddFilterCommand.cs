@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Win32;
+using TextureViewer.Models.Filter;
 using TextureViewer.Properties;
 
 namespace TextureViewer.Commands
@@ -38,7 +39,12 @@ namespace TextureViewer.Commands
             var disableGl = models.GlContext.Enable();
             try
             {
-
+                // load shader
+                var loader = new FilterLoader(ofd.FileName);
+                // create model
+                var model = new FilterModel(loader);
+                // add to list
+                models.Filter.Add(model);
             }
             catch (Exception e)
             {

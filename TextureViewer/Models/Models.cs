@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextureViewer.Models.Filter;
 
 namespace TextureViewer.Models
 {
@@ -28,6 +29,7 @@ namespace TextureViewer.Models
             Equations = new ImageEquationsModel(Images);
             Progress = new ProgressModel();
             FinalImages = new FinalImagesModel(GlData.TextureCache, Images);
+            Filter = new FiltersModel();
 
             GlContext.Disable();
         }
@@ -51,5 +53,6 @@ namespace TextureViewer.Models
         public ImageEquationsModel Equations { get; }
         public ProgressModel Progress { get; }
         public FinalImagesModel FinalImages { get; }
+        public FiltersModel Filter { get; }
     }
 }

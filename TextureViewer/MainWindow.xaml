@@ -324,7 +324,9 @@
                                     <ListBox 
                                         Height="180"
                                         ScrollViewer.VerticalScrollBarVisibility="Visible"
-                                        Margin="0 0 0 5">
+                                        Margin="0 0 0 5"
+                                        ItemsSource="{Binding Filter.AvailableFilter}"
+                                        SelectedItem="{Binding Filter.SelectedFilter}">
                                     </ListBox>
                                     
                                     <Button
