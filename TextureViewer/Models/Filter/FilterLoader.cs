@@ -217,8 +217,7 @@ namespace TextureViewer.Models.Filter
             if (pars.Length < 3)
                 throw new Exception("not enough arguments for #param provided");
 
-            int location;
-            if (!Int32.TryParse(pars[1], out location))
+            if (!Int32.TryParse(pars[1], out var location))
                 throw new Exception("location must be a number");
 
             ParameterType type;
