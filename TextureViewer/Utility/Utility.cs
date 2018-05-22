@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using OpenTK;
+using Point = System.Drawing.Point;
 
 namespace TextureViewer.Utility
 {
@@ -42,7 +43,7 @@ namespace TextureViewer.Utility
         /// opens the file dialog for images
         /// </summary>
         /// <returns>string with filenames or null if aborted</returns>
-        public static string[] ShowImportImageDialog()
+        public static string[] ShowImportImageDialog(Window parent)
         {
             var ofd = new Microsoft.Win32.OpenFileDialog
             {
@@ -50,7 +51,7 @@ namespace TextureViewer.Utility
                 InitialDirectory = Properties.Settings.Default.ImagePath
             };
 
-            if (ofd.ShowDialog() != true) return null;
+            if (ofd.ShowDialog(parent) != true) return null;
 
             // set new image path in settings
             Properties.Settings.Default.ImagePath = System.IO.Path.GetDirectoryName(ofd.FileName);

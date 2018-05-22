@@ -140,6 +140,17 @@
     <Compile Include="glhelper\VertexArray.cs" />
     <Compile Include="Models\AppModel.cs" />
     <Compile Include="Models\Dialog\ExportModel.cs" />
+    <Compile Include="Models\Filter\ActionType.cs" />
+    <Compile Include="Models\Filter\BoolFilterParameterModel.cs" />
+    <Compile Include="Models\Filter\FilterLoader.cs" />
+    <Compile Include="Models\Filter\FilterModel.cs" />
+    <Compile Include="Models\Filter\FilterParameterModel.cs" />
+    <Compile Include="Models\Filter\FilterParameterModelBase.cs" />
+    <Compile Include="Models\Filter\FloatFilterParameterModel.cs" />
+    <Compile Include="Models\Filter\IFilterParameter.cs" />
+    <Compile Include="Models\Filter\IntFilterParameterModel.cs" />
+    <Compile Include="Models\Filter\ModificationType.cs" />
+    <Compile Include="Models\Filter\ParameterType.cs" />
     <Compile Include="Models\FinalImageModel.cs" />
     <Compile Include="Models\FinalImagesModel.cs" />
     <Compile Include="Models\FormulaModel.cs" />

@@ -29,7 +29,7 @@ namespace TextureViewer.Commands
         /// </summary>
         public void Execute(object parameter)
         {
-            var files = Utility.Utility.ShowImportImageDialog();
+            var files = Utility.Utility.ShowImportImageDialog(models.App.Window);
             if (files == null) return;
 
             foreach (var filename in files)

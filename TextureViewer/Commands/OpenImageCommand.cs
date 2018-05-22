@@ -32,7 +32,7 @@ namespace TextureViewer.Commands
                 return;
             }
 
-            var files = Utility.Utility.ShowImportImageDialog();
+            var files = Utility.Utility.ShowImportImageDialog(models.App.Window);
             if (files == null) return;
 
             var wnd = models.App.App.SpawnWindow();
