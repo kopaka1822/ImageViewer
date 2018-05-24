@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using GongSolutions.Wpf.DragDrop;
 using TextureViewer.Annotations;
 using TextureViewer.Commands;
 using TextureViewer.Models;
@@ -18,9 +19,9 @@ using TextureViewer.Views;
 
 namespace TextureViewer.ViewModels
 {
-    public class FiltersViewModel : INotifyPropertyChanged
+    public class FiltersViewModel : INotifyPropertyChanged, IDropTarget
     {
-        private Models.Models models;
+        private readonly Models.Models models;
 
         private class FilterItem
         {
@@ -52,17 +53,26 @@ namespace TextureViewer.ViewModels
             this.CancelCommand = new CancelFiltersCommand(this);
         }
 
-        public ObservableCollection<FilterListBoxItem> AvailableFilter
+        private List<FilterListBoxItem> availableFilter = new List<FilterListBoxItem>();
+        public List<FilterListBoxItem> AvailableFilter
         {
-            get
+            get => availableFilter;
+            set
             {
-                var list = new ObservableCollection<FilterListBoxItem>();
-                foreach (var filterItem in items)
-                {
-                    list.Add(filterItem.ListView);
-                }
-                return list;
+                availableFilter = value;
+                OnPropertyChanged(nameof(AvailableFilter));
             }
+        }
+
+        private void UpdateAvailableFilter()
+        {
+            var res = new List<FilterListBoxItem>();
+            foreach (var filterItem in items)
+            {
+                res.Add(filterItem.ListView);
+            }
+
+            AvailableFilter = res;
         }
 
         private FilterListBoxItem selectedFilter = null;
@@ -111,7 +121,7 @@ namespace TextureViewer.ViewModels
         {
             var item = new FilterItem(this, filter);
             items.Add(item);            
-            OnPropertyChanged(nameof(AvailableFilter));
+            UpdateAvailableFilter();
 
             // select the added element
             SelectedFilter = item.ListView;
@@ -125,7 +135,7 @@ namespace TextureViewer.ViewModels
         {
             var removeItem = items.Find(item => item.Model.Equals(filter));
             items.Remove(removeItem);
-            OnPropertyChanged(nameof(AvailableFilter));
+            UpdateAvailableFilter();
             UpdateHasChanges();
 
             // dispose of shader data
@@ -232,6 +242,36 @@ namespace TextureViewer.ViewModels
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void DragOver(IDropInfo dropInfo)
+        {
+            // enable drop if both items are filter list box items
+            if (dropInfo.Data is FilterListBoxItem && dropInfo.TargetItem is FilterListBoxItem)
+            {
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
+                dropInfo.Effects = DragDropEffects.Move;
+            }
+        }
+
+        public void Drop(IDropInfo dropInfo)
+        {
+            var source = dropInfo.Data as FilterListBoxItem;
+            var dest = dropInfo.TargetItem as FilterListBoxItem;
+
+            // swap both items
+            var idx1 = AvailableFilter.FindIndex(i => ReferenceEquals(i, source));
+            var idx2 = AvailableFilter.FindIndex(i => ReferenceEquals(i, dest));
+            if (idx1 < 0 || idx2 < 0) return;
+
+            {
+                var tmp = items[idx1];
+                items[idx1] = items[idx2];
+                items[idx2] = tmp;
+            }
+
+            UpdateAvailableFilter();
+            UpdateHasChanges();
         }
     }
 }

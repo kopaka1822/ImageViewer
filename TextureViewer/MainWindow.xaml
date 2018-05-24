@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:properties="clr-namespace:TextureViewer.Properties"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
         mc:Ignorable="d"
         Title="Texture Viewer" 
         Background="#eee"
@@ -326,7 +327,10 @@
                                         ScrollViewer.VerticalScrollBarVisibility="Visible"
                                         Margin="0 0 0 5"
                                         ItemsSource="{Binding Filter.AvailableFilter}"
-                                        SelectedItem="{Binding Filter.SelectedFilter}">
+                                        SelectedItem="{Binding Filter.SelectedFilter}"
+                                        dd:DragDrop.IsDragSource="True"
+                                        dd:DragDrop.IsDropTarget="True"
+                                        dd:DragDrop.DropHandler="{Binding Filter}">
                                     </ListBox>
 
                                     <StackPanel 
