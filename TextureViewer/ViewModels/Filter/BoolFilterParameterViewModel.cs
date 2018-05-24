@@ -31,8 +31,25 @@ namespace TextureViewer.ViewModels.Filter
 
         public void Apply()
         {
-            parameter.Value = currentValue;
+            parameter.Value = Value;
         }
+
+        public void Cancel()
+        {
+            Value = parameter.Value;
+        }
+
+        public void RestoreDefaults()
+        {
+            Value = parameter.Default;
+        }
+
+        public bool HasChanges()
+        {
+            return Value != parameter.Value;
+        }
+
+        public event EventHandler Changed;
 
         private bool currentValue;
         public bool Value
@@ -43,6 +60,7 @@ namespace TextureViewer.ViewModels.Filter
                 if (currentValue == value) return;
                 currentValue = value;
                 OnPropertyChanged(nameof(Value));
+                OnChanged();
             }
         }
 
@@ -52,6 +70,11 @@ namespace TextureViewer.ViewModels.Filter
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected virtual void OnChanged()
+        {
+            Changed?.Invoke(this, EventArgs.Empty);
         }
     }
 }

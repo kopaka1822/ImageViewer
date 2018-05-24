@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using TextureViewer.Models.Filter;
+using TextureViewer.ViewModels;
 
 namespace TextureViewer.Views
 {
@@ -14,7 +15,7 @@ namespace TextureViewer.Views
     {
         public FilterModel Filter { get; }
 
-        public FilterListBoxItem(FiltersModel filters, FilterModel filter)
+        public FilterListBoxItem(FiltersViewModel filters, FilterModel filter)
         {
             Filter = filter;
 
@@ -57,7 +58,7 @@ namespace TextureViewer.Views
             ToolTip = filter.Name;
             HorizontalContentAlignment = HorizontalAlignment.Stretch;
 
-            btnDelete.Click += (sender, args) => filters.Remove(filter);
+            btnDelete.Click += (sender, args) => filters.RemoveFilter(filter);
         }
     }
 }

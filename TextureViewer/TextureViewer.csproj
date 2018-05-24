@@ -107,7 +107,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Commands\AddFilterCommand.cs" />
+    <Compile Include="Commands\ApplyFiltersCommand.cs" />
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
+    <Compile Include="Commands\CancelFiltersCommand.cs" />
     <Compile Include="Commands\ExportImageCommand.cs" />
     <Compile Include="Commands\OpenImageCommand.cs" />
     <Compile Include="Commands\ResizeWindowCommand.cs" />
@@ -184,6 +186,7 @@
     <Compile Include="Utility\Color.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="ViewModels\Filter\BoolFilterParameterViewModel.cs" />
+    <Compile Include="ViewModels\Filter\FilterParametersViewModel.cs" />
     <Compile Include="ViewModels\Filter\FloatFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\IFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\IntFilterParameterViewModel.cs" />
@@ -196,7 +199,6 @@
       <DependentUpon>ExportDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\FilterListBoxItem.cs" />
-    <Compile Include="Views\FilterProperties.cs" />
     <Compile Include="Views\FloatFilterParameterView.cs" />
     <Compile Include="Views\ImageListBoxItem.cs" />
     <Compile Include="Views\IntFilterParameterView.cs" />

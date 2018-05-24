@@ -11,51 +11,47 @@ using TextureViewer.Commands;
 
 namespace TextureViewer.Models.Filter
 {
-    public class FilterEvent : EventArgs
-    {
-        public FilterEvent(FilterModel model, int index)
-        {
-            Model = model;
-            Index = index;
-        }
-
-        public FilterModel Model { get; }
-        public int Index { get; }
-    }
-
-    public delegate void FilterAddEvent(FiltersModel source, FilterEvent item);
-    public delegate void FilterRemoveEvent(FiltersModel source, FilterEvent item);
-
     public class FiltersModel
     {
-        public event FilterAddEvent AddedFilter;
-        public event FilterRemoveEvent RemovedFilter;
-
-        private readonly List<FilterModel> filter = new List<FilterModel>();
+        private List<FilterModel> filter = new List<FilterModel>();
         public IReadOnlyList<FilterModel> Filter => filter;
         public int NumFilter => filter.Count;
 
-        public void Add(FilterModel model)
+        /// <summary>
+        /// returns if the shader is in use by the active model
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public bool IsUsed(FilterModel model)
         {
-            filter.Add(model);
-            OnAddedFilter(model, filter.Count - 1);
+            return filter.Any(f => ReferenceEquals(f, model));
         }
 
-        public void Remove(FilterModel model)
+        public void Apply(List<FilterModel> models, OpenGlContext context)
         {
-            var index = filter.FindIndex(m => ReferenceEquals(m, model));
-            filter.RemoveAt(index);
-            OnRemovedFilter(model, index);
+            DisposeUnusedFilter(models, filter, context);
+            filter = models;
         }
 
-        protected virtual void OnAddedFilter(FilterModel item, int index)
+        /// <summary>
+        /// disposes all filters from old list which are no longer used in new list
+        /// </summary>
+        /// <param name="newList"></param>
+        /// <param name="oldList"></param>
+        /// <param name="context"></param>
+        public static void DisposeUnusedFilter(IReadOnlyList<FilterModel> newList, IReadOnlyList<FilterModel> oldList, OpenGlContext context)
         {
-            AddedFilter?.Invoke(this, new FilterEvent(item, index));
-        }
+            var disable = context.Enable();
 
-        protected virtual void OnRemovedFilter(FilterModel item, int index)
-        {
-            RemovedFilter?.Invoke(this, new FilterEvent(item, index));
+            foreach (var old in oldList)
+            {
+                // delete if the filter is not used in new list
+                if(newList.All(newFilter => !ReferenceEquals(newFilter, old)))
+                    old.Dispose();
+            }
+
+            if(disable)
+                context.Disable();
         }
     }
 }

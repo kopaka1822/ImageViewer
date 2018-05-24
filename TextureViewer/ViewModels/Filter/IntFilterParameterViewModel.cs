@@ -31,8 +31,25 @@ namespace TextureViewer.ViewModels.Filter
 
         public void Apply()
         {
-            parameter.Value = currentValue;
+            parameter.Value = Value;
         }
+
+        public void Cancel()
+        {
+            Value = parameter.Value;
+        }
+
+        public void RestoreDefaults()
+        {
+            Value = parameter.Default;
+        }
+
+        public bool HasChanges()
+        {
+            return Value != parameter.Value;
+        }
+
+        public event EventHandler Changed;
 
         private int currentValue;
         public int Value
@@ -40,11 +57,16 @@ namespace TextureViewer.ViewModels.Filter
             get => currentValue;
             set
             {
+                var prevChanges = HasChanges();
+
                 var clamped = Math.Min(Math.Max(value, parameter.Min), parameter.Max);
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (currentValue == clamped) return;
                 currentValue = clamped;
                 OnPropertyChanged(nameof(Value));
+                
+                if(prevChanges != HasChanges())
+                    OnChanged();
             }
         }
 
@@ -54,6 +76,11 @@ namespace TextureViewer.ViewModels.Filter
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected virtual void OnChanged()
+        {
+            Changed?.Invoke(this, EventArgs.Empty);
         }
     }
 }

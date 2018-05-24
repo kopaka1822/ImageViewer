@@ -8,8 +8,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using TextureViewer.Annotations;
+using TextureViewer.Commands;
+using TextureViewer.Models;
 using TextureViewer.Models.Filter;
+using TextureViewer.ViewModels.Filter;
 using TextureViewer.Views;
 
 namespace TextureViewer.ViewModels
@@ -18,26 +22,48 @@ namespace TextureViewer.ViewModels
     {
         private Models.Models models;
 
+        private class FilterItem
+        {
+            public FilterModel Model { get; }
+            public FilterListBoxItem ListView { get; }
+            public FilterParametersViewModel Parameters { get; }
+
+            public FilterItem(FiltersViewModel parent, FilterModel model)
+            {
+                Model = model;
+                ListView = new FilterListBoxItem(parent, model);
+                Parameters = new FilterParametersViewModel(model);
+            }
+
+            public void Dispose(OpenGlContext context)
+            {
+                var disable = context.Enable();
+                Model.Dispose();
+                if(disable) context.Disable();
+            }
+        }
+
+        private List<FilterItem> items = new List<FilterItem>();
+
         public FiltersViewModel(Models.Models models)
         {
             this.models = models;
-            models.Filter.AddedFilter += FilterOnAddedFilter;
-            models.Filter.RemovedFilter += FilterOnRemovedFilter;
+            this.ApplyCommand = new ApplyFiltersCommand(this);
+            this.CancelCommand = new CancelFiltersCommand(this);
         }
 
-        private void FilterOnRemovedFilter(FiltersModel source, FilterEvent item)
+        public ObservableCollection<FilterListBoxItem> AvailableFilter
         {
-            AvailableFilter.RemoveAt(item.Index);
-            OnPropertyChanged(nameof(AvailableFilter));
+            get
+            {
+                var list = new ObservableCollection<FilterListBoxItem>();
+                foreach (var filterItem in items)
+                {
+                    list.Add(filterItem.ListView);
+                }
+                return list;
+            }
         }
-
-        private void FilterOnAddedFilter(FiltersModel source, FilterEvent item)
-        {
-            AvailableFilter.Insert(item.Index, new FilterListBoxItem(source, item.Model));
-            OnPropertyChanged(nameof(AvailableFilter));
-        }
-
-        public ObservableCollection<FilterListBoxItem> AvailableFilter { get; } = new ObservableCollection<FilterListBoxItem>();
 
         private FilterListBoxItem selectedFilter = null;
         public FilterListBoxItem SelectedFilter
@@ -48,23 +74,156 @@ namespace TextureViewer.ViewModels
                 if (Equals(selectedFilter, value)) return;
                 selectedFilter = value;
                 OnPropertyChanged(nameof(SelectedFilter));
-
-                // display the selected item properties
-                UpdateSelectedFilterProperties();
+                OnPropertyChanged(nameof(SelectedFilterProperties));
             }
         }
 
-        public ObservableCollection<object> SelectedFilterProperties { get; } = new ObservableCollection<object>();
+        public ICommand ApplyCommand { get; }
+        public ICommand CancelCommand { get; }
 
-        private void UpdateSelectedFilterProperties()
+        public ObservableCollection<object> SelectedFilterProperties
         {
-            SelectedFilterProperties.Clear();
+            get
+            {
+                foreach (var filterItem in items)
+                {
+                    if (ReferenceEquals(filterItem.ListView, selectedFilter))
+                        return filterItem.Parameters.View;
+                }
 
-            var margin = new Thickness(0.0, 0.0, 0.0, 2.0);
+                return null;
+            }
+        }
 
-            //SelectedFilterProperties.Add(new TextBlock { Text = parameters.Shader.Name, Margin = margin, TextWrapping = TextWrapping.Wrap, FontSize = 18.0 });
+        private bool hasChanges = false;
+        public bool HasChanges
+        {
+            get => hasChanges;
+            set
+            {
+                if (value == hasChanges) return;
+                hasChanges = value;
+                OnPropertyChanged(nameof(HasChanges));
+            }
+        }
 
-            OnPropertyChanged(nameof(SelectedFilterProperties));
+        public void AddFilter(FilterModel filter)
+        {
+            var item = new FilterItem(this, filter);
+            items.Add(item);            
+            OnPropertyChanged(nameof(AvailableFilter));
+
+            // select the added element
+            SelectedFilter = item.ListView;
+            UpdateHasChanges();
+
+            // register on changed for apply and cancel button
+            item.Parameters.Changed += (sender, args) => UpdateHasChanges();
+        }
+
+        public void RemoveFilter(FilterModel filter)
+        {
+            var removeItem = items.Find(item => item.Model.Equals(filter));
+            items.Remove(removeItem);
+            OnPropertyChanged(nameof(AvailableFilter));
+            UpdateHasChanges();
+
+            // dispose of shader data
+            if(!models.Filter.IsUsed(removeItem.Model))
+                removeItem.Dispose(models.GlContext);
+        }
+
+        /// <summary>
+        /// applies all pending changes from the parameters
+        /// </summary>
+        public void Apply()
+        {
+            // apply the current parameters
+            foreach (var filterItem in items)
+            {
+                filterItem.Parameters.Apply();
+            }
+
+            // exchange model lists
+            var newModels = new List<FilterModel>();
+            foreach (var filterItem in items)
+            {
+                newModels.Add(filterItem.Model);
+            }
+
+            models.Filter.Apply(newModels, models.GlContext);
+
+            UpdateHasChanges();
+        }
+
+        /// <summary>
+        /// reverts all changes since the last apply
+        /// </summary>
+        public void Cancel()
+        {
+            // restore old state
+            var filters = new List<FilterModel>();
+            foreach (var filterItem in items)
+            {
+                filters.Add(filterItem.Model);
+            }
+            
+            // dispose all filter which were never used after import
+            FiltersModel.DisposeUnusedFilter(models.Filter.Filter, filters, models.GlContext);
+
+            // restore list
+            var newItems = new List<FilterItem>();
+            foreach (var filterModel in models.Filter.Filter)
+            {
+                // find the correspinging FilterItem if it still exists
+                var filterItem = items.Find(fi => ReferenceEquals(fi.Model, filterModel));
+                if (filterItem != null)
+                {
+                    newItems.Add(filterItem);
+                    filterItem.Parameters.Cancel();
+                }
+                else
+                {
+                    // create a new filter item
+                    newItems.Add(new FilterItem(this, filterModel));
+                }
+            }
+
+            items = newItems;
+
+            OnPropertyChanged(nameof(AvailableFilter));
+            UpdateHasChanges();
+        }
+
+        /// <summary>
+        /// compares the view model with the model data to determine if anything changed.
+        /// Sets HasChanges
+        /// </summary>
+        private void UpdateHasChanges()
+        {
+            HasChanges = CalculateHasChanges();
+        }
+
+        /// <summary>
+        /// compares the view model with the model data to determine if anything changed
+        /// </summary>
+        private bool CalculateHasChanges()
+        {
+            if (models.Filter.NumFilter != items.Count) return true;
+
+            // same amount of filter. do they match?
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (!ReferenceEquals(models.Filter.Filter[i], items[i].Model)) return true;
+            }
+
+            // have the parameters changed?
+            foreach (var filterItem in items)
+            {
+                if (filterItem.Parameters.HasChanged) return true;
+            }
+
+            return false;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

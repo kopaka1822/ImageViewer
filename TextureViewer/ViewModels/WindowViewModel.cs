@@ -35,7 +35,7 @@ namespace TextureViewer.ViewModels
             ResizeCommand = new ResizeWindowCommand(models);
             OpenCommand = new OpenImageCommand(models, import);
             ExportCommand = new ExportImageCommand(models);
-            AddFilterCommand = new AddFilterCommand(models);
+            AddFilterCommand = new AddFilterCommand(models, Filter);
         }
 
         /// <summary>

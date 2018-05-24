@@ -328,13 +328,27 @@
                                         ItemsSource="{Binding Filter.AvailableFilter}"
                                         SelectedItem="{Binding Filter.SelectedFilter}">
                                     </ListBox>
-                                    
-                                    <Button
-                                        Content="Apply"
-                                        Width="80"
-                                        HorizontalAlignment="Right"
-                                        Margin="0 0 0 5"/>
-                                    
+
+                                    <StackPanel 
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Right">
+
+                                        <Button
+                                            Content="Apply"
+                                            Width="80"
+                                            HorizontalAlignment="Right"
+                                            Margin="0 0 5 5"
+                                            Command="{Binding Filter.ApplyCommand}"/>
+
+                                        <Button
+                                            Content="Cancel"
+                                            Width="80"
+                                            HorizontalAlignment="Right"
+                                            Margin="0 0 0 5"
+                                            Command="{Binding Filter.CancelCommand}"/>
+                                    </StackPanel>
+
+                                   
                                     <Separator Height="2"/>
                                     
                                     <ItemsControl ItemsSource="{Binding Filter.SelectedFilterProperties}"/>

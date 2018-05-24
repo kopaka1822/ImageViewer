@@ -7,15 +7,18 @@ using System.Windows.Input;
 using Microsoft.Win32;
 using TextureViewer.Models.Filter;
 using TextureViewer.Properties;
+using TextureViewer.ViewModels;
 
 namespace TextureViewer.Commands
 {
     public class AddFilterCommand : ICommand
     {
+        private readonly FiltersViewModel viewModel;
         private readonly Models.Models models;
 
-        public AddFilterCommand(Models.Models models)
+        public AddFilterCommand(Models.Models models, FiltersViewModel viewModel)
         {
+            this.viewModel = viewModel;
             this.models = models;
         }
 
@@ -43,8 +46,9 @@ namespace TextureViewer.Commands
                 var loader = new FilterLoader(ofd.FileName);
                 // create model
                 var model = new FilterModel(loader);
+
                 // add to list
-                models.Filter.Add(model);
+                viewModel.AddFilter(model);
             }
             catch (Exception e)
             {
