@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using TextureViewer.Controller.Filter;
+using TextureViewer.Controller.ImageCombination;
 using TextureViewer.Models.Shader;
+using TextureViewer.Utility;
 
 namespace TextureViewer.Models.Filter
 {
@@ -28,6 +31,30 @@ namespace TextureViewer.Models.Filter
         public void Dispose()
         {
             Shader.Dispose();
+        }
+
+        public IStepable MakeStepable(Models models, ImageCombineBuilder builder)
+        {
+            var steps = new List<IStepable>();
+            for (int layer = 0; layer < models.Images.NumLayers; ++layer)
+            {
+                for (int mipmap = 0; mipmap < models.Images.NumMipmaps; ++mipmap)
+                {
+                    if (IsSingleInvocation)
+                    {
+                        steps.Add(new SingleDispatchStepper(models, this, builder, 0, layer, mipmap));
+                        if(IsSepa)
+                            steps.Add(new SingleDispatchStepper(models, this, builder, 1, layer, mipmap));
+                    }
+                    else
+                    {
+                        steps.Add(new MultiDispatchStepper(models, this, builder, 0, layer, mipmap));
+                        if (IsSepa)
+                            steps.Add(new MultiDispatchStepper(models, this, builder, 1, layer, mipmap));
+                    }
+                }
+            }
+            return new StepList(steps);
         }
     }
 }

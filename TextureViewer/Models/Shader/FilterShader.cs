@@ -15,8 +15,8 @@ namespace TextureViewer.Models.Shader
         private readonly Program program;
         private readonly int maxTextureBindings;
 
-        private static readonly int LocalSize = 8;
-        private static readonly int MinWorkGroupSize = 4;
+        public static readonly int LocalSize = 8;
+        public static readonly int MinWorkGroupSize = 4;
 
         private readonly bool isSepa;
 
@@ -38,6 +38,11 @@ namespace TextureViewer.Models.Shader
         public void Dispose()
         {
             program.Dispose();
+        }
+
+        public void Bind()
+        {
+            program.Bind();
         }
 
         public void Dispatch(int width, int height, List<IFilterParameter> parameters) =>

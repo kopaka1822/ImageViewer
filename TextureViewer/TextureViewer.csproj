@@ -116,6 +116,9 @@
     <Compile Include="Commands\ExportImageCommand.cs" />
     <Compile Include="Commands\OpenImageCommand.cs" />
     <Compile Include="Commands\ResizeWindowCommand.cs" />
+    <Compile Include="Controller\Filter\FilterStepableBase.cs" />
+    <Compile Include="Controller\Filter\MultiDispatchStepper.cs" />
+    <Compile Include="Controller\Filter\SingleDispatchStepper.cs" />
     <Compile Include="Controller\ImageCombination\FinalImageStepable.cs" />
     <Compile Include="Controller\ImageCombination\ImageCombineBuilder.cs" />
     <Compile Include="Controller\ImageCombination\ImageCombineShader.cs" />

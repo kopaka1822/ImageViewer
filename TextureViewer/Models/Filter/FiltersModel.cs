@@ -18,6 +18,12 @@ namespace TextureViewer.Models.Filter
         public int NumFilter => filter.Count;
 
         /// <summary>
+        /// this will be triggered if the model changes due to:
+        /// - Apply()
+        /// </summary>
+        public event EventHandler Changed;
+
+        /// <summary>
         /// returns if the shader is in use by the active model
         /// </summary>
         /// <param name="model"></param>
@@ -31,6 +37,7 @@ namespace TextureViewer.Models.Filter
         {
             DisposeUnusedFilter(models, filter, context);
             filter = models;
+            OnChanged();
         }
 
         /// <summary>
@@ -52,6 +59,11 @@ namespace TextureViewer.Models.Filter
 
             if(disable)
                 context.Disable();
+        }
+
+        protected virtual void OnChanged()
+        {
+            Changed?.Invoke(this, EventArgs.Empty);
         }
     }
 }
