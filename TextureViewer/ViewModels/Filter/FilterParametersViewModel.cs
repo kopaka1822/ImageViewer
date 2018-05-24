@@ -94,6 +94,19 @@ namespace TextureViewer.ViewModels.Filter
                 // register on changed callback                
                 vm.Changed += (sender, args) => HasChanged = HasChanges();
             }
+
+            if (item.Parameters.Count <= 0) return;
+            
+            // restore default button
+            var btn = new Button
+            {
+                Content = "Restore Defaults",
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Margin = new Thickness(0.0, 8.0, 0.0, 0.0),
+                Padding = new Thickness(2)
+            };
+            btn.Click += (sender, args) => RestoreDefaults();
+            View.Add(btn);       
         }
 
         public void Apply()
