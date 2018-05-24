@@ -15,7 +15,7 @@ namespace TextureViewer.Models.Filter
         }
 
         private float currentValue;
-        public float Value
+        public override float Value
         {
             get => currentValue;
             set

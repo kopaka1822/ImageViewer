@@ -15,7 +15,7 @@ namespace TextureViewer.Models.Filter
         }
 
         private int currentValue;
-        public int Value
+        public override int Value
         {
             get => currentValue;
             set

@@ -33,6 +33,7 @@ namespace TextureViewer.Models.Filter
         public T Default { get; }
         public Dictionary<Key, ParameterAction> Keybindings { get; } = new Dictionary<Key, ParameterAction>();
         public Dictionary<ActionType, ParameterAction> Actions { get; } = new Dictionary<ActionType, ParameterAction>();
+        public virtual T Value { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public FilterParameterModel(string name, int location, T min, T max, T defaultValue)
         : base(name, location)
