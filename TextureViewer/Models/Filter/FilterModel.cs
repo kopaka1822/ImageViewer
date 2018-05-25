@@ -42,15 +42,15 @@ namespace TextureViewer.Models.Filter
                 {
                     if (IsSingleInvocation)
                     {
-                        steps.Add(new SingleDispatchStepper(models, this, builder, 0, layer, mipmap));
+                        steps.Add(new SingleDispatchStepper(models, this, builder, layer: layer, mipmap: mipmap, iteration: 0));
                         if(IsSepa)
-                            steps.Add(new SingleDispatchStepper(models, this, builder, 1, layer, mipmap));
+                            steps.Add(new SingleDispatchStepper(models, this, builder, layer: layer, mipmap: mipmap, iteration: 1));
                     }
                     else
                     {
-                        steps.Add(new MultiDispatchStepper(models, this, builder, 0, layer, mipmap));
+                        steps.Add(new MultiDispatchStepper(models, this, builder, layer: layer, mipmap: mipmap, iteration: 0));
                         if (IsSepa)
-                            steps.Add(new MultiDispatchStepper(models, this, builder, 1, layer, mipmap));
+                            steps.Add(new MultiDispatchStepper(models, this, builder, layer: layer, mipmap: mipmap, iteration: 1));
                     }
                 }
             }

@@ -33,15 +33,15 @@ namespace TextureViewer.Controller.ImageCombination
         /// source textures have to be bound before a call to this function
         /// </summary>
         /// <param name="layer"></param>
-        /// <param name="level"></param>
+        /// <param name="mipmap"></param>
         /// <param name="width">mipmap width</param>
         /// <param name="height">mipmap height</param>
         /// <param name="target">target image</param>
-        public void Run(int layer, int level, int width, int height, TextureArray2D target)
+        public void Run(int layer, int mipmap, int width, int height, TextureArray2D target)
         {
             shader.Bind();
-            target.BindAsImage(GetDestinationImageBinding(), level, layer, TextureAccess.WriteOnly);
-            SetLevel(level);
+            target.BindAsImage(GetDestinationImageBinding(), layer: layer, mipmap: mipmap, access: TextureAccess.WriteOnly);
+            SetLevel(mipmap);
             SetLayer(layer);
             GL.DispatchCompute(width / LocalSize + 1, height / LocalSize + 1, 1);
             Program.Unbind();

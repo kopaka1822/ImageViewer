@@ -17,8 +17,8 @@ namespace TextureViewer.Controller.Filter
         private readonly int width;
         private readonly int height;
 
-        public SingleDispatchStepper(Models.Models models, FilterModel model, ImageCombineBuilder builder, int iteration, int layer, int mipmap) :
-            base(models, model, builder, layer, mipmap, iteration)
+        public SingleDispatchStepper(Models.Models models, FilterModel model, ImageCombineBuilder builder, int layer, int mipmap, int iteration) :
+            base(models, model, builder, layer: layer, mipmap: mipmap, iteration: iteration)
         {
             this.width = models.Images.GetWidth(mipmap);
             this.height = models.Images.GetHeight(mipmap);

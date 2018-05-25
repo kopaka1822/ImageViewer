@@ -26,17 +26,20 @@ void main()
 {
 	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
 	
-	vec3 pixelSum = vec3(0.0);
-	float weightSum = 0.0;
-	
-	for(int d = -blur_radius; d <= blur_radius; d++)
-	{			
-		float w = kernel(d);
-		weightSum += w;
-		ivec2 pos = d * filterDirection + pixelCoord;
-		pixelSum += w * getPixel(pos.x, pos.y);
+	if(pixelCoord.x < imageSize(dst_image).x && pixelCoord.y < imageSize(dst_image).y)
+	{
+		vec3 pixelSum = vec3(0.0);
+		float weightSum = 0.0;
 		
-	}
-	
-	imageStore(dst_image, pixelCoord, vec4(pixelSum / weightSum, 1.0));
+		for(int d = -blur_radius; d <= blur_radius; d++)
+		{			
+			float w = kernel(d);
+			weightSum += w;
+			ivec2 pos = d * filterDirection + pixelCoord;
+			pixelSum += w * getPixel(pos.x, pos.y);
+			
+		}
+		
+		imageStore(dst_image, pixelCoord, vec4(pixelSum / weightSum, 1.0));
+	}	
 }

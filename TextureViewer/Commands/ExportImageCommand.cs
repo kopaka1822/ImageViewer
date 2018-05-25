@@ -82,7 +82,7 @@ namespace TextureViewer.Commands
                 if (texture == null)
                     throw new Exception("texture is not computed");
 
-                var data = texture.GetData(info.Mipmap, info.Layer, info.PixelFormat, info.PixelType, 
+                var data = texture.GetData(info.Layer, info.Mipmap, info.PixelFormat, info.PixelType, 
                     out var width, out var height);
                 if(data == null)
                     throw new Exception("error retrieving image from gpu");
