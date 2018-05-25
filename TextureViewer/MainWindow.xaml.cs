@@ -73,6 +73,7 @@ namespace TextureViewer
 
             var binding = BindingOperations.GetBindingExpression(box, prop);
             binding?.UpdateSource();
+            Keyboard.ClearFocus();
         }
     }
 }

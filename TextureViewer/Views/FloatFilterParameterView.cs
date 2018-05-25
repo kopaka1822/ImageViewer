@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using TextureViewer.Models.Filter;
 using TextureViewer.ViewModels.Filter;
 using Xceed.Wpf.Toolkit;
@@ -33,6 +34,18 @@ namespace TextureViewer.Views
                 UpdateSourceTrigger = UpdateSourceTrigger.LostFocus
             };
             BindingOperations.SetBinding(this, ValueProperty, valueBinding);
+
+            KeyUp += OnKeyUp;
+        }
+
+        private void OnKeyUp(object sender, KeyEventArgs e)
+        {
+            // update property on enter
+            if (e.Key != Key.Enter) return;
+
+            var binding = BindingOperations.GetBindingExpression(this, ValueProperty);
+            binding?.UpdateSource();
+            Keyboard.ClearFocus();
         }
     }
 }
