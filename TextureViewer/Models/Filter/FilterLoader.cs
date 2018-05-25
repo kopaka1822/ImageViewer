@@ -131,21 +131,21 @@ namespace TextureViewer.Models.Filter
         private void AddParameterAction(IntFilterParameterModel model, string value, ModificationType modType, ActionType actionType)
         {
             var val = GetIntValue(value);
-            var action = new FilterParameterModel<int>.ParameterAction(val, modType);
+            var action = new IntFilterParameterModel.IntParameterAction(val, modType);
             model.Actions[actionType] = action;
         }
 
         private void AddParameterAction(FloatFilterParameterModel model, string value, ModificationType modType, ActionType actionType)
         {
             var val = GetFloatValue(value);
-            var action = new FilterParameterModel<float>.ParameterAction(val, modType);
+            var action = new FloatFilterParameterModel.FloatParameterAction(val, modType);
             model.Actions[actionType] = action;
         }
 
         private void AddParameterAction(BoolFilterParameterModel model, string value, ModificationType modType, ActionType actionType)
         {
             var val = GetBoolValue(value);
-            var action = new FilterParameterModel<bool>.ParameterAction(val, modType);
+            var action = new BoolFilterParameterModel.BoolParameterAction(val, modType);
             model.Actions[actionType] = action;
         }
 
@@ -194,21 +194,21 @@ namespace TextureViewer.Models.Filter
         private void AddKeybinding(IntFilterParameterModel model, string value, ModificationType modType, Key key)
         {
             var val = GetIntValue(value);
-            var binding = new FilterParameterModel<int>.ParameterAction(val, modType);
+            var binding = new IntFilterParameterModel.IntParameterAction(val, modType);
             model.Keybindings[key] = binding;
         }
 
         private void AddKeybinding(FloatFilterParameterModel model, string value, ModificationType modType, Key key)
         {
             var val = GetFloatValue(value);
-            var binding = new FilterParameterModel<float>.ParameterAction(val, modType);
+            var binding = new FloatFilterParameterModel.FloatParameterAction(val, modType);
             model.Keybindings[key] = binding;
         }
 
         private void AddKeybinding(BoolFilterParameterModel model, string value, ModificationType modType, Key key)
         {
             var val = GetBoolValue(value);
-            var binding = new FilterParameterModel<bool>.ParameterAction(val, modType);
+            var binding = new BoolFilterParameterModel.BoolParameterAction(val, modType);
             model.Keybindings[key] = binding;
         }
 

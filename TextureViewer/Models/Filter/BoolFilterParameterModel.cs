@@ -9,6 +9,28 @@ namespace TextureViewer.Models.Filter
 {
     public class BoolFilterParameterModel : FilterParameterModel<bool>, IFilterParameter
     {
+        public class BoolParameterAction : ParameterAction
+        {
+            public BoolParameterAction(bool value, ModificationType modType) : base(value, modType)
+            {
+            }
+
+            public override bool Invoke(bool value)
+            {
+                switch (ModType)
+                {
+                    case ModificationType.Add:
+                        return value || OpValue;
+                    case ModificationType.Multiply:
+                        return value && OpValue;
+                    case ModificationType.Set:
+                        return OpValue;
+                }
+
+                return value;
+            }
+        }
+
         public BoolFilterParameterModel(string name, int location, bool min, bool max, bool defaultValue) : base(name, location, min, max, defaultValue)
         {
             currentValue = defaultValue;

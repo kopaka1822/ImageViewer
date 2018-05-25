@@ -9,10 +9,36 @@ namespace TextureViewer.Models.Filter
 {
     public class IntFilterParameterModel : FilterParameterModel<int>, IFilterParameter
     {
+        public class IntParameterAction : ParameterAction
+        {
+            public IntParameterAction(int value, ModificationType modType) : base(value, modType)
+            {
+            }
+
+            public override int Invoke(int value)
+            {
+                switch (ModType)
+                {
+                    case ModificationType.Add:
+                        return value + OpValue;
+                    case ModificationType.Multiply:
+                        return value * OpValue;
+                    case ModificationType.Set:
+                        return OpValue;
+                }
+
+                return value;
+            }
+        }
+
         public IntFilterParameterModel(string name, int location, int min, int max, int defaultValue) 
             : base(name, location, min, max, defaultValue)
         {
             currentValue = defaultValue;
+
+            // default actions
+            Actions[ActionType.OnAdd] = new IntParameterAction(1, ModificationType.Add);
+            Actions[ActionType.OnSubtract] = new IntParameterAction(-1, ModificationType.Add);
         }
 
         private int currentValue;

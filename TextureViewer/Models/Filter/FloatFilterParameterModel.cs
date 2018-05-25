@@ -9,10 +9,36 @@ namespace TextureViewer.Models.Filter
 {
     public class FloatFilterParameterModel : FilterParameterModel<float>, IFilterParameter
     {
+        public class FloatParameterAction : ParameterAction
+        {
+            public FloatParameterAction(float value, ModificationType modType) : base(value, modType)
+            {
+            }
+
+            public override float Invoke(float value)
+            {
+                switch (ModType)
+                {
+                    case ModificationType.Add:
+                        return value + OpValue;
+                    case ModificationType.Multiply:
+                        return value * OpValue;
+                    case ModificationType.Set:
+                        return OpValue;
+                }
+
+                return value;
+            }
+        }
+
         public FloatFilterParameterModel(string name, int location, float min, float max, float defaultValue) 
             : base(name, location, min, max, defaultValue)
         {
             currentValue = defaultValue;
+
+            // default actions
+            Actions[ActionType.OnAdd] = new FloatParameterAction(1.0f, ModificationType.Add);
+            Actions[ActionType.OnSubtract] = new FloatParameterAction(-1.0f, ModificationType.Add);
         }
 
         private float currentValue;

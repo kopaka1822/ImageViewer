@@ -16,16 +16,23 @@ namespace TextureViewer.Models.Filter
     /// <typeparam name="T"></typeparam>
     public class FilterParameterModel<T> : FilterParameterModelBase, INotifyPropertyChanged
     {
-        public class ParameterAction
+        public abstract class ParameterAction
         {
-            private readonly T value;
-            private readonly ModificationType modType;
+            protected readonly T OpValue;
+            protected readonly ModificationType ModType;
 
-            public ParameterAction(T value, ModificationType modType)
+            protected ParameterAction(T value, ModificationType modType)
             {
-                this.value = value;
-                this.modType = modType;
+                this.OpValue = value;
+                this.ModType = modType;
             }
+
+            /// <summary>
+            /// applies the operation on the given value and returns the modified value
+            /// </summary>
+            /// <param name="value">value after action</param>
+            /// <returns></returns>
+            public abstract T Invoke(T value);
         }
 
         public T Min { get; }

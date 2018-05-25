@@ -26,6 +26,8 @@ namespace TextureViewer.Views
                 UpdateSourceTrigger = UpdateSourceTrigger.LostFocus
             };
             BindingOperations.SetBinding(this, IsCheckedProperty, valueBinding);
+
+            
         }
     }
 }

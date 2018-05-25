@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using TextureViewer.Models.Filter;
 using TextureViewer.ViewModels.Filter;
 using Xceed.Wpf.Toolkit;
 
@@ -13,8 +14,12 @@ namespace TextureViewer.Views
 {
     public class IntFilterParameterView : IntegerUpDown
     {
+        private IntFilterParameterViewModel viewModel;
+
         public IntFilterParameterView(IntFilterParameterViewModel viewModel)
         {
+            this.viewModel = viewModel;
+
             Margin = new Thickness(0.0, 0.0, 0.0, 2.0);
             CultureInfo = App.GetCulture();
             Increment = 0;
@@ -32,6 +37,20 @@ namespace TextureViewer.Views
             BindingOperations.SetBinding(this, ValueProperty, valueBinding);
 
             KeyUp += OnKeyUp;
+
+            Spinned += OnSpinned;
+        }
+
+        private void OnSpinned(object sender, SpinEventArgs args)
+        {
+            if (args.Direction == SpinDirection.Increase)
+            {
+                viewModel.InvokeAction(ActionType.OnAdd);
+            }
+            else if (args.Direction == SpinDirection.Decrease)
+            {
+                viewModel.InvokeAction(ActionType.OnSubtract);
+            }
         }
 
         private void OnKeyUp(object sender, KeyEventArgs e)

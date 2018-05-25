@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextureViewer.Models.Filter;
 
 namespace TextureViewer.ViewModels.Filter
 {
@@ -28,6 +29,8 @@ namespace TextureViewer.ViewModels.Filter
         /// </summary>
         /// <returns></returns>
         bool HasChanges();
+
+        void InvokeAction(ActionType action);
 
         event EventHandler Changed;
     }

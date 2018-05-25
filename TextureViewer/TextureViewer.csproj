@@ -193,6 +193,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="ViewModels\Filter\BoolFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\FilterParametersViewModel.cs" />
+    <Compile Include="ViewModels\Filter\FilterParameterViewModelBase.cs" />
     <Compile Include="ViewModels\Filter\FloatFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\IFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\IntFilterParameterViewModel.cs" />

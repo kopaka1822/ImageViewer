@@ -10,49 +10,19 @@ using TextureViewer.Models.Filter;
 
 namespace TextureViewer.ViewModels.Filter
 {
-    public class IntFilterParameterViewModel : INotifyPropertyChanged, IFilterParameterViewModel
+    public class IntFilterParameterViewModel : FilterParameterViewModelBase<int>
     {
         private readonly IntFilterParameterModel parameter;
 
         public IntFilterParameterViewModel(IntFilterParameterModel parameter)
+        : base(parameter)
         {
             this.parameter = parameter;
-            this.parameter.PropertyChanged += ParameterOnPropertyChanged;
             currentValue = parameter.Value;
         }
 
-        private void ParameterOnPropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
-            if (args.PropertyName == nameof(IntFilterParameterModel.Value))
-            {
-                Value = parameter.Value;
-            }
-        }
-
-        public void Apply()
-        {
-            parameter.Value = Value;
-        }
-
-        public void Cancel()
-        {
-            Value = parameter.Value;
-        }
-
-        public void RestoreDefaults()
-        {
-            Value = parameter.Default;
-        }
-
-        public bool HasChanges()
-        {
-            return Value != parameter.Value;
-        }
-
-        public event EventHandler Changed;
-
         private int currentValue;
-        public int Value
+        public override int Value
         {
             get => currentValue;
             set
@@ -68,19 +38,6 @@ namespace TextureViewer.ViewModels.Filter
                 if(prevChanges != HasChanges())
                     OnChanged();
             }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        protected virtual void OnChanged()
-        {
-            Changed?.Invoke(this, EventArgs.Empty);
         }
     }
 }

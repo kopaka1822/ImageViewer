@@ -15,8 +15,12 @@ namespace TextureViewer.Views
 {
     public class FloatFilterParameterView : SingleUpDown
     {
+        private readonly FloatFilterParameterViewModel viewModel;
+
         public FloatFilterParameterView(FloatFilterParameterViewModel viewModel)
         {
+            this.viewModel = viewModel;
+
             Margin = new Thickness(0.0, 0.0, 0.0, 2.0);
             CultureInfo = App.GetCulture();
             Increment = 0.0f;
@@ -36,6 +40,20 @@ namespace TextureViewer.Views
             BindingOperations.SetBinding(this, ValueProperty, valueBinding);
 
             KeyUp += OnKeyUp;
+
+            Spinned += OnSpinned;
+        }
+
+        private void OnSpinned(object sender, SpinEventArgs args)
+        {
+            if (args.Direction == SpinDirection.Increase)
+            {
+                viewModel.InvokeAction(ActionType.OnAdd);
+            }
+            else if (args.Direction == SpinDirection.Decrease)
+            {
+                viewModel.InvokeAction(ActionType.OnSubtract);
+            }
         }
 
         private void OnKeyUp(object sender, KeyEventArgs e)
