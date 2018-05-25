@@ -195,13 +195,16 @@ namespace TextureViewer.ViewModels
                 else
                 {
                     // create a new filter item
-                    newItems.Add(new FilterItem(this, filterModel));
+                    var item = new FilterItem(this, filterModel);
+                    newItems.Add(item);
+                    // register on changed for apply and cancel button
+                    item.Parameters.Changed += (sender, args) => UpdateHasChanges();
                 }
             }
 
             items = newItems;
 
-            OnPropertyChanged(nameof(AvailableFilter));
+            UpdateAvailableFilter();
             UpdateHasChanges();
         }
 
