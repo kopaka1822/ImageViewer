@@ -7,7 +7,7 @@
     <ProjectGuid>{E339B099-A84E-41D9-A3F8-F437764CC86D}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>TextureViewer</RootNamespace>
-    <AssemblyName>TextureViewer</AssemblyName>
+    <AssemblyName>Texture Viewer</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -221,6 +221,7 @@
     <Compile Include="ViewModels\Dialog\ExportViewModel.cs" />
     <Compile Include="Models\Shader\PixelValueShader.cs" />
     <Compile Include="ViewModels\FiltersViewModel.cs" />
+    <Compile Include="Views\CustomTextBox.cs" />
     <Compile Include="Views\ExportDialog.xaml.cs">
       <DependentUpon>ExportDialog.xaml</DependentUpon>
     </Compile>

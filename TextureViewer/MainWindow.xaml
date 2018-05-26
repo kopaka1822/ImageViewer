@@ -6,6 +6,7 @@
         xmlns:properties="clr-namespace:TextureViewer.Properties"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
+        xmlns:views="clr-namespace:TextureViewer.Views"
         mc:Ignorable="d"
         Title="Texture Viewer" 
         Background="#eee"
@@ -201,7 +202,7 @@
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Text="RGB: "/>
-                                                <TextBox 
+                                                <views:CustomTextBox 
                                                     Grid.Column="1"
                                                     Text="{Binding Equations.Equation1.ColorFormula, UpdateSourceTrigger=PropertyChanged}"
                                                     Margin="0 0 0 5"
@@ -489,11 +490,10 @@
                             Width="16" 
                             Height="16" 
                             Margin="0 0 5 0"/>
-                        <TextBox 
+                        <views:CustomTextBox 
                             Grid.Column="1" 
                             Width="70"
                             Text="{Binding Display.Zoom}"
-                            KeyUp="UpdateOnEnter"
                             />
                     </Grid>
                 </StatusBarItem>

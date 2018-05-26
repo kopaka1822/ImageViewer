@@ -36,6 +36,13 @@ namespace TextureViewer.ViewModels
             OpenCommand = new OpenImageCommand(models, import);
             ExportCommand = new ExportImageCommand(models);
             AddFilterCommand = new AddFilterCommand(models, Filter);
+
+            window.KeyUp += WindowOnKeyUp;
+        }
+
+        private void WindowOnKeyUp(object sender, KeyEventArgs keyEventArgs)
+        {
+            
         }
 
         /// <summary>
