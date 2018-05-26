@@ -16,7 +16,7 @@ namespace TextureViewer
     public partial class App : Application
     {
         // change this if the assembly name was changed
-        public static readonly string AppName = "Texture Viewer";
+        public static readonly string AppName = "TextureViewer";
 
         private readonly List<MainWindow> openWindows = new List<MainWindow>();
 
