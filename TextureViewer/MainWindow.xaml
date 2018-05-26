@@ -214,7 +214,7 @@
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Text="Alpha: "/>
-                                                <TextBox 
+                                                <views:CustomTextBox 
                                                     Grid.Column="1"
                                                     Text="{Binding Equations.Equation1.AlphaFormula, UpdateSourceTrigger=PropertyChanged}"
                                                     Margin="0 0 0 5"
@@ -255,7 +255,7 @@
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Text="RGB: "/>
-                                                <TextBox 
+                                                <views:CustomTextBox 
                                                     Grid.Column="1"
                                                     Text="{Binding Equations.Equation2.ColorFormula, UpdateSourceTrigger=PropertyChanged}"
                                                     Margin="0 0 0 5"
@@ -267,7 +267,7 @@
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Text="Alpha: " Height="23" VerticalAlignment="Top"/>
-                                                <TextBox 
+                                                <views:CustomTextBox 
                                                     Grid.Column="1"
                                                     Text="{Binding Equations.Equation2.AlphaFormula, UpdateSourceTrigger=PropertyChanged}"
                                                     Margin="0 0 0 5"

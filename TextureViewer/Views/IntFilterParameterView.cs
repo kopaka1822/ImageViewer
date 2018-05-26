@@ -56,8 +56,14 @@ namespace TextureViewer.Views
         private void OnKeyUp(object sender, KeyEventArgs e)
         {
             // update property on enter
-            if (e.Key != Key.Enter) return;
+            if (e.Key != Key.Enter)
+            {
+                base.OnKeyUp(e);
+                e.Handled = true;
+                return;
+            }
 
+            e.Handled = true;
             var binding = BindingOperations.GetBindingExpression(this, ValueProperty);
             binding?.UpdateSource();
             Keyboard.ClearFocus();
