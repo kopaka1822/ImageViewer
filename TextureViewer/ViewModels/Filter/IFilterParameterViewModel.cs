@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using TextureViewer.Models.Filter;
 
 namespace TextureViewer.ViewModels.Filter
@@ -33,5 +34,9 @@ namespace TextureViewer.ViewModels.Filter
         void InvokeAction(ActionType action);
 
         event EventHandler Changed;
+
+        bool HasKeyToInvoke(Key key);
+
+        void InvokeKey(Key key);
     }
 }

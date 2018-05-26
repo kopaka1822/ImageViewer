@@ -40,9 +40,16 @@ namespace TextureViewer.ViewModels
             window.KeyUp += WindowOnKeyUp;
         }
 
-        private void WindowOnKeyUp(object sender, KeyEventArgs keyEventArgs)
+        private void WindowOnKeyUp(object sender, KeyEventArgs e)
         {
-            
+            if (Filter.HasKeyToInvoke(e.Key))
+            {
+                // invoke the key
+                Filter.InvokeKey(e.Key);
+
+                if(Filter.ApplyCommand.CanExecute(null))
+                    Filter.ApplyCommand.Execute(null);
+            }
         }
 
         /// <summary>

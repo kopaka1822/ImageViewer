@@ -276,5 +276,18 @@ namespace TextureViewer.ViewModels
             UpdateAvailableFilter();
             UpdateHasChanges();
         }
+
+        public bool HasKeyToInvoke(Key key)
+        {
+            return items.Any(f => f.Parameters.HasKeyToInvoke(key));
+        }
+
+        public void InvokeKey(Key key)
+        {
+            foreach (var filterItem in items)
+            {
+                filterItem.Parameters.InvokeKey(key);
+            }
+        }
     }
 }

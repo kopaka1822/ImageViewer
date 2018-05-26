@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using TextureViewer.Annotations;
 using TextureViewer.Models.Filter;
 
@@ -60,6 +61,18 @@ namespace TextureViewer.ViewModels.Filter
         }
 
         public event EventHandler Changed;
+        public bool HasKeyToInvoke(Key key)
+        {
+            return parameter.Keybindings.ContainsKey(key);
+        }
+
+        public void InvokeKey(Key key)
+        {
+            if(!parameter.Keybindings.TryGetValue(key, out var pa)) return;
+
+            // invole on local parameter
+            Value = pa.Invoke(Value);
+        }
 
         protected virtual void OnChanged()
         {

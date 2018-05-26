@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using TextureViewer.Models.Filter;
 using TextureViewer.Views;
 
@@ -152,6 +153,19 @@ namespace TextureViewer.ViewModels.Filter
         protected virtual void OnChanged()
         {
             Changed?.Invoke(this, EventArgs.Empty);
+        }
+
+        public bool HasKeyToInvoke(Key key)
+        {
+            return ViewModels.Any(p => p.HasKeyToInvoke(key));
+        }
+
+        public void InvokeKey(Key key)
+        {
+            foreach (var p in ViewModels)
+            {
+                p.InvokeKey(key);
+            }
         }
     }
 }

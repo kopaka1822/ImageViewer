@@ -180,14 +180,14 @@ namespace TextureViewer.Models.Filter
             switch (matchingParam.GetParamterType())
             {
                 case ParameterType.Float:
+                    AddKeybinding(matchingParam.GetFloatModel(), pars[2], modType, key);
                     break;
                 case ParameterType.Int:
                     AddKeybinding(matchingParam.GetIntModel(), pars[2], modType, key);
                     break;
                 case ParameterType.Bool:
+                    AddKeybinding(matchingParam.GetBoolModel(), pars[2], modType, key);
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException();
             }
         }
 
