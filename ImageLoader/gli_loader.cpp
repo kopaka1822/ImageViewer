@@ -7,6 +7,7 @@ void getImageFormat(ImageFormat& format, const gli::texture& tex)
 {
 	gli::gl GL(gli::gl::PROFILE_GL33);
 	auto GLformat = GL.translate(tex.format(), tex.swizzles());
+	// TODO check if format is srgb
 	format.openglInternalFormat = static_cast<uint32_t>(GLformat.Internal);
 	format.openglExternalFormat = static_cast<uint32_t>(GLformat.External);
 	format.openglType = static_cast<uint32_t>(GLformat.Type);

@@ -7,7 +7,7 @@
 #include <gli/gl.hpp>
 #include "../dependencies/stb/stb_image_write.h"
 
-uint32_t getDefaultInternalFormat(int nComponents)
+uint32_t getDefaultExternalFormat(int nComponents)
 {
 	switch (nComponents)
 	{
@@ -17,8 +17,10 @@ uint32_t getDefaultInternalFormat(int nComponents)
 		return gli::gl::external_format::EXTERNAL_RG;
 	case 3:
 		return gli::gl::external_format::EXTERNAL_RGB;
+		//return gli::gl::EXTERNAL_SRGB_EXT;
 	case 4:
 		return gli::gl::external_format::EXTERNAL_RGBA;
+		//return gli::gl::external_format::EXTERNAL_SRGB_ALPHA_EXT;
 	}
 	return uint32_t(-1);
 }
@@ -41,16 +43,21 @@ uint32_t getSizedInternalFormat(int nComponents, bool isFloat)
 	}
 	else
 	{
+		// TODO let the user decide if srgb conversion should be done
 		switch (nComponents)
 		{
 		case 1:
-			return gli::gl::internal_format::INTERNAL_R8_UNORM;
+			return gli::gl::internal_format::INTERNAL_SR8;
+			//return gli::gl::internal_format::INTERNAL_R8_UNORM;
 		case 2:
-			return gli::gl::internal_format::INTERNAL_RG8_UNORM;
+			return gli::gl::internal_format::INTERNAL_SRG8;
+			//return gli::gl::internal_format::INTERNAL_RG8_UNORM;
 		case 3:
-			return gli::gl::internal_format::INTERNAL_RGB8_UNORM;
+			return gli::gl::internal_format::INTERNAL_SRGB8;
+			//return gli::gl::internal_format::INTERNAL_RGB8_UNORM;
 		case 4:
-			return gli::gl::internal_format::INTERNAL_RGBA8_UNORM;
+			return gli::gl::internal_format::INTERNAL_SRGB8_ALPHA8;
+			//return gli::gl::internal_format::INTERNAL_RGBA8_UNORM;
 		}
 	}
 	
@@ -74,7 +81,7 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 			throw std::exception("error during reading file");
 
 		format.openglInternalFormat = getSizedInternalFormat(nComponents, true);
-		format.openglExternalFormat = getDefaultInternalFormat(nComponents);
+		format.openglExternalFormat = getDefaultExternalFormat(nComponents);
 		format.openglType = gli::gl::type_format::TYPE_F32;
 		format.isCompressed = false;
 
@@ -94,7 +101,7 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 			throw std::exception("error during reading file");
 
 		format.openglInternalFormat = getSizedInternalFormat(nComponents, false);
-		format.openglExternalFormat = getDefaultInternalFormat(nComponents);
+		format.openglExternalFormat = getDefaultExternalFormat(nComponents);
 		format.openglType = gli::gl::type_format::TYPE_U8;
 		format.isCompressed = false;
 

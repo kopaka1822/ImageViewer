@@ -87,6 +87,7 @@ namespace TextureViewer.glhelper
             }
             else
             {
+                
                 var pixelFormat = (PixelFormat)image.OpenglExternalFormat;
                 var pixelType = (PixelType)image.OpenglType;
 
