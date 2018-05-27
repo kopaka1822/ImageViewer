@@ -10,7 +10,7 @@ namespace TextureViewer.Utility
     /// <summary>
     /// multiple IStepables in one class
     /// </summary>
-    class StepList : IStepable
+    public class StepList : IStepable
     {
         private readonly List<IStepable> steps;
         // item index in list
@@ -33,7 +33,7 @@ namespace TextureViewer.Utility
             return steps.GetRange(0, curItem).Sum(s => s.GetNumSteps()) + steps[curItem].CurrentStep();
         }
 
-        public void NextStep()
+        public virtual void NextStep()
         {
             Debug.Assert(curItem < steps.Count);
             // advance current item

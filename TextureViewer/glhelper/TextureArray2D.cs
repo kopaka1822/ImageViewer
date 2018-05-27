@@ -48,6 +48,8 @@ namespace TextureViewer.glhelper
             GL.TexStorage3D(TextureTarget3d.Texture2DArray, numMipmaps,
                 internalFormat, width,
                 height, numLayers);
+
+            CreateTexture2DViews();
         }
 
         /// <summary>
@@ -103,6 +105,8 @@ namespace TextureViewer.glhelper
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLod, (float)image.NumMipmaps);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureBaseLevel, 0);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLevel, image.NumMipmaps);
+
+            CreateTexture2DViews();
         }
 
         /// <summary>
@@ -192,7 +196,7 @@ namespace TextureViewer.glhelper
         /// <param name="mipmap">mipmap mipmap</param>
         public void BindAsTexture2D(int slot, int layer, int mipmap)
         {
-            CreateTexture2DViews();
+            Debug.Assert(tex2DId != null);
             BindAs(slot, TextureTarget.Texture2D, tex2DId[GetTextureIndex(layer, mipmap)]);
         }
 

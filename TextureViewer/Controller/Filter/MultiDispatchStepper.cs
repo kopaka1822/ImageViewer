@@ -52,10 +52,6 @@ namespace TextureViewer.Controller.Filter
 
             curX = 0;
             ++curY;
-
-            // swap images if finished
-            if(CurrentStep() == GetNumSteps())
-                Builder.SwapPrimaryAndTemporary();
         }
 
         public bool HasStep()

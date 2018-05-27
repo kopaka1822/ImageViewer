@@ -43,8 +43,6 @@ namespace TextureViewer.Controller.Filter
             GL.Uniform2(1, 0, 0);
             GL.DispatchCompute(width, height, 1);
 
-            Builder.SwapPrimaryAndTemporary();
-
             ++currentStep;
         }
 

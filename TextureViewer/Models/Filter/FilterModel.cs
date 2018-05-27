@@ -35,6 +35,20 @@ namespace TextureViewer.Models.Filter
 
         public IStepable MakeStepable(Models models, ImageCombineBuilder builder)
         {
+            if (!IsSepa)
+                return MakeIterationStepable(models, builder, 0);
+
+            var steps = new List<IStepable>
+            {
+                MakeIterationStepable(models, builder, 0),
+                MakeIterationStepable(models, builder, 1)
+            };
+
+            return new StepList(steps);
+        }
+
+        private IStepable MakeIterationStepable(Models models, ImageCombineBuilder builder, int iteration)
+        {
             var steps = new List<IStepable>();
             for (int layer = 0; layer < models.Images.NumLayers; ++layer)
             {
@@ -42,19 +56,15 @@ namespace TextureViewer.Models.Filter
                 {
                     if (IsSingleInvocation)
                     {
-                        steps.Add(new SingleDispatchStepper(models, this, builder, layer: layer, mipmap: mipmap, iteration: 0));
-                        if(IsSepa)
-                            steps.Add(new SingleDispatchStepper(models, this, builder, layer: layer, mipmap: mipmap, iteration: 1));
+                        steps.Add(new SingleDispatchStepper(models, this, builder, layer: layer, mipmap: mipmap, iteration: iteration));
                     }
                     else
                     {
-                        steps.Add(new MultiDispatchStepper(models, this, builder, layer: layer, mipmap: mipmap, iteration: 0));
-                        if (IsSepa)
-                            steps.Add(new MultiDispatchStepper(models, this, builder, layer: layer, mipmap: mipmap, iteration: 1));
+                        steps.Add(new MultiDispatchStepper(models, this, builder, layer: layer, mipmap: mipmap, iteration: iteration));
                     }
                 }
             }
-            return new StepList(steps);
+            return new FilterStepList(builder, steps);
         }
     }
 }

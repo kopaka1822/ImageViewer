@@ -47,7 +47,7 @@ namespace TextureViewer.Controller
             switch (args.PropertyName)
             {
                 case nameof(ImagesModel.NumImages):
-                    if (models.Images.PrevNumImages == 0)
+                    if (models.Images.PrevNumImages == 0 || models.Images.PrevNumImages > models.Images.NumImages)
                     {
                         recomputeImage = true;
                         // issue redraw to do work

@@ -45,6 +45,7 @@ namespace TextureViewer.Controller.Filter
             Builder.GetPrimaryTexture();
             Builder.GetTemporaryTexture();
 
+            models.GlData.BindSampler(Model.Shader.GetSourceImageLocation(), false, true);
             Builder.GetPrimaryTexture().BindAsTexture2D(Model.Shader.GetSourceImageLocation(), layer: layer, mipmap: mipmap);
             Builder.GetTemporaryTexture()
                 .BindAsImage(Model.Shader.GetDestinationImageLocation(), layer: layer, mipmap: mipmap, access: TextureAccess.WriteOnly);
@@ -56,7 +57,7 @@ namespace TextureViewer.Controller.Filter
                 if (i == -1) break;
 
                 var tex = models.Images.GetTexture(i);
-                models.GlData.BindSampler(i, tex.HasMipmaps, true);
+                models.GlData.BindSampler(i, false, true);
                 tex.BindAsTexture2D(slot, layer: layer, mipmap: mipmap);
             }
 
