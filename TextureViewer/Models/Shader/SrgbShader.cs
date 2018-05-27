@@ -46,8 +46,14 @@ namespace TextureViewer.Models.Shader
                 "layout(binding = 0) uniform sampler2D tex;\n" +
                 "out vec4 fragColor;\n" +
                 "void main(){\n" +
-                   "fragColor = texelFetch(tex, ivec2(gl_FragCoord.xy), 0);\n" +
-                   "fragColor.rgb = pow(fragColor.rgb, vec3(1.0/2.2));\n" +
+                   "fragColor =  texelFetch(tex, ivec2(gl_FragCoord.xy), 0);\n" +
+                   // convert back
+                   "for(int i = 0; i < 3; ++i){\n" + 
+                      "if( fragColor[i] > 1.0) fragColor[i] = 1.0;\n" +
+                      "else if( fragColor[i] < 0.0) fragColor[i] = 0.0;\n" +
+                      "else if( fragColor[i] < 0.0031308) fragColor[i] = 12.92 * fragColor[i];\n" +
+                      "else fragColor[i] = 1.055 * pow(fragColor[i], 0.41666) - 0.055;\n" +
+                   "}\n" +
                 "}\n";
         }
 
