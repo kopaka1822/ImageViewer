@@ -427,8 +427,7 @@
                 </StatusBarItem>
 
                 <!-- MOUSE POSITION COLOR 1 -->
-                <StatusBarItem 
-                    Width="140" 
+                <StatusBarItem  
                     HorizontalAlignment="Left" 
                     BorderBrush="DarkGray" 
                     BorderThickness="0 0 1 0"
@@ -452,7 +451,6 @@
 
                 <!-- MOUSE POSITION COLOR 2 -->
                 <StatusBarItem 
-                    Width="140" 
                     HorizontalAlignment="Left" 
                     BorderBrush="DarkGray" 
                     BorderThickness="0 0 1 0"

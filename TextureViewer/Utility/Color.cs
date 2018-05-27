@@ -41,7 +41,7 @@ namespace TextureViewer.Utility
             var g = ScalarToString(Green, decimalPlaces);
             var b = ScalarToString(Blue, decimalPlaces);
             var a = ScalarToString(Alpha, decimalPlaces);
-            return $"{r} {g} {b} {a}" + (showAlpha ? $" {a}" : "");
+            return $"{r} {g} {b}" + (showAlpha ? $" {a}" : "");
         }
 
         /// <summary>
