@@ -21,6 +21,7 @@ namespace TextureViewer.Models
         public CheckersShader CheckersShader { get; }
         public TextureCacheModel TextureCache { get; }
         public PixelValueShader GetPixelShader { get; }
+        public SrgbShader SrgbShader { get; }
 
         private readonly Sampler samplerLinear;
         private readonly Sampler samplerLinearMip;
@@ -38,6 +39,7 @@ namespace TextureViewer.Models
             samplerNearestMip = new Sampler(TextureMinFilter.NearestMipmapNearest, TextureMagFilter.Nearest);
             TextureCache = new TextureCacheModel(images, context);
             GetPixelShader = new PixelValueShader();
+            SrgbShader = new SrgbShader();
         }
 
         /// <summary>
@@ -74,6 +76,7 @@ namespace TextureViewer.Models
             samplerNearestMip.Dispose();
             TextureCache.Clear();
             GetPixelShader.Dispose();
+            SrgbShader.Dispose();
         }
     }
 }

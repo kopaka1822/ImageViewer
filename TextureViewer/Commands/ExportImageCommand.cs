@@ -59,7 +59,7 @@ namespace TextureViewer.Commands
                 format = ExportModel.FileFormat.Hdr;
             else if (sfd.FileName.EndsWith(".pfm"))
                 format = ExportModel.FileFormat.Pfm;
-
+            
             var pixelFormat = PixelFormat.Rgb;
             if (models.Images.IsAlpha)
                 pixelFormat = PixelFormat.Rgba;
@@ -82,9 +82,26 @@ namespace TextureViewer.Commands
                 if (texture == null)
                     throw new Exception("texture is not computed");
 
-                var data = texture.GetData(info.Layer, info.Mipmap, info.PixelFormat, info.PixelType, 
-                    out var width, out var height);
-                if(data == null)
+                byte[] data = null;
+                var width = 0;
+                var height = 0;
+
+                if (format == ExportModel.FileFormat.Png || format == ExportModel.FileFormat.Bmp)
+                {
+                    // disable srgbframebuffer to save the result correctly
+                    //GL.Disable(EnableCap.FramebufferSrgb);
+                    // values have to be converted i
+                    data = texture.GetSrgbData(info.Layer, info.Mipmap, info.PixelFormat, info.PixelType, out width,
+                        out height, models.GlData);
+
+                }
+                else
+                {
+                    data = texture.GetData(info.Layer, info.Mipmap, info.PixelFormat, info.PixelType,
+                        out width, out height);
+                }
+
+                if (data == null)
                     throw new Exception("error retrieving image from gpu");
 
                 var numComponents = TextureArray2D.GetPixelFormatCount(info.PixelFormat);

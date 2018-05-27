@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
+using TextureViewer.Models;
+using TextureViewer.Models.Shader;
 
 namespace TextureViewer.glhelper
 {
@@ -249,7 +251,7 @@ namespace TextureViewer.glhelper
             GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureWidth, out width);
             GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureHeight, out height);
 
-            Debug.Assert((uint)layer < nLayer);
+            Debug.Assert(layer < nLayer);
 
             int bufferSize = width * height * GetPixelTypeSize(type) * GetPixelFormatCount(format) * nLayer;
             byte[] buffer = new byte[bufferSize];
@@ -279,6 +281,58 @@ namespace TextureViewer.glhelper
                 for (int curLayer = 0; curLayer < nLayer; ++curLayer)
                     MirrorHorizontally(buffer, width * GetPixelTypeSize(type) * GetPixelFormatCount(format), height, curLayer * (bufferSize / nLayer));
             }
+
+            return buffer;
+        }
+
+
+        public byte[] GetSrgbData(int layer, int mipmap, PixelFormat format, PixelType type, out int width, out int height, OpenGlModel glModel)
+        {
+            // retrieve width and height of the mipmap
+            GL.BindTexture(TextureTarget.Texture2DArray, id);
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureWidth, out width);
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureHeight, out height);
+
+            Debug.Assert((uint)layer < nLayer);
+
+            // create framebuffer and texture to render into
+            // texture
+            var framebufferTexture = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, framebufferTexture);
+            GL.TexStorage2D(TextureTarget2d.Texture2D, 1, SizedInternalFormat.Rgba8, width, height);
+
+            // framebuffer
+            var framebufferId = GL.GenFramebuffer();
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebufferId);
+            GL.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, framebufferTexture, 0);
+            var status = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
+            Debug.Assert(status == FramebufferErrorCode.FramebufferComplete);
+            GL.DrawBuffers(1, new[]{DrawBuffersEnum.ColorAttachment0});
+
+            // draw into the framebuffer
+            GL.Viewport(0, 0, width, height);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            GL.Enable(EnableCap.FramebufferSrgb);
+
+            glModel.SrgbShader.Bind();
+            BindAsTexture2D(0, layer, mipmap);
+
+            glModel.Vao.DrawQuad();
+
+            GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
+
+            // obtain the image from the back buffer
+            int bufferSize = width * height * GetPixelTypeSize(type) * GetPixelFormatCount(format);
+            byte[] buffer = new byte[bufferSize];
+            GL.ReadPixels(0, 0, width, height, format, type, buffer);
+
+
+            // delete framebuffer and texture
+            GL.DeleteFramebuffer(framebufferId);
+            GL.DeleteTexture(framebufferTexture);
+
+            MirrorHorizontally(buffer, width * GetPixelTypeSize(type) * GetPixelFormatCount(format), height, 0);
 
             return buffer;
         }

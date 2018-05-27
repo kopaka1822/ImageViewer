@@ -208,6 +208,7 @@
     <Compile Include="Models\OpenGlModel.cs" />
     <Compile Include="Models\ProgressModel.cs" />
     <Compile Include="Models\Shader\FilterShader.cs" />
+    <Compile Include="Models\Shader\SrgbShader.cs" />
     <Compile Include="Models\TextureCacheModel.cs" />
     <Compile Include="Utility\Color.cs" />
     <Compile Include="Settings.cs" />
