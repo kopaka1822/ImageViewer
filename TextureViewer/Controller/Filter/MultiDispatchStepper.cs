@@ -47,13 +47,15 @@ namespace TextureViewer.Controller.Filter
             GL.Uniform2(1, curX * (FilterShader.LocalSize * FilterShader.MinWorkGroupSize), curY * (FilterShader.LocalSize * FilterShader.MinWorkGroupSize));
             GL.DispatchCompute(FilterShader.MinWorkGroupSize, FilterShader.MinWorkGroupSize, 1);
 
-            Builder.SwapPrimaryAndTemporary();
-
             if (++curX < width)
                 return;
 
             curX = 0;
             ++curY;
+
+            // swap images if finished
+            if(CurrentStep() == GetNumSteps())
+                Builder.SwapPrimaryAndTemporary();
         }
 
         public bool HasStep()
