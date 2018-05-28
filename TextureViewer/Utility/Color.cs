@@ -142,5 +142,10 @@ namespace TextureViewer.Utility
 
             return str;
         }
+
+        public Vector4 ToVector()
+        {
+            return new Vector4(Red, Green, Blue, Alpha);
+        }
     }
 }
