@@ -49,7 +49,13 @@ namespace TextureViewer.ViewModels
             switch (args.PropertyName)
             {
                 case nameof(DisplayModel.TexelPosition):
+                case nameof(DisplayModel.TexelRadius):
                     RecomputeTexelColor();
+                    break;
+                case nameof(DisplayModel.TexelDisplay):
+                case nameof(DisplayModel.TexelDisplayAlpha):
+                case nameof(DisplayModel.TexelDecimalPlaces):
+                    OnPropertyChanged(nameof(TexelColor));
                     break;
             }
         }
@@ -158,7 +164,25 @@ namespace TextureViewer.ViewModels
             }
         }
 
-        public string TexelColor => model.TexelColor.ToDecimalString(true, 3);
+        public string TexelColor
+        {
+            get
+            {
+                var c = model.TexelColor;
+                if (models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.SrgbByte ||
+                    models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.SrgbDecimal)
+                    c = c.ToSrgb();
+
+                if (models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.SrgbDecimal ||
+                    models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.LinearDecimal)
+                    return c.ToDecimalString(models.Display.TexelDisplayAlpha, models.Display.TexelDecimalPlaces);
+
+                return c.ToBitString(models.Display.TexelDisplayAlpha);
+            }
+        }
+
+
+        // => model.TexelColor.ToDecimalString(true, 3);
 
         private void RecomputeTexelColor()
         {

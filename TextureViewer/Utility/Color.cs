@@ -22,6 +22,7 @@ namespace TextureViewer.Utility
         public Color(Vector4 color) :
             this(color.X, color.Y, color.Z, color.W)
         {
+
         }
 
         public float Red { get; set; }
@@ -51,7 +52,7 @@ namespace TextureViewer.Utility
         /// <returns></returns>
         public string ToBitString(bool showAlpha)
         {
-            return $"{(int)(Red * 255.0f)} {(int)(Green * 255.0f)} {(int)(Blue * 255.0f)}" + (showAlpha ? $" {(int)(Alpha * 255.0f)}" : "");
+            return $"{ScalarToByte(Red)} {ScalarToByte(Green)} {ScalarToByte(Blue)}" + (showAlpha ? $" {ScalarToByte(Alpha)}" : "");
         }
 
         /// <summary>
@@ -66,6 +67,28 @@ namespace TextureViewer.Utility
                 Math.Min(Math.Max(Blue, 0.0f), 1.0f),
                 Math.Min(Math.Max(Alpha, 0.0f), 1.0f)
             );
+        }
+
+        /// <summary>
+        /// converts the color from a linear space into srgb space
+        /// </summary>
+        /// <returns></returns>
+        public Color ToSrgb()
+        {
+            return new Color(
+                ToSrgb(Red),
+                ToSrgb(Green),
+                ToSrgb(Blue),
+                Alpha
+            );
+        }
+
+        private float ToSrgb(float c)
+        {
+            if (c > 1.0f) return 1.0f;
+            if (c < 0.0f) return 0.0f;
+            if (c < 0.0031308) return 12.92f * c;
+            return 1.055f * (float)Math.Pow(c, 0.41666) - 0.055f;
         }
 
         public override string ToString()
@@ -106,6 +129,18 @@ namespace TextureViewer.Utility
                 s += " ";
             }
             return s;
+        }
+
+        private static string ScalarToByte(float val)
+        {
+            var str = ((int) (val * 255.0f)).ToString();
+            // bytes should ocuppy 3 spaces (srgb maximum is 255)
+            while (str.Length < 3)
+            {
+                str = " " + str;
+            }
+
+            return str;
         }
     }
 }
