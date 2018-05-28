@@ -201,7 +201,7 @@ namespace TextureViewer.ViewModels
                     models.Display.ActiveMipmap);
 
                 models.Equations.Get(imageId).TexelColor =
-                    shader.GetPixelColor(models.Display.TexelPosition.X, models.Display.TexelPosition.Y, 0);
+                    shader.GetPixelColor(models.Display.TexelPosition.X, models.Display.TexelPosition.Y, models.Display.TexelRadius);
             }
             catch (Exception e)
             {
