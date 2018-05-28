@@ -82,7 +82,9 @@
                         <Image Source="Icons/grayscale.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="_Pixel Display">
+                <MenuItem 
+                    Header="_Pixel Display"
+                    Command="{Binding ShowPixelDisplayCommand}">
                     <MenuItem.Icon>
                         <Image Source="Icons/displayconfig.png"/>
                     </MenuItem.Icon>

@@ -36,6 +36,7 @@ namespace TextureViewer.ViewModels
             OpenCommand = new OpenImageCommand(models, import);
             ExportCommand = new ExportImageCommand(models);
             AddFilterCommand = new AddFilterCommand(models, Filter);
+            ShowPixelDisplayCommand = new ShowPixelDialogCommand(models);
 
             window.KeyUp += WindowOnKeyUp;
         }
@@ -82,5 +83,6 @@ namespace TextureViewer.ViewModels
         public ICommand ExportCommand { get; }
         public ICommand ResizeCommand { get; }
         public ICommand AddFilterCommand { get; }
+        public ICommand ShowPixelDisplayCommand { get; }
     }
 }

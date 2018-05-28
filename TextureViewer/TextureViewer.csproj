@@ -135,6 +135,7 @@
     <Compile Include="Commands\ExportImageCommand.cs" />
     <Compile Include="Commands\OpenImageCommand.cs" />
     <Compile Include="Commands\ResizeWindowCommand.cs" />
+    <Compile Include="Commands\ShowPixelDialogCommand.cs" />
     <Compile Include="Controller\Filter\FilterStepableBase.cs" />
     <Compile Include="Controller\Filter\FilterStepList.cs" />
     <Compile Include="Controller\Filter\MultiDispatchStepper.cs" />
@@ -212,6 +213,7 @@
     <Compile Include="Models\TextureCacheModel.cs" />
     <Compile Include="Utility\Color.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
     <Compile Include="ViewModels\Filter\BoolFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\FilterParametersViewModel.cs" />
     <Compile Include="ViewModels\Filter\FilterParameterViewModelBase.cs" />
@@ -231,6 +233,9 @@
     <Compile Include="Views\FloatFilterParameterView.cs" />
     <Compile Include="Views\ImageListBoxItem.cs" />
     <Compile Include="Views\IntFilterParameterView.cs" />
+    <Compile Include="Views\PixelDisplayDialog.xaml.cs">
+      <DependentUpon>PixelDisplayDialog.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -247,6 +252,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\ExportDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PixelDisplayDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

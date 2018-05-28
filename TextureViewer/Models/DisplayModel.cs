@@ -40,6 +40,14 @@ namespace TextureViewer.Models
             Horizontal
         }
 
+        public enum TexelDisplayMode
+        {
+            LinearDecimal,
+            LinearByte,
+            SrgbDecimal,
+            SrgbByte
+        }
+
         private readonly ImagesModel imagesModel;
         private readonly OpenGlContext glContext;
 
@@ -202,6 +210,62 @@ namespace TextureViewer.Models
                 if (value == null || value.Equals(texelPosition)) return;
                 texelPosition = value;
                 OnPropertyChanged(nameof(TexelPosition));
+            }
+        }
+
+        public int MinTexelDecimalPlaces { get; } = 2;
+        public int MaxTexelDecimalPlaces { get; } = 10;
+
+        private int texelDecimalPlaces = 3;
+        public int TexelDecimalPlaces
+        {
+            get => texelDecimalPlaces;
+            set
+            {
+                var clamped = Math.Min(Math.Max(value, MinTexelDecimalPlaces), MaxTexelDecimalPlaces);
+                if(clamped == texelDecimalPlaces) return;
+                texelDecimalPlaces = clamped;
+                OnPropertyChanged(nameof(TexelDecimalPlaces));
+            }
+        }
+
+        private bool texelDisplayAlpha = true;
+        public bool TexelDisplayAlpha
+        {
+            get => texelDisplayAlpha;
+            set
+            {
+                if(value == texelDisplayAlpha) return;
+                texelDisplayAlpha = value;
+                OnPropertyChanged(nameof(TexelDisplayAlpha));
+            }
+        }
+
+        public int MinTexelRadius { get; } = 0;
+        public int MaxTexelRadius { get; } = 10;
+
+        private int texelRadius = 0;
+        public int TexelRadius
+        {
+            get => texelRadius;
+            set
+            {
+                var clamped = Math.Min(Math.Max(value, MinTexelRadius), MaxTexelRadius);
+                if (texelRadius == clamped) return;
+                texelRadius = clamped;
+                OnPropertyChanged(nameof(TexelRadius));
+            }
+        }
+
+        private TexelDisplayMode texelDisplay = TexelDisplayMode.LinearDecimal;
+        public TexelDisplayMode TexelDisplay
+        {
+            get => texelDisplay;
+            set
+            {
+                if (value == texelDisplay) return;
+                texelDisplay = value;
+                OnPropertyChanged(nameof(TexelDisplay));
             }
         }
 
