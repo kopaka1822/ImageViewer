@@ -23,6 +23,17 @@ namespace TextureViewer
 
             InitializeComponent();
 
+            try
+            {
+                // initialize data models
+                ViewModel = new WindowViewModel(parent, this);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                throw;
+            }
+
             Debug.Assert(ViewModel != null);
             DataContext = ViewModel;
 
@@ -37,7 +48,7 @@ namespace TextureViewer
         /// <param name="e"></param>
         private void OpenGlHost_OnInitialized(object sender, EventArgs e)
         {
-            try
+            /*try
             {
                 // initialize data models
                 ViewModel = new WindowViewModel(parent, this);
@@ -46,7 +57,7 @@ namespace TextureViewer
             {
                 Console.WriteLine(exception);
                 throw;
-            }
+            }*/
 
         }
 

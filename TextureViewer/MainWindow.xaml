@@ -120,6 +120,7 @@
                     Width="220"
                     Background="#eee"
                     BorderThickness="1 0 0 0"
+                    x:Name="TabControl"
                     >
                     <TabItem 
                         Header="Images">
@@ -365,7 +366,7 @@
                     </TabItem>
                     
                     <TabItem Header="Statistics"
-                             >
+                             x:Name="StatisticsTabItem">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <Border Padding="5">
                                 <StackPanel>

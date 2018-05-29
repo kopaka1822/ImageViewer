@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using TextureViewer.Annotations;
 using TextureViewer.Models;
 using TextureViewer.Views;
@@ -27,8 +28,15 @@ namespace TextureViewer.ViewModels
             viewModels = new StatisticViewModel[models.Statistics.NumStatistics];
             for (int i = 0; i < viewModels.Length; ++i)
             {
-                viewModels[i] = new StatisticViewModel(i, models);
+                viewModels[i] = new StatisticViewModel(i, models, this);
             }
+
+            models.App.Window.TabControl.SelectionChanged += TabControlOnSelectionChanged;
+        }
+
+        private void TabControlOnSelectionChanged(object sender, SelectionChangedEventArgs selectionChangedEventArgs)
+        {
+            IsVisible = ReferenceEquals(models.App.Window.TabControl.SelectedItem, models.App.Window.StatisticsTabItem);
         }
 
         private void StatisticsOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -47,6 +55,18 @@ namespace TextureViewer.ViewModels
         public StatisticViewModel Equation1 => viewModels[0];
         public StatisticViewModel Equation2 => viewModels[1];
 
+        private bool isVisible = false;
+        public bool IsVisible
+        {
+            get => isVisible;
+            private set
+            {
+                if (isVisible == value) return;
+                isVisible = value;
+                OnPropertyChanged(nameof(IsVisible));
+            }
+        }
+
         public List<ComboBoxItem<StatisticsModel.ColorSpaceType>> AvailableColorSpaces { get; } = new List<ComboBoxItem<StatisticsModel.ColorSpaceType>>
         {
             new ComboBoxItem<StatisticsModel.ColorSpaceType>("Linear", StatisticsModel.ColorSpaceType.Linear),
@@ -61,6 +81,7 @@ namespace TextureViewer.ViewModels
             {
                 if(ReferenceEquals(selectedColorSpace, value)) return;
                 selectedColorSpace = value;
+                models.Statistics.ColorSpace = value.Cargo;
                 OnPropertyChanged(nameof(SelectedColorSpace));
             }
         }
@@ -81,6 +102,7 @@ namespace TextureViewer.ViewModels
             {
                 if (ReferenceEquals(value, selectedChannel)) return;
                 selectedChannel = value;
+                models.Statistics.Channel = value.Cargo;
                 OnPropertyChanged(nameof(SelectedChannel));
             }
         }
