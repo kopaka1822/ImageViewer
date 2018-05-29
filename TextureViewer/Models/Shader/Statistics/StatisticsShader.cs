@@ -48,7 +48,7 @@ namespace TextureViewer.Models.Shader.Statistics
             GL.Uniform1(1, curStride);
 
             var curWidth = models.Images.Width;
-            GL.DispatchCompute(curWidth / (LocalSize * 2), models.Images.Height, 1);
+            GL.DispatchCompute(Math.Max(curWidth / (LocalSize * 2), 1), models.Images.Height, 1);
 
             // swap textures
             var texSrc = models.GlData.TextureCache.GetTexture();
@@ -69,7 +69,7 @@ namespace TextureViewer.Models.Shader.Statistics
                 GL.Uniform1(1, curStride);
 
                 // dispatch
-                GL.DispatchCompute(curWidth / (LocalSize * 2), models.Images.Height, 1);
+                GL.DispatchCompute(Math.Max(1, curWidth / (LocalSize * 2)), models.Images.Height, 1);
                 GL.MemoryBarrier(MemoryBarrierFlags.TextureFetchBarrierBit);
             }
 
@@ -90,7 +90,7 @@ namespace TextureViewer.Models.Shader.Statistics
                 // stride
                 GL.Uniform1(1, curStride);
 
-                GL.DispatchCompute(1, curHeight / (LocalSize * 2), 1);
+                GL.DispatchCompute(1, Math.Max(1, curHeight / (LocalSize * 2)), 1);
                 GL.MemoryBarrier(MemoryBarrierFlags.TextureFetchBarrierBit);
 
                 curHeight /= 2;
@@ -148,7 +148,8 @@ namespace TextureViewer.Models.Shader.Statistics
                         if(pos2.x >= size.x || pos2.y >= size.y)
                         {
                             /* only write the value as is */
-                            imageStore(dst_image, pos1, texelFetch(src_image, pos1, 0));
+                            vec4 color = combineSingle(texelFetch(src_image, pos1, 0));
+                            imageStore(dst_image, pos1, color);
                             return;
                         }
                         vec4 color = combine( texelFetch(src_image, pos1, 0), texelFetch(src_image, pos2, 0) );
