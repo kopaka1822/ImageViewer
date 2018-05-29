@@ -9,6 +9,7 @@ using TextureViewer.Controller;
 using TextureViewer.Controller.TextureViews.Shader;
 using TextureViewer.glhelper;
 using TextureViewer.Models.Shader;
+using TextureViewer.Models.Shader.Statistics;
 
 namespace TextureViewer.Models
 {
@@ -22,6 +23,15 @@ namespace TextureViewer.Models
         public TextureCacheModel TextureCache { get; }
         public PixelValueShader GetPixelShader { get; }
         public SrgbShader SrgbShader { get; }
+
+        // statistics shader
+        public MaxStatistics LinearMaxStatistics { get; }
+        public MinStatistics LinearMinStatistics { get; }
+        public AverageStatistics LinearAvgStatistics { get; }
+
+        public MaxStatistics SrgbMaxStatistics { get; }
+        public MinStatistics SrgbMinStatistics { get; }
+        public AverageStatistics SrgbAvgStatistics { get; }
 
         private readonly Sampler samplerLinear;
         private readonly Sampler samplerLinearMip;
@@ -40,6 +50,13 @@ namespace TextureViewer.Models
             TextureCache = new TextureCacheModel(images, context);
             GetPixelShader = new PixelValueShader();
             SrgbShader = new SrgbShader();
+
+            LinearMaxStatistics = new MaxStatistics(false);
+            SrgbMaxStatistics = new MaxStatistics(true);
+            LinearMinStatistics = new MinStatistics(false);
+            SrgbMinStatistics = new MinStatistics(true);
+            LinearAvgStatistics = new AverageStatistics(false, images);
+            SrgbAvgStatistics = new AverageStatistics(true, images);
         }
 
         /// <summary>
@@ -77,6 +94,11 @@ namespace TextureViewer.Models
             TextureCache.Clear();
             GetPixelShader.Dispose();
             SrgbShader.Dispose();
+
+            LinearMaxStatistics.Dispose();
+            SrgbMaxStatistics.Dispose();
+            LinearMinStatistics.Dispose();
+            SrgbMinStatistics.Dispose();
         }
     }
 }

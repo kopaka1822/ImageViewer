@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.glhelper;
+using TextureViewer.Utility;
 
 namespace TextureViewer.Models.Shader.Statistics
 {
@@ -30,7 +31,7 @@ namespace TextureViewer.Models.Shader.Statistics
         /// executes the shader for the outer image layer
         /// </summary>
         /// <returns></returns>
-        public Vector4 Run(TextureArray2D source, Models models)
+        public Color Run(TextureArray2D source, Models models)
         {
             var texDst = models.GlData.TextureCache.GetTexture();
 
@@ -106,7 +107,7 @@ namespace TextureViewer.Models.Shader.Statistics
             models.GlData.TextureCache.StoreTexture(texSrc);
             models.GlData.TextureCache.StoreTexture(texDst);
 
-            return res.ToVector();
+            return ModifyResult(res);
         }
 
         private void Swap(ref TextureArray2D t1, ref TextureArray2D t2)
@@ -120,22 +121,29 @@ namespace TextureViewer.Models.Shader.Statistics
         {
             return OpenGlContext.ShaderVersion + "\n" +
                    $"layout(local_size_x = {LocalSize}) in;\n" +
-                   "layout(binding = 0) uniform sampler2D src_image;\n" +
-                   "layout(binding = 1) uniform writeonly image2D dst_image;\n" +
-                   "layout(location = 0) uniform ivec2 direction;\n" +
-                   "layout(location = 1) uniform int stride;\n" +
-                   "vec4 combine(vec4 a, vec4 b) {"
-                   + GetCombineFunction() + "}\n" +
-                   @"void main() {
+                   @"layout(binding = 0) uniform sampler2D src_image;
+                   layout(binding = 1) uniform writeonly image2D dst_image;
+                   layout(location = 0) uniform ivec2 direction;
+                   layout(location = 1) uniform int stride;
+                   vec4 combine(vec4 a, vec4 b) {" + 
+                   GetCombineFunction() + 
+                   "}\n" +
+                   "vec4 combineSingle(vec4 a) {\n" +
+                   GetSingleCombine() +
+                   "}\n" +
+                   @"#line 1 10
+                    int idot(ivec2 a, ivec2 b) { return a.x * b.x + a.y * b.y; }
+
+                    void main() {
                         ivec2 pixel = ivec2(gl_GlobalInvocationID);
-                        ivec2 y = dot(pixel, ivec2(1) - direction) * (ivec2(1) - direction);
-                        ivec2 x = dot(pixel, direction) * stride * direction;
+                        ivec2 y = idot(pixel, ivec2(1) - direction) * (ivec2(1) - direction);
+                        ivec2 x = idot(pixel, direction) * stride * direction;
                         ivec2 x2 = x + direction * (stride - 1);
                         
                         ivec2 pos1 = x + y;
                         ivec2 pos2 = x2 + y;
 
-                        ivec2 size = textureSize(src_image, 0);
+                        ivec2 size = ivec2(textureSize(src_image, 0));
                         if(pos1.x >= size.x || pos1.y >= size.y) return;
                         if(pos2.x >= size.x || pos2.y >= size.y)
                         {
@@ -148,6 +156,29 @@ namespace TextureViewer.Models.Shader.Statistics
                     }";
         }
 
+        /// <summary>
+        /// function which combines vec4 a and vec4 b
+        /// </summary>
+        /// <returns></returns>
         protected abstract string GetCombineFunction();
+
+        /// <summary>
+        /// function that will be called if no partner for vec4 a exists (only vec4 a as argument)
+        /// </summary>
+        /// <returns></returns>
+        protected virtual string GetSingleCombine()
+        {
+            return "return a;";
+        }
+
+        protected virtual string GetFunctions()
+        {
+            return "";
+        }
+
+        protected virtual Color ModifyResult(Color color)
+        {
+            return color;
+        }
     }
 }

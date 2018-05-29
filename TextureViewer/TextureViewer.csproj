@@ -210,6 +210,11 @@
     <Compile Include="Models\ProgressModel.cs" />
     <Compile Include="Models\Shader\FilterShader.cs" />
     <Compile Include="Models\Shader\SrgbShader.cs" />
+    <Compile Include="Models\Shader\Statistics\AverageStatistics.cs" />
+    <Compile Include="Models\Shader\Statistics\MaxStatistics.cs" />
+    <Compile Include="Models\Shader\Statistics\MinStatistics.cs" />
+    <Compile Include="Models\Shader\Statistics\PreSrgbStatistics.cs" />
+    <Compile Include="Models\Shader\Statistics\RgbLuminanceStatistics.cs" />
     <Compile Include="Models\Shader\Statistics\StatisticsShader.cs" />
     <Compile Include="Models\StatisticsModel.cs" />
     <Compile Include="Models\TextureCacheModel.cs" />
