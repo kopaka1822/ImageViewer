@@ -364,7 +364,8 @@
                         </ScrollViewer>
                     </TabItem>
                     
-                    <TabItem Header="Statistics">
+                    <TabItem Header="Statistics"
+                             >
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <Border Padding="5">
                                 <StackPanel>
@@ -389,7 +390,8 @@
 
                                     <GroupBox
                                         Header="Equation 1"
-                                        Margin="0 0 0 5">
+                                        Margin="0 0 0 5"
+                                        Visibility="{Binding Statistics.Equation1.Visibility}">
 
                                         <StackPanel>
                                             <TextBlock 
@@ -409,6 +411,33 @@
                                                 Margin="0 0 0 2"/>
                                             <TextBox 
                                                 Text="{Binding Statistics.Equation1.Max}"
+                                                Margin="0 0 0 5"/>
+                                        </StackPanel>
+                                    </GroupBox>
+
+                                    <GroupBox
+                                        Header="Equation 2"
+                                        Margin="0 0 0 5"
+                                        Visibility="{Binding Statistics.Equation2.Visibility}">
+
+                                        <StackPanel>
+                                            <TextBlock 
+                                                Text="Average"
+                                                Margin="0 0 0 2"/>
+                                            <TextBox 
+                                                Text="{Binding Statistics.Equation2.Average}"
+                                                Margin="0 0 0 5"/>
+                                            <TextBlock 
+                                                Text="Min"
+                                                Margin="0 0 0 2"/>
+                                            <TextBox 
+                                                Text="{Binding Statistics.Equation2.Min}"
+                                                Margin="0 0 0 5"/>
+                                            <TextBlock 
+                                                Text="Max"
+                                                Margin="0 0 0 2"/>
+                                            <TextBox 
+                                                Text="{Binding Statistics.Equation2.Max}"
                                                 Margin="0 0 0 5"/>
                                         </StackPanel>
                                     </GroupBox>

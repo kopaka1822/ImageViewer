@@ -27,7 +27,7 @@ namespace TextureViewer.ViewModels
             viewModels = new StatisticViewModel[models.Statistics.NumStatistics];
             for (int i = 0; i < viewModels.Length; ++i)
             {
-                viewModels[i] = new StatisticViewModel(i, models.Statistics);
+                viewModels[i] = new StatisticViewModel(i, models);
             }
         }
 

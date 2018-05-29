@@ -64,17 +64,6 @@ namespace TextureViewer.Models
             }
         }
 
-        private StatisticModel statistics = StatisticModel.ZERO;
-        public StatisticModel Statistics
-        {
-            get => statistics;
-            private set
-            {
-                statistics = value;
-                OnPropertyChanged(nameof(Statistics));
-            }
-        }
-
         /// <summary>
         /// resets the model to the initial state (empty textures)
         /// </summary>

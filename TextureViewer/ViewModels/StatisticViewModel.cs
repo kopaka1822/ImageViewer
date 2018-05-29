@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using TextureViewer.Annotations;
 using TextureViewer.Models;
 
@@ -13,14 +14,25 @@ namespace TextureViewer.ViewModels
     public class StatisticViewModel : INotifyPropertyChanged
     {
         private readonly int index;
-        private readonly StatisticsModel model;
+        private readonly Models.Models models;
 
-        public StatisticViewModel(int index, StatisticsModel model)
+        public StatisticViewModel(int index, Models.Models models)
         {
             this.index = index;
-            this.model = model;
-            this.model.StatisticChanged += ModelOnStatisticChanged;
-            this.model.PropertyChanged += ModelOnPropertyChanged;
+            this.models = models;
+            this.models.Statistics.StatisticChanged += ModelOnStatisticChanged;
+            this.models.Statistics.PropertyChanged += ModelOnPropertyChanged;
+            this.models.Equations.Get(index).PropertyChanged += OnEquationPropertyChanged;
+        }
+
+        private void OnEquationPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(ImageEquationModel.Visible):
+                    OnPropertyChanged(nameof(Visibility));
+                    break;
+            }
         }
 
         private void ModelOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -46,21 +58,23 @@ namespace TextureViewer.ViewModels
             }
         }
 
+        public Visibility Visibility => models.Equations.Get(index).Visible ? Visibility.Visible : Visibility.Collapsed;
+
         public string Average
         {
-            get => model.Get(index).Avg.Get(model.ColorSpace).Get(model.Channel).ToString(App.GetCulture());
+            get => models.Statistics.Get(index).Avg.Get(models.Statistics.ColorSpace).Get(models.Statistics.Channel).ToString(App.GetCulture());
             set { }
         }
 
         public string Min
         {
-            get => model.Get(index).Min.Get(model.ColorSpace).Get(model.Channel).ToString(App.GetCulture());
+            get => models.Statistics.Get(index).Min.Get(models.Statistics.ColorSpace).Get(models.Statistics.Channel).ToString(App.GetCulture());
             set { }
         }
 
         public string Max
         {
-            get => model.Get(index).Max.Get(model.ColorSpace).Get(model.Channel).ToString(App.GetCulture());
+            get => models.Statistics.Get(index).Max.Get(models.Statistics.ColorSpace).Get(models.Statistics.Channel).ToString(App.GetCulture());
             set { }
         }
 
