@@ -369,30 +369,49 @@
                             <Border Padding="5">
                                 <StackPanel>
                                     <TextBlock 
+                                        Text="Color Space:"
+                                        Margin="0 0 0 2"/>
+                                    <ComboBox
+                                        Margin="0 0 0 5"
+                                        ItemsSource="{Binding Statistics.AvailableColorSpaces}"
+                                        SelectedItem="{Binding Statistics.SelectedColorSpace}"/>
+                                    <TextBlock
+                                        Text="Component"
+                                        Margin="0 0 0 2"/>
+                                    <ComboBox
+                                        Margin="0 0 0 5"
+                                        ItemsSource="{Binding Statistics.AvailableChannels}"
+                                        SelectedItem="{Binding Statistics.SelectedChannel}"/>
+                                    <TextBlock 
                                         Text="Double click box to copy content to clipboard"
                                         Margin="0 0 0 5"
                                         TextWrapping="Wrap"/>
 
-                                    <TextBlock Text="Average:"/>
-                                    <TextBlock Text="Luminance:"/>
-                                    <TextBox Text="1.0"/>
-                                    <TextBlock Text="Red:"/>
-                                    <TextBox Text="1.0"/>
-                                    <TextBlock Text="Green:"/>
-                                    <TextBox Text="1.0"/>
-                                    <TextBlock Text="Blue:"/>
-                                    <TextBox Text="1.0"/>
+                                    <GroupBox
+                                        Header="Equation 1"
+                                        Margin="0 0 0 5">
 
-                                    <TextBlock Text="Root of Average:"/>
-                                    <TextBlock Text="Luminance:"/>
-                                    <TextBox Text="1.0"/>
-                                    <TextBlock Text="Red:"/>
-                                    <TextBox Text="1.0"/>
-                                    <TextBlock Text="Green:"/>
-                                    <TextBox Text="1.0"/>
-                                    <TextBlock Text="Blue:"/>
-                                    <TextBox Text="1.0"/>
-
+                                        <StackPanel>
+                                            <TextBlock 
+                                                Text="Average"
+                                                Margin="0 0 0 2"/>
+                                            <TextBox 
+                                                Text="{Binding Statistics.Equation1.Average}"
+                                                Margin="0 0 0 5"/>
+                                            <TextBlock 
+                                                Text="Min"
+                                                Margin="0 0 0 2"/>
+                                            <TextBox 
+                                                Text="{Binding Statistics.Equation1.Min}"
+                                                Margin="0 0 0 5"/>
+                                            <TextBlock 
+                                                Text="Max"
+                                                Margin="0 0 0 2"/>
+                                            <TextBox 
+                                                Text="{Binding Statistics.Equation1.Max}"
+                                                Margin="0 0 0 5"/>
+                                        </StackPanel>
+                                    </GroupBox>
                                 </StackPanel>
                             </Border>
                         </ScrollViewer>

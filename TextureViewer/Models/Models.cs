@@ -30,6 +30,7 @@ namespace TextureViewer.Models
             Progress = new ProgressModel();
             FinalImages = new FinalImagesModel(GlData.TextureCache, Images);
             Filter = new FiltersModel();
+            Statistics = new StatisticsModel();
 
             GlContext.Disable();
         }
@@ -54,5 +55,6 @@ namespace TextureViewer.Models
         public ProgressModel Progress { get; }
         public FinalImagesModel FinalImages { get; }
         public FiltersModel Filter { get; }
+        public StatisticsModel Statistics { get; }
     }
 }

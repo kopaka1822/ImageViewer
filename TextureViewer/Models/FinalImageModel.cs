@@ -64,8 +64,8 @@ namespace TextureViewer.Models
             }
         }
 
-        private StatisticsModel statistics = StatisticsModel.ZERO;
-        public StatisticsModel Statistics
+        private StatisticModel statistics = StatisticModel.ZERO;
+        public StatisticModel Statistics
         {
             get => statistics;
             private set

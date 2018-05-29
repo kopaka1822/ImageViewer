@@ -1,56 +1,108 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using TextureViewer.Annotations;
 
 namespace TextureViewer.Models
 {
-    public class StatisticsModel
+    public class ChangedStatisticEvent : EventArgs
     {
-        public struct Channel
+        public ChangedStatisticEvent(int index, StatisticModel model)
         {
-            public Channel(float luminance, float red, float green, float blue)
+            Index = index;
+            Model = model;
+        }
+
+        public int Index { get; }
+        public StatisticModel Model { get; }
+    }
+
+    public delegate void ChangedStatisticsHandler(object sender, ChangedStatisticEvent e);
+
+    public class StatisticsModel : INotifyPropertyChanged
+    {
+        private readonly StatisticModel[] statistics;
+
+        public int NumStatistics => statistics.Length;
+
+        public event ChangedStatisticsHandler StatisticChanged;
+
+        public StatisticsModel()
+        {
+            statistics = new[]
             {
-                Luminance = luminance;
-                Red = red;
-                Green = green;
-                Blue = blue;
-            }
-
-            public float Luminance { get; }
-            public float Red { get; }
-            public float Green { get; }
-            public float Blue { get; }
-
-            public static readonly Channel ZERO = new Channel(0.0f, 0.0f, 0.0f, 0.0f);
+                StatisticModel.ZERO,
+                StatisticModel.ZERO
+            };
         }
 
-        public struct ColorSpace
+        public void UpdateModel(StatisticModel model, int index)
         {
-            public ColorSpace(Channel linear, Channel srgb)
+            Debug.Assert(index >= 0 && index <= statistics.Length);
+            statistics[index] = model;
+            OnStatisticChanged(index);
+        }
+
+        public StatisticModel Get(int index)
+        {
+            Debug.Assert(index >= 0 && index <= statistics.Length);
+            return statistics[index];
+        }
+
+        public enum ColorSpaceType
+        {
+            Linear,
+            Srgb
+        }
+
+        public enum ChannelType
+        {
+            Red,
+            Green,
+            Blue,
+            Luminance
+        }
+
+        private ColorSpaceType colorSpace = ColorSpaceType.Linear;
+        public ColorSpaceType ColorSpace
+        {
+            get => colorSpace;
+            set
             {
-                Linear = linear;
-                Srgb = srgb;
+                if (value == colorSpace) return;
+                colorSpace = value;
+                OnPropertyChanged(nameof(ColorSpace));
             }
-
-            public Channel Linear { get; }
-            public Channel Srgb { get; }
-
-            public static readonly ColorSpace ZERO = new ColorSpace(Channel.ZERO, Channel.ZERO);
         }
 
-        public ColorSpace Sum { get; }
-        public ColorSpace Min { get; }
-        public ColorSpace Max { get; }
-
-        public StatisticsModel(ColorSpace sum, ColorSpace min, ColorSpace max)
+        private ChannelType channel = ChannelType.Luminance;
+        public ChannelType Channel
         {
-            Sum = sum;
-            Min = min;
-            Max = max;
+            get => channel;
+            set
+            {
+                if (value == channel) return;
+                channel = value;
+                OnPropertyChanged(nameof(Channel));
+            }
         }
 
-        public static readonly StatisticsModel ZERO = new StatisticsModel(ColorSpace.ZERO, ColorSpace.ZERO, ColorSpace.ZERO);
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected virtual void OnStatisticChanged(int index)
+        {
+            StatisticChanged?.Invoke(this, new ChangedStatisticEvent(index, statistics[index]));
+        }
     }
 }

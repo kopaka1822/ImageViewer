@@ -216,6 +216,7 @@
     <Compile Include="Models\Shader\Statistics\PreSrgbStatistics.cs" />
     <Compile Include="Models\Shader\Statistics\RgbLuminanceStatistics.cs" />
     <Compile Include="Models\Shader\Statistics\StatisticsShader.cs" />
+    <Compile Include="Models\StatisticModel.cs" />
     <Compile Include="Models\StatisticsModel.cs" />
     <Compile Include="Models\TextureCacheModel.cs" />
     <Compile Include="Utility\Color.cs" />
@@ -227,6 +228,8 @@
     <Compile Include="ViewModels\Filter\FloatFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\IFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\IntFilterParameterViewModel.cs" />
+    <Compile Include="ViewModels\StatisticsViewModel.cs" />
+    <Compile Include="ViewModels\StatisticViewModel.cs" />
     <Compile Include="Views\BoolFilterParameterView.cs" />
     <Compile Include="Views\ComboBoxItem.cs" />
     <Compile Include="ViewModels\Dialog\ExportViewModel.cs" />
