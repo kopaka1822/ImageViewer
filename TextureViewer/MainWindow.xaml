@@ -686,7 +686,7 @@
                     HorizontalAlignment="Left" 
                     BorderBrush="DarkGray" 
                     BorderThickness="0 0 1 0"
-                    Visibility="{Binding Display.EnableMipMaps}">
+                    IsEnabled="{Binding Display.EnableMipMaps}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>

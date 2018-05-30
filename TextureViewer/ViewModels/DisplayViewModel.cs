@@ -182,7 +182,7 @@ namespace TextureViewer.ViewModels
         public ObservableCollection<ComboBoxItem<DisplayModel.ViewMode>> AvailableViewModes { get; } =
             new ObservableCollection<ComboBoxItem<DisplayModel.ViewMode>>();
 
-        public Visibility EnableMipMaps => AvailableMipMaps.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+        public bool EnableMipMaps => AvailableMipMaps.Count > 1;
         public Visibility EnableLayers => AvailableLayers.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
         public Visibility EnableViewModes => AvailableViewModes.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
         public bool EnableSplitMode => models.Equations.GetVisibles().Count > 1;

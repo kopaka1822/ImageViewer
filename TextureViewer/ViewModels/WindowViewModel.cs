@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Windows.Forms;
 using System.Windows.Input;
 using TextureViewer.Commands;
 using TextureViewer.Controller;
 using TextureViewer.Models;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace TextureViewer.ViewModels
 {
@@ -40,6 +42,19 @@ namespace TextureViewer.ViewModels
             ShowPixelDisplayCommand = new ShowPixelDialogCommand(models);
 
             window.KeyUp += WindowOnKeyUp;
+            models.GlContext.GlControl.DragDrop += GlControlOnDragDrop;
+        }
+
+        private void GlControlOnDragDrop(object sender, DragEventArgs args)
+        {
+            if (args.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])args.Data.GetData(DataFormats.FileDrop);
+
+                if (files != null)
+                    foreach (var file in files)
+                        ImportImage(file);
+            }
         }
 
         private void WindowOnKeyUp(object sender, KeyEventArgs e)
