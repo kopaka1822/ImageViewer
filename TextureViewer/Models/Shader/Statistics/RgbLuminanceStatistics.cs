@@ -26,8 +26,8 @@ namespace TextureViewer.Models.Shader.Statistics
         {
             return @"vec4 toSrgb(vec4 a){
                         for(int i = 0; i < 3; ++i){
-                            if( a[i] > 1.0 ) a[i] = 1.0;
-                            else if( a[i] < 0.0 ) a[i] = 0.0;
+                            if( a[i] >= 1.0 ) a[i] = 1.0;
+                            else if( a[i] <= 0.0 ) a[i] = 0.0;
                             else if( a[i] < 0.0031308 ) a[i] = 12.92 * a[i];
                             else a[i] = 1.055 * pow( a[i], 0.41666) - 0.055;
                         }
