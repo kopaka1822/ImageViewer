@@ -41,8 +41,8 @@ namespace TextureViewer.Models.Shader.Statistics
             var res = "";
             if(useSrgb)
                 // convert all values to srgb in the first iteration
-                res += @"if( stride == 2 && direction == ivec2(1, 0) )
-                        a = toSrgb(a);
+                res += @"if( stride == 2 && direction == ivec2(1, 0) ){
+                        a = toSrgb(a);}
                     ";
 
             // convert alpha to luminance instead

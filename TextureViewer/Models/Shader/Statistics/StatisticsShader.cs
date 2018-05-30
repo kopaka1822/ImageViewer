@@ -15,7 +15,7 @@ namespace TextureViewer.Models.Shader.Statistics
     {
         private Program program;
 
-        public static readonly int LocalSize = 32;
+        public static readonly int LocalSize = 1;
 
         protected StatisticsShader()
         {}
@@ -29,6 +29,11 @@ namespace TextureViewer.Models.Shader.Statistics
         public void Dispose()
         {
             program.Dispose();
+        }
+
+        private int DivideRoundUp(int a, int b)
+        {
+            return (a + b - 1) / b;
         }
 
         /// <summary>
@@ -52,16 +57,20 @@ namespace TextureViewer.Models.Shader.Statistics
             GL.Uniform1(1, curStride);
 
             var curWidth = models.Images.Width;
-            GL.DispatchCompute(Math.Max(curWidth / (LocalSize * 2), 1), models.Images.Height, 1);
+            GL.DispatchCompute(DivideRoundUp(curWidth, LocalSize * 2), models.Images.Height, 1);
 
             // swap textures
             var texSrc = models.GlData.TextureCache.GetTexture();
             GL.MemoryBarrier(MemoryBarrierFlags.TextureFetchBarrierBit);
 
+            var test = texDst.GetRedFloatData(0);
+
+
             // do invocation until finished
             while (curWidth > 2)
             {
-                curWidth /= 2;
+                //curWidth /= 2;
+                curWidth = DivideRoundUp(curWidth, 2);
                 curStride *= 2;
 
                 // swap textures
@@ -73,9 +82,14 @@ namespace TextureViewer.Models.Shader.Statistics
                 GL.Uniform1(1, curStride);
 
                 // dispatch
-                GL.DispatchCompute(Math.Max(1, curWidth / (LocalSize * 2)), models.Images.Height, 1);
+                var divVal = DivideRoundUp(curWidth, LocalSize * 2);
+                GL.DispatchCompute(DivideRoundUp(curWidth, LocalSize * 2), models.Images.Height, 1);
                 GL.MemoryBarrier(MemoryBarrierFlags.TextureFetchBarrierBit);
+
+                //test = texDst.GetRedFloatData(0);
             }
+
+            //test = texDst.GetRedFloatData(0);
 
             // do the scan in y direction
             var curHeight = models.Images.Height;
@@ -84,7 +98,7 @@ namespace TextureViewer.Models.Shader.Statistics
             // set direction
             GL.Uniform2(0, 0, 1);
 
-            while (curHeight >= 2)
+            while (curHeight > 1)
             {
                 // swap textures
                 Swap(ref texSrc, ref texDst);
@@ -94,10 +108,10 @@ namespace TextureViewer.Models.Shader.Statistics
                 // stride
                 GL.Uniform1(1, curStride);
 
-                GL.DispatchCompute(1, Math.Max(1, curHeight / (LocalSize * 2)), 1);
+                GL.DispatchCompute(1, DivideRoundUp(curHeight, LocalSize * 2), 1);
                 GL.MemoryBarrier(MemoryBarrierFlags.TextureFetchBarrierBit);
 
-                curHeight /= 2;
+                curHeight = DivideRoundUp(curHeight, 2);
                 curStride *= 2;
             }
 
