@@ -45,6 +45,11 @@ namespace TextureViewer.ViewModels
             models.GlContext.GlControl.DragDrop += GlControlOnDragDrop;
         }
 
+        public void Dispose()
+        {
+            models.Dispose();
+        }
+
         private void GlControlOnDragDrop(object sender, DragEventArgs args)
         {
             if (args.Data.GetDataPresent(DataFormats.FileDrop))

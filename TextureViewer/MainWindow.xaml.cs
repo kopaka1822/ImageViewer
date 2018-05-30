@@ -50,5 +50,12 @@ namespace TextureViewer
                 ViewModel.ImportImage(file);
             }
         }
+
+
+        protected override void OnClosed(EventArgs e)
+        {
+            ViewModel.Dispose();
+            base.OnClosed(e);
+        }
     }
 }
