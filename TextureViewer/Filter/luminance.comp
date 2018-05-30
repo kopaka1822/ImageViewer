@@ -1,0 +1,10 @@
+#setting title, Luminance values
+#setting description, Transforms the image into a grayscale image with luminance values. color = dot((r,g,b),(0.2126, 0.7152, 0.0722)). Alpha value remains unchanged.
+
+void main()
+{
+	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
+	vec4 color = texelFetch(src_image, pixelCoord, 0);
+	imageStore(dst_image, pixelCoord, vec4(vec3(dot(color.rgb, vec3(0.2126, 0.7152, 0.0722))), color.a));
+	
+}

@@ -51,6 +51,26 @@ namespace TextureViewer.ViewModels
             this.models = models;
             this.ApplyCommand = new ApplyFiltersCommand(this);
             this.CancelCommand = new CancelFiltersCommand(this);
+
+            // load default filter
+            var disableGl = models.GlContext.Enable();
+            try
+            {
+                var loader = new FilterLoader("Filter/gamma.comp");
+
+                AddFilter(new FilterModel(loader));
+
+                Apply();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            finally
+            {
+                if (disableGl)
+                    models.GlContext.Disable();
+            }
         }
 
         private List<FilterListBoxItem> availableFilter = new List<FilterListBoxItem>();

@@ -41,25 +41,7 @@ namespace TextureViewer
             Height = Properties.Settings.Default.WindowSizeY;
         }
 
-        /// <summary>
-        /// intializes the opengl frame (happens before the data context binding)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OpenGlHost_OnInitialized(object sender, EventArgs e)
-        {
-            /*try
-            {
-                // initialize data models
-                ViewModel = new WindowViewModel(parent, this);
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-                throw;
-            }*/
 
-        }
 
         public void ImportImages(string[] files)
         {

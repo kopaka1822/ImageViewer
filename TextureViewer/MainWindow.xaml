@@ -103,8 +103,7 @@
 
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="7*"/>
-                    <ColumnDefinition Width="263*"/>
+                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
@@ -112,11 +111,10 @@
                     x:Name="OpenGlHost"
                     Focusable="True"
                     AllowDrop="True"
-                    Initialized="OpenGlHost_OnInitialized" Grid.ColumnSpan="2"
                 />
 
                 <TabControl
-                    Grid.Column="2"
+                    Grid.Column="1"
                     HorizontalAlignment="Right"
                     Width="220"
                     Background="#eee"
