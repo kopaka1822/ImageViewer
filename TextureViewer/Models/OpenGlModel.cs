@@ -40,7 +40,7 @@ namespace TextureViewer.Models
 
         public OpenGlModel(OpenGlContext context, ImagesModel images)
         {
-            Debug.Assert(context.IsEnabled);
+            Debug.Assert(context.GlEnabled);
             Vao = new VertexArray();
             CheckersShader = new CheckersShader();
             samplerLinear = new Sampler(TextureMinFilter.Linear, TextureMagFilter.Linear);

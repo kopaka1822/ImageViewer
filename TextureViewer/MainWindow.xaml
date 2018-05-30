@@ -123,10 +123,11 @@
                     x:Name="TabControl"
                     >
                     <TabItem 
-                        Header="Images">
+                        Header="Images"
+                        >
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <Border Padding="5">
-                                <StackPanel>
+                                <StackPanel IsEnabled="{Binding Progress.NotProcessing}">
                                     <!--Image Label + Import Button-->
                                     <Grid  Margin="0 0 0 2">
                                         <Grid.ColumnDefinitions>
@@ -296,7 +297,7 @@
                     <TabItem Header="Filter">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <Border Padding="5">
-                                <StackPanel>
+                                <StackPanel IsEnabled="{Binding Progress.NotProcessing}">
                                     <!--Filter Label + Import Button-->
                                     <Grid  Margin="0 0 0 2">
                                         <Grid.ColumnDefinitions>

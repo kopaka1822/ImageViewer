@@ -111,7 +111,8 @@ namespace TextureViewer.Models
             }
         }
 
-        public bool IsEnabled { get; private set; } = false;
+        private bool glEnabled = false;
+        public bool GlEnabled => glEnabled;
 
         /// <summary>
         /// makes the window opengl context current
@@ -119,11 +120,11 @@ namespace TextureViewer.Models
         /// <returns>true if the context was not enabled before</returns>
         public bool Enable()
         {
-            var wasEnabled = IsEnabled;
+            var wasEnabled = GlEnabled;
             GlControl?.MakeCurrent();
             if (debugGl)
                 glhelper.Utility.EnableDebugCallback();
-            IsEnabled = true;
+            glEnabled = true;
 
             return !wasEnabled;
         }
@@ -146,7 +147,7 @@ namespace TextureViewer.Models
                 // happens sometimes..
             }
 
-            IsEnabled = false;
+            glEnabled = false;
         }
 
         /// <summary>

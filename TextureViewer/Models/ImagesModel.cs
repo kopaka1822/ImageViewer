@@ -140,7 +140,7 @@ namespace TextureViewer.Models
         /// <param name="glController"></param>
         public void AddImages(List<ImageLoader.Image> imgs)
         {
-            Debug.Assert(!context.IsEnabled);
+            Debug.Assert(!context.GlEnabled);
             context.Enable();
             foreach (var image in imgs)
             {
@@ -221,7 +221,7 @@ namespace TextureViewer.Models
             var isGrayscale = IsGrayscale;
             var isHdr = IsHdr;
 
-            Debug.Assert(!context.IsEnabled);
+            Debug.Assert(!context.GlEnabled);
             context.Enable();
             // delete old data
             images[imageId].Dispose();

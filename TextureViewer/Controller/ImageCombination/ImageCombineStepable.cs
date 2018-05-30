@@ -39,7 +39,7 @@ namespace TextureViewer.Controller.ImageCombination
         public void NextStep()
         {
             Debug.Assert(curStep == 0);
-            Debug.Assert(models.GlContext.IsEnabled);
+            Debug.Assert(models.GlContext.GlEnabled);
 
             // make the combine shader
             var shader = new ImageCombineShader(

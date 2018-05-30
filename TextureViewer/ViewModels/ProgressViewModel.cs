@@ -28,6 +28,7 @@ namespace TextureViewer.ViewModels
             {
                 case nameof(ProgressModel.IsProcessing):
                     OnPropertyChanged(nameof(EnableProgress));
+                    OnPropertyChanged(nameof(NotProcessing));
                     break;
                 case nameof(ProgressModel.Progress):
                     OnPropertyChanged(nameof(ProgressValue));
@@ -36,6 +37,7 @@ namespace TextureViewer.ViewModels
         }
 
         public Visibility EnableProgress => models.Progress.IsProcessing ? Visibility.Visible : Visibility.Collapsed;
+        public bool NotProcessing => !models.Progress.IsProcessing;
 
         public float ProgressValue
         {

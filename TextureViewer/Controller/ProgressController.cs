@@ -14,8 +14,9 @@ namespace TextureViewer.Controller
     public class ProgressController
     {
         private readonly Models.Models models;
-        private readonly Queue<IStepable> workList = new Queue<IStepable>();
         private readonly List<ImageCombineController> imageController;
+
+        private IStepable currentWork = null;
 
         public ProgressController(Models.Models models)
         {
@@ -27,26 +28,23 @@ namespace TextureViewer.Controller
             }
         }
 
-        void DispatchWork(IStepable work)
-        {
-            workList.Enqueue(work);
-        }
-
         /// <summary>
         /// true if DoWork should be called to perform some work
         /// </summary>
         /// <returns></returns>
         public bool HasWork()
         {
+            if (currentWork != null) return true;
+
             // check if the other controllers have something
             foreach (var ctrl in imageController)
             {
-                var work = ctrl.GetWork();
-                if(work != null)
-                    DispatchWork(work);
+                currentWork = ctrl.GetWork();
+                if (currentWork != null)
+                    return true;
             }
 
-            return workList.Count > 0;
+            return false;
         }
 
         /// <summary>
@@ -56,21 +54,19 @@ namespace TextureViewer.Controller
         {
             models.Progress.IsProcessing = true;
 
-            Debug.Assert(workList.Count != 0);
-
-            var e = workList.Peek();
+            Debug.Assert(currentWork != null);
 
             // advance the first stepable
-            if (e.HasStep())
+            if (currentWork.HasStep())
             {
-                e.NextStep();
+                currentWork.NextStep();
             }
 
-            if (!e.HasStep())
+            if (!currentWork.HasStep())
             {
                 // remove this element
-                workList.Dequeue();
-                if (workList.Count == 0)
+                currentWork = null;
+                if (!HasWork())
                 {
                     models.Progress.IsProcessing = false;
                 }
@@ -78,8 +74,8 @@ namespace TextureViewer.Controller
             else
             {
                 // report progress
-                models.Progress.What = e.GetDescription();
-                models.Progress.Progress = (float)e.CurrentStep() / e.GetNumSteps();
+                models.Progress.What = currentWork.GetDescription();
+                models.Progress.Progress = (float)currentWork.CurrentStep() / currentWork.GetNumSteps();
             }
         }
     }

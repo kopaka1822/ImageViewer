@@ -32,7 +32,7 @@ namespace TextureViewer.Models
         {
             if (textures.Count > 0) return textures.Pop();
 
-            Debug.Assert(glContext.IsEnabled);
+            Debug.Assert(glContext.GlEnabled);
             // make new texture with the current configuration
             return new TextureArray2D(images.NumLayers, images.NumMipmaps,
                 SizedInternalFormat.Rgba32f, images.GetWidth(0), images.GetHeight(0));
@@ -52,7 +52,7 @@ namespace TextureViewer.Models
         /// </summary>
         public void Clear()
         {
-            Debug.Assert(glContext.IsEnabled);
+            Debug.Assert(glContext.GlEnabled);
 
             foreach (var textureArray2D in textures)
             {

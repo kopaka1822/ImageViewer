@@ -61,6 +61,9 @@ namespace TextureViewer.Controller
 
         private void GlControlOnMouseWheel(object sender, MouseEventArgs mouseEventArgs)
         {
+            // dont interrupt when processing
+            if (models.Progress.IsProcessing) return;
+
             // convert to canonical coordinates
             currentView.OnScroll(
                 (float)mouseEventArgs.Delta, 
@@ -76,6 +79,9 @@ namespace TextureViewer.Controller
         private void GlControlOnMouseMove(object sender, MouseEventArgs args)
         {
             var newPosition = new Point(args.X, args.Y);
+
+            // dont interrupt when processing
+            if (models.Progress.IsProcessing) return;
 
             if (mouseDown)
             {
