@@ -27,12 +27,29 @@ namespace TextureViewer.ViewModels
             {
                 case nameof(ImagesModel.NumImages):
                     RefreshImageList();
+                    OnPropertyChanged(nameof(WindowTitle));
                     break;
             }
         }
 
         public ObservableCollection<ImageListBoxItem> ImageListItems { get; } = new ObservableCollection<ImageListBoxItem>();
         public ImageListBoxItem SelectedImageListItem { get; set; }
+
+        public string WindowTitle
+        {
+            get
+            {
+                if (this.models.Images.NumImages == 0) return "Texture Viewer";
+                var res = System.IO.Path.GetFileNameWithoutExtension(models.Images.GetFilename(0));
+
+                if (this.models.Images.NumImages > 1)
+                {
+                    res += $" ({models.Images.NumImages})";
+                }
+
+                return res;
+            }
+        }
 
         private void RefreshImageList()
         {

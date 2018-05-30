@@ -8,7 +8,7 @@
         xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
         xmlns:views="clr-namespace:TextureViewer.Views"
         mc:Ignorable="d"
-        Title="Texture Viewer" 
+        Title="{Binding Images.WindowTitle}" 
         Background="#eee"
         MinWidth="250" 
         MinHeight="200"
@@ -44,7 +44,8 @@
                 <Separator/>
                 <MenuItem 
                     Header="_Export"
-                    Command="{Binding ExportCommand}">
+                    Command="{Binding ExportCommand}"
+                    IsEnabled="{Binding Progress.NotProcessing}">
                     <MenuItem.Icon>
                         <Image Source="Icons/save.png"/>
                     </MenuItem.Icon>
@@ -99,23 +100,23 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            
+
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="7*"/>
+                    <ColumnDefinition Width="263*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                
+
                 <WindowsFormsHost
                     x:Name="OpenGlHost"
-                    DockPanel.Dock="Left"
                     Focusable="True"
                     AllowDrop="True"
-                    Initialized="OpenGlHost_OnInitialized"
+                    Initialized="OpenGlHost_OnInitialized" Grid.ColumnSpan="2"
                 />
 
                 <TabControl
-                    Grid.Column="1"
+                    Grid.Column="2"
                     HorizontalAlignment="Right"
                     Width="220"
                     Background="#eee"
@@ -165,7 +166,7 @@
                                         ItemsSource="{Binding Images.ImageListItems}"
                                         SelectedItem="{Binding Images.SelectedImageListItem}"/>
 
-                                        <Button
+                                    <Button
                                             Command="{Binding Equations.Apply}"
                                             Content="Apply"
                                             Width="80"
@@ -357,15 +358,15 @@
                                             Command="{Binding Filter.CancelCommand}"/>
                                     </StackPanel>
 
-                                   
+
                                     <Separator Height="2"/>
-                                    
+
                                     <ItemsControl ItemsSource="{Binding Filter.SelectedFilterProperties}"/>
                                 </StackPanel>
                             </Border>
                         </ScrollViewer>
                     </TabItem>
-                    
+
                     <TabItem Header="Statistics"
                              x:Name="StatisticsTabItem">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -529,8 +530,8 @@
                     </TabItem>
                 </TabControl>
             </Grid>
-        
-            
+
+
             <!--STATUS BAR-->
             <StatusBar 
                 Grid.Row="1" 
@@ -706,7 +707,7 @@
                             IsSynchronizedWithCurrentItem="True"/>
                     </Grid>
                 </StatusBarItem>
-                
+
                 <!--PROGRESS BAR-->
                 <StatusBarItem 
                     Width="Auto"
