@@ -144,6 +144,7 @@
     <Compile Include="Controller\ImageCombination\ImageCombineBuilder.cs" />
     <Compile Include="Controller\ImageCombination\ImageCombineShader.cs" />
     <Compile Include="Controller\ImageCombination\ImageCombineStepable.cs" />
+    <Compile Include="Controller\ImageCombination\StatisticsSaveStepable.cs" />
     <Compile Include="Controller\ImageCombineController.cs" />
     <Compile Include="Controller\PaintController.cs" />
     <Compile Include="Controller\ProgressController.cs" />

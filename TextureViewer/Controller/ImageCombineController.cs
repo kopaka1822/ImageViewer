@@ -101,7 +101,13 @@ namespace TextureViewer.Controller
             var steps = new List<IStepable> {new ImageCombineStepable(equation, finalImage, models, builder)};
             if (equation.UseFilter)
             {
-                steps.AddRange(models.Filter.Filter.Select(filterModel => filterModel.MakeStepable(models, builder)));
+                for (int i = 0; i < models.Filter.NumFilter; ++i)
+                {
+                    if(i == models.Filter.StatisticsPoint)
+                        steps.Add(new StatisticsSaveStepable(builder));
+
+                    steps.Add(models.Filter.Filter[i].MakeStepable(models, builder));
+                }
             }
             steps.Add(new FinalImageStepable(builder, finalImage));
 
