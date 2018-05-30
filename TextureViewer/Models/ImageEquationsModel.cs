@@ -22,14 +22,11 @@ namespace TextureViewer.Models
 
         public ImageEquationsModel(ImagesModel images)
         {
-            equations = new ImageEquationModel[2]
+            equations = new ImageEquationModel[App.MaxImageViews];
+            for (int i = 0; i < equations.Length; i++)
             {
-                new ImageEquationModel(true, 0, images),
-                new ImageEquationModel(false, 1, images)
-            };
-            foreach (var eq in equations)
-            {
-                eq.PropertyChanged += EquationOnPropertyChanged;
+                equations[i] = new ImageEquationModel(i == 0, i, images);
+                equations[i].PropertyChanged += EquationOnPropertyChanged;
             }
         }
 

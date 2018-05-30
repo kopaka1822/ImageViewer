@@ -18,6 +18,8 @@ namespace TextureViewer
         // change this if the assembly name was changed
         public static readonly string AppName = "TextureViewer";
 
+        public static readonly int MaxImageViews = 4;
+
         private readonly List<MainWindow> openWindows = new List<MainWindow>();
 
         protected override void OnStartup(StartupEventArgs e)

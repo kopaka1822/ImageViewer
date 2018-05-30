@@ -54,6 +54,8 @@ namespace TextureViewer.ViewModels
 
         public StatisticViewModel Equation1 => viewModels[0];
         public StatisticViewModel Equation2 => viewModels[1];
+        public StatisticViewModel Equation3 => viewModels[2];
+        public StatisticViewModel Equation4 => viewModels[3];
 
         private bool isVisible = false;
         public bool IsVisible

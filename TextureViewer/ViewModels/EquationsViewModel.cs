@@ -44,6 +44,8 @@ namespace TextureViewer.ViewModels
 
         public EquationViewModel Equation1 => viewModels[0];
         public EquationViewModel Equation2 => viewModels[1];
+        public EquationViewModel Equation3 => viewModels[2];
+        public EquationViewModel Equation4 => viewModels[3];
 
         public ICommand Apply { get; }
 

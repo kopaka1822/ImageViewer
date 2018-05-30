@@ -173,6 +173,16 @@
 
                                     <Separator Height="2"/>
 
+                                    <!--Split Mode-->
+                                    <TextBlock 
+                                        Text="Split Mode:" 
+                                        Margin="0 0 0 5"/>
+                                    <ComboBox 
+                                        Margin="0 0 0 5"
+                                        IsEnabled="{Binding Display.EnableSplitMode}"
+                                        SelectedItem="{Binding Display.SelectedSplitMode}"
+                                        ItemsSource="{Binding Display.AvailableSplitModes}"/>
+
                                     <!--Equation 1-->
                                     <GroupBox 
                                         Header="Equation 1" 
@@ -279,15 +289,111 @@
                                         </StackPanel>
                                     </GroupBox>
 
-                                    <!--Split Mode-->
-                                    <TextBlock 
-                                        Text="Split Mode:" 
-                                        Margin="0 0 0 5"/>
-                                    <ComboBox 
-                                        Margin="0 0 0 5"
-                                        IsEnabled="{Binding Display.EnableSplitMode}"
-                                        SelectedItem="{Binding Display.SelectedSplitMode}"
-                                        ItemsSource="{Binding Display.AvailableSplitModes}"/>
+                                    <!--Equation 3-->
+                                    <GroupBox 
+                                        Header="Equation 3" 
+                                        Margin="0 0 0 5">
+                                        <StackPanel>
+                                            <Grid Margin="0 5 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="70"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Visible: "/>
+                                                <CheckBox 
+                                                    Grid.Column="1"
+                                                    IsChecked="{Binding Equations.Equation3.IsVisible}"/>
+                                            </Grid>
+                                            <Grid Margin="0 0 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="70"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Use Filter: "/>
+                                                <CheckBox 
+                                                    Grid.Column="1"
+                                                    IsChecked="{Binding Equations.Equation3.UseFilter}"
+                                                    IsEnabled="{Binding Equations.Equation3.IsVisible}"/>
+                                            </Grid>
+                                            <Grid Margin="0 0 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="RGB: "/>
+                                                <views:CustomTextBox 
+                                                    Grid.Column="1"
+                                                    Text="{Binding Equations.Equation3.ColorFormula, UpdateSourceTrigger=PropertyChanged}"
+                                                    Margin="0 0 0 5"
+                                                    IsEnabled="{Binding Equations.Equation3.IsVisible}"/>
+                                            </Grid>
+                                            <Grid Margin="0 0 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Alpha: " Height="23" VerticalAlignment="Top"/>
+                                                <views:CustomTextBox 
+                                                    Grid.Column="1"
+                                                    Text="{Binding Equations.Equation3.AlphaFormula, UpdateSourceTrigger=PropertyChanged}"
+                                                    Margin="0 0 0 5"
+                                                    IsEnabled="{Binding Equations.Equation3.IsVisible}"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </GroupBox>
+
+                                    <!--Equation 4-->
+                                    <GroupBox 
+                                        Header="Equation 4" 
+                                        Margin="0 0 0 5">
+                                        <StackPanel>
+                                            <Grid Margin="0 5 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="70"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Visible: "/>
+                                                <CheckBox 
+                                                    Grid.Column="1"
+                                                    IsChecked="{Binding Equations.Equation4.IsVisible}"/>
+                                            </Grid>
+                                            <Grid Margin="0 0 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="70"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Use Filter: "/>
+                                                <CheckBox 
+                                                    Grid.Column="1"
+                                                    IsChecked="{Binding Equations.Equation4.UseFilter}"
+                                                    IsEnabled="{Binding Equations.Equation4.IsVisible}"/>
+                                            </Grid>
+                                            <Grid Margin="0 0 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="RGB: "/>
+                                                <views:CustomTextBox 
+                                                    Grid.Column="1"
+                                                    Text="{Binding Equations.Equation4.ColorFormula, UpdateSourceTrigger=PropertyChanged}"
+                                                    Margin="0 0 0 5"
+                                                    IsEnabled="{Binding Equations.Equation4.IsVisible}"/>
+                                            </Grid>
+                                            <Grid Margin="0 0 0 5">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="Alpha: " Height="23" VerticalAlignment="Top"/>
+                                                <views:CustomTextBox 
+                                                    Grid.Column="1"
+                                                    Text="{Binding Equations.Equation4.AlphaFormula, UpdateSourceTrigger=PropertyChanged}"
+                                                    Margin="0 0 0 5"
+                                                    IsEnabled="{Binding Equations.Equation4.IsVisible}"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </GroupBox>
                                 </StackPanel>
                             </Border>
                         </ScrollViewer>
@@ -522,6 +628,140 @@
                                                 Grid.Row="3"/>
                                         </Grid>
                                     </GroupBox>
+
+                                    <GroupBox
+                                        Header="Equation 3"
+                                        Margin="0 0 0 5"
+                                        Visibility="{Binding Statistics.Equation3.Visibility}">
+
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <!--  Average -->
+                                            <TextBlock 
+                                                Text="Average:"
+                                                Margin="0 0 5 0"
+                                                Grid.Column="0"
+                                                Grid.Row="0"/>
+                                            <views:StatisticTextBox 
+                                                Text="{Binding Statistics.Equation3.Average}"
+                                                Margin="0 0 0 5"
+                                                Grid.Column="1"
+                                                Grid.Row="0"/>
+
+                                            <!--  Root Average -->
+                                            <TextBlock 
+                                                Text="Root Avg:"
+                                                Margin="0 0 5 0"
+                                                Grid.Column="0"
+                                                Grid.Row="1"/>
+                                            <views:StatisticTextBox 
+                                                Text="{Binding Statistics.Equation3.RootAverage}"
+                                                Margin="0 0 0 5"
+                                                Grid.Column="1"
+                                                Grid.Row="1"/>
+
+                                            <!--  Min -->
+                                            <TextBlock 
+                                                Text="Min:"
+                                                Margin="0 0 5 0"
+                                                Grid.Column="0"
+                                                Grid.Row="2"/>
+                                            <views:StatisticTextBox 
+                                                Text="{Binding Statistics.Equation3.Min}"
+                                                Margin="0 0 0 5"
+                                                Grid.Column="1"
+                                                Grid.Row="2"/>
+
+                                            <!--  Max -->
+                                            <TextBlock 
+                                                Text="Max"
+                                                Margin="0 0 0 2"
+                                                Grid.Column="0"
+                                                Grid.Row="3"/>
+                                            <views:StatisticTextBox 
+                                                Text="{Binding Statistics.Equation3.Max}"
+                                                Margin="0 0 0 5"
+                                                Grid.Column="1"
+                                                Grid.Row="3"/>
+                                        </Grid>
+                                    </GroupBox>
+
+                                    <GroupBox
+                                        Header="Equation 4"
+                                        Margin="0 0 0 5"
+                                        Visibility="{Binding Statistics.Equation4.Visibility}">
+
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <!--  Average -->
+                                            <TextBlock 
+                                                Text="Average:"
+                                                Margin="0 0 5 0"
+                                                Grid.Column="0"
+                                                Grid.Row="0"/>
+                                            <views:StatisticTextBox 
+                                                Text="{Binding Statistics.Equation4.Average}"
+                                                Margin="0 0 0 5"
+                                                Grid.Column="1"
+                                                Grid.Row="0"/>
+
+                                            <!--  Root Average -->
+                                            <TextBlock 
+                                                Text="Root Avg:"
+                                                Margin="0 0 5 0"
+                                                Grid.Column="0"
+                                                Grid.Row="1"/>
+                                            <views:StatisticTextBox 
+                                                Text="{Binding Statistics.Equation4.RootAverage}"
+                                                Margin="0 0 0 5"
+                                                Grid.Column="1"
+                                                Grid.Row="1"/>
+
+                                            <!--  Min -->
+                                            <TextBlock 
+                                                Text="Min:"
+                                                Margin="0 0 5 0"
+                                                Grid.Column="0"
+                                                Grid.Row="2"/>
+                                            <views:StatisticTextBox 
+                                                Text="{Binding Statistics.Equation4.Min}"
+                                                Margin="0 0 0 5"
+                                                Grid.Column="1"
+                                                Grid.Row="2"/>
+
+                                            <!--  Max -->
+                                            <TextBlock 
+                                                Text="Max"
+                                                Margin="0 0 0 2"
+                                                Grid.Column="0"
+                                                Grid.Row="3"/>
+                                            <views:StatisticTextBox 
+                                                Text="{Binding Statistics.Equation4.Max}"
+                                                Margin="0 0 0 5"
+                                                Grid.Column="1"
+                                                Grid.Row="3"/>
+                                        </Grid>
+                                    </GroupBox>
                                 </StackPanel>
                             </Border>
                         </ScrollViewer>
@@ -599,6 +839,54 @@
                             Margin="0 0 5 0"/>
                         <TextBlock  
                             Text="{Binding Equations.Equation2.TexelColor}" 
+                            Grid.Column="1"
+                            FontFamily="Consolas"
+                            Margin="0 0 5 0"/>
+                    </Grid>
+                </StatusBarItem>
+
+                <!-- MOUSE POSITION COLOR 3 -->
+                <StatusBarItem 
+                    HorizontalAlignment="Left" 
+                    BorderBrush="DarkGray" 
+                    BorderThickness="0 0 1 0"
+                    Visibility="{Binding Equations.Equation3.Visibility}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image 
+                            Source="Icons/eyedropper.png" 
+                            Width="16" 
+                            Height="16" 
+                            Margin="0 0 5 0"/>
+                        <TextBlock  
+                            Text="{Binding Equations.Equation3.TexelColor}" 
+                            Grid.Column="1"
+                            FontFamily="Consolas"
+                            Margin="0 0 5 0"/>
+                    </Grid>
+                </StatusBarItem>
+
+                <!-- MOUSE POSITION COLOR 4 -->
+                <StatusBarItem 
+                    HorizontalAlignment="Left" 
+                    BorderBrush="DarkGray" 
+                    BorderThickness="0 0 1 0"
+                    Visibility="{Binding Equations.Equation4.Visibility}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image 
+                            Source="Icons/eyedropper.png" 
+                            Width="16" 
+                            Height="16" 
+                            Margin="0 0 5 0"/>
+                        <TextBlock  
+                            Text="{Binding Equations.Equation4.TexelColor}" 
                             Grid.Column="1"
                             FontFamily="Consolas"
                             Margin="0 0 5 0"/>

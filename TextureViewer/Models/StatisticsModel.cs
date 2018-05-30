@@ -34,11 +34,11 @@ namespace TextureViewer.Models
 
         public StatisticsModel()
         {
-            statistics = new[]
+            statistics = new StatisticModel[App.MaxImageViews];
+            for (var i = 0; i < statistics.Length; i++)
             {
-                StatisticModel.ZERO,
-                StatisticModel.ZERO
-            };
+                statistics[i] = StatisticModel.ZERO;
+            }
         }
 
         public void UpdateModel(StatisticModel model, int index)

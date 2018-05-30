@@ -185,7 +185,7 @@ namespace TextureViewer.ViewModels
         public bool EnableMipMaps => AvailableMipMaps.Count > 1;
         public Visibility EnableLayers => AvailableLayers.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
         public Visibility EnableViewModes => AvailableViewModes.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
-        public bool EnableSplitMode => models.Equations.GetVisibles().Count > 1;
+        public bool EnableSplitMode => models.Equations.GetVisibles().Count == 2;
 
         // layers are fixed for cube maps
         public bool ChooseLayers => models.Display.ActiveView == DisplayModel.ViewMode.Single ||

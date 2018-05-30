@@ -15,11 +15,11 @@ namespace TextureViewer.Models
 
         public FinalImagesModel(TextureCacheModel cache, ImagesModel images)
         {
-            this.images = new FinalImageModel[2]
+            this.images = new FinalImageModel[App.MaxImageViews];
+            for (var i = 0; i < this.images.Length; i++)
             {
-                new FinalImageModel(cache, images),
-                new FinalImageModel(cache, images)
-            };
+                this.images[i] = new FinalImageModel(cache, images);
+            }
         }
 
         public FinalImageModel Get(int id)
