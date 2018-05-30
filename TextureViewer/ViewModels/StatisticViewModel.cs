@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Media3D;
 using TextureViewer.Annotations;
 using TextureViewer.Models;
 
@@ -77,6 +78,7 @@ namespace TextureViewer.ViewModels
                 case nameof(StatisticsModel.Channel):
                 case nameof(StatisticsModel.ColorSpace):
                     OnPropertyChanged(nameof(Average));
+                    OnPropertyChanged(nameof(RootAverage));
                     OnPropertyChanged(nameof(Max));
                     OnPropertyChanged(nameof(Min));
                     break;
@@ -88,6 +90,7 @@ namespace TextureViewer.ViewModels
             if (e.Index == index)
             {
                 OnPropertyChanged(nameof(Average));
+                OnPropertyChanged(nameof(RootAverage));
                 OnPropertyChanged(nameof(Max));
                 OnPropertyChanged(nameof(Min));
             }
@@ -98,6 +101,12 @@ namespace TextureViewer.ViewModels
         public string Average
         {
             get => models.Statistics.Get(index).Avg.Get(models.Statistics.ColorSpace).Get(models.Statistics.Channel).ToString(App.GetCulture());
+            set { }
+        }
+
+        public string RootAverage
+        {
+            get => Math.Sqrt(models.Statistics.Get(index).Avg.Get(models.Statistics.ColorSpace).Get(models.Statistics.Channel)).ToString(App.GetCulture());
             set { }
         }
 

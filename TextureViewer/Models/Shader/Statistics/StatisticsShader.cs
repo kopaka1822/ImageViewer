@@ -63,9 +63,6 @@ namespace TextureViewer.Models.Shader.Statistics
             var texSrc = models.GlData.TextureCache.GetTexture();
             GL.MemoryBarrier(MemoryBarrierFlags.TextureFetchBarrierBit);
 
-            var test = texDst.GetRedFloatData(0);
-
-
             // do invocation until finished
             while (curWidth > 2)
             {
@@ -82,14 +79,9 @@ namespace TextureViewer.Models.Shader.Statistics
                 GL.Uniform1(1, curStride);
 
                 // dispatch
-                var divVal = DivideRoundUp(curWidth, LocalSize * 2);
                 GL.DispatchCompute(DivideRoundUp(curWidth, LocalSize * 2), models.Images.Height, 1);
                 GL.MemoryBarrier(MemoryBarrierFlags.TextureFetchBarrierBit);
-
-                //test = texDst.GetRedFloatData(0);
             }
-
-            //test = texDst.GetRedFloatData(0);
 
             // do the scan in y direction
             var curHeight = models.Images.Height;

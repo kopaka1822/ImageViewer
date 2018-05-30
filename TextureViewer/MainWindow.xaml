@@ -394,26 +394,66 @@
                                         Margin="0 0 0 5"
                                         Visibility="{Binding Statistics.Equation1.Visibility}">
 
-                                        <StackPanel>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+
+                                            <!--  Average -->
                                             <TextBlock 
-                                                Text="Average"
-                                                Margin="0 0 0 2"/>
+                                                Text="Average:"
+                                                Margin="0 0 5 0"
+                                                Grid.Column="0"
+                                                Grid.Row="0"/>
                                             <TextBox 
                                                 Text="{Binding Statistics.Equation1.Average}"
-                                                Margin="0 0 0 5"/>
+                                                Margin="0 0 0 5"
+                                                Grid.Column="1"
+                                                Grid.Row="0"/>
+
+                                            <!--  Root Average -->
                                             <TextBlock 
-                                                Text="Min"
-                                                Margin="0 0 0 2"/>
+                                                Text="Root Avg:"
+                                                Margin="0 0 5 0"
+                                                Grid.Column="0"
+                                                Grid.Row="1"/>
+                                            <TextBox 
+                                                Text="{Binding Statistics.Equation1.RootAverage}"
+                                                Margin="0 0 0 5"
+                                                Grid.Column="1"
+                                                Grid.Row="1"/>
+
+                                            <!--  Min -->
+                                            <TextBlock 
+                                                Text="Min:"
+                                                Margin="0 0 5 0"
+                                                Grid.Column="0"
+                                                Grid.Row="2"/>
                                             <TextBox 
                                                 Text="{Binding Statistics.Equation1.Min}"
-                                                Margin="0 0 0 5"/>
+                                                Margin="0 0 0 5"
+                                                Grid.Column="1"
+                                                Grid.Row="2"/>
+
+                                            <!--  Max -->
                                             <TextBlock 
                                                 Text="Max"
-                                                Margin="0 0 0 2"/>
+                                                Margin="0 0 0 2"
+                                                Grid.Column="0"
+                                                Grid.Row="3"/>
                                             <TextBox 
                                                 Text="{Binding Statistics.Equation1.Max}"
-                                                Margin="0 0 0 5"/>
-                                        </StackPanel>
+                                                Margin="0 0 0 5"
+                                                Grid.Column="1"
+                                                Grid.Row="3"/>
+                                        </Grid>
                                     </GroupBox>
 
                                     <GroupBox
