@@ -18,6 +18,8 @@ namespace TextureViewer.Models.Shader.Statistics
         public RgbLuminanceStatistics(bool useSrgb)
         {
             this.useSrgb = useSrgb;
+
+            init();
         }
 
         protected override string GetFunctions()
@@ -29,6 +31,7 @@ namespace TextureViewer.Models.Shader.Statistics
                             else if( a[i] < 0.0031308 ) a[i] = 12.92 * a[i];
                             else a[i] = 1.055 * pow( a[i], 0.41666) - 0.055;
                         }
+                        return a;
                     }";
         }
 

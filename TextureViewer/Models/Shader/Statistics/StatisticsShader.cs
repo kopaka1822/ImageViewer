@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,14 +13,17 @@ namespace TextureViewer.Models.Shader.Statistics
 {
     public abstract class StatisticsShader
     {
-        private readonly Program program;
+        private Program program;
 
         public static readonly int LocalSize = 32;
 
         protected StatisticsShader()
+        {}
+
+        protected void init()
         {
             var shader = new glhelper.Shader(ShaderType.ComputeShader, GetComputeSource()).Compile();
-            program = new Program(new List<glhelper.Shader>{shader}, true);
+            program = new Program(new List<glhelper.Shader> { shader }, true);
         }
 
         public void Dispose()
@@ -54,8 +58,6 @@ namespace TextureViewer.Models.Shader.Statistics
             var texSrc = models.GlData.TextureCache.GetTexture();
             GL.MemoryBarrier(MemoryBarrierFlags.TextureFetchBarrierBit);
 
-            var test = texDst.GetRedFloatData(0);
-
             // do invocation until finished
             while (curWidth > 2)
             {
@@ -70,14 +72,9 @@ namespace TextureViewer.Models.Shader.Statistics
                 // stride
                 GL.Uniform1(1, curStride);
 
-                test = texDst.GetRedFloatData(0);
-
                 // dispatch
                 GL.DispatchCompute(Math.Max(1, curWidth / (LocalSize * 2)), models.Images.Height, 1);
                 GL.MemoryBarrier(MemoryBarrierFlags.TextureFetchBarrierBit);
-
-                test = texDst.GetRedFloatData(0);
-                test = texSrc.GetRedFloatData(0);
             }
 
             // do the scan in y direction
@@ -102,13 +99,10 @@ namespace TextureViewer.Models.Shader.Statistics
 
                 curHeight /= 2;
                 curStride *= 2;
-
-                test = texDst.GetRedFloatData(0);
             }
 
             GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
             // the result is in pixel 0 0
-            test = texDst.GetRedFloatData(0);
 
             texDst.BindAsTexture2D(models.GlData.GetPixelShader.GetTextureLocation(), 0, 0);
             // y coordinates for the texture fetch are reverted
@@ -136,8 +130,9 @@ namespace TextureViewer.Models.Shader.Statistics
                    @"layout(binding = 0) uniform sampler2D src_image;
                    layout(binding = 1) uniform writeonly image2D dst_image;
                    layout(location = 0) uniform ivec2 direction;
-                   layout(location = 1) uniform int stride;
-                   vec4 combine(vec4 a, vec4 b) {" + 
+                   layout(location = 1) uniform int stride;" +
+                   GetFunctions() +
+                   "\nvec4 combine(vec4 a, vec4 b) {" + 
                    GetCombineFunction() + 
                    "}\n" +
                    "vec4 combineSingle(vec4 a) {\n" +
