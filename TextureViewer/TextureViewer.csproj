@@ -246,6 +246,7 @@
     <Compile Include="Views\PixelDisplayDialog.xaml.cs">
       <DependentUpon>PixelDisplayDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\StatisticsListBoxItem.cs" />
     <Compile Include="Views\StatisticTextBox.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -18,6 +18,8 @@ namespace TextureViewer.Models.Filter
         public IReadOnlyList<FilterModel> Filter => filter;
         public int NumFilter => filter.Count;
 
+        public int StatisticsPoint { get; private set; } = 0;
+
         /// <summary>
         /// this will be triggered if the model changes due to:
         /// - Apply()
@@ -34,10 +36,12 @@ namespace TextureViewer.Models.Filter
             return filter.Any(f => ReferenceEquals(f, model));
         }
 
-        public void Apply(List<FilterModel> models, OpenGlContext context)
+        public void Apply(List<FilterModel> models, int statisticsPoint, OpenGlContext context)
         {
             DisposeUnusedFilter(models, filter, context);
             filter = models;
+            Debug.Assert(statisticsPoint >= 0 && statisticsPoint <= filter.Count);
+            StatisticsPoint = statisticsPoint;
             OnChanged();
         }
 

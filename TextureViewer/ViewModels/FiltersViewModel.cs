@@ -45,12 +45,19 @@ namespace TextureViewer.ViewModels
         }
 
         private List<FilterItem> items = new List<FilterItem>();
+        private int statisticsPoint = 0;
+        private readonly ObservableCollection<object> statisticsInfo = new ObservableCollection<object>();
 
         public FiltersViewModel(Models.Models models)
         {
             this.models = models;
             this.ApplyCommand = new ApplyFiltersCommand(this);
             this.CancelCommand = new CancelFiltersCommand(this);
+            this.statisticsInfo.Add(new TextBlock
+            {
+                Text = StatisticsListBoxItem.Text,
+                TextWrapping = TextWrapping.Wrap
+            });
 
             // load default filter
             var disableGl = models.GlContext.Enable();
@@ -73,8 +80,8 @@ namespace TextureViewer.ViewModels
             }
         }
 
-        private List<FilterListBoxItem> availableFilter = new List<FilterListBoxItem>();
-        public List<FilterListBoxItem> AvailableFilter
+        private List<ListBoxItem> availableFilter = new List<ListBoxItem>();
+        public List<ListBoxItem> AvailableFilter
         {
             get => availableFilter;
             set
@@ -86,17 +93,19 @@ namespace TextureViewer.ViewModels
 
         private void UpdateAvailableFilter()
         {
-            var res = new List<FilterListBoxItem>();
+            var res = new List<ListBoxItem>();
             foreach (var filterItem in items)
             {
                 res.Add(filterItem.ListView);
             }
 
+            res.Insert(statisticsPoint, new StatisticsListBoxItem());
+
             AvailableFilter = res;
         }
 
-        private FilterListBoxItem selectedFilter = null;
-        public FilterListBoxItem SelectedFilter
+        private ListBoxItem selectedFilter = null;
+        public ListBoxItem SelectedFilter
         {
             get => selectedFilter;
             set
@@ -121,7 +130,7 @@ namespace TextureViewer.ViewModels
                         return filterItem.Parameters.View;
                 }
 
-                return null;
+                return statisticsInfo;
             }
         }
 
@@ -181,7 +190,7 @@ namespace TextureViewer.ViewModels
                 newModels.Add(filterItem.Model);
             }
 
-            models.Filter.Apply(newModels, models.GlContext);
+            models.Filter.Apply(newModels, statisticsPoint, models.GlContext);
 
             UpdateHasChanges();
         }
@@ -223,6 +232,7 @@ namespace TextureViewer.ViewModels
             }
 
             items = newItems;
+            statisticsPoint = models.Filter.StatisticsPoint;
 
             UpdateAvailableFilter();
             UpdateHasChanges();
@@ -243,6 +253,8 @@ namespace TextureViewer.ViewModels
         private bool CalculateHasChanges()
         {
             if (models.Filter.NumFilter != items.Count) return true;
+
+            if (statisticsPoint != models.Filter.StatisticsPoint) return true;
 
             // same amount of filter. do they match?
             for (int i = 0; i < items.Count; i++)
@@ -267,10 +279,15 @@ namespace TextureViewer.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        private static bool IsValidDropItem(object o)
+        {
+            return o is FilterListBoxItem || o is StatisticsListBoxItem;
+        }
+
         public void DragOver(IDropInfo dropInfo)
         {
             // enable drop if both items are filter list box items
-            if (dropInfo.Data is FilterListBoxItem && dropInfo.TargetItem is FilterListBoxItem)
+            if (IsValidDropItem(dropInfo.Data) && IsValidDropItem(dropInfo.TargetItem))
             {
                 dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
                 dropInfo.Effects = DragDropEffects.Move;
@@ -279,19 +296,23 @@ namespace TextureViewer.ViewModels
 
         public void Drop(IDropInfo dropInfo)
         {
-            var source = dropInfo.Data as FilterListBoxItem;
-            var dest = dropInfo.TargetItem as FilterListBoxItem;
-
-            // swap both items
-            var idx1 = AvailableFilter.FindIndex(i => ReferenceEquals(i, source));
-            var idx2 = AvailableFilter.FindIndex(i => ReferenceEquals(i, dest));
+            var idx1 = AvailableFilter.FindIndex(i => ReferenceEquals(i, dropInfo.Data));
+            var idx2 = AvailableFilter.FindIndex(i => ReferenceEquals(i, dropInfo.TargetItem));
             if (idx1 < 0 || idx2 < 0) return;
 
+            // insert dummy statistics into list
+            items.Insert(statisticsPoint, null);
+
+            // swap both items
             {
                 var tmp = items[idx1];
                 items[idx1] = items[idx2];
                 items[idx2] = tmp;
             }
+
+            // remove dummy
+            statisticsPoint = items.FindIndex(item => item == null);
+            items.Remove(null);
 
             UpdateAvailableFilter();
             UpdateHasChanges();

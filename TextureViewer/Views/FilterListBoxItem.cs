@@ -27,9 +27,10 @@ namespace TextureViewer.Views
 
             var imgArrow = new Image
             {
-                Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/list_move.png", UriKind.Absolute))
+                Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/list_move.png",
+                    UriKind.Absolute)),
+                Margin = new Thickness(0.0, 0.0, 5.0, 0.0)
             };
-            imgArrow.Margin = new Thickness(0.0, 0.0, 5.0, 0.0);
 
             var btnDelete = new Button
             {
@@ -40,7 +41,7 @@ namespace TextureViewer.Views
 
             var text = new TextBlock { Text = filter.Name };
 
-            // grid with name, remove, up/down
+            // grid with arrow, name, remove
             var grid = new Grid();
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Auto) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Star) });
