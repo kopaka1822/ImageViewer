@@ -234,6 +234,20 @@ namespace TextureViewer.glhelper
             return buffer;
         }
 
+        public float[] GetRedFloatData(int mipmap)
+        {
+            // retrieve width and height of the mipmap
+            int width, height;
+            GL.BindTexture(TextureTarget.Texture2DArray, id);
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureWidth, out width);
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureHeight, out height);
+
+            float[] buffer = new float[width * height * nLayer];
+            Utility.ReadTexture(TextureTarget.Texture2DArray, id, mipmap, PixelFormat.Red, PixelType.Float, ref buffer);
+
+            return buffer;
+        }
+
         /// <summary>
         /// reads data from gpu
         /// </summary>

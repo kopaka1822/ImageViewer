@@ -54,6 +54,8 @@ namespace TextureViewer.Models.Shader.Statistics
             var texSrc = models.GlData.TextureCache.GetTexture();
             GL.MemoryBarrier(MemoryBarrierFlags.TextureFetchBarrierBit);
 
+            var test = texDst.GetRedFloatData(0);
+
             // do invocation until finished
             while (curWidth > 2)
             {
@@ -68,9 +70,14 @@ namespace TextureViewer.Models.Shader.Statistics
                 // stride
                 GL.Uniform1(1, curStride);
 
+                test = texDst.GetRedFloatData(0);
+
                 // dispatch
                 GL.DispatchCompute(Math.Max(1, curWidth / (LocalSize * 2)), models.Images.Height, 1);
                 GL.MemoryBarrier(MemoryBarrierFlags.TextureFetchBarrierBit);
+
+                test = texDst.GetRedFloatData(0);
+                test = texSrc.GetRedFloatData(0);
             }
 
             // do the scan in y direction
@@ -95,13 +102,17 @@ namespace TextureViewer.Models.Shader.Statistics
 
                 curHeight /= 2;
                 curStride *= 2;
+
+                test = texDst.GetRedFloatData(0);
             }
 
             GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
             // the result is in pixel 0 0
+            test = texDst.GetRedFloatData(0);
 
             texDst.BindAsTexture2D(models.GlData.GetPixelShader.GetTextureLocation(), 0, 0);
-            var res = models.GlData.GetPixelShader.GetPixelColor(0, 0, 0);
+            // y coordinates for the texture fetch are reverted
+            var res = models.GlData.GetPixelShader.GetPixelColor(0, models.Images.Height - 1, 0);
 
             // cleanup
             models.GlData.TextureCache.StoreTexture(texSrc);
@@ -121,6 +132,7 @@ namespace TextureViewer.Models.Shader.Statistics
         {
             return OpenGlContext.ShaderVersion + "\n" +
                    $"layout(local_size_x = {LocalSize}) in;\n" +
+                   $"const int LOCAL_SIZE = {LocalSize};\n" +
                    @"layout(binding = 0) uniform sampler2D src_image;
                    layout(binding = 1) uniform writeonly image2D dst_image;
                    layout(location = 0) uniform ivec2 direction;
@@ -135,10 +147,15 @@ namespace TextureViewer.Models.Shader.Statistics
                     int idot(ivec2 a, ivec2 b) { return a.x * b.x + a.y * b.y; }
 
                     void main() {
-                        ivec2 pixel = ivec2(gl_GlobalInvocationID);
-                        ivec2 y = idot(pixel, ivec2(1) - direction) * (ivec2(1) - direction);
+                        const ivec2 invDir = ivec2(1) - direction;
+
+                        ivec2 pixelX = (idot(ivec2(gl_WorkGroupID), direction) * LOCAL_SIZE + int(gl_LocalInvocationID)) * direction;
+                        ivec2 pixelY = idot(ivec2(gl_WorkGroupID), invDir) * invDir;
+                        ivec2 pixel = pixelX + pixelY;
+
+                        ivec2 y = idot(pixel, invDir) * invDir;
                         ivec2 x = idot(pixel, direction) * stride * direction;
-                        ivec2 x2 = x + direction * (stride - 1);
+                        ivec2 x2 = x + direction * (stride / 2);
                         
                         ivec2 pos1 = x + y;
                         ivec2 pos2 = x2 + y;
@@ -153,7 +170,9 @@ namespace TextureViewer.Models.Shader.Statistics
                             return;
                         }
                         vec4 color = combine( texelFetch(src_image, pos1, 0), texelFetch(src_image, pos2, 0) );
+                        //imageStore(dst_image, pos1, vec4(float(pos2.x)));
                         imageStore(dst_image, pos1, color);
+
                     }";
         }
 
