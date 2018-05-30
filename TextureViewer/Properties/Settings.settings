@@ -6,7 +6,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="TonemapperPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">Filter</Value>
     </Setting>
     <Setting Name="ExportPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
