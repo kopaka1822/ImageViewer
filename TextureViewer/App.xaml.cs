@@ -19,12 +19,15 @@ namespace TextureViewer
         public static readonly string AppName = "TextureViewer";
 
         public static readonly int MaxImageViews = 4;
+        public string ExecutionPath { get; private set; }
 
         private readonly List<MainWindow> openWindows = new List<MainWindow>();
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            ExecutionPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
             if (e.Args.Length == 0)
             {
