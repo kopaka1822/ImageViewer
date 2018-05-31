@@ -13,6 +13,7 @@
         MinWidth="250" 
         MinHeight="200"
         Icon="Icons/app.png"
+        x:Name="Window"
         >
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="SizeChanged">
@@ -103,8 +104,9 @@
 
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" MaxWidth="{Binding ElementName=Window, Path=Width}"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="200" MaxWidth="{Binding ElementName=Window, Path=Width}"/>
                 </Grid.ColumnDefinitions>
 
                 <WindowsFormsHost
@@ -113,13 +115,20 @@
                     AllowDrop="True"
                 />
 
-                <TabControl
+                <GridSplitter 
                     Grid.Column="1"
-                    HorizontalAlignment="Right"
-                    Width="220"
+                    Width="5"
+                    HorizontalAlignment="Stretch"
+                    Background="#e2e2e2"/>
+
+                <TabControl
+                    Grid.Column="2"
+                    DockPanel.Dock="Left"
+                    HorizontalAlignment="Stretch"
                     Background="#eee"
-                    BorderThickness="1 0 0 0"
+                    BorderThickness="0 0 0 0"
                     x:Name="TabControl"
+                    
                     >
                     <TabItem 
                         Header="Images"
@@ -767,6 +776,7 @@
                         </ScrollViewer>
                     </TabItem>
                 </TabControl>
+
             </Grid>
 
 
