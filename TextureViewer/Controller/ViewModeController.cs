@@ -203,26 +203,27 @@ namespace TextureViewer.Controller
                 var scissorsPos = new Point(mousePosition.X, mousePosition.Y);
                 scissorsPos.X = Math.Min(clientX - 1, Math.Max(0, scissorsPos.X));
                 scissorsPos.Y = Math.Min(clientY - 1, Math.Max(0, scissorsPos.Y));
+                // opengl coordinates start up down
                 scissorsPos.Y = clientY - scissorsPos.Y - 1;
 
                 // draw first in upper left, second uper right, third lower (left, fourth lower right)
 
                 // first (upper left)
-                GL.Scissor(0, 0, scissorsPos.X, scissorsPos.Y);
+                GL.Scissor(0, scissorsPos.Y, scissorsPos.X, clientY);
                 currentView.Draw(models.FinalImages.Get(visible[0]).Texture);
 
                 // second (upper right)
-                GL.Scissor(scissorsPos.X, 0, clientX, scissorsPos.Y);
+                GL.Scissor(scissorsPos.X, scissorsPos.Y, clientX, clientY);
                 currentView.Draw(models.FinalImages.Get(visible[1]).Texture);
 
                 // draw third texture (entire bottom if only 3 are visible, lower left if 4 are visible)
-                GL.Scissor(0, scissorsPos.Y, visible.Count == 3 ? clientX : scissorsPos.X, clientY);
+                GL.Scissor(0, 0, visible.Count == 3 ? clientX : scissorsPos.X, scissorsPos.Y);
                 currentView.Draw(models.FinalImages.Get(visible[2]).Texture);
 
                 if (visible.Count == 4)
                 {
                     // draw fourth texture (lower right)
-                    GL.Scissor(scissorsPos.X, scissorsPos.Y, clientX, clientY);
+                    GL.Scissor(scissorsPos.X, 0, clientX, scissorsPos.Y);
                     currentView.Draw(models.FinalImages.Get(visible[3]).Texture);
                 }
 
