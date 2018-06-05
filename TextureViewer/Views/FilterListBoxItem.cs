@@ -36,23 +36,24 @@ namespace TextureViewer.Views
             {
                 Height = 16,
                 Width = 16,
-                Content = imgDelete
+                Content = imgDelete,
+                Margin = new Thickness(0.0, 0.0, 5.0, 0.0)
             };
 
             var text = new TextBlock { Text = filter.Name };
 
-            // grid with arrow, name, remove
+            // grid with remove, arrow, name
             var grid = new Grid();
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Auto) });
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Star) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Auto) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Star) });
 
-            Grid.SetColumn(imgArrow, 0);
-            grid.Children.Add(imgArrow);
-            Grid.SetColumn(text, 1);
-            grid.Children.Add(text);
-            Grid.SetColumn(btnDelete, 2);
+            Grid.SetColumn(btnDelete, 0);
             grid.Children.Add(btnDelete);
+            Grid.SetColumn(imgArrow, 1);
+            grid.Children.Add(imgArrow);
+            Grid.SetColumn(text, 2);
+            grid.Children.Add(text);
 
             // add callbacks
             Content = grid;

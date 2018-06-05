@@ -27,7 +27,8 @@ namespace TextureViewer.Views
             {
                 Height = 16,
                 Width = 16,
-                Content = imgDelete
+                Content = imgDelete,
+                Margin = new Thickness(0.0, 0.0, 5.0, 0.0)
             };
 
             var text = new TextBlock
@@ -36,13 +37,13 @@ namespace TextureViewer.Views
             };
 
             var grid = new Grid();
-            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Star) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Auto) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.0, GridUnitType.Star) });
 
-            Grid.SetColumn(text, 0);
-            grid.Children.Add(text);
-            Grid.SetColumn(btnDelete, 1);
+            Grid.SetColumn(btnDelete, 0);
             grid.Children.Add(btnDelete);
+            Grid.SetColumn(text, 1);
+            grid.Children.Add(text);
 
             btnDelete.Click += (sender, args) => imagesModel.DeleteImage(Id);
 
