@@ -408,8 +408,13 @@
                         </ScrollViewer>
                     </TabItem>
 
-                    <TabItem Header="Filter">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <TabItem 
+                        Header="Filter"
+                        Foreground="{Binding Filter.TabItemColor}"
+                         >
+                        <ScrollViewer 
+                            VerticalScrollBarVisibility="Auto"
+                            Foreground="Black">
                             <Border Padding="5">
                                 <StackPanel IsEnabled="{Binding Progress.NotProcessing}">
                                     <!--Filter Label + Import Button-->

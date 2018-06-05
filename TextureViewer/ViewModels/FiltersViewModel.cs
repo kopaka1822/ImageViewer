@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using GongSolutions.Wpf.DragDrop;
 using TextureViewer.Annotations;
 using TextureViewer.Commands;
@@ -143,8 +144,11 @@ namespace TextureViewer.ViewModels
                 if (value == hasChanges) return;
                 hasChanges = value;
                 OnPropertyChanged(nameof(HasChanges));
+                OnPropertyChanged(nameof(TabItemColor));
             }
         }
+
+        public Brush TabItemColor => HasChanges ? new SolidColorBrush(Color.FromRgb(237, 28, 36)) : new SolidColorBrush(Color.FromRgb(0, 0, 0));
 
         public void AddFilter(FilterModel filter)
         {
