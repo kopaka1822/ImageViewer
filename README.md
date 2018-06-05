@@ -114,6 +114,12 @@ The following function from GLSL can be used as well:
 * length(value)*
 * min(value1, value2)
 * max(value1, value2)
+* pow(value1, value2)
+* atan(value1, value2)
+* mod(value1, value2)
+* step(value1, value2)
+* cross(value1, value2)*
+* dot(value1, value2)*
 
 Additionaly you can use:
 * red(value)
@@ -121,9 +127,7 @@ Additionaly you can use:
 * blue(value)
 * alpha(value)
 
-normalize: normalizes rgb and sets alpha to 1.0
-
-lenght: takes the length of the rgb vector and puts it into all 4 components
+functions marked with * will only use the rgb components for computation and ignore alpha.
 
 to extract a single color channel as value.
 
