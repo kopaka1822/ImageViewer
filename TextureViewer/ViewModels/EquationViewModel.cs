@@ -173,11 +173,15 @@ namespace TextureViewer.ViewModels
                     models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.SrgbDecimal)
                     c = c.ToSrgb();
 
+                string res;
+
                 if (models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.SrgbDecimal ||
                     models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.LinearDecimal)
-                    return c.ToDecimalString(models.Display.TexelDisplayAlpha, models.Display.TexelDecimalPlaces);
+                    res = c.ToDecimalString(models.Display.TexelDisplayAlpha, models.Display.TexelDecimalPlaces);
+                else
+                    res = c.ToBitString(models.Display.TexelDisplayAlpha);
 
-                return c.ToBitString(models.Display.TexelDisplayAlpha);
+                return $"E{imageId + 1}: " + res;
             }
         }
 
