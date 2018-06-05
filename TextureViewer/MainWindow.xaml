@@ -103,8 +103,9 @@
             </Grid.RowDefinitions>
 
             <Grid>
+
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" MaxWidth="{Binding ElementName=Window, Path=Width}"/>
+                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="5"/>
                     <ColumnDefinition Width="200" MaxWidth="{Binding ElementName=Window, Path=Width}"/>
                 </Grid.ColumnDefinitions>
