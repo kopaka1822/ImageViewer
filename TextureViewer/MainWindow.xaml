@@ -97,7 +97,10 @@
             <MenuItem Header="Help">
                 <MenuItem 
                     Header="About"
-                    Command="{Binding HelpAboutCommand}"/>    
+                    Command="{Binding HelpAboutCommand}"/>
+                <MenuItem
+                    Header="Equation"
+                    Command="{Binding HelpEquationCommand}"/>
             </MenuItem>
         </Menu>
 

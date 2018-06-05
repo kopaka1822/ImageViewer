@@ -45,6 +45,7 @@ namespace TextureViewer.ViewModels
             models.GlContext.GlControl.DragDrop += GlControlOnDragDrop;
 
             HelpAboutCommand = new HelpCommand("help\\about.md");
+            HelpEquationCommand = new HelpCommand("help\\equation.md");
         }
 
         public void Dispose()
@@ -110,5 +111,6 @@ namespace TextureViewer.ViewModels
         public ICommand ShowPixelDisplayCommand { get; }
 
         public ICommand HelpAboutCommand { get; }
+        public ICommand HelpEquationCommand { get; }
     }
 }
