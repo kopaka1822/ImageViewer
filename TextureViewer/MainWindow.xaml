@@ -101,6 +101,10 @@
                 <MenuItem
                     Header="Equation"
                     Command="{Binding HelpEquationCommand}"/>
+                <MenuItem
+                    Header="Filter Manual"
+                    Command="{Binding HelpFilterManualCommand}"
+                    />
             </MenuItem>
         </Menu>
 

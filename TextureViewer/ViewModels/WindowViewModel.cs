@@ -46,6 +46,7 @@ namespace TextureViewer.ViewModels
 
             HelpAboutCommand = new HelpCommand("help\\about.md");
             HelpEquationCommand = new HelpCommand("help\\equation.md");
+            HelpFilterManualCommand = new HelpCommand("help\\filter_manual.md");
         }
 
         public void Dispose()
@@ -112,5 +113,6 @@ namespace TextureViewer.ViewModels
 
         public ICommand HelpAboutCommand { get; }
         public ICommand HelpEquationCommand { get; }
+        public ICommand HelpFilterManualCommand { get; }
     }
 }
