@@ -58,13 +58,16 @@ namespace TextureViewer.Equation.Token
                 case "floor":
                 case "ceil":
                 case "fract":
-                case "normalize":
                     front = name + "(";
                     end = ")";
                     break;
+                case "normalize":
+                    front = "vec4(" + name + "(vec3(";
+                    end = ")), 1.0)";
+                    break;
                 case "length":
-                    front = "vec4(length(";
-                    end = "))";
+                    front = "vec4(length(vec3(";
+                    end = ")))";
                     break;
                 default:
                     front = null;
