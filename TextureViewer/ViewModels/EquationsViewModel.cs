@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Markup;
+using System.Windows.Media;
 using TextureViewer.Annotations;
 using TextureViewer.Commands;
 using TextureViewer.Models;
@@ -75,8 +76,11 @@ namespace TextureViewer.ViewModels
                 if (value == hasChanges) return;
                 hasChanges = value;
                 OnPropertyChanged(nameof(HasChanges));
+                OnPropertyChanged(nameof(TabItemColor));
             }
         }
+
+        public Brush TabItemColor => HasChanges ? new SolidColorBrush(Color.FromRgb(237, 28, 36)) : new SolidColorBrush(Color.FromRgb(0, 0, 0));
 
         public event PropertyChangedEventHandler PropertyChanged;
 

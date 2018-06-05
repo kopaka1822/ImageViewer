@@ -132,8 +132,11 @@
                     >
                     <TabItem 
                         Header="Images"
+                        Foreground="{Binding Equations.TabItemColor}"
                         >
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ScrollViewer 
+                            VerticalScrollBarVisibility="Auto"
+                            Foreground="Black">
                             <Border Padding="5">
                                 <StackPanel IsEnabled="{Binding Progress.NotProcessing}">
                                     <!--Image Label + Import Button-->
