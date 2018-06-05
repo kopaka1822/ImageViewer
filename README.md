@@ -110,8 +110,8 @@ The following function from GLSL can be used as well:
 * floor(value)
 * ceil(value)
 * fract(value)
-* normalize(value)
-* length(value)
+* normalize(value)*
+* length(value)*
 * min(value1, value2)
 * max(value1, value2)
 
@@ -120,6 +120,10 @@ Additionaly you can use:
 * green(value)
 * blue(value)
 * alpha(value)
+
+normalize: normalizes rgb and sets alpha to 1.0
+
+lenght: takes the length of the rgb vector and puts it into all 4 components
 
 to extract a single color channel as value.
 
