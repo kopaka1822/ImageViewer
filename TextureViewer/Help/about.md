@@ -1,15 +1,1 @@
-# Texture Viewer
-
-An image viewer for anyone related to computer graphics.
-
-## File Formats
-
-Currently the following image formats can be imported:
-* PNG, JPG, BMP
-* HDR, PFM
-* KTX, DDS
-* EXR (based on [tinyexr](https://github.com/syoyo/tinyexr))
-
-Exporting is supported for:
-* PNG, JPG
-* HDR
+# Texture ViewerAn image viewer for anyone related to computer graphics.## Credits### Texture Viewer Developers- Felix Bruell- Johannes Jendersie### Icons- App Icon made by https://www.flaticon.com/authors/smashicons Smashicons from https://www.flaticon.com/- Other Icons were taken from the Visual Studio Image Library

@@ -94,6 +94,11 @@
             </MenuItem>
             <!--END VIEW-->
 
+            <MenuItem Header="Help">
+                <MenuItem 
+                    Header="About"
+                    Command="{Binding HelpAboutCommand}"/>    
+            </MenuItem>
         </Menu>
 
         <Grid>

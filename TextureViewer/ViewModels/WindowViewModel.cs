@@ -43,6 +43,8 @@ namespace TextureViewer.ViewModels
 
             window.KeyUp += WindowOnKeyUp;
             models.GlContext.GlControl.DragDrop += GlControlOnDragDrop;
+
+            HelpAboutCommand = new HelpCommand("help\\about.md");
         }
 
         public void Dispose()
@@ -106,5 +108,7 @@ namespace TextureViewer.ViewModels
         public ICommand ResizeCommand { get; }
         public ICommand AddFilterCommand { get; }
         public ICommand ShowPixelDisplayCommand { get; }
+
+        public ICommand HelpAboutCommand { get; }
     }
 }

@@ -11,6 +11,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Markdig;
 
@@ -34,11 +35,22 @@ namespace TextureViewer.Views
 
             // display markup in browser
             Browser.NavigateToString(html);
+            Browser.Navigating += BrowserOnNavigating;
+        }
+
+        private void BrowserOnNavigating(object sender, NavigatingCancelEventArgs args)
+        {
+            // dont open web page in the embedded browser
+            if (args.Uri.ToString().StartsWith("http") || args.Uri.ToString().StartsWith("www"))
+            {
+                args.Cancel = true;
+                System.Diagnostics.Process.Start(args.Uri.ToString());
+            }
         }
 
         private void OkOnClick(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;
+            Close();
         }
     }
 }
