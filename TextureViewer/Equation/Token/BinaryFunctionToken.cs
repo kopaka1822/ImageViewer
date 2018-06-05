@@ -7,6 +7,7 @@ namespace TextureViewer.Equation.Token
         private readonly string funcName;
         private readonly ValueToken value1;
         private readonly ValueToken value2;
+        private bool convertToRgb = false;
 
         public BinaryFunctionToken(string funcName, ValueToken value1, ValueToken value2)
         {
@@ -20,6 +21,8 @@ namespace TextureViewer.Equation.Token
             if(!IsOpenGlFunction())
                 throw new Exception("invalid string as function name: " + funcName);
 
+            if(convertToRgb)
+                return "vec4(" + funcName + "(vec3(" + value1.ToOpenGl() + "),vec3(" + value2.ToOpenGl() + ")), 1.0)";
             return funcName + "(" + value1.ToOpenGl() + "," + value2.ToOpenGl() + ")";
         }
 
@@ -33,6 +36,10 @@ namespace TextureViewer.Equation.Token
                 case "pow":
                 case "mod":
                 case "step":
+                    return true;
+                case "dot":
+                case "cross":
+                    convertToRgb = true;
                     return true;
             }
             return false;
