@@ -162,8 +162,13 @@ namespace TextureViewer.ViewModels
 
         public void RemoveFilter(FilterModel filter)
         {
-            var removeItem = items.Find(item => item.Model.Equals(filter));
-            items.Remove(removeItem);
+            var index = items.FindIndex(item => item.Model.Equals(filter));
+            var removeItem = items[index];
+            items.RemoveAt(index);
+            // adjust the statistics point
+            if (statisticsPoint > index)
+                --statisticsPoint;
+
             UpdateAvailableFilter();
             UpdateHasChanges();
 
