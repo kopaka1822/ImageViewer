@@ -19,7 +19,7 @@ namespace TextureViewer.ViewModels
 
         public WindowViewModel(App app, MainWindow window)
         {
-            this.models = new Models.Models(app, window);
+            this.models = new Models.Models(app, window, this);
 
             // controller
             this.paintController = new PaintController(models);
@@ -40,6 +40,7 @@ namespace TextureViewer.ViewModels
             ExportCommand = new ExportImageCommand(models);
             AddFilterCommand = new AddFilterCommand(models, Filter);
             ShowPixelDisplayCommand = new ShowPixelDialogCommand(models);
+            ShowPixelColorCommand = new ShowPixelColorCommand(models);
 
             window.KeyUp += WindowOnKeyUp;
             models.GlContext.GlControl.DragDrop += GlControlOnDragDrop;
@@ -110,6 +111,7 @@ namespace TextureViewer.ViewModels
         public ICommand ResizeCommand { get; }
         public ICommand AddFilterCommand { get; }
         public ICommand ShowPixelDisplayCommand { get; }
+        public ICommand ShowPixelColorCommand { get; }
 
         public ICommand HelpAboutCommand { get; }
         public ICommand HelpEquationCommand { get; }

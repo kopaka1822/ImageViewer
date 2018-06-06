@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TextureViewer.Models.Filter;
+using TextureViewer.ViewModels;
 
 namespace TextureViewer.Models
 {
@@ -17,10 +18,10 @@ namespace TextureViewer.Models
         /// </summary>
         /// <param name="app"></param>
         /// <param name="window"></param>
-        public Models(App app, MainWindow window)
+        public Models(App app, MainWindow window, WindowViewModel viewModel)
         {
             this.App = new AppModel(app, window);
-            GlContext = new OpenGlContext(window);
+            GlContext = new OpenGlContext(window, viewModel);
             GlContext.Enable();
 
             Images = new ImagesModel(GlContext);

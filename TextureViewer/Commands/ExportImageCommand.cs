@@ -68,6 +68,7 @@ namespace TextureViewer.Commands
 
             // open export dialog
             var dia = new ExportDialog(models, sfd.FileName, pixelFormat, format);
+            dia.Owner = models.App.Window;
             if (dia.ShowDialog() != true) return;
 
             var info = dia.Model;

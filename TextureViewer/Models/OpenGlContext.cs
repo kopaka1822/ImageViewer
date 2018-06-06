@@ -12,6 +12,8 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.Annotations;
+using TextureViewer.ViewModels;
+using TextureViewer.Views;
 
 namespace TextureViewer.Models
 {
@@ -36,7 +38,7 @@ namespace TextureViewer.Models
         public static int MinorVersion { get; } = 3;
         public static string ShaderVersion { get; } = "#version 430 core";
 
-        public OpenGlContext(MainWindow window)
+        public OpenGlContext(MainWindow window, WindowViewModel viewModel)
         {
             try
             {
@@ -80,6 +82,8 @@ namespace TextureViewer.Models
                 GlControl.Paint += (sender, args) => issuedRedraw = false;
                 GlControl.DragOver += (o, args) => args.Effect = System.Windows.Forms.DragDropEffects.Copy;
                 GlControl.AllowDrop = true;
+
+                GlControl.ContextMenuStrip = new OpenGlHostContextMenu(viewModel);
 
                 Enable();
 

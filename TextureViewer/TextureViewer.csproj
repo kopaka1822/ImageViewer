@@ -139,6 +139,7 @@
     <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="Commands\OpenImageCommand.cs" />
     <Compile Include="Commands\ResizeWindowCommand.cs" />
+    <Compile Include="Commands\ShowPixelColorCommand.cs" />
     <Compile Include="Commands\ShowPixelDialogCommand.cs" />
     <Compile Include="Controller\Filter\FilterStepableBase.cs" />
     <Compile Include="Controller\Filter\FilterStepList.cs" />
@@ -226,6 +227,7 @@
     <Compile Include="Models\TextureCacheModel.cs" />
     <Compile Include="Utility\Color.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="ViewModels\Dialog\PixelColorViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
     <Compile Include="ViewModels\Filter\BoolFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\FilterParametersViewModel.cs" />
@@ -251,6 +253,12 @@
     </Compile>
     <Compile Include="Views\ImageListBoxItem.cs" />
     <Compile Include="Views\IntFilterParameterView.cs" />
+    <Compile Include="Views\OpenGlHostContextMenu.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Views\PixelColorDialog.xaml.cs">
+      <DependentUpon>PixelColorDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\PixelDisplayDialog.xaml.cs">
       <DependentUpon>PixelDisplayDialog.xaml</DependentUpon>
     </Compile>
@@ -276,6 +284,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\HelpDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PixelColorDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -50,21 +50,6 @@ namespace TextureViewer.Models
         private TextureArray2D statisticsTexture = null;
 
         /// <summary>
-        /// pixel color at the current texel location
-        /// </summary>
-        private Color pixelColor = new Color();
-        public Color PixelColor
-        {
-            get => pixelColor;
-            set
-            {
-                if (value.Equals(pixelColor)) return;
-                pixelColor = value;
-                OnPropertyChanged(nameof(PixelColor));
-            }
-        }
-
-        /// <summary>
         /// resets the model to the initial state (empty textures)
         /// </summary>
         public void Reset()

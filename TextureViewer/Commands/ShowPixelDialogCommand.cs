@@ -25,6 +25,7 @@ namespace TextureViewer.Commands
         public void Execute(object parameter)
         {
             var dia = new PixelDisplayDialog(models);
+            dia.Owner = models.App.Window;
             dia.ShowDialog();
         }
 

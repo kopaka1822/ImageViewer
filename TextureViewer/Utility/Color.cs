@@ -28,6 +28,7 @@ namespace TextureViewer.Utility
         public float Red { get; set; }
         public float Green { get; set; }
         public float Blue { get; set; }
+
         public float Alpha { get; set; }
 
         /// <summary>
@@ -133,7 +134,7 @@ namespace TextureViewer.Utility
 
         private static string ScalarToByte(float val)
         {
-            var str = ((int) (val * 255.0f)).ToString();
+            var str = ((int) (val * 255.0f)).ToString(App.GetCulture());
             // bytes should ocuppy 3 spaces (srgb maximum is 255)
             while (str.Length < 3)
             {
