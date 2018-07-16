@@ -51,11 +51,11 @@ View and navigate through the polar image in a projection view:
 
 ## Image Manipulation
 
-Add a custom or predefined tonemapper to your image:
+Add a custom or predefined filter to your image:
 
 ![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/balcony_tonemapper.png)
 
-Or define a custom tonemapper like this. Tonemapper are GLSL compute shader. The work group size will be set by the application and only the main method needs to be implemented (this method will be called once for every pixel).
+Or define a custom filter like this. Filter are GLSL compute shader. The work group size will be set by the application and only the main method needs to be implemented (this method will be called once for every pixel).
 
 ```glsl
 // general information about the shader
