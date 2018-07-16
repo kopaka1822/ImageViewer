@@ -4,7 +4,7 @@ An image viewer for anyone related to computer graphics.
 
 ## Download
 
-x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/blob/Release/Build/Texture%20Viewer.zip?raw=true)
+x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/raw/Release/Build/Texture%20Viewer.zip)
 
 ## File Formats
 
