@@ -20,7 +20,7 @@ Exporting is supported for:
 
 ## View Modes
 ### Simple Images
-View simple images with and without alpha channel. The status bar displays the current texture coordinates (cursor) along with the corresponding RGBA color values.
+The status bar displays the current texture coordinates (cursor) along with the corresponding RGBA color values in linear color space. The display type can be cahnged from linear color space to Srgb color space via: View->Pixel Display->Format.
 
 ![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/transparent.png)
 
