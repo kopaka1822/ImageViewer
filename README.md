@@ -12,6 +12,7 @@ Currently the following image formats can be imported:
 * PNG, JPG, BMP
 * HDR, PFM
 * KTX, DDS
+* EXR (based on [tinyexr](https://github.com/syoyo/tinyexr))
 
 Exporting is supported for:
 * PNG, JPG
@@ -109,8 +110,16 @@ The following function from GLSL can be used as well:
 * floor(value)
 * ceil(value)
 * fract(value)
-* normalize(value)
-* length(value)
+* normalize(value)*
+* length(value)*
+* min(value1, value2)
+* max(value1, value2)
+* pow(value1, value2)
+* atan(value1, value2)
+* mod(value1, value2)
+* step(value1, value2)
+* cross(value1, value2)*
+* dot(value1, value2)*
 
 Additionaly you can use:
 * red(value)
@@ -118,6 +127,8 @@ Additionaly you can use:
 * blue(value)
 * alpha(value)
 
+functions marked with * will only use the rgb components for computation and ignore alpha.
+
 to extract a single color channel as value.
 
-`rgb(value, value, value)` may be used to construct an rgb value width alpha component 1.0
+`rgb(value, value, value)` may be used to construct an rgb value with alpha component 1.0
