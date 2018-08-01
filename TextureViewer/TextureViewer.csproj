@@ -359,6 +359,9 @@
     <None Include="Filter\set_color.comp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Filter\silhouette.comp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Help\about.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
