@@ -25,7 +25,7 @@ namespace TextureViewer.ViewModels
             this.paintController = new PaintController(models);
             
             // model views
-            Images = new ImagesViewModel(models);
+            Images = new ImagesViewModel(models, this);
             Display = new DisplayViewModel(models);
             Equations = new EquationsViewModel(models);
             Progress = new ProgressViewModel(models);
@@ -80,20 +80,22 @@ namespace TextureViewer.ViewModels
         }
 
         /// <summary>
-        /// tries to import an image. Displays an error on failure
+        /// tries to import an image. Displays an error on failure. Returns true on success
         /// </summary>
         /// <param name="filename"></param>
-        public void ImportImage(string filename)
+        public bool ImportImage(string filename)
         {
             try
             {
                 var imgs = ImageLoader.LoadImage(filename);
                 models.Images.AddImages(imgs);
+                return true;
             }
             catch (Exception e)
             {
                 App.ShowErrorDialog(models.App.Window, e.Message);
             }
+            return false;
         }
 
         // view models

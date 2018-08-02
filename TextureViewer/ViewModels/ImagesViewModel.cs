@@ -16,10 +16,12 @@ namespace TextureViewer.ViewModels
     public class ImagesViewModel : INotifyPropertyChanged, IDropTarget
     {
         private readonly Models.Models models;
+        private readonly WindowViewModel windowViewModel;
 
-        public ImagesViewModel(Models.Models models)
+        public ImagesViewModel(Models.Models models, WindowViewModel windowViewModel)
         {
             this.models = models;
+            this.windowViewModel = windowViewModel;
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
 
@@ -89,21 +91,48 @@ namespace TextureViewer.ViewModels
                 dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
                 dropInfo.Effects = DragDropEffects.Move;
             }
+
+            if(dropInfo.Data is System.Windows.DataObject)
+            {
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
+                dropInfo.Effects = DragDropEffects.Copy;
+            }
         }
 
         public void Drop(IDropInfo dropInfo)
         {
-            var idx1 = ImageListItems.IndexOf(dropInfo.Data as ImageListBoxItem);
-            var idx2 = dropInfo.InsertIndex;
-            if (idx1 < 0 || idx2 < 0) return;
-            // did the order change?
-            if (idx1 == idx2) return;
+            if(dropInfo.Data is ImageListBoxItem)
+            {
+                // move images 
+                var idx1 = ImageListItems.IndexOf(dropInfo.Data as ImageListBoxItem);
+                var idx2 = dropInfo.InsertIndex;
+                if (idx1 < 0 || idx2 < 0) return;
+                // did the order change?
+                if (idx1 == idx2) return;
 
-            // move image want the final position of the moved image
-            if (idx1 < idx2) idx2--;
+                // move image want the final position of the moved image
+                if (idx1 < idx2) idx2--;
 
-            // put item from idx1 into the position it was dragged to
-            models.Images.MoveImage(idx1, idx2);
+                // put item from idx1 into the position it was dragged to
+                models.Images.MoveImage(idx1, idx2);
+            }
+            else if(dropInfo.Data is DataObject)
+            {
+                var obj = dropInfo.Data as System.Windows.DataObject;
+                var items = obj.GetFileDropList();
+                if (items == null) return;
+
+                int desiredPosition = dropInfo.InsertIndex;
+
+                foreach(var file in items)
+                {
+                    if(windowViewModel.ImportImage(file))
+                    {
+                        // put inserted image into correct position
+                        models.Images.MoveImage(models.Images.NumImages - 1, desiredPosition++);
+                    }
+                }
+            }
         }
         #endregion
     }
