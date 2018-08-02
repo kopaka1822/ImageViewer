@@ -22,12 +22,25 @@ namespace TextureViewer.Views
     /// </summary>
     public partial class HelpDialog : Window
     {
+        public bool IsValid { get; private set; } = true;
+
         public HelpDialog(string filename)
         {
             InitializeComponent();
 
-            // load text from file
-            var text = File.ReadAllText(filename);
+            string text = "";
+            try
+            {
+                // load text from file
+                text = File.ReadAllText(filename);
+            }
+            catch(Exception)
+            {
+                App.ShowErrorDialog(this, "Could not open " + filename);
+                Close();
+                IsValid = false;
+                return;
+            }
 
             // convert markup into htm
             var pipe = new Markdig.MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
