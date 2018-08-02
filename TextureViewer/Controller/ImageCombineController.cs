@@ -54,6 +54,12 @@ namespace TextureViewer.Controller
                         models.GlContext.RedrawFrame();
                     }
                     break;
+                case nameof(ImagesModel.ImageOrder):
+                    // TODO check if the result actually changes
+                    recomputeImage = true;
+                    // issue redraw to do work
+                    models.GlContext.RedrawFrame();
+                    break;
             }
         }
 

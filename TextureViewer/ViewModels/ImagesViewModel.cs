@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GongSolutions.Wpf.DragDrop;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -11,7 +13,7 @@ using TextureViewer.Views;
 
 namespace TextureViewer.ViewModels
 {
-    public class ImagesViewModel : INotifyPropertyChanged
+    public class ImagesViewModel : INotifyPropertyChanged, IDropTarget
     {
         private readonly Models.Models models;
 
@@ -28,6 +30,9 @@ namespace TextureViewer.ViewModels
                 case nameof(ImagesModel.NumImages):
                     RefreshImageList();
                     OnPropertyChanged(nameof(WindowTitle));
+                    break;
+                case nameof(ImagesModel.ImageOrder):
+                    RefreshImageList();
                     break;
             }
         }
@@ -73,5 +78,33 @@ namespace TextureViewer.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        #region DRAG DROP
+        public void DragOver(IDropInfo dropInfo)
+        {
+            
+            // enable if both items are image list box items
+            if(dropInfo.Data is ImageListBoxItem && dropInfo.TargetItem is ImageListBoxItem)
+            {
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
+                dropInfo.Effects = DragDropEffects.Move;
+            }
+        }
+
+        public void Drop(IDropInfo dropInfo)
+        {
+            var idx1 = ImageListItems.IndexOf(dropInfo.Data as ImageListBoxItem);
+            var idx2 = dropInfo.InsertIndex;
+            if (idx1 < 0 || idx2 < 0) return;
+            // did the order change?
+            if (idx1 == idx2) return;
+
+            // move image want the final position of the moved image
+            if (idx1 < idx2) idx2--;
+
+            // put item from idx1 into the position it was dragged to
+            models.Images.MoveImage(idx1, idx2);
+        }
+        #endregion
     }
 }

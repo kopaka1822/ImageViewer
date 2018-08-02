@@ -187,7 +187,10 @@
                                         Height="180"
                                         Margin="0 0 0 5"
                                         ItemsSource="{Binding Images.ImageListItems}"
-                                        SelectedItem="{Binding Images.SelectedImageListItem}"/>
+                                        SelectedItem="{Binding Images.SelectedImageListItem}"
+                                        dd:DragDrop.IsDragSource="True"
+                                        dd:DragDrop.IsDropTarget="True"
+                                        dd:DragDrop.DropHandler="{Binding Images}"/>
 
                                     <Button
                                             Command="{Binding Equations.Apply}"

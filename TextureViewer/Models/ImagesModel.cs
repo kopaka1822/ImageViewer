@@ -65,6 +65,9 @@ namespace TextureViewer.Models
 
         #region Public Members
 
+        // this property change will be triggered if the image order changes (and not if the number of images changes)
+        public static string ImageOrder = nameof(ImageOrder);
+
         public int NumImages => images.Count;
         public int NumMipmaps => images.Count == 0 ? 0 : images[0].NumMipmaps;
         public int NumLayers => images.Count == 0 ? 0 : images[0].NumLayers;
@@ -248,6 +251,26 @@ namespace TextureViewer.Models
             }
 
             context.Disable();
+        }
+
+        /// <summary>
+        /// moves the image from index 1 to index 2
+        /// </summary>
+        /// <param name="idx1">current image index</param>
+        /// <param name="idx2">index after moving the image</param>
+        public void MoveImage(int idx1, int idx2)
+        {
+            Debug.Assert(idx1 >= 0);
+            Debug.Assert(idx2 >= 0);
+            Debug.Assert(idx1 < NumImages);
+            Debug.Assert(idx2 < NumImages);
+            if (idx1 == idx2) return;
+
+            var i = images[idx1];
+            images.RemoveAt(idx1);
+            images.Insert(idx2, i);
+
+            OnPropertyChanged(nameof(ImageOrder));
         }
 
         /// <summary>
