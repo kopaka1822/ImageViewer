@@ -306,18 +306,18 @@ namespace TextureViewer.ViewModels
         public void Drop(IDropInfo dropInfo)
         {
             var idx1 = AvailableFilter.FindIndex(i => ReferenceEquals(i, dropInfo.Data));
-            var idx2 = AvailableFilter.FindIndex(i => ReferenceEquals(i, dropInfo.TargetItem));
+            var idx2 = dropInfo.InsertIndex;
             if (idx1 < 0 || idx2 < 0) return;
 
             // insert dummy statistics into list
             items.Insert(statisticsPoint, null);
 
-            // swap both items
-            {
-                var tmp = items[idx1];
-                items[idx1] = items[idx2];
-                items[idx2] = tmp;
-            }
+            // put item from idx1 into the position it was dragged to
+            items.Insert(idx2, items[idx1]);
+
+            // remove the old items (duplicate)
+            if (idx1 > idx2) ++idx1;
+            items.RemoveAt(idx1);
 
             // remove dummy
             statisticsPoint = items.FindIndex(item => item == null);
