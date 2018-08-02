@@ -23,7 +23,7 @@ namespace TextureViewer.Views
                 Source = viewModel,
                 Path = new PropertyPath("Value"),
                 Mode = BindingMode.TwoWay,
-                UpdateSourceTrigger = UpdateSourceTrigger.LostFocus
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
             };
             BindingOperations.SetBinding(this, IsCheckedProperty, valueBinding);
 
