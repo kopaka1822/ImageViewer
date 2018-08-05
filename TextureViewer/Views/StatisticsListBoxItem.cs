@@ -17,7 +17,7 @@ namespace TextureViewer.Views
             {
                 Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/list_move.png",
                     UriKind.Absolute)),
-                Margin = new Thickness(21.0, 0.0, 5.0, 0.0)
+                Margin = new Thickness(42.0, 0.0, 5.0, 0.0)
             };
 
             var text = new TextBlock { Text = "Pixel Color" };

@@ -453,5 +453,8 @@
   <ItemGroup>
     <Resource Include="Icons\help.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\eye_closed.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

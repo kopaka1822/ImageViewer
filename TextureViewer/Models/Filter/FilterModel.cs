@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using TextureViewer.Controller.Filter;
 using TextureViewer.Controller.ImageCombination;
 using TextureViewer.Models.Shader;
@@ -15,6 +17,8 @@ namespace TextureViewer.Models.Filter
         public string Name { get; }
         public string Description { get; }
         public string Filename { get; }
+        public bool IsVisible { get; set; } = true;
+        public bool[] IsEquationVisible { get; } = new bool[App.MaxImageViews];
 
         public FilterModel(FilterLoader loader)
         {
@@ -24,6 +28,8 @@ namespace TextureViewer.Models.Filter
             Name = loader.Name;
             Description = loader.Description;
             Filename = loader.Filename;
+            for (var i = 0; i < IsEquationVisible.Length; ++i)
+                IsEquationVisible[i] = true;
 
             Shader = new FilterShader(loader.ShaderSource, IsSepa);
         }
@@ -31,6 +37,18 @@ namespace TextureViewer.Models.Filter
         public void Dispose()
         {
             Shader.Dispose();
+        }
+
+        /// <summary>
+        /// returns true if the filter should be applied for the equation
+        /// </summary>
+        /// <param name="equationId">equation index</param>
+        /// <returns></returns>
+        public bool IsVisibleFor(int equationId)
+        {
+            Debug.Assert(equationId >= 0);
+            Debug.Assert(equationId < App.MaxImageViews);
+            return IsEquationVisible[equationId] && IsVisible;
         }
 
         public IStepable MakeStepable(Models models, ImageCombineBuilder builder)

@@ -33,8 +33,8 @@ namespace TextureViewer.ViewModels
             public FilterItem(FiltersViewModel parent, FilterModel model)
             {
                 Model = model;
-                ListView = new FilterListBoxItem(parent, model);
                 Parameters = new FilterParametersViewModel(model);
+                ListView = new FilterListBoxItem(parent, model, Parameters);
             }
 
             public void Dispose(OpenGlContext context)

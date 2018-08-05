@@ -17,15 +17,17 @@ namespace TextureViewer.Controller
         private readonly ImageEquationModel equation;
         private readonly FinalImageModel finalImage;
         private readonly Models.Models models;
+        private readonly int equationId;
 
         // indicates if the image should be recomputed
         private bool recomputeImage = false;
 
-        public ImageCombineController(ImageEquationModel equation, FinalImageModel finalImage, Models.Models models)
+        public ImageCombineController(ImageEquationModel equation, FinalImageModel finalImage, Models.Models models, int equationId)
         {
             this.equation = equation;
             this.finalImage = finalImage;
             this.models = models;
+            this.equationId = equationId;
             equation.ColorFormula.PropertyChanged += FormulaOnPropertyChanged;
             equation.AlphaFormula.PropertyChanged += FormulaOnPropertyChanged;
             equation.PropertyChanged += EquationOnPropertyChanged;
@@ -35,6 +37,7 @@ namespace TextureViewer.Controller
 
         private void FilterOnChanged(object sender, EventArgs eventArgs)
         {
+            // TODO check if formula has changed for this image equation
             if (equation.UseFilter)
             {
                 recomputeImage = true;
@@ -112,7 +115,8 @@ namespace TextureViewer.Controller
                     if(i == models.Filter.StatisticsPoint)
                         steps.Add(new StatisticsSaveStepable(builder));
 
-                    steps.Add(models.Filter.Filter[i].MakeStepable(models, builder));
+                    if(models.Filter.Filter[i].IsVisibleFor(equationId))
+                        steps.Add(models.Filter.Filter[i].MakeStepable(models, builder));
                 }
             }
             steps.Add(new FinalImageStepable(builder, finalImage));
