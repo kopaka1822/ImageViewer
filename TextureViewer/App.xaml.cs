@@ -21,6 +21,7 @@ namespace TextureViewer
             Cancel,
             Eye,
             EyeClosed,
+            ListMove
         }
 
         // change this if the assembly name was changed
@@ -30,7 +31,7 @@ namespace TextureViewer
         public string ExecutionPath { get; private set; }
 
         private readonly List<MainWindow> openWindows = new List<MainWindow>();
-        private static Dictionary<ResourceIcon, BitmapImage> icons = new Dictionary<ResourceIcon, BitmapImage>();
+        private static readonly Dictionary<ResourceIcon, BitmapImage> icons = new Dictionary<ResourceIcon, BitmapImage>();
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -53,7 +54,7 @@ namespace TextureViewer
             }
         }
 
-        private void LoadIcons()
+        private static void LoadIcons()
         {
             icons[ResourceIcon.Cancel] =
                 new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/cancel.png",
@@ -65,6 +66,10 @@ namespace TextureViewer
 
             icons[ResourceIcon.EyeClosed] =
                 new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/eye_closed.png",
+                    UriKind.Absolute));
+
+            icons[ResourceIcon.ListMove] = 
+                new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/list_move.png",
                     UriKind.Absolute));
         }
 

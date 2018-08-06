@@ -20,7 +20,7 @@ namespace TextureViewer.Views
             // load images
             var imgDelete = new Image
             {
-                Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/cancel.png", UriKind.Absolute))
+                Source = App.GetResourceImage(App.ResourceIcon.Cancel)
             };
 
             var btnDelete = new Button

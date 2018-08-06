@@ -15,8 +15,7 @@ namespace TextureViewer.Views
         {
             var imgArrow = new Image
             {
-                Source = new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/list_move.png",
-                    UriKind.Absolute)),
+                Source = App.GetResourceImage(App.ResourceIcon.ListMove),
                 Margin = new Thickness(42.0, 0.0, 5.0, 0.0)
             };
 
