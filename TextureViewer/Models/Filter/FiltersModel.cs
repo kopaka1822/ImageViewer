@@ -20,11 +20,24 @@ namespace TextureViewer.Models.Filter
 
         public int StatisticsPoint { get; private set; } = 0;
 
+        #region Change Event
+        public class FiltersChangedEventArgs : EventArgs
+        {
+            public bool[] Changed { get; }
+
+            public FiltersChangedEventArgs(bool[] changed)
+            {
+                Changed = changed;
+            }
+        }
+
+        public delegate void FiltersChangedEventHandler(object sender, FiltersChangedEventArgs args);
         /// <summary>
         /// this will be triggered if the model changes due to:
         /// - Apply()
         /// </summary>
-        public event EventHandler Changed;
+        public event FiltersChangedEventHandler Changed;
+        #endregion
 
         /// <summary>
         /// returns if the shader is in use by the active model
@@ -36,13 +49,20 @@ namespace TextureViewer.Models.Filter
             return filter.Any(f => ReferenceEquals(f, model));
         }
 
-        public void Apply(List<FilterModel> models, int statisticsPoint, OpenGlContext context)
+        /// <summary>
+        /// Replaces the old filters with the new list of filters.
+        /// </summary>
+        /// <param name="models">new filter configuration</param>
+        /// <param name="statisticsPoint">index of the statistics point</param>
+        /// <param name="context"></param>
+        /// <param name="changed">This indicates which image equations were changed by the new filter configuration</param>
+        public void Apply(List<FilterModel> models, int statisticsPoint, OpenGlContext context, bool[] changed)
         {
             DisposeUnusedFilter(models, filter, context);
             filter = models;
             Debug.Assert(statisticsPoint >= 0 && statisticsPoint <= filter.Count);
             StatisticsPoint = statisticsPoint;
-            OnChanged();
+            OnChanged(changed);
         }
 
         /// <summary>
@@ -66,9 +86,9 @@ namespace TextureViewer.Models.Filter
                 context.Disable();
         }
 
-        protected virtual void OnChanged()
+        protected virtual void OnChanged(bool[] changed)
         {
-            Changed?.Invoke(this, EventArgs.Empty);
+            Changed?.Invoke(this, new FiltersChangedEventArgs(changed));
         }
     }
 }

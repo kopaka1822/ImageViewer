@@ -223,6 +223,10 @@ namespace TextureViewer.ViewModels.Filter
             HasChanged = HasChanges();
         }
 
+        /// <summary>
+        /// returns true if any parameters including the visibility and equation visibility has changed
+        /// </summary>
+        /// <returns></returns>
         private bool HasChanges()
         {
             // test for visibility change
@@ -231,6 +235,15 @@ namespace TextureViewer.ViewModels.Filter
             if (model.IsEquationVisible.Where((t, i) => t != IsEquationVisible[i]).Any())
                 return true;
             
+            return HasParameterChanges();
+        }
+
+        /// <summary>
+        /// returns true if any parameters beside the visibility and equation visibility has changed
+        /// </summary>
+        /// <returns></returns>
+        public bool HasParameterChanges()
+        {
             // test for parameter change
             foreach (var filter in ViewModels)
             {

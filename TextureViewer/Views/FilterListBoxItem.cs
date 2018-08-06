@@ -45,7 +45,8 @@ namespace TextureViewer.Views
                 Height = 16,
                 Width = 16,
                 Content = imgDelete,
-                Margin = new Thickness(0.0, 0.0, 5.0, 0.0)
+                Margin = new Thickness(0.0, 0.0, 5.0, 0.0),
+                ToolTip = "remove filter"
             };
 
             var btnVisible = new Button
@@ -54,6 +55,7 @@ namespace TextureViewer.Views
                 Width = 16,
                 Content = imgVisible,
                 Margin = new Thickness(0.0, 0.0, 5.0, 0.0),
+                ToolTip = "toggle filter usage"
             };
 
             btnVisible.Click += (sender, args) =>

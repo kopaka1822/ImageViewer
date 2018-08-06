@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using TextureViewer.Controller.Filter;
 using TextureViewer.Controller.ImageCombination;
 using TextureViewer.Models;
+using TextureViewer.Models.Filter;
 using TextureViewer.Utility;
 
 namespace TextureViewer.Controller
@@ -35,10 +36,9 @@ namespace TextureViewer.Controller
             this.models.Filter.Changed += FilterOnChanged;
         }
 
-        private void FilterOnChanged(object sender, EventArgs eventArgs)
+        private void FilterOnChanged(object sender, FiltersModel.FiltersChangedEventArgs eventArgs)
         {
-            // TODO check if formula has changed for this image equation
-            if (equation.UseFilter)
+            if (equation.UseFilter && eventArgs.Changed[equationId])
             {
                 recomputeImage = true;
                 models.GlContext.RedrawFrame();
