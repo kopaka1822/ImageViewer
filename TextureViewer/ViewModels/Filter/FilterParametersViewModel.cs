@@ -1,19 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
+using TextureViewer.Annotations;
 using TextureViewer.Models.Filter;
 using TextureViewer.Views;
 
 namespace TextureViewer.ViewModels.Filter
 {
-    public class FilterParametersViewModel
+    public class FilterParametersViewModel : INotifyPropertyChanged
     {
         private readonly FilterModel model;
 
@@ -43,6 +47,7 @@ namespace TextureViewer.ViewModels.Filter
                 if (isVisible == value) return;
                 isVisible = value;
                 HasChanged = HasChanges();
+                OnPropertyChanged(nameof(IsVisible));
             }
         }
 
@@ -75,7 +80,16 @@ namespace TextureViewer.ViewModels.Filter
                     Text = item.Description,
                     Margin = new Thickness(0.0, 0.0, 0.0, 10.0),
                     TextWrapping = TextWrapping.Wrap
-                });  
+                });
+
+            // default value change handler
+            var enabledBinding = new Binding
+            {
+                Source = this,
+                Path = new PropertyPath("IsVisible"),
+                Mode = BindingMode.OneWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };
 
             // add all settings
             foreach (var para in item.Parameters)
@@ -93,21 +107,21 @@ namespace TextureViewer.ViewModels.Filter
                     case ParameterType.Float:
                     {
                         var viewModel = new FloatFilterParameterViewModel(para.GetFloatModel());
-                        View.Add(new FloatFilterParameterView(viewModel));
+                        View.Add(new FloatFilterParameterView(viewModel, enabledBinding));
                         vm = viewModel;
                     }
                         break;
                     case ParameterType.Int:
                     {
                         var viewModel = new IntFilterParameterViewModel(para.GetIntModel());
-                        View.Add(new IntFilterParameterView(viewModel));
+                        View.Add(new IntFilterParameterView(viewModel, enabledBinding));
                         vm = viewModel;
                         }
                         break;
                     case ParameterType.Bool:
                     {
                         var viewModel = new BoolFilterParameterViewModel(para.GetBoolModel());
-                        View.Add(new BoolFilterParameterView(viewModel));
+                        View.Add(new BoolFilterParameterView(viewModel, enabledBinding));
                         vm = viewModel;
                         }      
                         break;
@@ -133,6 +147,7 @@ namespace TextureViewer.ViewModels.Filter
                 Orientation = Orientation.Horizontal,
                 Margin = new Thickness(0.0, 2.0, 0.0, 2.0),
             };
+
             for (var i = 0; i < App.MaxImageViews; ++i)
             {
                 fevPanel.Children.Add(new TextBlock
@@ -145,6 +160,7 @@ namespace TextureViewer.ViewModels.Filter
                     IsChecked = IsEquationVisible[i],
                     Margin = new Thickness(5.0, 0.0, 5.0, 0.0),
                 };
+                BindingOperations.SetBinding(cb, UIElement.IsEnabledProperty, enabledBinding);
 
                 // callbacks for checkbox actions
                 var cbIndex = i;
@@ -276,6 +292,14 @@ namespace TextureViewer.ViewModels.Filter
         {
             for (var i = 0; i < App.MaxImageViews; ++i)
                 equationCheckBoxes[i].IsChecked = IsEquationVisible[i];
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

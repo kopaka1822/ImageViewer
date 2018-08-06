@@ -12,7 +12,7 @@ namespace TextureViewer.Views
 {
     public class BoolFilterParameterView : CheckBox
     {
-        public BoolFilterParameterView(BoolFilterParameterViewModel viewModel)
+        public BoolFilterParameterView(BoolFilterParameterViewModel viewModel, Binding enabledBinding)
         {
             Margin = new Thickness(0.0, 0.0, 0.0, 2.0);
             DataContext = viewModel;
@@ -26,8 +26,7 @@ namespace TextureViewer.Views
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
             };
             BindingOperations.SetBinding(this, IsCheckedProperty, valueBinding);
-
-            
+            BindingOperations.SetBinding(this, IsEnabledProperty, enabledBinding);
         }
     }
 }

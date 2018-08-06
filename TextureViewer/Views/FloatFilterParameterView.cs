@@ -17,7 +17,7 @@ namespace TextureViewer.Views
     {
         private readonly FloatFilterParameterViewModel viewModel;
 
-        public FloatFilterParameterView(FloatFilterParameterViewModel viewModel)
+        public FloatFilterParameterView(FloatFilterParameterViewModel viewModel, Binding enabledBinding)
         {
             this.viewModel = viewModel;
 
@@ -25,6 +25,7 @@ namespace TextureViewer.Views
             CultureInfo = App.GetCulture();
             Increment = 0.0f;
             DataContext = viewModel;
+
 
             // TODO custom handler for up down buttons
 
@@ -38,6 +39,7 @@ namespace TextureViewer.Views
                 UpdateSourceTrigger = UpdateSourceTrigger.LostFocus
             };
             BindingOperations.SetBinding(this, ValueProperty, valueBinding);
+            BindingOperations.SetBinding(this, IsEnabledProperty, enabledBinding);
 
             KeyUp += OnKeyUp;
 
