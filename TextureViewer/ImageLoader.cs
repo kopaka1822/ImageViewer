@@ -16,8 +16,9 @@ namespace TextureViewer
         private static extern void release(int id);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void image_info(int id, out uint openglInternalFormat, out uint openglExternalFormat,
-            out uint openglType, out int nImages, out int nFaces, out int nMipmaps, out bool isCompressed);
+        private static extern void image_info(int id, out uint openglInternalFormat, 
+            out uint openglExternalFormat, out uint openglType, out int nImages, out int nFaces, 
+            out int nMipmaps, out bool isCompressed, out bool isSrgb);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void image_info_mipmap(int id, int mipmap, out int width, out int height);
@@ -110,17 +111,19 @@ namespace TextureViewer
             public readonly uint OpenglExternalFormat;
             public readonly uint OpenglType;
             public readonly bool IsCompressed;
+            public readonly bool IsSrgb;
             public readonly List<Face> Layers;
             public readonly string Filename;
 
             public Image(Resource resource, string filename, uint internalFormat, uint externalFormat,
-                uint type, int curImage, int nFaces, int nMipmaps, bool isCompressed)
+                uint type, int curImage, int nFaces, int nMipmaps, bool isCompressed, bool isSrgb)
             {
                 Filename = filename;
                 OpenglExternalFormat = externalFormat;
                 OpenglInternalFormat = internalFormat;
                 OpenglType = type;
                 IsCompressed = isCompressed;
+                IsSrgb = isSrgb;
                 // load relevant information
 
                 Layers = new List<Face>(nFaces);
@@ -244,12 +247,12 @@ namespace TextureViewer
         {
             var res = new Resource(file);
             image_info(res.Id, out var internalFormat, out var externalFormat, out var openglType,
-                out var nImages, out var nFaces, out var nMipmaps, out var isCompressed);
+                out var nImages, out var nFaces, out var nMipmaps, out var isCompressed, out var isSrgb);
             var images = new List<Image>(nImages);
             for (var curImage = 0; curImage < nImages; ++curImage)
             {
                 images.Add(new Image(res, file, internalFormat, externalFormat, openglType,
-                    curImage, nFaces, nMipmaps, isCompressed));
+                    curImage, nFaces, nMipmaps, isCompressed, isSrgb));
             }
 
             return images;

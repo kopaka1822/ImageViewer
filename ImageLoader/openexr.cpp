@@ -30,11 +30,9 @@ std::unique_ptr<ImageResource> openexr_load(const char* filename)
 	{
 		memcpy(mipmap.bytes.data() + y * lineBytes, reinterpret_cast<char*>(out) + (height - y - 1) * lineBytes, lineBytes);
 	}
-	//memcpy(mipmap.bytes.data(), out, imgSize);
-
-
 
 	res->format.isCompressed = false;
+	res->format.isSrgb = false;
 	res->format.openglType = gli::gl::type_format::TYPE_F32;
 	res->format.openglExternalFormat = gli::gl::external_format::EXTERNAL_RGBA;
 	res->format.openglInternalFormat = gli::gl::internal_format::INTERNAL_RGBA32F;

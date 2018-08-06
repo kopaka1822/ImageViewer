@@ -6,12 +6,12 @@
 void getImageFormat(ImageFormat& format, const gli::texture& tex)
 {
 	gli::gl GL(gli::gl::PROFILE_GL33);
-	auto GLformat = GL.translate(tex.format(), tex.swizzles());
-	// TODO check if format is srgb
+	const auto GLformat = GL.translate(tex.format(), tex.swizzles());
 	format.openglInternalFormat = static_cast<uint32_t>(GLformat.Internal);
 	format.openglExternalFormat = static_cast<uint32_t>(GLformat.External);
 	format.openglType = static_cast<uint32_t>(GLformat.Type);
 	format.isCompressed = gli::is_compressed(tex.format());
+	format.isSrgb = gli::is_srgb(tex.format());
 }
 
 std::unique_ptr<ImageResource> gli_load(const char* filename)
@@ -43,6 +43,7 @@ std::unique_ptr<ImageResource> gli_load(const char* filename)
 
 				auto data = tex.data(layer, face, mip);
 				auto size = tex.size(mip);
+				mipmap.bytes.reserve(size);
 				mipmap.bytes.assign(reinterpret_cast<char*>(data), reinterpret_cast<char*>(data) + size);
 			}
 		}
