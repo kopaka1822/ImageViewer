@@ -167,10 +167,12 @@ namespace TextureViewer.Models.Shader.Statistics
                         {
                             /* only write the value as is */
                             vec4 color = combineSingle(texelFetch(src_image, pos1, 0));
+                            if(any(isnan(color))) color = vec4(0);
                             imageStore(dst_image, pos1, color);
                             return;
                         }
                         vec4 color = combine( texelFetch(src_image, pos1, 0), texelFetch(src_image, pos2, 0) );
+                        if(any(isnan(color))) color = vec4(0);
                         //imageStore(dst_image, pos1, vec4(float(pos2.x)));
                         imageStore(dst_image, pos1, color);
 
