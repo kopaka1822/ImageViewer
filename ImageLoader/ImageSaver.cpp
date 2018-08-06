@@ -64,7 +64,7 @@ bool save_pfm(const char* filename, int width, int height, int components, const
 			for (int x = 0; x < width; ++x)
 			{
 				for(int c = 0; c < components; ++c)
-				file.write(reinterpret_cast<const char*>(&v[c + components * (x + (height-1-y) * width)]), sizeof(float));
+				file.write(reinterpret_cast<const char*>(&v[c + components * (x + y * width)]), sizeof(float));
 			}
 		}
 		return true;

@@ -283,19 +283,6 @@ namespace TextureViewer.glhelper
                 buffer = layerBuffer;
             }
 
-            // mirror horizontally
-            if (layer >= 0)
-            {
-                // only this layer
-                MirrorHorizontally(buffer, width * GetPixelTypeSize(type) * GetPixelFormatCount(format), height, layer * (bufferSize / nLayer));
-            }
-            else
-            {
-                // all layer
-                for (int curLayer = 0; curLayer < nLayer; ++curLayer)
-                    MirrorHorizontally(buffer, width * GetPixelTypeSize(type) * GetPixelFormatCount(format), height, curLayer * (bufferSize / nLayer));
-            }
-
             return buffer;
         }
 
@@ -346,24 +333,7 @@ namespace TextureViewer.glhelper
             GL.DeleteFramebuffer(framebufferId);
             GL.DeleteTexture(framebufferTexture);
 
-            MirrorHorizontally(buffer, width * GetPixelTypeSize(type) * GetPixelFormatCount(format), height, 0);
-
             return buffer;
-        }
-
-        private void MirrorHorizontally(byte[] buffer, int lineWidth, int height, int offset)
-        {
-            for (int y = 0; y < height / 2; ++y)
-            {
-                for (int x = 0; x < lineWidth; ++x)
-                {
-                    var a = y * lineWidth + x + offset;
-                    var b = (height - y - 1) * lineWidth + x + offset;
-                    var tmp = buffer[a];
-                    buffer[a] = buffer[b];
-                    buffer[b] = tmp;
-                }
-            }
         }
 
         public static int GetPixelFormatCount(PixelFormat f)
