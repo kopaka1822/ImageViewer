@@ -221,6 +221,9 @@ namespace TextureViewer.ViewModels
 
         private bool HasEquationChanged(int id)
         {
+            // if the statistics point has changed the image needs to be recomputed
+            if (statisticsPoint != models.Filter.StatisticsPoint) return true;
+
             var oldVisible = models.Filter.Filter.Where(filterModel => filterModel.IsVisibleFor(id)).ToList();
             var newVisible = items.Where(filterItem => filterItem.WillBeVisibleFor(id)).ToList();
 
