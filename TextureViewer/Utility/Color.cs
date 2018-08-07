@@ -86,8 +86,8 @@ namespace TextureViewer.Utility
 
         private float ToSrgb(float c)
         {
-            if (c > 1.0f) return 1.0f;
-            if (c < 0.0f) return 0.0f;
+            if (c >= 1.0f) return 1.0f;
+            if (c <= 0.0f) return 0.0f;
             if (c < 0.0031308) return 12.92f * c;
             return 1.055f * (float)Math.Pow(c, 0.41666) - 0.055f;
         }
