@@ -105,7 +105,7 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 		format.openglExternalFormat = getDefaultExternalFormat(nComponents);
 		format.openglType = gli::gl::type_format::TYPE_U8;
 		format.isCompressed = false;
-		format.isSrgb = false; // srbb conversion is done by choosing the correct internal format (e.g. srgb8)
+		format.isSrgb = false; // srgb conversion is done by choosing the correct internal format (e.g. srgb8)
 
 		size_t mipSize = mipmap.width * mipmap.height * nComponents;
 		mipmap.bytes.resize(mipSize);

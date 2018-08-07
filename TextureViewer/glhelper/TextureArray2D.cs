@@ -32,6 +32,11 @@ namespace TextureViewer.glhelper
         public bool HasMipmaps => nMipmaps > 1;
 
         /// <summary>
+        /// indicates if the texture needs to be converted from srb space to physical space
+        /// </summary>
+        public bool IsSrgb { get; } = false;
+
+        /// <summary>
         /// creates an empty Texture 2D Array
         /// </summary>
         /// <param name="numLayers"></param>
@@ -64,6 +69,7 @@ namespace TextureViewer.glhelper
             this.nMipmaps = image.NumMipmaps;
             this.nLayer = image.Layers.Count;
             this.internalFormat = (SizedInternalFormat)image.OpenglInternalFormat;
+            this.IsSrgb = image.IsSrgb;
 
             GL.BindTexture(TextureTarget.Texture2DArray, id);
 
