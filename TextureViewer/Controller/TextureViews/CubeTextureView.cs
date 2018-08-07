@@ -22,7 +22,7 @@ namespace TextureViewer.Controller.TextureViews
 
         protected override Matrix4 GetOrientation()
         {
-            return Matrix4.CreateScale(1.0f, -1.0f, 1.0f);
+            return Matrix4.CreateScale(1.0f, 1.0f, 1.0f);
         }
 
         public override void Draw(TextureArray2D texture)
@@ -110,20 +110,16 @@ namespace TextureViewer.Controller.TextureViews
             // some tricking to get the coordinates right
             switch (maxIndex)
             {
-                case 0:
-                    sc *= -1.0f;
-                    break;
                 case 2:
                     sc *= -1.0f;
+                    tc *= -1.0f;
                     break;
                 case 1:
+                    tc *= -1.0f;
+                    break;
                 case 3:
                 case 4:
                     sc *= -1.0f;
-                    tc *= -1.0f;
-                    break;
-                case 5:
-                    tc *= -1.0f;
                     break;
             }
 

@@ -23,13 +23,15 @@ std::unique_ptr<ImageResource> openexr_load(const char* filename)
 	mipmap.depth = 1;
 	mipmap.width = width;
 	mipmap.height = height;
-	// image is upside down => revert
+	
+	/*// image is upside down => revert
 	
 	size_t lineBytes = width * 16;
 	for(size_t y = 0; y < height; ++y)
 	{
 		memcpy(mipmap.bytes.data() + y * lineBytes, reinterpret_cast<char*>(out) + (height - y - 1) * lineBytes, lineBytes);
-	}
+	}*/
+	memcpy(mipmap.bytes.data(), out, imgSize);
 
 	res->format.isCompressed = false;
 	res->format.isSrgb = false;

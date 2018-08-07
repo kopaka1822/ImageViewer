@@ -70,7 +70,7 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 	ImageMipmap mipmap;
 	ImageFormat format;
 
-	stbi_set_flip_vertically_on_load(true);
+	//stbi_set_flip_vertically_on_load(true);
 	if (stbi_is_hdr(filename))
 	{
 		// load hdr file
@@ -126,7 +126,7 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 
 void stb_save_png(const char* filename, int width, int height, int components, const void* data)
 {
-	stbi_flip_vertically_on_write(1);
+	//stbi_flip_vertically_on_write(1);
 	auto res = stbi_write_png(filename, width, height, components, data, width * components);
 	if (!res)
 		throw std::exception("could not save file");
@@ -134,7 +134,7 @@ void stb_save_png(const char* filename, int width, int height, int components, c
 
 void stb_save_bmp(const char* filename, int width, int height, int components, const void* data)
 {
-	stbi_flip_vertically_on_write(1);
+	//stbi_flip_vertically_on_write(1);
 	auto res = stbi_write_bmp(filename, width, height, components, data);
 	if (!res)
 		throw std::exception("could not save file");
@@ -142,7 +142,7 @@ void stb_save_bmp(const char* filename, int width, int height, int components, c
 
 void stb_save_hdr(const char* filename, int width, int height, int components, const void* data)
 {
-	stbi_flip_vertically_on_write(1);
+	//stbi_flip_vertically_on_write(1);
 	auto res = stbi_write_hdr(filename, width, height, components, reinterpret_cast<const float*>(data));
 	if (!res)
 		throw std::exception("could not save file");

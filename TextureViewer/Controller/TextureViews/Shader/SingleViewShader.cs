@@ -64,6 +64,7 @@ namespace TextureViewer.Controller.TextureViews.Shader
                    "gl_Position = transform * vertex;\n" +
                    // [-1,1]->[0,1]
                    "texcoord = (vertex.xy + vec2(1.0)) * vec2(0.5);\n" +
+                   "texcoord.y = 1.0 - texcoord.y;\n" +
                    "}\n";
         }
 

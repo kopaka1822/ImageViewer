@@ -20,10 +20,10 @@ namespace TextureViewer.Controller.TextureViews
         {
             // -x
             DrawLayer(Matrix4.CreateTranslation(-2.0f, 0.0f, 0.0f), 1, texture);
-            // +y
-            DrawLayer(Matrix4.CreateTranslation(0.0f, 2.0f, 0.0f), 3, texture);
             // -y
-            DrawLayer(Matrix4.CreateTranslation(0.0f, -2.0f, 0.0f), 2, texture);
+            DrawLayer(Matrix4.CreateTranslation(0.0f, -2.0f, 0.0f), 3, texture);
+            // +y
+            DrawLayer(Matrix4.CreateTranslation(0.0f, 2.0f, 0.0f), 2, texture);
             // +z
             DrawLayer(Matrix4.CreateTranslation(0.0f, 0.0f, 0.0f), 4, texture);
             // +x

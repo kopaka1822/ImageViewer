@@ -68,6 +68,7 @@ namespace TextureViewer.Controller.TextureViews.Shader
                    "if(gl_VertexID == 3u) vertex = vec4(-1.0, 1.0, 0.0, 1.0);\n" +
                    "gl_Position = vertex;" +
                    "raydir = normalize((transform * vec4(vertex.xy, farplane, 0.0)).xyz);\n" +
+                   "raydir.y *= -1.0;\n" + 
                    "}\n";
         }
 
