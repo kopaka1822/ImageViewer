@@ -71,7 +71,7 @@ namespace TextureViewer.Commands
             dia.Owner = models.App.Window;
             if (dia.ShowDialog() != true) return;
 
-            var info = dia.Model;
+            var info = models.Export;
 
             models.GlContext.Enable();
             try

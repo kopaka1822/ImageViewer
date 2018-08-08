@@ -17,12 +17,10 @@ namespace TextureViewer.ViewModels.Dialog
     public class ExportViewModel : INotifyPropertyChanged
     {
         private readonly Models.Models models;
-        private readonly ExportModel export;
 
-        public ExportViewModel(Models.Models models, ExportModel export)
+        public ExportViewModel(Models.Models models)
         {
             this.models = models;
-            this.export = export;
 
             // init layers
             for (var i = 0; i < models.Images.NumLayers; ++i)
@@ -30,7 +28,7 @@ namespace TextureViewer.ViewModels.Dialog
                 AvailableLayers.Add(new ComboBoxItem<int>("Layer " + i, i));
             }
             SelectedLayer = AvailableLayers[0];
-            Debug.Assert(SelectedLayer.Cargo == export.Layer);
+            Debug.Assert(SelectedLayer.Cargo == models.Export.Layer);
 
             // init mipmaps
             for (var i = 0; i < models.Images.NumMipmaps; ++i)
@@ -38,20 +36,49 @@ namespace TextureViewer.ViewModels.Dialog
                 AvailableMipmaps.Add(new ComboBoxItem<int>("Mipmap " + i, i));
             }
             SelectedMipmap = AvailableMipmaps[0];
-            Debug.Assert(SelectedMipmap.Cargo == export.Mipmap);
+            Debug.Assert(SelectedMipmap.Cargo == models.Export.Mipmap);
 
             // init formats
-            foreach (var format in export.SupportedFormats)
+            foreach (var format in models.Export.SupportedFormats)
             {
                 AvailableFormat.Add(new ComboBoxItem<PixelFormat>(format.ToString().ToUpper(), format));
-                if (format == export.PixelFormat)
+                if (format == models.Export.PixelFormat)
                     SelectedFormat = AvailableFormat.Last();
+            }
+
+            models.Export.PropertyChanged += ExportOnPropertyChanged;
+        }
+
+        public void Dispose()
+        {
+            models.Export.PropertyChanged -= ExportOnPropertyChanged;
+        }
+
+        private void ExportOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(ExportModel.UseCropping):
+                    OnPropertyChanged(nameof(UseCropping));
+                    break;
+                case nameof(ExportModel.CropStartX):
+                    OnPropertyChanged(nameof(CropStartX));
+                    break;
+                case nameof(ExportModel.CropStartY):
+                    OnPropertyChanged(nameof(CropStartY));
+                    break;
+                case nameof(ExportModel.CropEndX):
+                    OnPropertyChanged(nameof(CropEndX));
+                    break;
+                case nameof(ExportModel.CropEndY):
+                    OnPropertyChanged(nameof(CropEndY));
+                    break;
             }
         }
 
         public string Filename
         {
-            get => export.Filename;
+            get => models.Export.Filename;
             set
             {
                 // do nothing. the text box needs a read/write property but wont be changed anyways
@@ -74,7 +101,7 @@ namespace TextureViewer.ViewModels.Dialog
             {
                 if (value == null || value == selectedLayer) return;
                 selectedLayer = value;
-                export.Layer = selectedLayer.Cargo;
+                models.Export.Layer = selectedLayer.Cargo;
                 OnPropertyChanged(nameof(SelectedLayer));
             }
         }
@@ -87,7 +114,7 @@ namespace TextureViewer.ViewModels.Dialog
             {
                 if (value == null || value == selectedMipmap) return;
                 selectedMipmap = value;
-                export.Mipmap = selectedMipmap.Cargo;
+                models.Export.Mipmap = selectedMipmap.Cargo;
                 OnPropertyChanged(nameof(SelectedMipmap));
             }
         }
@@ -100,9 +127,39 @@ namespace TextureViewer.ViewModels.Dialog
             {
                 if (value == null || value == selectedFormat) return;
                 selectedFormat = value;
-                export.PixelFormat = selectedFormat.Cargo;
+                models.Export.PixelFormat = selectedFormat.Cargo;
                 OnPropertyChanged(nameof(SelectedFormat));
             }
+        }
+
+        public bool UseCropping
+        {
+            get => models.Export.UseCropping;
+            set => models.Export.UseCropping = value;
+        }
+
+        public int CropStartX
+        {
+            get => models.Export.CropStartX;
+            set => models.Export.CropStartX = value;
+        }
+
+        public int CropStartY
+        {
+            get => models.Export.CropStartY;
+            set => models.Export.CropStartY = value;
+        }
+
+        public int CropEndX
+        {
+            get => models.Export.CropEndX;
+            set => models.Export.CropEndX = value;
+        }
+
+        public int CropEndY
+        {
+            get => models.Export.CropEndY;
+            set => models.Export.CropEndY = value;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

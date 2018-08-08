@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:TextureViewer.Views"
         mc:Ignorable="d"
         Title="Export"
-        Height="200"
+        Height="240"
         Width="400"
         ResizeMode="NoResize"
         Background="#eee"
@@ -66,6 +66,54 @@
                         IsEnabled="{Binding EnableFormat}"
                         ItemsSource="{Binding AvailableFormat}"
                         SelectedItem="{Binding SelectedFormat}"/>
+                </Grid>
+
+                <!-- Crop -->
+                <Grid Margin="0 0 0 15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel 
+                        Orientation="Horizontal"
+                        VerticalAlignment="Top">
+                        <TextBlock 
+                            Text="Crop:" 
+                            Margin="0 0 5 0"
+                            VerticalAlignment="Center"/>
+                        <CheckBox 
+                            VerticalAlignment="Center"
+                            IsChecked="{Binding UseCropping}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <StackPanel 
+                            Orientation="Horizontal"
+                            Margin="0 0 0 5">
+                            <TextBlock Text="X from: " Width="45"/>
+                            <TextBox 
+                                Width="80" 
+                                Margin="0 0 5 0"
+                                IsEnabled="{Binding UseCropping}"
+                                />
+                            <TextBlock Text="to:" Margin="0 0 5 0"/>
+                            <TextBox 
+                                Width="80" 
+                                IsEnabled="{Binding UseCropping}"/>
+                        </StackPanel>
+                        <StackPanel
+                            Orientation="Horizontal">
+                            <TextBlock Text="Y from: " Width="45"/>
+                            <TextBox 
+                                Width="80" 
+                                Margin="0 0 5 0"
+                                IsEnabled="{Binding UseCropping}"/>
+                            <TextBlock Text="to:" Margin="0 0 5 0"/>
+                            <TextBox 
+                                Width="80" 
+                                IsEnabled="{Binding UseCropping}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
                 </Grid>
 
                 <Grid HorizontalAlignment="Right">
