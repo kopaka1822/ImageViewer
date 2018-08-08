@@ -70,6 +70,42 @@ namespace TextureViewer.Models.Dialog
         {
             this.imagesModel = imagesModel;
             this.displayModel = displayModel;
+
+            imagesModel.PropertyChanged += ImagesModelOnPropertyChanged;
+        }
+
+        private void ImagesModelOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(ImagesModel.NumImages):
+                    if (imagesModel.PrevNumImages == 0 || imagesModel.NumImages == 0)
+                    {
+                        // TODO set mipmap
+                        OnPropertyChanged(nameof(CropMaxX));
+                        OnPropertyChanged(nameof(CropMaxY));
+                    }
+
+                    if (imagesModel.PrevNumImages == 0)
+                    {
+                        // set default width, height
+                        CropStartX = 0;
+                        CropStartY = 0;
+                        CropEndX = CropMaxX;
+                        CropEndY = CropMaxY;
+                    }
+
+                    if (imagesModel.NumImages == 0)
+                    {
+                        // reset everything to 0
+                        CropStartX = 0;
+                        CropStartY = 0;
+                        CropEndX = 0;
+                        CropEndY = 0;
+                    }
+                    
+                    break;
+            }
         }
 
         public string Filename { get; private set; }
@@ -102,6 +138,11 @@ namespace TextureViewer.Models.Dialog
             }
         }
 
+        public int CropMinX => 0;
+        public int CropMinY => 0;
+        public int CropMaxX => imagesModel.NumImages != 0 ? Math.Max(imagesModel.GetWidth(Mipmap) - 1, 0) : 0;
+        public int CropMaxY => imagesModel.NumImages != 0 ? Math.Max(imagesModel.GetHeight(Mipmap) - 1, 0) : 0;
+
         private int cropStartX = 0;
         private int cropStartY = 0;
         private int cropEndX;
@@ -112,8 +153,9 @@ namespace TextureViewer.Models.Dialog
             get => cropStartX;
             set
             {
-                if (value == cropStartX) return;
-                cropStartX = value;
+                var val = Math.Min(Math.Max(value, CropMinX), CropMaxX);
+                if (val == cropStartX) return;
+                cropStartX = val;
                 OnPropertyChanged(nameof(CropStartX));
             }
         }
@@ -122,8 +164,9 @@ namespace TextureViewer.Models.Dialog
             get => cropStartY;
             set
             {
-                if (value == cropStartY) return;
-                cropStartY = value;
+                var val = Math.Min(Math.Max(value, CropMinY), CropMaxY);
+                if (val == cropStartY) return;
+                cropStartY = val;
                 OnPropertyChanged(nameof(CropStartY));
             }
         }
@@ -132,8 +175,9 @@ namespace TextureViewer.Models.Dialog
             get => cropEndX;
             set
             {
-                if (value == cropEndX) return;
-                cropEndX = value;
+                var val = Math.Min(Math.Max(value, CropMinX), CropMaxX);
+                if (val == cropEndX) return;
+                cropEndX = val;
                 OnPropertyChanged(nameof(CropEndX));
             }
         }
@@ -142,8 +186,9 @@ namespace TextureViewer.Models.Dialog
             get => cropEndY;
             set
             {
-                if (value == cropEndY) return;
-                cropEndY = value;
+                var val = Math.Min(Math.Max(value, CropMinY), CropMaxY);
+                if (val == cropEndY) return;
+                cropEndY = val;
                 OnPropertyChanged(nameof(CropEndY));
             }
         }

@@ -61,6 +61,18 @@ namespace TextureViewer.ViewModels.Dialog
                 case nameof(ExportModel.UseCropping):
                     OnPropertyChanged(nameof(UseCropping));
                     break;
+                case nameof(ExportModel.CropMinX):
+                    OnPropertyChanged(nameof(CropMinX));
+                    break;
+                case nameof(ExportModel.CropMinY):
+                    OnPropertyChanged(nameof(CropMinY));
+                    break;
+                case nameof(ExportModel.CropMaxX):
+                    OnPropertyChanged(nameof(CropMaxX));
+                    break;
+                case nameof(ExportModel.CropMaxY):
+                    OnPropertyChanged(nameof(CropMaxY));
+                    break;
                 case nameof(ExportModel.CropStartX):
                     OnPropertyChanged(nameof(CropStartX));
                     break;
@@ -137,6 +149,11 @@ namespace TextureViewer.ViewModels.Dialog
             get => models.Export.UseCropping;
             set => models.Export.UseCropping = value;
         }
+
+        public int CropMinX => models.Export.CropMinX;
+        public int CropMaxX => models.Export.CropMaxX;
+        public int CropMinY => models.Export.CropMinY;
+        public int CropMaxY => models.Export.CropMaxY;
 
         public int CropStartX
         {
