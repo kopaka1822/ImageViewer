@@ -215,6 +215,7 @@
     <Compile Include="Models\OpenGlModel.cs" />
     <Compile Include="Models\ProgressModel.cs" />
     <Compile Include="Models\Shader\FilterShader.cs" />
+    <Compile Include="Models\Shader\PixelExportShader.cs" />
     <Compile Include="Models\Shader\SrgbShader.cs" />
     <Compile Include="Models\Shader\Statistics\AverageStatistics.cs" />
     <Compile Include="Models\Shader\Statistics\MaxStatistics.cs" />

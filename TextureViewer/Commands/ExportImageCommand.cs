@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -83,24 +84,15 @@ namespace TextureViewer.Commands
                 if (texture == null)
                     throw new Exception("texture is not computed");
 
-                byte[] data = null;
-                var width = 0;
-                var height = 0;
+                var width = info.GetCropWidth();
+                var height = info.GetCropHeight();
+                Debug.Assert(width > 0);
+                Debug.Assert(height > 0);
 
-                if (format == ExportModel.FileFormat.Png || format == ExportModel.FileFormat.Bmp)
-                {
-                    // disable srgbframebuffer to save the result correctly
-                    //GL.Disable(EnableCap.FramebufferSrgb);
-                    // values have to be converted i
-                    data = texture.GetSrgbData(info.Layer, info.Mipmap, info.PixelFormat, info.PixelType, out width,
-                        out height, models.GlData);
-
-                }
-                else
-                {
-                    data = texture.GetData(info.Layer, info.Mipmap, info.PixelFormat, info.PixelType,
-                        out width, out height);
-                }
+                var convertToSrgb = format == ExportModel.FileFormat.Png || format == ExportModel.FileFormat.Bmp;
+                var data = texture.GetData(info.Layer, info.Mipmap, info.PixelFormat, info.PixelType, convertToSrgb,
+                    info.UseCropping, info.CropStartX, info.CropStartY, ref width, ref height,
+                    models.GlData.ExportShader);
 
                 if (data == null)
                     throw new Exception("error retrieving image from gpu");

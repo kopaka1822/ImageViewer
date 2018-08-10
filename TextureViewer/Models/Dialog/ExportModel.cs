@@ -201,5 +201,15 @@ namespace TextureViewer.Models.Dialog
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public int GetCropWidth()
+        {
+            return CropEndX - CropStartX + 1;
+        }
+
+        public int GetCropHeight()
+        {
+            return CropEndY - CropStartY + 1;
+        }
     }
 }
