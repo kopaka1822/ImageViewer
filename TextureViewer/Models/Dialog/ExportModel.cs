@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.Annotations;
 
@@ -210,6 +211,26 @@ namespace TextureViewer.Models.Dialog
         public int GetCropHeight()
         {
             return CropEndY - CropStartY + 1;
+        }
+
+        public float GetCropStartXPercent()
+        {
+            return (float)CropStartX / (CropMaxX + 1);
+        }
+
+        public float GetCropEndXPercent()
+        {
+            return (float)(CropEndX + 1) / (CropMaxX + 1);
+        }
+
+        public float GetCropStartYPercent()
+        {
+            return (float)CropStartY / (CropMaxY + 1);
+        }
+
+        public float GetCropEndYPercent()
+        {
+            return (float)(CropEndY + 1) / (CropMaxY + 1);
         }
     }
 }

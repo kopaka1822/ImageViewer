@@ -41,6 +41,19 @@ namespace TextureViewer.Controller.TextureViews.Shader
                    "else if(grayscale == uint(4)) color = vec4(color.aaa,1.0);\n";
         }
 
+        /// <summary>
+        /// darkens the area that will be cropped by the image export.
+        /// - color must be the current color
+        /// - texcoord the current texture coordinate
+        /// - crop must be the crop boundry vec4(xmin, xmax, ymin, ymax)
+        /// </summary>
+        /// <returns></returns>
+        protected static string ApplyColorCrop(string texcoord = "texcoord")
+        {
+            return $"if({texcoord}.x < crop.x || {texcoord}.x > crop.y || {texcoord}.y < crop.z || {texcoord}.y > crop.w)\n" +
+                   "color.rgb = min(color.rgb, vec3(1.0)) * vec3(0.5);\n";
+        }
+
         public void Dispose()
         {
             ShaderProgram?.Dispose();

@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.Models;
+using TextureViewer.Models.Dialog;
 
 namespace TextureViewer.Controller
 {
@@ -23,9 +24,23 @@ namespace TextureViewer.Controller
 
             this.models.GlContext.GlControl.Paint += OnPaint;
             this.models.GlContext.PropertyChanged += GlContextOnPropertyChanged;
+            this.models.Export.PropertyChanged += ExportOnPropertyChanged;
 
             this.viewModeController = new ViewModeController(models);
             this.progressController = new ProgressController(models);
+        }
+
+        private void ExportOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(ExportModel.CropMinX):
+                case nameof(ExportModel.CropMinY):
+                case nameof(ExportModel.CropMaxX):
+                case nameof(ExportModel.CropMaxY):
+                    models.GlContext.RedrawFrame();
+                    break;
+            }
         }
 
         private void GlContextOnPropertyChanged(object sender, PropertyChangedEventArgs args)

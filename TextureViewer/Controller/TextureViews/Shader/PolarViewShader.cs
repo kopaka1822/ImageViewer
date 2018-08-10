@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.Models;
+using TextureViewer.Models.Dialog;
 
 namespace TextureViewer.Controller.TextureViews.Shader
 {
@@ -51,6 +52,19 @@ namespace TextureViewer.Controller.TextureViews.Shader
             return 0;
         }
 
+        public void SetCrop(ExportModel model)
+        {
+            if (model.UseCropping)
+            {
+                GL.Uniform4(6, model.GetCropStartXPercent(), model.GetCropEndXPercent(),
+                    model.GetCropStartYPercent(), model.GetCropEndYPercent());
+            }
+            else
+            {
+                GL.Uniform4(6, 0.0f, 1.0f, 0.0f, 1.0f);
+            }
+        }
+
         public static string GetVertexSource()
         {
             return GetVersion() +
@@ -80,6 +94,7 @@ namespace TextureViewer.Controller.TextureViews.Shader
                    "layout(location = 2) uniform float layer;\n" +
                    "layout(location = 3) uniform float level;\n" +
                    "layout(location = 4) uniform uint grayscale;\n" +
+                   "layout(location = 6) uniform vec4 crop;\n" +
                    // in out
                    "layout(location = 0) in vec3 raydir;\n" +
                    "out vec4 fragColor;\n" +
@@ -99,6 +114,7 @@ namespace TextureViewer.Controller.TextureViews.Shader
                    "if( polarDirection.s < 0.0) polarDirection.s += 1.0;\n" +
                    "vec4 color = textureLod(tex, vec3(polarDirection.st, layer), level);\n" +
                    ApplyGrayscale() +
+                   ApplyColorCrop("polarDirection") +
                    "fragColor = color;\n" +
                    "}\n";
         }
