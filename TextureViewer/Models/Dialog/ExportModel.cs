@@ -82,7 +82,7 @@ namespace TextureViewer.Models.Dialog
                 case nameof(ImagesModel.NumImages):
                     if (imagesModel.PrevNumImages == 0 || imagesModel.NumImages == 0)
                     {
-                        // TODO set mipmap
+                        Mipmap = 0;
                         OnPropertyChanged(nameof(CropMaxX));
                         OnPropertyChanged(nameof(CropMaxY));
                     }
@@ -128,8 +128,25 @@ namespace TextureViewer.Models.Dialog
 
         public int Layer { get; set; }
 
-        public int Mipmap { get; set; }
-
+        private int mipmap = 0;
+        public int Mipmap
+        {
+            get => mipmap;
+            set
+            {
+                if (mipmap == value) return;
+                mipmap = value;
+                OnPropertyChanged(nameof(Mipmap));
+                // dimensions have changed
+                OnPropertyChanged(nameof(CropMaxX));
+                OnPropertyChanged(nameof(CropMaxY));
+                // adjust other crop values
+                if (CropStartX > CropMaxX) CropStartX = CropMaxX;
+                if (CropStartY > CropMaxY) CropStartY = CropMaxY;
+                if (CropEndX > CropMaxX) CropEndX = CropMaxX;
+                if (CropEndY > CropMaxY) CropEndY = CropMaxY;
+            }
+        }
         public PixelFormat PixelFormat { get; set; }
 
         public IReadOnlyList<PixelFormat> SupportedFormats { get; private set; }
