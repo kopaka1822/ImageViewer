@@ -34,10 +34,10 @@ namespace TextureViewer.Controller
         {
             switch (args.PropertyName)
             {
-                case nameof(ExportModel.CropMinX):
-                case nameof(ExportModel.CropMinY):
-                case nameof(ExportModel.CropMaxX):
-                case nameof(ExportModel.CropMaxY):
+                case nameof(ExportModel.CropStartX):
+                case nameof(ExportModel.CropStartY):
+                case nameof(ExportModel.CropEndX):
+                case nameof(ExportModel.CropEndY):
                     models.GlContext.RedrawFrame();
                     break;
             }

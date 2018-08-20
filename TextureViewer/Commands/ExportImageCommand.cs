@@ -67,62 +67,69 @@ namespace TextureViewer.Commands
             if (models.Images.IsGrayscale)
                 pixelFormat = PixelFormat.Red;
 
+            models.Export.IsExporting = true;
             // open export dialog
             var dia = new ExportDialog(models, sfd.FileName, pixelFormat, format);
             dia.Owner = models.App.Window;
-            if (dia.ShowDialog() != true) return;
-
-            var info = models.Export;
-
-            models.GlContext.Enable();
-            try
+            dia.Closed += (sender, args) =>
             {
-                // obtain data from gpu
-                var visibleId = models.Equations.GetFirstVisible();
+                models.Export.IsExporting = false;
+                if (!dia.ExportResult) return;
 
-                var texture = models.FinalImages.Get(visibleId).Texture;
-                if (texture == null)
-                    throw new Exception("texture is not computed");
+                var info = models.Export;
 
-                var width = info.GetCropWidth();
-                var height = info.GetCropHeight();
-                Debug.Assert(width > 0);
-                Debug.Assert(height > 0);
-
-                var convertToSrgb = format == ExportModel.FileFormat.Png || format == ExportModel.FileFormat.Bmp;
-                var data = texture.GetData(info.Layer, info.Mipmap, info.PixelFormat, info.PixelType, convertToSrgb,
-                    info.UseCropping, info.CropStartX, info.CropStartY, ref width, ref height,
-                    models.GlData.ExportShader);
-
-                if (data == null)
-                    throw new Exception("error retrieving image from gpu");
-
-                var numComponents = TextureArray2D.GetPixelFormatCount(info.PixelFormat);
-
-                switch (format)
+                models.GlContext.Enable();
+                try
                 {
-                    case ExportModel.FileFormat.Png:
-                        ImageLoader.SavePng(info.Filename, width, height, numComponents, data);
-                        break;
-                    case ExportModel.FileFormat.Bmp:
-                        ImageLoader.SaveBmp(info.Filename, width, height, numComponents, data);
-                        break;
-                    case ExportModel.FileFormat.Hdr:
-                        ImageLoader.SaveHdr(info.Filename, width, height, numComponents, data);
-                        break;
-                    case ExportModel.FileFormat.Pfm:
-                        ImageLoader.SavePfm(info.Filename, width, height, numComponents, data);
-                        break;
+                    // obtain data from gpu
+                    var visibleId = models.Equations.GetFirstVisible();
+
+                    var texture = models.FinalImages.Get(visibleId).Texture;
+                    if (texture == null)
+                        throw new Exception("texture is not computed");
+
+                    var width = info.GetCropWidth();
+                    var height = info.GetCropHeight();
+                    Debug.Assert(width > 0);
+                    Debug.Assert(height > 0);
+
+                    var convertToSrgb = format == ExportModel.FileFormat.Png || format == ExportModel.FileFormat.Bmp;
+                    var data = texture.GetData(info.Layer, info.Mipmap, info.PixelFormat, info.PixelType, convertToSrgb,
+                        info.UseCropping, info.CropStartX, info.CropStartY, ref width, ref height,
+                        models.GlData.ExportShader);
+
+                    if (data == null)
+                        throw new Exception("error retrieving image from gpu");
+
+                    var numComponents = TextureArray2D.GetPixelFormatCount(info.PixelFormat);
+
+                    switch (format)
+                    {
+                        case ExportModel.FileFormat.Png:
+                            ImageLoader.SavePng(info.Filename, width, height, numComponents, data);
+                            break;
+                        case ExportModel.FileFormat.Bmp:
+                            ImageLoader.SaveBmp(info.Filename, width, height, numComponents, data);
+                            break;
+                        case ExportModel.FileFormat.Hdr:
+                            ImageLoader.SaveHdr(info.Filename, width, height, numComponents, data);
+                            break;
+                        case ExportModel.FileFormat.Pfm:
+                            ImageLoader.SavePfm(info.Filename, width, height, numComponents, data);
+                            break;
+                    }
                 }
-            }
-            catch (Exception e)
-            {
-                App.ShowErrorDialog(models.App.Window, e.Message);
-            }
-            finally
-            {
-                models.GlContext.Disable();
-            }
+                catch (Exception e)
+                {
+                    App.ShowErrorDialog(models.App.Window, e.Message);
+                }
+                finally
+                {
+                    models.GlContext.Disable();
+                }
+            };
+
+            dia.Show();
         }
 
         public event EventHandler CanExecuteChanged

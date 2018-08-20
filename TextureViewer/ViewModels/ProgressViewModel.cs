@@ -20,6 +20,17 @@ namespace TextureViewer.ViewModels
         {
             this.models = models;
             this.models.Progress.PropertyChanged += ProgressOnPropertyChanged;
+            this.models.Export.PropertyChanged += ExportOnPropertyChanged;
+        }
+
+        private void ExportOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch(args.PropertyName)
+            {
+                case nameof(Models.Dialog.ExportModel.IsExporting):
+                    OnPropertyChanged(nameof(NotProcessing));
+                    break;
+            }
         }
 
         private void ProgressOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -37,7 +48,7 @@ namespace TextureViewer.ViewModels
         }
 
         public Visibility EnableProgress => models.Progress.IsProcessing ? Visibility.Visible : Visibility.Collapsed;
-        public bool NotProcessing => !models.Progress.IsProcessing;
+        public bool NotProcessing => !models.Progress.IsProcessing && !models.Export.IsExporting;
 
         public float ProgressValue
         {

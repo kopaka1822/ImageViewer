@@ -109,6 +109,19 @@ namespace TextureViewer.Models.Dialog
             }
         }
 
+        private bool isExporting = false;
+        // this indicates if the export dialog is open
+        public bool IsExporting
+        {
+            get => isExporting;
+            set
+            {
+                if (value == isExporting) return;
+                isExporting = value;
+                OnPropertyChanged(nameof(IsExporting));
+            }
+        }
+
         public string Filename { get; private set; }
 
         public FileFormat Format;

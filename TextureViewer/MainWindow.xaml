@@ -30,14 +30,16 @@
             <MenuItem Header="File">
                 <MenuItem 
                     Header="_Open"
-                    Command="{Binding OpenCommand}">
+                    Command="{Binding OpenCommand}"
+                  IsEnabled="{Binding Progress.NotProcessing}">
                     <MenuItem.Icon>
                         <Image Source="Icons/open.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem 
                     Header="_Import"
-                    Command="{Binding ImportCommand}">
+                    Command="{Binding ImportCommand}"
+                  IsEnabled="{Binding Progress.NotProcessing}">
                     <MenuItem.Icon>
                         <Image Source="Icons/import.png"/>
                     </MenuItem.Icon>

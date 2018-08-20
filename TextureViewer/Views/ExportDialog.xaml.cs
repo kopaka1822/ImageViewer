@@ -12,6 +12,7 @@ namespace TextureViewer.Views
     public partial class ExportDialog : Window
     {
         private readonly ExportViewModel viewModel;
+        public bool ExportResult { get; private set; } = false;
 
         public ExportDialog(Models.Models models, string filename, PixelFormat defaultPixelFormat, ExportModel.FileFormat format)
         {
@@ -24,12 +25,16 @@ namespace TextureViewer.Views
 
         private void ButtonExport_OnClick(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;
+            //DialogResult = true;
+            ExportResult = true;
+            Close();
         }
 
         private void ButtonCancel_OnClick(object sender, RoutedEventArgs e)
         {
-            DialogResult = false;
+            //DialogResult = false;
+            ExportResult = false;
+            Close();
         }
 
         protected override void OnClosed(EventArgs e)
