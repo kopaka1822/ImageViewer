@@ -88,17 +88,13 @@
                                 Width="80"
                                 IsEnabled="{Binding UseCropping}"
                                 Margin="0 0 5 0"
-                                Value="{Binding CropStartX}"
-                                Minimum="{Binding CropMinX}"
-                                Maximum="{Binding CropMaxX}"/>
+                                Value="{Binding CropStartX}"/>
                             <TextBlock Text="to:" Margin="0 0 5 0"/>
                             <xctk:IntegerUpDown
                                 Width="80"
                                 IsEnabled="{Binding UseCropping}"
                                 Margin="0 0 5 0"
-                                Value="{Binding CropEndX}"
-                                Minimum="{Binding CropMinX}"
-                                Maximum="{Binding CropMaxX}"/>
+                                Value="{Binding CropEndX}"/>
                         </StackPanel>
                         <StackPanel
                             Orientation="Horizontal">
@@ -107,17 +103,13 @@
                                 Width="80"
                                 IsEnabled="{Binding UseCropping}"
                                 Margin="0 0 5 0"
-                                Value="{Binding CropStartY}"
-                                Minimum="{Binding CropMinY}"
-                                Maximum="{Binding CropMaxY}"/>
+                                Value="{Binding CropStartY}"/>
                             <TextBlock Text="to:" Margin="0 0 5 0"/>
                             <xctk:IntegerUpDown
                                 Width="80"
                                 IsEnabled="{Binding UseCropping}"
                                 Margin="0 0 5 0"
-                                Value="{Binding CropEndY}"
-                                Minimum="{Binding CropMinY}"
-                                Maximum="{Binding CropMaxY}"/>
+                                Value="{Binding CropEndY}"/>
                         </StackPanel>
                     </StackPanel>
 
