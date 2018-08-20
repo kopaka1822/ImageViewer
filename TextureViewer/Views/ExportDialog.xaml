@@ -4,9 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TextureViewer.Views"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="Export"
-        Height="200"
+        Height="260"
         Width="400"
         ResizeMode="NoResize"
         Background="#eee"
@@ -55,7 +56,7 @@
                         SelectedItem="{Binding SelectedMipmap}"/>
                 </Grid>
                 <!-- Format -->
-                <Grid Margin="0 0 0 15">
+                <Grid Margin="0 0 0 5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="60"/>
                         <ColumnDefinition/>
@@ -67,6 +68,60 @@
                         ItemsSource="{Binding AvailableFormat}"
                         SelectedItem="{Binding SelectedFormat}"/>
                 </Grid>
+
+                <!-- Crop -->
+                <GroupBox Margin="0 0 0 15">
+                    <GroupBox.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Crop:" Margin="0 0 5 0" HorizontalAlignment="Center"/>
+                            <CheckBox 
+                                HorizontalAlignment="Center"
+                                IsChecked="{Binding UseCropping}"/>
+                        </StackPanel>
+                    </GroupBox.Header>
+                    <StackPanel HorizontalAlignment="Center">
+                        <StackPanel 
+                            Orientation="Horizontal"
+                            Margin="0 0 0 5">
+                            <TextBlock Text="X from: " Width="45"/>
+                            <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="0 0 5 0"
+                                Value="{Binding CropStartX}"
+                                Minimum="{Binding CropMinX}"
+                                Maximum="{Binding CropMaxX}"/>
+                            <TextBlock Text="to:" Margin="0 0 5 0"/>
+                            <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="0 0 5 0"
+                                Value="{Binding CropEndX}"
+                                Minimum="{Binding CropMinX}"
+                                Maximum="{Binding CropMaxX}"/>
+                        </StackPanel>
+                        <StackPanel
+                            Orientation="Horizontal">
+                            <TextBlock Text="Y from: " Width="45"/>
+                            <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="0 0 5 0"
+                                Value="{Binding CropStartY}"
+                                Minimum="{Binding CropMinY}"
+                                Maximum="{Binding CropMaxY}"/>
+                            <TextBlock Text="to:" Margin="0 0 5 0"/>
+                            <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="0 0 5 0"
+                                Value="{Binding CropEndY}"
+                                Minimum="{Binding CropMinY}"
+                                Maximum="{Binding CropMaxY}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                </GroupBox>
 
                 <Grid HorizontalAlignment="Right">
                     <Grid.ColumnDefinitions>

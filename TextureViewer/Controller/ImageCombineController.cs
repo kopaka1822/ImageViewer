@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using TextureViewer.Controller.Filter;
 using TextureViewer.Controller.ImageCombination;
 using TextureViewer.Models;
+using TextureViewer.Models.Filter;
 using TextureViewer.Utility;
 
 namespace TextureViewer.Controller
@@ -17,15 +18,17 @@ namespace TextureViewer.Controller
         private readonly ImageEquationModel equation;
         private readonly FinalImageModel finalImage;
         private readonly Models.Models models;
+        private readonly int equationId;
 
         // indicates if the image should be recomputed
         private bool recomputeImage = false;
 
-        public ImageCombineController(ImageEquationModel equation, FinalImageModel finalImage, Models.Models models)
+        public ImageCombineController(ImageEquationModel equation, FinalImageModel finalImage, Models.Models models, int equationId)
         {
             this.equation = equation;
             this.finalImage = finalImage;
             this.models = models;
+            this.equationId = equationId;
             equation.ColorFormula.PropertyChanged += FormulaOnPropertyChanged;
             equation.AlphaFormula.PropertyChanged += FormulaOnPropertyChanged;
             equation.PropertyChanged += EquationOnPropertyChanged;
@@ -33,9 +36,9 @@ namespace TextureViewer.Controller
             this.models.Filter.Changed += FilterOnChanged;
         }
 
-        private void FilterOnChanged(object sender, EventArgs eventArgs)
+        private void FilterOnChanged(object sender, FiltersModel.FiltersChangedEventArgs eventArgs)
         {
-            if (equation.UseFilter)
+            if (equation.UseFilter && eventArgs.Changed[equationId])
             {
                 recomputeImage = true;
                 models.GlContext.RedrawFrame();
@@ -112,7 +115,8 @@ namespace TextureViewer.Controller
                     if(i == models.Filter.StatisticsPoint)
                         steps.Add(new StatisticsSaveStepable(builder));
 
-                    steps.Add(models.Filter.Filter[i].MakeStepable(models, builder));
+                    if(models.Filter.Filter[i].IsVisibleFor(equationId))
+                        steps.Add(models.Filter.Filter[i].MakeStepable(models, builder));
                 }
             }
             steps.Add(new FinalImageStepable(builder, finalImage));

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL4;
+using TextureViewer.Models.Shader;
 
 namespace TextureViewer.glhelper
 {
@@ -47,13 +48,6 @@ namespace TextureViewer.glhelper
             GL.Arb.DebugMessageControl(All.DontCare, All.DontCare, All.DebugSeverityMedium, 0, (int[])null, true);
             GL.Arb.DebugMessageControl(All.DontCare, All.DontCare, All.DebugSeverityHigh, 0, (int[])null, true);
             GL.Arb.DebugMessageCallback(OpenGlDebug, IntPtr.Zero);
-        }
-
-        public static void ReadTexture<T>(TextureTarget target, int textureId, int level, PixelFormat format, PixelType type, ref T[] buffer) where T : struct
-        {
-            GL.BindTexture(target, textureId);
-            GL.GetTexImage(target, level, format, type, buffer);
-            Utility.GlCheck();
         }
     }
 }

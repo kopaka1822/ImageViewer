@@ -25,7 +25,8 @@ extern "C"
 __declspec(dllexport)
 void
 __cdecl
-image_info(int id, uint32_t& openglInternalFormat, uint32_t& openglExternalFormat, uint32_t& openglType, int& nImages, int& nFaces, int& nMipmaps, bool& isCompressed);
+image_info(int id, uint32_t& openglInternalFormat, uint32_t& openglExternalFormat, uint32_t& openglType, 
+	int& nImages, int& nFaces, int& nMipmaps, bool& isCompressed, bool& isSrgb);
 
 extern "C"
 __declspec(dllexport)

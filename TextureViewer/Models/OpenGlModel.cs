@@ -23,6 +23,7 @@ namespace TextureViewer.Models
         public TextureCacheModel TextureCache { get; }
         public PixelValueShader GetPixelShader { get; }
         public SrgbShader SrgbShader { get; }
+        public PixelExportShader ExportShader { get; }
 
         // statistics shader
         public MaxStatistics LinearMaxStatistics { get; }
@@ -50,6 +51,7 @@ namespace TextureViewer.Models
             TextureCache = new TextureCacheModel(images, context);
             GetPixelShader = new PixelValueShader();
             SrgbShader = new SrgbShader();
+            ExportShader = new PixelExportShader();
 
             LinearMaxStatistics = new MaxStatistics(false);
             SrgbMaxStatistics = new MaxStatistics(true);
@@ -94,6 +96,7 @@ namespace TextureViewer.Models
             TextureCache.Clear();
             GetPixelShader.Dispose();
             SrgbShader.Dispose();
+            ExportShader.Dispose();
 
             LinearMaxStatistics.Dispose();
             SrgbMaxStatistics.Dispose();

@@ -85,8 +85,7 @@ namespace TextureViewer.Models.Shader
                    "for(int x = pixelCoord.x - pixelRadius; x <= pixelCoord.x + pixelRadius; ++x)\n" +
                    "for(int y = pixelCoord.y - pixelRadius; y <= pixelCoord.y + pixelRadius; ++y)\n" +
                    "    sum += texelFetch(src, ivec2(   clamp(x,0,size.x-1),\n" +
-                   // y coords are reverted
-                   "                                    clamp(size.y - y - 1,0,size.y-1)), 0);\n" +
+                   "                                    clamp(y,0,size.y-1)), 0);\n" +
 
                    "int width = 1 + 2 * pixelRadius;\n" +
                    "pixelDst = sum / ivec4(width * width);\n" +

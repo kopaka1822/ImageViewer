@@ -33,8 +33,8 @@ namespace TextureViewer.ViewModels
             public FilterItem(FiltersViewModel parent, FilterModel model)
             {
                 Model = model;
-                ListView = new FilterListBoxItem(parent, model);
                 Parameters = new FilterParametersViewModel(model);
+                ListView = new FilterListBoxItem(parent, model, Parameters);
             }
 
             public void Dispose(OpenGlContext context)
@@ -42,6 +42,16 @@ namespace TextureViewer.ViewModels
                 var disable = context.Enable();
                 Model.Dispose();
                 if(disable) context.Disable();
+            }
+
+            /// <summary>
+            /// returns true if this filter will be visible for the equation after applying
+            /// </summary>
+            /// <param name="id"></param>
+            /// <returns></returns>
+            public bool WillBeVisibleFor(int id)
+            {
+                return Parameters.IsVisible && Parameters.IsEquationVisible[id];
             }
         }
 
@@ -186,6 +196,11 @@ namespace TextureViewer.ViewModels
         /// </summary>
         public void Apply()
         {
+            // fill the has changed array
+            bool[] changed = new bool[4];
+            for (var i = 0; i < App.MaxImageViews; ++i)
+                changed[i] = HasEquationChanged(i);
+
             // apply the current parameters
             foreach (var filterItem in items)
             {
@@ -199,9 +214,31 @@ namespace TextureViewer.ViewModels
                 newModels.Add(filterItem.Model);
             }
 
-            models.Filter.Apply(newModels, statisticsPoint, models.GlContext);
+            models.Filter.Apply(newModels, statisticsPoint, models.GlContext, changed);
 
             UpdateHasChanges();
+        }
+
+        private bool HasEquationChanged(int id)
+        {
+            // if the statistics point has changed the image needs to be recomputed
+            if (statisticsPoint != models.Filter.StatisticsPoint) return true;
+
+            var oldVisible = models.Filter.Filter.Where(filterModel => filterModel.IsVisibleFor(id)).ToList();
+            var newVisible = items.Where(filterItem => filterItem.WillBeVisibleFor(id)).ToList();
+
+            if (oldVisible.Count != newVisible.Count) return true;
+
+            for (var i = 0; i < newVisible.Count; ++i)
+            {
+                // same model?
+                if (!ReferenceEquals(oldVisible[i], newVisible[i].Model)) return true;
+
+                // parameters changed?
+                if (newVisible[i].Parameters.HasParameterChanges()) return true;
+            }
+
+            return false;
         }
 
         /// <summary>
