@@ -176,6 +176,18 @@ namespace TextureViewer.Models
             }
         }
 
+        private bool showCropRectangle = true;
+        public bool ShowCropRectangle
+        {
+            get => showCropRectangle;
+            set
+            {
+                if (showCropRectangle == value) return;
+                showCropRectangle = value;
+                OnPropertyChanged(nameof(ShowCropRectangle));
+            }
+        }
+
         private GrayscaleMode grayscale = GrayscaleMode.Disabled;
         public GrayscaleMode Grayscale
         {

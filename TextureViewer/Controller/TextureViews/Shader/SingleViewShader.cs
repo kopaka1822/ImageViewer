@@ -25,7 +25,7 @@ namespace TextureViewer.Controller.TextureViews.Shader
 
         public void SetCrop(ExportModel model)
         {
-            if (model.UseCropping)
+            if (model.DisplayCropping)
             {
                 GL.Uniform4(5, model.GetCropStartXPercent(), model.GetCropEndXPercent(), 
                     model.GetCropStartYPercent(), model.GetCropEndYPercent());

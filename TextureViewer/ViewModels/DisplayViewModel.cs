@@ -46,6 +46,10 @@ namespace TextureViewer.ViewModels
                     OnPropertyChanged(nameof(LinearInterpolation));
                     break;
 
+                case nameof(DisplayModel.ShowCropRectangle):
+                    OnPropertyChanged(nameof(ShowCropRectangle));
+                    break;
+
                 case nameof(DisplayModel.Grayscale):
                     // assume that everything has changed
                     OnPropertyChanged(nameof(IsGrayscaleDisabled));
@@ -118,6 +122,12 @@ namespace TextureViewer.ViewModels
         {
             get => models.Display.LinearInterpolation;
             set => models.Display.LinearInterpolation = value;
+        }
+
+        public bool ShowCropRectangle
+        {
+            get => models.Display.ShowCropRectangle;
+            set => models.Display.ShowCropRectangle = value;
         }
 
         public bool IsGrayscaleDisabled

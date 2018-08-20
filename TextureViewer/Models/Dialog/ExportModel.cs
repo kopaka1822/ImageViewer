@@ -152,6 +152,8 @@ namespace TextureViewer.Models.Dialog
             }
         }
 
+        public bool DisplayCropping => UseCropping && displayModel.ShowCropRectangle;
+
         public int CropMinX => 0;
         public int CropMinY => 0;
         public int CropMaxX => imagesModel.NumImages != 0 ? Math.Max(imagesModel.GetWidth(Mipmap) - 1, 0) : 0;

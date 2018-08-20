@@ -61,6 +61,12 @@
                     Header="Linear Interpolation" 
                     IsCheckable="True"
                     IsChecked="{Binding Display.LinearInterpolation}"/>
+                <MenuItem
+                    Header="Show Crop Box"
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.ShowCropRectangle}"
+                    ToolTip="Shows the crop box if cropping is enabled for export"
+                    />
                 <MenuItem Header="_Grayscale">
                     <MenuItem 
                         Header="_Disabled" 

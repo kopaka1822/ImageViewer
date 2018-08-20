@@ -25,9 +25,21 @@ namespace TextureViewer.Controller
             this.models.GlContext.GlControl.Paint += OnPaint;
             this.models.GlContext.PropertyChanged += GlContextOnPropertyChanged;
             this.models.Export.PropertyChanged += ExportOnPropertyChanged;
+            this.models.Display.PropertyChanged += DisplayOnPropertyChanged;
 
             this.viewModeController = new ViewModeController(models);
             this.progressController = new ProgressController(models);
+        }
+
+        private void DisplayOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch(args.PropertyName)
+            {
+                case nameof(DisplayModel.LinearInterpolation):
+                case nameof(DisplayModel.ShowCropRectangle):
+                    models.GlContext.RedrawFrame();
+                    break;
+            }
         }
 
         private void ExportOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -38,6 +50,7 @@ namespace TextureViewer.Controller
                 case nameof(ExportModel.CropStartY):
                 case nameof(ExportModel.CropEndX):
                 case nameof(ExportModel.CropEndY):
+                case nameof(ExportModel.UseCropping):
                     models.GlContext.RedrawFrame();
                     break;
             }
