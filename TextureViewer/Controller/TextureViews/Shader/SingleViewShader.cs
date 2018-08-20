@@ -25,18 +25,7 @@ namespace TextureViewer.Controller.TextureViews.Shader
 
         public void SetCrop(ExportModel model, int layer)
         {
-            if (model.DisplayCropping)
-            {
-                if (model.Layer == layer)
-                    GL.Uniform4(5, model.GetCropStartXPercent(), model.GetCropEndXPercent(),
-                        model.GetCropStartYPercent(), model.GetCropEndYPercent());
-                else // everything is gray
-                    GL.Uniform4(5, 0.0f, 0.0f, 0.0f, 0.0f);
-            }
-            else
-            {
-                GL.Uniform4(5, 0.0f, 1.0f, 0.0f, 1.0f);
-            }
+            SetCropCoordinates(5, model, layer);
         }
 
         public void SetTransform(Matrix4 mat)

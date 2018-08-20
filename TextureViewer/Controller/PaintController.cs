@@ -53,6 +53,7 @@ namespace TextureViewer.Controller
                 case nameof(ExportModel.UseCropping):
                 case nameof(ExportModel.Mipmap):
                 case nameof(ExportModel.Layer):
+                case nameof(ExportModel.IsExporting):
                     models.GlContext.RedrawFrame();
                     break;
             }

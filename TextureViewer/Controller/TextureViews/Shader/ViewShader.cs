@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.glhelper;
 using TextureViewer.Models;
+using TextureViewer.Models.Dialog;
 
 namespace TextureViewer.Controller.TextureViews.Shader
 {
@@ -52,6 +53,28 @@ namespace TextureViewer.Controller.TextureViews.Shader
         {
             return $"if({texcoord}.x < crop.x || {texcoord}.x > crop.y || {texcoord}.y < crop.z || {texcoord}.y > crop.w)\n" +
                    "color.rgb = min(color.rgb, vec3(1.0)) * vec3(0.5);\n";
+        }
+
+        protected static void SetCropCoordinates(int location, ExportModel model, int layer)
+        {
+            if (model.DisplayCropping || model.IsExporting)
+            {
+                // only mask out the layer when the export dialog is active
+                if (model.Layer == layer || !model.IsExporting)
+                    GL.Uniform4(location, model.GetCropStartXPercent(), model.GetCropEndXPercent(),
+                        model.GetCropStartYPercent(), model.GetCropEndYPercent());
+                else // everything is gray
+                    GL.Uniform4(location, 0.0f, 0.0f, 0.0f, 0.0f);
+            }
+            else if (model.IsExporting && layer != model.Layer)
+            {
+                // everything is gray (inactive export layer)
+                GL.Uniform4(location, 0.0f, 0.0f, 0.0f, 0.0f);
+            }
+            else
+            {
+                GL.Uniform4(location, 0.0f, 1.0f, 0.0f, 1.0f);
+            }
         }
 
         public void Dispose()
