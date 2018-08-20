@@ -27,16 +27,16 @@ namespace TextureViewer.ViewModels.Dialog
             {
                 AvailableLayers.Add(new ComboBoxItem<int>("Layer " + i, i));
             }
-            SelectedLayer = AvailableLayers[0];
-            Debug.Assert(SelectedLayer.Cargo == models.Export.Layer);
+            selectedLayer = AvailableLayers[models.Export.Layer];
+            Debug.Assert(selectedLayer.Cargo == models.Export.Layer);
 
             // init mipmaps
             for (var i = 0; i < models.Images.NumMipmaps; ++i)
             {
                 AvailableMipmaps.Add(new ComboBoxItem<int>("Mipmap " + i, i));
             }
-            SelectedMipmap = AvailableMipmaps[0];
-            Debug.Assert(SelectedMipmap.Cargo == models.Export.Mipmap);
+            selectedMipmap = AvailableMipmaps[models.Export.Mipmap];
+            Debug.Assert(selectedMipmap.Cargo == models.Export.Mipmap);
 
             // init formats
             foreach (var format in models.Export.SupportedFormats)
@@ -85,6 +85,14 @@ namespace TextureViewer.ViewModels.Dialog
                 case nameof(ExportModel.CropEndY):
                     OnPropertyChanged(nameof(CropEndY));
                     break;
+                case nameof(ExportModel.Mipmap):
+                    selectedMipmap = AvailableMipmaps[models.Export.Mipmap];
+                    OnPropertyChanged(nameof(SelectedMipmap));
+                    break;
+                case nameof(ExportModel.Layer):
+                    selectedLayer = AvailableLayers[models.Export.Layer];
+                    OnPropertyChanged(nameof(SelectedLayer));
+                    break;
             }
         }
 
@@ -112,9 +120,9 @@ namespace TextureViewer.ViewModels.Dialog
             set
             {
                 if (value == null || value == selectedLayer) return;
-                selectedLayer = value;
-                models.Export.Layer = selectedLayer.Cargo;
-                OnPropertyChanged(nameof(SelectedLayer));
+                //selectedLayer = value;
+                models.Export.Layer = value.Cargo;
+                //OnPropertyChanged(nameof(SelectedLayer));
             }
         }
 
@@ -125,9 +133,9 @@ namespace TextureViewer.ViewModels.Dialog
             set
             {
                 if (value == null || value == selectedMipmap) return;
-                selectedMipmap = value;
-                models.Export.Mipmap = selectedMipmap.Cargo;
-                OnPropertyChanged(nameof(SelectedMipmap));
+                //selectedMipmap = value;
+                models.Export.Mipmap = value.Cargo;
+                //OnPropertyChanged(nameof(SelectedMipmap));
             }
         }
 

@@ -23,12 +23,15 @@ namespace TextureViewer.Controller.TextureViews.Shader
             ShaderProgram.Bind();
         }
 
-        public void SetCrop(ExportModel model)
+        public void SetCrop(ExportModel model, int layer)
         {
             if (model.DisplayCropping)
             {
-                GL.Uniform4(5, model.GetCropStartXPercent(), model.GetCropEndXPercent(), 
-                    model.GetCropStartYPercent(), model.GetCropEndYPercent());
+                if (model.Layer == layer)
+                    GL.Uniform4(5, model.GetCropStartXPercent(), model.GetCropEndXPercent(),
+                        model.GetCropStartYPercent(), model.GetCropEndYPercent());
+                else // everything is gray
+                    GL.Uniform4(5, 0.0f, 0.0f, 0.0f, 0.0f);
             }
             else
             {

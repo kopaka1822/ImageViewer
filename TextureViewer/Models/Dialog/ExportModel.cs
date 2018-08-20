@@ -103,6 +103,7 @@ namespace TextureViewer.Models.Dialog
                         CropStartY = 0;
                         CropEndX = 0;
                         CropEndY = 0;
+                        Layer = 0;
                     }
                     
                     break;
@@ -126,7 +127,17 @@ namespace TextureViewer.Models.Dialog
 
         public FileFormat Format;
 
-        public int Layer { get; set; }
+        private int layer = 0;
+        public int Layer
+        {
+            get => layer;
+            set
+            {
+                if (layer == value) return;
+                layer = value;
+                OnPropertyChanged(nameof(Layer));
+            }
+        }
 
         private int mipmap = 0;
         public int Mipmap

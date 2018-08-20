@@ -92,7 +92,7 @@ namespace TextureViewer.Controller.TextureViews
             shader.SetLayer(layer);
             shader.SetMipmap(models.Display.ActiveMipmap);
             shader.SetGrayscale(models.Display.Grayscale);
-            shader.SetCrop(models.Export);
+            shader.SetCrop(models.Export, layer);
 
             models.GlData.BindSampler(shader.GetTextureLocation(), true, models.Display.LinearInterpolation);
             texture.Bind(shader.GetTextureLocation());

@@ -42,7 +42,7 @@ namespace TextureViewer.Controller.TextureViews
             shader.SetLayer((float)models.Display.ActiveLayer);
             shader.SetFarplane(CalcFarplane());
             shader.SetGrayscale(models.Display.Grayscale);
-            shader.SetCrop(models.Export);
+            shader.SetCrop(models.Export, models.Display.ActiveLayer);
 
             models.GlData.BindSampler(shader.GetTextureLocation(), true, models.Display.LinearInterpolation);
             texture.Bind(shader.GetTextureLocation());
