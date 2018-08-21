@@ -309,6 +309,7 @@ namespace TextureViewer.Models
                     {
                         ActiveMipmap = 0;
                         ActiveLayer = 0;
+                        Grayscale = GrayscaleMode.Disabled;
                         // this will reset active view as well
                         AvailableViews = new List<ViewMode> { ViewMode.Empty };
                     }
