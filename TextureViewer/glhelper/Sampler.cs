@@ -8,7 +8,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace TextureViewer.glhelper
 {
-    class Sampler
+    public class Sampler
     {
         private int id;
 

@@ -57,8 +57,8 @@ namespace TextureViewer.Controller.ImageCombination
             // bind source images
             for (int i = 0; i < models.Images.NumImages; ++i)
             {
-                models.GlData.BindSampler(i, models.Images.GetTexture(i).HasMipmaps, false);
-                models.Images.GetTexture(i).Bind(shader.GetSourceImageBinding(i));
+                var tex = models.Images.GetTexture(i);
+                shader.BindSourceImage(tex, models.GlData.GetSampler(tex.HasMipmaps, false), i);
             }
 
             for (var layer = 0; layer < models.Images.NumLayers; ++layer)

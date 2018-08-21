@@ -69,19 +69,29 @@ namespace TextureViewer.Models
         /// <param name="linear">linear interpolation enabled</param>
         public void BindSampler(int unit, bool hasMipmaps, bool linear)
         {
+            GetSampler(hasMipmaps, linear).Bind(unit);
+        }
+
+        /// <summary>
+        /// gets a specific sampler
+        /// </summary>
+        /// <param name="hasMipmaps">mipmap sampling enabled</param>
+        /// <param name="linear">linear interpolation enabled</param>
+        public Sampler GetSampler(bool hasMipmaps, bool linear)
+        {
             if (hasMipmaps)
             {
                 if (linear)
-                    samplerLinearMip.Bind(unit);
+                    return samplerLinearMip;
                 else
-                    samplerNearestMip.Bind(unit);
+                    return samplerNearestMip;
             }
             else
             {
                 if (linear)
-                    samplerLinear.Bind(unit);
+                    return samplerLinear;
                 else
-                    samplerNearest.Bind(unit);
+                    return samplerNearest;
             }
         }
 

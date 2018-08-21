@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.glhelper;
 using TextureViewer.Models;
+using TextureViewer.Models.Shader;
 
 namespace TextureViewer.Controller.ImageCombination
 {
     class ImageCombineShader
     {
         private const int LocalSize = 8;
-        private const int TextureBindingStart = 3;
+        private const int TextureBindingStart = 0;
+        private readonly static int TextureSrgbStart = 3;
 
         private readonly Program shader;
 
@@ -62,6 +64,15 @@ namespace TextureViewer.Controller.ImageCombination
             return TextureBindingStart + id;
         }
 
+        public void BindSourceImage(TextureArray2D texture, Sampler sampler, int id)
+        {
+            sampler.Bind(TextureBindingStart + id);
+            texture.Bind(TextureBindingStart + id);
+            // set srgb variable
+            shader.Bind();
+            GL.Uniform1(TextureSrgbStart + id, texture.IsSrgb?1:0);
+        }
+
         private void SetLayer(int layer)
         {
             GL.Uniform1(1, layer);
@@ -90,6 +101,7 @@ namespace TextureViewer.Controller.ImageCombination
                    // uniforms
                    "layout(location = 1) uniform int layer;\n" +
                    "layout(location = 2) uniform int level;\n" +
+                   SrgbShader.FromSrgbFunction() +
                    GetTextureBindings(numImages) +
                    GetTextureGetters(numImages) +
                    "void main(){\n" +
@@ -107,6 +119,8 @@ namespace TextureViewer.Controller.ImageCombination
             for (int i = 0; i < numImages; ++i)
             {
                 res += $"layout(binding = {i + TextureBindingStart}) uniform sampler2DArray texture{i};\n";
+                // indicates if the texture must be converted from srgb space
+                res += $"layout(location = {i + TextureSrgbStart}) uniform int textureSrgb{i};\n";
             }
             return res;
         }
@@ -122,7 +136,9 @@ namespace TextureViewer.Controller.ImageCombination
             for (int i = 0; i < numImages; ++i)
             {
                 res += $"vec4 GetTexture{i}(){'{'}\n" +
-                       $"return texelFetch(texture{i}, ivec3(pixelPos, layer), level);\n" +
+                       $"vec4 c = texelFetch(texture{i}, ivec3(pixelPos, layer), level);\n" +
+                       $"if(textureSrgb{i} != 0) c = fromSrgb(c);\n" +
+                       "return c;\n" +
                        "}\n";
             }
             return res;

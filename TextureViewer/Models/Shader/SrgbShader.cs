@@ -46,8 +46,21 @@ namespace TextureViewer.Models.Shader
                         for(int i = 0; i < 3; ++i){
                             if( c[i] > 1.0) c[i] = 1.0;
                             else if( c[i] < 0.0) c[i] = 0.0;
-                            else if( c[i] < 0.0031308) c[i] = 12.92 * c[i];
+                            else if( c[i] <= 0.0031308) c[i] = 12.92 * c[i];
                             else c[i] = 1.055 * pow(c[i], 0.41666) - 0.055;
+                        }
+                        return c;
+                    }";
+        }
+
+        public static string FromSrgbFunction()
+        {
+            return @"vec4 fromSrgb(vec4 c){
+                        for(int i = 0; i < 3; ++i){
+                            if(c[i] > 1.0) c[i] = 1.0;
+                            else if(c[i] < 0.0) c[i] = 0.0;
+                            else if(c[i] <= 0.04045) c[i] /= 12.92;
+                            else c[i] = pow((c[i] + 0.055)/1.055, 2.4);
                         }
                         return c;
                     }";

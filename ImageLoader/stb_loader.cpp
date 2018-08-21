@@ -25,8 +25,9 @@ uint32_t getDefaultExternalFormat(int nComponents)
 	return uint32_t(-1);
 }
 
-uint32_t getSizedInternalFormat(int nComponents, bool isFloat)
+uint32_t getSizedInternalFormat(int nComponents, bool isFloat, bool& isSrgb)
 {
+	isSrgb = false;
 	if(isFloat)
 	{
 		switch (nComponents)
@@ -47,11 +48,15 @@ uint32_t getSizedInternalFormat(int nComponents, bool isFloat)
 		switch (nComponents)
 		{
 		case 1:
-			return gli::gl::internal_format::INTERNAL_SR8;
-			//return gli::gl::internal_format::INTERNAL_R8_UNORM;
+			// not supported:
+			//return gli::gl::internal_format::INTERNAL_SR8;
+			isSrgb = true;
+			return gli::gl::internal_format::INTERNAL_R8_UNORM;
 		case 2:
-			return gli::gl::internal_format::INTERNAL_SRG8;
-			//return gli::gl::internal_format::INTERNAL_RG8_UNORM;
+			// not supported:
+			//return gli::gl::internal_format::INTERNAL_SRG8;
+			isSrgb = true;
+			return gli::gl::internal_format::INTERNAL_RG8_UNORM;
 		case 3:
 			return gli::gl::internal_format::INTERNAL_SRGB8;
 			//return gli::gl::internal_format::INTERNAL_RGB8_UNORM;
@@ -80,11 +85,10 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 		if (!data)
 			throw std::exception("error during reading file");
 
-		format.openglInternalFormat = getSizedInternalFormat(nComponents, true);
+		format.openglInternalFormat = getSizedInternalFormat(nComponents, true, format.isSrgb);
 		format.openglExternalFormat = getDefaultExternalFormat(nComponents);
 		format.openglType = gli::gl::type_format::TYPE_F32;
 		format.isCompressed = false;
-		format.isSrgb = false;
 
 		size_t mipSize = mipmap.width * mipmap.height * nComponents * 4;
 		mipmap.bytes.resize(mipSize);
@@ -101,11 +105,10 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 		if (!data)
 			throw std::exception("error during reading file");
 
-		format.openglInternalFormat = getSizedInternalFormat(nComponents, false);
+		format.openglInternalFormat = getSizedInternalFormat(nComponents, false, format.isSrgb);
 		format.openglExternalFormat = getDefaultExternalFormat(nComponents);
 		format.openglType = gli::gl::type_format::TYPE_U8;
 		format.isCompressed = false;
-		format.isSrgb = false; // srgb conversion is done by choosing the correct internal format (e.g. srgb8)
 
 		size_t mipSize = mipmap.width * mipmap.height * nComponents;
 		mipmap.bytes.resize(mipSize);
