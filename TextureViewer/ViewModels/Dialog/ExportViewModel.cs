@@ -60,6 +60,7 @@ namespace TextureViewer.ViewModels.Dialog
             {
                 case nameof(ExportModel.UseCropping):
                     OnPropertyChanged(nameof(UseCropping));
+                    OnPropertyChanged(nameof(IsValid));
                     break;
                 case nameof(ExportModel.CropMinX):
                     OnPropertyChanged(nameof(CropMinX));
@@ -75,15 +76,19 @@ namespace TextureViewer.ViewModels.Dialog
                     break;
                 case nameof(ExportModel.CropStartX):
                     OnPropertyChanged(nameof(CropStartX));
+                    OnPropertyChanged(nameof(IsValid));
                     break;
                 case nameof(ExportModel.CropStartY):
                     OnPropertyChanged(nameof(CropStartY));
+                    OnPropertyChanged(nameof(IsValid));
                     break;
                 case nameof(ExportModel.CropEndX):
                     OnPropertyChanged(nameof(CropEndX));
+                    OnPropertyChanged(nameof(IsValid));
                     break;
                 case nameof(ExportModel.CropEndY):
                     OnPropertyChanged(nameof(CropEndY));
+                    OnPropertyChanged(nameof(IsValid));
                     break;
                 case nameof(ExportModel.Mipmap):
                     selectedMipmap = AvailableMipmaps[models.Export.Mipmap];
@@ -95,6 +100,8 @@ namespace TextureViewer.ViewModels.Dialog
                     break;
             }
         }
+
+        public bool IsValid => !UseCropping || (CropStartX <= CropEndX && CropStartY <= CropEndY);
 
         public string Filename
         {

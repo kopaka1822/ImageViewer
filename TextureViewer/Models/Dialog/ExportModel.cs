@@ -123,6 +123,8 @@ namespace TextureViewer.Models.Dialog
             }
         }
 
+        
+
         public string Filename { get; private set; }
 
         public FileFormat Format;

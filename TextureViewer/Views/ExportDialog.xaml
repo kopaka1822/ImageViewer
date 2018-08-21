@@ -124,8 +124,10 @@
                         Content="_Export" 
                         Margin="0 0 10 0" 
                         Width="60"
-                        Click="ButtonExport_OnClick"/>
-                    <Button 
+                        Click="ButtonExport_OnClick"
+                        IsEnabled="{Binding IsValid}"
+                        />
+                        <Button 
                         Grid.Column="1" 
                         Content="_Cancel" 
                         Width="60"
