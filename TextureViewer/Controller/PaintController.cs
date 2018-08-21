@@ -78,10 +78,23 @@ namespace TextureViewer.Controller
             {
                 if (progressController.HasWork())
                 {
-                    // Advance to process
+                    // Advance to process (do work for 500 ms)
+                    var timer = new System.Timers.Timer();
+                    var timeUp = false;
+                    timer.Elapsed += (source, args) =>
+                    {
+                        timeUp = true;
+                    };
+                    timer.Interval = 500;
+                    timer.Enabled = true;
 
-                    progressController.DoWork();
-                    GL.Finish();
+                    do
+                    {
+                        progressController.DoWork();
+                        GL.Finish();
+                    }
+                    while (!timeUp && progressController.HasWork());
+                    
                     models.GlContext.RedrawFrame();
                 }
                 else
