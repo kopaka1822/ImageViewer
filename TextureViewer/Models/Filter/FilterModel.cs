@@ -12,6 +12,7 @@ namespace TextureViewer.Models.Filter
     {
         public FilterShader Shader { get; }
         public List<IFilterParameter> Parameters { get; }
+        public List<FilterTextureParameterModel> TextureParameters { get; }
         public bool IsSepa { get; }
         public bool IsSingleInvocation { get; }
         public string Name { get; }
@@ -23,6 +24,7 @@ namespace TextureViewer.Models.Filter
         public FilterModel(FilterLoader loader)
         {
             Parameters = loader.Parameters;
+            TextureParameters = loader.TextureParameters;
             IsSepa = loader.IsSepa;
             IsSingleInvocation = loader.IsSingleInvocation;
             Name = loader.Name;

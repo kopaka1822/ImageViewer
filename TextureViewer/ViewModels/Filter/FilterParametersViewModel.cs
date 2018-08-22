@@ -12,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using TextureViewer.Annotations;
+using TextureViewer.Models;
 using TextureViewer.Models.Filter;
 using TextureViewer.Views;
 
@@ -56,7 +57,7 @@ namespace TextureViewer.ViewModels.Filter
 
         private readonly List<CheckBox> equationCheckBoxes = new List<CheckBox>();
 
-        public FilterParametersViewModel(FilterModel item)
+        public FilterParametersViewModel(FilterModel item, ImagesModel images)
         {
             model = item;
             isVisible = item.IsVisible;
@@ -92,6 +93,23 @@ namespace TextureViewer.ViewModels.Filter
             };
 
             // add all settings
+            foreach (var tex in item.TextureParameters)
+            {
+                View.Add(new TextBlock
+                {
+                    Text = tex.Name + ":",
+                    Margin = margin,
+                    TextWrapping = TextWrapping.Wrap
+                });
+
+                var vm = new FilterTextureParameterViewModel(tex, images);
+                ViewModels.Add(vm);
+                View.Add(new FilterTextureParameterView(vm, enabledBinding));
+
+                // register on changed callback                
+                vm.Changed += (sender, args) => HasChanged = HasChanges();
+            }
+
             foreach (var para in item.Parameters)
             {
                 View.Add(new TextBlock
@@ -237,6 +255,14 @@ namespace TextureViewer.ViewModels.Filter
             }
 
             HasChanged = HasChanges();
+        }
+
+        public void Dispose()
+        {
+            foreach(var i in ViewModels)
+            {
+                i.Dispose();
+            }
         }
 
         /// <summary>

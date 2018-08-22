@@ -51,14 +51,11 @@ namespace TextureViewer.Controller.Filter
                 .BindAsImage(Model.Shader.GetDestinationImageLocation(), layer: layer, mipmap: mipmap, access: TextureAccess.WriteOnly);
 
             // bind original images
-            for (int i = 0; i < models.Images.NumImages; ++i)
+            foreach(var texPara in Model.TextureParameters)
             {
-                var slot = Model.Shader.GetOriginalImageLocation(i);
-                if (i == -1) break;
-
-                var tex = models.Images.GetTexture(i);
-                models.GlData.BindSampler(i, false, true);
-                tex.BindAsTexture2D(slot, layer: layer, mipmap: mipmap);
+                var tex = models.Images.GetTexture(texPara.Source);
+                models.GlData.BindSampler(texPara.Binding, false, true);
+                tex.BindAsTexture2D(texPara.Binding, layer: layer, mipmap: mipmap);
             }
 
             Model.Shader.Bind();

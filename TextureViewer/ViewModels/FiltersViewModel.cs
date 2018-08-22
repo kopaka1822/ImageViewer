@@ -30,16 +30,17 @@ namespace TextureViewer.ViewModels
             public FilterListBoxItem ListView { get; }
             public FilterParametersViewModel Parameters { get; }
 
-            public FilterItem(FiltersViewModel parent, FilterModel model)
+            public FilterItem(FiltersViewModel parent, FilterModel model, ImagesModel images)
             {
                 Model = model;
-                Parameters = new FilterParametersViewModel(model);
+                Parameters = new FilterParametersViewModel(model, images);
                 ListView = new FilterListBoxItem(parent, model, Parameters);
             }
 
             public void Dispose(OpenGlContext context)
             {
                 var disable = context.Enable();
+                Parameters.Dispose();
                 Model.Dispose();
                 if(disable) context.Disable();
             }
@@ -162,7 +163,7 @@ namespace TextureViewer.ViewModels
 
         public void AddFilter(FilterModel filter)
         {
-            var item = new FilterItem(this, filter);
+            var item = new FilterItem(this, filter, models.Images);
             items.Add(item);            
             UpdateAvailableFilter();
 
@@ -270,7 +271,7 @@ namespace TextureViewer.ViewModels
                 else
                 {
                     // create a new filter item
-                    var item = new FilterItem(this, filterModel);
+                    var item = new FilterItem(this, filterModel, models.Images);
                     newItems.Add(item);
                     // register on changed for apply and cancel button
                     item.Parameters.Changed += (sender, args) => UpdateHasChanges();

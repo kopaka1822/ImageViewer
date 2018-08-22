@@ -17,6 +17,7 @@ namespace TextureViewer.Models.Filter
         public string Name { get; private set; }
         public string Description { get; private set; }
         public string Filename { get; }
+        public List<FilterTextureParameterModel> TextureParameters { get; } = new List<FilterTextureParameterModel>();
 
         public FilterLoader(string filename)
         {
@@ -43,6 +44,11 @@ namespace TextureViewer.Models.Filter
                     else if (line.StartsWith("#param"))
                     {
                         HandleParam(GetParameters(line.Substring("#param".Length)));
+                        ShaderSource += "\n"; // remember line for error information
+                    }
+                    else if(line.StartsWith("#texture"))
+                    {
+                        HandleTexture(GetParameters(line.Substring("#texture".Length)));
                         ShaderSource += "\n"; // remember line for error information
                     }
                     else if (line.StartsWith("#setting"))
@@ -87,6 +93,23 @@ namespace TextureViewer.Models.Filter
             {
                 file.Close();
             }
+        }
+
+        private void HandleTexture(string[] pars)
+        {
+            if (pars.Length < 2)
+                throw new Exception("not enough arguments for #texture provided");
+            var name = pars[0];
+            if (!Int32.TryParse(pars[1], out int binding))
+                throw new Exception("binding must be a number");
+            if (binding == 0)
+                throw new Exception("binding 0 is reserved");
+            // TODO throw if max texture units exceeded
+            // make sure that binding was not used
+            if (TextureParameters.Find((item) => item.Binding == binding) != null)
+                throw new Exception($"texture binding {binding} was used more than once");
+
+            TextureParameters.Add(new FilterTextureParameterModel(name, binding));
         }
 
         private void HandleParamprop(string[] pars)

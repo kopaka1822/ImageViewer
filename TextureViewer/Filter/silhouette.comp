@@ -1,5 +1,11 @@
 #setting title, Normal Depth Silhouette
-#setting description, Makes a silhouette based on a normal guide and a depth guide. The normal guide should be in image 1 and the depth guide should be in image 2.
+#setting description, Makes a silhouette based on a normal guide and a depth guide.
+
+layout(binding = 1) uniform sampler2D normalGuide;
+#texture Normal Guide, 1
+
+layout(binding = 2) uniform sampler2D depthGuide;
+#texture Depth Guide, 2
 
 const ivec2 g_offsets[] = {ivec2(-1, 0), ivec2(1, 0), ivec2(0, -1), ivec2(0, 1)};
 
@@ -8,19 +14,19 @@ void main()
 	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
 
 	bool isEdge = false;
-	vec3 base = texelFetch(texture1, pixelCoord, 0).xyz;
+	vec3 base = texelFetch(normalGuide, pixelCoord, 0).xyz;
 	vec4 color = texelFetch(src_image, pixelCoord, 0);
 	for(int i = 0; i < g_offsets.length(); ++i)
 	{
-		vec3 o = texelFetch(texture1, pixelCoord + g_offsets[i], 0).xyz;
+		vec3 o = texelFetch(normalGuide, pixelCoord + g_offsets[i], 0).xyz;
 		vec3 p = base-o;
 		if(abs(p.r)+abs(p.g)+abs(p.b) > 0.1)
 			isEdge = true;
 	}
-	vec3 base2 = texelFetch(texture2, pixelCoord, 0).xyz;
+	vec3 base2 = texelFetch(depthGuide, pixelCoord, 0).xyz;
 	for(int i = 0; i < g_offsets.length(); ++i)
 	{
-		vec3 o = texelFetch(texture2, pixelCoord + g_offsets[i], 0).xyz;
+		vec3 o = texelFetch(depthGuide, pixelCoord + g_offsets[i], 0).xyz;
 		vec3 p = base2-o;
 		if(abs(p.r) > 0.01)
 			isEdge = true;

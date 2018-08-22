@@ -200,6 +200,7 @@
     <Compile Include="Models\Filter\FilterParameterModel.cs" />
     <Compile Include="Models\Filter\FilterParameterModelBase.cs" />
     <Compile Include="Models\Filter\FiltersModel.cs" />
+    <Compile Include="Models\Filter\FilterTextureParameterModel.cs" />
     <Compile Include="Models\Filter\FloatFilterParameterModel.cs" />
     <Compile Include="Models\Filter\IFilterParameter.cs" />
     <Compile Include="Models\Filter\IntFilterParameterModel.cs" />
@@ -233,6 +234,7 @@
     <Compile Include="ViewModels\Filter\BoolFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\FilterParametersViewModel.cs" />
     <Compile Include="ViewModels\Filter\FilterParameterViewModelBase.cs" />
+    <Compile Include="ViewModels\Filter\FilterTextureParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\FloatFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\IFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\IntFilterParameterViewModel.cs" />
@@ -248,6 +250,7 @@
       <DependentUpon>ExportDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\FilterListBoxItem.cs" />
+    <Compile Include="Views\FilterTextureParameterView.cs" />
     <Compile Include="Views\FloatFilterParameterView.cs" />
     <Compile Include="Views\HelpDialog.xaml.cs">
       <DependentUpon>HelpDialog.xaml</DependentUpon>

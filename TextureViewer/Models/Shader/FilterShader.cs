@@ -95,20 +95,6 @@ namespace TextureViewer.Models.Shader
             return 0;
         }
 
-        /// <summary>
-        /// returns the binding point for the original images (the imported images)
-        /// </summary>
-        /// <param name="index">original image index (starting with 0)</param>
-        /// <returns>binding point for the original images or -1 if the image can not be nound due to bounding point maximum</returns>
-        public int GetOriginalImageLocation(int index)
-        {
-            // up to context.MaxTextureBindings textures can be bound at once
-            // one texture is used for the source image => context.MaxTextureBindings - 1 slots for the original images
-            if (index > maxTextureBindings - 1)
-                return -1;
-            return index + 1;
-        }
-
         public int GetDestinationImageLocation()
         {
             return 1;
@@ -119,18 +105,9 @@ namespace TextureViewer.Models.Shader
             return "#version 430\n" +
                    $"layout(local_size_x = {LocalSize}, local_size_y = {LocalSize}) in;\n" +
                    "layout(binding = 0) uniform sampler2D src_image;\n" +
-                   GetTextureBindings(maxTextureBindings - 1) +
                    "layout(rgba32f, binding = 1) uniform writeonly image2D dst_image;\n" +
                    "layout(location = 1) uniform ivec2 pixelOffset;\n" +
                    (isSepa ? "layout(location = 0) uniform ivec2 filterDirection;\n" : "");
-        }
-
-        private string GetTextureBindings(int numBindings)
-        {
-            string res = "";
-            for (int i = 0; i < numBindings; ++i)
-                res += $"layout(binding = {i + 1}) uniform sampler2D texture{i};\n";
-            return res;
         }
     }
 }

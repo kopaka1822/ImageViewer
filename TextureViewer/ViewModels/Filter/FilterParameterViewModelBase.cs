@@ -74,6 +74,11 @@ namespace TextureViewer.ViewModels.Filter
             Value = pa.Invoke(Value);
         }
 
+        public void Dispose()
+        {
+            parameter.PropertyChanged -= ParameterOnPropertyChanged;
+        }
+
         protected virtual void OnChanged()
         {
             Changed?.Invoke(this, EventArgs.Empty);
