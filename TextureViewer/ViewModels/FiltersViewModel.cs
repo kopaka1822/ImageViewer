@@ -75,7 +75,7 @@ namespace TextureViewer.ViewModels
             var disableGl = models.GlContext.Enable();
             try
             {
-                var loader = new FilterLoader(models.App.App.ExecutionPath + "\\Filter\\gamma.comp");
+                var loader = new FilterLoader(models.App.App.ExecutionPath + "\\Filter\\gamma.comp", models.GlContext);
 
                 AddFilter(new FilterModel(loader));
 

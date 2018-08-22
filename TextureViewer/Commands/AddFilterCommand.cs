@@ -43,7 +43,7 @@ namespace TextureViewer.Commands
             try
             {
                 // load shader
-                var loader = new FilterLoader(ofd.FileName);
+                var loader = new FilterLoader(ofd.FileName, models.GlContext);
                 // create model
                 var model = new FilterModel(loader);
 

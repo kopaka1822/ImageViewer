@@ -33,7 +33,7 @@ namespace TextureViewer.ViewModels
             Statistics = new StatisticsViewModel(models);
 
             // commands
-            var import = new ImportImageCommand(models);
+            var import = new ImportImageCommand(models, this);
             ImportCommand = import;
             ResizeCommand = new ResizeWindowCommand(models);
             OpenCommand = new OpenImageCommand(models, import);
@@ -85,6 +85,13 @@ namespace TextureViewer.ViewModels
         /// <param name="filename"></param>
         public bool ImportImage(string filename)
         {
+            // maximum amount of images reached?
+            if(models.Images.NumImages == models.GlContext.MaxTextureUnits)
+            {
+                App.ShowErrorDialog(models.App.Window, $"Maximum texture units reached. This GPU only supports {models.GlContext.MaxTextureUnits} units");
+                return false;
+            }
+
             try
             {
                 var imgs = ImageLoader.LoadImage(filename);

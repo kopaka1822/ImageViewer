@@ -19,7 +19,7 @@ namespace TextureViewer.Models.Filter
         public string Filename { get; }
         public List<FilterTextureParameterModel> TextureParameters { get; } = new List<FilterTextureParameterModel>();
 
-        public FilterLoader(string filename)
+        public FilterLoader(string filename, OpenGlContext glContext)
         {
             this.Filename = filename;
             Name = filename;
@@ -48,7 +48,7 @@ namespace TextureViewer.Models.Filter
                     }
                     else if(line.StartsWith("#texture"))
                     {
-                        HandleTexture(GetParameters(line.Substring("#texture".Length)));
+                        HandleTexture(GetParameters(line.Substring("#texture".Length)), glContext);
                         ShaderSource += "\n"; // remember line for error information
                     }
                     else if (line.StartsWith("#setting"))
@@ -95,7 +95,7 @@ namespace TextureViewer.Models.Filter
             }
         }
 
-        private void HandleTexture(string[] pars)
+        private void HandleTexture(string[] pars, OpenGlContext glContext)
         {
             if (pars.Length < 2)
                 throw new Exception("not enough arguments for #texture provided");
@@ -104,7 +104,9 @@ namespace TextureViewer.Models.Filter
                 throw new Exception("binding must be a number");
             if (binding == 0)
                 throw new Exception("binding 0 is reserved");
-            // TODO throw if max texture units exceeded
+            if (binding < 0 || binding >= glContext.MaxTextureUnits)
+                throw new Exception($"binding {binding} cannot be used because only {glContext.MaxTextureUnits} texture bindings are available on this GPU");
+
             // make sure that binding was not used
             if (TextureParameters.Find((item) => item.Binding == binding) != null)
                 throw new Exception($"texture binding {binding} was used more than once");

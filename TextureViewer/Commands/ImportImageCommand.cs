@@ -13,10 +13,12 @@ namespace TextureViewer.Commands
     public class ImportImageCommand : ICommand
     {
         private readonly Models.Models models;
+        private readonly WindowViewModel viewModel;
 
-        public ImportImageCommand(Models.Models models)
+        public ImportImageCommand(Models.Models models, WindowViewModel viewModel)
         {
             this.models = models;
+            this.viewModel = viewModel;
         }
 
         public bool CanExecute(object parameter)
@@ -34,16 +36,7 @@ namespace TextureViewer.Commands
 
             foreach (var filename in files)
             {
-                // load image
-                try
-                {
-                    var imgs = ImageLoader.LoadImage(filename);
-                    models.Images.AddImages(imgs);
-                }
-                catch (Exception e)
-                {
-                    App.ShowErrorDialog(models.App.Window, e.Message);
-                }
+                viewModel.ImportImage(filename);
             }  
         }
 
