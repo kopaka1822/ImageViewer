@@ -61,12 +61,11 @@ void main()
 
 	// Increase contrasts
 	float newSat = avgBrSat.y + (centerSat - avgBrSat.y) * COLOR_CONTRAST;
-	newSat = clamp(newSat * SATURATION, 0, 1);
+	newSat = newSat * SATURATION;
 	float newBr = avgBrSat.x + (centerBr - avgBrSat.x) * BR_CONTRAST;
 
 	// Return to RGB
-	newSat *= newBr;
-	ab *= newSat / (centerSat * centerBr + 1e-6);
+	ab *= newSat * newBr / (centerSat * centerBr + 1e-6);
 	vec3 outColor = newBr + vec3(0.701 * ab.x - 0.273086677 * ab.y,
 								-0.299 * ab.x + 0.304263592 * ab.y,
 								-0.299 * ab.x - 0.850436947 * ab.y);
