@@ -112,7 +112,7 @@ namespace TextureViewer.Models.Shader.Statistics
 
             texDst.BindAsTexture2D(models.GlData.GetPixelShader.GetTextureLocation(), 0, 0);
             // y coordinates for the texture fetch are reverted
-            var res = models.GlData.GetPixelShader.GetPixelColor(0, models.Images.Height - 1, 0);
+            var res = models.GlData.GetPixelShader.GetPixelColor(0, 0, 0);
 
             // cleanup
             models.GlData.TextureCache.StoreTexture(texSrc);
