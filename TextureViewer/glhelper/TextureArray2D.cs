@@ -169,12 +169,10 @@ namespace TextureViewer.glhelper
         /// <summary>
         /// binds specified texture
         /// </summary>
-        /// <param name="slot">binding slot</param>
         /// <param name="target">texture target</param>
         /// <param name="texId">texture id</param>
-        private void BindAs(int slot, TextureTarget target, int texId)
+        private void BindAs(TextureTarget target, int texId)
         {
-            GL.ActiveTexture(TextureUnit.Texture0 + slot);
             GL.BindTexture(target, texId);
         }
 
@@ -184,7 +182,8 @@ namespace TextureViewer.glhelper
         /// <param name="slot">binding slot</param>
         public void Bind(int slot)
         {
-            BindAs(slot, TextureTarget.Texture2DArray, id);
+            GL.ActiveTexture(TextureUnit.Texture0 + slot);
+            BindAs(TextureTarget.Texture2DArray, id);
         }
 
         /// <summary>
@@ -193,8 +192,9 @@ namespace TextureViewer.glhelper
         /// <param name="slot">binding slot</param>
         public void BindAsCubemap(int slot)
         {
+            GL.ActiveTexture(TextureUnit.Texture0 + slot);
             CreateCubeMapView();
-            BindAs(slot, TextureTarget.TextureCubeMap, cubeId);
+            BindAs(TextureTarget.TextureCubeMap, cubeId);
         }
 
         /// <summary>
@@ -206,7 +206,8 @@ namespace TextureViewer.glhelper
         public void BindAsTexture2D(int slot, int layer, int mipmap)
         {
             Debug.Assert(tex2DId != null);
-            BindAs(slot, TextureTarget.Texture2D, tex2DId[GetTextureIndex(layer, mipmap)]);
+            GL.ActiveTexture(TextureUnit.Texture0 + slot);
+            BindAs(TextureTarget.Texture2D, tex2DId[GetTextureIndex(layer, mipmap)]);
         }
 
         /// <summary>
