@@ -9,6 +9,7 @@
         Title="Export"
         Height="260"
         Width="400"
+        WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="#eee"
         Icon="../Icons/app.png">
