@@ -36,6 +36,9 @@ namespace TextureViewer.Models
             }
         }
 
+        // the id of the first image that was used in the equation
+        public int FirstImageId { get; private set; }
+
         // the converted formula
         public string Converted { get; private set; }
 
@@ -48,6 +51,7 @@ namespace TextureViewer.Models
         private string ConvertFormula(string f)
         {
             var eq = new Equation.Equation(f, Math.Max(images.NumImages, 1));
+            FirstImageId = eq.GetFirstImageId();
             return eq.GetOpenGlExpression();
         }
 

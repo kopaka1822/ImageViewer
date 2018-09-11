@@ -39,12 +39,17 @@ namespace TextureViewer.Commands
             }
 
             // get active final image
+            var equationId = models.Equations.GetFirstVisible();
+            var firstImageId = models.Equations.Get(equationId).ColorFormula.FirstImageId;
+            var proposedFilename = firstImageId < models.Images.NumImages ?
+                System.IO.Path.GetFileNameWithoutExtension(models.Images.GetFilename(firstImageId)) : "";
 
             // open save file dialog
             var sfd = new SaveFileDialog
             {
                 Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|HDR (*.hdr)|*.hdr|Portable float map (*.pfm)|*.pfm",
-                InitialDirectory = Properties.Settings.Default.ExportPath
+                InitialDirectory = Properties.Settings.Default.ExportPath,
+                FileName = proposedFilename
             };
 
             if (sfd.ShowDialog() != true)
@@ -82,9 +87,7 @@ namespace TextureViewer.Commands
                 try
                 {
                     // obtain data from gpu
-                    var visibleId = models.Equations.GetFirstVisible();
-
-                    var texture = models.FinalImages.Get(visibleId).Texture;
+                    var texture = models.FinalImages.Get(equationId).Texture;
                     if (texture == null)
                         throw new Exception("texture is not computed");
 
