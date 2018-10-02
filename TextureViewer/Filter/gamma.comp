@@ -8,7 +8,9 @@
 #param Factor, 2, float, 1.0, 0
 
 #keybinding Factor, Add, 2.0, multiply
+#keybinding Factor, OemPlus, 2.0, multiply
 #keybinding Factor, Subtract, 0.5, multiply
+#keybinding Factor, OemMinus, 0.5, multiply
 
 layout(location = 3) uniform float gamma;
 layout(location = 2) uniform float factor;
