@@ -23,8 +23,8 @@ namespace TextureViewer.ViewModels
             this.model = model;
             this.models = models;
             this.imageId = imageId;
-            this.Color = new FormulaViewModel(model.ColorFormula);
-            this.Alpha = new FormulaViewModel(model.AlphaFormula);
+            this.Color = new FormulaViewModel(model.ColorFormula, models.Images);
+            this.Alpha = new FormulaViewModel(model.AlphaFormula, models.Images);
             Color.PropertyChanged += FormulaOnPropertyChanged;
             Alpha.PropertyChanged += FormulaOnPropertyChanged;
 
@@ -109,11 +109,6 @@ namespace TextureViewer.ViewModels
             {
                 model.Visible = value;
                 if (value) return;
-                /*// restore default values if tempory changes happend.
-                // it would probably confuse the user otherwise if he
-                // sees a formula that is not used on reenabling.
-                AlphaFormula = model.AlphaFormula.Formula;
-                ColorFormula = model.ColorFormula.Formula;*/
                 UseFilter = model.UseFilter;
             }
         }

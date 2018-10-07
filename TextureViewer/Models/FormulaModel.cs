@@ -47,19 +47,19 @@ namespace TextureViewer.Models
         /// tests if the given formula is valid
         /// </summary>
         /// <param name="f">formula to test</param>
-        /// <returns></returns>
-        public bool IsValid(string f)
+        /// <returns>null if valid, error string if invalid</returns>
+        public string TestFormula(string f)
         {
             try
             {
                 var eq = new Equation.Equation(f, Math.Max(images.NumImages, 1));
                 eq.GetOpenGlExpression();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return false;
+                return e.Message;
             }
-            return true;
+            return null;
         }
 
         /// <summary>
