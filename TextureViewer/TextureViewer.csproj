@@ -238,6 +238,7 @@
     <Compile Include="ViewModels\Filter\FloatFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\IFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\IntFilterParameterViewModel.cs" />
+    <Compile Include="ViewModels\FormulaViewModel.cs" />
     <Compile Include="ViewModels\StatisticsViewModel.cs" />
     <Compile Include="ViewModels\StatisticViewModel.cs" />
     <Compile Include="Views\BoolFilterParameterView.cs" />

@@ -23,15 +23,26 @@ namespace TextureViewer.ViewModels
             this.model = model;
             this.models = models;
             this.imageId = imageId;
-            this.colorFormula = model.ColorFormula.Formula;
-            this.alphaFormula = model.AlphaFormula.Formula;
+            this.Color = new FormulaViewModel(model.ColorFormula);
+            this.Alpha = new FormulaViewModel(model.AlphaFormula);
+            Color.PropertyChanged += FormulaOnPropertyChanged;
+            Alpha.PropertyChanged += FormulaOnPropertyChanged;
+
             this.useFilter = model.UseFilter;
 
             this.model.PropertyChanged += ModelOnPropertyChanged;
-            this.model.ColorFormula.PropertyChanged += ColorFormulaOnPropertyChanged;
-            this.model.AlphaFormula.PropertyChanged += AlphaFormulaOnPropertyChanged;
             this.models.Display.PropertyChanged += DisplayOnPropertyChanged;
             this.models.FinalImages.Get(imageId).PropertyChanged += FinalImageOnPropertyChanged;
+        }
+
+        private void FormulaOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch (args.PropertyName)
+            {
+                case nameof(FormulaViewModel.HasChanges):
+                    if(HasChangedChanged()) OnPropertyChanged(nameof(HasChanges));
+                    break;
+            }
         }
 
         private void FinalImageOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -66,29 +77,10 @@ namespace TextureViewer.ViewModels
         /// </summary>
         public void ApplyFormulas()
         {
-            model.ColorFormula.Formula = colorFormula;
-            model.AlphaFormula.Formula = alphaFormula;
+            Color.Apply();
+            Alpha.Apply();
             model.UseFilter = useFilter;
-        }
-
-        private void ColorFormulaOnPropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
-            switch (args.PropertyName)
-            {
-                case nameof(FormulaModel.Formula):
-                    ColorFormula = model.ColorFormula.Formula;
-                    break;
-            }
-        }
-
-        private void AlphaFormulaOnPropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
-            switch (args.PropertyName)
-            {
-                case nameof(FormulaModel.Formula):
-                    AlphaFormula = model.AlphaFormula.Formula;
-                    break;
-            }
+            prevHasChanged = false;
         }
 
         private void ModelOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -117,11 +109,11 @@ namespace TextureViewer.ViewModels
             {
                 model.Visible = value;
                 if (value) return;
-                // restore default values if tempory changes happend.
+                /*// restore default values if tempory changes happend.
                 // it would probably confuse the user otherwise if he
                 // sees a formula that is not used on reenabling.
                 AlphaFormula = model.AlphaFormula.Formula;
-                ColorFormula = model.ColorFormula.Formula;
+                ColorFormula = model.ColorFormula.Formula;*/
                 UseFilter = model.UseFilter;
             }
         }
@@ -137,32 +129,13 @@ namespace TextureViewer.ViewModels
                 if (value == useFilter) return;
                 useFilter = value;
                 OnPropertyChanged(nameof(UseFilter));
+                if(HasChangedChanged()) OnPropertyChanged(nameof(HasChanges));
             }
         }
 
-        private string colorFormula;
-        public string ColorFormula
-        {
-            get => colorFormula;
-            set
-            {
-                if (value == null || value.Equals(colorFormula)) return;
-                colorFormula = value;
-                OnPropertyChanged(nameof(ColorFormula));
-            }
-        }
+        public FormulaViewModel Color { get; }
 
-        private string alphaFormula;
-        public string AlphaFormula
-        {
-            get => alphaFormula;
-            set
-            {
-                if (value == null || value.Equals(alphaFormula)) return;
-                alphaFormula = value;
-                OnPropertyChanged(nameof(AlphaFormula));
-            }
-        }
+        public FormulaViewModel Alpha { get; }
 
         public string TexelColor
         {
@@ -226,13 +199,21 @@ namespace TextureViewer.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public bool HasChanges()
-        {
-            return
-                !alphaFormula.Equals(model.AlphaFormula.Formula) ||
-                !colorFormula.Equals(model.ColorFormula.Formula) ||
-                useFilter != model.UseFilter;
+        private bool prevHasChanged = false;
+        public bool HasChanges => Color.HasChanges ||
+                                  Alpha.HasChanges ||
+                                  useFilter != model.UseFilter;
 
+        /// <summary>
+        /// indicates if the has changed property changed since the last query
+        /// </summary>
+        /// <returns></returns>
+        private bool HasChangedChanged()
+        {
+            var changes = HasChanges;
+            var res = prevHasChanged != changes;
+            prevHasChanged = changes;
+            return res;
         }
     }
 }

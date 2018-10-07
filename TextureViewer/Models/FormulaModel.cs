@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using TextureViewer.Annotations;
+using Xceed.Wpf.DataGrid;
 
 namespace TextureViewer.Models
 {
@@ -41,6 +42,25 @@ namespace TextureViewer.Models
 
         // the converted formula
         public string Converted { get; private set; }
+
+        /// <summary>
+        /// tests if the given formula is valid
+        /// </summary>
+        /// <param name="f">formula to test</param>
+        /// <returns></returns>
+        public bool IsValid(string f)
+        {
+            try
+            {
+                var eq = new Equation.Equation(f, Math.Max(images.NumImages, 1));
+                eq.GetOpenGlExpression();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
 
         /// <summary>
         /// convertes the formula into an opengl expression.

@@ -35,11 +35,12 @@ namespace TextureViewer.ViewModels
 
         private void UpdateHasChanges()
         {
-            HasChanges = viewModels.Any(eq => eq.HasChanges() && eq.IsVisible);
+            HasChanges = viewModels.Any(eq => eq.HasChanges && eq.IsVisible);
         }
 
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
+            if (args.PropertyName != nameof(EquationViewModel.HasChanges)) return;
             UpdateHasChanges();
         }
 
