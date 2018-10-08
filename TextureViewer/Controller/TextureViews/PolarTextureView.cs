@@ -29,7 +29,6 @@ namespace TextureViewer.Controller.TextureViews
 
         public override void Draw(TextureArray2D texture)
         {
-            GL.Disable(EnableCap.FramebufferSrgb);
             // this will draw the checkers background
             base.Draw(texture);
 
@@ -50,7 +49,6 @@ namespace TextureViewer.Controller.TextureViews
 
             models.GlData.Vao.DrawQuad();
 
-            GL.Enable(EnableCap.FramebufferSrgb);
             GL.Disable(EnableCap.Blend);
             Program.Unbind();
         }

@@ -100,9 +100,8 @@ namespace TextureViewer.Controller
                 else
                 {
                     // draw the frame
-
                     GL.Viewport(0, 0, context.ClientSize.Width, context.ClientSize.Height);
-                    GL.ClearColor(0.854992608124234f, 0.854992608124234f, 0.854992608124234f, 1.0f);
+                    GL.ClearColor(0.9333f, 0.9333f, 0.9333f, 1.0f);
                     GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
                     //models.GlData.CheckersShader.Bind(Matrix4.Identity);

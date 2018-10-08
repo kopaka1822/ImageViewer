@@ -27,7 +27,6 @@ namespace TextureViewer.Controller.TextureViews
 
         public override void Draw(TextureArray2D texture)
         {
-            GL.Disable(EnableCap.FramebufferSrgb);
             // draw checkerss
             base.Draw(texture);
 
@@ -45,7 +44,6 @@ namespace TextureViewer.Controller.TextureViews
             // draw via vertex array
             models.GlData.Vao.DrawQuad();
 
-            GL.Enable(EnableCap.FramebufferSrgb);
             GL.Disable(EnableCap.Blend);
             Program.Unbind();
         }

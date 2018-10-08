@@ -90,7 +90,6 @@ namespace TextureViewer.Models
                 Enable();
 
                 GL.Enable(EnableCap.TextureCubeMapSeamless);
-                GL.Enable(EnableCap.FramebufferSrgb);
                 GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
                 GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
                 MaxTextureUnits = GL.GetInteger(GetPName.MaxTextureImageUnits);
