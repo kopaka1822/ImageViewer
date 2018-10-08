@@ -59,9 +59,11 @@ uint32_t getSizedInternalFormat(int nComponents, bool isFloat, bool& isSrgb)
 			return gli::gl::internal_format::INTERNAL_RG8_UNORM;
 		case 3:
 			return gli::gl::internal_format::INTERNAL_SRGB8;
+			//isSrgb = true;
 			//return gli::gl::internal_format::INTERNAL_RGB8_UNORM;
 		case 4:
 			return gli::gl::internal_format::INTERNAL_SRGB8_ALPHA8;
+			//isSrgb = true;
 			//return gli::gl::internal_format::INTERNAL_RGBA8_UNORM;
 		}
 	}

@@ -102,6 +102,7 @@ namespace TextureViewer.Controller.ImageCombination
                    "layout(location = 1) uniform int layer;\n" +
                    "layout(location = 2) uniform int level;\n" +
                    SrgbShader.FromSrgbFunction() +
+                   SrgbShader.ToSrgbFunction() +
                    GetTextureBindings(numImages) +
                    GetTextureGetters(numImages) +
                    "void main(){\n" +

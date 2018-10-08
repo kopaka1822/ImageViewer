@@ -28,7 +28,7 @@ namespace TextureViewer.Equation.Token
 
         private bool IsOpenGlFunction()
         {
-            switch (funcName)
+            switch (funcName.ToLower())
             {
                 case "min":
                 case "max":

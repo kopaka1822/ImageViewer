@@ -23,11 +23,19 @@ namespace TextureViewer.Equation.Token
 
         private static bool GetOpenglFunction(string name, out string front, out string end)
         {
-            switch (name)
+            switch (name.ToLower())
             {
                 case "alpha":
                     front = "vec4((";
                     end = ").a)";
+                    break;
+                case "tosrgb":
+                    front = "toSrgb(";
+                    end = ")";
+                    break;
+                case "fromsrgb":
+                    front = "fromSrgb(";
+                    end = ")";
                     break;
                 case "red":
                     front = "vec4((";

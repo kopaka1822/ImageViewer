@@ -68,7 +68,7 @@ namespace TextureViewer.Controller.TextureViews.Shader
                    "pixel /= ivec2(10);\n" +
                    "bool isDark = ((pixel.x & 1) == 0);\n" +
                    "if( (pixel.y & 1) == 0 ) isDark = !isDark;\n" +
-                   "float c = isDark? 0.6 : 0.4;\n" +
+                   "float c = isDark? 0.7 : 0.5;\n" +
                    "fragColor = vec4(c,c,c,1.0);\n" +
                    "}\n";
         }

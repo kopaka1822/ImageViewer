@@ -7,6 +7,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.Models;
 using TextureViewer.Models.Dialog;
+using TextureViewer.Models.Shader;
 
 namespace TextureViewer.Controller.TextureViews.Shader
 {
@@ -81,6 +82,7 @@ namespace TextureViewer.Controller.TextureViews.Shader
         public static string GetFragmentSource()
         {
             return GetVersion() +
+                SrgbShader.ToSrgbFunction() +
                    // uniforms
                    "layout(binding = 0) uniform sampler2DArray tex;\n" +
                    "layout(location = 2) uniform float layer;\n" +
@@ -107,7 +109,7 @@ namespace TextureViewer.Controller.TextureViews.Shader
                    "vec4 color = textureLod(tex, vec3(polarDirection.st, layer), level);\n" +
                    ApplyGrayscale() +
                    ApplyColorCrop("polarDirection") +
-                   "fragColor = color;\n" +
+                   "fragColor = toSrgb(color);\n" +
                    "}\n";
         }
     }

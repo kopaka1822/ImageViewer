@@ -79,6 +79,8 @@ namespace TextureViewer.Controller.TextureViews
 
             var finalTransform = offset * GetTransform();
 
+            GL.Disable(EnableCap.FramebufferSrgb);
+
             // draw the checkers background
             models.GlData.CheckersShader.Bind(finalTransform);
             models.GlData.Vao.DrawQuad();
@@ -99,6 +101,7 @@ namespace TextureViewer.Controller.TextureViews
 
             models.GlData.Vao.DrawQuad();
 
+            GL.Enable(EnableCap.FramebufferSrgb);
             // disable everything
             GL.Disable(EnableCap.Blend);
             Program.Unbind();

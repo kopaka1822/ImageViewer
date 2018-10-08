@@ -126,6 +126,8 @@ Additionaly you can use:
 * green(value)
 * blue(value)
 * alpha(value)
+* toSrgb(value)*
+* fromSrgb(value)*
 
 functions marked with * will only use the rgb components for computation and ignore alpha.
 

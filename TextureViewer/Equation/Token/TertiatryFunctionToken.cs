@@ -19,7 +19,7 @@ namespace TextureViewer.Equation.Token
 
         public override string ToOpenGl()
         {
-            if (funcName == "rgb")
+            if (funcName.ToLower() == "rgb")
             {
                 // transform values into rgb vector
                 return $"vec4(({value1.ToOpenGl()}).r, " +
