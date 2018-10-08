@@ -13,14 +13,28 @@ namespace TextureViewer.ViewModels
     public class FormulaViewModel : INotifyPropertyChanged, IDataErrorInfo
     {
         private readonly FormulaModel model;
+        private readonly EquationViewModel parent;
 
-        public FormulaViewModel(FormulaModel model, ImagesModel images)
+        public FormulaViewModel(FormulaModel model, ImagesModel images, EquationViewModel parent)
         {
             this.model = model;
             this.formula = model.Formula;
+            this.parent = parent;
 
             model.PropertyChanged += ModelOnPropertyChanged;
             images.PropertyChanged += ImagesOnPropertyChanged;
+            parent.PropertyChanged += ParentOnPropertyChanged;
+        }
+
+        private void ParentOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            switch(args.PropertyName)
+            {
+                case nameof(EquationViewModel.IsVisible):
+                    // redo validation (only display invalid on visible formulas)
+                    OnPropertyChanged(nameof(Formula));
+                    break;
+            }
         }
 
         private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -48,6 +62,8 @@ namespace TextureViewer.ViewModels
                     OnPropertyChanged(nameof(HasChanges));
             }
         }
+
+        public bool IsVisible => parent.IsVisible;
 
         public bool HasChanges => Formula != model.Formula;
 
@@ -79,6 +95,9 @@ namespace TextureViewer.ViewModels
         private string Validate(string property)
         {
             if (property != nameof(Formula)) return string.Empty;
+
+            // only display error if formula is visible
+            if (!IsVisible) return string.Empty;
 
             var error = model.TestFormula(Formula);
             if (error == null) return string.Empty;

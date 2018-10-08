@@ -23,8 +23,8 @@ namespace TextureViewer.ViewModels
             this.model = model;
             this.models = models;
             this.imageId = imageId;
-            this.Color = new FormulaViewModel(model.ColorFormula, models.Images);
-            this.Alpha = new FormulaViewModel(model.AlphaFormula, models.Images);
+            this.Color = new FormulaViewModel(model.ColorFormula, models.Images, this);
+            this.Alpha = new FormulaViewModel(model.AlphaFormula, models.Images, this);
             Color.PropertyChanged += FormulaOnPropertyChanged;
             Alpha.PropertyChanged += FormulaOnPropertyChanged;
 
