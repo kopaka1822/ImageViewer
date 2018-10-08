@@ -129,6 +129,7 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 
 void stb_save_png(const char* filename, int width, int height, int components, const void* data)
 {
+	stbi_write_png_compression_level = 16;
 	//stbi_flip_vertically_on_write(1);
 	auto res = stbi_write_png(filename, width, height, components, data, width * components);
 	if (!res)
