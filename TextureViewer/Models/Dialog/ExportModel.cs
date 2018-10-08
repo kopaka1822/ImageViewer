@@ -55,7 +55,7 @@ namespace TextureViewer.Models.Dialog
                     HasQuality = true;
                     MinQuality = 1;
                     MaxQuality = 100;
-                    Quality = 98;
+                    Quality = Properties.Settings.Default.JpgQuality;
                     break;
                 case FileFormat.Bmp:
                     supportedFormats.Add(PixelFormat.Red);
@@ -264,6 +264,8 @@ namespace TextureViewer.Models.Dialog
                 if (val == quality) return;
                 quality = val;
                 OnPropertyChanged(nameof(Quality));
+                if (Format == FileFormat.Jpg)
+                    Properties.Settings.Default.JpgQuality = quality;
             }
         }
 
