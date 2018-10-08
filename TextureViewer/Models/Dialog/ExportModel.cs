@@ -27,10 +27,9 @@ namespace TextureViewer.Models.Dialog
         private readonly DisplayModel displayModel;
 
         // initializes the export model for a new export
-        public void Init(string filename, PixelFormat pixelFromat, FileFormat format)
+        public void Init(string filename, PixelFormat pixelFormat, FileFormat format)
         {
             Filename = filename;
-            PixelFormat = pixelFromat;
             Format = format;
             HasQuality = false;
 
@@ -49,9 +48,8 @@ namespace TextureViewer.Models.Dialog
                     supportedFormats.Add(PixelFormat.Red);
                     supportedFormats.Add(PixelFormat.Green);
                     supportedFormats.Add(PixelFormat.Blue);
-                    supportedFormats.Add(PixelFormat.Rg);
+                    //supportedFormats.Add(PixelFormat.Rg);
                     supportedFormats.Add(PixelFormat.Rgb);
-                    supportedFormats.Add(PixelFormat.Rgba);
                     HasQuality = true;
                     MinQuality = 1;
                     MaxQuality = 100;
@@ -73,7 +71,11 @@ namespace TextureViewer.Models.Dialog
                     break;
             }
 
-            Debug.Assert(supportedFormats.Contains(pixelFromat));
+            PixelFormat = pixelFormat;
+            if (!supportedFormats.Contains(pixelFormat))
+            {
+                PixelFormat = supportedFormats.Last();
+            }
 
             SupportedFormats = supportedFormats;
 
