@@ -150,3 +150,12 @@ void stb_save_hdr(const char* filename, int width, int height, int components, c
 	if (!res)
 		throw std::exception("could not save file");
 }
+
+void stb_save_jpg(const char* filename, int width, int height, int components, const void* data, int quality)
+{
+	if (quality < 1 || quality > 100)
+		throw std::out_of_range("quality must be between 1 and 100");
+	auto res = stbi_write_jpg(filename, width, height, components, data, quality);
+	if (!res)
+		throw std::exception("could not save file");
+}

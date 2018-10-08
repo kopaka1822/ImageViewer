@@ -46,6 +46,20 @@ bool save_hdr(const char* filename, int width, int height, int components, const
 	return true;
 }
 
+bool save_jpg(const char* filename, int width, int height, int components, const void* data, int quality)
+{
+	try
+	{
+		stb_save_jpg(filename, width, height, components, data, quality);
+	}
+	catch (const std::exception& e)
+	{
+		set_error(e.what());
+		return false;
+	}
+	return true;
+}
+
 bool save_pfm(const char* filename, int width, int height, int components, const void* data)
 {
 	if(components != 1 && components != 3) return false;

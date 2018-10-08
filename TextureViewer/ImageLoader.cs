@@ -41,6 +41,9 @@ namespace TextureViewer
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern bool save_pfm(string filename, int width, int height, int components, byte[] data);
 
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool save_jpg(string filename, int width, int height, int components, byte[] data, int quality);
+
         private static string GetError()
         {
             var ptr = get_error(out var length);
@@ -273,6 +276,12 @@ namespace TextureViewer
         public static void SaveHdr(string filename, int width, int height, int components, byte[] data)
         {
             if (!save_hdr(filename, width, height, components, data))
+                throw new Exception("saving image failed: " + GetError());
+        }
+
+        public static void SaveJpg(string filename, int width, int height, int components, byte[] data, int quality)
+        {
+            if (!save_jpg(filename, width, height, components, data, quality))
                 throw new Exception("saving image failed: " + GetError());
         }
 

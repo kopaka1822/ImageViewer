@@ -47,7 +47,7 @@ namespace TextureViewer.Commands
             // open save file dialog
             var sfd = new SaveFileDialog
             {
-                Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|HDR (*.hdr)|*.hdr|Portable float map (*.pfm)|*.pfm",
+                Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|JPEG (*.jpg)|*.jpg|HDR (*.hdr)|*.hdr|Portable float map (*.pfm)|*.pfm",
                 InitialDirectory = Properties.Settings.Default.ExportPath,
                 FileName = proposedFilename
             };
@@ -65,6 +65,8 @@ namespace TextureViewer.Commands
                 format = ExportModel.FileFormat.Hdr;
             else if (sfd.FileName.EndsWith(".pfm"))
                 format = ExportModel.FileFormat.Pfm;
+            else if (sfd.FileName.EndsWith(".jpg"))
+                format = ExportModel.FileFormat.Jpg;
             
             var pixelFormat = PixelFormat.Rgb;
             if (models.Images.IsAlpha)
@@ -96,7 +98,7 @@ namespace TextureViewer.Commands
                     Debug.Assert(width > 0);
                     Debug.Assert(height > 0);
 
-                    var convertToSrgb = format == ExportModel.FileFormat.Png || format == ExportModel.FileFormat.Bmp;
+                    var convertToSrgb = format == ExportModel.FileFormat.Png || format == ExportModel.FileFormat.Bmp || format == ExportModel.FileFormat.Jpg;
                     var data = texture.GetData(info.Layer, info.Mipmap, info.PixelFormat, info.PixelType, convertToSrgb,
                         info.UseCropping, info.CropStartX, info.CropStartY, ref width, ref height,
                         models.GlData.ExportShader);
@@ -119,6 +121,9 @@ namespace TextureViewer.Commands
                             break;
                         case ExportModel.FileFormat.Pfm:
                             ImageLoader.SavePfm(info.Filename, width, height, numComponents, data);
+                            break;
+                        case ExportModel.FileFormat.Jpg:
+                            ImageLoader.SaveJpg(info.Filename, width, height, numComponents, data, info.Quality);
                             break;
                     }
                 }

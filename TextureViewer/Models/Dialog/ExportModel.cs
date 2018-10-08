@@ -19,7 +19,8 @@ namespace TextureViewer.Models.Dialog
             Png,
             Bmp,
             Hdr,
-            Pfm
+            Pfm,
+            Jpg
         }
 
         private ImagesModel imagesModel;
@@ -31,6 +32,7 @@ namespace TextureViewer.Models.Dialog
             Filename = filename;
             PixelFormat = pixelFromat;
             Format = format;
+            HasQuality = false;
 
             var supportedFormats = new List<PixelFormat>();
             switch (format)
@@ -42,6 +44,18 @@ namespace TextureViewer.Models.Dialog
                     supportedFormats.Add(PixelFormat.Rg);
                     supportedFormats.Add(PixelFormat.Rgb);
                     supportedFormats.Add(PixelFormat.Rgba);
+                    break;
+                case FileFormat.Jpg:
+                    supportedFormats.Add(PixelFormat.Red);
+                    supportedFormats.Add(PixelFormat.Green);
+                    supportedFormats.Add(PixelFormat.Blue);
+                    supportedFormats.Add(PixelFormat.Rg);
+                    supportedFormats.Add(PixelFormat.Rgb);
+                    supportedFormats.Add(PixelFormat.Rgba);
+                    HasQuality = true;
+                    MinQuality = 1;
+                    MaxQuality = 100;
+                    Quality = 98;
                     break;
                 case FileFormat.Bmp:
                     supportedFormats.Add(PixelFormat.Red);
@@ -160,6 +174,7 @@ namespace TextureViewer.Models.Dialog
                 if (CropEndY > CropMaxY) CropEndY = CropMaxY;
             }
         }
+
         public PixelFormat PixelFormat { get; set; }
 
         public IReadOnlyList<PixelFormat> SupportedFormats { get; private set; }
@@ -239,6 +254,23 @@ namespace TextureViewer.Models.Dialog
             }
         }
 
+        private int quality = 0;
+        public int Quality
+        {
+            get => quality;
+            set
+            {
+                var val = Math.Min(Math.Max(value, MinQuality), MaxQuality);
+                if (val == quality) return;
+                quality = val;
+                OnPropertyChanged(nameof(Quality));
+            }
+        }
+
+        public int MinQuality { get; private set; }
+        public int MaxQuality { get; private set; }
+        // indicates if this format has a quality attribute
+        public bool HasQuality { get; private set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.Annotations;
 using TextureViewer.Models.Dialog;
@@ -97,6 +98,9 @@ namespace TextureViewer.ViewModels.Dialog
                 case nameof(ExportModel.Layer):
                     selectedLayer = AvailableLayers[models.Export.Layer];
                     OnPropertyChanged(nameof(SelectedLayer));
+                    break;
+                case nameof(ExportModel.Quality):
+                    OnPropertyChanged(nameof(Quality));
                     break;
             }
         }
@@ -192,6 +196,15 @@ namespace TextureViewer.ViewModels.Dialog
         {
             get => models.Export.CropEndY;
             set => models.Export.CropEndY = value;
+        }
+
+        public Visibility HasQuality => models.Export.HasQuality ? Visibility.Visible : Visibility.Collapsed;
+        public int MinQuality => models.Export.MinQuality;
+        public int MaxQuality => models.Export.MaxQuality;
+        public int Quality
+        {
+            get => models.Export.Quality;
+            set => models.Export.Quality = value;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

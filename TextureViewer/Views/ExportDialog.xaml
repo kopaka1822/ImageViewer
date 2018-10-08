@@ -7,7 +7,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="Export"
-        Height="260"
+        Height="300"
         Width="400"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
@@ -29,6 +29,27 @@
                         Grid.Column="1" 
                         IsEnabled="False"
                         Text="{Binding Filename}"/>
+                </Grid>
+                <!-- QUALITY -->
+              <Grid 
+                  Margin="0 0 0 5"
+                  Visibility="{Binding HasQuality}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock 
+                        Grid.Column="0" 
+                        Text="Quality: "/>
+                    <xctk:IntegerUpDown
+                        Grid.Column="1"
+                        Width="80"
+                        Margin="0 0 5 0"
+                        Value="{Binding Quality}"
+                        Minimum="{Binding MinQuality}"
+                        Maximum="{Binding MaxQuality}"
+                        HorizontalAlignment="Left"/>
                 </Grid>
                 <!-- LAYER -->
                 <Grid Margin="0 0 0 5">
