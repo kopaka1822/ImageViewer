@@ -41,6 +41,7 @@ namespace TextureViewer.ViewModels
             AddFilterCommand = new AddFilterCommand(models, Filter);
             ShowPixelDisplayCommand = new ShowPixelDialogCommand(models);
             ShowPixelColorCommand = new ShowPixelColorCommand(models);
+            GenerateMipmapsCommand = new GenerateMipmapsCommand(models);
 
             window.KeyUp += WindowOnKeyUp;
             models.GlContext.GlControl.DragDrop += GlControlOnDragDrop;
@@ -114,14 +115,21 @@ namespace TextureViewer.ViewModels
         public StatisticsViewModel Statistics { get; }
 
         // commands
+        // file
         public ICommand ImportCommand { get; }
         public ICommand OpenCommand { get; }
         public ICommand ExportCommand { get; }
         public ICommand ResizeCommand { get; }
         public ICommand AddFilterCommand { get; }
+
+        // view
         public ICommand ShowPixelDisplayCommand { get; }
         public ICommand ShowPixelColorCommand { get; }
 
+        // tools
+        public ICommand GenerateMipmapsCommand { get; }
+
+        // help
         public ICommand HelpAboutCommand { get; }
         public ICommand HelpEquationCommand { get; }
         public ICommand HelpFilterManualCommand { get; }

@@ -102,6 +102,20 @@
             </MenuItem>
             <!--END VIEW-->
 
+            <MenuItem Header="Tools">
+                <MenuItem 
+                    Header="Generate Mipmaps"
+                    Command="{Binding GenerateMipmapsCommand}">
+                    <MenuItem.Icon>
+                        <Image 
+                            Source="Icons/image.png"
+                            Width="16" 
+                            Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <!--END TOOLS-->
+            
             <MenuItem Header="Help">
                 <MenuItem 
                     Header="About"

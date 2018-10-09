@@ -28,8 +28,13 @@ namespace TextureViewer.glhelper
         private readonly SizedInternalFormat internalFormat;
         private readonly int nMipmaps;
         private readonly int nLayer;
+        // width of upper level
+        private readonly int width;
+        // height of upper level
+        private readonly int height;
 
         public bool HasMipmaps => nMipmaps > 1;
+        public int NumMipmaps => nMipmaps;
 
         /// <summary>
         /// indicates if the texture needs to be converted from srb space to physical space
@@ -44,12 +49,16 @@ namespace TextureViewer.glhelper
         /// <param name="internalFormat"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        public TextureArray2D(int numLayers, int numMipmaps, SizedInternalFormat internalFormat, int width, int height)
+        public TextureArray2D(int numLayers, int numMipmaps, SizedInternalFormat internalFormat, 
+            int width, int height, bool isSrgb = false)
         {
             id = GL.GenTexture();
             this.internalFormat = internalFormat;
             this.nMipmaps = numMipmaps;
             this.nLayer = numLayers;
+            this.width = width;
+            this.height = height;
+            this.IsSrgb = isSrgb;
             GL.BindTexture(TextureTarget.Texture2DArray, id);
 
             GL.TexStorage3D(TextureTarget3d.Texture2DArray, numMipmaps,
@@ -70,6 +79,8 @@ namespace TextureViewer.glhelper
             this.nLayer = image.Layers.Count;
             this.internalFormat = (SizedInternalFormat)image.OpenglInternalFormat;
             this.IsSrgb = image.IsSrgb;
+            this.width = image.GetWidth(0);
+            this.height = image.GetHeight(0);
 
             GL.BindTexture(TextureTarget.Texture2DArray, id);
 
@@ -110,10 +121,10 @@ namespace TextureViewer.glhelper
                 }
             }
             
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinLod, 0.0f);
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLod, (float)image.NumMipmaps);
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureBaseLevel, 0);
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLevel, image.NumMipmaps);
+            //GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinLod, 0.0f);
+            //GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLod, (float)image.NumMipmaps);
+            //GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureBaseLevel, 0);
+            //GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLevel, image.NumMipmaps);
 
             CreateTexture2DViews();
         }
@@ -166,6 +177,27 @@ namespace TextureViewer.glhelper
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapR, (int)TextureParameterName.ClampToEdge);
         }
 
+        /// <summary>
+        /// generates new mipmaps
+        /// </summary>
+        public TextureArray2D GenerateMipmapLevels(int levels)
+        {
+            Debug.Assert(!HasMipmaps);
+            // create a texture with the same format and more mipmaps
+            var newTex = new TextureArray2D(nLayer, levels, internalFormat, width, height, IsSrgb);
+
+            // copy image data of first level
+            GL.CopyImageSubData(id, ImageTarget.Texture2DArray, 0, 0, 0, 0,
+                         newTex.id, ImageTarget.Texture2DArray, 0, 0, 0, 0, width, height, nLayer);
+
+            newTex.GenerateMipmaps();
+
+            return newTex;
+        }
+
+        /// <summary>
+        /// generates mipmaps for the existing mipmap levels
+        /// </summary>
         public void GenerateMipmaps()
         {
             Debug.Assert(HasMipmaps);

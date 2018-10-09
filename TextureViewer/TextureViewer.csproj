@@ -136,6 +136,7 @@
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
     <Compile Include="Commands\CancelFiltersCommand.cs" />
     <Compile Include="Commands\ExportImageCommand.cs" />
+    <Compile Include="Commands\GenerateMipmapsCommand.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="Commands\OpenImageCommand.cs" />
     <Compile Include="Commands\ResizeWindowCommand.cs" />

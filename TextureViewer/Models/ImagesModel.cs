@@ -26,8 +26,8 @@ namespace TextureViewer.Models
 
         private class ImageData
         {
-            public TextureArray2D TextureArray { get; }
-            public int NumMipmaps { get; }
+            public TextureArray2D TextureArray { get; private set; }
+            public int NumMipmaps { get; private set; }
             public int NumLayers { get; }
             public bool IsGrayscale { get; }
             public bool HasAlpha { get; }
@@ -43,6 +43,14 @@ namespace TextureViewer.Models
                 HasAlpha = image.HasAlpha();
                 IsHdr = image.IsHdr();
                 Filename = image.Filename;
+            }
+
+            public void GenerateMipmaps(int levels)
+            {
+                var oldTex = TextureArray;
+                TextureArray = TextureArray.GenerateMipmapLevels(levels);
+                oldTex.Dispose();
+                NumMipmaps = levels;
             }
 
             /// <summary>
@@ -284,6 +292,54 @@ namespace TextureViewer.Models
                 imageData.Dispose();
             }
             images.Clear();
+        }
+
+        /// <summary>
+        /// generates mipmaps for all images
+        /// </summary>
+        public void GenerateMipmaps()
+        {
+            Debug.Assert(!context.GlEnabled);
+            context.Enable();
+
+            Debug.Assert(NumMipmaps == 1);
+
+            // compute new mipmap levels
+            var levels = ComputeMaxMipLevels();
+            if (levels == NumMipmaps) return;
+
+            foreach (var image in images)
+            {
+                image.GenerateMipmaps(levels);
+            }
+
+            // recalc dimensions array
+            var w = Width;
+            var h = Height;
+            dimensions = new Dimension[levels];
+            for (int i = 0; i < levels; ++i)
+            {
+                dimensions[i].Width = w;
+                dimensions[i].Height = h;
+                w = Math.Max(w / 2, 1);
+                h = Math.Max(h / 2, 1);
+            }
+
+            OnPropertyChanged(nameof(NumMipmaps));
+
+            context.Disable();
+        }
+
+        /// <summary>
+        /// computes the maximum amount of mipmap levels for the current width and height
+        /// </summary>
+        /// <returns></returns>
+        private int ComputeMaxMipLevels()
+        {
+            var resolution = Math.Max(Width, Height);
+            var maxMip = 1;
+            while ((resolution /= 2) > 0) ++maxMip;
+            return maxMip;
         }
 
         #endregion

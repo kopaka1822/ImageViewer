@@ -35,6 +35,9 @@ namespace TextureViewer.Models
                         Reset();
                     }
                     break;
+                case nameof(ImagesModel.NumMipmaps):
+                    Reset();
+                    break;
             }
         }
 

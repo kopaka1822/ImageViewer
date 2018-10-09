@@ -57,6 +57,10 @@ namespace TextureViewer.Controller
                         models.GlContext.RedrawFrame();
                     }
                     break;
+                case nameof(ImagesModel.NumMipmaps):
+                    recomputeImage = true;
+                    models.GlContext.RedrawFrame();
+                    break;
                 case nameof(ImagesModel.ImageOrder):
                     // TODO check if the result actually changes
                     recomputeImage = true;
