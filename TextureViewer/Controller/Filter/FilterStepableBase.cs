@@ -21,14 +21,12 @@ namespace TextureViewer.Controller.Filter
         protected readonly ImageCombineBuilder Builder;
         private readonly Models.Models models;
         private readonly int layer;
-        private readonly int mipmap;
 
         public FilterStepableBase(
             Models.Models models,
             FilterModel model, 
             ImageCombineBuilder builder, 
-            int layer, 
-            int mipmap,
+            int layer,
             int iteration)
         {
             Model = model;
@@ -36,7 +34,6 @@ namespace TextureViewer.Controller.Filter
             this.Builder = builder;
             this.models = models;
             this.layer = layer;
-            this.mipmap = mipmap;
         }
 
         protected void BindProgramAndUniforms()
@@ -46,16 +43,16 @@ namespace TextureViewer.Controller.Filter
             Builder.GetTemporaryTexture();
 
             models.GlData.BindSampler(Model.Shader.GetSourceImageLocation(), false, true);
-            Builder.GetPrimaryTexture().BindAsTexture2D(Model.Shader.GetSourceImageLocation(), layer: layer, mipmap: mipmap);
+            Builder.GetPrimaryTexture().BindAsTexture2D(Model.Shader.GetSourceImageLocation(), layer: layer, mipmap: 0);
             Builder.GetTemporaryTexture()
-                .BindAsImage(Model.Shader.GetDestinationImageLocation(), layer: layer, mipmap: mipmap, access: TextureAccess.WriteOnly);
+                .BindAsImage(Model.Shader.GetDestinationImageLocation(), layer: layer, mipmap: 0, access: TextureAccess.WriteOnly);
 
             // bind original images
             foreach(var texPara in Model.TextureParameters)
             {
                 var tex = models.Images.GetTexture(texPara.Source);
                 models.GlData.BindSampler(texPara.Binding, false, true);
-                tex.BindAsTexture2D(texPara.Binding, layer: layer, mipmap: mipmap);
+                tex.BindAsTexture2D(texPara.Binding, layer: layer, mipmap: 0);
             }
 
             Model.Shader.Bind();

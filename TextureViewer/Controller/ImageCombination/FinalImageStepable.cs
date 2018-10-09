@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextureViewer.glhelper;
 using TextureViewer.Models;
 using TextureViewer.Utility;
 
@@ -38,7 +39,19 @@ namespace TextureViewer.Controller.ImageCombination
         {
             Debug.Assert(curStep == 0);
 
-            finalImage.Apply(builder.GetPrimaryTexture(), builder.GetStatisticsTexture());
+            var primary = builder.GetPrimaryTexture();
+            var statistics = builder.GetStatisticsTexture();
+
+            // generate mipmaps
+            if(primary.HasMipmaps)
+            {
+                primary.GenerateMipmaps();
+                if(!ReferenceEquals(primary, statistics))
+                    statistics.GenerateMipmaps();
+            }
+
+            // save in model
+            finalImage.Apply(primary, statistics);
 
             builder.Dispose();
 

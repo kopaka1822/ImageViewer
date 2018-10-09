@@ -166,6 +166,13 @@ namespace TextureViewer.glhelper
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapR, (int)TextureParameterName.ClampToEdge);
         }
 
+        public void GenerateMipmaps()
+        {
+            Debug.Assert(HasMipmaps);
+            GL.BindTexture(TextureTarget.Texture2DArray, id);
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
+        }
+
         /// <summary>
         /// binds specified texture
         /// </summary>
