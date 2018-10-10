@@ -15,8 +15,8 @@ Currently the following image formats can be imported:
 * EXR (based on [tinyexr](https://github.com/syoyo/tinyexr))
 
 Exporting is supported for:
-* PNG, JPG
-* HDR
+* PNG, JPG, BMP
+* HDR, PFM
 
 ## View Modes
 ### Simple Images
