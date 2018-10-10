@@ -11,7 +11,7 @@ namespace TextureViewer.Models.Filter
     public class FilterTextureParameterModel : INotifyPropertyChanged
     {
         public string Name { get; }
-        public int Binding { get; }
+        public string FunctionName { get; }
         private int source = 0;
 
         // describes which source images is used for the binding
@@ -26,10 +26,10 @@ namespace TextureViewer.Models.Filter
             }
         }
 
-        public FilterTextureParameterModel(string name, int binding)
+        public FilterTextureParameterModel(string name, string functionName)
         {
             Name = name;
-            Binding = binding;
+            FunctionName = functionName;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

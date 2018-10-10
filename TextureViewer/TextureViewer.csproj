@@ -332,9 +332,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="Filter\absolute.comp">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Filter\blur.comp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -2,17 +2,14 @@
 #setting title, Gaussian Blur
 #setting description, The visual effect of this blurring technique is a smooth blur resembling that of viewing the image through a translucent screen, distinctly different from the bokeh effect produced by an out-of-focus lens or the shadow of an object under usual illumination
 
-#param Blur Radius, 3, int, 20, 1
-#param Variance, 2, float, 72.46, 1
-
-layout(location = 3) uniform int blur_radius;
-layout(location = 2) uniform float VARIANCE;
+#param Blur Radius, blur_radius, int, 20, 1
+#param Variance, variance, float, 72.46, 1
 
 // Simple Gauss-Kernel. Normalization is not included and must be
 // done by dividing through the weight sum.
 float kernel(int _offset)
 {
-	return exp(- _offset * _offset / VARIANCE);
+	return exp(- _offset * _offset / variance);
 }
 
 vec3 getPixel(int x, int y)

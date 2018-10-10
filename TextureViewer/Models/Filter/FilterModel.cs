@@ -33,7 +33,7 @@ namespace TextureViewer.Models.Filter
             for (var i = 0; i < IsEquationVisible.Length; ++i)
                 IsEquationVisible[i] = true;
 
-            Shader = new FilterShader(loader.ShaderSource, IsSepa);
+            Shader = new FilterShader(loader.ShaderSource, this);
         }
 
         public void Dispose()

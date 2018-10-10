@@ -1,11 +1,8 @@
 #setting title, Mirror
 #setting description, Mirrors the image
 
-#param Flip horizontally, 2, bool, false
-#param Flip vertically, 3, bool, false
-
-layout(location = 2) uniform bool flipx;
-layout(location = 3) uniform bool flipy;
+#param Flip horizontally, flipx, bool, false
+#param Flip vertically, flipy, bool, false
 
 void main()
 {

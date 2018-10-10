@@ -47,42 +47,7 @@ namespace TextureViewer.Controller.Filter
             Builder.GetTemporaryTexture()
                 .BindAsImage(Model.Shader.GetDestinationImageLocation(), layer: layer, mipmap: 0, access: TextureAccess.WriteOnly);
 
-            // bind original images
-            foreach(var texPara in Model.TextureParameters)
-            {
-                var tex = models.Images.GetTexture(texPara.Source);
-                models.GlData.BindSampler(texPara.Binding, false, true);
-                tex.BindAsTexture2D(texPara.Binding, layer: layer, mipmap: 0);
-            }
-
-            Model.Shader.Bind();
-
-            foreach (var parameter in Model.Parameters)
-            {
-                switch (parameter.GetParamterType())
-                {
-                    case ParameterType.Float:
-                        GL.Uniform1(parameter.GetBase().Location, parameter.GetFloatModel().Value);
-                        break;
-                    case ParameterType.Int:
-                        GL.Uniform1(parameter.GetBase().Location, parameter.GetIntModel().Value);
-                        break;
-                    case ParameterType.Bool:
-                        GL.Uniform1(parameter.GetBase().Location, parameter.GetBoolModel().Value ? 1 : 0);
-                        break;
-                }
-            }
-
-            if (Model.IsSepa)
-            {
-                // set direction for sepa shader
-                Debug.Assert(iteration == 1 || iteration == 0);
-                GL.Uniform2(0, iteration, 1 - iteration);
-            }
-            else
-            {
-                Debug.Assert(iteration == 0);
-            }
+            Model.Shader.Bind(models, layer, iteration);
         }
 
         /// <summary>

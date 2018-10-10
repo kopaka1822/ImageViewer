@@ -1,22 +1,18 @@
 #setting title, Gamma Correction
 #setting description, Nonlinear operation used to encode and decode luminance or tristimulus values in video or still image systems. Formula: |Factor * V| ^ (1/Gamma).
 
-#param Gamma, 3, float, 1, 0
+#param Gamma, gamma, float, 1, 0
 #paramprop Gamma, onSubtract, -0.1, add
 #paramprop Gamma, onAdd, 0.1, add
 
-#param Factor, 2, float, 1.0, 0
+#param Factor, factor, float, 1.0, 0
 
-#param Per Channel Gamma, 4, bool, false
+#param Per Channel Gamma, perChannel, bool, false
 
 #keybinding Factor, Add, 2.0, multiply
 #keybinding Factor, OemPlus, 2.0, multiply
 #keybinding Factor, Subtract, 0.5, multiply
 #keybinding Factor, OemMinus, 0.5, multiply
-
-layout(location = 3) uniform float gamma;
-layout(location = 2) uniform float factor;
-layout(location = 4) uniform bool perChannel; 
 
 void main()
 {

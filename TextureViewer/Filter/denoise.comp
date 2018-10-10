@@ -1,15 +1,11 @@
 #setting title, Bilateral Denoise
 #setting description, A bilateral gaussian blur (non-seperated).
 
-#param Blur Radius, 3, int, 4, 1, 8
-#param Variance, 2, float, 15.0, 0.5, 50.0
-#param Color Variance, 4, float, 0.1, 0.0001, 2.0
+#param Blur Radius, BLUR_RADIUS, int, 4, 1, 8
+#param Variance, VARIANCE, float, 15.0, 0.5, 50.0
+#param Color Variance, COLOR_VARIANCE, float, 0.1, 0.0001, 2.0
 #paramprop Variance, onAdd, 0.5, add
 #paramprop Variance, onSubtract, -0.5, add
-
-layout(location = 3) uniform int BLUR_RADIUS;
-layout(location = 2) uniform float VARIANCE;
-layout(location = 4) uniform float COLOR_VARIANCE;
 
 // Simple Gauss-Kernel. Normalization is not included and must be
 // done by dividing through the weight sum.

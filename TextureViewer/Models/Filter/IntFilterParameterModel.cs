@@ -31,8 +31,8 @@ namespace TextureViewer.Models.Filter
             }
         }
 
-        public IntFilterParameterModel(string name, int location, int min, int max, int defaultValue) 
-            : base(name, location, min, max, defaultValue)
+        public IntFilterParameterModel(string name, string variableName, int min, int max, int defaultValue) 
+            : base(name, variableName, min, max, defaultValue)
         {
             currentValue = defaultValue;
 
