@@ -28,11 +28,11 @@ The default value is true.
 To set uniform variables from the filter tab, you have to specify parameters.
 The syntax is:
 
-**#param** *Displayed Name*, *Location*, *Type*, *DefaultValue* [, *Minimun* [, *Maximum*]]
+**#param** *Displayed Name*, *Variable Name*, *Type*, *DefaultValue* [, *Minimun* [, *Maximum*]]
 
 *Displayed Name*: Will be displayed in the filter tab as variable name.
 
-*Location*: Location of the uniform variable.
+*Variable Name*: Name of the shader variable.
 
 *Type*: type of the variable. Valid types are: Int, Float, Bool.
 
@@ -41,8 +41,6 @@ The syntax is:
 *Minimum*: (Optional) Minimum allowed value of the variable.
 
 *Maximum*: (Optional) Maximum allowed value of the variable.
-
-Note: Uniform locations 0 and 1 are reserved and should not be used.
 
 Additional properties can be specified via:
 **#paramprop** *Displayed Name*, *Action*, ...
@@ -56,11 +54,11 @@ Additional properties can be specified via:
 
 ***Example:***
 
-`layout(location = 2) uniform float g;`
+`#param Gamma, gma, Float, 1.0, 0.0`
 
-`#param gamma, 2, Float, 1.0, 0.0`
+`#paramprop Gamma, onAdd, 2.0, multiply`
 
-`#paramprop gamma, onAdd, 2.0, multiply`
+`float a = pow(0.5, gma); // variable usage`
 
 ### Texture Parameters:
 
@@ -113,11 +111,11 @@ When pressing the key, the new parameter value will be: parameterValue (operatio
 
 ***Example:***
 
-`#keybinding gamma, P, 0.5, multiply`
+`#keybinding Gamma, P, 0.5, multiply`
 
 => after pressing P the gamma value will be multiplied by 0.5
 
-`#keybinding gamma, I, 10.0, set`
+`#keybinding Gamma, I, 10.0, set`
 
 => after pressing I the gamma value will be set to 10.0
 
