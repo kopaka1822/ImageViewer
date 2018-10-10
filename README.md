@@ -62,13 +62,9 @@ Or define a custom filter like this. Filter are GLSL compute shader. The work gr
 #setting title, Gamma Correction
 #setting description, Nonlinear operation used to encode and decode luminance or tristimulus values in video or still image systems. Formula: (Factor * V) ^ Gamma.
 
-// define variables for the user to interact with
-layout(location = 3) uniform float gamma;
-layout(location = 2) uniform float factor;
-
-// define displayed name, location (see above), variable type, default value and optional minimum, maximum
-#param Gamma, 3, float, 0.45454545, 0
-#param Factor, 2, float, 1.0, 0
+// define displayed name, variable name (for the shader), variable type, default value and optional minimum, maximum
+#param Gamma, gamma, float, 0.45454545, 0
+#param Factor, factor, float, 1.0, 0
 
 void main()
 {
