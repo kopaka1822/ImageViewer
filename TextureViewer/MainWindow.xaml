@@ -105,7 +105,8 @@
             <MenuItem Header="Tools">
                 <MenuItem 
                     Header="Generate Mipmaps"
-                    Command="{Binding GenerateMipmapsCommand}">
+                    Command="{Binding GenerateMipmapsCommand}"
+                    IsEnabled="{Binding Progress.NotProcessing}">
                     <MenuItem.Icon>
                         <Image 
                             Source="Icons/image.png"
