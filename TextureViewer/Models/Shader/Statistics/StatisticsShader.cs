@@ -31,11 +31,6 @@ namespace TextureViewer.Models.Shader.Statistics
             program.Dispose();
         }
 
-        private int DivideRoundUp(int a, int b)
-        {
-            return (a + b - 1) / b;
-        }
-
         /// <summary>
         /// executes the shader for the outer image layer
         /// </summary>
@@ -57,7 +52,7 @@ namespace TextureViewer.Models.Shader.Statistics
             GL.Uniform1(1, curStride);
 
             var curWidth = models.Images.Width;
-            GL.DispatchCompute(DivideRoundUp(curWidth, LocalSize * 2), models.Images.Height, 1);
+            GL.DispatchCompute(Utility.Utility.DivideRoundUp(curWidth, LocalSize * 2), models.Images.Height, 1);
 
             // swap textures
             var texSrc = models.GlData.TextureCache.GetTexture();
@@ -67,7 +62,7 @@ namespace TextureViewer.Models.Shader.Statistics
             while (curWidth > 2)
             {
                 //curWidth /= 2;
-                curWidth = DivideRoundUp(curWidth, 2);
+                curWidth = Utility.Utility.DivideRoundUp(curWidth, 2);
                 curStride *= 2;
 
                 // swap textures
@@ -79,7 +74,7 @@ namespace TextureViewer.Models.Shader.Statistics
                 GL.Uniform1(1, curStride);
 
                 // dispatch
-                GL.DispatchCompute(DivideRoundUp(curWidth, LocalSize * 2), models.Images.Height, 1);
+                GL.DispatchCompute(Utility.Utility.DivideRoundUp(curWidth, LocalSize * 2), models.Images.Height, 1);
                 GL.MemoryBarrier(MemoryBarrierFlags.TextureFetchBarrierBit);
             }
 
@@ -100,10 +95,10 @@ namespace TextureViewer.Models.Shader.Statistics
                 // stride
                 GL.Uniform1(1, curStride);
 
-                GL.DispatchCompute(1, DivideRoundUp(curHeight, LocalSize * 2), 1);
+                GL.DispatchCompute(1, Utility.Utility.DivideRoundUp(curHeight, LocalSize * 2), 1);
                 GL.MemoryBarrier(MemoryBarrierFlags.TextureFetchBarrierBit);
 
-                curHeight = DivideRoundUp(curHeight, 2);
+                curHeight = Utility.Utility.DivideRoundUp(curHeight, 2);
                 curStride *= 2;
             }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -56,6 +57,19 @@ namespace TextureViewer.Utility
             // set new image path in settings
             Properties.Settings.Default.ImagePath = System.IO.Path.GetDirectoryName(ofd.FileName);
             return ofd.FileNames;
+        }
+
+        /// <summary>
+        /// calculates a/b and adds one if the remainder (a%b) is not zero
+        /// </summary>
+        /// <param name="a">nominator</param>
+        /// <param name="b">denominator</param>
+        /// <returns></returns>
+        public static int DivideRoundUp(int a, int b)
+        {
+            Debug.Assert(b > 0);
+            Debug.Assert(a >= 0);
+            return (a + b - 1) / b;
         }
     }
 }

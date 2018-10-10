@@ -68,7 +68,7 @@ namespace TextureViewer.Controller.Filter
         /// <returns></returns>
         protected static int GetNumMinimalInvocations(int pixels)
         {
-            return pixels / (FilterShader.LocalSize * FilterShader.MinWorkGroupSize) + (pixels % (FilterShader.LocalSize * FilterShader.MinWorkGroupSize) != 0 ? 1 : 0);
+            return Utility.Utility.DivideRoundUp(pixels, FilterShader.LocalSize * FilterShader.MinWorkGroupSize);
         }
     }
 }
