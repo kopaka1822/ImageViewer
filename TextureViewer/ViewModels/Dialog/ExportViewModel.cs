@@ -46,6 +46,7 @@ namespace TextureViewer.ViewModels.Dialog
             {
                 AvailableLayers.Add(new ComboBoxItem<int>("All Layer", -1));
                 selectedLayer = AvailableLayers.Last();
+                models.Export.Layer = selectedLayer.Cargo;
             }
 
             // all mipmaps option for ktx and dds
@@ -53,6 +54,7 @@ namespace TextureViewer.ViewModels.Dialog
             {
                 AvailableMipmaps.Add(new ComboBoxItem<int>("All Mipmaps", -1));
                 selectedMipmap = AvailableMipmaps.Last();
+                models.Export.Mipmap = selectedMipmap.Cargo;
             }
 
             // init formats
@@ -108,15 +110,24 @@ namespace TextureViewer.ViewModels.Dialog
                     OnPropertyChanged(nameof(IsValid));
                     break;
                 case nameof(ExportModel.Mipmap):
-                    selectedMipmap = AvailableMipmaps[models.Export.Mipmap];
+                    if(models.Export.Mipmap < 0)
+                        selectedMipmap = AvailableMipmaps.Last();
+                    else
+                        selectedMipmap = AvailableMipmaps[models.Export.Mipmap];
                     OnPropertyChanged(nameof(SelectedMipmap));
                     break;
                 case nameof(ExportModel.Layer):
-                    selectedLayer = AvailableLayers[models.Export.Layer];
+                    if (models.Export.Layer < 0)
+                        selectedLayer = AvailableLayers.Last();
+                    else
+                        selectedLayer = AvailableLayers[models.Export.Layer];
                     OnPropertyChanged(nameof(SelectedLayer));
                     break;
                 case nameof(ExportModel.Quality):
                     OnPropertyChanged(nameof(Quality));
+                    break;
+                case nameof(ExportModel.AllowCropping):
+                    OnPropertyChanged(nameof(AllowCropping));
                     break;
             }
         }
@@ -184,6 +195,8 @@ namespace TextureViewer.ViewModels.Dialog
             get => models.Export.UseCropping;
             set => models.Export.UseCropping = value;
         }
+
+        public bool AllowCropping => models.Export.AllowCropping;
 
         public int CropMinX => models.Export.CropMinX;
         public int CropMaxX => models.Export.CropMaxX;

@@ -186,6 +186,13 @@ namespace TextureViewer.Commands
 
             var width = info.GetCropWidth();
             var height = info.GetCropHeight();
+            if(!info.UseCropping && numLevels == 1)
+            {
+                // set full width and height
+                width = models.Images.GetWidth(info.Mipmap);
+                height = models.Images.GetHeight(info.Mipmap);
+            }
+
             Debug.Assert(width > 0);
             Debug.Assert(height > 0);
             if(!supportCropping)

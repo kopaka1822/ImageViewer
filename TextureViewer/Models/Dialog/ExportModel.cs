@@ -198,6 +198,9 @@ namespace TextureViewer.Models.Dialog
                 mipmap = value;
                 OnPropertyChanged(nameof(Mipmap));
                 // dimensions have changed
+                if (!AllowCropping)
+                    UseCropping = false;
+                OnPropertyChanged(nameof(AllowCropping));
                 OnPropertyChanged(nameof(CropMaxX));
                 OnPropertyChanged(nameof(CropMaxY));
                 // adjust other crop values
@@ -225,10 +228,13 @@ namespace TextureViewer.Models.Dialog
 
         public bool DisplayCropping => UseCropping && displayModel.ShowCropRectangle;
 
+        // cropping is only allowed if a single mipmap is exported (-1 = all mipmaps will be exported)
+        public bool AllowCropping => Mipmap != -1;
+
         public int CropMinX => 0;
         public int CropMinY => 0;
-        public int CropMaxX => imagesModel.NumImages != 0 ? Math.Max(imagesModel.GetWidth(Mipmap) - 1, 0) : 0;
-        public int CropMaxY => imagesModel.NumImages != 0 ? Math.Max(imagesModel.GetHeight(Mipmap) - 1, 0) : 0;
+        public int CropMaxX => imagesModel.NumImages != 0 ? Math.Max(imagesModel.GetWidth(AllowCropping ? Mipmap : 0) - 1, 0) : 0;
+        public int CropMaxY => imagesModel.NumImages != 0 ? Math.Max(imagesModel.GetHeight(AllowCropping ? Mipmap : 0) - 1, 0) : 0;
 
         private int cropStartX = 0;
         private int cropStartY = 0;

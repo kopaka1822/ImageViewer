@@ -70,31 +70,71 @@ std::unique_ptr<ImageResource> gli_load(const char* filename)
 }
 
 // intermediate texture for ktx image export
-static gli::texture2d_array s_texture;
+static bool s_useCubemap = false;
+static gli::texture2d_array s_textureArray;
+static gli::texture_cube s_textureCube;
+static size_t s_numLayer;
 
 void gli_create_storage(int format, int width, int height, int layer, int levels)
 {
-	s_texture = gli::texture2d_array(gli::format(format), gli::extent2d(width, height), layer, levels);
-	if (s_texture.empty())
-		throw std::runtime_error("could not create texture");
+	s_numLayer = layer;
+	if(layer == 6)
+	{
+		// cube map
+		s_useCubemap = true;
+		s_textureCube = gli::texture_cube(gli::format(format), gli::extent2d(width, height), levels);
+		if (s_textureCube.empty())
+			throw std::runtime_error("could not create texture");
+	}
+	else
+	{
+		s_useCubemap = false;
+		s_textureArray = gli::texture2d_array(gli::format(format), gli::extent2d(width, height), layer, levels);
+		if (s_textureArray.empty())
+			throw std::runtime_error("could not create texture");
+	}
 }
 
 void gli_store_level(int layer, int level, const void* data, uint64_t size)
 {
-	if (s_texture.size() != size)
-		throw std::runtime_error("data size mismatch. Expected "
-			+ std::to_string(s_texture.size()) + " but got " + std::to_string(size));
-	memcpy(s_texture.data(layer, 0, level), data, s_texture.size(level));
+	if(s_useCubemap)
+	{
+		if (s_textureCube.size() / s_numLayer != size)
+			throw std::runtime_error("data size mismatch. Expected "
+				+ std::to_string(s_textureCube.size() / s_numLayer) + " but got " + std::to_string(size));
+		memcpy(s_textureCube.data(0, layer, level), data, size);
+	}
+	else
+	{
+		if (s_textureArray.size() / s_numLayer != size)
+			throw std::runtime_error("data size mismatch. Expected "
+				+ std::to_string(s_textureArray.size() / s_numLayer) + " but got " + std::to_string(size));
+		memcpy(s_textureArray.data(layer, 0, level), data, size);
+	}	
 }
 
 void gli_save_ktx(const char* filename)
 {
-	if (!gli::save_ktx(s_texture, filename))
+	if(s_useCubemap)
 	{
+		if (!gli::save_ktx(s_textureCube, filename))
+		{
+			// clear texture
+			s_textureCube = gli::texture_cube();
+			throw std::exception("could not save file");
+		}
 		// clear texture
-		s_texture = gli::texture2d_array();
-		throw std::exception("could not save file");
+		s_textureCube = gli::texture_cube();
 	}
-	// clear texture
-	s_texture = gli::texture2d_array();
+	else
+	{
+		if (!gli::save_ktx(s_textureArray, filename))
+		{
+			// clear texture
+			s_textureArray = gli::texture2d_array();
+			throw std::exception("could not save file");
+		}
+		// clear texture
+		s_textureArray = gli::texture2d_array();
+	}
 }
