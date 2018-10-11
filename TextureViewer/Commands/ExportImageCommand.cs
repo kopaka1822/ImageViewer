@@ -90,7 +90,7 @@ namespace TextureViewer.Commands
                         texFormat.ExternalFormat = PixelFormat.Red;
                     break;
                 case ExportModel.FileFormat.Ktx:
-                    texFormat = new ImageLoader.ImageFormat(GliFormat.RG3B2_UNORM_PACK8);
+                    texFormat = new ImageLoader.ImageFormat(GliFormat.RGB8_SRGB_PACK8);
                     break;
             }
 
@@ -118,8 +118,7 @@ namespace TextureViewer.Commands
                     Debug.Assert(width > 0);
                     Debug.Assert(height > 0);
 
-                    var convertToSrgb = format == ExportModel.FileFormat.Png || format == ExportModel.FileFormat.Bmp || format == ExportModel.FileFormat.Jpg;
-                    var data = texture.GetData(info.Layer, info.Mipmap, info.TexFormat.Format.Format, info.TexFormat.Format.Type, convertToSrgb,
+                    var data = texture.GetData(info.Layer, info.Mipmap, info.TexFormat.Format.Format, info.TexFormat.Format.Type, info.TexFormat.Format.IsSrgb,
                         info.UseCropping, info.CropStartX, info.CropStartY, ref width, ref height,
                         models.GlData.ExportShader);
 

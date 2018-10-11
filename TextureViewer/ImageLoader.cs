@@ -165,6 +165,10 @@ namespace TextureViewer
 
             public bool Equals(ImageFormat other)
             {
+                // special case if a gli format is used
+                if (HasGliFormat != other.HasGliFormat) return false;
+                if (HasGliFormat) return GliFormat == other.GliFormat;
+
                 if (IsCompressed != other.IsCompressed) return false;
                 if (IsSrgb != other.IsSrgb) return false;
                 if (Format != other.Format) return false;

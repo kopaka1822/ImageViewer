@@ -11,7 +11,10 @@ void getImageFormat(ImageFormat& format, const gli::texture& tex)
 	format.openglExternalFormat = static_cast<uint32_t>(GLformat.External);
 	format.openglType = static_cast<uint32_t>(GLformat.Type);
 	format.isCompressed = gli::is_compressed(tex.format());
-	format.isSrgb = gli::is_srgb(tex.format());
+	//format.isSrgb = gli::is_srgb(tex.format());
+	// even if the data is stored in srgb space opengl reads the data in linear space because of the given texture format
+	// therefore this should be false for the image loader
+	format.isSrgb = false;
 }
 
 void gli_to_opengl_format(int gliFormat, int& glInternal, int& glExternal, int& glType, bool& isCompressed, bool& isSrgb)
