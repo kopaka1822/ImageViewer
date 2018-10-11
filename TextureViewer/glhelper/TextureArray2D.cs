@@ -364,6 +364,7 @@ namespace TextureViewer.glhelper
             {
                 case PixelType.UnsignedByte:
                 case PixelType.Byte:
+                case PixelType.UnsignedInt8888Reversed:
                     return 1;
                 case PixelType.HalfFloat:
                 case PixelType.Short:
