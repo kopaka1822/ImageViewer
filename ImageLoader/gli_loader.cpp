@@ -14,6 +14,20 @@ void getImageFormat(ImageFormat& format, const gli::texture& tex)
 	format.isSrgb = gli::is_srgb(tex.format());
 }
 
+void gli_to_opengl_format(int gliFormat, int& glInternal, int& glExternal, int& glType, bool& isCompressed, bool& isSrgb)
+{
+	gli::gl GL(gli::gl::PROFILE_GL33);
+	// assume no swizzeling
+	auto f = gli::format(gliFormat);
+	const auto GLFormat = GL.translate(f, gli::swizzles(gli::swizzle::SWIZZLE_RED, gli::SWIZZLE_GREEN, gli::SWIZZLE_BLUE, gli::SWIZZLE_ALPHA));
+
+	glInternal = GLFormat.Internal;
+	glExternal = GLFormat.External;
+	glType = GLFormat.Type;
+	isCompressed = gli::is_compressed(f);
+	isSrgb = gli::is_srgb(f);
+}
+
 std::unique_ptr<ImageResource> gli_load(const char* filename)
 {
 	gli::texture tex = gli::load(filename);
@@ -50,4 +64,19 @@ std::unique_ptr<ImageResource> gli_load(const char* filename)
 	}
 
 	return res;
+}
+
+void gli_save_2d_ktx(const char* filename, int format, int width, int height, int levels, const void* data, uint64_t size)
+{
+	gli::texture2d tex = gli::texture2d(gli::format(format), gli::extent2d(width, height), levels);
+	if (tex.empty())
+		throw std::runtime_error("could not create texture");
+
+	if (tex.size() != size)
+		throw std::runtime_error("data size mismatch. Expected " 
+			+ std::to_string(tex.size()) + " but got " + std::to_string(size));
+
+	memcpy(tex.data(), data, size);
+
+	gli::save_ktx(tex, filename);
 }

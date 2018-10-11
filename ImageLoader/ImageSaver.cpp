@@ -3,6 +3,7 @@
 #include <fstream>
 #include "ImageLoader.h"
 #include "stb_loader.h"
+#include "gli_loader.h"
 
 bool save_png(const char* filename, int width, int height, int components, const void* data)
 {
@@ -53,6 +54,20 @@ bool save_jpg(const char* filename, int width, int height, int components, const
 		stb_save_jpg(filename, width, height, components, data, quality);
 	}
 	catch (const std::exception& e)
+	{
+		set_error(e.what());
+		return false;
+	}
+	return true;
+}
+
+bool save_2d_ktx(const char* filename, int format, int width, int height, int levels, const void* data, uint64_t size)
+{
+	try
+	{
+		gli_save_2d_ktx(filename, format, width, height, levels, data, size);
+	}
+	catch(const std::exception& e)
 	{
 		set_error(e.what());
 		return false;

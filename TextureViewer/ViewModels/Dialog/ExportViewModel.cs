@@ -39,6 +39,13 @@ namespace TextureViewer.ViewModels.Dialog
             selectedMipmap = AvailableMipmaps[models.Export.Mipmap];
             Debug.Assert(selectedMipmap.Cargo == models.Export.Mipmap);
 
+            // all mipmaps option for ktx and dds
+            if(models.Export.Format == ExportModel.FileFormat.Ktx)
+            {
+                AvailableMipmaps.Add(new ComboBoxItem<int>("All Mipmaps", -1));
+                selectedMipmap = AvailableMipmaps.Last();
+            }
+
             // init formats
             foreach (var format in models.Export.SupportedFormats)
             {

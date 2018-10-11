@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 /**
  * \brief 
@@ -75,3 +76,10 @@ __declspec(dllexport)
 bool
 __cdecl
 save_jpg(const char* filename, int width, int height, int components, const void* data, int quality);
+
+
+extern "C"
+__declspec(dllexport)
+bool
+__cdecl
+save_2d_ktx(const char* filename, int format, int width, int height, int levels, const void* data, uint64_t size);

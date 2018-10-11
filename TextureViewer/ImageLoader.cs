@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL4;
+using TextureViewer.Utility;
 
 namespace TextureViewer
 {
@@ -43,6 +44,12 @@ namespace TextureViewer
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern bool save_jpg(string filename, int width, int height, int components, byte[] data, int quality);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool save_2d_ktx(string filename, int format, int width, int height, int levels, byte[] data, UInt64 size);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void gli_to_opengl_format(int gliFormat, out int glInternal, out int glExternal, out int glType, out bool isCompressed, out bool isSrgb);
 
         private static string GetError()
         {
@@ -108,25 +115,45 @@ namespace TextureViewer
             }
         }
 
+        public struct ImageFormat
+        {
+            public PixelFormat ExternalFormat { get; set; }
+            public PixelFormat Format => IsCompressed ? (PixelFormat)InternalFormat : ExternalFormat;
+            public PixelType Type { get; set; }
+            public SizedInternalFormat InternalFormat { get; set; }
+            public bool IsSrgb { get; set; }
+            public bool IsCompressed { get; set; }
+
+            public ImageFormat(PixelFormat externalFormat, PixelType type, SizedInternalFormat internalFormat, bool isSrgb, bool isCompressed) : this()
+            {
+                ExternalFormat = externalFormat;
+                Type = type;
+                InternalFormat = internalFormat;
+                IsSrgb = isSrgb;
+                IsCompressed = isCompressed;
+            }
+
+            public ImageFormat(GliFormat format)
+            {
+                gli_to_opengl_format((int)format, out var intForm, out var extForm, out var pt, out var compressed, out var srgb);
+                ExternalFormat = (PixelFormat)extForm;
+                Type = (PixelType)pt;
+                InternalFormat = (SizedInternalFormat)intForm;
+                IsSrgb = srgb;
+                IsCompressed = compressed;
+            }
+        }
+
         public class Image
         {
-            public readonly uint OpenglInternalFormat;
-            public readonly uint OpenglExternalFormat;
-            public readonly uint OpenglType;
-            public readonly bool IsCompressed;
-            public readonly bool IsSrgb;
+            public readonly ImageFormat Format;
             public readonly List<Face> Layers;
             public readonly string Filename;
 
-            public Image(Resource resource, string filename, uint internalFormat, uint externalFormat,
-                uint type, int curImage, int nFaces, int nMipmaps, bool isCompressed, bool isSrgb)
+            public Image(Resource resource, string filename, int curImage, int nFaces, int nMipmaps, ImageFormat format)
             {
                 Filename = filename;
-                OpenglExternalFormat = externalFormat;
-                OpenglInternalFormat = internalFormat;
-                OpenglType = type;
-                IsCompressed = isCompressed;
-                IsSrgb = isSrgb;
+                Format = format;
                 // load relevant information
 
                 Layers = new List<Face>(nFaces);
@@ -159,8 +186,7 @@ namespace TextureViewer
             /// <returns>true if only one component is used</returns>
             public bool IsGrayscale()
             {
-                PixelFormat pixelFormat = (PixelFormat) OpenglExternalFormat;
-                switch (pixelFormat)
+                switch (Format.ExternalFormat)
                 {
                     case PixelFormat.UnsignedShort:
                     case PixelFormat.UnsignedInt:
@@ -188,8 +214,7 @@ namespace TextureViewer
             /// <returns>true if image has an alpha component</returns>
             public bool HasAlpha()
             {
-                var pixelFormat = (PixelFormat)OpenglExternalFormat;
-                switch (pixelFormat)
+                switch (Format.ExternalFormat)
                 {
                     case PixelFormat.Rgba:
                     case PixelFormat.LuminanceAlpha:
@@ -211,8 +236,7 @@ namespace TextureViewer
             /// <returns>true if the image type is bigger than byte (range > [0-255])</returns>
             public bool IsHdr()
             {
-                var type = (PixelType) OpenglType;
-                switch (type)
+                switch (Format.Type)
                 {
                     case PixelType.Short:
                     case PixelType.UnsignedShort:
@@ -251,11 +275,12 @@ namespace TextureViewer
             var res = new Resource(file);
             image_info(res.Id, out var internalFormat, out var externalFormat, out var openglType,
                 out var nImages, out var nFaces, out var nMipmaps, out var isCompressed, out var isSrgb);
+
+            var format = new ImageFormat((PixelFormat)externalFormat, (PixelType)openglType, (SizedInternalFormat)internalFormat, isSrgb, isCompressed);
             var images = new List<Image>(nImages);
             for (var curImage = 0; curImage < nImages; ++curImage)
             {
-                images.Add(new Image(res, file, internalFormat, externalFormat, openglType,
-                    curImage, nFaces, nMipmaps, isCompressed, isSrgb));
+                images.Add(new Image(res, file, curImage, nFaces, nMipmaps, format));
             }
 
             return images;
@@ -288,6 +313,12 @@ namespace TextureViewer
         public static void SavePfm(string filename, int width, int height, int components, byte[] data)
         {
             if (!save_pfm(filename, width, height, components, data))
+                throw new Exception("saving image failed: " + GetError());
+        }
+
+        public static void SaveKtx2D(string filename, GliFormat format, int width, int height, int levels, byte[] data, UInt64 size)
+        {
+            if (!save_2d_ktx(filename, (int)format, width, height, levels, data, size))
                 throw new Exception("saving image failed: " + GetError());
         }
     }

@@ -67,6 +67,8 @@ namespace TextureViewer.Commands
                 format = ExportModel.FileFormat.Pfm;
             else if (sfd.FileName.EndsWith(".jpg"))
                 format = ExportModel.FileFormat.Jpg;
+            else if (sfd.FileName.EndsWith(".ktx"))
+                format = ExportModel.FileFormat.Ktx;
             
             var pixelFormat = PixelFormat.Rgb;
             if (models.Images.IsAlpha)
@@ -124,6 +126,9 @@ namespace TextureViewer.Commands
                             break;
                         case ExportModel.FileFormat.Jpg:
                             ImageLoader.SaveJpg(info.Filename, width, height, numComponents, data, info.Quality);
+                            break;
+                        case ExportModel.FileFormat.Ktx:
+                            //ImageLoader.SaveKtx2D(info.Filename, )
                             break;
                     }
                 }

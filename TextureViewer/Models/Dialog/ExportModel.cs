@@ -20,7 +20,8 @@ namespace TextureViewer.Models.Dialog
             Bmp,
             Hdr,
             Pfm,
-            Jpg
+            Jpg,
+            Ktx
         }
 
         private ImagesModel imagesModel;
@@ -40,6 +41,16 @@ namespace TextureViewer.Models.Dialog
                     supportedFormats.Add(PixelFormat.Red);
                     supportedFormats.Add(PixelFormat.Green);
                     supportedFormats.Add(PixelFormat.Blue);
+                    supportedFormats.Add(PixelFormat.Alpha);
+                    supportedFormats.Add(PixelFormat.Rg);
+                    supportedFormats.Add(PixelFormat.Rgb);
+                    supportedFormats.Add(PixelFormat.Rgba);
+                    break;
+                case FileFormat.Ktx:
+                    supportedFormats.Add(PixelFormat.Red);
+                    supportedFormats.Add(PixelFormat.Green);
+                    supportedFormats.Add(PixelFormat.Blue);
+                    supportedFormats.Add(PixelFormat.Alpha);
                     supportedFormats.Add(PixelFormat.Rg);
                     supportedFormats.Add(PixelFormat.Rgb);
                     supportedFormats.Add(PixelFormat.Rgba);
@@ -48,6 +59,7 @@ namespace TextureViewer.Models.Dialog
                     supportedFormats.Add(PixelFormat.Red);
                     supportedFormats.Add(PixelFormat.Green);
                     supportedFormats.Add(PixelFormat.Blue);
+                    supportedFormats.Add(PixelFormat.Alpha);
                     //supportedFormats.Add(PixelFormat.Rg);
                     supportedFormats.Add(PixelFormat.Rgb);
                     HasQuality = true;
@@ -59,6 +71,7 @@ namespace TextureViewer.Models.Dialog
                     supportedFormats.Add(PixelFormat.Red);
                     supportedFormats.Add(PixelFormat.Green);
                     supportedFormats.Add(PixelFormat.Blue);
+                    supportedFormats.Add(PixelFormat.Alpha);
                     supportedFormats.Add(PixelFormat.Rg);
                     supportedFormats.Add(PixelFormat.Rgb);
                     break;
@@ -67,6 +80,7 @@ namespace TextureViewer.Models.Dialog
                     supportedFormats.Add(PixelFormat.Red);
                     supportedFormats.Add(PixelFormat.Green);
                     supportedFormats.Add(PixelFormat.Blue);
+                    supportedFormats.Add(PixelFormat.Alpha);
                     supportedFormats.Add(PixelFormat.Rgb);
                     break;
             }

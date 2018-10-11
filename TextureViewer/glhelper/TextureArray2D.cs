@@ -77,8 +77,8 @@ namespace TextureViewer.glhelper
             id = GL.GenTexture();
             this.nMipmaps = image.NumMipmaps;
             this.nLayer = image.Layers.Count;
-            this.internalFormat = (SizedInternalFormat)image.OpenglInternalFormat;
-            this.IsSrgb = image.IsSrgb;
+            this.internalFormat = image.Format.InternalFormat;
+            this.IsSrgb = image.Format.IsSrgb;
             this.width = image.GetWidth(0);
             this.height = image.GetHeight(0);
 
@@ -90,7 +90,7 @@ namespace TextureViewer.glhelper
                 internalFormat, image.GetWidth(0),
                 image.GetHeight(0), image.Layers.Count);
 
-            if (image.IsCompressed)
+            if (image.Format.IsCompressed)
             {
                 for (int face = 0; face < image.Layers.Count; ++face)
                 {
@@ -98,7 +98,7 @@ namespace TextureViewer.glhelper
                     {
                         GL.CompressedTexSubImage3D(TextureTarget.Texture2DArray, level,
                             0, 0, face, image.GetWidth(level), image.GetHeight(level),
-                            1, (PixelFormat)image.OpenglInternalFormat,
+                            1, image.Format.Format,
                             (int)image.Layers[face].Mipmaps[level].Size,
                             image.Layers[face].Mipmaps[level].Bytes);
                     }
@@ -106,25 +106,16 @@ namespace TextureViewer.glhelper
             }
             else
             {
-                
-                var pixelFormat = (PixelFormat)image.OpenglExternalFormat;
-                var pixelType = (PixelType)image.OpenglType;
-
                 for (int face = 0; face < image.Layers.Count; ++face)
                 {
                     for (int level = 0; level < image.NumMipmaps; ++level)
                     {
                         GL.TexSubImage3D(TextureTarget.Texture2DArray, level,
                             0, 0, face, image.GetWidth(level), image.GetHeight(level),
-                            1, pixelFormat, pixelType, image.Layers[face].Mipmaps[level].Bytes);
+                            1, image.Format.Format, image.Format.Type, image.Layers[face].Mipmaps[level].Bytes);
                     }
                 }
             }
-            
-            //GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinLod, 0.0f);
-            //GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLod, (float)image.NumMipmaps);
-            //GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureBaseLevel, 0);
-            //GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLevel, image.NumMipmaps);
 
             CreateTexture2DViews();
         }
@@ -262,7 +253,7 @@ namespace TextureViewer.glhelper
         }
 
         /// <summary>
-        /// reads (sub) data from a single image layer with the specified format and type
+        /// reads (sub) data from a single image layer and a single image mipmap with the specified format and type
         /// </summary>
         /// <param name="layer">image layer</param>
         /// <param name="mipmap">image mipmap</param>
