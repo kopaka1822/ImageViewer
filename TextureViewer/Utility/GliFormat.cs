@@ -12,7 +12,7 @@ namespace TextureViewer.Utility
     {
         UNDEFINED = 0,
 
-        RG4_UNORM_PACK8, FORMAT_FIRST = RG4_UNORM_PACK8,
+        FORMAT_FIRST, RG4_UNORM_PACK8 = FORMAT_FIRST,
         RGBA4_UNORM_PACK16,
         BGRA4_UNORM_PACK16,
         R5G6B5_UNORM_PACK16,

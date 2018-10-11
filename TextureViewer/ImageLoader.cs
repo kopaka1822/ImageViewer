@@ -120,9 +120,18 @@ namespace TextureViewer
             public PixelFormat ExternalFormat { get; set; }
             public PixelFormat Format => IsCompressed ? (PixelFormat)InternalFormat : ExternalFormat;
             public PixelType Type { get; set; }
-            public SizedInternalFormat InternalFormat { get; set; }
             public bool IsSrgb { get; set; }
             public bool IsCompressed { get; set; }
+            public SizedInternalFormat InternalFormat { get; set; }
+
+            public ImageFormat(PixelFormat format, PixelType type, bool isSrgb)
+            {
+                ExternalFormat = format;
+                Type = type;
+                IsSrgb = isSrgb;
+                IsCompressed = false;
+                InternalFormat = (SizedInternalFormat)0;
+            }
 
             public ImageFormat(PixelFormat externalFormat, PixelType type, SizedInternalFormat internalFormat, bool isSrgb, bool isCompressed) : this()
             {
@@ -141,6 +150,16 @@ namespace TextureViewer
                 InternalFormat = (SizedInternalFormat)intForm;
                 IsSrgb = srgb;
                 IsCompressed = compressed;
+            }
+
+            public bool Equals(ImageFormat other)
+            {
+                if (IsCompressed != other.IsCompressed) return false;
+                if (IsSrgb != other.IsSrgb) return false;
+                if (Format != other.Format) return false;
+                // type is only important is the format is uncompressed
+                if (!IsCompressed && Type != other.Type) return false;
+                return true;
             }
         }
 

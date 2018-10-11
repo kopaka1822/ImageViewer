@@ -9,6 +9,7 @@ using Microsoft.Win32;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.glhelper;
 using TextureViewer.Models.Dialog;
+using TextureViewer.Utility;
 using TextureViewer.Views;
 
 namespace TextureViewer.Commands
@@ -47,7 +48,7 @@ namespace TextureViewer.Commands
             // open save file dialog
             var sfd = new SaveFileDialog
             {
-                Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|JPEG (*.jpg)|*.jpg|HDR (*.hdr)|*.hdr|Portable float map (*.pfm)|*.pfm",
+                Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|JPEG (*.jpg)|*.jpg|HDR (*.hdr)|*.hdr|Portable float map (*.pfm)|*.pfm|Khronos Texture (*.ktx)|*.ktx",
                 InitialDirectory = Properties.Settings.Default.ExportPath,
                 FileName = proposedFilename
             };
@@ -69,16 +70,33 @@ namespace TextureViewer.Commands
                 format = ExportModel.FileFormat.Jpg;
             else if (sfd.FileName.EndsWith(".ktx"))
                 format = ExportModel.FileFormat.Ktx;
-            
-            var pixelFormat = PixelFormat.Rgb;
-            if (models.Images.IsAlpha)
-                pixelFormat = PixelFormat.Rgba;
-            if (models.Images.IsGrayscale)
-                pixelFormat = PixelFormat.Red;
+
+            var texFormat = new ImageLoader.ImageFormat(PixelFormat.Rgb, PixelType.UnsignedByte, true);
+            switch (format)
+            {
+                case ExportModel.FileFormat.Png:
+                case ExportModel.FileFormat.Bmp:
+                case ExportModel.FileFormat.Jpg:
+                    if (models.Images.IsAlpha && format == ExportModel.FileFormat.Png)
+                        texFormat.ExternalFormat = PixelFormat.Rgba;
+                    if (models.Images.IsGrayscale)
+                        texFormat.ExternalFormat = PixelFormat.Red;
+                    break;
+
+                case ExportModel.FileFormat.Hdr:
+                case ExportModel.FileFormat.Pfm:
+                    texFormat = new ImageLoader.ImageFormat(PixelFormat.Rgb, PixelType.Float, false);
+                    if (models.Images.IsGrayscale)
+                        texFormat.ExternalFormat = PixelFormat.Red;
+                    break;
+                case ExportModel.FileFormat.Ktx:
+                    texFormat = new ImageLoader.ImageFormat(GliFormat.RG3B2_UNORM_PACK8);
+                    break;
+            }
 
             models.Export.IsExporting = true;
             // open export dialog
-            var dia = new ExportDialog(models, sfd.FileName, pixelFormat, format);
+            var dia = new ExportDialog(models, sfd.FileName, texFormat, format);
             dia.Owner = models.App.Window;
             dia.Closed += (sender, args) =>
             {
@@ -101,14 +119,14 @@ namespace TextureViewer.Commands
                     Debug.Assert(height > 0);
 
                     var convertToSrgb = format == ExportModel.FileFormat.Png || format == ExportModel.FileFormat.Bmp || format == ExportModel.FileFormat.Jpg;
-                    var data = texture.GetData(info.Layer, info.Mipmap, info.PixelFormat, info.PixelType, convertToSrgb,
+                    var data = texture.GetData(info.Layer, info.Mipmap, info.TexFormat.Format.Format, info.TexFormat.Format.Type, convertToSrgb,
                         info.UseCropping, info.CropStartX, info.CropStartY, ref width, ref height,
                         models.GlData.ExportShader);
 
                     if (data == null)
                         throw new Exception("error retrieving image from gpu");
 
-                    var numComponents = TextureArray2D.GetPixelFormatCount(info.PixelFormat);
+                    var numComponents = TextureArray2D.GetPixelFormatCount(info.TexFormat.Format.Format);
 
                     switch (format)
                     {

@@ -14,7 +14,7 @@ namespace TextureViewer.Views
         private readonly ExportViewModel viewModel;
         public bool ExportResult { get; private set; } = false;
 
-        public ExportDialog(Models.Models models, string filename, PixelFormat defaultPixelFormat, ExportModel.FileFormat format)
+        public ExportDialog(Models.Models models, string filename, ImageLoader.ImageFormat defaultPixelFormat, ExportModel.FileFormat format)
         {
             models.Export.Init(filename, defaultPixelFormat, format);
             viewModel = new ExportViewModel(models);

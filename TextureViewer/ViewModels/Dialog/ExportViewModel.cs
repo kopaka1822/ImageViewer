@@ -12,6 +12,8 @@ using OpenTK.Graphics.OpenGL4;
 using TextureViewer.Annotations;
 using TextureViewer.Models.Dialog;
 using TextureViewer.Views;
+using static TextureViewer.ImageLoader;
+using static TextureViewer.Models.Dialog.ExportModel;
 
 namespace TextureViewer.ViewModels.Dialog
 {
@@ -40,7 +42,7 @@ namespace TextureViewer.ViewModels.Dialog
             Debug.Assert(selectedMipmap.Cargo == models.Export.Mipmap);
 
             // all mipmaps option for ktx and dds
-            if(models.Export.Format == ExportModel.FileFormat.Ktx)
+            if(models.Export.FileType == ExportModel.FileFormat.Ktx)
             {
                 AvailableMipmaps.Add(new ComboBoxItem<int>("All Mipmaps", -1));
                 selectedMipmap = AvailableMipmaps.Last();
@@ -49,8 +51,8 @@ namespace TextureViewer.ViewModels.Dialog
             // init formats
             foreach (var format in models.Export.SupportedFormats)
             {
-                AvailableFormat.Add(new ComboBoxItem<PixelFormat>(format.ToString().ToUpper(), format));
-                if (format == models.Export.PixelFormat)
+                AvailableFormat.Add(new ComboBoxItem<DisplayedFormat>(format.DisplayedName, format));
+                if (format == models.Export.TexFormat)
                     SelectedFormat = AvailableFormat.Last();
             }
 
@@ -125,7 +127,7 @@ namespace TextureViewer.ViewModels.Dialog
 
         public ObservableCollection<ComboBoxItem<int>> AvailableLayers { get; } = new ObservableCollection<ComboBoxItem<int>>();
         public ObservableCollection<ComboBoxItem<int>> AvailableMipmaps { get; } = new ObservableCollection<ComboBoxItem<int>>();
-        public ObservableCollection<ComboBoxItem<PixelFormat>> AvailableFormat { get; } = new ObservableCollection<ComboBoxItem<PixelFormat>>();
+        public ObservableCollection<ComboBoxItem<DisplayedFormat>> AvailableFormat { get; } = new ObservableCollection<ComboBoxItem<DisplayedFormat>>();
 
         public bool EnableLayers => AvailableLayers.Count > 1;
         public bool EnableMipmaps => AvailableMipmaps.Count > 1;
@@ -157,15 +159,15 @@ namespace TextureViewer.ViewModels.Dialog
             }
         }
 
-        private ComboBoxItem<PixelFormat> selectedFormat;
-        public ComboBoxItem<PixelFormat> SelectedFormat
+        private ComboBoxItem<DisplayedFormat> selectedFormat;
+        public ComboBoxItem<DisplayedFormat> SelectedFormat
         {
             get => selectedFormat;
             set
             {
                 if (value == null || value == selectedFormat) return;
                 selectedFormat = value;
-                models.Export.PixelFormat = selectedFormat.Cargo;
+                models.Export.TexFormat = selectedFormat.Cargo;
                 OnPropertyChanged(nameof(SelectedFormat));
             }
         }

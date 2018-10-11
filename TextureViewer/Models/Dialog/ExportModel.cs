@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.Annotations;
+using TextureViewer.Utility;
 
 namespace TextureViewer.Models.Dialog
 {
@@ -24,71 +25,84 @@ namespace TextureViewer.Models.Dialog
             Ktx
         }
 
+        public class DisplayedFormat
+        {
+            public ImageLoader.ImageFormat Format;
+            public string DisplayedName;
+
+            public DisplayedFormat(ImageLoader.ImageFormat format, string displayedName)
+            {
+                Format = format;
+                DisplayedName = displayedName;
+            }
+        }
+
         private ImagesModel imagesModel;
         private readonly DisplayModel displayModel;
 
         // initializes the export model for a new export
-        public void Init(string filename, PixelFormat pixelFormat, FileFormat format)
+        public void Init(string filename, ImageLoader.ImageFormat pixelFormat, FileFormat fileFormat)
         {
             Filename = filename;
-            Format = format;
+            FileType = fileFormat;
             HasQuality = false;
 
-            var supportedFormats = new List<PixelFormat>();
-            switch (format)
+            var supportedFormats = new List<DisplayedFormat>();
+            switch (fileFormat)
             {
                 case FileFormat.Png:
-                    supportedFormats.Add(PixelFormat.Red);
-                    supportedFormats.Add(PixelFormat.Green);
-                    supportedFormats.Add(PixelFormat.Blue);
-                    supportedFormats.Add(PixelFormat.Alpha);
-                    supportedFormats.Add(PixelFormat.Rg);
-                    supportedFormats.Add(PixelFormat.Rgb);
-                    supportedFormats.Add(PixelFormat.Rgba);
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Red, PixelType.UnsignedByte, true), "Red"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Green, PixelType.UnsignedByte, true), "Green"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Blue, PixelType.UnsignedByte, true), "Blue"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Alpha, PixelType.UnsignedByte, true), "Alpha"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Rg, PixelType.UnsignedByte, true), "RG"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Rgb, PixelType.UnsignedByte, true), "RGB"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Rgba, PixelType.UnsignedByte, true), "RGBA"));
                     break;
                 case FileFormat.Ktx:
-                    supportedFormats.Add(PixelFormat.Red);
-                    supportedFormats.Add(PixelFormat.Green);
-                    supportedFormats.Add(PixelFormat.Blue);
-                    supportedFormats.Add(PixelFormat.Alpha);
-                    supportedFormats.Add(PixelFormat.Rg);
-                    supportedFormats.Add(PixelFormat.Rgb);
-                    supportedFormats.Add(PixelFormat.Rgba);
+                    for(int i = (int)GliFormat.FORMAT_FIRST; i <= (int)GliFormat.LAST; ++i)
+                    {
+                        var format = (GliFormat)i;
+                        supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(format), format.ToString()));
+                    }
                     break;
                 case FileFormat.Jpg:
-                    supportedFormats.Add(PixelFormat.Red);
-                    supportedFormats.Add(PixelFormat.Green);
-                    supportedFormats.Add(PixelFormat.Blue);
-                    supportedFormats.Add(PixelFormat.Alpha);
-                    //supportedFormats.Add(PixelFormat.Rg);
-                    supportedFormats.Add(PixelFormat.Rgb);
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Red, PixelType.UnsignedByte, true), "Red"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Green, PixelType.UnsignedByte, true), "Green"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Blue, PixelType.UnsignedByte, true), "Blue"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Alpha, PixelType.UnsignedByte, true), "Alpha"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Rgb, PixelType.UnsignedByte, true), "RGB"));
                     HasQuality = true;
                     MinQuality = 1;
                     MaxQuality = 100;
                     Quality = Properties.Settings.Default.JpgQuality;
                     break;
                 case FileFormat.Bmp:
-                    supportedFormats.Add(PixelFormat.Red);
-                    supportedFormats.Add(PixelFormat.Green);
-                    supportedFormats.Add(PixelFormat.Blue);
-                    supportedFormats.Add(PixelFormat.Alpha);
-                    supportedFormats.Add(PixelFormat.Rg);
-                    supportedFormats.Add(PixelFormat.Rgb);
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Red, PixelType.UnsignedByte, true), "Red"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Green, PixelType.UnsignedByte, true), "Green"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Blue, PixelType.UnsignedByte, true), "Blue"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Alpha, PixelType.UnsignedByte, true), "Alpha"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Rg, PixelType.UnsignedByte, true), "RG"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Rgb, PixelType.UnsignedByte, true), "RGB"));
                     break;
                 case FileFormat.Hdr:
                 case FileFormat.Pfm:
-                    supportedFormats.Add(PixelFormat.Red);
-                    supportedFormats.Add(PixelFormat.Green);
-                    supportedFormats.Add(PixelFormat.Blue);
-                    supportedFormats.Add(PixelFormat.Alpha);
-                    supportedFormats.Add(PixelFormat.Rgb);
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Red, PixelType.Float, false), "Red"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Green, PixelType.Float, false), "Green"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Blue, PixelType.Float, false), "Blue"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Alpha, PixelType.Float, false), "Alpha"));
+                    supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Rgb, PixelType.Float, false), "RGB"));
                     break;
             }
 
-            PixelFormat = pixelFormat;
-            if (!supportedFormats.Contains(pixelFormat))
+            // select preferred texture format
+            TexFormat = supportedFormats.Last();
+            foreach (var df in supportedFormats)
             {
-                PixelFormat = supportedFormats.Last();
+                if(df.Format.Equals(pixelFormat))
+                {
+                    TexFormat = df;
+                }
             }
 
             SupportedFormats = supportedFormats;
@@ -153,11 +167,11 @@ namespace TextureViewer.Models.Dialog
             }
         }
 
-        
-
         public string Filename { get; private set; }
 
-        public FileFormat Format;
+        public FileFormat FileType;
+
+        public DisplayedFormat TexFormat;
 
         private int layer = 0;
         public int Layer
@@ -191,14 +205,7 @@ namespace TextureViewer.Models.Dialog
             }
         }
 
-        public PixelFormat PixelFormat { get; set; }
-
-        public IReadOnlyList<PixelFormat> SupportedFormats { get; private set; }
-
-        public PixelType PixelType =>
-            Format == FileFormat.Hdr || 
-            Format == FileFormat.Pfm ? 
-                PixelType.Float : PixelType.UnsignedByte;
+        public IReadOnlyList<DisplayedFormat> SupportedFormats { get; private set; }
 
         private bool useCropping = false;
 
@@ -280,7 +287,7 @@ namespace TextureViewer.Models.Dialog
                 if (val == quality) return;
                 quality = val;
                 OnPropertyChanged(nameof(Quality));
-                if (Format == FileFormat.Jpg)
+                if (FileType == FileFormat.Jpg)
                     Properties.Settings.Default.JpgQuality = quality;
             }
         }
