@@ -57,21 +57,24 @@ namespace TextureViewer.Controller.TextureViews.Shader
 
         protected static void SetCropCoordinates(int location, ExportModel model, int layer)
         {
-            // darken due to layer mismatch?
-            if(model.IsExporting && model.Layer != layer)
+            if(model.Layer != -1) //  only a single layer active
             {
-                // everything is gray
-                GL.Uniform4(location, 0.0f, 0.0f, 0.0f, 0.0f);
-                return;
-            }
+                // darken due to layer mismatch?
+                if (model.IsExporting && model.Layer != layer)
+                {
+                    // everything is gray
+                    GL.Uniform4(location, 0.0f, 0.0f, 0.0f, 0.0f);
+                    return;
+                }
 
-            if(model.UseCropping && (model.DisplayCropping || model.IsExporting))
-            {
-                // draw crop box
-                GL.Uniform4(location, model.GetCropStartXPercent(), model.GetCropEndXPercent(),
-                       model.GetCropStartYPercent(), model.GetCropEndYPercent());
-                return;
-            }
+                if (model.UseCropping && (model.DisplayCropping || model.IsExporting))
+                {
+                    // draw crop box
+                    GL.Uniform4(location, model.GetCropStartXPercent(), model.GetCropEndXPercent(),
+                           model.GetCropStartYPercent(), model.GetCropEndYPercent());
+                    return;
+                }
+            } 
 
             // nothing is gray
             GL.Uniform4(location, 0.0f, 1.0f, 0.0f, 1.0f);
