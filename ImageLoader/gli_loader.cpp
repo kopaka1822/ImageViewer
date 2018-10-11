@@ -99,16 +99,16 @@ void gli_store_level(int layer, int level, const void* data, uint64_t size)
 {
 	if(s_useCubemap)
 	{
-		if (s_textureCube.size() / s_numLayer != size)
+		if (s_textureCube.size(level) != size)
 			throw std::runtime_error("data size mismatch. Expected "
-				+ std::to_string(s_textureCube.size() / s_numLayer) + " but got " + std::to_string(size));
+				+ std::to_string(s_textureCube.size(level)) + " but got " + std::to_string(size));
 		memcpy(s_textureCube.data(0, layer, level), data, size);
 	}
 	else
 	{
-		if (s_textureArray.size() / s_numLayer != size)
+		if (s_textureArray.size(level) != size)
 			throw std::runtime_error("data size mismatch. Expected "
-				+ std::to_string(s_textureArray.size() / s_numLayer) + " but got " + std::to_string(size));
+				+ std::to_string(s_textureArray.size(level)) + " but got " + std::to_string(size));
 		memcpy(s_textureArray.data(layer, 0, level), data, size);
 	}	
 }
