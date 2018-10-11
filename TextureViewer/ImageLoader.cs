@@ -46,7 +46,13 @@ namespace TextureViewer
         private static extern bool save_jpg(string filename, int width, int height, int components, byte[] data, int quality);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern bool save_2d_ktx(string filename, int format, int width, int height, int levels, byte[] data, UInt64 size);
+        private static extern bool create_storage(int format, int width, int height, int layer, int levels);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool store_level(int layer, int level, byte[] data, UInt64 size);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool save_ktx(string filename);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void gli_to_opengl_format(int gliFormat, out int glInternal, out int glExternal, out int glType, out bool isCompressed, out bool isSrgb);
@@ -123,6 +129,8 @@ namespace TextureViewer
             public bool IsSrgb { get; set; }
             public bool IsCompressed { get; set; }
             public SizedInternalFormat InternalFormat { get; set; }
+            public GliFormat GliFormat { get; set; }
+            public bool HasGliFormat => GliFormat != GliFormat.UNDEFINED;
 
             public ImageFormat(PixelFormat format, PixelType type, bool isSrgb)
             {
@@ -131,6 +139,7 @@ namespace TextureViewer
                 IsSrgb = isSrgb;
                 IsCompressed = false;
                 InternalFormat = (SizedInternalFormat)0;
+                GliFormat = GliFormat.UNDEFINED;
             }
 
             public ImageFormat(PixelFormat externalFormat, PixelType type, SizedInternalFormat internalFormat, bool isSrgb, bool isCompressed) : this()
@@ -140,6 +149,7 @@ namespace TextureViewer
                 InternalFormat = internalFormat;
                 IsSrgb = isSrgb;
                 IsCompressed = isCompressed;
+                GliFormat = GliFormat.UNDEFINED;
             }
 
             public ImageFormat(GliFormat format)
@@ -150,6 +160,7 @@ namespace TextureViewer
                 InternalFormat = (SizedInternalFormat)intForm;
                 IsSrgb = srgb;
                 IsCompressed = compressed;
+                GliFormat = format;
             }
 
             public bool Equals(ImageFormat other)
@@ -335,9 +346,21 @@ namespace TextureViewer
                 throw new Exception("saving image failed: " + GetError());
         }
 
-        public static void SaveKtx2D(string filename, GliFormat format, int width, int height, int levels, byte[] data, UInt64 size)
+        public static void CreateStorage(GliFormat format, int width, int height, int layer, int levels)
         {
-            if (!save_2d_ktx(filename, (int)format, width, height, levels, data, size))
+            if (!create_storage((int)format, width, height, layer, levels))
+                throw new Exception("create storage failed: " + GetError());
+        }
+
+        public static void StoreLevel(int layer, int level, byte[] data, UInt64 size)
+        {
+            if (!store_level(layer, level, data, size))
+                throw new Exception($"store level failed (layer {layer}, level {level}): " + GetError());
+        }
+
+        public static void SaveKtx(string filename)
+        {
+            if (!save_ktx(filename))
                 throw new Exception("saving image failed: " + GetError());
         }
     }

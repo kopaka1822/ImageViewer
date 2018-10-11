@@ -66,17 +66,32 @@ std::unique_ptr<ImageResource> gli_load(const char* filename)
 	return res;
 }
 
-void gli_save_2d_ktx(const char* filename, int format, int width, int height, int levels, const void* data, uint64_t size)
+// intermediate texture for ktx image export
+static gli::texture2d_array s_texture;
+
+void gli_create_storage(int format, int width, int height, int layer, int levels)
 {
-	gli::texture2d tex = gli::texture2d(gli::format(format), gli::extent2d(width, height), levels);
-	if (tex.empty())
+	s_texture = gli::texture2d_array(gli::format(format), gli::extent2d(width, height), layer, levels);
+	if (s_texture.empty())
 		throw std::runtime_error("could not create texture");
+}
 
-	if (tex.size() != size)
-		throw std::runtime_error("data size mismatch. Expected " 
-			+ std::to_string(tex.size()) + " but got " + std::to_string(size));
+void gli_store_level(int layer, int level, const void* data, uint64_t size)
+{
+	if (s_texture.size() != size)
+		throw std::runtime_error("data size mismatch. Expected "
+			+ std::to_string(s_texture.size()) + " but got " + std::to_string(size));
+	memcpy(s_texture.data(layer, 0, level), data, s_texture.size(level));
+}
 
-	memcpy(tex.data(), data, size);
-
-	gli::save_ktx(tex, filename);
+void gli_save_ktx(const char* filename)
+{
+	if (!gli::save_ktx(s_texture, filename))
+	{
+		// clear texture
+		s_texture = gli::texture2d_array();
+		throw std::exception("could not save file");
+	}
+	// clear texture
+	s_texture = gli::texture2d_array();
 }

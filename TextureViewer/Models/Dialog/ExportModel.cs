@@ -63,7 +63,10 @@ namespace TextureViewer.Models.Dialog
                     for(int i = (int)GliFormat.FORMAT_FIRST; i <= (int)GliFormat.LAST; ++i)
                     {
                         var format = (GliFormat)i;
-                        supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(format), format.ToString()));
+                        var imgf = new ImageLoader.ImageFormat(format);
+                        // TODO support compressed format as well
+                        if (!imgf.IsCompressed)
+                            supportedFormats.Add(new DisplayedFormat(imgf, format.ToString()));
                     }
                     break;
                 case FileFormat.Jpg:

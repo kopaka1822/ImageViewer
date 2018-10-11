@@ -253,44 +253,4 @@ namespace TextureViewer.Utility
 
         RG3B2_UNORM_PACK8, LAST = RG3B2_UNORM_PACK8
     };
-
-    public static class GliFormatConverter
-    {
-        public static GliFormat Convert(PixelFormat pixelFormat, PixelType pixelType)
-        {
-            switch (pixelFormat)
-            {
-                case PixelFormat.Red:
-                    switch (pixelType)
-                    {
-                        case PixelType.Byte:
-                            return GliFormat.R8_SNORM_PACK8;
-                        case PixelType.UnsignedByte:
-                            return GliFormat.R8_UNORM_PACK8;
-                        case PixelType.Int:
-                            return GliFormat.R8_SINT_PACK8;
-                        case PixelType.UnsignedInt:
-                            break;
-                        case PixelType.Float:
-                            break;
-                        case PixelType.HalfFloat:
-                            break;
-                    }
-                    break;
-                case PixelFormat.Green:
-                    break;
-                case PixelFormat.Blue:
-                    break;
-                case PixelFormat.Alpha:
-                    break;
-                case PixelFormat.Rgb:
-                    break;
-                case PixelFormat.Rg:
-                    break;
-                case PixelFormat.Rgba:
-                    break;
-            }
-            throw new Exception("could not convert to GliFormat");
-        }
-    }
 }

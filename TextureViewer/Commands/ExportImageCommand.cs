@@ -146,7 +146,10 @@ namespace TextureViewer.Commands
                             ImageLoader.SaveJpg(info.Filename, width, height, numComponents, data, info.Quality);
                             break;
                         case ExportModel.FileFormat.Ktx:
-                            //ImageLoader.SaveKtx2D(info.Filename, )
+                            Debug.Assert(info.TexFormat.Format.HasGliFormat);
+                            ImageLoader.CreateStorage(info.TexFormat.Format.GliFormat, width, height, 1, 1);
+                            ImageLoader.StoreLevel(0, 0, data, (UInt64)data.Length);
+                            ImageLoader.SaveKtx(info.Filename);
                             break;
                     }
                 }

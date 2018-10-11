@@ -77,9 +77,39 @@ bool
 __cdecl
 save_jpg(const char* filename, int width, int height, int components, const void* data, int quality);
 
-
+/**
+* \brief allocates a texture with the given amount of layers and levels (used for ktx export)
+* \param format gli texture format
+* \param width width in pixels
+* \param height height in pixels
+* \param layer number of layers
+* \param levels number of levels
+*/
 extern "C"
 __declspec(dllexport)
 bool
 __cdecl
-save_2d_ktx(const char* filename, int format, int width, int height, int levels, const void* data, uint64_t size);
+create_storage(int format, int width, int height, int layer, int levels);
+
+/**
+* \brief writes one level into the prevoiusly allocated texture (from create_storage)
+* \param layer layer index
+* \param level level index
+* \param data
+* \param size size of data
+*/
+extern "C"
+__declspec(dllexport)
+bool
+__cdecl
+store_level(int layer, int level, const void* data, uint64_t size);
+
+/**
+* \brief saves the texture that was allocated by create_storage and filled with store_level into a ktx file
+* \param filename
+*/
+extern "C"
+__declspec(dllexport)
+bool
+__cdecl
+save_ktx(const char* filename);

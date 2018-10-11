@@ -61,11 +61,39 @@ bool save_jpg(const char* filename, int width, int height, int components, const
 	return true;
 }
 
-bool save_2d_ktx(const char* filename, int format, int width, int height, int levels, const void* data, uint64_t size)
+bool create_storage(int format, int width, int height, int layer, int levels)
 {
 	try
 	{
-		gli_save_2d_ktx(filename, format, width, height, levels, data, size);
+		gli_create_storage(format, width, height, layer, levels);
+	}
+	catch(const std::exception& e)
+	{
+		set_error(e.what());
+		return false;
+	}
+	return true;
+}
+
+bool store_level(int layer, int level, const void* data, uint64_t size)
+{
+	try
+	{
+		gli_store_level(layer, level, data, size);
+	}
+	catch(const std::exception& e)
+	{
+		set_error(e.what());
+		return false;
+	}
+	return true;
+}
+
+bool save_ktx(const char* filename)
+{
+	try
+	{
+		gli_save_ktx(filename);
 	}
 	catch(const std::exception& e)
 	{
