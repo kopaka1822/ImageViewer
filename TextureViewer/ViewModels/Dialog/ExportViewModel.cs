@@ -41,12 +41,19 @@ namespace TextureViewer.ViewModels.Dialog
             selectedMipmap = AvailableMipmaps[models.Export.Mipmap];
             Debug.Assert(selectedMipmap.Cargo == models.Export.Mipmap);
 
+            // all layer option for ktx and dds
+            if (models.Images.NumLayers > 1 && models.Export.FileType == ExportModel.FileFormat.Ktx)
+            {
+                AvailableLayers.Add(new ComboBoxItem<int>("All Layer", -1));
+                selectedLayer = AvailableLayers.Last();
+            }
+
             // all mipmaps option for ktx and dds
-            /*if(models.Export.FileType == ExportModel.FileFormat.Ktx)
+            if (models.Images.NumMipmaps > 1 && models.Export.FileType == ExportModel.FileFormat.Ktx)
             {
                 AvailableMipmaps.Add(new ComboBoxItem<int>("All Mipmaps", -1));
                 selectedMipmap = AvailableMipmaps.Last();
-            }*/
+            }
 
             // init formats
             foreach (var format in models.Export.SupportedFormats)
