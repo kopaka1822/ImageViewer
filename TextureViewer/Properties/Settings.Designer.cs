@@ -106,5 +106,17 @@ namespace TextureViewer.Properties {
                 this["JpgQuality"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("RGBA8_SRGB_PACK32")]
+        public string GliFormat {
+            get {
+                return ((string)(this["GliFormat"]));
+            }
+            set {
+                this["GliFormat"] = value;
+            }
+        }
     }
 }

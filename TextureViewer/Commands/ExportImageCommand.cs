@@ -93,7 +93,11 @@ namespace TextureViewer.Commands
                     break;
                 case ExportModel.FileFormat.Ktx:
                 case ExportModel.FileFormat.Dds:
-                    texFormat = new ImageLoader.ImageFormat(GliFormat.RGB8_SRGB_PACK8);
+                    // load default format from settings
+                    if (Enum.TryParse<GliFormat>(Properties.Settings.Default.GliFormat, out var fmt))
+                        texFormat = new ImageLoader.ImageFormat(fmt);
+                    else
+                        texFormat = new ImageLoader.ImageFormat(GliFormat.RGB8_SRGB_PACK8);
                     break;
             }
 
@@ -104,6 +108,12 @@ namespace TextureViewer.Commands
             dia.Closed += (sender, args) =>
             {
                 models.Export.IsExporting = false;
+
+                // save gli format if present
+                var fmt = models.Export.TexFormat.Format;
+                if (fmt.HasGliFormat)
+                    Properties.Settings.Default.GliFormat = fmt.GliFormat.ToString();
+
                 if (!dia.ExportResult) return;
 
                 var info = models.Export;
