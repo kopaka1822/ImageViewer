@@ -299,7 +299,8 @@ namespace TextureViewer.glhelper
             if(bs == 0) bs = width * height * GetPixelTypeSize(format.Type) * GetPixelFormatCount(format.Format);
             byte[] buffer = new byte[bufferSize];
 
-            if (format.IsSrgb || useCropping)
+            //if (format.IsSrgb || useCropping)
+            // This needs to be used due to some export bug with certain formats (e.g. RGBA4_UNORM_PACK16)
             {
                 // create temporary texture and convert data
                 var tmpTex = GL.GenTexture();
@@ -319,12 +320,12 @@ namespace TextureViewer.glhelper
                 // cleanup
                 GL.DeleteTexture(tmpTex);
             }
-            else
-            {
-                // read directly
-                BindAsTexture2D(0, layer, mipmap);
-                GL.GetTexImage(TextureTarget.Texture2D, 0, format.Format, format.Type, buffer);
-            }
+            //else
+            //{
+            //    // read directly (NOT POSSIBLE DUE TO EXPORT BUG e.g. RGBA4_UNORM_PACK16)
+            //    BindAsTexture2D(0, layer, mipmap);
+            //    GL.GetTexImage(TextureTarget.Texture2D, 0, format.Format, format.Type, buffer);
+            //}
 
             return buffer;
         }
