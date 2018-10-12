@@ -17,6 +17,7 @@ Currently the following image formats can be imported:
 Exporting is supported for:
 * PNG, JPG, BMP
 * HDR, PFM
+* KTX, DDS
 
 ## View Modes
 ### Simple Images
