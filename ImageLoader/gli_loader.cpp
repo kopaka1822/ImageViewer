@@ -113,6 +113,18 @@ void gli_store_level(int layer, int level, const void* data, uint64_t size)
 	}	
 }
 
+void gli_get_level_size(int level, uint64_t& size)
+{
+	if(s_useCubemap)
+	{
+		size = s_textureCube.size(level);
+	}
+	else
+	{
+		size = s_textureArray.size(level);
+	}
+}
+
 void gli_save_ktx(const char* filename)
 {
 	if(s_useCubemap)

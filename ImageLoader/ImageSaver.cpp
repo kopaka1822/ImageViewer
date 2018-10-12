@@ -89,6 +89,20 @@ bool store_level(int layer, int level, const void* data, uint64_t size)
 	return true;
 }
 
+bool get_level_size(int level, uint64_t& size)
+{
+	try
+	{
+		gli_get_level_size(level, size);
+	}
+	catch(const std::exception& e)
+	{
+		set_error(e.what());
+		return false;
+	}
+	return true;
+}
+
 bool save_ktx(const char* filename)
 {
 	try

@@ -52,6 +52,9 @@ namespace TextureViewer
         private static extern bool store_level(int layer, int level, byte[] data, UInt64 size);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool get_level_size(int level, out UInt64 size);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern bool save_ktx(string filename);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
@@ -131,6 +134,7 @@ namespace TextureViewer
             public SizedInternalFormat InternalFormat { get; set; }
             public GliFormat GliFormat { get; set; }
             public bool HasGliFormat => GliFormat != GliFormat.UNDEFINED;
+            public bool HasInternalFormat => InternalFormat != 0;
 
             public ImageFormat(PixelFormat format, PixelType type, bool isSrgb)
             {
@@ -360,6 +364,12 @@ namespace TextureViewer
         {
             if (!store_level(layer, level, data, size))
                 throw new Exception($"store level failed (layer {layer}, level {level}): " + GetError());
+        }
+
+        public static void GetLevelSize(int level, out UInt64 size)
+        {
+            if (!get_level_size(level, out size))
+                throw new Exception($"get level size failed (level {level}): " + GetError());
         }
 
         public static void SaveKtx(string filename)

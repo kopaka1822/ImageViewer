@@ -113,7 +113,7 @@ namespace TextureViewer.Commands
                     if (texture == null)
                         throw new Exception("texture is not computed");
 
-                    if (info.Layer == -1 || info.Mipmap == -1)
+                    if (info.FileType == ExportModel.FileFormat.Ktx)
                         SaveMultipleLevel(info, texture);
                     else
                         SaveSingleLevel(info, texture);
@@ -133,12 +133,14 @@ namespace TextureViewer.Commands
 
         private void SaveSingleLevel(ExportModel info, TextureArray2D texture)
         {
+            Debug.Assert(info.FileType != ExportModel.FileFormat.Ktx);
+
             var width = info.GetCropWidth();
             var height = info.GetCropHeight();
             Debug.Assert(width > 0);
             Debug.Assert(height > 0);
 
-            var data = texture.GetData(info.Layer, info.Mipmap, info.TexFormat.Format.Format, info.TexFormat.Format.Type, info.TexFormat.Format.IsSrgb,
+            var data = texture.GetData(info.Layer, info.Mipmap, info.TexFormat.Format,
                 info.UseCropping, info.CropStartX, info.CropStartY, ref width, ref height,
                 models.GlData.ExportShader);
 
@@ -165,12 +167,6 @@ namespace TextureViewer.Commands
                     break;
                 case ExportModel.FileFormat.Jpg:
                     ImageLoader.SaveJpg(info.Filename, width, height, numComponents, data, info.Quality);
-                    break;
-                case ExportModel.FileFormat.Ktx:
-                    Debug.Assert(info.TexFormat.Format.HasGliFormat);
-                    ImageLoader.CreateStorage(info.TexFormat.Format.GliFormat, width, height, 1, 1);
-                    ImageLoader.StoreLevel(0, 0, data, (UInt64)data.Length);
-                    ImageLoader.SaveKtx(info.Filename);
                     break;
             }
         }
@@ -209,12 +205,13 @@ namespace TextureViewer.Commands
             {
                 for(var levelIdx = 0; levelIdx < numLevels; ++levelIdx)
                 {
+                    ImageLoader.GetLevelSize(levelIdx, out var bufSize);
                     var data = texture.GetData(
                         numLayer == 1 ? info.Layer : layerIdx,
                         numLevels == 1 ? info.Mipmap : levelIdx,
-                        info.TexFormat.Format.Format, info.TexFormat.Format.Type, info.TexFormat.Format.IsSrgb,
-                        info.UseCropping && supportCropping, info.CropStartX, info.CropStartY, ref width, ref height,
-                        models.GlData.ExportShader);
+                        info.TexFormat.Format, info.UseCropping && supportCropping, 
+                        info.CropStartX, info.CropStartY, ref width, ref height,
+                        models.GlData.ExportShader, (int)bufSize);
 
                     ImageLoader.StoreLevel(layerIdx, levelIdx, data, (UInt64)data.Length);
                 }

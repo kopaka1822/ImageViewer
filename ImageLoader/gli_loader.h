@@ -39,6 +39,13 @@ void gli_create_storage(int format, int width, int height, int layer, int levels
 void gli_store_level(int layer, int level, const void* data, uint64_t size);
 
 /**
+* \brief retrieves the expected level size
+* \param level level index
+* \param size size of the level data
+*/
+void gli_get_level_size(int level, uint64_t& size);
+
+/**
  * \brief saves the texture that was allocated by gli_create_storage and filled with gli_store_level into a ktx file
  * \param filename 
  */

@@ -266,10 +266,13 @@ namespace TextureViewer.glhelper
         /// <param name="width">if useCropping: width of destination image. Will be set to the exported image width</param>
         /// <param name="height">if useCropping: height of destination image. Will be set to the exported image height</param>
         /// <param name="exportShader">shader required for srgb conversion and cropping</param>
+        /// <param name="bufferSize"> Expected size of buffer in bytes. If bufferSize = 0 the buffer size will be calculated based the pixel type size times the number of pixel components (this only works for simple formats)</param>
         /// <returns></returns>
-        public byte[] GetData(int layer, int mipmap, PixelFormat format, PixelType type, bool toSrgb, bool useCropping,
-            int xOffset, int yOffset, ref int width, ref int height, PixelExportShader exportShader)
+        public byte[] GetData(int layer, int mipmap, ImageLoader.ImageFormat format, bool useCropping,
+            int xOffset, int yOffset, ref int width, ref int height, PixelExportShader exportShader, int bufferSize = 0)
         {
+            Debug.Assert(!format.IsCompressed);
+
             // retrieve width and height of the mipmap
             GL.BindTexture(TextureTarget.Texture2DArray, id);
             GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureWidth, out int maxWidth);
@@ -290,10 +293,13 @@ namespace TextureViewer.glhelper
                 height = maxHeight;
             }
 
-            int bufferSize = width * height * GetPixelTypeSize(type) * GetPixelFormatCount(format);
+
+            int bs = bufferSize;
+            // try to calculate the buffer size (only for simple formats)
+            if(bs == 0) bs = width * height * GetPixelTypeSize(format.Type) * GetPixelFormatCount(format.Format);
             byte[] buffer = new byte[bufferSize];
 
-            if (toSrgb || useCropping)
+            if (format.IsSrgb || useCropping)
             {
                 // create temporary texture and convert data
                 var tmpTex = GL.GenTexture();
@@ -304,11 +310,11 @@ namespace TextureViewer.glhelper
                 GL.BindImageTexture(exportShader.GetDestinationTextureLocation(), tmpTex, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba32f);
                 BindAsTexture2D(exportShader.GetSourceTextureLocation(), layer, mipmap);
 
-                exportShader.Use(xOffset, yOffset, width, height, toSrgb);
+                exportShader.Use(xOffset, yOffset, width, height, format.IsSrgb);
 
                 // obtain data
                 GL.BindTexture(TextureTarget.Texture2D, tmpTex);
-                GL.GetTexImage(TextureTarget.Texture2D, 0, format, type, buffer);
+                GL.GetTexImage(TextureTarget.Texture2D, 0, format.Format, format.Type, buffer);
 
                 // cleanup
                 GL.DeleteTexture(tmpTex);
@@ -317,7 +323,7 @@ namespace TextureViewer.glhelper
             {
                 // read directly
                 BindAsTexture2D(0, layer, mipmap);
-                GL.GetTexImage(TextureTarget.Texture2D, 0, format, type, buffer);
+                GL.GetTexImage(TextureTarget.Texture2D, 0, format.Format, format.Type, buffer);
             }
 
             return buffer;

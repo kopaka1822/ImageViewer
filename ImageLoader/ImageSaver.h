@@ -105,6 +105,17 @@ __cdecl
 store_level(int layer, int level, const void* data, uint64_t size);
 
 /**
+* \brief retrieves the expected level size
+* \param level level index
+* \param size size of the level data
+*/
+extern "C"
+__declspec(dllexport)
+bool
+__cdecl
+get_level_size(int level, uint64_t& size);
+
+/**
 * \brief saves the texture that was allocated by create_storage and filled with store_level into a ktx file
 * \param filename
 */
