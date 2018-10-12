@@ -48,7 +48,7 @@ namespace TextureViewer.Commands
             // open save file dialog
             var sfd = new SaveFileDialog
             {
-                Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|JPEG (*.jpg)|*.jpg|HDR (*.hdr)|*.hdr|Portable float map (*.pfm)|*.pfm|Khronos Texture (*.ktx)|*.ktx",
+                Filter = "PNG (*.png)|*.png|BMP (*.bmp)|*.bmp|JPEG (*.jpg)|*.jpg|HDR (*.hdr)|*.hdr|Portable float map (*.pfm)|*.pfm|Khronos Texture (*.ktx)|*.ktx|DirectDraw Surface (*.dds)|*.dds",
                 InitialDirectory = Properties.Settings.Default.ExportPath,
                 FileName = proposedFilename
             };
@@ -70,6 +70,8 @@ namespace TextureViewer.Commands
                 format = ExportModel.FileFormat.Jpg;
             else if (sfd.FileName.EndsWith(".ktx"))
                 format = ExportModel.FileFormat.Ktx;
+            else if (sfd.FileName.EndsWith(".dds"))
+                format = ExportModel.FileFormat.Dds;
 
             var texFormat = new ImageLoader.ImageFormat(PixelFormat.Rgb, PixelType.UnsignedByte, true);
             switch (format)
@@ -90,6 +92,7 @@ namespace TextureViewer.Commands
                         texFormat.ExternalFormat = PixelFormat.Red;
                     break;
                 case ExportModel.FileFormat.Ktx:
+                case ExportModel.FileFormat.Dds:
                     texFormat = new ImageLoader.ImageFormat(GliFormat.RGB8_SRGB_PACK8);
                     break;
             }
@@ -113,7 +116,7 @@ namespace TextureViewer.Commands
                     if (texture == null)
                         throw new Exception("texture is not computed");
 
-                    if (info.FileType == ExportModel.FileFormat.Ktx)
+                    if (info.FileType == ExportModel.FileFormat.Ktx || info.FileType == ExportModel.FileFormat.Dds)
                         SaveMultipleLevel(info, texture);
                     else
                         SaveSingleLevel(info, texture);
@@ -133,8 +136,6 @@ namespace TextureViewer.Commands
 
         private void SaveSingleLevel(ExportModel info, TextureArray2D texture)
         {
-            Debug.Assert(info.FileType != ExportModel.FileFormat.Ktx);
-
             var width = info.GetCropWidth();
             var height = info.GetCropHeight();
             Debug.Assert(width > 0);
@@ -148,8 +149,7 @@ namespace TextureViewer.Commands
                 throw new Exception("error retrieving image from gpu");
 
             var numComponents = 0;
-            if(info.FileType != ExportModel.FileFormat.Ktx)
-                numComponents = TextureArray2D.GetPixelFormatCount(info.TexFormat.Format.Format);
+            numComponents = TextureArray2D.GetPixelFormatCount(info.TexFormat.Format.Format);
 
             switch (info.FileType)
             {
@@ -173,7 +173,6 @@ namespace TextureViewer.Commands
 
         private void SaveMultipleLevel(ExportModel info, TextureArray2D texture)
         {
-            Debug.Assert(info.FileType == ExportModel.FileFormat.Ktx);
             Debug.Assert(info.TexFormat.Format.HasGliFormat);
 
             var numLayer = info.Layer == -1 ? models.Images.NumLayers : 1;
@@ -218,7 +217,10 @@ namespace TextureViewer.Commands
             }
 
             // save texture
-            ImageLoader.SaveKtx(info.Filename);
+            if (info.FileType == ExportModel.FileFormat.Ktx)
+                ImageLoader.SaveKtx(info.Filename);
+            else if (info.FileType == ExportModel.FileFormat.Dds)
+                ImageLoader.SaveDDS(info.Filename);
         }
 
         public event EventHandler CanExecuteChanged

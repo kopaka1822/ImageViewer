@@ -22,7 +22,8 @@ namespace TextureViewer.Models.Dialog
             Hdr,
             Pfm,
             Jpg,
-            Ktx
+            Ktx,
+            Dds
         }
 
         public class DisplayedFormat
@@ -59,6 +60,7 @@ namespace TextureViewer.Models.Dialog
                     supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Rgb, PixelType.UnsignedByte, true), "RGB"));
                     supportedFormats.Add(new DisplayedFormat(new ImageLoader.ImageFormat(PixelFormat.Rgba, PixelType.UnsignedByte, true), "RGBA"));
                     break;
+                case FileFormat.Dds:
                 case FileFormat.Ktx:
                     for(int i = (int)GliFormat.FORMAT_FIRST; i <= (int)GliFormat.LAST; ++i)
                     {

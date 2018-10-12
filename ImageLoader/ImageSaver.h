@@ -124,3 +124,13 @@ __declspec(dllexport)
 bool
 __cdecl
 save_ktx(const char* filename);
+
+/**
+* \brief saves the texture that was allocated by create_storage and filled with store_level into a dds file
+* \param filename
+*/
+extern "C"
+__declspec(dllexport)
+bool
+__cdecl
+save_dds(const char* filename);

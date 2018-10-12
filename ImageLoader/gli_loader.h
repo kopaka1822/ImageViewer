@@ -50,3 +50,9 @@ void gli_get_level_size(int level, uint64_t& size);
  * \param filename 
  */
 void gli_save_ktx(const char* filename);
+
+/**
+* \brief saves the texture that was allocated by gli_create_storage and filled with gli_store_level into a dds file
+* \param filename
+*/
+void gli_save_dds(const char* filename);

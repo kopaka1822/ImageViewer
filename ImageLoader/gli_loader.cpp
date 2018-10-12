@@ -150,3 +150,29 @@ void gli_save_ktx(const char* filename)
 		s_textureArray = gli::texture2d_array();
 	}
 }
+
+void gli_save_dds(const char* filename)
+{
+	if (s_useCubemap)
+	{
+		if (!gli::save_dds(s_textureCube, filename))
+		{
+			// clear texture
+			s_textureCube = gli::texture_cube();
+			throw std::exception("could not save file");
+		}
+		// clear texture
+		s_textureCube = gli::texture_cube();
+	}
+	else
+	{
+		if (!gli::save_dds(s_textureArray, filename))
+		{
+			// clear texture
+			s_textureArray = gli::texture2d_array();
+			throw std::exception("could not save file");
+		}
+		// clear texture
+		s_textureArray = gli::texture2d_array();
+	}
+}

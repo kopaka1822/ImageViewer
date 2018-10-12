@@ -58,6 +58,9 @@ namespace TextureViewer
         private static extern bool save_ktx(string filename);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool save_dds(string filename);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void gli_to_opengl_format(int gliFormat, out int glInternal, out int glExternal, out int glType, out bool isCompressed, out bool isSrgb);
 
         private static string GetError()
@@ -375,6 +378,12 @@ namespace TextureViewer
         public static void SaveKtx(string filename)
         {
             if (!save_ktx(filename))
+                throw new Exception("saving image failed: " + GetError());
+        }
+
+        public static void SaveDDS(string filename)
+        {
+            if (!save_dds(filename))
                 throw new Exception("saving image failed: " + GetError());
         }
     }

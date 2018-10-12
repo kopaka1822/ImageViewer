@@ -117,6 +117,20 @@ bool save_ktx(const char* filename)
 	return true;
 }
 
+bool save_dds(const char* filename)
+{
+	try
+	{
+		gli_save_dds(filename);
+	}
+	catch (const std::exception& e)
+	{
+		set_error(e.what());
+		return false;
+	}
+	return true;
+}
+
 bool save_pfm(const char* filename, int width, int height, int components, const void* data)
 {
 	if(components != 1 && components != 3) return false;
