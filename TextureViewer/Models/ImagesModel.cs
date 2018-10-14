@@ -156,7 +156,6 @@ namespace TextureViewer.Models
         /// Throws an exception if the image cannot be added
         /// </summary>
         /// <param name="imgs">images that should be added</param>
-        /// <param name="glController"></param>
         public void AddImages(List<ImageLoader.Image> imgs)
         {
             Debug.Assert(!context.GlEnabled);
@@ -192,26 +191,55 @@ namespace TextureViewer.Models
                 else // test if image compatible with previous images
                 {
                     if(image.Layers.Count != NumLayers)
-                        throw new Exception($"Inconsistent amount of layers. Expected {NumLayers} got {image.Layers.Count}");
+                        throw new Exception($"{image.Filename}: Inconsistent amount of layers. Expected {NumLayers} got {image.Layers.Count}");
 
+                    ImageData imgData = null;
                     if (image.NumMipmaps != NumMipmaps)
-                        throw new Exception($"Inconsistent amount of mipmaps. Expected {NumMipmaps} got {image.NumMipmaps}");
+                    {
+                        // try to generate/discard mipmaps if the dimensions match
+                        // first layer MUST be of the same size
+                        if(image.GetWidth(0) != GetWidth(0) || image.GetHeight(0) != GetHeight(0))
+                            throw new Exception($"{image.Filename}: Mismatching image resolution. Expected {GetWidth(0)}x{GetHeight(0)}" +
+                                                $" got {image.GetWidth(0)}x{image.GetHeight(0)}");
+
+                        // either generate or remove mipmaps
+                        if (NumMipmaps == 1)
+                        {
+                            // TODO inform the user? offer to generate mipmaps for the other images instead?
+                            // remove mipmaps from the new image
+                            imgData = new ImageData(image);
+                            imgData.DeleteMipmaps();
+                        }
+                        else if(image.NumMipmaps == 1)
+                        {
+                            // TODO inform the user?
+                            // generate mipmaps for the new image
+                            imgData = new ImageData(image);
+                            imgData.GenerateMipmaps(NumMipmaps);
+                        }
+                        else throw new Exception($"{image.Filename}: Inconsistent amount of mipmaps. Expected {NumMipmaps} got {image.NumMipmaps}");                       
+                    }
+                    else // mipmaps are present in both images
+                    {
+                        // test mipmaps
+                        for (var level = 0; level < NumMipmaps; ++level)
+                        {
+                            if (image.GetWidth(level) != GetWidth(level) || image.GetHeight(level) != GetHeight(level))
+                                throw new Exception(
+                                    $"{image.Filename}: Inconsistent mipmaps dimension. Expected {GetWidth(level)}x{GetHeight(level)}" +
+                                    $" got {image.GetWidth(level)}x{image.GetHeight(level)}");
+                        }
+                        imgData = new ImageData(image);
+                    }    
+
+                    Debug.Assert(imgData != null);
 
                     // remember old properties
                     var isAlpha = IsAlpha;
                     var isGrayscale = IsGrayscale;
                     var isHdr = IsHdr;
 
-                    // test mipmaps
-                    for (var level = 0; level < NumMipmaps; ++level)
-                    {
-                        if (image.GetWidth(level) != GetWidth(level) || image.GetHeight(level) != GetHeight(level))
-                            throw new Exception(
-                                $"Inconsistent mipmaps dimension. Expected {GetWidth(level)}x{GetHeight(level)}" +
-                                $" got {image.GetWidth(level)}x{image.GetHeight(level)}");
-                    }
-
-                    images.Add(new ImageData(image));
+                    images.Add(imgData);
 
                     PrevNumImages = NumImages - 1;
                     OnPropertyChanged(nameof(NumImages));
@@ -230,7 +258,6 @@ namespace TextureViewer.Models
         /// deletes an image including all opengl data
         /// </summary>
         /// <param name="imageId"></param>
-        /// <param name="glController"></param>
         public void DeleteImage(int imageId)
         {
             Debug.Assert(imageId >= 0 && imageId < NumImages);
