@@ -42,6 +42,7 @@ namespace TextureViewer.ViewModels
             ShowPixelDisplayCommand = new ShowPixelDialogCommand(models);
             ShowPixelColorCommand = new ShowPixelColorCommand(models);
             GenerateMipmapsCommand = new GenerateMipmapsCommand(models);
+            DeleteMipmapsCommand = new DeleteMipmapsCommand(models);
 
             window.KeyUp += WindowOnKeyUp;
             models.GlContext.GlControl.DragDrop += GlControlOnDragDrop;
@@ -128,6 +129,7 @@ namespace TextureViewer.ViewModels
 
         // tools
         public ICommand GenerateMipmapsCommand { get; }
+        public ICommand DeleteMipmapsCommand { get; }
 
         // help
         public ICommand HelpAboutCommand { get; }

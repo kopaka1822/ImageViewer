@@ -187,6 +187,27 @@ namespace TextureViewer.glhelper
         }
 
         /// <summary>
+        /// creates a new texture that has only one mipmap level
+        /// </summary>
+        /// <param name="level">mipmap level to clone</param>
+        /// <returns></returns>
+        public TextureArray2D CloneMipmapLevel(int level)
+        {
+            Debug.Assert(level < nMipmaps);
+            Debug.Assert(level >= 0);
+
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureWidth, out int lvlWidth);
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureHeight, out int lvlHeight);
+            var newTex = new TextureArray2D(nLayer, 1, internalFormat, lvlWidth, lvlHeight, IsSrgb);
+
+            // copy data of first mipmap level
+            GL.CopyImageSubData(id, ImageTarget.Texture2DArray, level, 0, 0, 0,
+                         newTex.id, ImageTarget.Texture2DArray, 0, 0, 0, 0, lvlWidth, lvlHeight, nLayer);
+
+            return newTex;
+        }
+
+        /// <summary>
         /// generates mipmaps for the existing mipmap levels
         /// </summary>
         public void GenerateMipmaps()

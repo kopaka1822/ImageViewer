@@ -114,6 +114,17 @@
                             Height="16"/>
                     </MenuItem.Icon>
                 </MenuItem>
+                <MenuItem 
+                    Header="Delete Mipmaps"
+                    Command="{Binding DeleteMipmapsCommand}"
+                    IsEnabled="{Binding Progress.NotProcessing}">
+                    <MenuItem.Icon>
+                        <Image 
+                            Source="Icons/cancel.png"
+                            Width="16" 
+                            Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
             <!--END TOOLS-->
             

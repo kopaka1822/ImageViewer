@@ -53,6 +53,14 @@ namespace TextureViewer.Models
                 NumMipmaps = levels;
             }
 
+            public void DeleteMipmaps()
+            {
+                var oldTex = TextureArray;
+                TextureArray = TextureArray.CloneMipmapLevel(0);
+                oldTex.Dispose();
+                NumMipmaps = 1;
+            }
+
             /// <summary>
             /// disposes all opengl related data.
             /// Component should not be used after this
@@ -324,6 +332,28 @@ namespace TextureViewer.Models
                 w = Math.Max(w / 2, 1);
                 h = Math.Max(h / 2, 1);
             }
+
+            OnPropertyChanged(nameof(NumMipmaps));
+
+            context.Disable();
+        }
+
+        public void DeleteMipmaps()
+        {
+            Debug.Assert(!context.GlEnabled);
+            context.Enable();
+            
+            Debug.Assert(NumMipmaps > 1);
+            foreach (var image in images)
+            {
+                image.DeleteMipmaps();
+            }
+            // refresh dimensions array
+            var w = Width;
+            var h = Height;
+            dimensions = new Dimension[1];
+            dimensions[0].Width = w;
+            dimensions[0].Height = h;
 
             OnPropertyChanged(nameof(NumMipmaps));
 
