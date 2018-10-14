@@ -63,7 +63,10 @@ namespace TextureViewer.Controller.ImageCombination
 
             for (var layer = 0; layer < models.Images.NumLayers; ++layer)
             {
-                shader.Run(layer, 0, models.Images.Width, models.Images.Height, target);
+                for (var mipmap = 0; mipmap < models.Images.NumMipmaps; ++mipmap)
+                {
+                    shader.Run(layer, mipmap, models.Images.GetWidth(mipmap), models.Images.GetHeight(mipmap), target);
+                }
             }
 
             GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);

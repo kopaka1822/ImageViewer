@@ -72,13 +72,16 @@ namespace TextureViewer.Models.Filter
             var steps = new List<IStepable>();
             for (int layer = 0; layer < models.Images.NumLayers; ++layer)
             {
-                if (IsSingleInvocation)
+                for (int mipmap = 0; mipmap < models.Images.NumMipmaps; ++mipmap)
                 {
-                    steps.Add(new SingleDispatchStepper(models, this, builder, layer: layer, iteration: iteration));
-                }
-                else
-                {
-                    steps.Add(new MultiDispatchStepper(models, this, builder, layer: layer, iteration: iteration));
+                    if (IsSingleInvocation)
+                    {
+                        steps.Add(new SingleDispatchStepper(models, this, builder, layer: layer, mipmap: mipmap, iteration: iteration));
+                    }
+                    else
+                    {
+                        steps.Add(new MultiDispatchStepper(models, this, builder, layer: layer, mipmap: mipmap, iteration: iteration));
+                    }
                 }
             }
             return new FilterStepList(builder, steps);

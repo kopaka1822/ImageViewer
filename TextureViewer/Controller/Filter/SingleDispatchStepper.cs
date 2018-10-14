@@ -18,11 +18,11 @@ namespace TextureViewer.Controller.Filter
         private readonly int width;
         private readonly int height;
 
-        public SingleDispatchStepper(Models.Models models, FilterModel model, ImageCombineBuilder builder, int layer, int iteration) :
-            base(models, model, builder, layer: layer, iteration: iteration)
+        public SingleDispatchStepper(Models.Models models, FilterModel model, ImageCombineBuilder builder, int layer, int mipmap, int iteration) :
+            base(models, model, builder, layer: layer, mipmap: mipmap, iteration: iteration)
         {
-            this.width = Utility.Utility.DivideRoundUp(models.Images.Width, FilterShader.LocalSize);
-            this.height = Utility.Utility.DivideRoundUp(models.Images.Height, FilterShader.LocalSize);
+            this.width = Utility.Utility.DivideRoundUp(models.Images.GetWidth(mipmap), FilterShader.LocalSize);
+            this.height = Utility.Utility.DivideRoundUp(models.Images.GetHeight(mipmap), FilterShader.LocalSize);
         }
 
         public int GetNumSteps()

@@ -22,11 +22,11 @@ namespace TextureViewer.Controller.Filter
         // invocation offset y
         private int curY = 0;
 
-        public MultiDispatchStepper(Models.Models models, FilterModel model, ImageCombineBuilder builder, int layer, int iteration) : 
-            base(models, model, builder, layer: layer, iteration: iteration)
+        public MultiDispatchStepper(Models.Models models, FilterModel model, ImageCombineBuilder builder, int layer, int mipmap, int iteration) : 
+            base(models, model, builder, layer: layer, mipmap: mipmap, iteration: iteration)
         {
-            this.width = GetNumMinimalInvocations(models.Images.Width);
-            this.height = GetNumMinimalInvocations(models.Images.Height);
+            this.width = GetNumMinimalInvocations(models.Images.GetWidth(mipmap));
+            this.height = GetNumMinimalInvocations(models.Images.GetHeight(mipmap));
         }
 
         public int GetNumSteps()
