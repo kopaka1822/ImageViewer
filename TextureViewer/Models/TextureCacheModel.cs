@@ -44,7 +44,17 @@ namespace TextureViewer.Models
         /// <param name="tex"></param>
         public void StoreTexture(TextureArray2D tex)
         {
-            textures.Push(tex);
+            Debug.Assert(tex != null);
+            if(tex.NumMipmaps == images.NumMipmaps)
+            {
+                // can be used for later
+                textures.Push(tex);
+            }
+            else
+            {
+                // immediately discard (incompatible image)
+                tex.Dispose();
+            }
         }
 
         /// <summary>

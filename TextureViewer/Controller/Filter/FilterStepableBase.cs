@@ -50,45 +50,7 @@ namespace TextureViewer.Controller.Filter
             Builder.GetTemporaryTexture()
                 .BindAsImage(Model.Shader.GetDestinationImageLocation(), layer: layer, mipmap: mipmap, access: TextureAccess.WriteOnly);
 
-            // bind original images
-            for (int i = 0; i < models.Images.NumImages; ++i)
-            {
-                var slot = Model.Shader.GetOriginalImageLocation(i);
-                if (i == -1) break;
-
-                var tex = models.Images.GetTexture(i);
-                models.GlData.BindSampler(i, false, true);
-                tex.BindAsTexture2D(slot, layer: layer, mipmap: mipmap);
-            }
-
-            Model.Shader.Bind();
-
-            foreach (var parameter in Model.Parameters)
-            {
-                switch (parameter.GetParamterType())
-                {
-                    case ParameterType.Float:
-                        GL.Uniform1(parameter.GetBase().Location, parameter.GetFloatModel().Value);
-                        break;
-                    case ParameterType.Int:
-                        GL.Uniform1(parameter.GetBase().Location, parameter.GetIntModel().Value);
-                        break;
-                    case ParameterType.Bool:
-                        GL.Uniform1(parameter.GetBase().Location, parameter.GetBoolModel().Value ? 1 : 0);
-                        break;
-                }
-            }
-
-            if (Model.IsSepa)
-            {
-                // set direction for sepa shader
-                Debug.Assert(iteration == 1 || iteration == 0);
-                GL.Uniform2(0, iteration, 1 - iteration);
-            }
-            else
-            {
-                Debug.Assert(iteration == 0);
-            }
+            Model.Shader.Bind(models, layer, iteration);
         }
 
         /// <summary>
@@ -109,7 +71,7 @@ namespace TextureViewer.Controller.Filter
         /// <returns></returns>
         protected static int GetNumMinimalInvocations(int pixels)
         {
-            return pixels / (FilterShader.LocalSize * FilterShader.MinWorkGroupSize) + (pixels % (FilterShader.LocalSize * FilterShader.MinWorkGroupSize) != 0 ? 1 : 0);
+            return Utility.Utility.DivideRoundUp(pixels, FilterShader.LocalSize * FilterShader.MinWorkGroupSize);
         }
     }
 }

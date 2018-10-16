@@ -30,14 +30,16 @@
             <MenuItem Header="File">
                 <MenuItem 
                     Header="_Open"
-                    Command="{Binding OpenCommand}">
+                    Command="{Binding OpenCommand}"
+                  IsEnabled="{Binding Progress.NotProcessing}">
                     <MenuItem.Icon>
                         <Image Source="Icons/open.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem 
                     Header="_Import"
-                    Command="{Binding ImportCommand}">
+                    Command="{Binding ImportCommand}"
+                  IsEnabled="{Binding Progress.NotProcessing}">
                     <MenuItem.Icon>
                         <Image Source="Icons/import.png"/>
                     </MenuItem.Icon>
@@ -59,6 +61,12 @@
                     Header="Linear Interpolation" 
                     IsCheckable="True"
                     IsChecked="{Binding Display.LinearInterpolation}"/>
+                <MenuItem
+                    Header="Show Crop Box"
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.ShowCropRectangle}"
+                    ToolTip="Shows the crop box if cropping is enabled for export"
+                    />
                 <MenuItem Header="_Grayscale">
                     <MenuItem 
                         Header="_Disabled" 
@@ -94,6 +102,32 @@
             </MenuItem>
             <!--END VIEW-->
 
+            <MenuItem Header="Tools">
+                <MenuItem 
+                    Header="Generate Mipmaps"
+                    Command="{Binding GenerateMipmapsCommand}"
+                    IsEnabled="{Binding Progress.NotProcessing}">
+                    <MenuItem.Icon>
+                        <Image 
+                            Source="Icons/image.png"
+                            Width="16" 
+                            Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem 
+                    Header="Delete Mipmaps"
+                    Command="{Binding DeleteMipmapsCommand}"
+                    IsEnabled="{Binding Progress.NotProcessing}">
+                    <MenuItem.Icon>
+                        <Image 
+                            Source="Icons/cancel.png"
+                            Width="16" 
+                            Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <!--END TOOLS-->
+            
             <MenuItem Header="Help">
                 <MenuItem 
                     Header="About"
@@ -187,7 +221,10 @@
                                         Height="180"
                                         Margin="0 0 0 5"
                                         ItemsSource="{Binding Images.ImageListItems}"
-                                        SelectedItem="{Binding Images.SelectedImageListItem}"/>
+                                        SelectedItem="{Binding Images.SelectedImageListItem}"
+                                        dd:DragDrop.IsDragSource="True"
+                                        dd:DragDrop.IsDropTarget="True"
+                                        dd:DragDrop.DropHandler="{Binding Images}"/>
 
                                     <Button
                                             Command="{Binding Equations.Apply}"
@@ -242,7 +279,7 @@
                                                 <TextBlock Text="RGB: "/>
                                                 <views:CustomTextBox 
                                                     Grid.Column="1"
-                                                    Text="{Binding Equations.Equation1.ColorFormula, UpdateSourceTrigger=PropertyChanged}"
+                                                    Text="{Binding Equations.Equation1.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                                     Margin="0 0 0 5"
                                                     IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
                                             </Grid>
@@ -254,7 +291,7 @@
                                                 <TextBlock Text="Alpha: "/>
                                                 <views:CustomTextBox 
                                                     Grid.Column="1"
-                                                    Text="{Binding Equations.Equation1.AlphaFormula, UpdateSourceTrigger=PropertyChanged}"
+                                                    Text="{Binding Equations.Equation1.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                                     Margin="0 0 0 5"
                                                     IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
                                             </Grid>
@@ -295,7 +332,7 @@
                                                 <TextBlock Text="RGB: "/>
                                                 <views:CustomTextBox 
                                                     Grid.Column="1"
-                                                    Text="{Binding Equations.Equation2.ColorFormula, UpdateSourceTrigger=PropertyChanged}"
+                                                    Text="{Binding Equations.Equation2.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                                     Margin="0 0 0 5"
                                                     IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
                                             </Grid>
@@ -307,7 +344,7 @@
                                                 <TextBlock Text="Alpha: " Height="23" VerticalAlignment="Top"/>
                                                 <views:CustomTextBox 
                                                     Grid.Column="1"
-                                                    Text="{Binding Equations.Equation2.AlphaFormula, UpdateSourceTrigger=PropertyChanged}"
+                                                    Text="{Binding Equations.Equation2.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                                     Margin="0 0 0 5"
                                                     IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
                                             </Grid>
@@ -348,7 +385,7 @@
                                                 <TextBlock Text="RGB: "/>
                                                 <views:CustomTextBox 
                                                     Grid.Column="1"
-                                                    Text="{Binding Equations.Equation3.ColorFormula, UpdateSourceTrigger=PropertyChanged}"
+                                                    Text="{Binding Equations.Equation3.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                                     Margin="0 0 0 5"
                                                     IsEnabled="{Binding Equations.Equation3.IsVisible}"/>
                                             </Grid>
@@ -360,7 +397,7 @@
                                                 <TextBlock Text="Alpha: " Height="23" VerticalAlignment="Top"/>
                                                 <views:CustomTextBox 
                                                     Grid.Column="1"
-                                                    Text="{Binding Equations.Equation3.AlphaFormula, UpdateSourceTrigger=PropertyChanged}"
+                                                    Text="{Binding Equations.Equation3.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                                     Margin="0 0 0 5"
                                                     IsEnabled="{Binding Equations.Equation3.IsVisible}"/>
                                             </Grid>
@@ -401,7 +438,7 @@
                                                 <TextBlock Text="RGB: "/>
                                                 <views:CustomTextBox 
                                                     Grid.Column="1"
-                                                    Text="{Binding Equations.Equation4.ColorFormula, UpdateSourceTrigger=PropertyChanged}"
+                                                    Text="{Binding Equations.Equation4.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                                     Margin="0 0 0 5"
                                                     IsEnabled="{Binding Equations.Equation4.IsVisible}"/>
                                             </Grid>
@@ -413,7 +450,7 @@
                                                 <TextBlock Text="Alpha: " Height="23" VerticalAlignment="Top"/>
                                                 <views:CustomTextBox 
                                                     Grid.Column="1"
-                                                    Text="{Binding Equations.Equation4.AlphaFormula, UpdateSourceTrigger=PropertyChanged}"
+                                                    Text="{Binding Equations.Equation4.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
                                                     Margin="0 0 0 5"
                                                     IsEnabled="{Binding Equations.Equation4.IsVisible}"/>
                                             </Grid>

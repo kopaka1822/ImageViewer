@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.Controller.ImageCombination;
 using TextureViewer.Models.Filter;
+using TextureViewer.Models.Shader;
 using TextureViewer.Utility;
 
 namespace TextureViewer.Controller.Filter
@@ -20,8 +21,8 @@ namespace TextureViewer.Controller.Filter
         public SingleDispatchStepper(Models.Models models, FilterModel model, ImageCombineBuilder builder, int layer, int mipmap, int iteration) :
             base(models, model, builder, layer: layer, mipmap: mipmap, iteration: iteration)
         {
-            this.width = models.Images.GetWidth(mipmap);
-            this.height = models.Images.GetHeight(mipmap);
+            this.width = Utility.Utility.DivideRoundUp(models.Images.GetWidth(mipmap), FilterShader.LocalSize);
+            this.height = Utility.Utility.DivideRoundUp(models.Images.GetHeight(mipmap), FilterShader.LocalSize);
         }
 
         public int GetNumSteps()

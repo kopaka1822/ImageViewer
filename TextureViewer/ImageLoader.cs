@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using OpenTK.Graphics.OpenGL4;
+using TextureViewer.Utility;
 
 namespace TextureViewer
 {
@@ -16,8 +17,9 @@ namespace TextureViewer
         private static extern void release(int id);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void image_info(int id, out uint openglInternalFormat, out uint openglExternalFormat,
-            out uint openglType, out int nImages, out int nFaces, out int nMipmaps, out bool isCompressed);
+        private static extern void image_info(int id, out uint openglInternalFormat, 
+            out uint openglExternalFormat, out uint openglType, out int nImages, out int nFaces, 
+            out int nMipmaps, out bool isCompressed, out bool isSrgb);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void image_info_mipmap(int id, int mipmap, out int width, out int height);
@@ -39,6 +41,27 @@ namespace TextureViewer
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern bool save_pfm(string filename, int width, int height, int components, byte[] data);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool save_jpg(string filename, int width, int height, int components, byte[] data, int quality);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool create_storage(int format, int width, int height, int layer, int levels);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool store_level(int layer, int level, byte[] data, UInt64 size);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool get_level_size(int level, out UInt64 size);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool save_ktx(string filename);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool save_dds(string filename);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void gli_to_opengl_format(int gliFormat, out int glInternal, out int glExternal, out int glType, out bool isCompressed, out bool isSrgb);
 
         private static string GetError()
         {
@@ -104,23 +127,74 @@ namespace TextureViewer
             }
         }
 
+        public struct ImageFormat
+        {
+            public PixelFormat ExternalFormat { get; set; }
+            public PixelFormat Format => IsCompressed ? (PixelFormat)InternalFormat : ExternalFormat;
+            public PixelType Type { get; set; }
+            public bool IsSrgb { get; set; }
+            public bool IsCompressed { get; set; }
+            public SizedInternalFormat InternalFormat { get; set; }
+            public GliFormat GliFormat { get; set; }
+            public bool HasGliFormat => GliFormat != GliFormat.UNDEFINED;
+            public bool HasInternalFormat => InternalFormat != 0;
+
+            public ImageFormat(PixelFormat format, PixelType type, bool isSrgb)
+            {
+                ExternalFormat = format;
+                Type = type;
+                IsSrgb = isSrgb;
+                IsCompressed = false;
+                InternalFormat = (SizedInternalFormat)0;
+                GliFormat = GliFormat.UNDEFINED;
+            }
+
+            public ImageFormat(PixelFormat externalFormat, PixelType type, SizedInternalFormat internalFormat, bool isSrgb, bool isCompressed) : this()
+            {
+                ExternalFormat = externalFormat;
+                Type = type;
+                InternalFormat = internalFormat;
+                IsSrgb = isSrgb;
+                IsCompressed = isCompressed;
+                GliFormat = GliFormat.UNDEFINED;
+            }
+
+            public ImageFormat(GliFormat format)
+            {
+                gli_to_opengl_format((int)format, out var intForm, out var extForm, out var pt, out var compressed, out var srgb);
+                ExternalFormat = (PixelFormat)extForm;
+                Type = (PixelType)pt;
+                InternalFormat = (SizedInternalFormat)intForm;
+                IsSrgb = srgb;
+                IsCompressed = compressed;
+                GliFormat = format;
+            }
+
+            public bool Equals(ImageFormat other)
+            {
+                // special case if a gli format is used
+                if (HasGliFormat != other.HasGliFormat) return false;
+                if (HasGliFormat) return GliFormat == other.GliFormat;
+
+                if (IsCompressed != other.IsCompressed) return false;
+                if (IsSrgb != other.IsSrgb) return false;
+                if (Format != other.Format) return false;
+                // type is only important is the format is uncompressed
+                if (!IsCompressed && Type != other.Type) return false;
+                return true;
+            }
+        }
+
         public class Image
         {
-            public readonly uint OpenglInternalFormat;
-            public readonly uint OpenglExternalFormat;
-            public readonly uint OpenglType;
-            public readonly bool IsCompressed;
+            public readonly ImageFormat Format;
             public readonly List<Face> Layers;
             public readonly string Filename;
 
-            public Image(Resource resource, string filename, uint internalFormat, uint externalFormat,
-                uint type, int curImage, int nFaces, int nMipmaps, bool isCompressed)
+            public Image(Resource resource, string filename, int curImage, int nFaces, int nMipmaps, ImageFormat format)
             {
                 Filename = filename;
-                OpenglExternalFormat = externalFormat;
-                OpenglInternalFormat = internalFormat;
-                OpenglType = type;
-                IsCompressed = isCompressed;
+                Format = format;
                 // load relevant information
 
                 Layers = new List<Face>(nFaces);
@@ -153,8 +227,7 @@ namespace TextureViewer
             /// <returns>true if only one component is used</returns>
             public bool IsGrayscale()
             {
-                PixelFormat pixelFormat = (PixelFormat) OpenglExternalFormat;
-                switch (pixelFormat)
+                switch (Format.ExternalFormat)
                 {
                     case PixelFormat.UnsignedShort:
                     case PixelFormat.UnsignedInt:
@@ -182,8 +255,7 @@ namespace TextureViewer
             /// <returns>true if image has an alpha component</returns>
             public bool HasAlpha()
             {
-                var pixelFormat = (PixelFormat)OpenglExternalFormat;
-                switch (pixelFormat)
+                switch (Format.ExternalFormat)
                 {
                     case PixelFormat.Rgba:
                     case PixelFormat.LuminanceAlpha:
@@ -205,8 +277,7 @@ namespace TextureViewer
             /// <returns>true if the image type is bigger than byte (range > [0-255])</returns>
             public bool IsHdr()
             {
-                var type = (PixelType) OpenglType;
-                switch (type)
+                switch (Format.Type)
                 {
                     case PixelType.Short:
                     case PixelType.UnsignedShort:
@@ -244,12 +315,13 @@ namespace TextureViewer
         {
             var res = new Resource(file);
             image_info(res.Id, out var internalFormat, out var externalFormat, out var openglType,
-                out var nImages, out var nFaces, out var nMipmaps, out var isCompressed);
+                out var nImages, out var nFaces, out var nMipmaps, out var isCompressed, out var isSrgb);
+
+            var format = new ImageFormat((PixelFormat)externalFormat, (PixelType)openglType, (SizedInternalFormat)internalFormat, isSrgb, isCompressed);
             var images = new List<Image>(nImages);
             for (var curImage = 0; curImage < nImages; ++curImage)
             {
-                images.Add(new Image(res, file, internalFormat, externalFormat, openglType,
-                    curImage, nFaces, nMipmaps, isCompressed));
+                images.Add(new Image(res, file, curImage, nFaces, nMipmaps, format));
             }
 
             return images;
@@ -273,9 +345,45 @@ namespace TextureViewer
                 throw new Exception("saving image failed: " + GetError());
         }
 
+        public static void SaveJpg(string filename, int width, int height, int components, byte[] data, int quality)
+        {
+            if (!save_jpg(filename, width, height, components, data, quality))
+                throw new Exception("saving image failed: " + GetError());
+        }
+
         public static void SavePfm(string filename, int width, int height, int components, byte[] data)
         {
             if (!save_pfm(filename, width, height, components, data))
+                throw new Exception("saving image failed: " + GetError());
+        }
+
+        public static void CreateStorage(GliFormat format, int width, int height, int layer, int levels)
+        {
+            if (!create_storage((int)format, width, height, layer, levels))
+                throw new Exception("create storage failed: " + GetError());
+        }
+
+        public static void StoreLevel(int layer, int level, byte[] data, UInt64 size)
+        {
+            if (!store_level(layer, level, data, size))
+                throw new Exception($"store level failed (layer {layer}, level {level}): " + GetError());
+        }
+
+        public static void GetLevelSize(int level, out UInt64 size)
+        {
+            if (!get_level_size(level, out size))
+                throw new Exception($"get level size failed (level {level}): " + GetError());
+        }
+
+        public static void SaveKtx(string filename)
+        {
+            if (!save_ktx(filename))
+                throw new Exception("saving image failed: " + GetError());
+        }
+
+        public static void SaveDDS(string filename)
+        {
+            if (!save_dds(filename))
                 throw new Exception("saving image failed: " + GetError());
         }
     }

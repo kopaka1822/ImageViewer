@@ -28,8 +28,18 @@ namespace TextureViewer.glhelper
         private readonly SizedInternalFormat internalFormat;
         private readonly int nMipmaps;
         private readonly int nLayer;
+        // width of upper level
+        private readonly int width;
+        // height of upper level
+        private readonly int height;
 
         public bool HasMipmaps => nMipmaps > 1;
+        public int NumMipmaps => nMipmaps;
+
+        /// <summary>
+        /// indicates if the texture needs to be converted from srb space to physical space
+        /// </summary>
+        public bool IsSrgb { get; } = false;
 
         /// <summary>
         /// creates an empty Texture 2D Array
@@ -39,12 +49,16 @@ namespace TextureViewer.glhelper
         /// <param name="internalFormat"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        public TextureArray2D(int numLayers, int numMipmaps, SizedInternalFormat internalFormat, int width, int height)
+        public TextureArray2D(int numLayers, int numMipmaps, SizedInternalFormat internalFormat, 
+            int width, int height, bool isSrgb = false)
         {
             id = GL.GenTexture();
             this.internalFormat = internalFormat;
             this.nMipmaps = numMipmaps;
             this.nLayer = numLayers;
+            this.width = width;
+            this.height = height;
+            this.IsSrgb = isSrgb;
             GL.BindTexture(TextureTarget.Texture2DArray, id);
 
             GL.TexStorage3D(TextureTarget3d.Texture2DArray, numMipmaps,
@@ -63,7 +77,10 @@ namespace TextureViewer.glhelper
             id = GL.GenTexture();
             this.nMipmaps = image.NumMipmaps;
             this.nLayer = image.Layers.Count;
-            this.internalFormat = (SizedInternalFormat)image.OpenglInternalFormat;
+            this.internalFormat = image.Format.InternalFormat;
+            this.IsSrgb = image.Format.IsSrgb;
+            this.width = image.GetWidth(0);
+            this.height = image.GetHeight(0);
 
             GL.BindTexture(TextureTarget.Texture2DArray, id);
 
@@ -73,7 +90,7 @@ namespace TextureViewer.glhelper
                 internalFormat, image.GetWidth(0),
                 image.GetHeight(0), image.Layers.Count);
 
-            if (image.IsCompressed)
+            if (image.Format.IsCompressed)
             {
                 for (int face = 0; face < image.Layers.Count; ++face)
                 {
@@ -81,7 +98,7 @@ namespace TextureViewer.glhelper
                     {
                         GL.CompressedTexSubImage3D(TextureTarget.Texture2DArray, level,
                             0, 0, face, image.GetWidth(level), image.GetHeight(level),
-                            1, (PixelFormat)image.OpenglInternalFormat,
+                            1, image.Format.Format,
                             (int)image.Layers[face].Mipmaps[level].Size,
                             image.Layers[face].Mipmaps[level].Bytes);
                     }
@@ -89,25 +106,16 @@ namespace TextureViewer.glhelper
             }
             else
             {
-                
-                var pixelFormat = (PixelFormat)image.OpenglExternalFormat;
-                var pixelType = (PixelType)image.OpenglType;
-
                 for (int face = 0; face < image.Layers.Count; ++face)
                 {
                     for (int level = 0; level < image.NumMipmaps; ++level)
                     {
                         GL.TexSubImage3D(TextureTarget.Texture2DArray, level,
                             0, 0, face, image.GetWidth(level), image.GetHeight(level),
-                            1, pixelFormat, pixelType, image.Layers[face].Mipmaps[level].Bytes);
+                            1, image.Format.Format, image.Format.Type, image.Layers[face].Mipmaps[level].Bytes);
                     }
                 }
             }
-            
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinLod, 0.0f);
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLod, (float)image.NumMipmaps);
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureBaseLevel, 0);
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMaxLevel, image.NumMipmaps);
 
             CreateTexture2DViews();
         }
@@ -161,14 +169,61 @@ namespace TextureViewer.glhelper
         }
 
         /// <summary>
+        /// generates new mipmaps
+        /// </summary>
+        public TextureArray2D GenerateMipmapLevels(int levels)
+        {
+            Debug.Assert(!HasMipmaps);
+            // create a texture with the same format and more mipmaps
+            var newTex = new TextureArray2D(nLayer, levels, internalFormat, width, height, IsSrgb);
+
+            // copy image data of first level
+            GL.CopyImageSubData(id, ImageTarget.Texture2DArray, 0, 0, 0, 0,
+                         newTex.id, ImageTarget.Texture2DArray, 0, 0, 0, 0, width, height, nLayer);
+
+            newTex.GenerateMipmaps();
+
+            return newTex;
+        }
+
+        /// <summary>
+        /// creates a new texture that has only one mipmap level
+        /// </summary>
+        /// <param name="level">mipmap level to clone</param>
+        /// <returns></returns>
+        public TextureArray2D CloneMipmapLevel(int level)
+        {
+            Debug.Assert(level < nMipmaps);
+            Debug.Assert(level >= 0);
+
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureWidth, out int lvlWidth);
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureHeight, out int lvlHeight);
+            var newTex = new TextureArray2D(nLayer, 1, internalFormat, lvlWidth, lvlHeight, IsSrgb);
+
+            // copy data of first mipmap level
+            GL.CopyImageSubData(id, ImageTarget.Texture2DArray, level, 0, 0, 0,
+                         newTex.id, ImageTarget.Texture2DArray, 0, 0, 0, 0, lvlWidth, lvlHeight, nLayer);
+
+            return newTex;
+        }
+
+        /// <summary>
+        /// generates mipmaps for the existing mipmap levels
+        /// </summary>
+        public void GenerateMipmaps()
+        {
+            Debug.Assert(HasMipmaps);
+            GL.BindTexture(TextureTarget.Texture2DArray, id);
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
+        }
+
+        /// <summary>
         /// binds specified texture
         /// </summary>
-        /// <param name="slot">binding slot</param>
         /// <param name="target">texture target</param>
         /// <param name="texId">texture id</param>
-        private void BindAs(int slot, TextureTarget target, int texId)
+        private void BindAs(TextureTarget target, int texId)
         {
-            GL.ActiveTexture(TextureUnit.Texture0 + slot);
             GL.BindTexture(target, texId);
         }
 
@@ -178,7 +233,8 @@ namespace TextureViewer.glhelper
         /// <param name="slot">binding slot</param>
         public void Bind(int slot)
         {
-            BindAs(slot, TextureTarget.Texture2DArray, id);
+            GL.ActiveTexture(TextureUnit.Texture0 + slot);
+            BindAs(TextureTarget.Texture2DArray, id);
         }
 
         /// <summary>
@@ -187,8 +243,9 @@ namespace TextureViewer.glhelper
         /// <param name="slot">binding slot</param>
         public void BindAsCubemap(int slot)
         {
+            GL.ActiveTexture(TextureUnit.Texture0 + slot);
             CreateCubeMapView();
-            BindAs(slot, TextureTarget.TextureCubeMap, cubeId);
+            BindAs(TextureTarget.TextureCubeMap, cubeId);
         }
 
         /// <summary>
@@ -200,7 +257,8 @@ namespace TextureViewer.glhelper
         public void BindAsTexture2D(int slot, int layer, int mipmap)
         {
             Debug.Assert(tex2DId != null);
-            BindAs(slot, TextureTarget.Texture2D, tex2DId[GetTextureIndex(layer, mipmap)]);
+            GL.ActiveTexture(TextureUnit.Texture0 + slot);
+            BindAs(TextureTarget.Texture2D, tex2DId[GetTextureIndex(layer, mipmap)]);
         }
 
         /// <summary>
@@ -216,154 +274,81 @@ namespace TextureViewer.glhelper
         }
 
         /// <summary>
-        /// retrieves the texture data from the gpu in float rgba format (all layers)
+        /// reads (sub) data from a single image layer and a single image mipmap with the specified format and type
         /// </summary>
-        /// <param name="mipmap">mip map mipmap</param>
+        /// <param name="layer">image layer</param>
+        /// <param name="mipmap">image mipmap</param>
+        /// <param name="format">destination format</param>
+        /// <param name="type">destination type</param>
+        /// <param name="toSrgb">indicates if data should be converted into srgb space</param>
+        /// <param name="useCropping">indicates if the source image should be cropped</param>
+        /// <param name="xOffset">if useCropping: x pixel offset</param>
+        /// <param name="yOffset">if useCropping: y pixel offset</param>
+        /// <param name="width">if useCropping: width of destination image. Will be set to the exported image width</param>
+        /// <param name="height">if useCropping: height of destination image. Will be set to the exported image height</param>
+        /// <param name="exportShader">shader required for srgb conversion and cropping</param>
+        /// <param name="bufferSize"> Expected size of buffer in bytes. If bufferSize = 0 the buffer size will be calculated based the pixel type size times the number of pixel components (this only works for simple formats)</param>
         /// <returns></returns>
-        public float[] GetFloatData(int mipmap)
+        public byte[] GetData(int layer, int mipmap, ImageLoader.ImageFormat format, bool useCropping,
+            int xOffset, int yOffset, ref int width, ref int height, PixelExportShader exportShader, int bufferSize = 0)
         {
-            // retrieve width and height of the mipmap
-            int width, height;
-            GL.BindTexture(TextureTarget.Texture2DArray, id);
-            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureWidth, out width);
-            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureHeight, out height);
+            Debug.Assert(!format.IsCompressed);
 
-            float[] buffer = new float[4 * width * height * nLayer];
-            Utility.ReadTexture(TextureTarget.Texture2DArray, id, mipmap, PixelFormat.Rgba, PixelType.Float, ref buffer);
-
-            return buffer;
-        }
-
-        public float[] GetRedFloatData(int mipmap)
-        {
-            // retrieve width and height of the mipmap
-            int width, height;
-            GL.BindTexture(TextureTarget.Texture2DArray, id);
-            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureWidth, out width);
-            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureHeight, out height);
-
-            float[] buffer = new float[width * height * nLayer];
-            Utility.ReadTexture(TextureTarget.Texture2DArray, id, mipmap, PixelFormat.Red, PixelType.Float, ref buffer);
-
-            return buffer;
-        }
-
-        /// <summary>
-        /// reads data from gpu
-        /// </summary>
-        /// <param name="layer">requested layer or -1 if all layers</param>
-        /// <param name="mipmap">requested mipmap</param>
-        /// <param name="format"></param>
-        /// <param name="type"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <returns></returns>
-        public byte[] GetData(int layer, int mipmap, PixelFormat format, PixelType type, out int width, out int height)
-        {
             // retrieve width and height of the mipmap
             GL.BindTexture(TextureTarget.Texture2DArray, id);
-            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureWidth, out width);
-            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureHeight, out height);
-
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureWidth, out int maxWidth);
+            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureHeight, out int maxHeight);
+            
             Debug.Assert(layer < nLayer);
-
-            int bufferSize = width * height * GetPixelTypeSize(type) * GetPixelFormatCount(format) * nLayer;
-            byte[] buffer = new byte[bufferSize];
-
-            Utility.ReadTexture(TextureTarget.Texture2DArray, id, mipmap, format, type, ref buffer);
-
-            if (nLayer > 1 && layer >= 0)
+            Debug.Assert(mipmap < nMipmaps);
+            if (useCropping)
             {
-                // get data from the layer
-                int layerSize = bufferSize / nLayer;
-                byte[] layerBuffer = new byte[layerSize];
-                for (int i = 0; i < layerSize; ++i)
-                    layerBuffer[i] = buffer[layer * layerSize + i];
-
-                buffer = layerBuffer;
-            }
-
-            // mirror horizontally
-            if (layer >= 0)
-            {
-                // only this layer
-                MirrorHorizontally(buffer, width * GetPixelTypeSize(type) * GetPixelFormatCount(format), height, layer * (bufferSize / nLayer));
+                Debug.Assert(xOffset + width <= maxWidth);
+                Debug.Assert(yOffset + height <= maxHeight);
             }
             else
             {
-                // all layer
-                for (int curLayer = 0; curLayer < nLayer; ++curLayer)
-                    MirrorHorizontally(buffer, width * GetPixelTypeSize(type) * GetPixelFormatCount(format), height, curLayer * (bufferSize / nLayer));
+                xOffset = 0;
+                yOffset = 0;
+                width = maxWidth;
+                height = maxHeight;
             }
 
-            return buffer;
-        }
 
-
-        public byte[] GetSrgbData(int layer, int mipmap, PixelFormat format, PixelType type, out int width, out int height, OpenGlModel glModel)
-        {
-            // retrieve width and height of the mipmap
-            GL.BindTexture(TextureTarget.Texture2DArray, id);
-            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureWidth, out width);
-            GL.GetTexLevelParameter(TextureTarget.Texture2DArray, mipmap, GetTextureParameter.TextureHeight, out height);
-
-            Debug.Assert((uint)layer < nLayer);
-
-            // create framebuffer and texture to render into
-            // texture
-            var framebufferTexture = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, framebufferTexture);
-            GL.TexStorage2D(TextureTarget2d.Texture2D, 1, SizedInternalFormat.Rgba8, width, height);
-
-            // framebuffer
-            var framebufferId = GL.GenFramebuffer();
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebufferId);
-            GL.FramebufferTexture(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, framebufferTexture, 0);
-            var status = GL.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
-            Debug.Assert(status == FramebufferErrorCode.FramebufferComplete);
-            GL.DrawBuffers(1, new[]{DrawBuffersEnum.ColorAttachment0});
-
-            // draw into the framebuffer
-            GL.Viewport(0, 0, width, height);
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            GL.Enable(EnableCap.FramebufferSrgb);
-
-            glModel.SrgbShader.Bind();
-            BindAsTexture2D(0, layer, mipmap);
-
-            glModel.Vao.DrawQuad();
-
-            GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
-
-            // obtain the image from the back buffer
-            int bufferSize = width * height * GetPixelTypeSize(type) * GetPixelFormatCount(format);
+            int bs = bufferSize;
+            // try to calculate the buffer size (only for simple formats)
+            if(bs == 0) bs = width * height * GetPixelTypeSize(format.Type) * GetPixelFormatCount(format.Format);
             byte[] buffer = new byte[bufferSize];
-            GL.ReadPixels(0, 0, width, height, format, type, buffer);
 
+            //if (format.IsSrgb || useCropping)
+            // This needs to be used due to some export bug with certain formats (e.g. RGBA4_UNORM_PACK16)
+            {
+                // create temporary texture and convert data
+                var tmpTex = GL.GenTexture();
+                GL.BindTexture(TextureTarget.Texture2D, tmpTex);
+                GL.TexStorage2D(TextureTarget2d.Texture2D, 1, SizedInternalFormat.Rgba32f, width, height);
 
-            // delete framebuffer and texture
-            GL.DeleteFramebuffer(framebufferId);
-            GL.DeleteTexture(framebufferTexture);
+                // use crop/srgb shader
+                GL.BindImageTexture(exportShader.GetDestinationTextureLocation(), tmpTex, 0, false, 0, TextureAccess.WriteOnly, SizedInternalFormat.Rgba32f);
+                BindAsTexture2D(exportShader.GetSourceTextureLocation(), layer, mipmap);
 
-            MirrorHorizontally(buffer, width * GetPixelTypeSize(type) * GetPixelFormatCount(format), height, 0);
+                exportShader.Use(xOffset, yOffset, width, height, format.IsSrgb);
+
+                // obtain data
+                GL.BindTexture(TextureTarget.Texture2D, tmpTex);
+                GL.GetTexImage(TextureTarget.Texture2D, 0, format.Format, format.Type, buffer);
+
+                // cleanup
+                GL.DeleteTexture(tmpTex);
+            }
+            //else
+            //{
+            //    // read directly (NOT POSSIBLE DUE TO EXPORT BUG e.g. RGBA4_UNORM_PACK16)
+            //    BindAsTexture2D(0, layer, mipmap);
+            //    GL.GetTexImage(TextureTarget.Texture2D, 0, format.Format, format.Type, buffer);
+            //}
 
             return buffer;
-        }
-
-        private void MirrorHorizontally(byte[] buffer, int lineWidth, int height, int offset)
-        {
-            for (int y = 0; y < height / 2; ++y)
-            {
-                for (int x = 0; x < lineWidth; ++x)
-                {
-                    var a = y * lineWidth + x + offset;
-                    var b = (height - y - 1) * lineWidth + x + offset;
-                    var tmp = buffer[a];
-                    buffer[a] = buffer[b];
-                    buffer[b] = tmp;
-                }
-            }
         }
 
         public static int GetPixelFormatCount(PixelFormat f)
@@ -407,6 +392,7 @@ namespace TextureViewer.glhelper
             {
                 case PixelType.UnsignedByte:
                 case PixelType.Byte:
+                case PixelType.UnsignedInt8888Reversed:
                     return 1;
                 case PixelType.HalfFloat:
                 case PixelType.Short:

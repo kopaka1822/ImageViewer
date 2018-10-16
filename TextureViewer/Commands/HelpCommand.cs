@@ -24,7 +24,9 @@ namespace TextureViewer.Commands
 
         public void Execute(object parameter)
         {
-            new HelpDialog(path).Show();
+            var dia = new HelpDialog(path);
+            // only show dialog if window is valid (help page was found)
+            if (dia.IsValid) dia.Show();
         }
 
         public event EventHandler CanExecuteChanged

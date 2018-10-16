@@ -24,7 +24,7 @@ namespace TextureViewer.Controller
             this.imageController = new List<ImageCombineController>();
             for (var i = 0; i < models.Equations.NumEquations; ++i)
             {
-                imageController.Add(new ImageCombineController(models.Equations.Get(i), models.FinalImages.Get(i), models));
+                imageController.Add(new ImageCombineController(models.Equations.Get(i), models.FinalImages.Get(i), models, i));
             }
         }
 

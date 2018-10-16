@@ -34,6 +34,8 @@ namespace TextureViewer.Models
 
         public GLControl GlControl { get; }
 
+        public int MaxTextureUnits { get; }
+
         public static int MajorVersion { get; } = 4;
         public static int MinorVersion { get; } = 3;
         public static string ShaderVersion { get; } = "#version 430 core";
@@ -88,9 +90,9 @@ namespace TextureViewer.Models
                 Enable();
 
                 GL.Enable(EnableCap.TextureCubeMapSeamless);
-                GL.Enable(EnableCap.FramebufferSrgb);
                 GL.PixelStore(PixelStoreParameter.PackAlignment, 1);
                 GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
+                MaxTextureUnits = GL.GetInteger(GetPName.MaxTextureImageUnits);
             }
             catch (Exception e)
             {

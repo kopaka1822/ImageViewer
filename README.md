@@ -4,7 +4,7 @@ An image viewer for anyone related to computer graphics.
 
 ## Download
 
-x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/blob/Release/Build/Texture%20Viewer.zip?raw=true)
+Version 2.1 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/raw/Release/Build/Texture%20Viewer.zip)
 
 ## File Formats
 
@@ -15,12 +15,13 @@ Currently the following image formats can be imported:
 * EXR (based on [tinyexr](https://github.com/syoyo/tinyexr))
 
 Exporting is supported for:
-* PNG, JPG
-* HDR
+* PNG, JPG, BMP
+* HDR, PFM
+* KTX, DDS
 
 ## View Modes
 ### Simple Images
-View simple images with and without alpha channel. The status bar displays the current texture coordinates (cursor) along with the corresponding RGBA color values.
+The status bar displays the current texture coordinates (cursor) along with the corresponding RGBA color values in linear color space. The display type can be changed from linear color space to Srgb color space via: View->Pixel Display->Format.
 
 ![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/transparent.png)
 
@@ -51,24 +52,20 @@ View and navigate through the polar image in a projection view:
 
 ## Image Manipulation
 
-Add a custom or predefined tonemapper to your image:
+Add a custom or predefined filter to your image:
 
 ![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/balcony_tonemapper.png)
 
-Or define a custom tonemapper like this. Tonemapper are GLSL compute shader. The work group size will be set by the application and only the main method needs to be implemented (this method will be called once for every pixel).
+Or define a custom filter like this. Filter are GLSL compute shader. The work group size will be set by the application and only the main method needs to be implemented (this method will be called once for every pixel). The detailed filter guide can be found [here](https://github.com/kopaka1822/ImageViewer/blob/master/TextureViewer/Help/filter_manual.md).
 
 ```glsl
 // general information about the shader
 #setting title, Gamma Correction
 #setting description, Nonlinear operation used to encode and decode luminance or tristimulus values in video or still image systems. Formula: (Factor * V) ^ Gamma.
 
-// define variables for the user to interact with
-layout(location = 3) uniform float gamma;
-layout(location = 2) uniform float factor;
-
-// define displayed name, location (see above), variable type, default value and optional minimum, maximum
-#param Gamma, 3, float, 0.45454545, 0
-#param Factor, 2, float, 1.0, 0
+// define displayed name, variable name (for the shader), variable type, default value and optional minimum, maximum
+#param Gamma, gamma, float, 0.45454545, 0
+#param Factor, factor, float, 1.0, 0
 
 void main()
 {
@@ -92,43 +89,4 @@ You can even import more than one image and combine them into one with a user de
 
 ![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/image_formula.png)
 
-I0 and I1 are the pixels from the first and the second image. RGB values are in range [0,1] and you can combine them with following operators: * + - / ^. Numerical constants can be used as well.
-The following function from GLSL can be used as well:
-* abs(value)
-* sin(value)
-* cos(value)
-* tan(value)
-* asin(value)
-* acos(value)
-* atan(value)
-* exp(value)
-* log(value)
-* exp2(value)
-* log2(value)
-* sqrt(value)
-* sign(value)
-* floor(value)
-* ceil(value)
-* fract(value)
-* normalize(value)*
-* length(value)*
-* min(value1, value2)
-* max(value1, value2)
-* pow(value1, value2)
-* atan(value1, value2)
-* mod(value1, value2)
-* step(value1, value2)
-* cross(value1, value2)*
-* dot(value1, value2)*
-
-Additionaly you can use:
-* red(value)
-* green(value)
-* blue(value)
-* alpha(value)
-
-functions marked with * will only use the rgb components for computation and ignore alpha.
-
-to extract a single color channel as value.
-
-`rgb(value, value, value)` may be used to construct an rgb value with alpha component 1.0
+I0 and I1 are the pixels from the first and the second image. RGB values are in range [0,1] and you can combine them with following operators: * + - / ^. Numerical constants can be used as well. The detailed image equation guide can be found [here](https://github.com/kopaka1822/ImageViewer/blob/master/TextureViewer/Help/equation.md).

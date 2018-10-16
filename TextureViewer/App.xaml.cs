@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace TextureViewer
 {
@@ -15,6 +16,14 @@ namespace TextureViewer
     /// </summary>
     public partial class App : Application
     {
+        public enum ResourceIcon
+        {
+            Cancel,
+            Eye,
+            EyeClosed,
+            ListMove
+        }
+
         // change this if the assembly name was changed
         public static readonly string AppName = "TextureViewer";
 
@@ -22,12 +31,15 @@ namespace TextureViewer
         public string ExecutionPath { get; private set; }
 
         private readonly List<MainWindow> openWindows = new List<MainWindow>();
+        private static readonly Dictionary<ResourceIcon, BitmapImage> icons = new Dictionary<ResourceIcon, BitmapImage>();
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
             ExecutionPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+            LoadIcons();
 
             if (e.Args.Length == 0)
             {
@@ -40,6 +52,25 @@ namespace TextureViewer
                 var wnd = SpawnWindow();
                 wnd.ImportImages(e.Args);
             }
+        }
+
+        private static void LoadIcons()
+        {
+            icons[ResourceIcon.Cancel] =
+                new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/cancel.png",
+                    UriKind.Absolute));
+
+            icons[ResourceIcon.Eye] =
+                new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/eye.png",
+                    UriKind.Absolute));
+
+            icons[ResourceIcon.EyeClosed] =
+                new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/eye_closed.png",
+                    UriKind.Absolute));
+
+            icons[ResourceIcon.ListMove] = 
+                new BitmapImage(new Uri($@"pack://application:,,,/{App.AppName};component/Icons/list_move.png",
+                    UriKind.Absolute));
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -83,7 +114,6 @@ namespace TextureViewer
             else
                 MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 #endif
-
         }
 
         /// <summary>
@@ -99,10 +129,23 @@ namespace TextureViewer
                 MessageBox.Show(message, "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
+        public static bool ShowYesNoDialog(Window owner, string title, string message)
+        {
+            if (owner != null)
+                return MessageBox.Show(owner, message, title, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes;
+            return MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes;
+        }
+
         private static readonly CultureInfo CultureInfo = new CultureInfo("en-US");
+
         public static CultureInfo GetCulture()
         {
             return CultureInfo;
+        }
+
+        public static BitmapImage GetResourceImage(ResourceIcon r)
+        {
+            return icons[r];
         }
     }
 }

@@ -25,7 +25,7 @@ namespace TextureViewer.ViewModels
             this.paintController = new PaintController(models);
             
             // model views
-            Images = new ImagesViewModel(models);
+            Images = new ImagesViewModel(models, this);
             Display = new DisplayViewModel(models);
             Equations = new EquationsViewModel(models);
             Progress = new ProgressViewModel(models);
@@ -33,7 +33,7 @@ namespace TextureViewer.ViewModels
             Statistics = new StatisticsViewModel(models);
 
             // commands
-            var import = new ImportImageCommand(models);
+            var import = new ImportImageCommand(models, this);
             ImportCommand = import;
             ResizeCommand = new ResizeWindowCommand(models);
             OpenCommand = new OpenImageCommand(models, import);
@@ -41,6 +41,8 @@ namespace TextureViewer.ViewModels
             AddFilterCommand = new AddFilterCommand(models, Filter);
             ShowPixelDisplayCommand = new ShowPixelDialogCommand(models);
             ShowPixelColorCommand = new ShowPixelColorCommand(models);
+            GenerateMipmapsCommand = new GenerateMipmapsCommand(models);
+            DeleteMipmapsCommand = new DeleteMipmapsCommand(models);
 
             window.KeyUp += WindowOnKeyUp;
             models.GlContext.GlControl.DragDrop += GlControlOnDragDrop;
@@ -80,20 +82,29 @@ namespace TextureViewer.ViewModels
         }
 
         /// <summary>
-        /// tries to import an image. Displays an error on failure
+        /// tries to import an image. Displays an error on failure. Returns true on success
         /// </summary>
         /// <param name="filename"></param>
-        public void ImportImage(string filename)
+        public bool ImportImage(string filename)
         {
+            // maximum amount of images reached?
+            if(models.Images.NumImages == models.GlContext.MaxTextureUnits)
+            {
+                App.ShowErrorDialog(models.App.Window, $"Maximum texture units reached. This GPU only supports {models.GlContext.MaxTextureUnits} units");
+                return false;
+            }
+
             try
             {
                 var imgs = ImageLoader.LoadImage(filename);
                 models.Images.AddImages(imgs);
+                return true;
             }
             catch (Exception e)
             {
                 App.ShowErrorDialog(models.App.Window, e.Message);
             }
+            return false;
         }
 
         // view models
@@ -105,14 +116,22 @@ namespace TextureViewer.ViewModels
         public StatisticsViewModel Statistics { get; }
 
         // commands
+        // file
         public ICommand ImportCommand { get; }
         public ICommand OpenCommand { get; }
         public ICommand ExportCommand { get; }
         public ICommand ResizeCommand { get; }
         public ICommand AddFilterCommand { get; }
+
+        // view
         public ICommand ShowPixelDisplayCommand { get; }
         public ICommand ShowPixelColorCommand { get; }
 
+        // tools
+        public ICommand GenerateMipmapsCommand { get; }
+        public ICommand DeleteMipmapsCommand { get; }
+
+        // help
         public ICommand HelpAboutCommand { get; }
         public ICommand HelpEquationCommand { get; }
         public ICommand HelpFilterManualCommand { get; }

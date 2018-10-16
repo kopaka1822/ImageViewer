@@ -2,16 +2,16 @@
 {
     internal class ImageToken : ValueToken
     {
-        private readonly int id;
+        public readonly int Id;
 
         public ImageToken(int id)
         {
-            this.id = id;
+            this.Id = id;
         }
 
         public override string ToOpenGl()
         {
-            return $"GetTexture{id.ToString(App.GetCulture())}()";
+            return $"GetTexture{Id.ToString(App.GetCulture())}()";
         }
     }
 }

@@ -42,8 +42,8 @@ namespace TextureViewer.Models.Filter
         public Dictionary<ActionType, ParameterAction> Actions { get; } = new Dictionary<ActionType, ParameterAction>();
         public virtual T Value { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public FilterParameterModel(string name, int location, T min, T max, T defaultValue)
-        : base(name, location)
+        public FilterParameterModel(string name, string variableName, T min, T max, T defaultValue)
+        : base(name, variableName)
         {
             Min = min;
             Max = max;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TextureViewer.Models.Dialog;
 using TextureViewer.Models.Filter;
 using TextureViewer.ViewModels;
 
@@ -24,7 +25,7 @@ namespace TextureViewer.Models
             GlContext = new OpenGlContext(window, viewModel);
             GlContext.Enable();
 
-            Images = new ImagesModel(GlContext);
+            Images = new ImagesModel(GlContext, App);
             GlData = new OpenGlModel(GlContext, Images);
             Display = new DisplayModel(Images, GlContext);
             Equations = new ImageEquationsModel(Images);
@@ -32,6 +33,7 @@ namespace TextureViewer.Models
             FinalImages = new FinalImagesModel(GlData.TextureCache, Images);
             Filter = new FiltersModel();
             Statistics = new StatisticsModel();
+            Export = new ExportModel(Images, Display);
 
             GlContext.Disable();
         }
@@ -57,5 +59,6 @@ namespace TextureViewer.Models
         public FinalImagesModel FinalImages { get; }
         public FiltersModel Filter { get; }
         public StatisticsModel Statistics { get; }
+        public ExportModel Export { get; }
     }
 }

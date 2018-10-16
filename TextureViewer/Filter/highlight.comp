@@ -1,13 +1,9 @@
 #setting title, Highlighting
 #setting description, Highlights certain colors. Uses RGB average.
 
-#param Negative Values (blue), 2, bool, true
-#param Positive Values (red), 3, bool, true
-#param Oversaturated Values (green), 4, bool, false
-
-layout(location = 2) uniform bool negative;
-layout(location = 3) uniform bool positive;
-layout(location = 4) uniform bool grOne;
+#param Negative Values (blue), negative, bool, true
+#param Positive Values (red), positive, bool, true
+#param Oversaturated Values (green), grOne, bool, false
 
 void main()
 {

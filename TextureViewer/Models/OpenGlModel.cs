@@ -23,6 +23,7 @@ namespace TextureViewer.Models
         public TextureCacheModel TextureCache { get; }
         public PixelValueShader GetPixelShader { get; }
         public SrgbShader SrgbShader { get; }
+        public PixelExportShader ExportShader { get; }
 
         // statistics shader
         public MaxStatistics LinearMaxStatistics { get; }
@@ -50,6 +51,7 @@ namespace TextureViewer.Models
             TextureCache = new TextureCacheModel(images, context);
             GetPixelShader = new PixelValueShader();
             SrgbShader = new SrgbShader();
+            ExportShader = new PixelExportShader();
 
             LinearMaxStatistics = new MaxStatistics(false);
             SrgbMaxStatistics = new MaxStatistics(true);
@@ -67,19 +69,29 @@ namespace TextureViewer.Models
         /// <param name="linear">linear interpolation enabled</param>
         public void BindSampler(int unit, bool hasMipmaps, bool linear)
         {
+            GetSampler(hasMipmaps, linear).Bind(unit);
+        }
+
+        /// <summary>
+        /// gets a specific sampler
+        /// </summary>
+        /// <param name="hasMipmaps">mipmap sampling enabled</param>
+        /// <param name="linear">linear interpolation enabled</param>
+        public Sampler GetSampler(bool hasMipmaps, bool linear)
+        {
             if (hasMipmaps)
             {
                 if (linear)
-                    samplerLinearMip.Bind(unit);
+                    return samplerLinearMip;
                 else
-                    samplerNearestMip.Bind(unit);
+                    return samplerNearestMip;
             }
             else
             {
                 if (linear)
-                    samplerLinear.Bind(unit);
+                    return samplerLinear;
                 else
-                    samplerNearest.Bind(unit);
+                    return samplerNearest;
             }
         }
 
@@ -94,6 +106,7 @@ namespace TextureViewer.Models
             TextureCache.Clear();
             GetPixelShader.Dispose();
             SrgbShader.Dispose();
+            ExportShader.Dispose();
 
             LinearMaxStatistics.Dispose();
             SrgbMaxStatistics.Dispose();

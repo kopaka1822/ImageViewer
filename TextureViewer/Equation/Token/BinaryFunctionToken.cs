@@ -22,13 +22,13 @@ namespace TextureViewer.Equation.Token
                 throw new Exception("invalid string as function name: " + funcName);
 
             if(convertToRgb)
-                return "vec4(" + funcName + "(vec3(" + value1.ToOpenGl() + "),vec3(" + value2.ToOpenGl() + ")), 1.0)";
+                return "vec4(vec3(" + funcName + "(vec3(" + value1.ToOpenGl() + "),vec3(" + value2.ToOpenGl() + "))), 1.0)";
             return funcName + "(" + value1.ToOpenGl() + "," + value2.ToOpenGl() + ")";
         }
 
         private bool IsOpenGlFunction()
         {
-            switch (funcName)
+            switch (funcName.ToLower())
             {
                 case "min":
                 case "max":

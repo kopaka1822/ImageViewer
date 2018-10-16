@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using TextureViewer.Models;
+using TextureViewer.Models.Dialog;
+using TextureViewer.Models.Shader;
 
 namespace TextureViewer.Controller.TextureViews.Shader
 {
@@ -51,6 +53,11 @@ namespace TextureViewer.Controller.TextureViews.Shader
             return 0;
         }
 
+        public void SetCrop(ExportModel model, int layer)
+        {
+            SetCropCoordinates(6, model, layer);
+        }
+
         public static string GetVertexSource()
         {
             return GetVersion() +
@@ -68,17 +75,20 @@ namespace TextureViewer.Controller.TextureViews.Shader
                    "if(gl_VertexID == 3u) vertex = vec4(-1.0, 1.0, 0.0, 1.0);\n" +
                    "gl_Position = vertex;" +
                    "raydir = normalize((transform * vec4(vertex.xy, farplane, 0.0)).xyz);\n" +
+                   "raydir.y *= -1.0;\n" + 
                    "}\n";
         }
 
         public static string GetFragmentSource()
         {
             return GetVersion() +
+                SrgbShader.ToSrgbFunction() +
                    // uniforms
                    "layout(binding = 0) uniform sampler2DArray tex;\n" +
                    "layout(location = 2) uniform float layer;\n" +
                    "layout(location = 3) uniform float level;\n" +
                    "layout(location = 4) uniform uint grayscale;\n" +
+                   "layout(location = 6) uniform vec4 crop;\n" +
                    // in out
                    "layout(location = 0) in vec3 raydir;\n" +
                    "out vec4 fragColor;\n" +
@@ -98,7 +108,8 @@ namespace TextureViewer.Controller.TextureViews.Shader
                    "if( polarDirection.s < 0.0) polarDirection.s += 1.0;\n" +
                    "vec4 color = textureLod(tex, vec3(polarDirection.st, layer), level);\n" +
                    ApplyGrayscale() +
-                   "fragColor = color;\n" +
+                   ApplyColorCrop("polarDirection") +
+                   "fragColor = toSrgb(color);\n" +
                    "}\n";
         }
     }

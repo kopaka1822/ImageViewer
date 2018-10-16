@@ -3,6 +3,7 @@
 #include <fstream>
 #include "ImageLoader.h"
 #include "stb_loader.h"
+#include "gli_loader.h"
 
 bool save_png(const char* filename, int width, int height, int components, const void* data)
 {
@@ -46,6 +47,90 @@ bool save_hdr(const char* filename, int width, int height, int components, const
 	return true;
 }
 
+bool save_jpg(const char* filename, int width, int height, int components, const void* data, int quality)
+{
+	try
+	{
+		stb_save_jpg(filename, width, height, components, data, quality);
+	}
+	catch (const std::exception& e)
+	{
+		set_error(e.what());
+		return false;
+	}
+	return true;
+}
+
+bool create_storage(int format, int width, int height, int layer, int levels)
+{
+	try
+	{
+		gli_create_storage(format, width, height, layer, levels);
+	}
+	catch(const std::exception& e)
+	{
+		set_error(e.what());
+		return false;
+	}
+	return true;
+}
+
+bool store_level(int layer, int level, const void* data, uint64_t size)
+{
+	try
+	{
+		gli_store_level(layer, level, data, size);
+	}
+	catch(const std::exception& e)
+	{
+		set_error(e.what());
+		return false;
+	}
+	return true;
+}
+
+bool get_level_size(int level, uint64_t& size)
+{
+	try
+	{
+		gli_get_level_size(level, size);
+	}
+	catch(const std::exception& e)
+	{
+		set_error(e.what());
+		return false;
+	}
+	return true;
+}
+
+bool save_ktx(const char* filename)
+{
+	try
+	{
+		gli_save_ktx(filename);
+	}
+	catch(const std::exception& e)
+	{
+		set_error(e.what());
+		return false;
+	}
+	return true;
+}
+
+bool save_dds(const char* filename)
+{
+	try
+	{
+		gli_save_dds(filename);
+	}
+	catch (const std::exception& e)
+	{
+		set_error(e.what());
+		return false;
+	}
+	return true;
+}
+
 bool save_pfm(const char* filename, int width, int height, int components, const void* data)
 {
 	if(components != 1 && components != 3) return false;
@@ -64,7 +149,7 @@ bool save_pfm(const char* filename, int width, int height, int components, const
 			for (int x = 0; x < width; ++x)
 			{
 				for(int c = 0; c < components; ++c)
-				file.write(reinterpret_cast<const char*>(&v[c + components * (x + (height-1-y) * width)]), sizeof(float));
+				file.write(reinterpret_cast<const char*>(&v[c + components * (x + (height - y - 1) * width)]), sizeof(float));
 			}
 		}
 		return true;

@@ -16,7 +16,7 @@ namespace TextureViewer.Views
     {
         private IntFilterParameterViewModel viewModel;
 
-        public IntFilterParameterView(IntFilterParameterViewModel viewModel)
+        public IntFilterParameterView(IntFilterParameterViewModel viewModel, Binding enabledBinding)
         {
             this.viewModel = viewModel;
 
@@ -35,6 +35,7 @@ namespace TextureViewer.Views
                 UpdateSourceTrigger = UpdateSourceTrigger.LostFocus
             };
             BindingOperations.SetBinding(this, ValueProperty, valueBinding);
+            BindingOperations.SetBinding(this, IsEnabledProperty, enabledBinding);
 
             KeyUp += OnKeyUp;
 

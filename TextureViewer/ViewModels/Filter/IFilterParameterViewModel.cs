@@ -38,5 +38,10 @@ namespace TextureViewer.ViewModels.Filter
         bool HasKeyToInvoke(Key key);
 
         void InvokeKey(Key key);
+
+        /// <summary>
+        /// is called when the object is no longer needed
+        /// </summary>
+        void Dispose();
     }
 }

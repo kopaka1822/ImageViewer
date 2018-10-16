@@ -1,16 +1,11 @@
 #setting title, Quantile Filter
-#setting description, Computes a sorted list of pixels, removes the 'q' smallest and largest values and computes the average of the remaining. Additionally, only values which are brighter as this average by an inverse factor of threshold are replaced.
+#setting description, Computes a sorted list of pixels, removes the 'q' smallest and largest values and computes the average of the remaining. Additionally, only values which are brighter/darker as this average by a factor greater or equal threshold are replaced.
 
-#param Radius, 2, Int, 1, 1, 6
-#param Quantile, 3, Int, 2, 1, 84
-#param Threshold, 4, float, 0.2, 0.0, 1.0
-#paramprop Threshold, onAdd, 0.05, add
-#paramprop Threshold, onSubtract, -0.05, add
-
-layout(location = 2) uniform int RADIUS;
-layout(location = 3) uniform int QUANTIL;
-layout(location = 4) uniform float THRESHOLD;
-
+#param Radius, RADIUS, Int, 1, 1, 6
+#param Quantile, QUANTIL, Int, 2, 1, 84
+#param Threshold, THRESHOLD, float, 10.0, 1.0, 1000.0
+#paramprop Threshold, onAdd, 2.0, multiply
+#paramprop Threshold, onSubtract, 0.5, multiply
 
 vec4 buf[169];
 
@@ -48,7 +43,9 @@ void main()
 		{
 			buf[count].rgb = texelFetch(src_image, ivec2(x,y), 0).rgb;
 			buf[count].w = dot(buf[count].rgb, vec3(1.0/3.0));
-			++count;
+			// Do not use the sample if it is NaN
+			if(buf[count].w == buf[count].w)
+				++count;
 		}
 		
 		// sort the buffer
@@ -56,16 +53,17 @@ void main()
 		
 		// Compute average
 		vec3 sum = vec3(0.0);
-		for(int i = QUANTIL; i < count-QUANTIL; ++i)
+		int q = min((count - 1) / 2, QUANTIL); // Keep at least 1 or 2 elements
+		for(int i = q; i < count-q; ++i)
 			sum += buf[i].rgb;
-		sum /= max(1, count - QUANTIL * 2);
+		sum /= max(1, count - q * 2);
 		
 		vec4 centerColor = texelFetch(src_image, pixelCoord, 0);
 		float centerAvg = dot(centerColor.rgb, vec3(1.0/3.0));
 		float sumAvg = dot(sum, vec3(1.0/3.0));
 		//float factor = min(centerAvg / sumAvg, sumAvg / centerAvg);
-		float factor = sumAvg / centerAvg;
-		if(factor < THRESHOLD)
+		float factor = max(sumAvg / centerAvg, centerAvg / sumAvg);
+		if(factor > THRESHOLD || centerAvg != centerAvg)
 			centerColor.rgb = sum;
 		imageStore(dst_image, pixelCoord, centerColor);
 	}

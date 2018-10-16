@@ -11,13 +11,15 @@ namespace TextureViewer.Models.Filter
     /// </summary>
     public class FilterParameterModelBase
     {
-        public FilterParameterModelBase(string name, int location)
+        public FilterParameterModelBase(string name, string variableName)
         {
             Name = name;
-            Location = location;
+            VariableName = variableName;
         }
 
+        // name for the filter menu
         public string Name { get; }
-        public int Location { get; }
+        // name within the shader
+        public string VariableName { get; }
     }
 }

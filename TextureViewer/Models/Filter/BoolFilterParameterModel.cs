@@ -31,7 +31,7 @@ namespace TextureViewer.Models.Filter
             }
         }
 
-        public BoolFilterParameterModel(string name, int location, bool min, bool max, bool defaultValue) : base(name, location, min, max, defaultValue)
+        public BoolFilterParameterModel(string name, string variableName, bool min, bool max, bool defaultValue) : base(name, variableName, min, max, defaultValue)
         {
             currentValue = defaultValue;
         }

@@ -2,10 +2,7 @@
 #setting description, Chooses the pixel with the average luminance within the filter radius.
 #setting singleinvocation, false
 
-#param Radius, 2, Int, 1, 1, 6
-
-layout(location = 2) uniform int RADIUS;
-
+#param Radius, RADIUS, Int, 1, 1, 6
 
 vec4 buf[169];
 

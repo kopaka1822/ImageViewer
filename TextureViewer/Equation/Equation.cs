@@ -11,6 +11,7 @@ namespace TextureViewer.Equation
     {
         private readonly int maxTextureUnits;
         private ValueToken finalToken;
+        private int firstImageId;
 
         public Equation(string formula, int maxTextureUnits)
         {
@@ -26,6 +27,15 @@ namespace TextureViewer.Equation
         public string GetOpenGlExpression()
         {
             return finalToken.ToOpenGl();
+        }
+
+        /// <summary>
+        /// returns the id of the first image token that was used in the formula
+        /// </summary>
+        /// <returns>id of the first image token that was used in the formula</returns>
+        public int GetFirstImageId()
+        {
+            return firstImageId;
         }
 
         private List<Token.Token> GetToken(string formula)
@@ -118,6 +128,17 @@ namespace TextureViewer.Equation
 
         private void Compile(List<Token.Token> tokens)
         {
+            // determine first image id
+            foreach(var token in tokens)
+            {
+                if (token is ImageToken itoken)
+                {
+                    firstImageId = itoken.Id;
+                    break;
+                }
+            }
+
+            // determine final token
             tokens = MarkovProcess.Run(GetRules(), tokens);
 
             if(tokens.Count != 1)

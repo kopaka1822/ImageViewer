@@ -30,18 +30,29 @@ namespace TextureViewer.ViewModels
             public FilterListBoxItem ListView { get; }
             public FilterParametersViewModel Parameters { get; }
 
-            public FilterItem(FiltersViewModel parent, FilterModel model)
+            public FilterItem(FiltersViewModel parent, FilterModel model, ImagesModel images)
             {
                 Model = model;
-                ListView = new FilterListBoxItem(parent, model);
-                Parameters = new FilterParametersViewModel(model);
+                Parameters = new FilterParametersViewModel(model, images);
+                ListView = new FilterListBoxItem(parent, model, Parameters);
             }
 
             public void Dispose(OpenGlContext context)
             {
                 var disable = context.Enable();
+                Parameters.Dispose();
                 Model.Dispose();
                 if(disable) context.Disable();
+            }
+
+            /// <summary>
+            /// returns true if this filter will be visible for the equation after applying
+            /// </summary>
+            /// <param name="id"></param>
+            /// <returns></returns>
+            public bool WillBeVisibleFor(int id)
+            {
+                return Parameters.IsVisible && Parameters.IsEquationVisible[id];
             }
         }
 
@@ -64,7 +75,7 @@ namespace TextureViewer.ViewModels
             var disableGl = models.GlContext.Enable();
             try
             {
-                var loader = new FilterLoader(models.App.App.ExecutionPath + "\\Filter\\gamma.comp");
+                var loader = new FilterLoader(models.App.App.ExecutionPath + "\\Filter\\gamma.comp", models.GlContext);
 
                 AddFilter(new FilterModel(loader));
 
@@ -152,7 +163,7 @@ namespace TextureViewer.ViewModels
 
         public void AddFilter(FilterModel filter)
         {
-            var item = new FilterItem(this, filter);
+            var item = new FilterItem(this, filter, models.Images);
             items.Add(item);            
             UpdateAvailableFilter();
 
@@ -186,6 +197,11 @@ namespace TextureViewer.ViewModels
         /// </summary>
         public void Apply()
         {
+            // fill the has changed array
+            bool[] changed = new bool[4];
+            for (var i = 0; i < App.MaxImageViews; ++i)
+                changed[i] = HasEquationChanged(i);
+
             // apply the current parameters
             foreach (var filterItem in items)
             {
@@ -199,9 +215,31 @@ namespace TextureViewer.ViewModels
                 newModels.Add(filterItem.Model);
             }
 
-            models.Filter.Apply(newModels, statisticsPoint, models.GlContext);
+            models.Filter.Apply(newModels, statisticsPoint, models.GlContext, changed);
 
             UpdateHasChanges();
+        }
+
+        private bool HasEquationChanged(int id)
+        {
+            // if the statistics point has changed the image needs to be recomputed
+            if (statisticsPoint != models.Filter.StatisticsPoint) return true;
+
+            var oldVisible = models.Filter.Filter.Where(filterModel => filterModel.IsVisibleFor(id)).ToList();
+            var newVisible = items.Where(filterItem => filterItem.WillBeVisibleFor(id)).ToList();
+
+            if (oldVisible.Count != newVisible.Count) return true;
+
+            for (var i = 0; i < newVisible.Count; ++i)
+            {
+                // same model?
+                if (!ReferenceEquals(oldVisible[i], newVisible[i].Model)) return true;
+
+                // parameters changed?
+                if (newVisible[i].Parameters.HasParameterChanges()) return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -233,7 +271,7 @@ namespace TextureViewer.ViewModels
                 else
                 {
                     // create a new filter item
-                    var item = new FilterItem(this, filterModel);
+                    var item = new FilterItem(this, filterModel, models.Images);
                     newItems.Add(item);
                     // register on changed for apply and cancel button
                     item.Parameters.Changed += (sender, args) => UpdateHasChanges();
@@ -306,18 +344,18 @@ namespace TextureViewer.ViewModels
         public void Drop(IDropInfo dropInfo)
         {
             var idx1 = AvailableFilter.FindIndex(i => ReferenceEquals(i, dropInfo.Data));
-            var idx2 = AvailableFilter.FindIndex(i => ReferenceEquals(i, dropInfo.TargetItem));
+            var idx2 = dropInfo.InsertIndex;
             if (idx1 < 0 || idx2 < 0) return;
 
             // insert dummy statistics into list
             items.Insert(statisticsPoint, null);
 
-            // swap both items
-            {
-                var tmp = items[idx1];
-                items[idx1] = items[idx2];
-                items[idx2] = tmp;
-            }
+            // put item from idx1 into the position it was dragged to
+            items.Insert(idx2, items[idx1]);
+
+            // remove the old items (duplicate)
+            if (idx1 > idx2) ++idx1;
+            items.RemoveAt(idx1);
 
             // remove dummy
             statisticsPoint = items.FindIndex(item => item == null);

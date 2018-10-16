@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -17,13 +18,14 @@ namespace TextureViewer.Models.Filter
         public string Name { get; private set; }
         public string Description { get; private set; }
         public string Filename { get; }
+        public List<FilterTextureParameterModel> TextureParameters { get; } = new List<FilterTextureParameterModel>();
+        private static readonly Regex variableRegex = new Regex(@"[a-zA-Z]([a-zA-Z0-9]*)"); 
 
-        public FilterLoader(string filename)
+        public FilterLoader(string filename, OpenGlContext glContext)
         {
             this.Filename = filename;
             Name = filename;
             Description = "";
-
             int lineNumber = 1;
 
             // Read the file and display it line by line.
@@ -43,6 +45,11 @@ namespace TextureViewer.Models.Filter
                     else if (line.StartsWith("#param"))
                     {
                         HandleParam(GetParameters(line.Substring("#param".Length)));
+                        ShaderSource += "\n"; // remember line for error information
+                    }
+                    else if(line.StartsWith("#texture"))
+                    {
+                        HandleTexture(GetParameters(line.Substring("#texture".Length)), glContext);
                         ShaderSource += "\n"; // remember line for error information
                     }
                     else if (line.StartsWith("#setting"))
@@ -87,6 +94,20 @@ namespace TextureViewer.Models.Filter
             {
                 file.Close();
             }
+        }
+
+        private void HandleTexture(string[] pars, OpenGlContext glContext)
+        {
+            if (pars.Length < 2)
+                throw new Exception("not enough arguments for #texture provided");
+            var name = pars[0];
+            if (!variableRegex.IsMatch(pars[1]))
+                throw new Exception("invalid function name (only alphanumeric characters allowed)");
+
+            if (TextureParameters.Count + 1 >= glContext.MaxTextureUnits)
+                throw new Exception($"Too many texture bindings. Only {glContext.MaxTextureUnits} texture bindings are available on this GPU");
+
+            TextureParameters.Add(new FilterTextureParameterModel(name, pars[1]));
         }
 
         private void HandleParamprop(string[] pars)
@@ -217,8 +238,8 @@ namespace TextureViewer.Models.Filter
             if (pars.Length < 3)
                 throw new Exception("not enough arguments for #param provided");
 
-            if (!Int32.TryParse(pars[1], out var location))
-                throw new Exception("location must be a number");
+            if (!variableRegex.IsMatch(pars[1]))
+                throw new Exception("invalid variable name (only alphanumeric characters allowed)");
 
             ParameterType type;
             if (pars[2].ToLower().Equals("float"))
@@ -232,18 +253,18 @@ namespace TextureViewer.Models.Filter
             switch (type)
             {
                 case ParameterType.Float:
-                    AddFloatParam(location, pars);
+                    AddFloatParam(pars);
                     break;
                 case ParameterType.Int:
-                    AddIntParam(location, pars);
+                    AddIntParam(pars);
                     break;
                 case ParameterType.Bool:
-                    AddBoolParam(location, pars);
+                    AddBoolParam(pars);
                     break;
             }
         }
 
-        private void AddIntParam(int location, string[] pars)
+        private void AddIntParam(string[] pars)
         {
             var def = pars.Length >= 4 ? GetIntValue(pars[3]) : 0;
 
@@ -251,10 +272,10 @@ namespace TextureViewer.Models.Filter
 
             var max = pars.Length >= 6 ? GetIntValue(pars[5]) : Int32.MaxValue;
 
-            Parameters.Add(new IntFilterParameterModel(pars[0], location, min, max, def));
+            Parameters.Add(new IntFilterParameterModel(pars[0], pars[1], min, max, def));
         }
 
-        private void AddFloatParam(int location, string[] pars)
+        private void AddFloatParam(string[] pars)
         {
             var def = pars.Length >= 4 ? GetFloatValue(pars[3]) : 0.0f;
 
@@ -262,14 +283,14 @@ namespace TextureViewer.Models.Filter
 
             var max = pars.Length >= 6 ? GetFloatValue(pars[5]) : Single.MaxValue;
 
-            Parameters.Add(new FloatFilterParameterModel(pars[0], location, min, max, def));
+            Parameters.Add(new FloatFilterParameterModel(pars[0], pars[1], min, max, def));
         }
 
-        private void AddBoolParam(int location, string[] pars)
+        private void AddBoolParam(string[] pars)
         {
             var def = pars.Length >= 4 && GetBoolValue(pars[3]);
 
-            Parameters.Add(new BoolFilterParameterModel(pars[0], location, false, true, def));
+            Parameters.Add(new BoolFilterParameterModel(pars[0], pars[1], false, true, def));
         }
 
         private bool GetBoolValue(string argument)

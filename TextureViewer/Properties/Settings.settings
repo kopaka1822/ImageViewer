@@ -20,5 +20,11 @@
     <Setting Name="IsMaximized" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="JpgQuality" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">98</Value>
+    </Setting>
+    <Setting Name="GliFormat" Type="System.String" Scope="User">
+      <Value Profile="(Default)">RGBA8_SRGB_PACK32</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

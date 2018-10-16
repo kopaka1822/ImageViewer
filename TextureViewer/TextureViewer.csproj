@@ -135,7 +135,9 @@
     <Compile Include="Commands\ApplyFiltersCommand.cs" />
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
     <Compile Include="Commands\CancelFiltersCommand.cs" />
+    <Compile Include="Commands\DeleteMipmapsCommand.cs" />
     <Compile Include="Commands\ExportImageCommand.cs" />
+    <Compile Include="Commands\GenerateMipmapsCommand.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="Commands\OpenImageCommand.cs" />
     <Compile Include="Commands\ResizeWindowCommand.cs" />
@@ -200,6 +202,7 @@
     <Compile Include="Models\Filter\FilterParameterModel.cs" />
     <Compile Include="Models\Filter\FilterParameterModelBase.cs" />
     <Compile Include="Models\Filter\FiltersModel.cs" />
+    <Compile Include="Models\Filter\FilterTextureParameterModel.cs" />
     <Compile Include="Models\Filter\FloatFilterParameterModel.cs" />
     <Compile Include="Models\Filter\IFilterParameter.cs" />
     <Compile Include="Models\Filter\IntFilterParameterModel.cs" />
@@ -215,6 +218,7 @@
     <Compile Include="Models\OpenGlModel.cs" />
     <Compile Include="Models\ProgressModel.cs" />
     <Compile Include="Models\Shader\FilterShader.cs" />
+    <Compile Include="Models\Shader\PixelExportShader.cs" />
     <Compile Include="Models\Shader\SrgbShader.cs" />
     <Compile Include="Models\Shader\Statistics\AverageStatistics.cs" />
     <Compile Include="Models\Shader\Statistics\MaxStatistics.cs" />
@@ -227,14 +231,17 @@
     <Compile Include="Models\TextureCacheModel.cs" />
     <Compile Include="Utility\Color.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="Utility\GliFormat.cs" />
     <Compile Include="ViewModels\Dialog\PixelColorViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
     <Compile Include="ViewModels\Filter\BoolFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\FilterParametersViewModel.cs" />
     <Compile Include="ViewModels\Filter\FilterParameterViewModelBase.cs" />
+    <Compile Include="ViewModels\Filter\FilterTextureParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\FloatFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\IFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\IntFilterParameterViewModel.cs" />
+    <Compile Include="ViewModels\FormulaViewModel.cs" />
     <Compile Include="ViewModels\StatisticsViewModel.cs" />
     <Compile Include="ViewModels\StatisticViewModel.cs" />
     <Compile Include="Views\BoolFilterParameterView.cs" />
@@ -247,6 +254,7 @@
       <DependentUpon>ExportDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\FilterListBoxItem.cs" />
+    <Compile Include="Views\FilterTextureParameterView.cs" />
     <Compile Include="Views\FloatFilterParameterView.cs" />
     <Compile Include="Views\HelpDialog.xaml.cs">
       <DependentUpon>HelpDialog.xaml</DependentUpon>
@@ -326,9 +334,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="Filter\absolute.comp">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Filter\blur.comp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -353,10 +358,16 @@
     <None Include="Filter\median.comp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Filter\mirror.comp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Filter\quantile.comp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Filter\set_color.comp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Filter\silhouette.comp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Help\about.md">
@@ -446,6 +457,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\help.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\eye_closed.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
