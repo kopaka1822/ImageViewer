@@ -129,6 +129,13 @@ namespace TextureViewer
                 MessageBox.Show(message, "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
+        public static bool ShowYesNoDialog(Window owner, string title, string message)
+        {
+            if (owner != null)
+                return MessageBox.Show(owner, message, title, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes;
+            return MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes, MessageBoxOptions.DefaultDesktopOnly) == MessageBoxResult.Yes;
+        }
+
         private static readonly CultureInfo CultureInfo = new CultureInfo("en-US");
 
         public static CultureInfo GetCulture()

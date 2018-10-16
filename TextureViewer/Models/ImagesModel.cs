@@ -22,6 +22,7 @@ namespace TextureViewer.Models
         }
 
         private OpenGlContext context;
+        private AppModel app;
         private Dimension[] dimensions = null;
 
         private class ImageData
@@ -73,8 +74,9 @@ namespace TextureViewer.Models
 
         private readonly List<ImageData> images;
 
-        public ImagesModel(OpenGlContext context)
+        public ImagesModel(OpenGlContext context, AppModel app)
         {
+            this.app = app;
             this.context = context;
             images = new List<ImageData>();
         }
@@ -212,8 +214,7 @@ namespace TextureViewer.Models
                         }
                         else if(image.NumMipmaps == 1)
                         {
-                            // TODO inform the user?
-                            // generate mipmaps for the new image
+                            // generate mipmaps for the new image (silent)
                             imgData = new ImageData(image);
                             imgData.GenerateMipmaps(NumMipmaps);
                         }
