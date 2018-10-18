@@ -35,6 +35,8 @@ namespace TextureViewer
 
             Width = Properties.Settings.Default.WindowSizeX;
             Height = Properties.Settings.Default.WindowSizeY;
+            if (Properties.Settings.Default.IsMaximized)
+                WindowState = WindowState.Maximized;
         }
 
 

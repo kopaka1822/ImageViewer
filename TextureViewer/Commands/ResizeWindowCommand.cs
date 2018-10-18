@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace TextureViewer.Commands
@@ -24,8 +25,16 @@ namespace TextureViewer.Commands
         public void Execute(object parameter)
         {
             // update settings
-            Properties.Settings.Default.WindowSizeX = (int) models.App.Window.Width;
-            Properties.Settings.Default.WindowSizeY = (int)models.App.Window.Height;
+            if (models.App.Window.WindowState == WindowState.Maximized)
+            {
+                Properties.Settings.Default.IsMaximized = true;
+            }
+            else if(models.App.Window.WindowState != WindowState.Minimized)
+            {
+                Properties.Settings.Default.WindowSizeX = (int)models.App.Window.Width;
+                Properties.Settings.Default.WindowSizeY = (int)models.App.Window.Height;
+                Properties.Settings.Default.IsMaximized = false;
+            }
         }
 
         public event EventHandler CanExecuteChanged
