@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageLoader", "ImageLoader\ImageLoader.vcxproj", "{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextureViewer", "TextureViewer\TextureViewer.csproj", "{E339B099-A84E-41D9-A3F8-F437764CC86D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC} = {8AA2D64F-E272-4458-9FDE-7290DE68F4EC}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextureViewerTests", "TextureViewerTests\TextureViewerTests.csproj", "{0992DB8A-D829-41AE-9119-609834B92E01}"
 EndProject
