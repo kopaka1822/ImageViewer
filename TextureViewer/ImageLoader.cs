@@ -31,33 +31,43 @@ namespace TextureViewer
         private static extern IntPtr get_error(out int length);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool save_png(string filename, int width, int height, int components, byte[] data);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool save_bmp(string filename, int width, int height, int components, byte[] data);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool save_hdr(string filename, int width, int height, int components, byte[] data);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool save_pfm(string filename, int width, int height, int components, byte[] data);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool save_jpg(string filename, int width, int height, int components, byte[] data, int quality);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool create_storage(int format, int width, int height, int layer, int levels);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool store_level(int layer, int level, byte[] data, UInt64 size);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool get_level_size(int level, out UInt64 size);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool save_ktx(string filename);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool save_dds(string filename);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
