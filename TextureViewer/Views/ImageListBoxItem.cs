@@ -14,7 +14,7 @@ namespace TextureViewer.Views
     {
         public int Id { get; }
 
-        public ImageListBoxItem(string filename, int id, ImagesModel imagesModel)
+        public ImageListBoxItem(string filename, string fileformat, int id, ImagesModel imagesModel)
         {
             Id = id;
             // load images
@@ -48,7 +48,7 @@ namespace TextureViewer.Views
             btnDelete.Click += (sender, args) => imagesModel.DeleteImage(Id);
 
             Content = grid;
-            ToolTip = filename;
+            ToolTip = filename + "\n" + fileformat;
             HorizontalContentAlignment = HorizontalAlignment.Stretch;
         }
     }

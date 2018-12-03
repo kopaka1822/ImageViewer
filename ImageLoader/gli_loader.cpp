@@ -11,6 +11,7 @@ void getImageFormat(ImageFormat& format, const gli::texture& tex)
 	format.openglExternalFormat = static_cast<uint32_t>(GLformat.External);
 	format.openglType = static_cast<uint32_t>(GLformat.Type);
 	format.isCompressed = gli::is_compressed(tex.format());
+	format.gliFormat = tex.format();
 	//format.isSrgb = gli::is_srgb(tex.format());
 	// even if the data is stored in srgb space opengl reads the data in linear space because of the given texture format
 	// therefore this should be false for the image loader
@@ -23,7 +24,7 @@ void gli_to_opengl_format(int gliFormat, int& glInternal, int& glExternal, int& 
 	// assume no swizzeling
 	auto f = gli::format(gliFormat);
 	const auto GLFormat = GL.translate(f, gli::swizzles(gli::swizzle::SWIZZLE_RED, gli::SWIZZLE_GREEN, gli::SWIZZLE_BLUE, gli::SWIZZLE_ALPHA));
-
+	
 	glInternal = GLFormat.Internal;
 	glExternal = GLFormat.External;
 	glType = GLFormat.Type;

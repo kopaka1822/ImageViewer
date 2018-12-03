@@ -16,4 +16,5 @@ struct ImageFormat
 	uint32_t openglType;
 	bool isCompressed;
 	bool isSrgb;
+	int gliFormat = 0;
 };

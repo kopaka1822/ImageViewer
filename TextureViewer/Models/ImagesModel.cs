@@ -34,6 +34,7 @@ namespace TextureViewer.Models
             public bool HasAlpha { get; }
             public bool IsHdr { get; }
             public string Filename { get; }
+            public string FormatName { get; }
 
             public ImageData(ImageLoader.Image image)
             {
@@ -44,6 +45,7 @@ namespace TextureViewer.Models
                 HasAlpha = image.HasAlpha();
                 IsHdr = image.IsHdr();
                 Filename = image.Filename;
+                FormatName = image.Format.ToString();
             }
 
             public void GenerateMipmaps(int levels)
@@ -145,6 +147,17 @@ namespace TextureViewer.Models
         {
             Debug.Assert((uint)(image) < images.Count);
             return images[image].Filename;
+        }
+
+        /// <summary>
+        /// name of the file format
+        /// </summary>
+        /// <param name="image"></param>
+        /// <returns></returns>
+        public string GetFileFormat(int image)
+        {
+            Debug.Assert((uint)(image) < images.Count);
+            return images[image].FormatName;
         }
 
         public TextureArray2D GetTexture(int image)

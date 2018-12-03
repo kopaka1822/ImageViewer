@@ -65,7 +65,7 @@ namespace TextureViewer.ViewModels
             ImageListItems.Clear();
             for (var i = 0; i < models.Images.NumImages; ++i)
             {
-                var item = new ImageListBoxItem(models.Images.GetFilename(i), i, models.Images);
+                var item = new ImageListBoxItem(models.Images.GetFilename(i), models.Images.GetFileFormat(i), i, models.Images);
                 ImageListItems.Add(item);
             }
 

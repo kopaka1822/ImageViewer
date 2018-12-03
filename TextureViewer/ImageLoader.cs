@@ -19,7 +19,7 @@ namespace TextureViewer
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void image_info(int id, out uint openglInternalFormat, 
             out uint openglExternalFormat, out uint openglType, out int nImages, out int nFaces, 
-            out int nMipmaps, out bool isCompressed, out bool isSrgb);
+            out int nMipmaps, out bool isCompressed, out bool isSrgb, out int gliFormat);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         private static extern void image_info_mipmap(int id, int mipmap, out int width, out int height);
@@ -159,14 +159,14 @@ namespace TextureViewer
                 GliFormat = GliFormat.UNDEFINED;
             }
 
-            public ImageFormat(PixelFormat externalFormat, PixelType type, SizedInternalFormat internalFormat, bool isSrgb, bool isCompressed) : this()
+            public ImageFormat(PixelFormat externalFormat, PixelType type, SizedInternalFormat internalFormat, bool isSrgb, bool isCompressed, GliFormat gliFormat = GliFormat.UNDEFINED) : this()
             {
                 ExternalFormat = externalFormat;
                 Type = type;
                 InternalFormat = internalFormat;
                 IsSrgb = isSrgb;
                 IsCompressed = isCompressed;
-                GliFormat = GliFormat.UNDEFINED;
+                GliFormat = gliFormat;
             }
 
             public ImageFormat(GliFormat format)
@@ -192,6 +192,13 @@ namespace TextureViewer
                 // type is only important is the format is uncompressed
                 if (!IsCompressed && Type != other.Type) return false;
                 return true;
+            }
+
+            public override string ToString()
+            {
+                if (HasGliFormat) return GliFormat.ToString();
+                if (IsCompressed) return InternalFormat.ToString().ToUpper();
+                return ExternalFormat.ToString().ToUpper() + "_" + Type.ToString().ToUpper();
             }
         }
 
@@ -325,9 +332,10 @@ namespace TextureViewer
         {
             var res = new Resource(file);
             image_info(res.Id, out var internalFormat, out var externalFormat, out var openglType,
-                out var nImages, out var nFaces, out var nMipmaps, out var isCompressed, out var isSrgb);
+                out var nImages, out var nFaces, out var nMipmaps, out var isCompressed, out var isSrgb, out var gliFormat);
 
-            var format = new ImageFormat((PixelFormat)externalFormat, (PixelType)openglType, (SizedInternalFormat)internalFormat, isSrgb, isCompressed);
+            var format = new ImageFormat((PixelFormat)externalFormat, (PixelType)openglType, 
+                (SizedInternalFormat)internalFormat, isSrgb, isCompressed, (GliFormat)gliFormat);
             var images = new List<Image>(nImages);
             for (var curImage = 0; curImage < nImages; ++curImage)
             {
