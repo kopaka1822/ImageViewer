@@ -82,6 +82,7 @@ std::unique_ptr<ImageResource> pfm_load(const char* filename)
 
 	auto res = std::make_unique<ImageResource>();
 	res->format.isCompressed = false;
+	res->format.isSrgb = false;
 	res->format.openglExternalFormat = 
 		grayscale? gli::gl::external_format::EXTERNAL_RED : gli::gl::external_format::EXTERNAL_RGB;
 	res->format.openglInternalFormat =
@@ -106,7 +107,7 @@ std::unique_ptr<ImageResource> pfm_load(const char* filename)
 				if (needSwap) {
 					swapBytes(&fvalue);
 				}
-				*(data + i * width + j) = fvalue;
+				*(data + (height - i - 1) * width + j) = fvalue;
 			}
 		}
 	}
@@ -120,9 +121,9 @@ std::unique_ptr<ImageResource> pfm_load(const char* filename)
 					swapBytes(&vfvalue.g);
 					swapBytes(&vfvalue.b);
 				}
-				*(data + (i * width + j) * 3) = vfvalue.r;
-				*(data + (i * width + j) * 3 + 1) = vfvalue.g;
-				*(data + (i * width + j) * 3 + 2) = vfvalue.b;
+				*(data + ((height - i - 1) * width + j) * 3) = vfvalue.r;
+				*(data + ((height - i - 1) * width + j) * 3 + 1) = vfvalue.g;
+				*(data + ((height - i - 1) * width + j) * 3 + 2) = vfvalue.b;
 			}
 		}
 	}

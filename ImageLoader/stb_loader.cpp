@@ -5,9 +5,9 @@
 #include <fstream>
 
 #include <gli/gl.hpp>
-#include "../dependencies/stb/stb_image_write.h"
+#include "../dependencies/stb_image_write.h"
 
-uint32_t getDefaultInternalFormat(int nComponents)
+uint32_t getDefaultExternalFormat(int nComponents)
 {
 	switch (nComponents)
 	{
@@ -17,14 +17,17 @@ uint32_t getDefaultInternalFormat(int nComponents)
 		return gli::gl::external_format::EXTERNAL_RG;
 	case 3:
 		return gli::gl::external_format::EXTERNAL_RGB;
+		//return gli::gl::EXTERNAL_SRGB_EXT;
 	case 4:
 		return gli::gl::external_format::EXTERNAL_RGBA;
+		//return gli::gl::external_format::EXTERNAL_SRGB_ALPHA_EXT;
 	}
 	return uint32_t(-1);
 }
 
-uint32_t getSizedInternalFormat(int nComponents, bool isFloat)
+uint32_t getSizedInternalFormat(int nComponents, bool isFloat, bool& isSrgb)
 {
+	isSrgb = false;
 	if(isFloat)
 	{
 		switch (nComponents)
@@ -41,15 +44,26 @@ uint32_t getSizedInternalFormat(int nComponents, bool isFloat)
 	}
 	else
 	{
+		// TODO let the user decide if srgb conversion should be done
 		switch (nComponents)
 		{
 		case 1:
+			// not supported:
+			//return gli::gl::internal_format::INTERNAL_SR8;
+			isSrgb = true;
 			return gli::gl::internal_format::INTERNAL_R8_UNORM;
 		case 2:
+			// not supported:
+			//return gli::gl::internal_format::INTERNAL_SRG8;
+			isSrgb = true;
 			return gli::gl::internal_format::INTERNAL_RG8_UNORM;
 		case 3:
+			//return gli::gl::internal_format::INTERNAL_SRGB8;
+			isSrgb = true;
 			return gli::gl::internal_format::INTERNAL_RGB8_UNORM;
 		case 4:
+			//return gli::gl::internal_format::INTERNAL_SRGB8_ALPHA8;
+			isSrgb = true;
 			return gli::gl::internal_format::INTERNAL_RGBA8_UNORM;
 		}
 	}
@@ -63,7 +77,7 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 	ImageMipmap mipmap;
 	ImageFormat format;
 
-	stbi_set_flip_vertically_on_load(true);
+	//stbi_set_flip_vertically_on_load(true);
 	if (stbi_is_hdr(filename))
 	{
 		// load hdr file
@@ -73,8 +87,8 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 		if (!data)
 			throw std::exception("error during reading file");
 
-		format.openglInternalFormat = getSizedInternalFormat(nComponents, true);
-		format.openglExternalFormat = getDefaultInternalFormat(nComponents);
+		format.openglInternalFormat = getSizedInternalFormat(nComponents, true, format.isSrgb);
+		format.openglExternalFormat = getDefaultExternalFormat(nComponents);
 		format.openglType = gli::gl::type_format::TYPE_F32;
 		format.isCompressed = false;
 
@@ -93,8 +107,8 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 		if (!data)
 			throw std::exception("error during reading file");
 
-		format.openglInternalFormat = getSizedInternalFormat(nComponents, false);
-		format.openglExternalFormat = getDefaultInternalFormat(nComponents);
+		format.openglInternalFormat = getSizedInternalFormat(nComponents, false, format.isSrgb);
+		format.openglExternalFormat = getDefaultExternalFormat(nComponents);
 		format.openglType = gli::gl::type_format::TYPE_U8;
 		format.isCompressed = false;
 
@@ -117,6 +131,8 @@ std::unique_ptr<ImageResource> stb_load(const char* filename)
 
 void stb_save_png(const char* filename, int width, int height, int components, const void* data)
 {
+	stbi_write_png_compression_level = 16;
+	//stbi_flip_vertically_on_write(1);
 	auto res = stbi_write_png(filename, width, height, components, data, width * components);
 	if (!res)
 		throw std::exception("could not save file");
@@ -124,6 +140,7 @@ void stb_save_png(const char* filename, int width, int height, int components, c
 
 void stb_save_bmp(const char* filename, int width, int height, int components, const void* data)
 {
+	//stbi_flip_vertically_on_write(1);
 	auto res = stbi_write_bmp(filename, width, height, components, data);
 	if (!res)
 		throw std::exception("could not save file");
@@ -131,7 +148,17 @@ void stb_save_bmp(const char* filename, int width, int height, int components, c
 
 void stb_save_hdr(const char* filename, int width, int height, int components, const void* data)
 {
+	//stbi_flip_vertically_on_write(1);
 	auto res = stbi_write_hdr(filename, width, height, components, reinterpret_cast<const float*>(data));
+	if (!res)
+		throw std::exception("could not save file");
+}
+
+void stb_save_jpg(const char* filename, int width, int height, int components, const void* data, int quality)
+{
+	if (quality < 1 || quality > 100)
+		throw std::out_of_range("quality must be between 1 and 100");
+	auto res = stbi_write_jpg(filename, width, height, components, data, quality);
 	if (!res)
 		throw std::exception("could not save file");
 }
