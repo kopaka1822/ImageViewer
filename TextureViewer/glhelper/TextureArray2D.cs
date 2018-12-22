@@ -318,7 +318,7 @@ namespace TextureViewer.glhelper
             int bs = bufferSize;
             // try to calculate the buffer size (only for simple formats)
             if(bs == 0) bs = width * height * GetPixelTypeSize(format.Type) * GetPixelFormatCount(format.Format);
-            byte[] buffer = new byte[bufferSize];
+            byte[] buffer = new byte[bs];
 
             //if (format.IsSrgb || useCropping)
             // This needs to be used due to some export bug with certain formats (e.g. RGBA4_UNORM_PACK16)
