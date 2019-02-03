@@ -6,7 +6,8 @@
         xmlns:properties="clr-namespace:TextureViewer.Properties"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
-        xmlns:views="clr-namespace:TextureViewer.Views"
+        xmlns:views="clr-namespace:TextureViewer.Views" 
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="{Binding Images.WindowTitle}" 
         Background="#eee"
@@ -39,10 +40,44 @@
                 <MenuItem 
                     Header="_Import"
                     Command="{Binding ImportCommand}"
-                  IsEnabled="{Binding Progress.NotProcessing}">
+                    IsEnabled="{Binding Progress.NotProcessing}">
                     <MenuItem.Icon>
                         <Image Source="Icons/import.png"/>
                     </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem
+                    Header="Import Equation Image"
+                    IsEnabled="{Binding Progress.NotProcessing}">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/import.png"/>
+                    </MenuItem.Icon>
+                    <MenuItem 
+                        Header="Equation 1"
+                        Command="{Binding ImportEquationImageCommand}">
+                        <MenuItem.CommandParameter>
+                            <system:Int32>0</system:Int32></MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem 
+                        Header="Equation 2"
+                        Command="{Binding ImportEquationImageCommand}">
+                        <MenuItem.CommandParameter>
+                            <system:Int32>1</system:Int32>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem 
+                        Header="Equation 3"
+                        Command="{Binding ImportEquationImageCommand}">
+                        <MenuItem.CommandParameter>
+                            <system:Int32>2</system:Int32>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem 
+                        Header="Equation 4"
+                        Command="{Binding ImportEquationImageCommand}">
+                        <MenuItem.CommandParameter>
+                            <system:Int32>3</system:Int32>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
                 </MenuItem>
                 <Separator/>
                 <MenuItem 

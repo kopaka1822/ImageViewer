@@ -36,6 +36,7 @@ namespace TextureViewer.ViewModels
             var import = new ImportImageCommand(models, this);
             ImportCommand = import;
             ResizeCommand = new ResizeWindowCommand(models);
+            ImportEquationImageCommand = new ImportEquationImageCommand(models);
             OpenCommand = new OpenImageCommand(models, import);
             ExportCommand = new ExportImageCommand(models);
             AddFilterCommand = new AddFilterCommand(models, Filter);
@@ -118,6 +119,7 @@ namespace TextureViewer.ViewModels
         // commands
         // file
         public ICommand ImportCommand { get; }
+        public ICommand ImportEquationImageCommand { get; }
         public ICommand OpenCommand { get; }
         public ICommand ExportCommand { get; }
         public ICommand ResizeCommand { get; }

@@ -35,6 +35,7 @@ namespace TextureViewer.glhelper
 
         public bool HasMipmaps => nMipmaps > 1;
         public int NumMipmaps => nMipmaps;
+        public int NumLayer => nLayer;
 
         /// <summary>
         /// indicates if the texture needs to be converted from srb space to physical space
@@ -203,6 +204,27 @@ namespace TextureViewer.glhelper
             // copy data of first mipmap level
             GL.CopyImageSubData(id, ImageTarget.Texture2DArray, level, 0, 0, 0,
                          newTex.id, ImageTarget.Texture2DArray, 0, 0, 0, 0, lvlWidth, lvlHeight, nLayer);
+
+            return newTex;
+        }
+
+        /// <summary>
+        /// performs a deep gpu copy of the textures
+        /// </summary>
+        /// <returns></returns>
+        public TextureArray2D Clone()
+        {
+            var newTex = new TextureArray2D(nLayer, nMipmaps, internalFormat, width, height, IsSrgb);
+
+            for (var level = 0; level < nMipmaps; ++level)
+            {
+                GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureWidth, out int lwidth);
+                GL.GetTexLevelParameter(TextureTarget.Texture2DArray, level, GetTextureParameter.TextureHeight, out int lheight);
+
+                GL.CopyImageSubData(id, ImageTarget.Texture2DArray, level, 0, 0, 0,
+                    newTex.id, ImageTarget.Texture2DArray, level, 0, 0, 0, 
+                    lwidth, lheight, nLayer);
+            }
 
             return newTex;
         }
@@ -425,5 +447,6 @@ namespace TextureViewer.glhelper
                 id = 0;
             }
         }
+
     }
 }
