@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using OpenTK.Graphics.OpenGL4;
 using TextureViewer.Annotations;
 using TextureViewer.Controller;
 using TextureViewer.glhelper;
@@ -24,6 +25,14 @@ namespace TextureViewer.Models
         private OpenGlContext context;
         private AppModel app;
         private Dimension[] dimensions = null;
+
+        public class TextureArray2DInformation
+        {
+            public TextureArray2D Image { get; set; }
+            public string Name { get; set; }
+            public bool IsGrayscale { get; set; }
+            public bool IsAlpha { get; set; }
+        }
 
         private class ImageData
         {
@@ -46,6 +55,18 @@ namespace TextureViewer.Models
                 IsHdr = image.IsHdr();
                 Filename = image.Filename;
                 FormatName = image.Format.ToString();
+            }
+
+            public ImageData(TextureArray2DInformation info)
+            {
+                this.TextureArray = info.Image;
+                NumMipmaps = TextureArray.NumMipmaps;
+                NumLayers = TextureArray.NumLayer;
+                IsGrayscale = info.IsGrayscale;
+                HasAlpha = info.IsAlpha;
+                IsHdr = true;
+                Filename = info.Name;
+                FormatName = new ImageLoader.ImageFormat(PixelFormat.Rgba, PixelType.Float, false).ToString();
             }
 
             public void GenerateMipmaps(int levels)
@@ -246,26 +267,50 @@ namespace TextureViewer.Models
                         imgData = new ImageData(image);
                     }    
 
-                    Debug.Assert(imgData != null);
-
-                    // remember old properties
-                    var isAlpha = IsAlpha;
-                    var isGrayscale = IsGrayscale;
-                    var isHdr = IsHdr;
-
-                    images.Add(imgData);
-
-                    PrevNumImages = NumImages - 1;
-                    OnPropertyChanged(nameof(NumImages));
-                    if(isAlpha != IsAlpha)
-                        OnPropertyChanged(nameof(isAlpha));
-                    if(isGrayscale != IsGrayscale)
-                        OnPropertyChanged(nameof(IsGrayscale));
-                    if(isHdr != IsHdr)
-                        OnPropertyChanged(nameof(IsHdr));
+                    Add(imgData);
                 }
             }
             context.Disable();
+        }
+
+        /// <summary>
+        /// Adds image from an existing TextureArray2D
+        /// </summary>
+        /// <param name="texture"></param>
+        public void AddImage(TextureArray2DInformation texture)
+        {
+            Debug.Assert(!context.GlEnabled);
+            context.Enable();
+            Add(new ImageData(texture));
+            context.Disable();
+        }
+
+        /// <summary>
+        /// adds an image and triggers some properties that might have changed
+        /// Only possible if there are already images in the list
+        /// </summary>
+        /// <param name="imgData"></param>
+        private void Add(ImageData imgData)
+        {
+            Debug.Assert(context.GlEnabled);
+            Debug.Assert(imgData != null);
+            Debug.Assert(images.Count != 0);
+
+            // remember old properties
+            var isAlpha = IsAlpha;
+            var isGrayscale = IsGrayscale;
+            var isHdr = IsHdr;
+
+            images.Add(imgData);
+
+            PrevNumImages = NumImages - 1;
+            OnPropertyChanged(nameof(NumImages));
+            if (isAlpha != IsAlpha)
+                OnPropertyChanged(nameof(isAlpha));
+            if (isGrayscale != IsGrayscale)
+                OnPropertyChanged(nameof(IsGrayscale));
+            if (isHdr != IsHdr)
+                OnPropertyChanged(nameof(IsHdr));
         }
 
         /// <summary>

@@ -136,10 +136,12 @@
     <Compile Include="Commands\ApplyFiltersCommand.cs" />
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
     <Compile Include="Commands\CancelFiltersCommand.cs" />
+    <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\DeleteMipmapsCommand.cs" />
     <Compile Include="Commands\ExportImageCommand.cs" />
     <Compile Include="Commands\GenerateMipmapsCommand.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
+    <Compile Include="Commands\ImportEquationImageCommand.cs" />
     <Compile Include="Commands\OpenImageCommand.cs" />
     <Compile Include="Commands\ResizeWindowCommand.cs" />
     <Compile Include="Commands\ShowPixelColorCommand.cs" />
