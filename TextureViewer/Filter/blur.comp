@@ -27,6 +27,7 @@ void main()
 	{
 		vec3 pixelSum = vec3(0.0);
 		float weightSum = 0.0;
+		float alpha = texelFetch(src_image, pixelCoord, 0).a;
 		
 		for(int d = -blur_radius; d <= blur_radius; d++)
 		{			
@@ -37,6 +38,6 @@ void main()
 			
 		}
 		
-		imageStore(dst_image, pixelCoord, vec4(pixelSum / weightSum, 1.0));
+		imageStore(dst_image, pixelCoord, vec4(pixelSum / weightSum, alpha));
 	}	
 }

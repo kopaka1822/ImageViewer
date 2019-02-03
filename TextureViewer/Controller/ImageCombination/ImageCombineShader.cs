@@ -105,6 +105,7 @@ namespace TextureViewer.Controller.ImageCombination
                    SrgbShader.ToSrgbFunction() +
                    GetTextureBindings(numImages) +
                    GetTextureGetters(numImages) +
+                   GetHelperFunctions() +
                    "void main(){\n" +
                    "pixelPos = ivec2(gl_GlobalInvocationID.xy);\n" +
                    "ivec2 imgSize = imageSize(out_image);\n" +
@@ -143,6 +144,29 @@ namespace TextureViewer.Controller.ImageCombination
                        "}\n";
             }
             return res;
+        }
+
+        private static string GetHelperFunctions()
+        {
+            return 
+                GetCompareFunction("equal", "==") + 
+                GetCompareFunction("bigger", ">") +
+                GetCompareFunction("smaller", "<") +
+                GetCompareFunction("biggereq", ">=") +
+                GetCompareFunction("smallereq", "<=");
+        }
+
+        private static string GetCompareFunction(string name, string comparision)
+        {
+            return $@"
+                vec4 {name}(vec4 a, vec4 b){{
+                    vec4 res = vec4(0.0);
+                    for(int i = 0; i < 4; ++i)
+                        if(a[i] {comparision} b[i])
+                            res[i] = 1.0;
+                    return res;
+                }}
+            ";
         }
 
         #endregion

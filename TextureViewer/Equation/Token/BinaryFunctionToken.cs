@@ -41,6 +41,14 @@ namespace TextureViewer.Equation.Token
                 case "cross":
                     convertToRgb = true;
                     return true;
+
+                // not core but provided by the image viewer
+                case "equal":
+                case "bigger":
+                case "smaller":
+                case "smallereq":
+                case "biggereq":
+                    return true;
             }
             return false;
         }
