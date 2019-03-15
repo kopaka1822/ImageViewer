@@ -57,7 +57,7 @@ void main()
 	// Increase contrasts
 	float newSat = avgBrSat.y + (centerSat - avgBrSat.y) * COLOR_CONTRAST;
 	newSat = newSat * SATURATION;
-	float newBr = avgBrSat.x + (centerBr - avgBrSat.x) * BR_CONTRAST;
+	float newBr = max(0, avgBrSat.x + (centerBr - avgBrSat.x) * BR_CONTRAST);
 
 	// Return to RGB
 	ab *= newSat * newBr / (centerSat * centerBr + 1e-6);
