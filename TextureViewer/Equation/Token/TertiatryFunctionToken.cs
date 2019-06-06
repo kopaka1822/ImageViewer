@@ -11,7 +11,7 @@ namespace TextureViewer.Equation.Token
 
         public TertiatryFunctionToken(string funcName, ValueToken value1, ValueToken value2, ValueToken value3)
         {
-            this.funcName = funcName;
+            this.funcName = funcName.ToLower();
             this.value1 = value1;
             this.value2 = value2;
             this.value3 = value3;
@@ -19,7 +19,7 @@ namespace TextureViewer.Equation.Token
 
         public override string ToOpenGl()
         {
-            if (funcName.ToLower() == "rgb")
+            if (funcName == "rgb")
             {
                 // transform values into rgb vector
                 return $"vec4(({value1.ToOpenGl()}).r, " +

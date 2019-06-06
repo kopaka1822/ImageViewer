@@ -9,7 +9,7 @@ namespace TextureViewer.Equation.Token
 
         public UnaryFunctionToken(string funcName, ValueToken value)
         {
-            this.funcName = funcName;
+            this.funcName = funcName.ToLower();
             this.value = value;
         }
 
@@ -23,7 +23,7 @@ namespace TextureViewer.Equation.Token
 
         private static bool GetOpenglFunction(string name, out string front, out string end)
         {
-            switch (name.ToLower())
+            switch (name)
             {
                 case "alpha":
                     front = "vec4((";

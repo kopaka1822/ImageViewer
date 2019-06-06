@@ -149,11 +149,11 @@ namespace TextureViewer.Controller.ImageCombination
         private static string GetHelperFunctions()
         {
             return 
-                GetCompareFunction("equal", "==") + 
-                GetCompareFunction("bigger", ">") +
-                GetCompareFunction("smaller", "<") +
-                GetCompareFunction("biggereq", ">=") +
-                GetCompareFunction("smallereq", "<=");
+                GetCompareFunction("fequal", "==") + 
+                GetCompareFunction("fbigger", ">") +
+                GetCompareFunction("fsmaller", "<") +
+                GetCompareFunction("fbiggereq", ">=") +
+                GetCompareFunction("fsmallereq", "<=");
         }
 
         private static string GetCompareFunction(string name, string comparision)
