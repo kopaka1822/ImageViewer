@@ -42,27 +42,29 @@ namespace TextureViewer.Models.Shader
 
         public static string ToSrgbFunction()
         {
-            return @"vec4 toSrgb(vec4 c){
+            return @"vec4 toSrgb(const in vec4 c){
+                        vec3 r; // workaround to fix a bug on intel chips
                         for(int i = 0; i < 3; ++i){
-                            if( c[i] > 1.0) c[i] = 1.0;
-                            else if( c[i] < 0.0) c[i] = 0.0;
-                            else if( c[i] <= 0.0031308) c[i] = 12.92 * c[i];
-                            else c[i] = 1.055 * pow(c[i], 0.41666) - 0.055;
+                            if( c[i] > 1.0) r[i] = 1.0;
+                            else if( c[i] < 0.0) r[i] = 0.0;
+                            else if( c[i] <= 0.0031308) r[i] = 12.92 * c[i];
+                            else r[i] = 1.055 * pow(c[i], 0.41666) - 0.055;
                         }
-                        return c;
+                        return vec4(r, c.a);
                     }";
         }
 
         public static string FromSrgbFunction()
         {
-            return @"vec4 fromSrgb(vec4 c){
+            return @"vec4 fromSrgb(const in vec4 c){
+                        vec3 r;
                         for(int i = 0; i < 3; ++i){
-                            if(c[i] > 1.0) c[i] = 1.0;
-                            else if(c[i] < 0.0) c[i] = 0.0;
-                            else if(c[i] <= 0.04045) c[i] /= 12.92;
-                            else c[i] = pow((c[i] + 0.055)/1.055, 2.4);
+                            if(c[i] > 1.0) r[i] = 1.0;
+                            else if(c[i] < 0.0) r[i] = 0.0;
+                            else if(c[i] <= 0.04045) r[i] = c[i] / 12.92;
+                            else r[i] = pow((c[i] + 0.055)/1.055, 2.4);
                         }
-                        return c;
+                        return vec4(r, c.a);
                     }";
         }
 
