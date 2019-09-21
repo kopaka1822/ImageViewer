@@ -24,6 +24,8 @@ packages/
 *.iobj
 *.ipdb
 
+obj/
+
 #logs
 #*.txt
 
