@@ -41,15 +41,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="DirectX\Device.cs" />
     <Compile Include="DirectX\SwapChain.cs" />
+    <Compile Include="DirectX\TextureArray2D.cs" />
+    <Compile Include="ImageLoader\Dll.cs" />
+    <Compile Include="ImageLoader\Face.cs" />
+    <Compile Include="ImageLoader\Image.cs" />
+    <Compile Include="ImageLoader\ImageFormat.cs" />
+    <Compile Include="ImageLoader\IO.cs" />
+    <Compile Include="ImageLoader\Mipmap.cs" />
+    <Compile Include="ImageLoader\Resource.cs" />
+    <Compile Include="Model\ImagesModel.cs" />
+    <Compile Include="Model\Models.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="SharpDX.Direct3D11">
       <Version>4.2.0</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controller\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

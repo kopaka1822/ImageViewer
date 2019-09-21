@@ -2,6 +2,7 @@
 #include <gli/gli.hpp>
 #include <gli/gl.hpp>
 
+static gli::dx DX;
 
 void getImageFormat(ImageFormat& format, const gli::texture& tex)
 {
@@ -30,6 +31,9 @@ void gli_to_opengl_format(int gliFormat, int& glInternal, int& glExternal, int& 
 	glType = GLFormat.Type;
 	isCompressed = gli::is_compressed(f);
 	isSrgb = gli::is_srgb(f);
+
+	const auto DXFormat = DX.translate(f);
+	
 }
 
 std::unique_ptr<ImageResource> gli_load(const char* filename)
