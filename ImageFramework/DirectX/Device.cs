@@ -45,6 +45,8 @@ namespace ImageFramework.DirectX
             context.ClearRenderTargetView(view, color);
         }
 
+
+
         public void Dispose()
         {
             context?.Dispose();

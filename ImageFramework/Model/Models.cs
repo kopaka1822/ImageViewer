@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ImageFramework
+namespace ImageFramework.Model
 {
-    public class Class1
+    public class Models
     {
+
     }
 }
