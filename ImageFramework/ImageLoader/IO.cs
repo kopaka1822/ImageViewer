@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SharpDX.DXGI;
 
 namespace ImageFramework.ImageLoader
 {
@@ -14,24 +15,19 @@ namespace ImageFramework.ImageLoader
         /// </summary>
         /// <param name="file">filename</param>
         /// <returns></returns>
-        public static List<Image> LoadImage(string file)
+        public static Image LoadImage(string file)
         {
             var res = new Resource(file);
-            Dll.image_info(res.Id, out var internalFormat, out var externalFormat, out var openglType,
-                out var nImages, out var nFaces, out var nMipmaps, out var isCompressed, out var isSrgb, out var gliFormat);
+            Dll.image_info(res.Id, out var dxgiformat, out var nLayer, out var nMipmaps, out var isSrgb, out var hasAlpha);
 
-            /*var format = new ImageFormat((PixelFormat)externalFormat, (PixelType)openglType,
-                (SizedInternalFormat)internalFormat, isSrgb, isCompressed, (GliFormat)gliFormat);*/
-            // TODO correct format
-            throw new NotImplementedException();
-            var format = new ImageFormat();
-            var images = new List<Image>(nImages);
-            for (var curImage = 0; curImage < nImages; ++curImage)
+            var format = new ImageFormat
             {
-                images.Add(new Image(res, file, curImage, nFaces, nMipmaps, format));
-            }
+                Format = (SharpDX.DXGI.Format)(dxgiformat),
+                HasAlpha = hasAlpha,
+                IsSrgb = isSrgb
+            };
 
-            return images;
+            return new Image(res, file, nLayer, nMipmaps, format);
         }
 
         public static void SavePng(string filename, int width, int height, int components, byte[] data)
@@ -64,7 +60,7 @@ namespace ImageFramework.ImageLoader
                 throw new Exception("saving image failed: " + Dll.GetError());
         }
 
-        public static void CreateStorage(/*TODO GLI format*/int format, int width, int height, int layer, int levels)
+        public static void CreateStorage(SharpDX.DXGI.Format format, int width, int height, int layer, int levels)
         {
             if (!Dll.create_storage((int)format, width, height, layer, levels))
                 throw new Exception("create storage failed: " + Dll.GetError());

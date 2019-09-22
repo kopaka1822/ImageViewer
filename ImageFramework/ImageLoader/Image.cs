@@ -9,19 +9,19 @@ namespace ImageFramework.ImageLoader
     public class Image
     {
         public ImageFormat Format { get; }
-        public List<Face> Layers { get; }
+        public List<Layer> Layers { get; }
         public string Filename { get; }
 
-        public Image(Resource resource, string filename, int curImage, int nFaces, int nMipmaps, ImageFormat format)
+        public Image(Resource resource, string filename, int nLayer, int nMipmaps, ImageFormat format)
         {
             Filename = filename;
             Format = format;
             // load relevant information
 
-            Layers = new List<Face>(nFaces);
-            for (var curLayer = 0; curLayer < nFaces; ++curLayer)
+            Layers = new List<Layer>(nLayer);
+            for (var curLayer = 0; curLayer < nLayer; ++curLayer)
             {
-                Layers.Add(new Face(resource, curImage, curLayer, nMipmaps));
+                Layers.Add(new Layer(resource, curLayer, nMipmaps));
             }
         }
 
