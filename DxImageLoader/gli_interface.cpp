@@ -1,65 +1,77 @@
-#include "gli_loader.h"
+#include "pch.h"
+#include "gli_interface.h"
 #include <gli/gli.hpp>
 #include <gli/gl.hpp>
-#include <dxgiformat.h>
 
 static gli::dx DX;
 
-void getImageFormat(ImageFormat& format, const gli::texture& tex)
+bool hasAlpha(DXGI_FORMAT format)
 {
-	gli::gl GL(gli::gl::PROFILE_GL33);
-	const auto GLformat = GL.translate(tex.format(), tex.swizzles());
-	format.openglInternalFormat = static_cast<uint32_t>(GLformat.Internal);
-	format.openglExternalFormat = static_cast<uint32_t>(GLformat.External);
-	format.openglType = static_cast<uint32_t>(GLformat.Type);
-	format.isCompressed = gli::is_compressed(tex.format());
-	format.gliFormat = tex.format();
-	//format.isSrgb = gli::is_srgb(tex.format());
-	// even if the data is stored in srgb space opengl reads the data in linear space because of the given texture format
+	switch (format)
+	{
+	case DXGI_FORMAT_R32G32B32A32_TYPELESS: 
+	case DXGI_FORMAT_R32G32B32A32_FLOAT: 
+	case DXGI_FORMAT_R32G32B32A32_UINT: 
+	case DXGI_FORMAT_R32G32B32A32_SINT: 
+	case DXGI_FORMAT_R16G16B16A16_TYPELESS: 
+	case DXGI_FORMAT_R16G16B16A16_FLOAT: 
+	case DXGI_FORMAT_R16G16B16A16_UNORM: 
+	case DXGI_FORMAT_R16G16B16A16_UINT: 
+	case DXGI_FORMAT_R16G16B16A16_SNORM: 
+	case DXGI_FORMAT_R16G16B16A16_SINT: 
+	case DXGI_FORMAT_R10G10B10A2_TYPELESS: 
+	case DXGI_FORMAT_R10G10B10A2_UNORM: 
+	case DXGI_FORMAT_R10G10B10A2_UINT: 
+	case DXGI_FORMAT_R8G8B8A8_TYPELESS: 
+	case DXGI_FORMAT_R8G8B8A8_UNORM: 
+	case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB: 
+	case DXGI_FORMAT_R8G8B8A8_UINT: 
+	case DXGI_FORMAT_R8G8B8A8_SNORM: 
+	case DXGI_FORMAT_R8G8B8A8_SINT: 
+	case DXGI_FORMAT_A8_UNORM: 
+	case DXGI_FORMAT_B5G5R5A1_UNORM: 
+	case DXGI_FORMAT_B8G8R8A8_UNORM: 
+	case DXGI_FORMAT_B8G8R8A8_TYPELESS: 
+	case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB: 
+		return true;
+	}
+	return false;
+}
+
+void getImageFormat(image::Format& format, const gli::texture& tex)
+{
+	const auto dxFormat = DX.translate(tex.format());
+	
+	// even if the data is stored in srgb space directx reads the data in linear space because of the given texture format
 	// therefore this should be false for the image loader
 	format.isSrgb = false;
+	format.dxgi = DXGI_FORMAT(dxFormat.DXGIFormat.DDS);
+	format.hasAlpha = hasAlpha(format.dxgi);
 }
 
-void gli_to_opengl_format(int gliFormat, int& glInternal, int& glExternal, int& glType, bool& isCompressed, bool& isSrgb)
-{
-	gli::gl GL(gli::gl::PROFILE_GL33);
-	// assume no swizzeling
-	auto f = gli::format(gliFormat);
-	const auto GLFormat = GL.translate(f, gli::swizzles(gli::swizzle::SWIZZLE_RED, gli::SWIZZLE_GREEN, gli::SWIZZLE_BLUE, gli::SWIZZLE_ALPHA));
-	
-	glInternal = GLFormat.Internal;
-	glExternal = GLFormat.External;
-	glType = GLFormat.Type;
-	isCompressed = gli::is_compressed(f);
-	isSrgb = gli::is_srgb(f);
-
-	const auto DXFormat = DX.translate(f);
-	
-}
-
-std::unique_ptr<ImageResource> gli_load(const char* filename)
+std::unique_ptr<image::Image> gli_load(const char* filename)
 {
 	gli::texture tex = gli::load(filename);
 	if (tex.empty())
 		throw std::exception("error opening file");
 
-	std::unique_ptr<ImageResource> res = std::make_unique<ImageResource>();
-	
+	std::unique_ptr<image::Image> res = std::make_unique<image::Image>();
+
 	// determine image format
 	getImageFormat(res->format, tex);
 
-	res->layer.assign(tex.layers(), ImageLayer());
-	for(size_t layer = 0; layer < tex.layers(); ++layer)
+	// put layers and faces together (only case that has layers and faces would be of type CUBE_ARRAY)
+	res->layer.assign(tex.layers() * tex.faces(), image::Layer());
+	size_t outputLayer = 0;
+	for (size_t layer = 0; layer < tex.layers(); ++layer)
 	{
-		res->layer.at(layer).faces.assign(tex.faces(), ImageFace());
-		for(size_t face = 0; face < tex.faces(); ++face)
+		for (size_t face = 0; face < tex.faces(); ++face)
 		{
-			// load face
-			res->layer.at(layer).faces.at(face).mipmaps.assign(tex.levels(), ImageMipmap());
-			for(size_t mip = 0; mip < tex.levels(); ++mip)
+			res->layer.at(outputLayer).mipmaps.assign(tex.levels(), image::Mipmap());
+			for (size_t mip = 0; mip < tex.levels(); ++mip)
 			{
 				// fill mipmap
-				ImageMipmap& mipmap = res->layer.at(layer).faces.at(face).mipmaps.at(mip);
+				image::Mipmap& mipmap = res->layer.at(outputLayer).mipmaps.at(mip);
 				mipmap.width = tex.extent(mip).x;
 				mipmap.height = tex.extent(mip).y;
 				mipmap.depth = tex.extent(mip).z;
@@ -69,6 +81,7 @@ std::unique_ptr<ImageResource> gli_load(const char* filename)
 				mipmap.bytes.reserve(size);
 				mipmap.bytes.assign(reinterpret_cast<char*>(data), reinterpret_cast<char*>(data) + size);
 			}
+			outputLayer++;
 		}
 	}
 
@@ -85,18 +98,21 @@ void gli_create_storage(int format, int width, int height, int layer, int levels
 {
 	s_numLayer = layer;
 
-	if(layer == 6)
+	auto dxFormat = DXGI_FORMAT(format);
+	auto gliFormat = DX.find(gli::dx::d3dfmt::D3DFMT_DX10, gli::dx::dxgiFormat(gli::dx::dxgi_format_dds(dxFormat)));
+
+	if (layer == 6)
 	{
 		// cube map
 		s_useCubemap = true;
-		s_textureCube = gli::texture_cube(gli::format(format), gli::extent2d(width, height), levels);
+		s_textureCube = gli::texture_cube(gliFormat, gli::extent2d(width, height), levels);
 		if (s_textureCube.empty())
 			throw std::runtime_error("could not create texture");
 	}
 	else
 	{
 		s_useCubemap = false;
-		s_textureArray = gli::texture2d_array(gli::format(format), gli::extent2d(width, height), layer, levels);
+		s_textureArray = gli::texture2d_array(gliFormat, gli::extent2d(width, height), layer, levels);
 		if (s_textureArray.empty())
 			throw std::runtime_error("could not create texture");
 	}
@@ -104,7 +120,7 @@ void gli_create_storage(int format, int width, int height, int layer, int levels
 
 void gli_store_level(int layer, int level, const void* data, uint64_t size)
 {
-	if(s_useCubemap)
+	if (s_useCubemap)
 	{
 		if (s_textureCube.size(level) != size)
 			throw std::runtime_error("data size mismatch. Expected "
@@ -117,12 +133,12 @@ void gli_store_level(int layer, int level, const void* data, uint64_t size)
 			throw std::runtime_error("data size mismatch. Expected "
 				+ std::to_string(s_textureArray.size(level)) + " but got " + std::to_string(size));
 		memcpy(s_textureArray.data(layer, 0, level), data, size);
-	}	
+	}
 }
 
 void gli_get_level_size(int level, uint64_t& size)
 {
-	if(s_useCubemap)
+	if (s_useCubemap)
 	{
 		size = s_textureCube.size(level);
 	}
@@ -134,7 +150,7 @@ void gli_get_level_size(int level, uint64_t& size)
 
 void gli_save_ktx(const char* filename)
 {
-	if(s_useCubemap)
+	if (s_useCubemap)
 	{
 		if (!gli::save_ktx(s_textureCube, filename))
 		{

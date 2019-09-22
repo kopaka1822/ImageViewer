@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Image">
+      <UniqueIdentifier>{cf9ac3fc-9d40-4e7b-b6de-f4f47acbb492}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\stbi">
+      <UniqueIdentifier>{55ec61f5-3a17-435f-ae45-85953d843198}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\pfm">
+      <UniqueIdentifier>{4bc91d60-b395-45b5-8e3d-f5179a5e72e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\exr">
+      <UniqueIdentifier>{9ff46aec-7645-4b15-9659-5cdd70224339}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gli">
+      <UniqueIdentifier>{0f6a55b3-1251-4e6e-acd8-4993d50cf256}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\pch">
+      <UniqueIdentifier>{8cd5d375-8cd5-471b-9ed4-f97898fb9ebe}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Format.h">
+      <Filter>Source Files\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Layer.h">
+      <Filter>Source Files\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>Source Files\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Mipmap.h">
+      <Filter>Source Files\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="stbi_interface.h">
+      <Filter>Source Files\stbi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\stb_image.h">
+      <Filter>Source Files\stbi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\stb_image_write.h">
+      <Filter>Source Files\stbi</Filter>
+    </ClInclude>
+    <ClInclude Include="pfm_interface.h">
+      <Filter>Source Files\pfm</Filter>
+    </ClInclude>
+    <ClInclude Include="exr_interface.h">
+      <Filter>Source Files\exr</Filter>
+    </ClInclude>
+    <ClInclude Include="gli_interface.h">
+      <Filter>Source Files\gli</Filter>
+    </ClInclude>
+    <ClInclude Include="interface.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Source Files\pch</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>Source Files\pch</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stbi_interface.cpp">
+      <Filter>Source Files\stbi</Filter>
+    </ClCompile>
+    <ClCompile Include="pfm_interface.cpp">
+      <Filter>Source Files\pfm</Filter>
+    </ClCompile>
+    <ClCompile Include="exr_interface.cpp">
+      <Filter>Source Files\exr</Filter>
+    </ClCompile>
+    <ClCompile Include="gli_interface.cpp">
+      <Filter>Source Files\gli</Filter>
+    </ClCompile>
+    <ClCompile Include="interface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files\pch</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

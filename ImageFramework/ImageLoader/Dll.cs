@@ -9,7 +9,7 @@ namespace ImageFramework.ImageLoader
 {
     internal static class Dll
     {
-        public const string DllFilePath = @"ImageLoader.dll";
+        public const string DllFilePath = @"DxImageLoader.dll";
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         public static extern int open(string filename);
@@ -18,15 +18,14 @@ namespace ImageFramework.ImageLoader
         public static extern void release(int id);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void image_info(int id, out uint openglInternalFormat,
-            out uint openglExternalFormat, out uint openglType, out int nImages, out int nFaces,
-            out int nMipmaps, out bool isCompressed, out bool isSrgb, out int gliFormat);
+        public static extern void image_info(int id, out uint format,
+            out int nLayer, out int nMipmaps, out bool isSrgb, out bool hasAlpha);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         public static extern void image_info_mipmap(int id, int mipmap, out int width, out int height);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr image_get_mipmap(int id, int image, int face, int mipmap, out uint size);
+        public static extern IntPtr image_get_mipmap(int id, int layer, int mipmap, out uint size);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr get_error(out int length);

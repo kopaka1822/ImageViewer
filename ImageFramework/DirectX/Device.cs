@@ -7,6 +7,7 @@ using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
+using Resource = SharpDX.Direct3D11.Resource;
 
 namespace ImageFramework.DirectX
 {
@@ -26,7 +27,7 @@ namespace ImageFramework.DirectX
 #if DEBUG
             flags |= DeviceCreationFlags.Debug;
 #endif
-            Handle = new SharpDX.Direct3D11.Device(DriverType.Hardware, flags);
+            Handle = new SharpDX.Direct3D11.Device(DriverType.Hardware, flags, new FeatureLevel[]{FeatureLevel.Level_11_0});
 
             // obtain the factory that created the device
             var obj = Handle.QueryInterface<SharpDX.DXGI.Device>();
@@ -45,7 +46,24 @@ namespace ImageFramework.DirectX
             context.ClearRenderTargetView(view, color);
         }
 
+        public void CopyResource(Resource src, Resource dst)
+        {
+            context.CopyResource(src, dst);
+        }
 
+        /// <summary>
+        /// copies entire subresource
+        /// </summary>
+        public void CopySubresource(Resource src, Resource dst, int srcSubresource, int dstSubresource, int width, int height)
+        {
+            context.CopySubresourceRegion(src, srcSubresource, new ResourceRegion(0, 0, 0, width, height, 1), 
+                dst, dstSubresource);
+        }
+
+        public void GenerateMips(ShaderResourceView res)
+        {
+            context.GenerateMips(res);
+        }
 
         public void Dispose()
         {
