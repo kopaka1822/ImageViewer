@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Utility;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
@@ -110,6 +111,56 @@ namespace ImageFramework.DirectX
 
             Device.Get().CopyResource(handle, newTex.handle);
             return newTex;
+        }
+
+        public Color[] GetPixelColors(int layer, int mipmap)
+        {
+            Debug.Assert(format == Format.R32G32B32A32_Float);
+            Debug.Assert(mipmap >= 0);
+            Debug.Assert(mipmap < NumMipmaps);
+            Debug.Assert(layer >= 0);
+            Debug.Assert(layer < NumLayers);
+
+            var desc = new Texture2DDescription
+            {
+                ArraySize = 1,
+                BindFlags = BindFlags.None,
+                CpuAccessFlags = CpuAccessFlags.Read,
+                Format = format,
+                Height = GetHeight(mipmap),
+                Width = GetWidth(mipmap),
+                MipLevels = 1,
+                OptionFlags = ResourceOptionFlags.None,
+                SampleDescription = new SampleDescription(1, 0),
+                Usage = ResourceUsage.Staging
+            };
+
+            // create staging texture
+            using (var staging = new Texture2D(Device.Get().Handle, desc))
+            {
+                // copy data to staging resource
+                Device.Get().CopySubresource(handle, staging, 
+                    GetTextureIndex(layer, mipmap), 0, 
+                    GetWidth(mipmap), GetHeight(mipmap)
+                );
+
+                // obtain data from staging resource
+                return Device.Get().GetColorData(staging, 0, desc.Width, desc.Height);
+            }
+        }
+
+        public int GetWidth(int mipmap)
+        {
+            Debug.Assert(mipmap >= 0);
+            Debug.Assert(mipmap < NumMipmaps);
+            return Math.Max(1, Width << mipmap);
+        }
+
+        public int GetHeight(int mipmap)
+        {
+            Debug.Assert(mipmap >= 0);
+            Debug.Assert(mipmap < NumMipmaps);
+            return Math.Max(1, Height << mipmap);
         }
 
         public void Dispose()
