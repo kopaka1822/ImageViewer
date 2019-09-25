@@ -14,6 +14,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ImageFramework.DirectX;
 using ImageViewer.DirectX;
+using SharpDX.Direct3D11;
+using Device = ImageFramework.DirectX.Device;
 
 namespace ImageViewer
 {
@@ -42,6 +44,10 @@ namespace ImageViewer
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
             chain.BeginFrame();
+
+            MessageBox.Show(Device.Get().TestFormats(), "Formats");
+
+         
 
             chain.EndFrame();
         }

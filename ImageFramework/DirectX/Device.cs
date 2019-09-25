@@ -32,13 +32,15 @@ namespace ImageFramework.DirectX
 #if DEBUG
             flags |= DeviceCreationFlags.Debug;
 #endif
-            Handle = new SharpDX.Direct3D11.Device(DriverType.Hardware, flags, new FeatureLevel[]{FeatureLevel.Level_11_0});
+            Handle = new SharpDX.Direct3D11.Device(DriverType.Hardware, flags, new FeatureLevel[]{FeatureLevel.Level_11_1});
 
             // obtain the factory that created the device
             var obj = Handle.QueryInterface<SharpDX.DXGI.Device>();
             var adapter = obj.Adapter;
             FactoryHandle = adapter.GetParent<SharpDX.DXGI.Factory>();
             context = Handle.ImmediateContext;
+
+            SetDefaults();
         }
 
         public static Device Get()
@@ -110,10 +112,75 @@ namespace ImageFramework.DirectX
             return result;
         }
 
+        public void Dispatch(int x, int y, int z = 1)
+        {
+            context.Dispatch(x, y, z);
+        }
+
+        public VertexShaderStage Vertex => context.VertexShader;
+        public PixelShaderStage Pixel => context.PixelShader;
+        public ComputeShaderStage Compute => context.ComputeShader;
+        public InputAssemblerStage InputAssembler => context.InputAssembler;
+        public OutputMergerStage OutputMerger => context.OutputMerger;
+        public RasterizerStage Rasterizer => context.Rasterizer;
+
         public void Dispose()
         {
             context?.Dispose();
             Handle?.Dispose();
+        }
+
+        private void SetDefaults()
+        {
+            InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
+            
+        }
+
+        /// <summary>
+        /// sets viewport and scissors
+        /// </summary>
+        public void SetViewScissors(int width, int height)
+        {
+            Rasterizer.SetViewport(0.0f, 0.0f, (float)width, (float)height);
+            Rasterizer.SetScissorRectangle(0, 0, width, height);
+        }
+
+        public string TestFormats()
+        {
+            string formats = "";
+
+            foreach (var f in Enum.GetValues(typeof(Format)).Cast<Format>())
+            {
+                if(f.ToString().Contains("_Typeless")) continue;
+                if(f.ToString().Contains("_UInt")) continue;
+                if(f.ToString().Contains("_SInt")) continue;
+                //if(f.ToString().Contains("_TYPELESS")) continue;
+
+                var sup = Handle.CheckFormatSupport(f);
+
+                string line = "";
+                if ((sup & FormatSupport.Texture2D) == 0)
+                    continue;
+                if ((sup & FormatSupport.ShaderSample) != 0)
+                    line += "Sample ";
+                if ((sup & FormatSupport.RenderTarget) != 0)
+                    //continue;
+                    line += "Rendertarget ";
+                if ((sup & FormatSupport.Mip) != 0)
+                    line += "Mip ";
+                if ((sup & FormatSupport.MipAutogen) != 0)
+                    line += "MipAuto";
+
+                if (line.Length > 0)
+                    formats += f.ToString() + " " + line + "\n";
+            }
+
+            return formats;
+        }
+
+        public void DrawQuad()
+        {
+            context.Draw(4, 0);
         }
     }
 }

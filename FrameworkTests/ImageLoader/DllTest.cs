@@ -14,21 +14,26 @@ namespace FrameworkTests.ImageLoader
     [TestClass]
     public class DllTest
     {
-        public string Directory = "../../FrameworkTests/TestData/";
-        private readonly Color[] smallData = new Color[]
+        public static string Directory = "../../FrameworkTests/TestData/";
+        private static readonly Color[] smallData = new Color[]
         {
             new Color(1.0f, 0.0f, 0.0f, 0.5f), new Color(0.0f, 1.0f, 0.0f, 0.5f), new Color(0.0f, 0.0f, 1.0f, 0.5f),
             new Color(0.0f, 0.0f, 0.0f, 0.5f), new Color(0.2122308f, 0.2122308f, 0.2122308f, 0.5f),   new Color(0.0f, 0.0f, 0.0f, 0.5f),
             new Color(1.0f, 1.0f, 1.0f, 0.5f),new Color(1.0f, 1.0f, 1.0f, 0.5f),new Color(1.0f, 1.0f, 1.0f, 0.5f)
         };
 
-        private void CompareWithSmall(Image image, Color.Channel channels)
+        public static void CompareWithSmall(Image image, Color.Channel channels)
         {
             var tex = new TextureArray2D(image);
             var colors = tex.GetPixelColors(0, 0);
 
+            CompareWithSmall(colors, channels);
+        }
+
+        public static void CompareWithSmall(Color[] colors, Color.Channel channels)
+        {
             Assert.AreEqual(smallData.Length, colors.Length);
-            for(int i = 0; i < colors.Length; ++i)
+            for (int i = 0; i < colors.Length; ++i)
             {
                 Assert.IsTrue(colors[i].Equals(smallData[i], channels));
             }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.ImageLoader;
 using ImageFramework.Utility;
 using SharpDX;
 using SharpDX.Direct3D;
@@ -25,6 +26,7 @@ namespace ImageFramework.DirectX
 
         private readonly Texture2D handle;
         private ShaderResourceView[] views;
+        private RenderTargetView[] rtViews;
         private Format format;
 
         public TextureArray2D(int numLayer, int numMipmaps, int width, int height, Format format, bool isSrgb = false)
@@ -69,9 +71,14 @@ namespace ImageFramework.DirectX
             CreateTextureViews();
         }
 
-        public ShaderResourceView GetView(int layer, int mipmap)
+        public ShaderResourceView GetSrView(int layer, int mipmap)
         {
             return views[GetTextureIndex(layer, mipmap)];
+        }
+
+        public RenderTargetView GetRtView(int layer, int mipmaps)
+        {
+            return rtViews[GetTextureIndex(layer, mipmaps)];
         }
 
         /// <summary>
@@ -163,6 +170,15 @@ namespace ImageFramework.DirectX
             return Math.Max(1, Height << mipmap);
         }
 
+        /// <summary>
+        /// returns true if the format matches
+        /// </summary>
+        /// <returns></returns>
+        public bool HasFormat(ImageFormat f)
+        {
+            return f.IsSrgb == IsSrgb && f.Format == format;
+        }
+
         public void Dispose()
         {
             handle?.Dispose();
@@ -177,6 +193,7 @@ namespace ImageFramework.DirectX
 
             // single slice views
             views = new ShaderResourceView[NumLayers * NumMipmaps];
+            rtViews = new RenderTargetView[NumLayers * NumMipmaps];
             for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
             {
                 for (int curMipmap = 0; curMipmap < NumMipmaps; ++curMipmap)
@@ -195,6 +212,20 @@ namespace ImageFramework.DirectX
                     };
 
                     views[GetTextureIndex(curLayer, curMipmap)] = new ShaderResourceView(Device.Get().Handle, handle, desc);
+
+                    var rtDesc = new RenderTargetViewDescription
+                    {
+                        Dimension = RenderTargetViewDimension.Texture2DArray,
+                        Format = format,
+                        Texture2DArray = new RenderTargetViewDescription.Texture2DArrayResource
+                        {
+                            ArraySize = 1,
+                            FirstArraySlice = curLayer,
+                            MipSlice = curMipmap
+                        }
+                    };
+
+                    rtViews[GetTextureIndex(curLayer, curMipmap)] = new RenderTargetView(Device.Get().Handle, handle, rtDesc);
                 }
             }
         }
