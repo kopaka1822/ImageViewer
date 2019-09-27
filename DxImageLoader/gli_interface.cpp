@@ -3,62 +3,26 @@
 #include <gli/gli.hpp>
 #include <gli/gl.hpp>
 
-static gli::dx DX;
-
-bool hasAlpha(DXGI_FORMAT format)
-{
-	switch (format)
-	{
-	case DXGI_FORMAT_R32G32B32A32_TYPELESS: 
-	case DXGI_FORMAT_R32G32B32A32_FLOAT: 
-	case DXGI_FORMAT_R32G32B32A32_UINT: 
-	case DXGI_FORMAT_R32G32B32A32_SINT: 
-	case DXGI_FORMAT_R16G16B16A16_TYPELESS: 
-	case DXGI_FORMAT_R16G16B16A16_FLOAT: 
-	case DXGI_FORMAT_R16G16B16A16_UNORM: 
-	case DXGI_FORMAT_R16G16B16A16_UINT: 
-	case DXGI_FORMAT_R16G16B16A16_SNORM: 
-	case DXGI_FORMAT_R16G16B16A16_SINT: 
-	case DXGI_FORMAT_R10G10B10A2_TYPELESS: 
-	case DXGI_FORMAT_R10G10B10A2_UNORM: 
-	case DXGI_FORMAT_R10G10B10A2_UINT: 
-	case DXGI_FORMAT_R8G8B8A8_TYPELESS: 
-	case DXGI_FORMAT_R8G8B8A8_UNORM: 
-	case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB: 
-	case DXGI_FORMAT_R8G8B8A8_UINT: 
-	case DXGI_FORMAT_R8G8B8A8_SNORM: 
-	case DXGI_FORMAT_R8G8B8A8_SINT: 
-	case DXGI_FORMAT_A8_UNORM: 
-	case DXGI_FORMAT_B5G5R5A1_UNORM: 
-	case DXGI_FORMAT_B8G8R8A8_UNORM: 
-	case DXGI_FORMAT_B8G8R8A8_TYPELESS: 
-	case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB: 
-		return true;
-	}
-	return false;
-}
-
-void getImageFormat(image::Format& format, const gli::texture& tex)
-{
-	const auto dxFormat = DX.translate(tex.format());
-	
-	// even if the data is stored in srgb space directx reads the data in linear space because of the given texture format
-	// therefore this should be false for the image loader
-	format.isSrgb = false;
-	format.dxgi = DXGI_FORMAT(dxFormat.DXGIFormat.DDS);
-	format.hasAlpha = hasAlpha(format.dxgi);
-}
 
 std::unique_ptr<image::Image> gli_load(const char* filename)
 {
 	gli::texture tex = gli::load(filename);
 	if (tex.empty())
 		throw std::exception("error opening file");
+	auto originalFormat = tex.format();
+
+	// convert image format if not compatible
+	if(!image::isSupported(tex.format()))
+	{
+		const auto newFormat = image::getSupportedFormat(tex.format());
+		tex = gli::convert(tex, newFormat);
+	}
 
 	std::unique_ptr<image::Image> res = std::make_unique<image::Image>();
 
 	// determine image format
-	getImageFormat(res->format, tex);
+	res->format = tex.format();
+	res->original = originalFormat;
 
 	// put layers and faces together (only case that has layers and faces would be of type CUBE_ARRAY)
 	res->layer.assign(tex.layers() * tex.faces(), image::Layer());
@@ -88,114 +52,198 @@ std::unique_ptr<image::Image> gli_load(const char* filename)
 	return res;
 }
 
-// intermediate texture for ktx image export
-static bool s_useCubemap = false;
-static gli::texture2d_array s_textureArray;
-static gli::texture_cube s_textureCube;
-static size_t s_numLayer;
-
-void gli_create_storage(int format, int width, int height, int layer, int levels)
+std::vector<uint32_t> dds_get_export_formats()
 {
-	s_numLayer = layer;
+	return std::vector<uint32_t>{
 
-	auto dxFormat = DXGI_FORMAT(format);
-	auto gliFormat = DX.find(gli::dx::d3dfmt::D3DFMT_DX10, gli::dx::dxgiFormat(gli::dx::dxgi_format_dds(dxFormat)));
+	// uniform
+	gli::format::FORMAT_RG3B2_UNORM_PACK8,
+	gli::format::FORMAT_RGBA4_UNORM_PACK16,
+	gli::format::FORMAT_BGRA4_UNORM_PACK16,
+	gli::format::FORMAT_R5G6B5_UNORM_PACK16,
+	gli::format::FORMAT_B5G6R5_UNORM_PACK16,
+	gli::format::FORMAT_RGB5A1_UNORM_PACK16,
+	gli::format::FORMAT_BGR5A1_UNORM_PACK16,
+	gli::format::FORMAT_R8_UNORM_PACK8,
+	gli::format::FORMAT_R8_SNORM_PACK8,
+	gli::format::FORMAT_RG8_UNORM_PACK8,
+	gli::format::FORMAT_RG8_SNORM_PACK8,
+	gli::format::FORMAT_RGB8_UNORM_PACK8,
+	gli::format::FORMAT_RGB8_SNORM_PACK8,
+	gli::format::FORMAT_RGB8_SRGB_PACK8,
+	gli::format::FORMAT_BGR8_UNORM_PACK8,
+	gli::format::FORMAT_BGR8_SNORM_PACK8,
+	gli::format::FORMAT_BGR8_SRGB_PACK8,
+	gli::format::FORMAT_RGBA8_UNORM_PACK8,
+	gli::format::FORMAT_RGBA8_SNORM_PACK8,
+	gli::format::FORMAT_RGBA8_SRGB_PACK8,
+	gli::format::FORMAT_BGRA8_UNORM_PACK8,
+	gli::format::FORMAT_BGRA8_SNORM_PACK8,
+	gli::format::FORMAT_BGRA8_SRGB_PACK8,
+	gli::format::FORMAT_RGBA8_UNORM_PACK32,
+	gli::format::FORMAT_RGBA8_SNORM_PACK32,
+	gli::format::FORMAT_RGBA8_SRGB_PACK32,
+	gli::format::FORMAT_RGB10A2_UNORM_PACK32,
+	gli::format::FORMAT_BGR10A2_UNORM_PACK32,
+	gli::format::FORMAT_BGR10A2_SNORM_PACK32,
+	gli::format::FORMAT_A8_UNORM_PACK8,
+	gli::format::FORMAT_A16_UNORM_PACK16,
+	gli::format::FORMAT_BGR8_UNORM_PACK32,
+	gli::format::FORMAT_BGR8_SRGB_PACK32,
 
-	if (layer == 6)
-	{
-		// cube map
-		s_useCubemap = true;
-		s_textureCube = gli::texture_cube(gliFormat, gli::extent2d(width, height), levels);
-		if (s_textureCube.empty())
-			throw std::runtime_error("could not create texture");
-	}
-	else
-	{
-		s_useCubemap = false;
-		s_textureArray = gli::texture2d_array(gliFormat, gli::extent2d(width, height), layer, levels);
-		if (s_textureArray.empty())
-			throw std::runtime_error("could not create texture");
-	}
+	// float formats
+	gli::format::FORMAT_R16_UNORM_PACK16,
+	gli::format::FORMAT_R16_SNORM_PACK16,
+	gli::format::FORMAT_R16_SFLOAT_PACK16,
+	gli::format::FORMAT_RG16_UNORM_PACK16,
+	gli::format::FORMAT_RG16_SNORM_PACK16,
+	gli::format::FORMAT_RG16_SFLOAT_PACK16,
+	gli::format::FORMAT_RGB16_UNORM_PACK16,
+	gli::format::FORMAT_RGB16_SNORM_PACK16,
+	gli::format::FORMAT_RGB16_SFLOAT_PACK16,
+	gli::format::FORMAT_RGBA16_UNORM_PACK16,
+	gli::format::FORMAT_RGBA16_SNORM_PACK16,
+	gli::format::FORMAT_RGBA16_SFLOAT_PACK16,
+	gli::format::FORMAT_R32_SFLOAT_PACK32,
+	gli::format::FORMAT_RG32_SFLOAT_PACK32,
+	gli::format::FORMAT_RGB32_SFLOAT_PACK32,
+	gli::format::FORMAT_RGBA32_SFLOAT_PACK32,
+	gli::format::FORMAT_RG11B10_UFLOAT_PACK32,
+	gli::format::FORMAT_RGB9E5_UFLOAT_PACK32,
+
+	// dds compressed
+	/*gli::format::FORMAT_RGB_DXT1_UNORM_BLOCK8,
+	gli::format::FORMAT_RGB_DXT1_SRGB_BLOCK8,
+	gli::format::FORMAT_RGBA_DXT1_UNORM_BLOCK8,
+	gli::format::FORMAT_RGBA_DXT1_SRGB_BLOCK8,
+	gli::format::FORMAT_RGBA_DXT3_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_DXT3_SRGB_BLOCK16,
+	gli::format::FORMAT_RGBA_DXT5_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_DXT5_SRGB_BLOCK16,
+	gli::format::FORMAT_R_ATI1N_UNORM_BLOCK8,
+	gli::format::FORMAT_R_ATI1N_SNORM_BLOCK8,
+	gli::format::FORMAT_RG_ATI2N_UNORM_BLOCK16,
+	gli::format::FORMAT_RG_ATI2N_SNORM_BLOCK16,
+	gli::format::FORMAT_RGB_BP_UFLOAT_BLOCK16,
+	gli::format::FORMAT_RGB_BP_SFLOAT_BLOCK16,
+	gli::format::FORMAT_RGBA_BP_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_BP_SRGB_BLOCK16,
+	gli::format::FORMAT_RGB_ETC2_UNORM_BLOCK8,
+	gli::format::FORMAT_RGB_ETC2_SRGB_BLOCK8,
+	gli::format::FORMAT_RGBA_ETC2_UNORM_BLOCK8,
+	gli::format::FORMAT_RGBA_ETC2_SRGB_BLOCK8,
+	gli::format::FORMAT_RGBA_ETC2_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ETC2_SRGB_BLOCK16,
+	gli::format::FORMAT_R_EAC_UNORM_BLOCK8,
+	gli::format::FORMAT_R_EAC_SNORM_BLOCK8,
+	gli::format::FORMAT_RG_EAC_UNORM_BLOCK16,
+	gli::format::FORMAT_RG_EAC_SNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_4X4_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_4X4_SRGB_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_5X4_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_5X4_SRGB_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_5X5_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_5X5_SRGB_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_6X5_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_6X5_SRGB_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_6X6_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_6X6_SRGB_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_8X5_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_8X5_SRGB_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_8X6_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_8X6_SRGB_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_8X8_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_8X8_SRGB_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_10X5_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_10X5_SRGB_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_10X6_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_10X6_SRGB_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_10X8_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_10X8_SRGB_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_10X10_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_10X10_SRGB_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_12X10_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_12X10_SRGB_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_12X12_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ASTC_12X12_SRGB_BLOCK16,
+	gli::format::FORMAT_RGB_PVRTC1_8X8_UNORM_BLOCK32,
+	gli::format::FORMAT_RGB_PVRTC1_8X8_SRGB_BLOCK32,
+	gli::format::FORMAT_RGB_PVRTC1_16X8_UNORM_BLOCK32,
+	gli::format::FORMAT_RGB_PVRTC1_16X8_SRGB_BLOCK32,
+	gli::format::FORMAT_RGBA_PVRTC1_8X8_UNORM_BLOCK32,
+	gli::format::FORMAT_RGBA_PVRTC1_8X8_SRGB_BLOCK32,
+	gli::format::FORMAT_RGBA_PVRTC1_16X8_UNORM_BLOCK32,
+	gli::format::FORMAT_RGBA_PVRTC1_16X8_SRGB_BLOCK32,
+	gli::format::FORMAT_RGBA_PVRTC2_4X4_UNORM_BLOCK8,
+	gli::format::FORMAT_RGBA_PVRTC2_4X4_SRGB_BLOCK8,
+	gli::format::FORMAT_RGBA_PVRTC2_8X4_UNORM_BLOCK8,
+	gli::format::FORMAT_RGBA_PVRTC2_8X4_SRGB_BLOCK8,
+	gli::format::FORMAT_RGB_ETC_UNORM_BLOCK8,
+	gli::format::FORMAT_RGB_ATC_UNORM_BLOCK8,
+	gli::format::FORMAT_RGBA_ATCA_UNORM_BLOCK16,
+	gli::format::FORMAT_RGBA_ATCI_UNORM_BLOCK16,
+	gli::format::FORMAT_L8_UNORM_PACK8,
+	
+	gli::format::FORMAT_LA8_UNORM_PACK8,
+	gli::format::FORMAT_L16_UNORM_PACK16,
+	gli::format::FORMAT_LA16_UNORM_PACK16,
+	*/
+	};
 }
 
-void gli_store_level(int layer, int level, const void* data, uint64_t size)
+std::vector<uint32_t> ktx_get_export_formats()
 {
-	if (s_useCubemap)
-	{
-		if (s_textureCube.size(level) != size)
-			throw std::runtime_error("data size mismatch. Expected "
-				+ std::to_string(s_textureCube.size(level)) + " but got " + std::to_string(size));
-		memcpy(s_textureCube.data(0, layer, level), data, size);
-	}
-	else
-	{
-		if (s_textureArray.size(level) != size)
-			throw std::runtime_error("data size mismatch. Expected "
-				+ std::to_string(s_textureArray.size(level)) + " but got " + std::to_string(size));
-		memcpy(s_textureArray.data(layer, 0, level), data, size);
-	}
+	return dds_get_export_formats();
 }
 
-void gli_get_level_size(int level, uint64_t& size)
+void gli_save_image(const char* filename, const image::Image& image, gli::format format, bool ktx)
 {
-	if (s_useCubemap)
+	gli::texture tex;
+	bool isCube = image.layer.size() == 6;
+	// create texture storage
+	if(isCube)
 	{
-		size = s_textureCube.size(level);
+		tex = static_cast<gli::texture>(gli::texture_cube(image.format,
+              gli::extent2d(image.layer[0].mipmaps[0].width,image.layer[0].mipmaps[0].height), 
+              image.layer[0].mipmaps.size()
+		));
 	}
 	else
 	{
-		size = s_textureArray.size(level);
+		tex = static_cast<gli::texture>(gli::texture2d_array(image.format,
+             gli::extent2d(image.layer[0].mipmaps[0].width, image.layer[0].mipmaps[0].height), 
+             image.layer.size(), 
+             image.layer[0].mipmaps.size()));
 	}
-}
 
-void gli_save_ktx(const char* filename)
-{
-	if (s_useCubemap)
+	// transfer texture data
+	for(size_t curLayer = 0; curLayer < image.layer.size(); ++curLayer)
 	{
-		if (!gli::save_ktx(s_textureCube, filename))
+		for(size_t curMip = 0; curMip < image.layer[curLayer].mipmaps.size(); ++curMip)
 		{
-			// clear texture
-			s_textureCube = gli::texture_cube();
-			throw std::exception("could not save file");
-		}
-		// clear texture
-		s_textureCube = gli::texture_cube();
-	}
-	else
-	{
-		if (!gli::save_ktx(s_textureArray, filename))
-		{
-			// clear texture
-			s_textureArray = gli::texture2d_array();
-			throw std::exception("could not save file");
-		}
-		// clear texture
-		s_textureArray = gli::texture2d_array();
-	}
-}
+			auto* dst = tex.data(
+				isCube ? 0 : curLayer,
+				isCube ? curLayer : 0,
+				curMip
+			);
+			const auto& mip = image.layer[curLayer].mipmaps[curMip];
+			if (mip.bytes.size() != tex.size(curMip))
+				throw std::runtime_error("mipmap size mipmatch. Expected "
+					+ std::to_string(tex.size(curMip)) + " but got " + std::to_string(mip.bytes.size()));
 
-void gli_save_dds(const char* filename)
-{
-	if (s_useCubemap)
-	{
-		if (!gli::save_dds(s_textureCube, filename))
-		{
-			// clear texture
-			s_textureCube = gli::texture_cube();
-			throw std::exception("could not save file");
+			memcpy(dst, mip.bytes.data(), mip.bytes.size());
 		}
-		// clear texture
-		s_textureCube = gli::texture_cube();
 	}
+
+	// convert texture if necessary
+	if(tex.format() != format)
+	{
+		tex = gli::convert(tex, format);
+	}
+
+	// save
+	if (ktx)
+		gli::save_ktx(tex, filename);
 	else
-	{
-		if (!gli::save_dds(s_textureArray, filename))
-		{
-			// clear texture
-			s_textureArray = gli::texture2d_array();
-			throw std::exception("could not save file");
-		}
-		// clear texture
-		s_textureArray = gli::texture2d_array();
-	}
+		gli::save_dds(tex, filename);
 }

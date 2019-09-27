@@ -13,13 +13,13 @@ extern "C"
 __declspec(dllexport)
 int
 __cdecl
-open(const char* filename);
+image_open(const char* filename);
 
 extern "C"
 __declspec(dllexport)
 void
 __cdecl
-release(int id);
+image_release(int id);
 
 extern "C"
 __declspec(dllexport)
