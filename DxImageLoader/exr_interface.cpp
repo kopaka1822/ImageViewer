@@ -26,9 +26,8 @@ std::unique_ptr<image::Image> openexr_load(const char* filename)
 
 	memcpy(mipmap.bytes.data(), out, imgSize);
 
-	res->format.isSrgb = false;
-	res->format.dxgi = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	res->format.hasAlpha = true;
+	res->format = gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
+	res->original = gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
 
 	res->layer.emplace_back();
 	res->layer[0].mipmaps.push_back(std::move(mipmap));

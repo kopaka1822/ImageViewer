@@ -44,4 +44,4 @@
 #define STRICT
 
 #include <Windows.h>
-#include <dxgiformat.h>
+#include <gli/format.hpp>

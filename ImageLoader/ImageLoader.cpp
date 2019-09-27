@@ -25,7 +25,7 @@ inline bool file_exists(const std::string& name) {
 	return f.good();
 }
 
-int open(const char* filename)
+int image_open(const char* filename)
 {
 	// try loading the resource
 	// transform filename to lowercase for file extension check
@@ -68,7 +68,7 @@ int open(const char* filename)
 	return id;
 }
 
-void release(int id)
+void image_release(int id)
 {
 	auto it = s_resources.find(id);
 	if (it != s_resources.end())

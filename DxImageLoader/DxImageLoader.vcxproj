@@ -159,8 +159,8 @@
   <ItemGroup>
     <ClInclude Include="..\dependencies\stb_image.h" />
     <ClInclude Include="..\dependencies\stb_image_write.h" />
+    <ClInclude Include="convert.h" />
     <ClInclude Include="exr_interface.h" />
-    <ClInclude Include="Format.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="gli_interface.h" />
     <ClInclude Include="Image.h" />
@@ -175,6 +175,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="exr_interface.cpp" />
     <ClCompile Include="gli_interface.cpp" />
+    <ClCompile Include="Image.cpp" />
     <ClCompile Include="interface.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

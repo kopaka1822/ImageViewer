@@ -81,16 +81,15 @@ std::unique_ptr<image::Image> pfm_load(const char* filename)
 	bool grayscale = (bands == "Pf");
 
 	auto res = std::make_unique<image::Image>();
-	res->format.isSrgb = false;
-	res->format.hasAlpha = false;
-	res->format.dxgi = grayscale ? DXGI_FORMAT_R32_FLOAT : DXGI_FORMAT_R32G32B32_FLOAT;
+	res->original = grayscale ? gli::FORMAT_R32_SFLOAT_PACK32 : gli::FORMAT_RGB32_SFLOAT_PACK32;
+	res->format = gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
 	res->layer.emplace_back();
 	res->layer.at(0).mipmaps.emplace_back();
 	auto& mipmap = res->layer.at(0).mipmaps.at(0);
 
 	mipmap.width = width;
 	mipmap.height = height;
-	mipmap.bytes.resize(width * height * 4 * (grayscale ? 1 : 3));
+	mipmap.bytes.resize(width * height * 4 * 4);
 	auto data = reinterpret_cast<float*>(mipmap.bytes.data());
 
 	if (bands == "Pf") {          // handle 1-band image 
@@ -101,7 +100,11 @@ std::unique_ptr<image::Image> pfm_load(const char* filename)
 				if (needSwap) {
 					swapBytes(&fvalue);
 				}
-				*(data + (height - i - 1) * width + j) = fvalue;
+				auto offset = data + ((height - i - 1) * width + j) * 4;
+				offset[0] = fvalue; // grayscale => repeat on each channel
+				offset[1] = fvalue;
+				offset[2] = fvalue;
+				offset[3] = 1.0f; // alpha
 			}
 		}
 	}
@@ -115,9 +118,11 @@ std::unique_ptr<image::Image> pfm_load(const char* filename)
 					swapBytes(&vfvalue.g);
 					swapBytes(&vfvalue.b);
 				}
-				*(data + ((height - i - 1) * width + j) * 3) = vfvalue.r;
-				*(data + ((height - i - 1) * width + j) * 3 + 1) = vfvalue.g;
-				*(data + ((height - i - 1) * width + j) * 3 + 2) = vfvalue.b;
+				auto offset = data + ((height - i - 1) * width + j) * 4;
+				offset[0] = vfvalue.r;
+				offset[1] = vfvalue.g;
+				offset[2] = vfvalue.b;
+				offset[3] = 1.0f; // alpha
 			}
 		}
 	}
@@ -125,4 +130,12 @@ std::unique_ptr<image::Image> pfm_load(const char* filename)
 		throw std::exception("invalid header - unknown bands description");
 
 	return res;
+}
+
+std::vector<uint32_t> pfm_get_export_formats()
+{
+	return {
+		gli::format::FORMAT_RGBA32_SFLOAT_PACK32,
+		gli::format::FORMAT_R32_SFLOAT_PACK32,
+	};
 }

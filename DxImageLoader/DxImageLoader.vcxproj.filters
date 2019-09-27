@@ -29,9 +29,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Format.h">
-      <Filter>Source Files\Image</Filter>
-    </ClInclude>
     <ClInclude Include="Layer.h">
       <Filter>Source Files\Image</Filter>
     </ClInclude>
@@ -68,6 +65,9 @@
     <ClInclude Include="framework.h">
       <Filter>Source Files\pch</Filter>
     </ClInclude>
+    <ClInclude Include="convert.h">
+      <Filter>Source Files\Image</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -90,6 +90,9 @@
     </ClCompile>
     <ClCompile Include="pch.cpp">
       <Filter>Source Files\pch</Filter>
+    </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>Source Files\Image</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

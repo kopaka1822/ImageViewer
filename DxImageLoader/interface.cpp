@@ -9,10 +9,15 @@
 #include "gli_interface.h"
 #include "pfm_interface.h"
 #include "exr_interface.h"
+#include <map>
+#include "convert.h"
 
 static int s_currentID = 1;
 static std::unordered_map<int, std::unique_ptr<image::Image>> s_resources;
 std::string s_error;
+
+// key = extension (e.g. png), value = DXGI formats
+static std::map<std::string, std::vector<uint32_t>> s_exportFormats;
 
 bool hasEnding(std::string const& fullString, std::string const& ending) {
 	if (fullString.length() >= ending.length()) {
@@ -26,7 +31,15 @@ inline bool file_exists(const std::string& name) {
 	return f.good();
 }
 
-int open(const char* filename)
+inline void assertSingleLayerMip(const image::Image& image)
+{
+	if (image.layer.size() != 1)
+		throw std::runtime_error("expected single layer image");
+	if (image.layer[0].mipmaps.size() != 1)
+		throw std::runtime_error("expected single mipmap image");
+}
+
+int image_open(const char* filename)
 {
 	// try loading the resource
 	// transform filename to lowercase for file extension check
@@ -69,24 +82,57 @@ int open(const char* filename)
 	return id;
 }
 
-void release(int id)
+int image_allocate(uint32_t format, int width, int height, int layer, int mipmaps)
+{
+	auto res = std::make_unique<image::Image>();
+	res->format = gli::format(format);
+	res->original = res->format;
+	if(image::isSupported(res->format))
+	{
+		set_error("image format is not supported for allocate");
+		return 0;
+	}
+
+	const auto pixelSize = image::pixelSize(res->format);
+	res->layer.resize(layer);
+	for(auto& l : res->layer)
+	{
+		l.mipmaps.resize(mipmaps);
+		int curWidth = width;
+		int curHeight = height;
+		for(auto& m : l.mipmaps)
+		{
+			m.bytes.resize(curWidth * curHeight * pixelSize);
+			m.width = curWidth;
+			m.height = curHeight;
+			m.depth = 1;
+
+			curWidth = std::max(curWidth / 2, 1);
+			curHeight = std::max(curHeight / 2, 1);
+		}
+	}
+
+	int id = s_currentID++;
+	s_resources[id] = move(res);
+
+	return id;
+}
+
+void image_release(int id)
 {
 	auto it = s_resources.find(id);
 	if (it != s_resources.end())
 		s_resources.erase(it);
 }
 
-void image_info(int id, uint32_t& format, int& nLayer, int& nMipmaps, bool& isSrgb, bool& hasAlpha)
+void image_info(int id, uint32_t& format, int& nLayer, int& nMipmaps)
 {
 	auto it = s_resources.find(id);
 	if (it == s_resources.end())
 		return;
 
-	format = uint32_t(it->second->format.dxgi);
+	format = uint32_t(it->second->format);
 	nLayer = int(it->second->layer.size());
-
-	isSrgb = it->second->format.isSrgb;
-	hasAlpha = it->second->format.hasAlpha;
 
 	nMipmaps = 0;
 	if (nLayer > 0)
@@ -125,6 +171,69 @@ unsigned char* image_get_mipmap(int id, int layer, int mipmap, uint32_t& size)
 
 	size = static_cast<int>(it->second->layer.at(layer).mipmaps[mipmap].bytes.size());
 	return it->second->layer.at(layer).mipmaps[mipmap].bytes.data();
+}
+
+bool image_save(int id, const char* filename, const char* extension, uint32_t format, int quality)
+{
+	auto it = s_resources.find(id);
+	if (it == s_resources.end())
+	{
+		set_error("invalid image id");
+		return false;
+	}
+
+	const std::string ext = extension;
+	const std::string fullName = filename + std::string(".") + extension;
+	try
+	{
+		if (ext == "dds")
+			gli_save_image(fullName.c_str(), *it->second, gli::format(format), false);
+		else if(ext == "ktx")
+			gli_save_image(fullName.c_str(), *it->second, gli::format(format), true);
+		else if(ext == "pfm" || ext == "hdr")
+		{
+			assertSingleLayerMip(*it->second);
+			if (it->second->format != gli::FORMAT_RGBA32_SFLOAT_PACK32)
+				throw std::exception("expected RGBA32F image format for pfm, hdr export");
+
+			// only 2 possible formats
+			if(format == gli::FORMAT_RGB32_SFLOAT_PACK32)
+			{
+				image::changeStride(it->second->layer[0].mipmaps[0].bytes, 32, 24);
+				// TODO
+			}
+		}
+	}
+	catch(const std::exception& e)
+	{
+		set_error(e.what());
+		return false;
+	}
+
+	return true;
+}
+
+const uint32_t* get_export_formats(const char* extension, int& numFormats)
+{
+	if(s_exportFormats.empty())
+	{
+		s_exportFormats["dds"];
+		s_exportFormats["ktx"];
+		s_exportFormats["pfm"] = pfm_get_export_formats();
+		s_exportFormats["hdr"] = stb_image_get_export_formats("hdr");
+		s_exportFormats["jpg"] = stb_image_get_export_formats("jpg");
+		s_exportFormats["png"] = stb_image_get_export_formats("png");
+		s_exportFormats["bmp"] = stb_image_get_export_formats("bmp");
+	}
+	auto it = s_exportFormats.find(extension);
+	if(it == s_exportFormats.end())
+	{	
+		numFormats = 0;
+		return nullptr;
+	}
+
+	numFormats = int(it->second.size());
+	return it->second.data();
 }
 
 const char* get_error(int& length)

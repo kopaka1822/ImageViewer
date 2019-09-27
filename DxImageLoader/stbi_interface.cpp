@@ -7,53 +7,37 @@
 #include "../dependencies/stb_image_write.h"
 #include <fstream>
 
-DXGI_FORMAT getDxFormat(int nComponents, bool isFloat, bool& isSrgb, bool& hasAlpha)
+gli::format getFloatFormat(int numComponents)
 {
-	if (isFloat)
+	switch(numComponents)
 	{
-		isSrgb = false;
-		hasAlpha = false;
-		switch (nComponents)
-		{
-		case 1:
-			return DXGI_FORMAT_R32_FLOAT;
-		case 2:
-			return DXGI_FORMAT_R32G32_FLOAT;
-		case 3:
-			return DXGI_FORMAT_R32G32B32_FLOAT;
-		case 4:
-			hasAlpha = true;
-			return DXGI_FORMAT_R32G32B32A32_FLOAT;
-		}
+	case 1: return gli::FORMAT_R32_SFLOAT_PACK32;
+	case 2: return gli::FORMAT_RG32_SFLOAT_PACK32;
+	case 3: return gli::FORMAT_RGB32_SFLOAT_PACK32;
+	case 4: return gli::FORMAT_RGBA32_SFLOAT_PACK32;
 	}
-	else
+	return gli::FORMAT_UNDEFINED;
+}
+
+gli::format getSrgbFormat(int numComponents)
+{
+	switch(numComponents)
 	{
-		// TODO let the user decide if srgb conversion should be done
-		isSrgb = true;
-		hasAlpha = false;
-
-		switch (nComponents)
-		{
-		case 1:			
-			return DXGI_FORMAT_R8_UNORM;
-		case 2:
-			return DXGI_FORMAT_R8G8_UNORM;
-		case 3:
-			return DXGI_FORMAT_R8G8B8A8_UNORM;
-		case 4:
-			hasAlpha = true;
-			return DXGI_FORMAT_R8G8B8A8_UNORM;
-		}
+	case 1: return gli::FORMAT_R8_SRGB_PACK8;
+	case 2: return gli::FORMAT_RG8_SRGB_PACK8;
+	case 3: return gli::FORMAT_RGB8_SRGB_PACK8;
+	case 4: return gli::FORMAT_RGBA8_SRGB_PACK8;
 	}
-
-	return DXGI_FORMAT_UNKNOWN;
+	return gli::FORMAT_UNDEFINED;
 }
 
 std::unique_ptr<image::Image> stb_image_load(const char* filename)
 {
 	// create resource with one layer
-	image::Mipmap mipmap;
-	image::Format format;
+	auto res = std::make_unique<image::Image>();
+	res->layer.emplace_back();
+	res->layer[0].mipmaps.emplace_back();
+	auto& mipmap = res->layer[0].mipmaps[0];
 
 	//stbi_set_flip_vertically_on_load(true);
 	if (stbi_is_hdr(filename))
@@ -61,13 +45,13 @@ std::unique_ptr<image::Image> stb_image_load(const char* filename)
 		// load hdr file
 		int nComponents = 0;
 		float* data = stbi_loadf(filename, reinterpret_cast<int*>(&mipmap.width),
-			reinterpret_cast<int*>(&mipmap.height), &nComponents, 0);
+			reinterpret_cast<int*>(&mipmap.height), &nComponents, 4);
 		if (!data)
 			throw std::exception("error during reading file");
 
-		format.dxgi = getDxFormat(nComponents, true, format.isSrgb, format.hasAlpha);
-
-		size_t mipSize = mipmap.width * mipmap.height * nComponents * 4;
+		res->original = getFloatFormat(nComponents);
+		res->format = gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
+		size_t mipSize = mipmap.width * mipmap.height * 4 * 4;
 		mipmap.bytes.resize(mipSize);
 		memcpy(mipmap.bytes.data(), data, mipSize);
 
@@ -75,38 +59,46 @@ std::unique_ptr<image::Image> stb_image_load(const char* filename)
 	}
 	else
 	{
-		// obtain information about number of components
-		int nComponents = 0;
-		if (!stbi_info(filename, reinterpret_cast<int*>(&mipmap.height), reinterpret_cast<int*>(&mipmap.width), &nComponents))
-			throw std::exception("error during reading file");
-
-		// 3 component 8 bit textures are not supported by DXGI => round up to 4 bit
-		int reqComponents = nComponents;
-		if (reqComponents == 3)
-			reqComponents = 4;
-
 		// load ldr file
+		int nComponents = 0;
 		stbi_uc* data = stbi_load(filename, reinterpret_cast<int*>(&mipmap.width),
-			reinterpret_cast<int*>(&mipmap.height), &nComponents, reqComponents);
+			reinterpret_cast<int*>(&mipmap.height), &nComponents, 4);
 		if (!data)
 			throw std::exception("error during reading file");
 
-		format.dxgi = getDxFormat(nComponents, false, format.isSrgb, format.hasAlpha);
+		res->original = getSrgbFormat(nComponents);
+		res->format = gli::format::FORMAT_RGBA8_SRGB_PACK8;
 
-		size_t mipSize = mipmap.width * mipmap.height * reqComponents;
+		size_t mipSize = mipmap.width * mipmap.height * 4;
 		mipmap.bytes.resize(mipSize);
 		memcpy(mipmap.bytes.data(), data, mipSize);
 
 		stbi_image_free(data);
 	}
 
-	// make the resource
-	auto res = std::make_unique<image::Image>();
-	res->format = format;
-	res->layer.emplace_back();
-	res->layer[0].mipmaps.push_back(std::move(mipmap));
-
 	return res;
+}
+
+std::vector<uint32_t> stb_image_get_export_formats(const char* extension)
+{
+	auto ext = std::string(extension);
+	if (ext == "bmp" || ext == "jpg")
+		return std::vector<uint32_t>{
+			gli::format::FORMAT_RGB8_SRGB_PACK8,
+			gli::format::FORMAT_R8_SRGB_PACK8
+		};
+	if (ext == "png")
+		return std::vector<uint32_t>{
+			gli::format::FORMAT_RGBA8_SRGB_PACK8,
+			gli::format::FORMAT_RGB8_SRGB_PACK8,
+			gli::format::FORMAT_R8_SRGB_PACK8
+		};
+	if (ext == "hdr")
+		return std::vector<uint32_t>{
+			gli::format::FORMAT_RGB32_SFLOAT_PACK32,
+			gli::format::FORMAT_R32_SFLOAT_PACK32
+		};
+	return {};
 }
 
 void stb_save_png(const char* filename, int width, int height, int components, const void* data)
