@@ -6,14 +6,18 @@ using System.Threading.Tasks;
 
 namespace ImageFramework.ImageLoader
 {
-    public class Image
+    public class Image : IDisposable
     {
         public ImageFormat Format { get; }
         public List<Layer> Layers { get; }
         public string Filename { get; }
 
+        // link to the dll resource id
+        public Resource Resource { get; }
+
         public Image(Resource resource, string filename, int nLayer, int nMipmaps, ImageFormat format)
         {
+            Resource = resource;
             Filename = filename;
             Format = format;
             // load relevant information
@@ -42,31 +46,9 @@ namespace ImageFramework.ImageLoader
         public int NumMipmaps => Layers.Count > 0 ? Layers[0].Mipmaps.Count : 0;
         public int NumLayers => Layers.Count;
 
-        /// <summary>
-        /// checks if the image is grayscale
-        /// </summary>
-        /// <returns>true if only one component is used</returns>
-        public bool IsGrayscale()
+        public void Dispose()
         {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// checks for availability of the alpha components
-        /// </summary>
-        /// <returns>true if image has an alpha component</returns>
-        public bool HasAlpha()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// checks for high dimension range
-        /// </summary>
-        /// <returns>true if the image type is bigger than byte (range > [0-255])</returns>
-        public bool IsHdr()
-        {
-           throw new NotImplementedException();
+            Resource.Dispose();
         }
     }
 }

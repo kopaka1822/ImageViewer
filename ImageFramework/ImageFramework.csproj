@@ -68,6 +68,7 @@
     <Compile Include="DirectX\SwapChain.cs" />
     <Compile Include="DirectX\TextureArray2D.cs" />
     <Compile Include="ImageLoader\Dll.cs" />
+    <Compile Include="ImageLoader\GliFormat.cs" />
     <Compile Include="ImageLoader\Image.cs" />
     <Compile Include="ImageLoader\ImageFormat.cs" />
     <Compile Include="ImageLoader\IO.cs" />

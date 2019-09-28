@@ -33,8 +33,14 @@ EXPORT(void) image_info_mipmap(int id, int mipmap, int& width, int& height);
 EXPORT(unsigned char*) image_get_mipmap(int id, int layer, int mipmap, uint32_t& size);
 
 /// \brief saves the image with the given format and extension
+/// \param id valid image id
+/// \param filename filename without extension
+/// \param extension file format extension (without dot)
 /// \param format format that must be compatible with the extension. Can by queried with image_get_export_formats
 /// \param quality quality for compressed formats or .jpg. range: [0, 100]
+/// \warning the image data might be changed by calling this function. Thus, the image should no longer be used after a call to save
+/// \remarks for pfm and hdr export: the image format must be FORMAT_RGBA32_SFLOAT_PACK32.
+///          for png, jpg and bmp export the image format must be one of: FORMAT_RGBA8_SRGB_PACK8, FORMAT_RGBA8_UNORM_PACK8, FORMAT_RGBA8_SNORM_PACK8
 EXPORT(bool) image_save(int id, const char* filename, const char* extension, uint32_t format, int quality);
 
 /// \brief retrieves an array with all supported dxgi formats that are available for export with the extension

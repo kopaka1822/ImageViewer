@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
+using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDX.DXGI;
@@ -35,109 +36,72 @@ namespace FrameworkTests.ImageLoader
             Assert.AreEqual(smallData.Length, colors.Length);
             for (int i = 0; i < colors.Length; ++i)
             {
-                Assert.IsTrue(colors[i].Equals(smallData[i], channels));
+                Assert.IsTrue(colors[i].Equals(smallData[i], channels, 0.02f)); // high tolerance because of jpg compression
             }
         }
 
-        private void VerifySmall3Ldr(Image image)
+        private void VerifySmallLdr(Image image, Color.Channel channels)
         {
             Assert.AreEqual(1, image.NumMipmaps);
             Assert.AreEqual(1, image.NumLayers);
             Assert.AreEqual(3, image.GetWidth(0));
             Assert.AreEqual(3, image.GetHeight(0));
-            Assert.AreEqual(Format.R8G8B8A8_UNorm, image.Format.Format);
-            Assert.AreEqual(true, image.Format.IsSrgb);
-            Assert.AreEqual(false , image.Format.HasAlpha);
-            
+            Assert.AreEqual(Format.R8G8B8A8_UNorm_SRgb, image.Format.DxgiFormat);
+
+            CompareWithSmall(image, channels);
         }
 
-        private void VerifySmall4Ldr(Image image)
+        public void VerifySmallHdr(Image image, Color.Channel channels)
         {
             Assert.AreEqual(1, image.NumMipmaps);
             Assert.AreEqual(1, image.NumLayers);
             Assert.AreEqual(3, image.GetWidth(0));
             Assert.AreEqual(3, image.GetHeight(0));
-            Assert.AreEqual(Format.R8G8B8A8_UNorm, image.Format.Format);
-            Assert.AreEqual(true, image.Format.IsSrgb);
-            Assert.AreEqual(true, image.Format.HasAlpha);
+            Assert.AreEqual(Format.R32G32B32A32_Float, image.Format.DxgiFormat);
 
-        }
-
-        public void VerifySmall4Hdr(Image image)
-        {
-            Assert.AreEqual(1, image.NumMipmaps);
-            Assert.AreEqual(1, image.NumLayers);
-            Assert.AreEqual(3, image.GetWidth(0));
-            Assert.AreEqual(3, image.GetHeight(0));
-            Assert.AreEqual(Format.R32G32B32A32_Float, image.Format.Format);
-            Assert.AreEqual(false, image.Format.IsSrgb);
-            Assert.AreEqual(true, image.Format.HasAlpha);
-
-            CompareWithSmall(image, Color.Channel.Rgba);
-        }
-
-        public void VerifySmall3Hdr(Image image)
-        {
-            Assert.AreEqual(1, image.NumMipmaps);
-            Assert.AreEqual(1, image.NumLayers);
-            Assert.AreEqual(3, image.GetWidth(0));
-            Assert.AreEqual(3, image.GetHeight(0));
-            Assert.AreEqual(Format.R32G32B32_Float, image.Format.Format);
-            Assert.AreEqual(false, image.Format.IsSrgb);
-            Assert.AreEqual(false, image.Format.HasAlpha);
-        }
-
-        public void VerifySmall1Hdr(Image image)
-        {
-            Assert.AreEqual(1, image.NumMipmaps);
-            Assert.AreEqual(1, image.NumLayers);
-            Assert.AreEqual(3, image.GetWidth(0));
-            Assert.AreEqual(3, image.GetHeight(0));
-            Assert.AreEqual(Format.R32_Float, image.Format.Format);
-            Assert.AreEqual(false, image.Format.IsSrgb);
-            Assert.AreEqual(false, image.Format.HasAlpha);
+            CompareWithSmall(image, channels);
         }
 
         [TestMethod]
         public void StbiLdr()
         {
-            VerifySmall3Ldr(IO.LoadImage(Directory + "small.png"));
+            VerifySmallLdr(IO.LoadImage(Directory + "small.png"), Color.Channel.Rgb);
 
-            VerifySmall4Ldr(IO.LoadImage(Directory + "small_a.png"));
+            VerifySmallLdr(IO.LoadImage(Directory + "small_a.png"), Color.Channel.Rgba);
 
-            VerifySmall3Ldr(IO.LoadImage(Directory + "small.bmp"));
+            VerifySmallLdr(IO.LoadImage(Directory + "small.bmp"), Color.Channel.Rgb);
 
-            VerifySmall3Ldr(IO.LoadImage(Directory + "small.jpg"));
+            VerifySmallLdr(IO.LoadImage(Directory + "small.jpg"), Color.Channel.Rgb);
         }
 
         [TestMethod]
         public void StbiHdr()
         {
-            VerifySmall3Hdr(IO.LoadImage(Directory + "small.hdr"));
+            VerifySmallHdr(IO.LoadImage(Directory + "small.hdr"), Color.Channel.Rgb);
         }
 
         [TestMethod]
         public void PfmColor()
         {
-            VerifySmall3Hdr(IO.LoadImage(Directory + "small.pfm"));
+            VerifySmallHdr(IO.LoadImage(Directory + "small.pfm"), Color.Channel.Rgb);
         }
 
         [TestMethod]
         public void PfmGrayscale()
         {
-            VerifySmall1Hdr(IO.LoadImage(Directory + "small_g.pfm"));
+            VerifySmallHdr(IO.LoadImage(Directory + "small_g.pfm"), Color.Channel.R);
         }
 
         [TestMethod]
         public void DDSSimple()
         {
-            VerifySmall4Hdr(IO.LoadImage(Directory + "small.dds"));
+            VerifySmallHdr(IO.LoadImage(Directory + "small.dds"), Color.Channel.Rgba);
         }
 
         [TestMethod]
         public void KTXSimple()
         {
-            VerifySmall4Hdr(IO.LoadImage(Directory + "small.ktx"));
+            VerifySmallHdr(IO.LoadImage(Directory + "small.ktx"), Color.Channel.Rgba);
         }
     }
 }

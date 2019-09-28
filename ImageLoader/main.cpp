@@ -6,9 +6,9 @@ int main(int argc, char** argv)
 {
 	if(argc >= 2)
 	{
-		auto id = image_open(argv[1]);
+		auto id = open(argv[1]);
 
-		image_release(id);
+		release(id);
 	}
 	return 0;
 }

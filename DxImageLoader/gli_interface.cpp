@@ -6,7 +6,7 @@
 
 std::unique_ptr<image::Image> gli_load(const char* filename)
 {
-	gli::texture tex = gli::load(filename);
+	gli::texture2d_array tex(gli::load(filename));
 	if (tex.empty())
 		throw std::exception("error opening file");
 	auto originalFormat = tex.format();
@@ -38,7 +38,7 @@ std::unique_ptr<image::Image> gli_load(const char* filename)
 				image::Mipmap& mipmap = res->layer.at(outputLayer).mipmaps.at(mip);
 				mipmap.width = tex.extent(mip).x;
 				mipmap.height = tex.extent(mip).y;
-				mipmap.depth = tex.extent(mip).z;
+				mipmap.depth = 1;
 
 				auto data = tex.data(layer, face, mip);
 				auto size = tex.size(mip);
@@ -198,22 +198,26 @@ std::vector<uint32_t> ktx_get_export_formats()
 
 void gli_save_image(const char* filename, const image::Image& image, gli::format format, bool ktx)
 {
-	gli::texture tex;
+	gli::texture* tex = nullptr;
+	gli::texture2d_array tex2d;
+	gli::texture_cube texCube;
 	bool isCube = image.layer.size() == 6;
 	// create texture storage
 	if(isCube)
 	{
-		tex = static_cast<gli::texture>(gli::texture_cube(image.format,
-              gli::extent2d(image.layer[0].mipmaps[0].width,image.layer[0].mipmaps[0].height), 
-              image.layer[0].mipmaps.size()
-		));
+		texCube = gli::texture_cube(image.format,
+			gli::extent2d(image.layer[0].mipmaps[0].width, image.layer[0].mipmaps[0].height),
+			image.layer[0].mipmaps.size()
+		);
+		tex = &texCube;
 	}
 	else
 	{
-		tex = static_cast<gli::texture>(gli::texture2d_array(image.format,
-             gli::extent2d(image.layer[0].mipmaps[0].width, image.layer[0].mipmaps[0].height), 
-             image.layer.size(), 
-             image.layer[0].mipmaps.size()));
+		tex2d = gli::texture2d_array(image.format,
+			gli::extent2d(image.layer[0].mipmaps[0].width, image.layer[0].mipmaps[0].height),
+			image.layer.size(),
+			image.layer[0].mipmaps.size());
+		tex = &tex2d;
 	}
 
 	// transfer texture data
@@ -221,29 +225,32 @@ void gli_save_image(const char* filename, const image::Image& image, gli::format
 	{
 		for(size_t curMip = 0; curMip < image.layer[curLayer].mipmaps.size(); ++curMip)
 		{
-			auto* dst = tex.data(
+			auto* dst = tex->data(
 				isCube ? 0 : curLayer,
 				isCube ? curLayer : 0,
 				curMip
 			);
 			const auto& mip = image.layer[curLayer].mipmaps[curMip];
-			if (mip.bytes.size() != tex.size(curMip))
+			if (mip.bytes.size() != tex->size(curMip))
 				throw std::runtime_error("mipmap size mipmatch. Expected "
-					+ std::to_string(tex.size(curMip)) + " but got " + std::to_string(mip.bytes.size()));
+					+ std::to_string(tex->size(curMip)) + " but got " + std::to_string(mip.bytes.size()));
 
 			memcpy(dst, mip.bytes.data(), mip.bytes.size());
 		}
 	}
 
 	// convert texture if necessary
-	if(tex.format() != format)
+	if(tex->format() != format)
 	{
-		tex = gli::convert(tex, format);
+		if (isCube)
+			texCube = gli::convert(texCube, format);
+		else
+			tex2d = gli::convert(tex2d, format);
 	}
 
 	// save
 	if (ktx)
-		gli::save_ktx(tex, filename);
+		gli::save_ktx(*tex, filename);
 	else
-		gli::save_dds(tex, filename);
+		gli::save_dds(*tex, filename);
 }

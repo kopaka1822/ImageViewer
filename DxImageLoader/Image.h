@@ -27,7 +27,7 @@ namespace image
 		return false;
 	}
 
-	inline uint32_t pixelSize(gli::format format);
+	uint32_t pixelSize(gli::format format);
 
 	gli::format getSupportedFormat(gli::format format);
 }
