@@ -139,3 +139,28 @@ std::vector<uint32_t> pfm_get_export_formats()
 		gli::format::FORMAT_R32_SFLOAT_PACK32,
 	};
 }
+
+void pfm_save(const char* filename, int width, int height, int components, const void* data)
+{
+	if (components != 1 && components != 3) 
+		throw std::runtime_error("pfm supports either 1 or 3 components");
+
+	std::ofstream file(filename, std::ios::binary);
+	if (file.bad() || file.fail())
+		throw std::runtime_error("Writing hdr image to " + std::string(filename) + ". cannot open file");
+	
+	file.write(components == 3 ? "PF\n" : "Pf\n", sizeof(char) * 3);
+	file << width << " " << height << "\n";
+
+	file.write("-1.000000\n", sizeof(char) * 10);
+
+	const float* v = reinterpret_cast<const float*>(data);
+	for (int y = 0; y < height; ++y)
+	{
+		for (int x = 0; x < width; ++x)
+		{
+			for (int c = 0; c < components; ++c)
+				file.write(reinterpret_cast<const char*>(&v[c + components * (x + (height - y - 1) * width)]), sizeof(float));
+		}
+	}
+}

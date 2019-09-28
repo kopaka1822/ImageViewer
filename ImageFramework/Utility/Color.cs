@@ -31,6 +31,22 @@ namespace ImageFramework.Utility
             Alpha = alpha;
         }
 
+        public Color(byte r, byte g, byte b, byte a, bool isSigned = false)
+        {
+            Red = r / 255.0f;
+            Green = g / 255.0f;
+            Blue = b / 255.0f;
+            Alpha = a / 255.0f;
+            
+            if(isSigned)
+            {
+                Red = Red * 2.0f - 1.0f;
+                Green = Green * 2.0f - 1.0f;
+                Blue = Blue * 2.0f - 1.0f;
+                Alpha = Alpha * 2.0f - 1.0f;
+            }
+        }
+
         public float Red;
         public float Green;
         public float Blue;
@@ -116,6 +132,22 @@ namespace ImageFramework.Utility
             if (c <= 0.0f) return 0.0f;
             if (c < 0.0031308) return 12.92f * c;
             return 1.055f * (float)Math.Pow(c, 0.41666) - 0.055f;
+        }
+
+        public Color FromSrgb()
+        {
+            return new Color(
+                FromSrgb(Red),
+                FromSrgb(Green),
+                FromSrgb(Blue),
+                Alpha
+            );
+        }
+
+        private float FromSrgb(float c)
+        {
+            if (c <= 0.04045f) return c / 12.92f;
+            return (float)Math.Pow((c + 0.055) / 1.055, 2.4);
         }
 
         public override string ToString()

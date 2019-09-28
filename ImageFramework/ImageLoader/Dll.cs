@@ -12,14 +12,17 @@ namespace ImageFramework.ImageLoader
         public const string DllFilePath = @"DxImageLoader.dll";
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int open(string filename);
+        public static extern int image_open(string filename);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void release(int id);
+        public static extern int image_allocate(uint format, int width, int height, int layer, int mipmaps);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void image_release(int id);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         public static extern void image_info(int id, out uint format,
-            out int nLayer, out int nMipmaps, out bool isSrgb, out bool hasAlpha);
+            out int nLayer, out int nMipmaps);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         public static extern void image_info_mipmap(int id, int mipmap, out int width, out int height);
@@ -28,50 +31,14 @@ namespace ImageFramework.ImageLoader
         public static extern IntPtr image_get_mipmap(int id, int layer, int mipmap, out uint size);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static extern bool image_save(int id, string filename, string extension, uint format, int quality);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr get_export_formats(string extension, out int nFormats);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr get_error(out int length);
-
-        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool save_png(string filename, int width, int height, int components, byte[] data);
-
-        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool save_bmp(string filename, int width, int height, int components, byte[] data);
-
-        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool save_hdr(string filename, int width, int height, int components, byte[] data);
-
-        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool save_pfm(string filename, int width, int height, int components, byte[] data);
-
-        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool save_jpg(string filename, int width, int height, int components, byte[] data, int quality);
-
-        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool create_storage(int format, int width, int height, int layer, int levels);
-
-        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool store_level(int layer, int level, byte[] data, UInt64 size);
-
-        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool get_level_size(int level, out UInt64 size);
-
-        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool save_ktx(string filename);
-
-        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        [return: MarshalAs(UnmanagedType.I1)]
-        public static extern bool save_dds(string filename);
-
-        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void gli_to_opengl_format(int gliFormat, out int glInternal, out int glExternal, out int glType, out bool isCompressed, out bool isSrgb);
 
         public static string GetError()
         {

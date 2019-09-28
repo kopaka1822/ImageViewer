@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,8 +11,8 @@ namespace ImageFramework.Model.Shader
 {
     public class ShaderModel : IDisposable
     {
-        private QuadShader quad { get; } = new QuadShader();
-        private ConvertFormatShader convert { get; } = new ConvertFormatShader();
+        private QuadShader quad = new QuadShader();
+        private ConvertFormatShader convert = new ConvertFormatShader();
 
         public ShaderModel()
         {
@@ -24,17 +25,18 @@ namespace ImageFramework.Model.Shader
         /// <param name="texture">src texture data</param>
         /// <param name="dstFormat">dst format</param>
         /// <returns></returns>
-        public TextureArray2D Convert(TextureArray2D texture, ImageFormat dstFormat)
+        public TextureArray2D Convert(TextureArray2D texture, SharpDX.DXGI.Format dstFormat)
         {
-            if (texture.HasFormat(dstFormat)) return texture.Clone();
+            Debug.Assert(convert.IsSupported(dstFormat));
+            Debug.Assert(convert.IsSupported(texture.Format));
+
+            if (texture.Format == dstFormat) return texture.Clone();
 
             var res = new TextureArray2D(
                 texture.NumLayers, texture.NumMipmaps, 
                 texture.Width, texture.Height,
-                dstFormat.Format, dstFormat.IsSrgb
+                dstFormat
             );
-
-            // TODO add srgb stuff
 
             var dev = Device.Get();
             for (int curLayer = 0; curLayer < texture.NumLayers; ++curLayer)

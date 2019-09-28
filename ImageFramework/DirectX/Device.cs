@@ -95,21 +95,42 @@ namespace ImageFramework.DirectX
         }
 
         /// <summary>
-        /// only works if the format is R32G32B32A32 FLOAT
+        /// gets color data, only works for the 4 supported formats.
+        /// Mainly for debug purposes
         /// </summary>
+        /// <returns></returns>
         public unsafe Color[] GetColorData(Texture2D res, int subresource, int width, int height)
         {
-            Debug.Assert(res.Description.Format == Format.R32G32B32A32_Float);
-
-            var tmp = GetData(res, subresource, width, height, 4 * 4);
-            var result = new Color[width * height];
-            fixed (byte* pBuffer = tmp)
+            if (res.Description.Format == Format.R32G32B32A32_Float)
             {
-                for (int i = 0; i < result.Length; i++)
-                    result[i] = ((Color*)pBuffer)[i];
-            }
+                var tmp = GetData(res, subresource, width, height, 4 * 4);
+                var result = new Color[width * height];
+                fixed (byte* pBuffer = tmp)
+                {
+                    for (int i = 0; i < result.Length; i++)
+                        result[i] = ((Color*)pBuffer)[i];
+                }
 
-            return result;
+                return result;
+            }
+            else
+            {
+                var tmp = GetData(res, subresource, width, height, 4);
+                var result = new Color[width * height];
+                bool isSigned = res.Description.Format == Format.R8G8B8A8_SNorm;
+                bool isSrgb = res.Description.Format == Format.R8G8B8A8_UNorm_SRgb;
+                fixed (byte* pBuffer = tmp)
+                {
+                    for (int dst = 0, src = 0; dst < result.Length; ++dst, src += 4)
+                    {
+                        result[dst] = new Color(pBuffer[src], pBuffer[src + 1], pBuffer[src + 2], pBuffer[src + 3], isSigned);
+                        if (isSrgb)
+                            result[dst] = result[dst].FromSrgb();
+                    }
+                }
+
+                return result;
+            }
         }
 
         public void Dispatch(int x, int y, int z = 1)
@@ -145,37 +166,9 @@ namespace ImageFramework.DirectX
             Rasterizer.SetScissorRectangle(0, 0, width, height);
         }
 
-        public string TestFormats()
+        public FormatSupport CheckFormatSupport(Format f)
         {
-            string formats = "";
-
-            foreach (var f in Enum.GetValues(typeof(Format)).Cast<Format>())
-            {
-                if(f.ToString().Contains("_Typeless")) continue;
-                if(f.ToString().Contains("_UInt")) continue;
-                if(f.ToString().Contains("_SInt")) continue;
-                //if(f.ToString().Contains("_TYPELESS")) continue;
-
-                var sup = Handle.CheckFormatSupport(f);
-
-                string line = "";
-                if ((sup & FormatSupport.Texture2D) == 0)
-                    continue;
-                if ((sup & FormatSupport.ShaderSample) != 0)
-                    line += "Sample ";
-                if ((sup & FormatSupport.RenderTarget) != 0)
-                    //continue;
-                    line += "Rendertarget ";
-                if ((sup & FormatSupport.Mip) != 0)
-                    line += "Mip ";
-                if ((sup & FormatSupport.MipAutogen) != 0)
-                    line += "MipAuto";
-
-                if (line.Length > 0)
-                    formats += f.ToString() + " " + line + "\n";
-            }
-
-            return formats;
+            return Handle.CheckFormatSupport(f);
         }
 
         public void DrawQuad()

@@ -11,6 +11,8 @@ namespace ImageFramework.ImageLoader
     {
         public int Width { get; }
         public int Height { get; }
+
+        // this pointer is managed by the resource of the Image class
         public IntPtr Bytes { get; }
         public uint Size { get; }
 
@@ -19,17 +21,8 @@ namespace ImageFramework.ImageLoader
             Dll.image_info_mipmap(resource.Id, mipmapId, out var width, out var height);
             Width = width;
             Height = height;
-
-            IntPtr ptr = Dll.image_get_mipmap(resource.Id, layerId, mipmapId, out var size);
+            Bytes =  Dll.image_get_mipmap(resource.Id, layerId, mipmapId, out var size);
             Size = size;
-            Bytes = Marshal.AllocHGlobal((int)Size);
-
-            Dll.CopyMemory(Bytes, ptr, Size);
-        }
-
-        ~Mipmap()
-        {
-            Marshal.FreeHGlobal(Bytes);
         }
     }
 }

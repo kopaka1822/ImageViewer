@@ -188,21 +188,71 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 	{
 		if (ext == "dds")
 			gli_save_image(fullName.c_str(), *it->second, gli::format(format), false);
-		else if(ext == "ktx")
+		else if (ext == "ktx")
 			gli_save_image(fullName.c_str(), *it->second, gli::format(format), true);
-		else if(ext == "pfm" || ext == "hdr")
+		else if (ext == "pfm" || ext == "hdr")
 		{
 			assertSingleLayerMip(*it->second);
 			if (it->second->format != gli::FORMAT_RGBA32_SFLOAT_PACK32)
-				throw std::exception("expected RGBA32F image format for pfm, hdr export");
+				throw std::runtime_error ("expected RGBA32F image format for pfm, hdr export");
+
+			auto& mip = it->second->layer[0].mipmaps[0];
+			int nComponents = 0;
 
 			// only 2 possible formats
-			if(format == gli::FORMAT_RGB32_SFLOAT_PACK32)
+			if (format == gli::FORMAT_RGB32_SFLOAT_PACK32)
 			{
-				image::changeStride(it->second->layer[0].mipmaps[0].bytes, 32, 24);
-				// TODO
+				image::changeStride(mip.bytes, 32, 24);
+				nComponents = 3;
 			}
+			else if (format == gli::FORMAT_R32_SFLOAT_PACK32)
+			{
+				image::changeStride(mip.bytes, 32, 8);
+				nComponents = 1;
+			}
+			else throw std::runtime_error("export format not supported for pfm, hdr");
+
+			if (ext == "hdr")
+				stb_save_hdr(fullName.c_str(), mip.width, mip.height, nComponents, mip.bytes.data());
+			else if (ext == "pfm")
+				pfm_save(fullName.c_str(), mip.width, mip.height, nComponents, mip.bytes.data());
+			else assert(false);
 		}
+		else if (ext == "png" || ext == "jpg" || ext == "bmp")
+		{
+			assertSingleLayerMip(*it->second);
+			if (it->second->format != gli::FORMAT_RGBA8_SRGB_PACK8 &&
+				it->second->format != gli::FORMAT_RGBA8_UNORM_PACK8 &&
+				it->second->format != gli::FORMAT_RGBA8_SNORM_PACK8)
+				throw std::runtime_error("unexpected image format. Expected one of FORMAT_RGBA8_SRGB_PACK8, FORMAT_RGBA8_UNORM_PACK8, FORMAT_RGBA8_SNORM_PACK8");
+
+			auto& mip = it->second->layer[0].mipmaps[0];
+			int nComponents = 0;
+			if (format == gli::FORMAT_RGBA8_SRGB_PACK8)
+			{
+				nComponents = 4;
+			}
+			else if (format == gli::FORMAT_RGB8_SRGB_PACK8)
+			{
+				nComponents = 3;
+				image::changeStride(mip.bytes, 4, 3);
+			}
+			else if (format == gli::FORMAT_R8_SRGB_PACK8)
+			{
+				nComponents = 1;
+				image::changeStride(mip.bytes, 4, 1);
+			}
+			else throw std::runtime_error("export format not supported for png, jpg, bmp");
+
+			if (ext == "png")
+				stb_save_png(fullName.c_str(), mip.width, mip.height, nComponents, mip.bytes.data());
+			else if (ext == "bmp")
+				stb_save_bmp(fullName.c_str(), mip.width, mip.height, nComponents, mip.bytes.data());
+			else if (ext == "jpg")
+				stb_save_jpg(fullName.c_str(), mip.width, mip.height, nComponents, mip.bytes.data(), quality);
+			else assert(false);
+		}
+		else throw std::runtime_error("file extension not supported");
 	}
 	catch(const std::exception& e)
 	{
@@ -217,8 +267,8 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 {
 	if(s_exportFormats.empty())
 	{
-		s_exportFormats["dds"];
-		s_exportFormats["ktx"];
+		s_exportFormats["dds"] = dds_get_export_formats();
+		s_exportFormats["ktx"] = ktx_get_export_formats();
 		s_exportFormats["pfm"] = pfm_get_export_formats();
 		s_exportFormats["hdr"] = stb_image_get_export_formats("hdr");
 		s_exportFormats["jpg"] = stb_image_get_export_formats("jpg");

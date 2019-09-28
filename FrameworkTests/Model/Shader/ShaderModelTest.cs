@@ -25,26 +25,24 @@ namespace FrameworkTests.Model.Shader
         }
 
         [TestMethod]
-        public void ConvertSimple()
-        {
-            // load simple image and convert from RGB to R
-            var tex = new TextureArray2D(IO.LoadImage(DllTest.Directory + "small.pfm"));
-
-            var newTex = shader.Convert(tex,
-                new ImageFormat {Format = Format.R32G32B32A32_Float, HasAlpha = false, IsSrgb = false});
-
-            DllTest.CompareWithSmall(newTex.GetPixelColors(0, 0), Color.Channel.Rgb);
-        }
-
-        [TestMethod]
-        public void ConvertSrgb()
+        public void ConvertFromSrgb()
         {
             var tex = new TextureArray2D(IO.LoadImage(DllTest.Directory + "small_a.png"));
 
-            var newTex = shader.Convert(tex,
-                new ImageFormat { Format = Format.R32G32B32A32_Float, HasAlpha = false, IsSrgb = false });
+            var newTex = shader.Convert(tex, Format.R32G32B32A32_Float);
 
             DllTest.CompareWithSmall(newTex.GetPixelColors(0, 0), Color.Channel.Rgba);
+        }
+
+        [TestMethod]
+        public void ConvertToSrgb()
+        {
+            // convert from RGBA32F to RGBA8_SRGB
+            var tex = new TextureArray2D(IO.LoadImage(DllTest.Directory + "small.pfm"));
+
+            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb);
+
+            DllTest.CompareWithSmall(newTex.GetPixelColors(0, 0), Color.Channel.Rgb);
         }
     }
 }

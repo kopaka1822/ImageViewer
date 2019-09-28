@@ -45,9 +45,6 @@ namespace ImageViewer
         {
             chain.BeginFrame();
 
-            MessageBox.Show(Device.Get().TestFormats(), "Formats");
-
-         
 
             chain.EndFrame();
         }

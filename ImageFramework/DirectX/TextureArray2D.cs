@@ -21,13 +21,13 @@ namespace ImageFramework.DirectX
         public int NumMipmaps { get; }
         public bool HasMipmaps => NumMipmaps > 1;
         public int NumLayers { get; }
-        public bool IsSrgb { get; } = false;
         public ShaderResourceView View { get; private set; }
+
+        public Format Format { get; }
 
         private readonly Texture2D handle;
         private ShaderResourceView[] views;
         private RenderTargetView[] rtViews;
-        private Format format;
 
         public TextureArray2D(int numLayer, int numMipmaps, int width, int height, Format format, bool isSrgb = false)
         {
@@ -35,8 +35,7 @@ namespace ImageFramework.DirectX
             Height = height;
             NumMipmaps = numMipmaps;
             NumLayers = numLayer;
-            IsSrgb = isSrgb;
-            this.format = format;
+            this.Format = format;
 
            
             handle = new SharpDX.Direct3D11.Texture2D(Device.Get().Handle, CreateTextureDescription());
@@ -50,8 +49,7 @@ namespace ImageFramework.DirectX
             Height = image.GetHeight(0);
             NumMipmaps = image.NumMipmaps;
             NumLayers = image.NumLayers;
-            IsSrgb = image.Format.IsSrgb;
-            format = image.Format.Format;
+            Format = image.Format.DxgiFormat;
 
             var data = new DataRectangle[NumLayers * NumMipmaps];
             for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
@@ -87,7 +85,7 @@ namespace ImageFramework.DirectX
         public TextureArray2D GenerateMipmapLevels(int levels)
         {
             Debug.Assert(!HasMipmaps);
-            var newTex = new TextureArray2D(NumLayers, levels, Width, Height, format, IsSrgb);
+            var newTex = new TextureArray2D(NumLayers, levels, Width, Height, Format);
             // copy image data of first level
             Device.Get().CopySubresource(handle, newTex.handle, 0, 0, Width, Height);
             Device.Get().GenerateMips(newTex.View);
@@ -101,7 +99,7 @@ namespace ImageFramework.DirectX
         /// <returns></returns>
         public TextureArray2D CloneWithoutMipmaps()
         {
-            var newTex = new TextureArray2D(NumLayers, 1, Width, Height, format, IsSrgb);
+            var newTex = new TextureArray2D(NumLayers, 1, Width, Height, Format);
             // copy data of first level
             Device.Get().CopySubresource(handle, newTex.handle, 0, 0, Width, Height);
 
@@ -114,7 +112,7 @@ namespace ImageFramework.DirectX
         /// <returns></returns>
         public TextureArray2D Clone()
         {
-            var newTex = new TextureArray2D(NumLayers, NumMipmaps, Width, Height, format, IsSrgb);
+            var newTex = new TextureArray2D(NumLayers, NumMipmaps, Width, Height, Format);
 
             Device.Get().CopyResource(handle, newTex.handle);
             return newTex;
@@ -122,7 +120,8 @@ namespace ImageFramework.DirectX
 
         public Color[] GetPixelColors(int layer, int mipmap)
         {
-            Debug.Assert(format == Format.R32G32B32A32_Float);
+            Debug.Assert(Format == Format.R32G32B32A32_Float || Format == Format.R8G8B8A8_UNorm_SRgb);
+
             Debug.Assert(mipmap >= 0);
             Debug.Assert(mipmap < NumMipmaps);
             Debug.Assert(layer >= 0);
@@ -133,7 +132,7 @@ namespace ImageFramework.DirectX
                 ArraySize = 1,
                 BindFlags = BindFlags.None,
                 CpuAccessFlags = CpuAccessFlags.Read,
-                Format = format,
+                Format = Format,
                 Height = GetHeight(mipmap),
                 Width = GetWidth(mipmap),
                 MipLevels = 1,
@@ -170,15 +169,6 @@ namespace ImageFramework.DirectX
             return Math.Max(1, Height << mipmap);
         }
 
-        /// <summary>
-        /// returns true if the format matches
-        /// </summary>
-        /// <returns></returns>
-        public bool HasFormat(ImageFormat f)
-        {
-            return f.IsSrgb == IsSrgb && f.Format == format;
-        }
-
         public void Dispose()
         {
             handle?.Dispose();
@@ -201,7 +191,7 @@ namespace ImageFramework.DirectX
                     var desc = new ShaderResourceViewDescription
                     {
                         Dimension = ShaderResourceViewDimension.Texture2DArray,
-                        Format = format,
+                        Format = Format,
                         Texture2DArray = new ShaderResourceViewDescription.Texture2DArrayResource
                         {
                             MipLevels = 1,
@@ -216,7 +206,7 @@ namespace ImageFramework.DirectX
                     var rtDesc = new RenderTargetViewDescription
                     {
                         Dimension = RenderTargetViewDimension.Texture2DArray,
-                        Format = format,
+                        Format = Format,
                         Texture2DArray = new RenderTargetViewDescription.Texture2DArrayResource
                         {
                             ArraySize = 1,
@@ -246,14 +236,14 @@ namespace ImageFramework.DirectX
             Debug.Assert(NumMipmaps > 0);
             Debug.Assert(Width > 0);
             Debug.Assert(Height > 0);
-            Debug.Assert(format != Format.Unknown);
+            Debug.Assert(Format != Format.Unknown);
 
             return new Texture2DDescription
             {
                 ArraySize = NumLayers,
                 BindFlags = BindFlags.ShaderResource | BindFlags.RenderTarget, // render target required for mip map generation
                 CpuAccessFlags = CpuAccessFlags.Read | CpuAccessFlags.Write,
-                Format = format,
+                Format = Format,
                 Height = Width,
                 MipLevels = NumMipmaps,
                 OptionFlags = ResourceOptionFlags.GenerateMipMaps,
