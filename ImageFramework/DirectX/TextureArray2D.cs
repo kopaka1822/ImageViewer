@@ -159,14 +159,14 @@ namespace ImageFramework.DirectX
         {
             Debug.Assert(mipmap >= 0);
             Debug.Assert(mipmap < NumMipmaps);
-            return Math.Max(1, Width << mipmap);
+            return Math.Max(1, Width >> mipmap);
         }
 
         public int GetHeight(int mipmap)
         {
             Debug.Assert(mipmap >= 0);
             Debug.Assert(mipmap < NumMipmaps);
-            return Math.Max(1, Height << mipmap);
+            return Math.Max(1, Height >> mipmap);
         }
 
         public void Dispose()

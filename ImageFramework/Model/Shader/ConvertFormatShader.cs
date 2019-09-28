@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.ImageLoader;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Device = SharpDX.Direct3D11.Device;
@@ -14,13 +15,6 @@ namespace ImageFramework.Model.Shader
         public PixelShader Pixel => shader.Pixel;
 
         private DirectX.Shader shader;
-        private readonly List<SharpDX.DXGI.Format> supportedFormats = new List<Format>
-        {
-            Format.R32G32B32A32_Float,
-            Format.R8G8B8A8_UNorm_SRgb,
-            Format.R8G8B8A8_UNorm,
-            Format.R8G8B8A8_SNorm
-        };
 
         public ConvertFormatShader()
         {
@@ -28,7 +22,7 @@ namespace ImageFramework.Model.Shader
             shader = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(), "ConvertFormatShader");
 
             // check supported format capabilities
-            foreach (var f in supportedFormats)
+            foreach (var f in IO.SupportedFormats)
             {
                 var sup = dev.CheckFormatSupport(f);
 
@@ -41,11 +35,6 @@ namespace ImageFramework.Model.Shader
                 if((sup & FormatSupport.RenderTarget) == 0)
                     throw new Exception($"RenderTarget support for {f} is required");
             }
-        }
-
-        public bool IsSupported(Format f)
-        {
-            return supportedFormats.Any(sf => sf == f);
         }
 
         public static int InputSrvBinding => 0;

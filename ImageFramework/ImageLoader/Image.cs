@@ -8,18 +8,22 @@ namespace ImageFramework.ImageLoader
 {
     public class Image : IDisposable
     {
+        // image format
         public ImageFormat Format { get; }
+        // format of the source image (can be different form current format)
+        public GliFormat OriginalFormat { get; }
         public List<Layer> Layers { get; }
         public string Filename { get; }
 
         // link to the dll resource id
         public Resource Resource { get; }
 
-        public Image(Resource resource, string filename, int nLayer, int nMipmaps, ImageFormat format)
+        public Image(Resource resource, string filename, int nLayer, int nMipmaps, ImageFormat format, GliFormat originalFormat)
         {
             Resource = resource;
             Filename = filename;
             Format = format;
+            OriginalFormat = originalFormat;
             // load relevant information
 
             Layers = new List<Layer>(nLayer);

@@ -20,7 +20,7 @@ namespace ImageFramework.Utility
             Rgba = R | G | B | A
         }
 
-        public static readonly Color Zero = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+        public static readonly Color Black = new Color(0.0f, 0.0f, 0.0f, 0.0f);
         public static readonly Color White = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 
         public Color(float red, float green, float blue, float alpha = 1.0f)
