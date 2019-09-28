@@ -27,8 +27,8 @@ namespace ImageFramework.Model.Shader
         /// <returns></returns>
         public TextureArray2D Convert(TextureArray2D texture, SharpDX.DXGI.Format dstFormat)
         {
-            Debug.Assert(convert.IsSupported(dstFormat));
-            Debug.Assert(convert.IsSupported(texture.Format));
+            Debug.Assert(ImageFormat.IsSupported(dstFormat));
+            Debug.Assert(ImageFormat.IsSupported(texture.Format));
 
             if (texture.Format == dstFormat) return texture.Clone();
 
@@ -39,12 +39,13 @@ namespace ImageFramework.Model.Shader
             );
 
             var dev = Device.Get();
+            dev.Vertex.Set(quad.Vertex);
+            dev.Pixel.Set(convert.Pixel);
+
             for (int curLayer = 0; curLayer < texture.NumLayers; ++curLayer)
             {
                 for (int curMipmap = 0; curMipmap < texture.NumMipmaps; ++curMipmap)
                 {
-                    dev.Vertex.Set(quad.Vertex);
-                    dev.Pixel.Set(convert.Pixel);
                     dev.Pixel.SetShaderResource(ConvertFormatShader.InputSrvBinding, texture.GetSrView(curLayer, curMipmap));
                     dev.OutputMerger.SetRenderTargets(res.GetRtView(curLayer, curMipmap));
                     dev.SetViewScissors(texture.GetWidth(curMipmap), texture.GetHeight(curMipmap));

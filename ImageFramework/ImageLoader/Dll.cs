@@ -21,7 +21,7 @@ namespace ImageFramework.ImageLoader
         public static extern void image_release(int id);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void image_info(int id, out uint format,
+        public static extern void image_info(int id, out uint format, out uint originalFormat,
             out int nLayer, out int nMipmaps);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]

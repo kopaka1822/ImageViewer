@@ -11,6 +11,18 @@ namespace ImageFramework.ImageLoader
     public static class IO
     {
         /// <summary>
+        /// list of formats that are supported internally for images. This does not include formats that
+        /// may be used for save image
+        /// </summary>
+        public static readonly List<SharpDX.DXGI.Format> SupportedFormats = new List<Format>
+        {
+            Format.R32G32B32A32_Float,
+            Format.R8G8B8A8_UNorm_SRgb,
+            Format.R8G8B8A8_UNorm,
+            Format.R8G8B8A8_SNorm
+        };
+
+        /// <summary>
         /// tries to load the image file and returns a list with loaded images
         /// (one image file can contain multiple images with multiple faces with multiple mipmaps)
         /// </summary>
@@ -19,16 +31,16 @@ namespace ImageFramework.ImageLoader
         public static Image LoadImage(string file)
         {
             var res = new Resource(file);
-            Dll.image_info(res.Id, out var gliFormat, out var nLayer, out var nMipmaps);
+            Dll.image_info(res.Id, out var gliFormat, out var originalFormat, out var nLayer, out var nMipmaps);
 
-            return new Image(res, file, nLayer, nMipmaps, new ImageFormat((GliFormat)gliFormat));
+            return new Image(res, file, nLayer, nMipmaps, new ImageFormat((GliFormat)gliFormat), (GliFormat)originalFormat);
         }
 
         public static Image CreateImage(ImageFormat format, int width, int height, int layer, int mipmaps)
         {
             var res = new Resource((uint)format.GliFormat, width, height, layer, mipmaps);
 
-            return new Image(res, "tmp", layer, mipmaps, format);
+            return new Image(res, "tmp", layer, mipmaps, format, format.GliFormat);
         }
 
         public static void SaveImage(Image image, string filename, string extension, GliFormat format, int quality = 0)

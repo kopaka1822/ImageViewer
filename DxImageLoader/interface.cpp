@@ -125,13 +125,14 @@ void image_release(int id)
 		s_resources.erase(it);
 }
 
-void image_info(int id, uint32_t& format, int& nLayer, int& nMipmaps)
+void image_info(int id, uint32_t& format, uint32_t& originalFormat, int& nLayer, int& nMipmaps)
 {
 	auto it = s_resources.find(id);
 	if (it == s_resources.end())
 		return;
 
 	format = uint32_t(it->second->format);
+	originalFormat = uint32_t(it->second->original);
 	nLayer = int(it->second->layer.size());
 
 	nMipmaps = 0;

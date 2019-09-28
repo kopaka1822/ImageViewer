@@ -58,5 +58,15 @@ namespace ImageFramework.ImageLoader
                     break;
             }
         }
+
+        /// <summary>
+        /// indicates if this format may be used internally
+        /// </summary>
+        /// <param name="format"></param>
+        /// <returns></returns>
+        public static bool IsSupported(Format format)
+        {
+            return IO.SupportedFormats.Contains(format);
+        }
     }
 }
