@@ -6,6 +6,6 @@
         {
         }
 
-        public abstract string ToOpenGl();
+        public abstract string ToHlsl();
     }
 }

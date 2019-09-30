@@ -27,9 +27,9 @@ namespace ImageFramework.Model.Equation
             Compile(tokens);
         }
 
-        public string GetOpenGlExpression()
+        public string GetHlslExpression()
         {
-            return finalToken.ToOpenGl();
+            return finalToken.ToHlsl();
         }
 
         /// <summary>

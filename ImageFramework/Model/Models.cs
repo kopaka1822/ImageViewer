@@ -11,19 +11,22 @@ namespace ImageFramework.Model
     public class Models : IDisposable
     {
         public static readonly CultureInfo Culture = new CultureInfo("en-US");
-
         public ImagesModel Images { get; }
-        public ShaderModel Shader { get; }
+        internal ShaderModel Shader { get; }
+        internal TextureCacheModel TexCache { get; }
 
         public Models()
         {
             Shader = new ShaderModel();
             Images = new ImagesModel();
+            TexCache = new TextureCacheModel(Images);
         }
 
         public void Dispose()
         {
             Shader?.Dispose();
+            Images?.Dispose();
+            TexCache?.Dispose();
         }
     }
 }

@@ -13,6 +13,9 @@ using SharpDX.DXGI;
 
 namespace ImageFramework.Model
 {
+    /// <summary>
+    /// collection of imported images that will be used in image equations
+    /// </summary>
     public class ImagesModel : INotifyPropertyChanged, IDisposable
     { 
         private struct Dimension

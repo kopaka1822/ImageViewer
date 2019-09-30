@@ -17,14 +17,14 @@ namespace ImageFramework.Model.Equation.Token
             this.value3 = value3;
         }
 
-        public override string ToOpenGl()
+        public override string ToHlsl()
         {
             if (funcName == "rgb")
             {
                 // transform values into rgb vector
-                return $"vec4(({value1.ToOpenGl()}).r, " +
-                       $"({value2.ToOpenGl()}).r, " +
-                       $"({value3.ToOpenGl()}).r, 1.0)";
+                return $"float4(({value1.ToHlsl()}).x, " +
+                       $"({value2.ToHlsl()}).x, " +
+                       $"({value3.ToHlsl()}).x, 1.0)";
             }
 
             throw new Exception("invalid string as function name: " + funcName);

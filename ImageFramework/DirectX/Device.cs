@@ -6,11 +6,12 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Utility;
+using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
-using Buffer = System.Buffer;
+using Buffer = SharpDX.Direct3D11.Buffer;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
 using Resource = SharpDX.Direct3D11.Resource;
 
@@ -174,6 +175,12 @@ namespace ImageFramework.DirectX
         public void DrawQuad()
         {
             context.Draw(4, 0);
+        }
+
+        public DataStream MapWritePermanently(Buffer buffer)
+        {
+            context.MapSubresource(buffer, MapMode.Write, MapFlags.None, out var stream);
+            return stream;
         }
     }
 }

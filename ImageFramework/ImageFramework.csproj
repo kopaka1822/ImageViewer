@@ -75,10 +75,10 @@
     <Compile Include="ImageLoader\Layer.cs" />
     <Compile Include="ImageLoader\Mipmap.cs" />
     <Compile Include="ImageLoader\Resource.cs" />
+    <Compile Include="Model\DxModel.cs" />
     <Compile Include="Model\Equation\Equation.cs" />
     <Compile Include="Model\Equation\FormulaModel.cs" />
     <Compile Include="Model\Equation\ImageEquationModel.cs" />
-    <Compile Include="Model\Equation\ImageEquationsModel.cs" />
     <Compile Include="Model\Equation\Markov\BinaryFunctionRule.cs" />
     <Compile Include="Model\Equation\Markov\BracketRule.cs" />
     <Compile Include="Model\Equation\Markov\MarkovRule.cs" />
@@ -97,11 +97,14 @@
     <Compile Include="Model\Equation\Token\Token.cs" />
     <Compile Include="Model\Equation\Token\UnaryFunctionToken.cs" />
     <Compile Include="Model\Equation\Token\ValueToken.cs" />
+    <Compile Include="Model\FinalImageModel.cs" />
     <Compile Include="Model\ImagesModel.cs" />
     <Compile Include="Model\Models.cs" />
+    <Compile Include="Model\Shader\ImageCombineShader.cs" />
     <Compile Include="Model\Shader\QuadShader.cs" />
     <Compile Include="Model\Shader\ShaderModel.cs" />
     <Compile Include="Model\Shader\ConvertFormatShader.cs" />
+    <Compile Include="Model\TextureCacheModel.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\Color.cs" />

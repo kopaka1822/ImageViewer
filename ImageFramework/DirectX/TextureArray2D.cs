@@ -22,6 +22,7 @@ namespace ImageFramework.DirectX
         public bool HasMipmaps => NumMipmaps > 1;
         public int NumLayers { get; }
         public ShaderResourceView View { get; private set; }
+        public UnorderedAccessView UaView { get; private set; }
 
         public Format Format { get; }
 
@@ -29,7 +30,7 @@ namespace ImageFramework.DirectX
         private ShaderResourceView[] views;
         private RenderTargetView[] rtViews;
 
-        public TextureArray2D(int numLayer, int numMipmaps, int width, int height, Format format, bool isSrgb = false)
+        public TextureArray2D(int numLayer, int numMipmaps, int width, int height, Format format)
         {
             Width = width;
             Height = height;
@@ -180,6 +181,7 @@ namespace ImageFramework.DirectX
 
             // default View
             View = new ShaderResourceView(Device.Get().Handle, handle);
+            UaView = new UnorderedAccessView(Device.Get().Handle, handle);
 
             // single slice views
             views = new ShaderResourceView[NumLayers * NumMipmaps];

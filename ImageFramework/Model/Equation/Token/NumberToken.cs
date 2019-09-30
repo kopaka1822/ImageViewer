@@ -9,9 +9,10 @@
             value = number;
         }
 
-        public override string ToOpenGl()
+        public override string ToHlsl()
         {
-            return $"vec4(float({value.ToString(Models.Culture)}))";
+            var num = $"float({value.ToString(Models.Culture)})";
+            return $"float4({num}, {num}, {num}, {num})";
         }
     }
 }
