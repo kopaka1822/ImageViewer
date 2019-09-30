@@ -13,37 +13,25 @@ namespace ImageFramework.Model.Equation
     {
         private readonly ImagesModel images;
 
-        public ImageEquationModel(ImagesModel images, bool visible, int defaultImage)
+        public ImageEquationModel(ImagesModel images, int defaultImage)
         {
             this.images = images;
-            this.visible = visible;
+            Color = new FormulaModel(images, defaultImage);
+            Alpha = new FormulaModel(images, defaultImage);
+            Color.PropertyChanged += FormulaOnPropertyChanged;
+            Alpha.PropertyChanged += FormulaOnPropertyChanged;
         }
 
-        private bool visible;
-
-        public bool Visible
+        private void FormulaOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            get => visible;
-            set
-            {
-                if (value == visible) return;
-                visible = value;
-                OnPropertyChanged(nameof(Visible));
-            }
+            if(e.PropertyName == nameof(FormulaModel.IsValid))
+                OnPropertyChanged(nameof(IsValid));
         }
 
-        private bool useFilter = true;
+        public FormulaModel Color { get; }
+        public FormulaModel Alpha { get; }
 
-        public bool UseFiler
-        {
-            get => useFilter;
-            set
-            {
-                if (value == useFilter) return;
-                useFilter = value;
-                OnPropertyChanged(nameof(UseFiler));
-            }
-        }
+        public bool IsValid => Color.IsValid && Alpha.IsValid;
 
         public event PropertyChangedEventHandler PropertyChanged;
 

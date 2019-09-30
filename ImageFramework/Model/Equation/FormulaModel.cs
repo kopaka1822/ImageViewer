@@ -98,9 +98,8 @@ namespace ImageFramework.Model.Equation
         {
             try
             {
-                //var eq = new Equation.Equation(f, Math.Max(images.NumImages, 1));
-                //eq.GetOpenGlExpression();
-                throw new NotImplementedException();
+                var eq = new Equation(f, Math.Max(images.NumImages, 1));
+                eq.GetHlslExpression();
             }
             catch (Exception e)
             {
@@ -122,7 +121,9 @@ namespace ImageFramework.Model.Equation
         /// <exception cref="Exception">on conversion failure</exception>
         private string ConvertFormula(string f)
         {
-            throw new NotImplementedException();
+            var eq = new Equation(f, Math.Max(images.NumImages, 1));
+            FirstImageId = eq.GetFirstImageId();
+            return eq.GetHlslExpression();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

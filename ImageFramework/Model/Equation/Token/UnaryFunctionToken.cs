@@ -13,12 +13,12 @@ namespace ImageFramework.Model.Equation.Token
             this.value = value;
         }
 
-        public override string ToOpenGl()
+        public override string ToHlsl()
         {
             // aqcuire opengl function name
             if (!GetOpenglFunction(funcName, out var start, out var end))
                 throw new Exception("invalid string as function name: " + funcName);
-            return start + value.ToOpenGl() + end;
+            return start + value.ToHlsl() + end;
         }
 
         private static bool GetOpenglFunction(string name, out string front, out string end)
@@ -26,8 +26,8 @@ namespace ImageFramework.Model.Equation.Token
             switch (name)
             {
                 case "alpha":
-                    front = "vec4((";
-                    end = ").a)";
+                    front = "(";
+                    end = ").aaaa";
                     break;
                 case "tosrgb":
                     front = "toSrgb(";
@@ -38,16 +38,16 @@ namespace ImageFramework.Model.Equation.Token
                     end = ")";
                     break;
                 case "red":
-                    front = "vec4((";
-                    end = ").r)";
+                    front = "(";
+                    end = ").rrrr";
                     break;
                 case "green":
-                    front = "vec4((";
-                    end = ").g)";
+                    front = "(";
+                    end = ").gggg";
                     break;
                 case "blue":
-                    front = "vec4((";
-                    end = ").b)";
+                    front = "(";
+                    end = ").bbbb";
                     break;
                 // original glsl functions
                 case "abs":
@@ -70,11 +70,11 @@ namespace ImageFramework.Model.Equation.Token
                     end = ")";
                     break;
                 case "normalize":
-                    front = "vec4(" + name + "(vec3(";
-                    end = ")), 1.0)";
+                    front = "float2(" + name + "(float3(";
+                    end = "), 1.0).xxxy";
                     break;
                 case "length":
-                    front = "vec4(length(vec3(";
+                    front = "f4(length(float3(";
                     end = ")))";
                     break;
                 default:

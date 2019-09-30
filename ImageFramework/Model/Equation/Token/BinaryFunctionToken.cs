@@ -16,17 +16,17 @@ namespace ImageFramework.Model.Equation.Token
             this.value2 = value2;
         }
 
-        public override string ToOpenGl()
+        public override string ToHlsl()
         {
-            if (!IsOpenGlFunction())
+            if (!IsHlslFunction())
                 throw new Exception("invalid string as function name: " + funcName);
 
             if (convertToRgb)
-                return "vec4(vec3(" + funcName + "(vec3(" + value1.ToOpenGl() + "),vec3(" + value2.ToOpenGl() + "))), 1.0)";
-            return funcName + "(" + value1.ToOpenGl() + "," + value2.ToOpenGl() + ")";
+                return "f4(f3(" + funcName + "(f3(" + value1.ToHlsl() + "),f3(" + value2.ToHlsl() + "))), 1.0)";
+            return funcName + "(" + value1.ToHlsl() + "," + value2.ToHlsl() + ")";
         }
 
-        private bool IsOpenGlFunction()
+        private bool IsHlslFunction()
         {
             switch (funcName)
             {
@@ -34,7 +34,7 @@ namespace ImageFramework.Model.Equation.Token
                 case "max":
                 case "atan":
                 case "pow":
-                case "mod":
+                case "fmod":
                 case "step":
                     return true;
                 case "dot":

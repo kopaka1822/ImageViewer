@@ -9,7 +9,7 @@
             this.Id = id;
         }
 
-        public override string ToOpenGl()
+        public override string ToHlsl()
         {
             return $"GetTexture{Id.ToString(Models.Culture)}()";
         }

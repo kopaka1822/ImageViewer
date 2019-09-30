@@ -14,14 +14,14 @@
             this.right = (ValueToken)right;
         }
 
-        public override string ToOpenGl()
+        public override string ToHlsl()
         {
             if (operat.Symbol == '^')
             {
-                return $"pow({left.ToOpenGl()},{right.ToOpenGl()})";
+                return $"pow({left.ToHlsl()},{right.ToHlsl()})";
             }
             // + - * / is easy
-            return $"({left.ToOpenGl()} {operat.Symbol} {right.ToOpenGl()})";
+            return $"({left.ToHlsl()} {operat.Symbol} {right.ToHlsl()})";
         }
     }
 }
