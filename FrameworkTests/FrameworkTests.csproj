@@ -64,6 +64,7 @@
     <Compile Include="DirectX\TextureArray2DTests.cs" />
     <Compile Include="ImageLoader\DllTest.cs" />
     <Compile Include="ImagePipelineTest.cs" />
+    <Compile Include="Model\Equation\EquationTest.cs" />
     <Compile Include="Model\Shader\ShaderModelTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
