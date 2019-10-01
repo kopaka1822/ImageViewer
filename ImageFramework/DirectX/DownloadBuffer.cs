@@ -24,8 +24,8 @@ namespace ImageFramework.DirectX
             {
                 BindFlags = BindFlags.UnorderedAccess,
                 CpuAccessFlags = CpuAccessFlags.Read,
-                OptionFlags = ResourceOptionFlags.BufferStructured,
-                SizeInBytes = elementSize,
+                OptionFlags = ResourceOptionFlags.None,
+                SizeInBytes = Utility.Utility.AlignTo(elementSize, 16),
                 StructureByteStride = elementSize,
                 Usage = ResourceUsage.Staging
             };
