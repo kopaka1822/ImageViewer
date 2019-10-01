@@ -35,7 +35,7 @@ namespace ImageFramework.Model.Shader
             var res = new TextureArray2D(
                 texture.NumLayers, texture.NumMipmaps, 
                 texture.Width, texture.Height,
-                dstFormat
+                dstFormat, false
             );
 
             var dev = Device.Get();

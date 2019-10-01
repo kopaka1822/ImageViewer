@@ -2,20 +2,18 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.Model;
 using SharpDX.DXGI;
 
-namespace ImageFramework.Model
+namespace ImageFramework.Utility
 {
-    public class TextureCacheModel : IDisposable
+    internal class TextureCache : IDisposable
     {
         private readonly Stack<TextureArray2D> textures = new Stack<TextureArray2D>(2);
         private readonly ImagesModel images;
 
-        public TextureCacheModel(ImagesModel images)
+        public TextureCache(ImagesModel images)
         {
             this.images = images;
             images.PropertyChanged += ImagesOnPropertyChanged;
@@ -31,7 +29,7 @@ namespace ImageFramework.Model
 
             // make new texture with the current configuration
             return new TextureArray2D(images.NumLayers, images.NumMipmaps,
-                images.GetWidth(0), images.GetHeight(0), Format.R32G32B32A32_Float);
+                images.GetWidth(0), images.GetHeight(0), Format.R32G32B32A32_Float, true);
         }
 
         /// <summary>

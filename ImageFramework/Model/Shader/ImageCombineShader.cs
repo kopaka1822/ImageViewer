@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.DirectX.Structs;
 
 namespace ImageFramework.Model.Shader
 {
