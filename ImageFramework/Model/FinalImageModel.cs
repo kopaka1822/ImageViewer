@@ -15,14 +15,11 @@ namespace ImageFramework.Model
 {
     public class FinalImageModel : INotifyPropertyChanged, IDisposable
     {
-        private readonly Models models;
         public ImageEquationModel Equation { get; }
 
-        public FinalImageModel(Models models, int defaultImage = 0)
+        public FinalImageModel(int defaultImage = 0)
         {
-            this.models = models;
             Equation = new ImageEquationModel(models.Images, defaultImage);
-            models.Images.PropertyChanged += ImagesOnPropertyChanged;
             Equation.PropertyChanged += EquationOnPropertyChanged;
             Equation.Color.PropertyChanged += FormulaOnPropertyChanged;
             Equation.Alpha.PropertyChanged += FormulaOnPropertyChanged;
@@ -69,22 +66,7 @@ namespace ImageFramework.Model
         /// </summary>
         public TextureArray2D Texture { get; private set; }
 
-        private bool hasChanges = true;
-
-        // indicates if the texture has to be recalculated due to formula or filter changes
-        public bool HasChanges
-        {
-            get => hasChanges;
-            set
-            {
-                if (value == hasChanges) return;
-                hasChanges = value;
-                if(hasChanges)
-                    Reset(); // remove texture because it is invalid now
-
-                OnPropertyChanged(nameof(HasChanges));
-            }
-        }
+       
 
         public bool IsValid => Equation.IsValid;
 
@@ -105,10 +87,8 @@ namespace ImageFramework.Model
         /// <summary>
         /// should be called if HasChanges is true to recalculate the texture
         /// </summary>
-        public void Update()
+        internal void Update(ImagesModel images)
         {
-            Debug.Assert(HasChanges);
-
             Reset();
             Texture = models.TexCache.GetTexture();
 
@@ -119,10 +99,9 @@ namespace ImageFramework.Model
             }
 
             OnPropertyChanged(nameof(Texture));
-            HasChanges = false;
         }
 
-        private void Reset()
+        internal void Reset()
         {
             if (Texture != null)
             {

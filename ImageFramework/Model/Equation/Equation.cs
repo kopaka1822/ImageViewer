@@ -12,13 +12,12 @@ namespace ImageFramework.Model.Equation
 {
     public class Equation
     {
-        private readonly int maxTextureUnits;
         private ValueToken finalToken;
-        private int firstImageId;
+        private int firstImageId = -1;
+        private int maxImageId = -1;
 
-        public Equation(string formula, int maxTextureUnits)
+        public Equation(string formula)
         {
-            this.maxTextureUnits = maxTextureUnits;
             // resolve to token
             var tokens = GetToken(formula);
             if (tokens.Count == 0)
@@ -33,13 +32,14 @@ namespace ImageFramework.Model.Equation
         }
 
         /// <summary>
-        /// returns the id of the first image token that was used in the formula
+        /// id of the first image that occured in the formula
         /// </summary>
-        /// <returns>id of the first image token that was used in the formula</returns>
-        public int GetFirstImageId()
-        {
-            return firstImageId;
-        }
+        public int FirstImageId => Math.Max(firstImageId, 0);
+
+        /// <summary>
+        /// highest image id that occured in the formula
+        /// </summary>
+        public int MaxImageId => Math.Max(maxImageId, 0);
 
         private List<Token.Token> GetToken(string formula)
         {
@@ -118,8 +118,13 @@ namespace ImageFramework.Model.Equation
                 int number;
                 if (!Int32.TryParse(identifier.Substring(1), NumberStyles.Integer, Models.Culture, out number))
                     throw new Exception($"Invalid Image Identifier: {identifier}");
-                if (number < 0 || number >= maxTextureUnits)
+                if (number < 0)
                     throw new Exception("Invalid Image Range: " + identifier);
+                // update highest image id
+                maxImageId = Math.Max(maxImageId, number);
+                if (firstImageId < 0) // first image that occured in the formula
+                    firstImageId = maxImageId;
+
                 return new ImageToken(number);
             }
 

@@ -11,27 +11,14 @@ namespace ImageFramework.Model.Equation
 {
     public class ImageEquationModel : INotifyPropertyChanged
     {
-        private readonly ImagesModel images;
-
-        public ImageEquationModel(ImagesModel images, int defaultImage)
+        public ImageEquationModel(int defaultImage)
         {
-            this.images = images;
-            Color = new FormulaModel(images, defaultImage);
-            Alpha = new FormulaModel(images, defaultImage);
-            Color.PropertyChanged += FormulaOnPropertyChanged;
-            Alpha.PropertyChanged += FormulaOnPropertyChanged;
-        }
-
-        private void FormulaOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if(e.PropertyName == nameof(FormulaModel.IsValid))
-                OnPropertyChanged(nameof(IsValid));
+            Color = new FormulaModel(defaultImage);
+            Alpha = new FormulaModel(defaultImage);
         }
 
         public FormulaModel Color { get; }
         public FormulaModel Alpha { get; }
-
-        public bool IsValid => Color.IsValid && Alpha.IsValid;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
