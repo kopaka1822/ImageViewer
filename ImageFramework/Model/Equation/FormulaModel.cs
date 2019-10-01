@@ -12,41 +12,12 @@ namespace ImageFramework.Model.Equation
 {
     public class FormulaModel : INotifyPropertyChanged
     {
-        private readonly ImagesModel images;
-        public FormulaModel(ImagesModel images, int defaultId)
+        public FormulaModel(int defaultId)
         {
             Debug.Assert(defaultId >= 0);
 
-            this.images = images;
             this.formula = $"I{defaultId}";
             this.Converted = $"GetTexture{defaultId}()";
-            this.isValid = defaultId < images.NumImages;
-
-            images.PropertyChanged += ImagesOnPropertyChanged;
-        }
-
-        private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(ImagesModel.NumImages):
-                    if(images.PrevNumImages > images.NumImages)
-                    {
-                        // image count decreased, formula still valid?
-                        if (IsValid)
-                        {
-                            IsValid = TestFormulaValid();
-                        }
-                    }
-                    else // image count increased, if the formula was invalid, is it valid now?
-                    {
-                        if (!IsValid)
-                        {
-                            IsValid = TestFormulaValid();
-                        }
-                    }
-                    break;
-            }
         }
 
         // the formula which is displayed
@@ -74,20 +45,11 @@ namespace ImageFramework.Model.Equation
         // the id of the first image that was used in the equation
         public int FirstImageId { get; private set; }
 
-        // the converted formula
-        public string Converted { get; private set; }
+        // the highest image id that was used in the equation
+        public int MaxImageId { get; private set; }
 
-        private bool isValid = false;
-        public bool IsValid
-        {
-            get => isValid;
-            private set
-            {
-                if (value == isValid) return;
-                isValid = value;
-                OnPropertyChanged(nameof(IsValid));
-            }
-        }
+        // the converted formula
+        public string Converted { get; private set; } 
 
         /// <summary>
         /// tests if the given formula is valid
@@ -98,7 +60,7 @@ namespace ImageFramework.Model.Equation
         {
             try
             {
-                var eq = new Equation(f, Math.Max(images.NumImages, 1));
+                var eq = new Equation(f);
                 eq.GetHlslExpression();
             }
             catch (Exception e)
@@ -121,8 +83,9 @@ namespace ImageFramework.Model.Equation
         /// <exception cref="Exception">on conversion failure</exception>
         private string ConvertFormula(string f)
         {
-            var eq = new Equation(f, Math.Max(images.NumImages, 1));
-            FirstImageId = eq.GetFirstImageId();
+            var eq = new Equation(f);
+            FirstImageId = eq.FirstImageId;
+            MaxImageId = eq.MaxImageId;
             return eq.GetHlslExpression();
         }
 

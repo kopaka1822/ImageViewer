@@ -63,6 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controller\FinalImageController.cs" />
     <Compile Include="DirectX\Device.cs" />
     <Compile Include="DirectX\DownloadBuffer.cs" />
     <Compile Include="DirectX\Shader.cs" />
@@ -120,8 +121,6 @@
       <Version>4.2.0</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controller\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
