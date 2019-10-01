@@ -3,9 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using ImageFramework.Controller;
+using ImageFramework.DirectX;
+using ImageFramework.ImageLoader;
 using ImageFramework.Model.Shader;
+using ImageFramework.Utility;
 
 namespace ImageFramework.Model
 {
@@ -13,40 +17,84 @@ namespace ImageFramework.Model
     {
         public static readonly CultureInfo Culture = new CultureInfo("en-US");
         public ImagesModel Images { get; }
+        public IReadOnlyList<ImagePipeline> Pipelines { get; }
 
-        public IReadOnlyList<FinalImageModel> FinalImages { get; }
-
+        public ProgressModel Progress { get; }
         internal ShaderModel Shader { get; }
-        internal DxModel DxModel { get; }
-        internal TextureCacheModel TexCache { get; }
 
-        private readonly List<FinalImageModel> finalImages = new List<FinalImageModel>();
-        private readonly List<FinalImageController> finalImageControllers = new List<FinalImageController>();
+        private readonly List<ImagePipeline> pipelines = new List<ImagePipeline>();
 
-        public Models()
+        private readonly PipelineController pipelineController;
+
+        public Models(int numPipelines = 1)
         {
+            // models
             Shader = new ShaderModel();
-            DxModel = new DxModel();
             Images = new ImagesModel();
-            TexCache = new TextureCacheModel(Images);
+            Progress = new ProgressModel();
 
-            FinalImages = finalImages;
-            // add one image equation by default
-            AddFinalImage();
+            for (int i = 0; i < numPipelines; ++i)
+            {
+                pipelines.Add(new ImagePipeline(i));
+            }
+            Pipelines = pipelines;
+
+            // pipeline controller
+            pipelineController = new PipelineController(this);
         }
 
-        public void AddFinalImage()
+        /// <summary>
+        /// loads image and adds it to Images 
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <exception cref="Exception"></exception>
+        public void AddImageFromFile(string filename)
         {
-            var fi = new FinalImageModel();
-            finalImages.Add(fi);
-            finalImageControllers.Add(new FinalImageController(this, fi));
+            using (var image = IO.LoadImage(filename))
+            {
+                var tex = new TextureArray2D(image);
+
+                try
+                {
+                    Images.AddImage(tex, filename, image.OriginalFormat);
+                }
+                catch (Exception)
+                {
+                    tex.Dispose();
+                    throw;
+                }
+            }
         }
+
+        /// <summary>
+        /// Forces all pending pipeline changes to be computed
+        /// </summary>
+        public void Apply()
+        {
+            using (var cts = new CancellationTokenSource())
+            {
+                ApplyAsync(cts.Token).Wait();
+            }
+        }
+
+        /// <summary>
+        /// Forces all pending pipeline changes to be computed
+        /// </summary>
+        public async Task ApplyAsync(CancellationToken ct)
+        {
+            await pipelineController.UpdateImagesAsync(ct);
+        }
+
 
         public void Dispose()
         {
             Shader?.Dispose();
             Images?.Dispose();
-            TexCache?.Dispose();
+            foreach (var imagePipeline in pipelines)
+            {
+                imagePipeline.Dispose();
+            }
+            pipelineController.Dispose();
         }
     }
 }

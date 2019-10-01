@@ -18,6 +18,8 @@ namespace ImageFramework.Model.Equation
 
             this.formula = $"I{defaultId}";
             this.Converted = $"GetTexture{defaultId}()";
+            this.FirstImageId = defaultId;
+            this.MaxImageId = defaultId;
         }
 
         // the formula which is displayed
@@ -30,6 +32,9 @@ namespace ImageFramework.Model.Equation
             {
                 if(value == null || formula.Equals(value)) return;
 
+                var oldFirst = FirstImageId;
+                var oldMax = MaxImageId;
+
                 var converted = ConvertFormula(value);
                 var changed = !converted.Equals(Converted);
 
@@ -38,6 +43,10 @@ namespace ImageFramework.Model.Equation
                 formula = value;
                 if(changed)
                     OnPropertyChanged(nameof(Converted));
+                if(oldFirst != FirstImageId)
+                    OnPropertyChanged(nameof(FirstImageId));
+                if (oldMax != MaxImageId)
+                    OnPropertyChanged(nameof(MaxImageId));
                 OnPropertyChanged(nameof(Formula));
             }
         }
@@ -84,9 +93,10 @@ namespace ImageFramework.Model.Equation
         private string ConvertFormula(string f)
         {
             var eq = new Equation(f);
+            var res = eq.GetHlslExpression();
             FirstImageId = eq.FirstImageId;
             MaxImageId = eq.MaxImageId;
-            return eq.GetHlslExpression();
+            return res;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
