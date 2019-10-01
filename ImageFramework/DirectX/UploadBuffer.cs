@@ -27,8 +27,8 @@ namespace ImageFramework.DirectX
             {
                 BindFlags = BindFlags.ConstantBuffer,
                 CpuAccessFlags = CpuAccessFlags.Write,
-                OptionFlags = ResourceOptionFlags.BufferStructured,
-                SizeInBytes = elementSize * elementCount,
+                OptionFlags = ResourceOptionFlags.None,
+                SizeInBytes = Utility.Utility.AlignTo(elementSize * elementCount, 16),
                 StructureByteStride = elementSize,
                 Usage = ResourceUsage.Dynamic
             };

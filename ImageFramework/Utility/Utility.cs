@@ -69,5 +69,11 @@ namespace ImageFramework.Utility
             Debug.Assert(a >= 0);
             return (a + b - 1) / b;
         }
+
+        public static int AlignTo(int size, int alignment)
+        {
+            if (size % alignment == 0) return size;
+            return size + alignment - (size % alignment);
+        }
     }
 }
