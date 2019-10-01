@@ -64,9 +64,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DirectX\Device.cs" />
+    <Compile Include="DirectX\DownloadBuffer.cs" />
     <Compile Include="DirectX\Shader.cs" />
     <Compile Include="DirectX\SwapChain.cs" />
     <Compile Include="DirectX\TextureArray2D.cs" />
+    <Compile Include="DirectX\UploadBuffer.cs" />
     <Compile Include="ImageLoader\Dll.cs" />
     <Compile Include="ImageLoader\GliFormat.cs" />
     <Compile Include="ImageLoader\Image.cs" />
