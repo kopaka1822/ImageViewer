@@ -96,6 +96,27 @@ namespace ImageFramework.DirectX
         }
 
         /// <summary>
+        /// gets data from the buffer (should be staging buffer) and puts the data into the array
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="b"></param>
+        /// <param name="dst"></param>
+        public void GetData<T>(Buffer b, ref T[] dst) where T : struct
+        {
+            var data = context.MapSubresource(b, 0, MapMode.Read, MapFlags.None);
+
+            var elementSize = Marshal.SizeOf(typeof(T));
+
+            for (int i = 0; i < dst.Length; ++i)
+            {
+                Marshal.PtrToStructure<T>(data.DataPointer, dst[i]);
+                data.DataPointer += elementSize;
+            }
+            
+            context.UnmapSubresource(b, 0);
+        }
+
+        /// <summary>
         /// gets color data, only works for the 4 supported formats.
         /// Mainly for debug purposes
         /// </summary>
@@ -177,10 +198,14 @@ namespace ImageFramework.DirectX
             context.Draw(4, 0);
         }
 
-        public DataStream MapWritePermanently(Buffer buffer)
+        public void UpdateBufferData<T>(Buffer buffer, T data) where T : struct
         {
-            context.MapSubresource(buffer, MapMode.Write, MapFlags.None, out var stream);
-            return stream;
+            context.UpdateSubresource(ref data, buffer);
+        }
+
+        public void UpdateBufferData<T>(Buffer buffer, T[] data) where T : struct
+        {
+            context.UpdateSubresource(data, buffer);
         }
     }
 }

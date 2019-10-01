@@ -13,11 +13,13 @@ namespace ImageFramework.Model
         public static readonly CultureInfo Culture = new CultureInfo("en-US");
         public ImagesModel Images { get; }
         internal ShaderModel Shader { get; }
+        internal DxModel DxModel { get; }
         internal TextureCacheModel TexCache { get; }
 
         public Models()
         {
             Shader = new ShaderModel();
+            DxModel = new DxModel();
             Images = new ImagesModel();
             TexCache = new TextureCacheModel(Images);
         }

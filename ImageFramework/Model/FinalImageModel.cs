@@ -9,19 +9,44 @@ using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.Model.Equation;
+using ImageFramework.Model.Shader;
 
 namespace ImageFramework.Model
 {
     public class FinalImageModel : INotifyPropertyChanged, IDisposable
     {
         private readonly Models models;
-        private readonly ImageEquationModel equation;
+        public ImageEquationModel Equation { get; }
 
         public FinalImageModel(Models models, int defaultImage = 0)
         {
             this.models = models;
-            equation = new ImageEquationModel(models.Images, defaultImage);
+            Equation = new ImageEquationModel(models.Images, defaultImage);
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
+            Equation.PropertyChanged += EquationOnPropertyChanged;
+            Equation.Color.PropertyChanged += FormulaOnPropertyChanged;
+            Equation.Alpha.PropertyChanged += FormulaOnPropertyChanged;
+        }
+
+        private void FormulaOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(FormulaModel.Converted):
+                    HasChanges = true;
+                    break;
+            }
+        }
+
+        private void EquationOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ImageEquationModel.IsValid):
+                    HasChanges = true; // valid status changed => changes on image count have occurred
+                    OnPropertyChanged(nameof(IsValid));
+                    break;
+            }
         }
 
         private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -31,6 +56,7 @@ namespace ImageFramework.Model
                 case nameof(ImagesModel.NumImages):
                     if(models.Images.NumImages == 0)
                         Reset();
+
                     break;
                 case nameof(ImagesModel.NumMipmaps):
                     Reset();
@@ -60,6 +86,8 @@ namespace ImageFramework.Model
             }
         }
 
+        public bool IsValid => Equation.IsValid;
+
         private bool useFilter = true;
         public bool UseFilter
         {
@@ -81,10 +109,16 @@ namespace ImageFramework.Model
         {
             Debug.Assert(HasChanges);
 
-            throw new NotImplementedException();
+            Reset();
+            Texture = models.TexCache.GetTexture();
+
+            using (var combineShader = new ImageCombineShader(Equation.Color.Converted, Equation.Alpha.Converted,
+                models.Images.NumImages))
+            {
+                combineShader.Run(models.Images, models.DxModel.LayerLevelBuffer, Texture);
+            }
 
             OnPropertyChanged(nameof(Texture));
-
             HasChanges = false;
         }
 
