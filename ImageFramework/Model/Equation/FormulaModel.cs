@@ -17,9 +17,7 @@ namespace ImageFramework.Model.Equation
             Debug.Assert(defaultId >= 0);
 
             this.formula = $"I{defaultId}";
-            this.Converted = $"GetTexture{defaultId}()";
-            this.FirstImageId = defaultId;
-            this.MaxImageId = defaultId;
+            this.Converted = ConvertFormula(this.formula);
         }
 
         // the formula which is displayed
