@@ -115,8 +115,15 @@ cbuffer InfoBuffer : register(b0)
     uint yoffset;
 };
 
-float4 main(float4 coord : SV_POSITION) : SV_TARGET
+struct PixelIn
 {
+    float2 texcoord : TEXCOORD;
+    float4 projPos : SV_POSITION;
+};
+
+float4 main(PixelIn i) : SV_TARGET
+{
+    float4 coord = i.projPos;
     return in_tex.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), layer)];
 }
 ";
