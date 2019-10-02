@@ -63,5 +63,11 @@ namespace ImageFramework.ImageLoader
 
             return res;
         }
+
+        public static ImageFormat GetStagingFormat(string extension)
+        {
+            var format = Dll.get_staging_format(extension);
+            return new ImageFormat((GliFormat)format);
+        }
     }
 }

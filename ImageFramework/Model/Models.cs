@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using ImageFramework.Controller;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
+using ImageFramework.Model.Export;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 
@@ -18,6 +19,8 @@ namespace ImageFramework.Model
         public static readonly CultureInfo Culture = new CultureInfo("en-US");
         public ImagesModel Images { get; }
         public IReadOnlyList<ImagePipeline> Pipelines { get; }
+
+        public ExportModel Export { get; }
 
         public ProgressModel Progress { get; }
         internal ShaderModel Shader { get; }
@@ -31,6 +34,7 @@ namespace ImageFramework.Model
             // models
             Shader = new ShaderModel();
             Images = new ImagesModel();
+            Export = new ExportModel();
             Progress = new ProgressModel();
 
             for (int i = 0; i < numPipelines; ++i)
