@@ -68,6 +68,7 @@
     <Compile Include="Model\Equation\ImageCombineTest.cs" />
     <Compile Include="Model\Shader\ShaderModelTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestData.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MSTest.TestAdapter">

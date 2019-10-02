@@ -14,14 +14,13 @@ namespace FrameworkTests.Model.Equation
         [TestMethod]
         public void DefaultImage()
         {
-            var shader = new ImageCombineShader(GetEq("I0"), GetEq("I0"), 1);
-            
+            TestFormula("I0");
         }
 
         [TestMethod]
         public void CombinedImage()
         {
-            var shader = new ImageCombineShader(GetEq("I0 + I1"), GetEq("1"), 2);
+            TestFormula("I0+I1");
         }
 
         [TestMethod]
@@ -112,7 +111,7 @@ namespace FrameworkTests.Model.Equation
         /// <param name="formula"></param>
         public void TestFormula(string formula)
         {
-            using (var shader = new ImageCombineShader(GetEq(formula), GetEq("1"), 1))
+            using (var shader = new ImageCombineShader(GetEq(formula), GetEq("1"), 2))
             {
                 
             }

@@ -27,22 +27,22 @@ namespace FrameworkTests.Model.Shader
         [TestMethod]
         public void ConvertFromSrgb()
         {
-            var tex = new TextureArray2D(IO.LoadImage(DllTest.Directory + "small_a.png"));
+            var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "small_a.png"));
 
             var newTex = shader.Convert(tex, Format.R32G32B32A32_Float);
 
-            DllTest.CompareWithSmall(newTex.GetPixelColors(0, 0), Color.Channel.Rgba);
+            TestData.CompareWithSmall(newTex.GetPixelColors(0, 0), Color.Channel.Rgba);
         }
 
         [TestMethod]
         public void ConvertToSrgb()
         {
             // convert from RGBA32F to RGBA8_SRGB
-            var tex = new TextureArray2D(IO.LoadImage(DllTest.Directory + "small.pfm"));
+            var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "small.pfm"));
 
             var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb);
 
-            DllTest.CompareWithSmall(newTex.GetPixelColors(0, 0), Color.Channel.Rgb);
+            TestData.CompareWithSmall(newTex.GetPixelColors(0, 0), Color.Channel.Rgb);
         }
     }
 }
