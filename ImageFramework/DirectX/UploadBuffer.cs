@@ -26,11 +26,11 @@ namespace ImageFramework.DirectX
             var bufferDesc = new BufferDescription
             {
                 BindFlags = BindFlags.ConstantBuffer,
-                CpuAccessFlags = CpuAccessFlags.Write,
+                CpuAccessFlags = CpuAccessFlags.None,
                 OptionFlags = ResourceOptionFlags.None,
                 SizeInBytes = Utility.Utility.AlignTo(elementSize * elementCount, 16),
                 StructureByteStride = elementSize,
-                Usage = ResourceUsage.Dynamic
+                Usage = ResourceUsage.Default
             };
 
             Handle = new Buffer(Device.Get().Handle, bufferDesc);

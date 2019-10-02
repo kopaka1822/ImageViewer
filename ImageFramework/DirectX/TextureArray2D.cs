@@ -231,7 +231,19 @@ namespace ImageFramework.DirectX
             Debug.Assert(handle != null);
 
             // default View
-            View = new ShaderResourceView(Device.Get().Handle, handle);
+            var defaultDesc = new ShaderResourceViewDescription
+            {
+                Dimension = ShaderResourceViewDimension.Texture2DArray,
+                Format = Format,
+                Texture2DArray = new ShaderResourceViewDescription.Texture2DArrayResource
+                {
+                    ArraySize = NumLayers,
+                    FirstArraySlice = 0,
+                    MipLevels = NumMipmaps,
+                    MostDetailedMip = 0
+                }
+            };
+            View = new ShaderResourceView(Device.Get().Handle, handle, defaultDesc);
 
             // single slice views
             views = new ShaderResourceView[NumLayers * NumMipmaps];

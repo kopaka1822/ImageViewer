@@ -114,7 +114,7 @@ cbuffer InfoBuffer : register(b0)
     uint yoffset;
 };
 
-float4 main(float4 coord : SV_Position) : SV_TARGET
+float4 main(float4 coord : SV_POSITION) : SV_TARGET
 {
     return in_tex.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), layer)];
 }
