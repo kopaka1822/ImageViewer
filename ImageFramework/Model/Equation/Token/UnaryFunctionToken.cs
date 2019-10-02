@@ -65,17 +65,17 @@ namespace ImageFramework.Model.Equation.Token
                 case "sign":
                 case "floor":
                 case "ceil":
-                case "fract":
+                case "frac":
                     front = name + "(";
                     end = ")";
                     break;
                 case "normalize":
-                    front = "float2(" + name + "(float3(";
-                    end = "), 1.0).xxxy";
+                    front = "float4(normalize((";
+                    end = ").xyz), 1.0)";
                     break;
                 case "length":
-                    front = "f4(length(float3(";
-                    end = ")))";
+                    front = "f4(length((";
+                    end = ").xyz))";
                     break;
                 default:
                     front = null;

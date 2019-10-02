@@ -103,9 +103,9 @@ namespace ImageFramework.DirectX
 
         public void Dispose()
         {
-            Vertex?.Dispose();
-            Pixel?.Dispose();
-            Compute?.Dispose();
+            vertex?.Dispose();
+            pixel?.Dispose();
+            compute?.Dispose();
         }
     }
 }

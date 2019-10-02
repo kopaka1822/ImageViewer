@@ -103,7 +103,7 @@
     <Compile Include="Model\ImagesModel.cs" />
     <Compile Include="Model\Models.cs" />
     <Compile Include="Model\ProgressModel.cs" />
-    <Compile Include="Model\Shader\ImageCombineShader.cs" />
+    <Compile Include="Model\Equation\ImageCombineShader.cs" />
     <Compile Include="Model\Shader\QuadShader.cs" />
     <Compile Include="Model\Shader\ShaderModel.cs" />
     <Compile Include="Model\Shader\ConvertFormatShader.cs" />

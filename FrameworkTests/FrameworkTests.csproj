@@ -65,6 +65,7 @@
     <Compile Include="ImageLoader\DllTest.cs" />
     <Compile Include="ImagePipelineTest.cs" />
     <Compile Include="Model\Equation\EquationTest.cs" />
+    <Compile Include="Model\Equation\ImageCombineTest.cs" />
     <Compile Include="Model\Shader\ShaderModelTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
