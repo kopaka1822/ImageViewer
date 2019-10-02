@@ -11,6 +11,7 @@ namespace image
 		if (newStride == oldStride) return;
 
 		assert(newStride < oldStride);
+		assert(bytes.size() % oldStride == 0);
 		const auto numElements = bytes.size() / oldStride;
 		for(size_t src = oldStride, dst = newStride; src < bytes.size(); src += oldStride, dst += newStride)
 		{

@@ -76,5 +76,14 @@ namespace FrameworkTests
             Assert.AreEqual(1, colors.Length);
             Assert.IsTrue(colors[0].Equals(new Color(0.5f, 0.5f, 0.5f), Color.Channel.Rgb));
         }
+
+        public static void CompareColors(Color[] left, Color[] right, Color.Channel channels = Color.Channel.Rgb, float tolerance = 0.01f)
+        {
+            Assert.AreEqual(left.Length, right.Length);
+            for (int i = 0; i < left.Length; ++i)
+            {
+                Assert.IsTrue(left[i].Equals(right[i], channels, tolerance));
+            }
+        }
     }
 }

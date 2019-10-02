@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FrameworkTests.ImageLoader;
-using ImageFramework.Model;
+﻿using ImageFramework.Model;
 using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace FrameworkTests
+namespace FrameworkTests.Model
 {
     [TestClass]
     public class ImagePipelineTest
