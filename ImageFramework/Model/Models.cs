@@ -11,6 +11,9 @@ using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
+using SharpDX.Direct3D11;
+using SharpDX.DXGI;
+using Device = ImageFramework.DirectX.Device;
 
 namespace ImageFramework.Model
 {
@@ -23,7 +26,6 @@ namespace ImageFramework.Model
         public ExportModel Export { get; }
 
         public ProgressModel Progress { get; }
-        internal ShaderModel Shader { get; }
 
         private readonly List<ImagePipeline> pipelines = new List<ImagePipeline>();
 
@@ -31,8 +33,9 @@ namespace ImageFramework.Model
 
         public Models(int numPipelines = 1)
         {
+            CheckDeviceCapabilities();
+
             // models
-            Shader = new ShaderModel();
             Images = new ImagesModel();
             Export = new ExportModel();
             Progress = new ProgressModel();
@@ -89,10 +92,37 @@ namespace ImageFramework.Model
             await pipelineController.UpdateImagesAsync(ct);
         }
 
+        /// <summary>
+        /// checks if this graphics card supports the relevant features
+        /// </summary>
+        private void CheckDeviceCapabilities()
+        {
+            var dev = Device.Get();
+            // check supported format capabilities
+            foreach (var f in IO.SupportedFormats)
+            {
+                var sup = dev.CheckFormatSupport(f);
+
+                if ((sup & FormatSupport.Texture2D) == 0)
+                    throw new Exception($"Texture2D support for {f} is required");
+                // TODO this can be optional
+                if ((sup & FormatSupport.MipAutogen) == 0)
+                    throw new Exception($"MipAutogen support for {f} is required");
+
+                if ((sup & FormatSupport.RenderTarget) == 0)
+                    throw new Exception($"RenderTarget support for {f} is required");
+
+                if (f == Format.R32G32B32A32_Float)
+                {
+                    if((sup & FormatSupport.TypedUnorderedAccessView) == 0)
+                        throw new Exception($"TypesUnorderedAccess support for {f} is required");
+                }
+            }
+        }
 
         public void Dispose()
         {
-            Shader?.Dispose();
+            Export?.Dispose();
             Images?.Dispose();
             foreach (var imagePipeline in pipelines)
             {

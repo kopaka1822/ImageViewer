@@ -38,9 +38,6 @@ namespace ImageFramework.ImageLoader
         public static extern IntPtr get_export_formats(string extension, out int nFormats);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern uint get_staging_format(string extension);
-
-        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr get_error(out int length);
 
         public static string GetError()

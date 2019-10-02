@@ -10,8 +10,11 @@ namespace ImageFramework.Model.Export
 {
     public class ExportDescription
     {
-        // complete filename
         public string Filename { get; }
+
+        public string Extension { get; }
+
+        public string FullFilename => Filename + "." + Extension;
 
         // destination file format
         private GliFormat fileFormat;
@@ -25,6 +28,8 @@ namespace ImageFramework.Model.Export
             }
         }
 
+        internal ImageFormat StagingFormat { get; }
+
         internal readonly ExportFormatModel ExportFormat;
 
         public ExportDescription(string filename, string extension, ExportModel model)
@@ -33,8 +38,33 @@ namespace ImageFramework.Model.Export
             if(ExportFormat == null)
                 throw new Exception("unsupported file extension: " + extension);
 
-            Filename = filename + "." + extension;
+            Filename = filename;
+            Extension = extension;
             fileFormat = ExportFormat.Formats[0];
+
+            // set staging format
+            if (extension == "png" || extension == "jpg" || extension == "bmp")
+            {
+                switch (model.LdrExportMode)
+                {
+                    case ExportModel.LdrMode.Srgb:
+                        StagingFormat = new ImageFormat(GliFormat.RGBA8_SRGB_PACK8);
+                        break;
+                    case ExportModel.LdrMode.UNorm:
+                        StagingFormat = new ImageFormat(GliFormat.RGBA8_UNORM_PACK8);
+                        break;
+                    case ExportModel.LdrMode.SNorm:
+                        StagingFormat = new ImageFormat(GliFormat.RGBA8_SNORM_PACK8);
+                        break;
+                    default:
+                        Debug.Assert(false);
+                        break;
+                }
+            }
+            else
+            {
+                StagingFormat = new ImageFormat(GliFormat.RGBA32_SFLOAT_PACK32);
+            }
         }
 
         /// <summary>

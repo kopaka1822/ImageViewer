@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
-using ImageFramework.Model.Shader;
 
-namespace ImageFramework.Model.Equation
+namespace ImageFramework.Model.Shader
 {
     internal class ImageCombineShader : IDisposable
     {

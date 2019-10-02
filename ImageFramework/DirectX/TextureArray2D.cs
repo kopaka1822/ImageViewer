@@ -129,7 +129,27 @@ namespace ImageFramework.DirectX
 
         public Color[] GetPixelColors(int layer, int mipmap)
         {
-            Debug.Assert(Format == Format.R32G32B32A32_Float || Format == Format.R8G8B8A8_UNorm_SRgb);
+            // create staging texture
+            using (var staging = GetStagingTexture(layer, mipmap))
+            {
+                // obtain data from staging resource
+                return Device.Get().GetColorData(staging, 0, GetWidth(mipmap), GetHeight(mipmap));
+            }
+        }
+
+        public void CopyPixels(int layer, int mipmap, IntPtr destination, uint size)
+        {
+            // create staging texture
+            using (var staging = GetStagingTexture(layer, mipmap))
+            {
+                // obtain data from staging resource
+                Device.Get().GetData(staging, 0, GetWidth(mipmap), GetHeight(mipmap), destination, size);
+            }
+        }
+
+        private Texture2D GetStagingTexture(int layer, int mipmap)
+        {
+            Debug.Assert(IO.SupportedFormats.Contains(Format));
 
             Debug.Assert(mipmap >= 0);
             Debug.Assert(mipmap < NumMipmaps);
@@ -151,17 +171,15 @@ namespace ImageFramework.DirectX
             };
 
             // create staging texture
-            using (var staging = new Texture2D(Device.Get().Handle, desc))
-            {
-                // copy data to staging resource
-                Device.Get().CopySubresource(handle, staging, 
-                    GetTextureIndex(layer, mipmap), 0, 
-                    GetWidth(mipmap), GetHeight(mipmap)
-                );
+            var staging = new Texture2D(Device.Get().Handle, desc);
 
-                // obtain data from staging resource
-                return Device.Get().GetColorData(staging, 0, desc.Width, desc.Height);
-            }
+            // copy data to staging resource
+            Device.Get().CopySubresource(handle, staging,
+                GetTextureIndex(layer, mipmap), 0,
+                GetWidth(mipmap), GetHeight(mipmap)
+            );
+
+            return staging;
         }
 
         public int GetWidth(int mipmap)
