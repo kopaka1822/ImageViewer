@@ -74,6 +74,22 @@ namespace ImageFramework.Model
         }
 
         /// <summary>
+        /// exports a pipeline image with the given format and extension.
+        /// Apply will be called by this method if required
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="extension"></param>
+        /// <param name="format"></param>
+        /// <param name="pipelineId"></param>
+        public void ExportPipelineImage(string filename, string extension, GliFormat format, int pipelineId = 0)
+        {
+            var desc = new ExportDescription(filename, extension, Export) {FileFormat = format};
+            // apply changes before exporting
+            Apply();
+            Export.Export(Pipelines[pipelineId].Image, desc);
+        }
+
+        /// <summary>
         /// Forces all pending pipeline changes to be computed
         /// </summary>
         public void Apply()

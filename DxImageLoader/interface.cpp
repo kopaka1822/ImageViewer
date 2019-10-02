@@ -87,7 +87,7 @@ int image_allocate(uint32_t format, int width, int height, int layer, int mipmap
 	auto res = std::make_unique<image::Image>();
 	res->format = gli::format(format);
 	res->original = res->format;
-	if(image::isSupported(res->format))
+	if(!image::isSupported(res->format))
 	{
 		set_error("image format is not supported for allocate");
 		return 0;
@@ -203,12 +203,12 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 			// only 2 possible formats
 			if (format == gli::FORMAT_RGB32_SFLOAT_PACK32)
 			{
-				image::changeStride(mip.bytes, 32, 24);
+				image::changeStride(mip.bytes, 16, 12);
 				nComponents = 3;
 			}
 			else if (format == gli::FORMAT_R32_SFLOAT_PACK32)
 			{
-				image::changeStride(mip.bytes, 32, 8);
+				image::changeStride(mip.bytes, 16, 4);
 				nComponents = 1;
 			}
 			else throw std::runtime_error("export format not supported for pfm, hdr");

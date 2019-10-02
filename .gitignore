@@ -33,3 +33,6 @@ obj/
 #log.txt
 Debug/
 Release/
+
+# unit testing tmp
+FrameworkTests/TestData/export/

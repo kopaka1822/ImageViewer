@@ -135,7 +135,7 @@ std::unique_ptr<image::Image> pfm_load(const char* filename)
 std::vector<uint32_t> pfm_get_export_formats()
 {
 	return {
-		gli::format::FORMAT_RGBA32_SFLOAT_PACK32,
+		gli::format::FORMAT_RGB32_SFLOAT_PACK32,
 		gli::format::FORMAT_R32_SFLOAT_PACK32,
 	};
 }
