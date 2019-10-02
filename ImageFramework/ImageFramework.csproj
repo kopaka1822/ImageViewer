@@ -67,6 +67,7 @@
     <Compile Include="DirectX\Device.cs" />
     <Compile Include="DirectX\DownloadBuffer.cs" />
     <Compile Include="DirectX\Shader.cs" />
+    <Compile Include="DirectX\Structs\LayerLevelOffsetData.cs" />
     <Compile Include="DirectX\Structs\LayerLevelData.cs" />
     <Compile Include="DirectX\SwapChain.cs" />
     <Compile Include="DirectX\TextureArray2D.cs" />
@@ -106,9 +107,8 @@
     <Compile Include="Model\ImagesModel.cs" />
     <Compile Include="Model\Models.cs" />
     <Compile Include="Model\ProgressModel.cs" />
-    <Compile Include="Model\Equation\ImageCombineShader.cs" />
+    <Compile Include="Model\Shader\ImageCombineShader.cs" />
     <Compile Include="Model\Shader\QuadShader.cs" />
-    <Compile Include="Model\Shader\ShaderModel.cs" />
     <Compile Include="Model\Shader\ConvertFormatShader.cs" />
     <Compile Include="Utility\TextureCache.cs" />
     <Compile Include="Properties\Annotations.cs" />

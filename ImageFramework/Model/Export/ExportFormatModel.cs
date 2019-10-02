@@ -14,15 +14,12 @@ namespace ImageFramework.Model.Export
 
         public IReadOnlyList<GliFormat> Formats { get; }
 
-        internal ImageFormat StagingFormat { get; }
-
         public ExportFormatModel(string extension)
         {
             Formats = IO.GetExportFormats(extension);
             Debug.Assert(Formats.Count > 0);
 
             Extension = extension;
-            StagingFormat = IO.GetStagingFormat(extension);
         }
     }
 }

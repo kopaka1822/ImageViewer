@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.ImageLoader;
 using ImageFramework.Utility;
 using SharpDX;
 using SharpDX.Direct3D;
@@ -95,6 +96,29 @@ namespace ImageFramework.DirectX
             return result;
         }
 
+        public void GetData(Texture2D res, int subresource, int width, int height, IntPtr dst, uint size)
+        {
+            Debug.Assert(IO.SupportedFormats.Contains(res.Description.Format));
+            int pixelSize = 4;
+            if (res.Description.Format == Format.R32G32B32A32_Float)
+                pixelSize = 16;
+
+            // verify expected size
+            Debug.Assert((uint)(height * width * pixelSize) == size);
+
+            var data = context.MapSubresource(res, subresource, MapMode.Read, MapFlags.None);
+            int rowSize = width * pixelSize;
+
+            for (int curY = 0; curY < height; ++curY)
+            {
+                Dll.CopyMemory(dst, data.DataPointer, (uint)rowSize);
+                dst += rowSize;
+                data.DataPointer += data.RowPitch;
+            }
+
+            context.UnmapSubresource(res, subresource);
+        }
+
         /// <summary>
         /// gets data from the buffer (should be staging buffer) and puts the data into the array
         /// </summary>
@@ -123,6 +147,8 @@ namespace ImageFramework.DirectX
         /// <returns></returns>
         public unsafe Color[] GetColorData(Texture2D res, int subresource, int width, int height)
         {
+            Debug.Assert(IO.SupportedFormats.Contains(res.Description.Format));
+
             if (res.Description.Format == Format.R32G32B32A32_Float)
             {
                 var tmp = GetData(res, subresource, width, height, 4 * 4);

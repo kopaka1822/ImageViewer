@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Model.Equation;
+using ImageFramework.Model.Shader;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FrameworkTests.Model.Equation
