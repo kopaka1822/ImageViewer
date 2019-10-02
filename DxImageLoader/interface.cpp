@@ -287,6 +287,14 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 	return it->second.data();
 }
 
+uint32_t get_staging_format(const char* extension)
+{
+	const auto ext = std::string(extension);
+	if (ext == "jpg" || ext == "png" || ext == "bmp")
+		return gli::FORMAT_RGBA8_SRGB_PACK8;
+	return gli::FORMAT_RGBA32_SFLOAT_PACK32;
+}
+
 const char* get_error(int& length)
 {
 	length = static_cast<int>(s_error.length());

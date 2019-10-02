@@ -81,6 +81,9 @@
     <Compile Include="ImageLoader\Resource.cs" />
     <Compile Include="Model\Equation\Equation.cs" />
     <Compile Include="Model\Equation\FormulaModel.cs" />
+    <Compile Include="Model\Export\ExportDescription.cs" />
+    <Compile Include="Model\Export\ExportFormatModel.cs" />
+    <Compile Include="Model\Export\ExportModel.cs" />
     <Compile Include="Model\ImagePipeline.cs" />
     <Compile Include="Model\Equation\Markov\BinaryFunctionRule.cs" />
     <Compile Include="Model\Equation\Markov\BracketRule.cs" />

@@ -39,12 +39,14 @@ EXPORT(unsigned char*) image_get_mipmap(int id, int layer, int mipmap, uint32_t&
 /// \param format format that must be compatible with the extension. Can by queried with image_get_export_formats
 /// \param quality quality for compressed formats or .jpg. range: [0, 100]
 /// \warning the image data might be changed by calling this function. Thus, the image should no longer be used after a call to save
-/// \remarks for pfm and hdr export: the image format must be FORMAT_RGBA32_SFLOAT_PACK32.
-///          for png, jpg and bmp export the image format must be one of: FORMAT_RGBA8_SRGB_PACK8, FORMAT_RGBA8_UNORM_PACK8, FORMAT_RGBA8_SNORM_PACK8
+/// \remarks the image must have an internal format that matches get_staging_format(extension)
 EXPORT(bool) image_save(int id, const char* filename, const char* extension, uint32_t format, int quality);
 
 /// \brief retrieves an array with all supported dxgi formats that are available for export with the extension
 EXPORT(const uint32_t*) get_export_formats(const char* extension, int& numFormats);
+
+/// \brief retrieves the gli format that should be used for the texture for exporting images with that extension
+EXPORT(uint32_t) get_staging_format(const char* extension);
 
 /// \brief get last error
 EXPORT(const char*) get_error(int& length);
