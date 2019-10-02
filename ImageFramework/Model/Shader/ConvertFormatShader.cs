@@ -77,6 +77,7 @@ namespace ImageFramework.Model.Shader
             var dev = DirectX.Device.Get();
             dev.Vertex.Set(quad.Vertex);
             dev.Pixel.Set(convert.Pixel);
+
             dev.Pixel.SetShaderResource(0, texture.View);
 
             for (int curLayer = 0; curLayer < nLayer; ++curLayer)

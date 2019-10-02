@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
 
@@ -42,6 +43,9 @@ namespace ImageFramework.Model.Shader
                     dev.Dispatch(Utility.Utility.DivideRoundUp(width, LocalSize), Utility.Utility.DivideRoundUp(height, LocalSize));
                 }
             }
+
+            // remove images from unordered acces view slots (otherwise they can't be bound as srv later)
+            dev.Compute.SetUnorderedAccessView(0, null);
         }
 
         private static string GetShaderSource(string colorFormula, string alphaFormula, int numImages)

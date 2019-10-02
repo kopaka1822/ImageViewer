@@ -3,15 +3,15 @@
 - [x] open ldr images (png, jpg, bmp)
 - [x] open hdr images (hdr, pfm, exr)
 - [x] open ktx, dds
-- [ ] export ldr
-- [ ] export hdr
-- [ ] export ktx, dds
-- [ ] crop image before export
-- [ ] combine images with custom formula
+- [x] export ldr
+- [x] export hdr
+- [x] export ktx, dds
+- [x] crop image before export
+- [x] combine images with custom formula
 - [ ] use custom shader/filter on each image
 - [ ] disable filter per image
 - [ ] custom parameters in filter (int, float, bool, image)
-- [ ] generate/delete image mipmaps
+- [x] generate/delete image mipmaps
 - [ ] get basic image statistics (average, min, max)
 - [ ] import custom formula as image
 - [ ] generate cube map from 6 images
