@@ -23,23 +23,12 @@ namespace ImageFramework.DirectX
         public int NumLayers { get; }
         public ShaderResourceView View { get; private set; }
 
-        private UnorderedAccessView uaView;
-
-        public UnorderedAccessView UaView
-        {
-            get
-            {
-                Debug.Assert(uaView != null);
-                return uaView;
-            }
-            private set => uaView = value;
-        }
-
         public Format Format { get; }
 
         private readonly Texture2D handle;
         private ShaderResourceView[] views;
         private RenderTargetView[] rtViews;
+        private UnorderedAccessView[] uaViews;
 
         public TextureArray2D(int numLayer, int numMipmaps, int width, int height, Format format, bool createUav)
         {
@@ -86,9 +75,17 @@ namespace ImageFramework.DirectX
             return views[GetTextureIndex(layer, mipmap)];
         }
 
-        public RenderTargetView GetRtView(int layer, int mipmaps)
+        public RenderTargetView GetRtView(int layer, int mipmap)
         {
-            return rtViews[GetTextureIndex(layer, mipmaps)];
+            return rtViews[GetTextureIndex(layer, mipmap)];
+        }
+
+        public UnorderedAccessView GetUaView(int mipmap)
+        {
+            Debug.Assert(uaViews != null);
+            Debug.Assert(mipmap < NumMipmaps);
+            Debug.Assert(mipmap >= 0);
+            return uaViews[mipmap];
         }
 
         /// <summary>
@@ -97,7 +94,7 @@ namespace ImageFramework.DirectX
         public TextureArray2D GenerateMipmapLevels(int levels)
         {
             Debug.Assert(!HasMipmaps);
-            var newTex = new TextureArray2D(NumLayers, levels, Width, Height, Format, uaView != null);
+            var newTex = new TextureArray2D(NumLayers, levels, Width, Height, Format, uaViews != null);
             // copy image data of first level
             Device.Get().CopySubresource(handle, newTex.handle, 0, 0, Width, Height);
             Device.Get().GenerateMips(newTex.View);
@@ -111,7 +108,7 @@ namespace ImageFramework.DirectX
         /// <returns></returns>
         public TextureArray2D CloneWithoutMipmaps()
         {
-            var newTex = new TextureArray2D(NumLayers, 1, Width, Height, Format, uaView != null);
+            var newTex = new TextureArray2D(NumLayers, 1, Width, Height, Format, uaViews != null);
             // copy data of first level
             Device.Get().CopySubresource(handle, newTex.handle, 0, 0, Width, Height);
 
@@ -124,7 +121,7 @@ namespace ImageFramework.DirectX
         /// <returns></returns>
         public TextureArray2D Clone()
         {
-            var newTex = new TextureArray2D(NumLayers, NumMipmaps, Width, Height, Format, uaView != null);
+            var newTex = new TextureArray2D(NumLayers, NumMipmaps, Width, Height, Format, uaViews != null);
 
             Device.Get().CopyResource(handle, newTex.handle);
             return newTex;
@@ -183,6 +180,31 @@ namespace ImageFramework.DirectX
 
         public void Dispose()
         {
+            if (views != null)
+            {
+                foreach (var shaderResourceView in views)
+                {
+                    shaderResourceView?.Dispose();
+                }
+            }
+
+            if (rtViews != null)
+            {
+                foreach (var renderTargetView in rtViews)
+                {
+                    renderTargetView?.Dispose();
+                }
+            }
+
+            if (uaViews != null)
+            {
+                foreach (var unorderedAccessView in uaViews)
+                {
+                    unorderedAccessView?.Dispose();
+                }
+            }
+
+            View?.Dispose();
             handle?.Dispose();
         }
 
@@ -192,8 +214,6 @@ namespace ImageFramework.DirectX
 
             // default View
             View = new ShaderResourceView(Device.Get().Handle, handle);
-            if(createUav)
-                UaView = new UnorderedAccessView(Device.Get().Handle, handle);
 
             // single slice views
             views = new ShaderResourceView[NumLayers * NumMipmaps];
@@ -230,6 +250,27 @@ namespace ImageFramework.DirectX
                     };
 
                     rtViews[GetTextureIndex(curLayer, curMipmap)] = new RenderTargetView(Device.Get().Handle, handle, rtDesc);
+                }
+            }
+
+            if (createUav)
+            {
+                uaViews = new UnorderedAccessView[NumMipmaps];
+                for (int curMipmap = 0; curMipmap < NumMipmaps; ++curMipmap)
+                {
+                    var desc = new UnorderedAccessViewDescription
+                    {
+                        Dimension = UnorderedAccessViewDimension.Texture2DArray,
+                        Format = Format,
+                        Texture2DArray = new UnorderedAccessViewDescription.Texture2DArrayResource
+                        {
+                            ArraySize = NumLayers,
+                            FirstArraySlice = 0,
+                            MipSlice = curMipmap
+                        }
+                    };
+
+                    uaViews[curMipmap] = new UnorderedAccessView(Device.Get().Handle, handle, desc);
                 }
             }
         }

@@ -22,7 +22,7 @@ namespace ImageFramework.Model.Equation.Token
                 throw new Exception("invalid string as function name: " + funcName);
 
             if (convertToRgb)
-                return "f4(f3(" + funcName + "(f3(" + value1.ToHlsl() + "),f3(" + value2.ToHlsl() + "))), 1.0)";
+                return "float4(f3(" + funcName + "((" + value1.ToHlsl() + ").xyz,(" + value2.ToHlsl() + ").xyz)), 1.0)";
             return funcName + "(" + value1.ToHlsl() + "," + value2.ToHlsl() + ")";
         }
 
@@ -32,7 +32,7 @@ namespace ImageFramework.Model.Equation.Token
             {
                 case "min":
                 case "max":
-                case "atan":
+                case "atan2":
                 case "pow":
                 case "fmod":
                 case "step":
