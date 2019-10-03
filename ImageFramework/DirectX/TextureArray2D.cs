@@ -334,12 +334,12 @@ namespace ImageFramework.DirectX
                 BindFlags = flags,
                 CpuAccessFlags = CpuAccessFlags.Read | CpuAccessFlags.Write,
                 Format = Format,
-                Height = Width,
+                Height = Height,
                 MipLevels = NumMipmaps,
                 OptionFlags = ResourceOptionFlags.GenerateMipMaps,
                 SampleDescription = new SampleDescription(1, 0),
                 Usage = ResourceUsage.Default,
-                Width = Height
+                Width = Width
             };
         }
     }

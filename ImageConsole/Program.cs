@@ -5,24 +5,38 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageConsole.Commands;
+using ImageConsole.Commands.Image;
+using ImageConsole.Commands.Program;
 using ImageFramework.Model;
 
 namespace ImageConsole
 {
-    class Program
+    public class Program
     {
         private readonly Dictionary<string, Command> commands = new Dictionary<string, Command>();
+        public bool ReadCin { get; set; } = false;
+        public bool Close { get; set; } = false;
 
         private Program()
         {
             // setup commands
             AddCommand(new OpenCommand());
+            AddCommand(new DeleteCommand());
+            AddCommand(new MoveCommand());
+            AddCommand(new TellLayers());
+            AddCommand(new TellMipmaps());
+            AddCommand(new TellSize());
+
+            AddCommand(new CinCommand(this));
+            AddCommand(new CloseCommand(this));
+
             AddCommand(new HelpCommand(commands));
         }
 
         private void AddCommand(Command c)
         {
             Debug.Assert(!commands.ContainsKey(c.Code));
+            Debug.Assert(c.Code.StartsWith("-"));
             commands[c.Code] = c;
         }
 
@@ -30,25 +44,83 @@ namespace ImageConsole
         {
             using (var model = new Models(1))
             {
-                int idx = 0;
-                while (idx < args.Length)
-                {
-                    var command = args[idx++];
-                    var arguments = ReadArgs(args, ref idx);
-
-                    if (!commands.TryGetValue(command, out var commandObject))
-                    {
-                        throw new Exception("could not find command " + command + ". Use -help to view all commands");
-                    }
-
-                    commandObject.Execute(arguments, model);
-                }
+                // handle startup arguments
+               InterpretArgs(args, model);
 
                 if (args.Length == 0)
                 {
                     Console.Error.WriteLine("Use -help to view all commands");
                 }
+
+                // handle cin input
+                while (ReadCin && !Close)
+                {
+                    try
+                    {
+                        var line = Console.ReadLine();
+                        var moreArgs = SplitToArgs(line);
+                        InterpretArgs(moreArgs, model);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Error.WriteLine(e.Message);
+                    }
+                }
             }
+        }
+
+        private void InterpretArgs(string[] args, Models model)
+        {
+            int idx = 0;
+            while (idx < args.Length)
+            {
+                var command = args[idx++];
+                var arguments = ReadArgs(args, ref idx);
+
+                if (!commands.TryGetValue(command, out var commandObject))
+                {
+                    throw new Exception("could not find command " + command + ". Use -help to view all commands");
+                }
+
+                commandObject.Execute(arguments, model);
+            }
+        }
+
+        public static string[] SplitToArgs(string argString)
+        {
+            string curValue = "";
+            var res = new List<string>();
+            bool isString = false;
+
+            // for each character
+            foreach (var c in argString)
+            {
+                if (c == ' ' && !isString)
+                {
+                    if(curValue.Length != 0)
+                        res.Add(curValue);
+                    curValue = "";
+                }
+                else if(c == '\"')
+                {
+                    isString = !isString;
+                    if (!isString && curValue.Length != 0) // string was closed
+                    {
+                        res.Add(curValue);
+                        curValue = "";
+                    }
+                }
+                else // add character
+                {
+                    curValue += c;
+                }
+            }
+
+            // add last argument
+            if(curValue.Length != 0)
+                res.Add(curValue);
+
+            return res.ToArray();
         }
 
         public static List<string> ReadArgs(string[] args, ref int startIdx)
