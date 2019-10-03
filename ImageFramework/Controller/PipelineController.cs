@@ -9,6 +9,7 @@ using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.Model;
 using ImageFramework.Model.Equation;
+using ImageFramework.Model.Filter;
 using ImageFramework.Utility;
 
 namespace ImageFramework.Controller
@@ -36,6 +37,36 @@ namespace ImageFramework.Controller
 
             textureCache = new TextureCache(models.Images);
             layerLevelBuffer = new UploadBuffer<LayerLevelData>(1);
+
+            this.models.Filter.PropertyChanged += FilterOnPropertyChanged;
+            this.models.Filter.ParameterChanged += FilterOnParameterChanged;
+        }
+
+        private void FilterOnParameterChanged(object sender, FiltersModel.ParameterChangeEventArgs args)
+        {
+            foreach (var pipeline in models.Pipelines)
+            {
+                if (pipeline.UseFilter)
+                {
+                    pipeline.HasChanges = true;
+                }
+            }
+        }
+
+        private void FilterOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(FiltersModel.Filter): // all equations with filter enabled must be recomputed
+                    foreach (var pipe in models.Pipelines)
+                    {
+                        if (pipe.UseFilter)
+                        {
+                            pipe.HasChanges = true;
+                        }
+                    }
+                    break;
+            }
         }
 
         private void PipelineFormulaOnPropertyChanged(ImagePipeline pipe, FormulaModel formula, PropertyChangedEventArgs e)

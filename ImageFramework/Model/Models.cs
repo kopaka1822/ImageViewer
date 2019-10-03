@@ -21,6 +21,8 @@ namespace ImageFramework.Model
     public class Models : IDisposable
     {
         public static readonly CultureInfo Culture = new CultureInfo("en-US");
+
+        public readonly int NumPipelines;
         public ImagesModel Images { get; }
         public FiltersModel Filter { get; }
         public IReadOnlyList<ImagePipeline> Pipelines { get; }
@@ -35,6 +37,8 @@ namespace ImageFramework.Model
 
         public Models(int numPipelines = 1)
         {
+            NumPipelines = numPipelines;
+
             CheckDeviceCapabilities();
 
             // models
