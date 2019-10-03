@@ -14,7 +14,7 @@ namespace ImageFramework.Model.Filter.Parameter
     /// filter parameter information which is dependent on a generic type
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class FilterParameterModel<T> : FilterParameterModelBase, INotifyPropertyChanged
+    public abstract class FilterParameterModel<T> : FilterParameterModelBase
     {
         public abstract class ParameterAction
         {
@@ -49,14 +49,6 @@ namespace ImageFramework.Model.Filter.Parameter
             Min = min;
             Max = max;
             Default = defaultValue;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

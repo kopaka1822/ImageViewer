@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Annotations;
 using ImageFramework.Model.Filter.Parameter;
 using ImageFramework.Model.Shader;
 
 namespace ImageFramework.Model.Filter
 {
-    public class FilterModel : IDisposable
+    public class FilterModel : IDisposable, INotifyPropertyChanged
     {
         internal FilterShader Shader { get; }
 
@@ -29,9 +32,20 @@ namespace ImageFramework.Model.Filter
 
         public string Filename { get; }
 
-        public bool IsEnabled { get; set; } = true;
+        private bool isEnabled = true;
 
-        public bool[] IsPipelineEnabled { get; set; }
+        public bool IsEnabled
+        {
+            get => isEnabled;
+            set
+            {
+                if (value == isEnabled) return;
+                isEnabled = value;
+                OnPropertyChanged(nameof(IsEnabled));
+            }
+        }
+
+        private bool[] isPipelineEnabled;
 
         public FilterModel(FilterLoader loader, int numPipelines)
         {
@@ -41,11 +55,27 @@ namespace ImageFramework.Model.Filter
             Name = loader.Name;
             Description = loader.Description;
             Filename = loader.Filename;
-            IsPipelineEnabled = new bool[numPipelines];
+            isPipelineEnabled = new bool[numPipelines];
             for (var i = 0; i < numPipelines; ++i)
-                IsPipelineEnabled[i] = true;
+                isPipelineEnabled[i] = true;
 
             Shader = new FilterShader(this, loader.ShaderSource);
+        }
+
+        public void SetIsPipelineEnabled(int index, bool value)
+        {
+            Debug.Assert(index >= 0);
+            Debug.Assert(index < isPipelineEnabled.Length);
+            if (value == isPipelineEnabled[index]) return;
+            isPipelineEnabled[index] = value;
+            OnPropertyChanged(nameof(IsPipelineEnabled));
+        }
+
+        public bool IsPipelineEnabled(int index)
+        {
+            Debug.Assert(index >= 0);
+            Debug.Assert(index < isPipelineEnabled.Length);
+            return isPipelineEnabled[index];
         }
 
         /// <summary>
@@ -54,13 +84,21 @@ namespace ImageFramework.Model.Filter
         public bool IsEnabledFor(int pipelineId)
         {
             Debug.Assert(pipelineId >= 0);
-            Debug.Assert(pipelineId < IsPipelineEnabled.Length);
-            return IsEnabled && IsPipelineEnabled[pipelineId];
+            Debug.Assert(pipelineId < isPipelineEnabled.Length);
+            return IsEnabled && isPipelineEnabled[pipelineId];
         }
 
         public void Dispose()
         {
             Shader?.Dispose();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
