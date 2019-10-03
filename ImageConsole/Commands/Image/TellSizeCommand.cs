@@ -7,19 +7,21 @@ using ImageFramework.Model;
 
 namespace ImageConsole.Commands.Image
 {
-    public class TellLayers : Command
+    public class TellSizeCommand : Command
     {
-        public TellLayers() 
-            : base("-telllayers", "", "print number of layers")
+        public TellSizeCommand() : 
+            base("-tellsize", "[mipmapIndex]", "prints the width and height of the mipmap")
         {
         }
 
         public override void Execute(List<string> arguments, Models model)
         {
             var reader = new ParameterReader(arguments);
+            var mip = reader.ReadInt("mipmapIndex", 0);
             reader.ExpectNoMoreArgs();
 
-            Console.Out.WriteLine(model.Images.NumLayers);
+            Console.Out.WriteLine(model.Images.GetWidth(mip));
+            Console.Out.WriteLine(model.Images.GetHeight(mip));
         }
     }
 }

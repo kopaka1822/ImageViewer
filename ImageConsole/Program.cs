@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageConsole.Commands;
+using ImageConsole.Commands.Equation;
+using ImageConsole.Commands.Export;
 using ImageConsole.Commands.Image;
 using ImageConsole.Commands.Program;
 using ImageFramework.Model;
@@ -23,12 +25,23 @@ namespace ImageConsole
             AddCommand(new OpenCommand());
             AddCommand(new DeleteCommand());
             AddCommand(new MoveCommand());
-            AddCommand(new TellLayers());
-            AddCommand(new TellMipmaps());
-            AddCommand(new TellSize());
+            AddCommand(new GenerateMipmapsCommand());
+            AddCommand(new DeleteMipmapsCommand());
+            AddCommand(new TellLayersCommand());
+            AddCommand(new TellMipmapsCommand());
+            AddCommand(new TellSizeCommand());
 
             AddCommand(new CinCommand(this));
             AddCommand(new CloseCommand(this));
+
+            AddCommand(new EquationCommand());
+
+            AddCommand(new ExportCommand());
+            AddCommand(new TellFormatsCommand());
+            AddCommand(new ExportMipmapCommand());
+            AddCommand(new ExportLayerCommand());
+            AddCommand(new ExportCroppingCommand());
+            AddCommand(new ExportQualityCommand());
 
             AddCommand(new HelpCommand(commands));
         }

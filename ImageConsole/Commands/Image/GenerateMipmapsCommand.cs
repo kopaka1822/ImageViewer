@@ -7,21 +7,24 @@ using ImageFramework.Model;
 
 namespace ImageConsole.Commands.Image
 {
-    public class TellSize : Command
+    class GenerateMipmapsCommand : Command
     {
-        public TellSize() : 
-            base("-tellsize", "[mipmapIndex]", "prints the width and height of the mipmap")
+        public GenerateMipmapsCommand() 
+            : base("-genmipmaps", "", "(re)generates mipmaps")
         {
         }
 
         public override void Execute(List<string> arguments, Models model)
         {
             var reader = new ParameterReader(arguments);
-            var mip = reader.ReadInt("mipmapIndex", 0);
             reader.ExpectNoMoreArgs();
 
-            Console.Out.WriteLine(model.Images.GetWidth(mip));
-            Console.Out.WriteLine(model.Images.GetHeight(mip));
+            if (model.Images.NumMipmaps > 1)
+            {
+                model.Images.DeleteMipmaps();
+            }
+
+            model.Images.GenerateMipmaps();
         }
     }
 }

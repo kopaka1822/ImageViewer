@@ -63,6 +63,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\Equation\EquationCommand.cs" />
+    <Compile Include="Commands\Export\ExportCommand.cs" />
+    <Compile Include="Commands\Export\ExportCroppingCommand.cs" />
+    <Compile Include="Commands\Export\ExportLayerCommand.cs" />
+    <Compile Include="Commands\Export\ExportMipmapCommand.cs" />
+    <Compile Include="Commands\Export\ExportQualityCommand.cs" />
+    <Compile Include="Commands\Export\TellFormatsCommand.cs" />
+    <Compile Include="Commands\Image\DeleteMipmapsCommand.cs" />
+    <Compile Include="Commands\Image\GenerateMipmapsCommand.cs" />
     <Compile Include="Commands\Program\CinCommand.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\Image\DeleteCommand.cs" />
@@ -70,9 +79,9 @@
     <Compile Include="Commands\Program\HelpCommand.cs" />
     <Compile Include="Commands\Image\OpenCommand.cs" />
     <Compile Include="Commands\Image\MoveCommand.cs" />
-    <Compile Include="Commands\Image\TellLayers.cs" />
-    <Compile Include="Commands\Image\TellMipmaps.cs" />
-    <Compile Include="Commands\Image\TellSize.cs" />
+    <Compile Include="Commands\Image\TellLayersCommand.cs" />
+    <Compile Include="Commands\Image\TellMipmapsCommand.cs" />
+    <Compile Include="Commands\Image\TellSizeCommand.cs" />
     <Compile Include="ParameterReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
