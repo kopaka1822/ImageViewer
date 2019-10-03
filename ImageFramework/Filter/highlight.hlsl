@@ -5,17 +5,16 @@
 #param Positive Values (red), positive, bool, true
 #param Oversaturated Values (green), grOne, bool, false
 
-void main()
+float4 filter(int2 pixelCoord, int2 size)
 {
-	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
-	vec4 color = texelFetch(src_image, pixelCoord, 0);
+	float4 color = src_image[pixelCoord];
 	float average = (color.r + color.g + color.b) / 3.0;
 	if( negative && (average < 0.0) )
-		color = vec4(0.0, 0.0, -average, 1.0);
+		color = float4(0.0, 0.0, -average, 1.0);
 	if( positive && (average > 0.0) )
-		color = vec4(average, 0.0, 0.0, 1.0);
+		color = float4(average, 0.0, 0.0, 1.0);
 	if( grOne && (average > 1.0) )
-		color = vec4(0.0, average, 0.0, 1.0);
-	imageStore(dst_image, pixelCoord, color);
+		color = float4(0.0, average, 0.0, 1.0);
 
+	return color;
 }

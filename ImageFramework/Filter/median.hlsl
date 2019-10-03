@@ -1,12 +1,12 @@
 #setting title, Median Filter
 #setting description, Chooses the pixel with the average luminance within the filter radius.
-#setting singleinvocation, false
 
 #param Radius, RADIUS, Int, 1, 1, 6
 
-vec4 buf[169];
+// sum of temp registers and indexable temp registers times 64 threads exceeds the recommended total 16384.  Performance may be reduced
+#pragma warning( disable : 4717 )
 
-void bubbleSort(int numLength)
+void bubbleSort(int numLength, inout float4 buf[169])
 {
 	int i = 0;
 	int j = 0;
@@ -18,7 +18,7 @@ void bubbleSort(int numLength)
 		{
 			if (buf[j+1].w > buf[j].w)
 			{
-				vec4 temp = buf[j];
+				float4 temp = buf[j];
 				buf[j] = buf[j+1];
 				buf[j+1] = temp;
 				flag = 1;
@@ -27,26 +27,23 @@ void bubbleSort(int numLength)
 	}
 }
 			
-void main()
+float4 filter(int2 pixelCoord, int2 size)
 {
-	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
-	ivec2 imgSize = textureSize(src_image, 0);
-	if(pixelCoord.x < imgSize.x && pixelCoord.y < imgSize.y)
+	float4 buf[169];
+
+	float alpha = src_image[pixelCoord].a;
+	// fill buffer
+	uint count = 0;
+	for(int y = max(0, pixelCoord.y - RADIUS); y <= min(pixelCoord.y + RADIUS, size.y-1); ++y)
+	for(int x = max(0, pixelCoord.x - RADIUS); x <= min(pixelCoord.x + RADIUS, size.x-1); ++x)
 	{
-		float alpha = texelFetch(src_image, pixelCoord, 0).a;
-		// fill buffer
-		int count = 0;
-		for(int y = max(0, pixelCoord.y - RADIUS); y <= min(pixelCoord.y + RADIUS, imgSize.y-1); ++y)
-		for(int x = max(0, pixelCoord.x - RADIUS); x <= min(pixelCoord.x + RADIUS, imgSize.x-1); ++x)
-		{
-			buf[count].rgb = texelFetch(src_image, ivec2(x,y), 0).rgb;
-			buf[count].w = dot(vec3(0.299, 0.587, 0.114), buf[count].rgb);
-			++count;
-		}
-		
-		// sort the buffer
-		bubbleSort(count);
-	
-		imageStore(dst_image, pixelCoord, vec4(buf[count/2].rgb, alpha));
+		buf[count].rgb = src_image[int2(x,y)].rgb;
+		buf[count].w = dot(float3(0.299, 0.587, 0.114), buf[count].rgb);
+		++count;
 	}
+	
+	// sort the buffer
+	bubbleSort(count, buf);
+
+	return float4(buf[count/2].rgb, alpha);
 }

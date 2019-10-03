@@ -119,6 +119,8 @@ cbuffer LayerLevelBuffer : register(b0) {{
     {filterDirectionVar}
 }};
 
+float4 filter(int2 pixel, int2 size);
+
 [numthreads({LocalSize}, {LocalSize}, 1)]
 void main(uint3 coord : SV_DISPATCHTHREADID) {{
     
@@ -126,7 +128,7 @@ void main(uint3 coord : SV_DISPATCHTHREADID) {{
     dst_image.GetDimensions(width, height, elements);
     if(coord.x >= width || coord.y >= height) return;    
 
-    dst_image[uint3(coord.x, coord.y, layer)] = filter(coord.xy, uint2(width, height));
+    dst_image[uint3(coord.x, coord.y, layer)] = filter(int2(coord.xy), int2(width, height));
 }}
 " + GetParamBufferDescription(parent.Parameters) + GetTextureParamBindings(parent.TextureParameters);
         }
@@ -141,7 +143,7 @@ void main(uint3 coord : SV_DISPATCHTHREADID) {{
                        filterParameter.GetBase().VariableName + ";\n";
             }
 
-            return res + "}\n";
+            return res + "};\n";
         }
 
         private static string GetTextureParamBindings(IReadOnlyList<TextureFilterParameterModel> parameters)

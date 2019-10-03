@@ -15,24 +15,26 @@
 #keybinding Factor, Subtract, 0.5, multiply
 #keybinding Factor, OemMinus, 0.5, multiply
 
-float4 filter(uint2 pixelCoord, uint2 size)
+float4 filter(int2 pixelCoord, int2 size)
 {
 	float4 color = src_image[pixelCoord];
-	
+
 	float3 sgn = sign(color.rgb);
 	color.rgb = abs(color.rgb * factor);
+	const float invGamma = 1.0 / gamma;
+
 	if(perChannel)
 	{
-		color.rgb = pow(color.rgb, float3(1.0 / gamma));
+		color.rgb = pow(color.rgb, float3(invGamma, invGamma, invGamma));
 	}
 	else
 	{
 		// this luminance looks better
-		float lum = dot(color.rgb, vec3(0.299, 0.587, 0.114));
-		//float lum = dot(color.rgb, vec3(0.2126, 0.7152, 0.0722));
+		float lum = dot(color.rgb, float3(0.299, 0.587, 0.114));
+		//float lum = dot(color.rgb, float3(0.2126, 0.7152, 0.0722));
 		if(lum > 0)
 		{
-			float newLum = pow(lum, 1.0/gamma);
+			float newLum = pow(lum, invGamma);
 			color.rgb = color.rgb / lum * newLum;
 		}
 	}

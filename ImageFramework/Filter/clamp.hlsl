@@ -4,11 +4,8 @@
 #param Minimum, minimum, float, 0
 #param Maximum, maximum, float, 1
 
-void main()
+float4 filter(int2 pixelCoord, int2 size)
 {
-	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
-
-	vec4 color = texelFetch(src_image, pixelCoord, 0);
-	imageStore(dst_image, pixelCoord, vec4(clamp(color.rgb, vec3(minimum), vec3(maximum)), color.a));
-	
+	float4 color = src_image[pixelCoord];
+	return float4(clamp(color.rgb, float3(minimum, minimum, minimum), float3(maximum, maximum, maximum)), color.a);
 }

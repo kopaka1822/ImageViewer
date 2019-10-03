@@ -47,7 +47,10 @@ namespace ImageFramework.Model.Filter
 
         private bool[] isPipelineEnabled;
 
-        public FilterModel(FilterLoader loader, int numPipelines)
+        /// <summary>
+        /// will be called internally by Models
+        /// </summary>
+        internal FilterModel(FilterLoader loader, int numPipelines)
         {
             Parameters = loader.Parameters;
             TextureParameters = loader.TextureParameters;

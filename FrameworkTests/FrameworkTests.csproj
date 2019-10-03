@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="DirectX\TextureArray2DTests.cs" />
     <Compile Include="ImageLoader\DllTest.cs" />
+    <Compile Include="Model\Filter\FilterLoaderTest.cs" />
     <Compile Include="Model\ImagePipelineTest.cs" />
     <Compile Include="Model\Equation\EquationTest.cs" />
     <Compile Include="Model\Equation\ImageCombineTest.cs" />

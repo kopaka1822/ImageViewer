@@ -7,9 +7,7 @@
 #paramprop Threshold, onAdd, 2.0, multiply
 #paramprop Threshold, onSubtract, 0.5, multiply
 
-vec4 buf[169];
-
-void bubbleSort(int numLength)
+void bubbleSort(int numLength, inout float4 buf[169])
 {
 	int i = 0;
 	int j = 0;
@@ -21,7 +19,7 @@ void bubbleSort(int numLength)
 		{
 			if (buf[j+1].w > buf[j].w)
 			{
-				vec4 temp = buf[j];
+				float4 temp = buf[j];
 				buf[j] = buf[j+1];
 				buf[j+1] = temp;
 				flag = 1;
@@ -30,41 +28,40 @@ void bubbleSort(int numLength)
 	}
 }
 			
-void main()
+float4 filter(int2 pixelCoord, int2 size)
 {
-	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
-	ivec2 imgSize = textureSize(src_image, 0);
-	if(pixelCoord.x < imgSize.x && pixelCoord.y < imgSize.y)
+	const float3 threeInv = float3(1.0/3.0, 1.0/3.0, 1.0/3.0);
+	float4 buf[169];
+
+	// fill buffer
+	uint count = 0;
+	for(int y = max(0, pixelCoord.y - RADIUS); y <= min(pixelCoord.y + RADIUS, size.y-1); ++y)
+	for(int x = max(0, pixelCoord.x - RADIUS); x <= min(pixelCoord.x + RADIUS, size.x-1); ++x)
 	{
-		// fill buffer
-		int count = 0;
-		for(int y = max(0, pixelCoord.y - RADIUS); y <= min(pixelCoord.y + RADIUS, imgSize.y-1); ++y)
-		for(int x = max(0, pixelCoord.x - RADIUS); x <= min(pixelCoord.x + RADIUS, imgSize.x-1); ++x)
-		{
-			buf[count].rgb = texelFetch(src_image, ivec2(x,y), 0).rgb;
-			buf[count].w = dot(buf[count].rgb, vec3(1.0/3.0));
-			// Do not use the sample if it is NaN
-			if(buf[count].w == buf[count].w)
-				++count;
-		}
-		
-		// sort the buffer
-		bubbleSort(count);
-		
-		// Compute average
-		vec3 sum = vec3(0.0);
-		int q = min((count - 1) / 2, QUANTIL); // Keep at least 1 or 2 elements
-		for(int i = q; i < count-q; ++i)
-			sum += buf[i].rgb;
-		sum /= max(1, count - q * 2);
-		
-		vec4 centerColor = texelFetch(src_image, pixelCoord, 0);
-		float centerAvg = dot(centerColor.rgb, vec3(1.0/3.0));
-		float sumAvg = dot(sum, vec3(1.0/3.0));
-		//float factor = min(centerAvg / sumAvg, sumAvg / centerAvg);
-		float factor = max(sumAvg / centerAvg, centerAvg / sumAvg);
-		if(factor > THRESHOLD || centerAvg != centerAvg)
-			centerColor.rgb = sum;
-		imageStore(dst_image, pixelCoord, centerColor);
+		buf[count].rgb = src_image[int2(x,y)].rgb;
+		buf[count].w = dot(buf[count].rgb, threeInv);
+		// Do not use the sample if it is NaN
+		if(buf[count].w == buf[count].w)
+			++count;
 	}
+	
+	// sort the buffer
+	bubbleSort(count, buf);
+	
+	// Compute average
+	float3 sum = float3(0.0, 0.0, 0.0);
+	int q = min((count - 1) / 2, QUANTIL); // Keep at least 1 or 2 elements
+	for(uint i = q; i < count-q; ++i)
+		sum += buf[i].rgb;
+	sum /= max(1, count - q * 2);
+	
+	float4 centerColor = src_image[pixelCoord];
+	float centerAvg = dot(centerColor.rgb, threeInv);
+	float sumAvg = dot(sum, threeInv);
+	//float factor = min(centerAvg / sumAvg, sumAvg / centerAvg);
+	float factor = max(sumAvg / centerAvg, centerAvg / sumAvg);
+	if(factor > THRESHOLD || centerAvg != centerAvg)
+		centerColor.rgb = sum;
+	
+	return centerColor;
 }
