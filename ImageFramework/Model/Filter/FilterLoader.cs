@@ -16,7 +16,6 @@ namespace ImageFramework.Model.Filter
         public string ShaderSource { get; private set; } = "";
         public List<IFilterParameter> Parameters { get; } = new List<IFilterParameter>();
         public bool IsSepa { get; private set; } = false;
-        public bool IsSingleInvocation { get; private set; } = true;
         public string Name { get; private set; }
         public string Description { get; private set; }
         public string Filename { get; }
@@ -338,9 +337,6 @@ namespace ImageFramework.Model.Filter
                     break;
                 case "description":
                     Description = wholeString;
-                    break;
-                case "singleinvocation":
-                    IsSingleInvocation = p[1].ToLower().Equals("true");
                     break;
                 default:
                     throw new Exception("unknown setting " + p[0]);

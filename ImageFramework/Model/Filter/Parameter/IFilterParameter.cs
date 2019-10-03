@@ -29,5 +29,11 @@ namespace ImageFramework.Model.Filter.Parameter
         /// </summary>
         /// <returns></returns>
         FloatFilterParameterModel GetFloatModel();
+
+        /// <summary>
+        /// stuffes the value into an integer variable (used for constant buffer parameter uploads)
+        /// </summary>
+        /// <returns></returns>
+        int StuffToInt();
     }
 }

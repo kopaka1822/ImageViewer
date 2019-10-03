@@ -17,9 +17,9 @@ namespace ImageFramework.Model.Filter.Parameter
             VariableName = variableName;
         }
 
-        // name for the filter menu
+        /// name for the filter menu
         public string Name { get; }
-        // name within the shader
+        /// name within the shader
         public string VariableName { get; }
     }
 }
