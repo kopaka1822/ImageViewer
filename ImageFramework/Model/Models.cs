@@ -58,6 +58,19 @@ namespace ImageFramework.Model
         }
 
         /// <summary>
+        /// creates a new filter from a file.
+        /// this filter is not added to the filter list
+        /// </summary>
+        /// <param name="filename">filter filename</param>
+        /// <returns></returns>
+        public FilterModel CreateFilter(string filename)
+        {
+            var loader = new FilterLoader(filename);
+            
+            return new FilterModel(loader, NumPipelines);
+        }
+
+        /// <summary>
         /// loads image and adds it to Images 
         /// </summary>
         /// <param name="filename"></param>

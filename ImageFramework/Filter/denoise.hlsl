@@ -14,30 +14,29 @@ float kernel(float _offset, float _variance)
 	return exp(- _offset * _offset / _variance);
 }
 
-vec3 readPixel(ivec2 pos)
+float3 readPixel(int2 pos, int2 size)
 {
-	pos = clamp(pos, ivec2(0), textureSize(src_image, 0).xy - 1);
-	return texelFetch(src_image, pos, 0).rgb;
+	pos = clamp(pos, int2(0, 0), size - int2(1, 1));
+	return src_image[pos].rgb;
 }
 
-void main()
+float4 filter(int2 pixelCoord, int2 size)
 {
-	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
-	
-	vec3 pixelSum = vec3(0.0);
+	float3 pixelSum = float3(0.0, 0.0, 0.0);
 	float weightSum = 0.0;
-	vec3 centerColor = readPixel(pixelCoord);
-	float centerAvg = dot(centerColor, vec3(1/3.0));
+	float3 centerColor = readPixel(pixelCoord, size);
+	const float3 threeInv = float3(1/3.0, 1/3.0, 1/3.0);
+	float centerAvg = dot(centerColor, threeInv);
 	
 	for(int y = -BLUR_RADIUS; y <= BLUR_RADIUS; y++)
 	for(int x = -BLUR_RADIUS; x <= BLUR_RADIUS; x++)
 	{
-		vec3 color = readPixel(pixelCoord + ivec2(x,y));
+		float3 color = readPixel(pixelCoord + int2(x,y), size);
 		float d = sqrt(x*x + y*y);
-		vec3 colorDiff = (color - centerColor);
+		float3 colorDiff = (color - centerColor);
 		float colorDist = length(colorDiff);
-		colorDist /= dot(color, vec3(1/3.0)) + dot(centerColor, vec3(1/3.0));
-		//float colorAvg = dot(color, vec3(1/3.0));
+		colorDist /= dot(color, threeInv) + dot(centerColor, threeInv);
+		//float colorAvg = dot(color, threeInv);
 		//float colorDist = max(colorAvg / centerAvg, centerAvg / colorAvg);
 		//float colorDist = abs(colorAvg - centerAvg);
 		float w = kernel(d, VARIANCE) * kernel(colorDist, COLOR_VARIANCE);
@@ -45,5 +44,5 @@ void main()
 		pixelSum += w * color;
 	}
 	
-	imageStore(dst_image, pixelCoord, vec4(pixelSum / weightSum, 1.0));
+	return float4(pixelSum / weightSum, 1.0);
 }

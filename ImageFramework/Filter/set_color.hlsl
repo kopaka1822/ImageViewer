@@ -10,14 +10,13 @@
 #param Set Alpha, setChAlpha, bool, false
 #param Alpha Channel Value, chAlpha, float, 1
 
-void main()
+float4 filter(int2 pixelCoord, int2 size)
 {
-	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
-	vec4 color = texelFetch(src_image, pixelCoord, 0);
+	float4 color = src_image[pixelCoord];
 	if(setChRed) color.r = chRed;
 	if(setChGreen) color.g = chGreen;
 	if(setChBlue) color.b = chBlue;
 	if(setChAlpha) color.a = chAlpha;
-	imageStore(dst_image, pixelCoord, color);
+	return color;
 	
 }

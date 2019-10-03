@@ -13,44 +13,42 @@ float kernel(float _offset, float _variance)
 	return exp(- _offset * _offset / _variance);
 }
 
-vec3 readPixel(ivec2 pos)
+float3 readPixel(int2 pos, int2 size)
 {
-	pos = clamp(pos, ivec2(0), textureSize(src_image, 0).xy - 1);
-	return texelFetch(src_image, pos, 0).rgb;
+	pos = clamp(pos, int2(0, 0), size - int2(1, 1));
+	return src_image[pos].rgb;
 }
 
-void main()
+float4 filter(int2 pixelCoord, int2 size)
 {
-	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
-	
-	vec2 avgBrSat = vec2(0.0);
+	float2 avgBrSat = float2(0.0, 0.0);
 	float weightSum = 0.0;
-	vec3 centerColor = readPixel(pixelCoord);
+	float3 centerColor = readPixel(pixelCoord, size);
 
 	// Decompose center color
-	float centerBr = dot(centerColor, vec3(0.299, 0.587, 0.114)) + 1e-6;
-	vec2 ab = vec2(centerColor.r - 0.5 * (centerColor.g + centerColor.b),
+	float centerBr = dot(centerColor, float3(0.299, 0.587, 0.114)) + 1e-6;
+	float2 ab = float2(centerColor.r - 0.5 * (centerColor.g + centerColor.b),
 					0.866025404 * (centerColor.g - centerColor.b));
 	float centerSat = length(ab) / centerBr;
 	//float centerH = atan(b, a);
 	if(centerBr != centerBr) {
 		centerBr = 0.5;
 		centerSat = 0.5;
-		ab = vec2(0.0);
+		ab = float2(0.0, 0.0);
 	}
 
 	// Gaussian filter to get the average brightness and saturation
 	for(int y = -RADIUS; y <= RADIUS; y++)
 	for(int x = -RADIUS; x <= RADIUS; x++)
 	{
-		vec3 color = readPixel(pixelCoord + ivec2(x,y));
-		float brightness = dot(color, vec3(0.299, 0.587, 0.114)) + 1e-6;
+		float3 color = readPixel(pixelCoord + int2(x,y), size);
+		float brightness = dot(color, float3(0.299, 0.587, 0.114)) + 1e-6;
 		if(brightness != brightness) continue;
-		float saturation = length(vec2(color.r - 0.5 * (color.g + color.b), 0.866025404 * (color.g - color.b))) / brightness;
+		float saturation = length(float2(color.r - 0.5 * (color.g + color.b), 0.866025404 * (color.g - color.b))) / brightness;
 		float d = sqrt(x*x + y*y);
 		float w = kernel(d, RADIUS * RADIUS / 4.0) * kernel(brightness - centerBr, 0.5);
 		weightSum += w;
-		avgBrSat += w * vec2(brightness, saturation);
+		avgBrSat += w * float2(brightness, saturation);
 	}
 	avgBrSat /= weightSum;
 
@@ -61,9 +59,9 @@ void main()
 
 	// Return to RGB
 	ab *= newSat * newBr / (centerSat * centerBr + 1e-6);
-	vec3 outColor = newBr + vec3(0.701 * ab.x - 0.273086677 * ab.y,
+	float3 outColor = newBr + float3(0.701 * ab.x - 0.273086677 * ab.y,
 								-0.299 * ab.x + 0.304263592 * ab.y,
 								-0.299 * ab.x - 0.850436947 * ab.y);
 
-	imageStore(dst_image, pixelCoord, vec4(outColor, 1.0));
+	return float4(outColor, 1.0);
 }

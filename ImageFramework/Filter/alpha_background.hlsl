@@ -5,11 +5,9 @@
 #param Green Channel Value, chGreen, float, 1
 #param Blue Channel Value, chBlue, float, 1
 
-void main()
+float4 filter(int2 pixelCoord, int2 size)
 {
-	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
-
-	vec4 color = texelFetch(src_image, pixelCoord, 0);
-	vec3 res = color.rgb * color.a + (1.0 - color.a) * vec3(chRed, chGreen, chBlue);
-	imageStore(dst_image, pixelCoord, vec4(res, 1.0));
+	float4 color = src_image[pixelCoord];
+	float3 res = color.rgb * color.a + (1.0 - color.a) * float3(chRed, chGreen, chBlue);
+	return float4(res, 1.0);
 }

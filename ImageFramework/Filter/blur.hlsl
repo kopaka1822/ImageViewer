@@ -12,32 +12,26 @@ float kernel(int _offset)
 	return exp(- _offset * _offset / variance);
 }
 
-vec3 getPixel(int x, int y)
+float3 getPixel(int x, int y, int2 size)
 {
-	x = clamp(x, 0, textureSize(src_image, 0).x - 1);
-	y = clamp(y, 0, textureSize(src_image, 0).y - 1);
-	return texelFetch(src_image, ivec2(x,y), 0).rgb;
+	x = clamp(x, 0, size.x - 1);
+	y = clamp(y, 0, size.y - 1);
+	return src_image[int2(x,y)].rgb;
 }
 
-void main()
+float4 filter(int2 pixelCoord, int2 size)
 {
-	ivec2 pixelCoord = ivec2(gl_GlobalInvocationID.xy) + pixelOffset;
+	float3 pixelSum = float3(0, 0, 0);
+	float weightSum = 0.0;
+	float alpha = src_image[pixelCoord].a;
 	
-	if(pixelCoord.x < imageSize(dst_image).x && pixelCoord.y < imageSize(dst_image).y)
-	{
-		vec3 pixelSum = vec3(0.0);
-		float weightSum = 0.0;
-		float alpha = texelFetch(src_image, pixelCoord, 0).a;
-		
-		for(int d = -blur_radius; d <= blur_radius; d++)
-		{			
-			float w = kernel(d);
-			weightSum += w;
-			ivec2 pos = d * filterDirection + pixelCoord;
-			pixelSum += w * getPixel(pos.x, pos.y);
-			
-		}
-		
-		imageStore(dst_image, pixelCoord, vec4(pixelSum / weightSum, alpha));
-	}	
+	for(int d = -blur_radius; d <= blur_radius; d++)
+	{			
+		float w = kernel(d);
+		weightSum += w;
+		int2 pos = d * filterDirection + pixelCoord;
+		pixelSum += w * getPixel(pos.x, pos.y, size);
+	}
+	
+	return float4(pixelSum / weightSum, alpha);
 }
