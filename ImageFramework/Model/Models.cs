@@ -9,6 +9,7 @@ using ImageFramework.Controller;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
+using ImageFramework.Model.Filter;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using SharpDX.Direct3D11;
@@ -21,6 +22,7 @@ namespace ImageFramework.Model
     {
         public static readonly CultureInfo Culture = new CultureInfo("en-US");
         public ImagesModel Images { get; }
+        public FiltersModel Filter { get; }
         public IReadOnlyList<ImagePipeline> Pipelines { get; }
 
         public ExportModel Export { get; }
@@ -39,6 +41,7 @@ namespace ImageFramework.Model
             Images = new ImagesModel();
             Export = new ExportModel();
             Progress = new ProgressModel();
+            Filter = new FiltersModel();
 
             for (int i = 0; i < numPipelines; ++i)
             {
@@ -145,6 +148,7 @@ namespace ImageFramework.Model
         {
             Export?.Dispose();
             Images?.Dispose();
+            Filter?.Dispose();
             foreach (var imagePipeline in pipelines)
             {
                 imagePipeline.Dispose();
