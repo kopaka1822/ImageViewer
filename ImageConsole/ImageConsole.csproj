@@ -63,9 +63,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\Program\CinCommand.cs" />
     <Compile Include="Commands\Command.cs" />
-    <Compile Include="Commands\HelpCommand.cs" />
-    <Compile Include="Commands\OpenCommand.cs" />
+    <Compile Include="Commands\Image\DeleteCommand.cs" />
+    <Compile Include="Commands\Program\CloseCommand.cs" />
+    <Compile Include="Commands\Program\HelpCommand.cs" />
+    <Compile Include="Commands\Image\OpenCommand.cs" />
+    <Compile Include="Commands\Image\MoveCommand.cs" />
+    <Compile Include="Commands\Image\TellLayers.cs" />
+    <Compile Include="Commands\Image\TellMipmaps.cs" />
+    <Compile Include="Commands\Image\TellSize.cs" />
+    <Compile Include="ParameterReader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
