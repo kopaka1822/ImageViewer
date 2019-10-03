@@ -7,10 +7,10 @@ using ImageFramework.Model;
 
 namespace ImageConsole.Commands.Image
 {
-    public class TellMipmaps : Command
+    public class TellLayersCommand : Command
     {
-        public TellMipmaps() 
-            : base("-tellmipmaps", "", "prints number of mipmaps")
+        public TellLayersCommand() 
+            : base("-telllayers", "", "print number of layers")
         {
         }
 
@@ -19,7 +19,7 @@ namespace ImageConsole.Commands.Image
             var reader = new ParameterReader(arguments);
             reader.ExpectNoMoreArgs();
 
-            Console.Out.WriteLine(model.Images.NumMipmaps);
+            Console.Out.WriteLine(model.Images.NumLayers);
         }
     }
 }

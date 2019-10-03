@@ -23,7 +23,9 @@ namespace ImageFramework.Model.Export
             get => fileFormat;
             set
             {
-                Debug.Assert(ExportFormat.Formats.Contains(value));
+                if(!ExportFormat.Formats.Contains(value))
+                    throw new Exception($"format {value} is not supported for file extension {Extension}");
+
                 fileFormat = value;
             }
         }
