@@ -61,6 +61,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controller\PipelineController.cs" />
@@ -85,6 +86,13 @@
     <Compile Include="Model\Export\ExportDescription.cs" />
     <Compile Include="Model\Export\ExportFormatModel.cs" />
     <Compile Include="Model\Export\ExportModel.cs" />
+    <Compile Include="Model\Filter\FilterModel.cs" />
+    <Compile Include="Model\Filter\Parameter\ActionType.cs" />
+    <Compile Include="Model\Filter\Parameter\FilterParameterModel.cs" />
+    <Compile Include="Model\Filter\Parameter\FilterParameterModelBase.cs" />
+    <Compile Include="Model\Filter\Parameter\IFilterParameter.cs" />
+    <Compile Include="Model\Filter\Parameter\ModificationType.cs" />
+    <Compile Include="Model\Filter\Parameter\ParameterType.cs" />
     <Compile Include="Model\ImagePipeline.cs" />
     <Compile Include="Model\Equation\Markov\BinaryFunctionRule.cs" />
     <Compile Include="Model\Equation\Markov\BracketRule.cs" />
