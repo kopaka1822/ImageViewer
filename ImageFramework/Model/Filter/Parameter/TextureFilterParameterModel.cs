@@ -10,8 +10,12 @@ namespace ImageFramework.Model.Filter.Parameter
 {
     public class TextureFilterParameterModel : INotifyPropertyChanged
     {
+        /// display name
         public string Name { get; }
-        public string FunctionName { get; }
+        /// shader name
+        public string TextureName { get; }
+
+
         private int source = 0;
 
         // describes which source images is used for the binding
@@ -26,10 +30,10 @@ namespace ImageFramework.Model.Filter.Parameter
             }
         }
 
-        public TextureFilterParameterModel(string name, string functionName)
+        public TextureFilterParameterModel(string name, string textureName)
         {
             Name = name;
-            FunctionName = functionName;
+            TextureName = textureName;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

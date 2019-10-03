@@ -12,7 +12,7 @@ namespace ImageFramework.Model.Filter
 {
     public class FilterModel : IDisposable
     {
-        public FilterShader Shader { get; }
+        internal FilterShader Shader { get; }
 
         public IReadOnlyList<IFilterParameter> Parameters { get; }
 

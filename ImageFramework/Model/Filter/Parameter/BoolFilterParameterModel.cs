@@ -72,5 +72,10 @@ namespace ImageFramework.Model.Filter.Parameter
         {
             throw new InvalidCastException();
         }
+
+        public int StuffToInt()
+        {
+            return Value ? 1 : 0;
+        }
     }
 }

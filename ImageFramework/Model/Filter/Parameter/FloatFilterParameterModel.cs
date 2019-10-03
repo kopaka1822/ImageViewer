@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -78,6 +79,19 @@ namespace ImageFramework.Model.Filter.Parameter
         public FloatFilterParameterModel GetFloatModel()
         {
             return this;
+        }
+
+        public int StuffToInt()
+        {
+            float f = Value;
+            int res;
+            unsafe
+            {
+                float* pf = &f;
+                res = *((int*) pf);
+            }
+
+            return res;
         }
     }
 }
