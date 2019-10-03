@@ -86,13 +86,19 @@
     <Compile Include="Model\Export\ExportDescription.cs" />
     <Compile Include="Model\Export\ExportFormatModel.cs" />
     <Compile Include="Model\Export\ExportModel.cs" />
+    <Compile Include="Model\Filter\FilterLoader.cs" />
     <Compile Include="Model\Filter\FilterModel.cs" />
+    <Compile Include="Model\Filter\FiltersModel.cs" />
     <Compile Include="Model\Filter\Parameter\ActionType.cs" />
+    <Compile Include="Model\Filter\Parameter\BoolFilterParameterModel.cs" />
     <Compile Include="Model\Filter\Parameter\FilterParameterModel.cs" />
     <Compile Include="Model\Filter\Parameter\FilterParameterModelBase.cs" />
+    <Compile Include="Model\Filter\Parameter\FloatFilterParameterModel.cs" />
     <Compile Include="Model\Filter\Parameter\IFilterParameter.cs" />
+    <Compile Include="Model\Filter\Parameter\IntFilterParameterModel.cs" />
     <Compile Include="Model\Filter\Parameter\ModificationType.cs" />
     <Compile Include="Model\Filter\Parameter\ParameterType.cs" />
+    <Compile Include="Model\Filter\Parameter\TextureFilterParameterModel.cs" />
     <Compile Include="Model\ImagePipeline.cs" />
     <Compile Include="Model\Equation\Markov\BinaryFunctionRule.cs" />
     <Compile Include="Model\Equation\Markov\BracketRule.cs" />
@@ -115,6 +121,7 @@
     <Compile Include="Model\ImagesModel.cs" />
     <Compile Include="Model\Models.cs" />
     <Compile Include="Model\ProgressModel.cs" />
+    <Compile Include="Model\Shader\FilterShader.cs" />
     <Compile Include="Model\Shader\ImageCombineShader.cs" />
     <Compile Include="Model\Shader\QuadShader.cs" />
     <Compile Include="Model\Shader\ConvertFormatShader.cs" />
