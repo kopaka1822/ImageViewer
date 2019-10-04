@@ -63,8 +63,37 @@ namespace FrameworkTests.Model
             var colors = model.Pipelines[0].Image.GetPixelColors(0, 0);
 
             // compare with reference image
-            var refTexture = new TextureArray2D(IO.LoadImage(TestData.Directory + "smallx4.pfm"));
-            var refColors = refTexture.GetPixelColors(0, 0);
+            var refColors = TestData.GetColors("smallx4.pfm");
+
+            TestData.CompareColors(refColors, colors);
+        }
+
+        [TestMethod]
+        public void MedianFilter()
+        {
+            var model = new Models(1);
+            model.AddImageFromFile(TestData.Directory + "sphere_salt.png");
+            model.Filter.AddFilter(model.CreateFilter("filter/median.hlsl"));
+            model.Apply();
+            var colors = model.Pipelines[0].Image.GetPixelColors(0, 0);
+
+            // compare with refence image
+            var refColors = TestData.GetColors("sphere_median.png");
+
+            TestData.CompareColors(refColors, colors);
+        }
+
+        [TestMethod]
+        public void BlurFilter()
+        {
+            var model = new Models(1);
+            model.AddImageFromFile(TestData.Directory + "sphere.png");
+            model.Filter.AddFilter(model.CreateFilter("filter/blur.hlsl"));
+            model.Apply();
+            var colors = model.Pipelines[0].Image.GetPixelColors(0, 0);
+
+            // compare with refence image
+            var refColors = TestData.GetColors("sphere_blur.png");
 
             TestData.CompareColors(refColors, colors);
         }
