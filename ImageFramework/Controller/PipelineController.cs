@@ -5,12 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.Model;
 using ImageFramework.Model.Equation;
 using ImageFramework.Model.Filter;
 using ImageFramework.Utility;
+using SharpDX.Direct3D11;
 
 namespace ImageFramework.Controller
 {
@@ -21,7 +23,7 @@ namespace ImageFramework.Controller
     {
         private readonly Models models;
         private readonly TextureCache textureCache;
-        private readonly UploadBuffer<LayerLevelData> layerLevelBuffer;
+        private readonly UploadBuffer<LayerLevelFilter> layerLevelBuffer;
 
         public PipelineController(Models models)
         {
@@ -36,7 +38,7 @@ namespace ImageFramework.Controller
             }
 
             textureCache = new TextureCache(models.Images);
-            layerLevelBuffer = new UploadBuffer<LayerLevelData>(1);
+            layerLevelBuffer = new UploadBuffer<LayerLevelFilter>(1);
 
             this.models.Filter.PropertyChanged += FilterOnPropertyChanged;
             this.models.Filter.ParameterChanged += FilterOnParameterChanged;
@@ -88,16 +90,38 @@ namespace ImageFramework.Controller
                 Images = models.Images,
                 LayerLevelBuffer = layerLevelBuffer,
                 Progress = models.Progress,
-                TextureCache = textureCache
+                TextureCache = textureCache,
+                Filters = null
             };
 
-            foreach (var pipe in models.Pipelines)
+            for (var i = 0; i < models.Pipelines.Count; i++)
             {
+                var pipe = models.Pipelines[i];
                 if (pipe.HasChanges && pipe.IsValid)
                 {
+                    if (pipe.UseFilter)
+                    {
+                        args.Filters = GetPipeFilters(i);
+                    }
+
                     await pipe.UpdateImageAsync(args, ct);
                 }
             }
+        }
+
+        /// <summary>
+        /// returns all filters that are enabled for this pipline
+        /// </summary>
+        private List<FilterModel> GetPipeFilters(int index)
+        {
+            var res = new List<FilterModel>();
+            foreach (var filter in models.Filter.Filter)
+            {
+                if(filter.IsPipelineEnabled(index))
+                    res.Add(filter);
+            }
+
+            return res;
         }
 
         private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)

@@ -17,7 +17,7 @@ namespace ImageFramework.Model.Shader
                 GetShaderSource(colorFormula, alphaFormula, Math.Max(numImages, 1)), "ImageCombineShader");
         }
 
-        public void Run(ImagesModel images, UploadBuffer<LayerLevelData> constantBuffer, TextureArray2D target)
+        public void Run(ImagesModel images, UploadBuffer<LayerLevelFilter> constantBuffer, TextureArray2D target)
         {
             var dev = Device.Get();
             dev.Compute.Set(shader.Compute);
@@ -38,7 +38,7 @@ namespace ImageFramework.Model.Shader
 
                 for (int curLayer = 0; curLayer < images.NumLayers; ++curLayer)
                 {
-                    constantBuffer.SetData(new LayerLevelData{Layer = curLayer, Level = curMipmap});
+                    constantBuffer.SetData(new LayerLevelFilter{Layer = curLayer, Level = curMipmap});
                     dev.Compute.SetConstantBuffer(0, constantBuffer.Handle);
                     dev.Dispatch(Utility.Utility.DivideRoundUp(width, LocalSize), Utility.Utility.DivideRoundUp(height, LocalSize));
                 }
