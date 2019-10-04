@@ -47,6 +47,7 @@ namespace ImageFramework.Model.Shader
             else Debug.Assert(iteration == 0);
 
             var dev = Device.Get();
+            dev.Compute.Set(shader.Compute);
 
             // filter parameters (constant)
             if(paramBuffer != null)

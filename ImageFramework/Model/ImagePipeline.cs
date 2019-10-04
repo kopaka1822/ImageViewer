@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.Model.Equation;
+using ImageFramework.Model.Filter;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 
@@ -78,7 +81,8 @@ namespace ImageFramework.Model
             public ImagesModel Images;
             public ProgressModel Progress;
             public TextureCache TextureCache;
-            public UploadBuffer<LayerLevelData> LayerLevelBuffer;
+            public UploadBuffer<LayerLevelFilter> LayerLevelBuffer;
+            public List<FilterModel> Filters;
         }
 
         internal async Task UpdateImageAsync(UpdateImageArgs args, CancellationToken ct)
@@ -107,12 +111,48 @@ namespace ImageFramework.Model
                 // next, apply filter
                 if (UseFilter)
                 {
-                    ct.ThrowIfCancellationRequested();
-                    
+                    Debug.Assert(args.Filters != null);
 
+                    // get a second texture and swap between source and destination image
+                    TextureArray2D[] tex = new TextureArray2D[2];
+                    tex[0] = Image;
+                    Image = null;
+                    tex[1] = args.TextureCache.GetTexture();
+                    int srcIdx = 0;
+
+                    try
+                    {
+                        foreach (var filter in args.Filters)
+                        {
+                            // TODO update parameters only on change
+                            filter.Shader.UpdateParamBuffer();
+
+                            ct.ThrowIfCancellationRequested();
+                            filter.Shader.Run(args.Images, tex[srcIdx], tex[1 - srcIdx], args.LayerLevelBuffer, 0);
+                            srcIdx = 1 - srcIdx;
+
+                            if (filter.IsSepa)
+                            {
+                                ct.ThrowIfCancellationRequested();
+                                filter.Shader.Run(args.Images, tex[srcIdx], tex[1 - srcIdx], args.LayerLevelBuffer, 1);
+                                srcIdx = 1 - srcIdx;
+                            }
+                        }
+                    }
+                    catch(Exception)
+                    {
+                        args.TextureCache.StoreTexture(tex[0]);
+                        args.TextureCache.StoreTexture(tex[1]);
+                        throw;
+                    }
+
+                    // all filter were executed
+                    Image = tex[srcIdx];
+                    args.TextureCache.StoreTexture(tex[1 - srcIdx]);
                 }
 
                 HasChanges = false;
+                OnPropertyChanged(nameof(Image));
             }
             catch (OperationCanceledException)
             {
