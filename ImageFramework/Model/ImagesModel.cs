@@ -37,8 +37,6 @@ namespace ImageFramework.Model
             public TextureArray2D Image { get; private set; }
             public int NumMipmaps => Image.NumMipmaps;
             public int NumLayers => Image.NumLayers;
-            public bool IsGrayscale { get; }
-            public bool HasAlpha { get; }
             public bool IsHdr => Image.Format == Format.R32G32B32A32_Float;
             public string Filename { get; }
             public GliFormat OriginalFormat { get; }
@@ -46,9 +44,6 @@ namespace ImageFramework.Model
             internal ImageData(TextureArray2D image, string filename, GliFormat originalFormat)
             {
                 Image = image;
-                // TODO determine alpha and grayscale by looking at image content
-                IsGrayscale = false;
-                HasAlpha = true;
                 Filename = filename;
                 OriginalFormat = originalFormat;
             }
@@ -85,14 +80,7 @@ namespace ImageFramework.Model
         public int NumImages => images.Count;
         public int NumMipmaps => images.Count == 0 ? 0 : images[0].NumMipmaps;
         public int NumLayers => images.Count == 0 ? 0 : images[0].NumLayers;
-        /// <summary>
-        /// true if all images are grayscale
-        /// </summary>
-        public bool IsGrayscale => images.All(imageData => imageData.IsGrayscale);
-        /// <summary>
-        /// true if any image has an alpha channel
-        /// </summary>
-        public bool IsAlpha => images.Any(imageData => imageData.HasAlpha);
+
         /// <summary>
         /// true if any image is hdr
         /// </summary>
@@ -158,8 +146,6 @@ namespace ImageFramework.Model
                 OnPropertyChanged(nameof(NumImages));
                 OnPropertyChanged(nameof(NumLayers));
                 OnPropertyChanged(nameof(NumMipmaps));
-                OnPropertyChanged(nameof(IsAlpha));
-                OnPropertyChanged(nameof(IsGrayscale));
                 OnPropertyChanged(nameof(IsHdr));
                 OnPropertyChanged(nameof(Width));
                 OnPropertyChanged(nameof(Height));
@@ -176,18 +162,12 @@ namespace ImageFramework.Model
                     throw new MipmapMismatch($"{name}: Inconsistent amount of mipmaps. Expected {NumMipmaps} got {image.NumMipmaps}");
 
                 // remember old properties
-                var isAlpha = IsAlpha;
-                var isGrayscale = IsGrayscale;
                 var isHdr = IsHdr;
 
                 images.Add(new ImageData(image, name, originalFormat));
                 PrevNumImages = NumImages - 1;
                 OnPropertyChanged(nameof(NumImages));
 
-                if (isAlpha != IsAlpha)
-                    OnPropertyChanged(nameof(isAlpha));
-                if (isGrayscale != IsGrayscale)
-                    OnPropertyChanged(nameof(IsGrayscale));
                 if (isHdr != IsHdr)
                     OnPropertyChanged(nameof(IsHdr));
             }
@@ -198,8 +178,6 @@ namespace ImageFramework.Model
             Debug.Assert(imageId >= 0 && imageId < NumImages);
 
             // remember old properties
-            var isAlpha = IsAlpha;
-            var isGrayscale = IsGrayscale;
             var isHdr = IsHdr;
 
             // delete old data
@@ -209,10 +187,6 @@ namespace ImageFramework.Model
             PrevNumImages = NumImages + 1;
             OnPropertyChanged(nameof(NumImages));
 
-            if (isAlpha != IsAlpha)
-                OnPropertyChanged(nameof(isAlpha));
-            if (isGrayscale != IsGrayscale)
-                OnPropertyChanged(nameof(IsGrayscale));
             if (isHdr != IsHdr)
                 OnPropertyChanged(nameof(IsHdr));
 

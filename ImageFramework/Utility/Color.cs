@@ -31,6 +31,18 @@ namespace ImageFramework.Utility
             Alpha = alpha;
         }
 
+        /// <summary>
+        /// intializes rgb with the value and alpha with 1.0
+        /// </summary>
+        /// <param name="single"></param>
+        public Color(float single)
+        {
+            Red = single;
+            Green = single;
+            Blue = single;
+            Alpha = 1.0f;
+        }
+
         public Color(byte r, byte g, byte b, byte a, bool isSigned = false)
         {
             Red = r / 255.0f;
@@ -51,6 +63,8 @@ namespace ImageFramework.Utility
         public float Green;
         public float Blue;
         public float Alpha;
+
+
 
         /// <summary>
         /// compares the flagged channels with the given tolerance

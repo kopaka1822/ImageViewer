@@ -133,7 +133,7 @@ namespace ImageFramework.DirectX
 
             for (int i = 0; i < dst.Length; ++i)
             {
-                Marshal.PtrToStructure<T>(data.DataPointer, dst[i]);
+                dst[i] = Marshal.PtrToStructure<T>(data.DataPointer);
                 data.DataPointer += elementSize;
             }
             
