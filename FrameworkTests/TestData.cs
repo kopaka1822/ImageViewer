@@ -85,5 +85,16 @@ namespace FrameworkTests
                 Assert.IsTrue(left[i].Equals(right[i], channels, tolerance));
             }
         }
+
+        /// <summary>
+        /// returns colors from the given filename within the test directory
+        /// </summary>
+        public static Color[] GetColors(string filename)
+        {
+            using (var tex = new TextureArray2D(IO.LoadImage(Directory + filename)))
+            {
+                return tex.GetPixelColors(0, 0);
+            }
+        }
     }
 }
