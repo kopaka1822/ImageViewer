@@ -62,7 +62,7 @@ namespace ImageFramework.Model.Filter
             for (var i = 0; i < numPipelines; ++i)
                 isPipelineEnabled[i] = true;
 
-            Shader = new FilterShader(this, loader.ShaderSource);
+            Shader = new FilterShader(this, loader.ShaderSource, loader.GroupSize);
         }
 
         public void SetIsPipelineEnabled(int index, bool value)

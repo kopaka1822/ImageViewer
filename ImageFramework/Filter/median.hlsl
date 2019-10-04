@@ -1,5 +1,6 @@
 #setting title, Median Filter
 #setting description, Chooses the pixel with the average luminance within the filter radius.
+#setting groupsize, 5
 
 #param Radius, RADIUS, Int, 1, 1, 6
 

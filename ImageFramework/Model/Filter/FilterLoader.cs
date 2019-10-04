@@ -19,6 +19,9 @@ namespace ImageFramework.Model.Filter
         public string Name { get; private set; }
         public string Description { get; private set; }
         public string Filename { get; }
+
+        // work group size per axis => 32 x 32 local threads (maximum)
+        public int GroupSize { get; private set; } = 32;
         public List<TextureFilterParameterModel> TextureParameters { get; } = new List<TextureFilterParameterModel>();
 
         private static readonly Regex variableRegex = new Regex(@"[a-zA-Z]([a-zA-Z0-9]*)");
@@ -337,6 +340,13 @@ namespace ImageFramework.Model.Filter
                     break;
                 case "description":
                     Description = wholeString;
+                    break;
+                case "groupsize":
+                    GroupSize = int.Parse(wholeString);
+                    if(GroupSize < 1)
+                        throw new Exception($"setting {p[0]} must be at least 1");
+                    if(GroupSize > 32)
+                        throw new Exception($"setting {p[0]} cannot exceed 32");
                     break;
                 default:
                     throw new Exception("unknown setting " + p[0]);
