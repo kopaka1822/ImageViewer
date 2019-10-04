@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ImageConsole.Commands;
 using ImageConsole.Commands.Equation;
 using ImageConsole.Commands.Export;
+using ImageConsole.Commands.Filter;
 using ImageConsole.Commands.Image;
 using ImageConsole.Commands.Program;
 using ImageFramework.Model;
@@ -35,6 +36,12 @@ namespace ImageConsole
             AddCommand(new CloseCommand(this));
 
             AddCommand(new EquationCommand());
+
+            AddCommand(new AddFilterCommand());
+            AddCommand(new DeleteFilterCommand());
+            AddCommand(new FilterParameterCommand());
+            AddCommand(new TellFilterCommand());
+            AddCommand(new TellFilterParamsCommand());
 
             AddCommand(new ExportCommand());
             AddCommand(new TellFormatsCommand());
