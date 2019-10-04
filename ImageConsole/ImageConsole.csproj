@@ -70,6 +70,11 @@
     <Compile Include="Commands\Export\ExportMipmapCommand.cs" />
     <Compile Include="Commands\Export\ExportQualityCommand.cs" />
     <Compile Include="Commands\Export\TellFormatsCommand.cs" />
+    <Compile Include="Commands\Filter\AddFilterCommand.cs" />
+    <Compile Include="Commands\Filter\DeleteFilterCommand.cs" />
+    <Compile Include="Commands\Filter\FilterParameterCommand.cs" />
+    <Compile Include="Commands\Filter\TellFilterCommand.cs" />
+    <Compile Include="Commands\Filter\TellFilterParamsCommand.cs" />
     <Compile Include="Commands\Image\DeleteMipmapsCommand.cs" />
     <Compile Include="Commands\Image\GenerateMipmapsCommand.cs" />
     <Compile Include="Commands\Program\CinCommand.cs" />
