@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -64,6 +65,8 @@ namespace ImageConsole
         {
             using (var model = new Models(1))
             {
+                model.Progress.PropertyChanged += ProgressOnPropertyChanged;
+
                 // handle startup arguments
                InterpretArgs(args, model);
 
@@ -86,6 +89,27 @@ namespace ImageConsole
                         Console.Error.WriteLine(e.Message);
                     }
                 }
+            }
+        }
+
+        private void ProgressOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var pm = (ProgressModel) sender;
+            switch (e.PropertyName)
+            {
+                case nameof(ProgressModel.What):
+                    Console.Error.WriteLine($"> {pm.What} {(int)(pm.Progress * 100.0f)}%");
+                    break;
+                case nameof(ProgressModel.IsProcessing):
+                    if (pm.IsProcessing)
+                    {
+                        Console.Error.WriteLine("started processing");
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine("finished processing");
+                    }
+                    break;
             }
         }
 

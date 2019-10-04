@@ -233,5 +233,19 @@ namespace ImageFramework.DirectX
         {
             context.UpdateSubresource(data, buffer);
         }
+
+        public void EndQuery(Query query)
+        {
+            context.End(query);
+        }
+
+        /// <summary>
+        /// true if the event is completed
+        /// </summary>
+        /// <param name="query"></param>
+        public bool GetQueryEventData(Query query)
+        {
+            return context.GetData<int>(query) != 0;
+        }
     }
 }
