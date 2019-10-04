@@ -51,6 +51,8 @@ namespace ImageConsole
             AddCommand(new ExportCroppingCommand());
             AddCommand(new ExportQualityCommand());
 
+            AddCommand(new TellPixelCommand());
+
             AddCommand(new HelpCommand(commands));
         }
 

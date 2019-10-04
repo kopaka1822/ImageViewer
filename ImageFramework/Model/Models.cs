@@ -35,6 +35,8 @@ namespace ImageFramework.Model
 
         private readonly PipelineController pipelineController;
 
+        private readonly PixelValueShader pixelValueShader = new PixelValueShader();
+
         public Models(int numPipelines = 1)
         {
             NumPipelines = numPipelines;
@@ -68,6 +70,12 @@ namespace ImageFramework.Model
             var loader = new FilterLoader(filename);
             
             return new FilterModel(loader, NumPipelines);
+        }
+
+        /// <inheritdoc cref="PixelValueShader.Run"/>
+        public Color GetPixelValue(TextureArray2D image, int x, int y, int layer, int mipmap, int radius = 0)
+        {
+            return pixelValueShader.Run(image, x, y, layer, mipmap, radius);
         }
 
         /// <summary>
@@ -170,7 +178,8 @@ namespace ImageFramework.Model
             {
                 imagePipeline.Dispose();
             }
-            pipelineController.Dispose();
+            pipelineController?.Dispose();
+            pixelValueShader?.Dispose();
         }
     }
 }
