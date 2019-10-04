@@ -18,10 +18,11 @@ namespace ImageFramework.Model.Shader
         private readonly DirectX.Shader shader;
         private readonly UploadBuffer<int> paramBuffer;
 
-        public static readonly int LocalSize = 8;
+        public readonly int localSize;
 
-        public FilterShader(FilterModel parent, string source)
+        public FilterShader(FilterModel parent, string source, int groupSize)
         {
+            localSize = groupSize;
             this.parent = parent;
             shader = new DirectX.Shader(DirectX.Shader.Type.Compute, GetShaderHeader() + "\n#line 1\n" + source, parent.Filename);
             if (parent.Parameters.Count != 0)
@@ -74,7 +75,7 @@ namespace ImageFramework.Model.Shader
 
                     dev.Compute.SetConstantBuffer(0, cbuffer.Handle);
 
-                    dev.Dispatch(Utility.Utility.DivideRoundUp(width, LocalSize), Utility.Utility.DivideRoundUp(height, LocalSize));
+                    dev.Dispatch(Utility.Utility.DivideRoundUp(width, localSize), Utility.Utility.DivideRoundUp(height, localSize));
                 }
             }
 
@@ -121,7 +122,7 @@ cbuffer LayerLevelBuffer : register(b0) {{
 
 float4 filter(int2 pixel, int2 size);
 
-[numthreads({LocalSize}, {LocalSize}, 1)]
+[numthreads({localSize}, {localSize}, 1)]
 void main(uint3 coord : SV_DISPATCHTHREADID) {{
     
     uint width, height, elements;

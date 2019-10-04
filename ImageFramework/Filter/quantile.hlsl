@@ -1,5 +1,6 @@
 #setting title, Quantile Filter
 #setting description, Computes a sorted list of pixels, removes the 'q' smallest and largest values and computes the average of the remaining. Additionally, only values which are brighter/darker as this average by a factor greater or equal threshold are replaced.
+#setting groupsize, 5
 
 #param Radius, RADIUS, Int, 1, 1, 6
 #param Quantile, QUANTIL, Int, 2, 1, 84
