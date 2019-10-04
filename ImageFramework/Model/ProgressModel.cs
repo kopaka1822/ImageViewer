@@ -35,7 +35,7 @@ namespace ImageFramework.Model
         private string what = "";
 
         /// <summary>
-        /// desription of the thing being processed
+        /// description of the thing being processed
         /// </summary>
         public string What
         {
@@ -43,7 +43,7 @@ namespace ImageFramework.Model
             internal set
             {
                 var val = value ?? "";
-                if (val.Equals(what)) return;
+                //if (val.Equals(what)) return;
                 what = val;
                 OnPropertyChanged(nameof(What));
             }

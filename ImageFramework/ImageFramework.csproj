@@ -67,6 +67,7 @@
     <Compile Include="Controller\PipelineController.cs" />
     <Compile Include="DirectX\Device.cs" />
     <Compile Include="DirectX\DownloadBuffer.cs" />
+    <Compile Include="DirectX\SyncQuery.cs" />
     <Compile Include="DirectX\Shader.cs" />
     <Compile Include="DirectX\Structs\LayerLevelFilter.cs" />
     <Compile Include="DirectX\Structs\LayerLevelOffsetData.cs" />

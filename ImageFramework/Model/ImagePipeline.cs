@@ -83,6 +83,7 @@ namespace ImageFramework.Model
             public TextureCache TextureCache;
             public UploadBuffer<LayerLevelFilter> LayerLevelBuffer;
             public List<FilterModel> Filters;
+            public SyncQuery Sync;
         }
 
         internal async Task UpdateImageAsync(UpdateImageArgs args, CancellationToken ct)
@@ -122,21 +123,18 @@ namespace ImageFramework.Model
 
                     try
                     {
-                        foreach (var filter in args.Filters)
+                        for (var index = 0; index < args.Filters.Count; index++)
                         {
+                            var filter = args.Filters[index];
                             // TODO update parameters only on change
                             filter.Shader.UpdateParamBuffer();
 
-                            ct.ThrowIfCancellationRequested();
-                            filter.Shader.Run(args.Images, tex[srcIdx], tex[1 - srcIdx], args.LayerLevelBuffer, 0);
-                            srcIdx = 1 - srcIdx;
+                            await DoFilterIterationAsync(args, index, tex[srcIdx], tex[1 - srcIdx], 0, ct);
 
                             if (filter.IsSepa)
-                            {
-                                ct.ThrowIfCancellationRequested();
-                                filter.Shader.Run(args.Images, tex[srcIdx], tex[1 - srcIdx], args.LayerLevelBuffer, 1);
+                                await DoFilterIterationAsync(args, index, tex[1 - srcIdx], tex[srcIdx], 1, ct);
+                            else
                                 srcIdx = 1 - srcIdx;
-                            }
                         }
                     }
                     catch(Exception)
@@ -151,6 +149,7 @@ namespace ImageFramework.Model
                     args.TextureCache.StoreTexture(tex[1 - srcIdx]);
                 }
 
+                args.Progress.Progress = 1.0f;
                 HasChanges = false;
                 OnPropertyChanged(nameof(Image));
             }
@@ -167,8 +166,20 @@ namespace ImageFramework.Model
             {
                 args.Progress.IsProcessing = false;
             }
+        }
 
-            
+        private Task DoFilterIterationAsync(UpdateImageArgs args, int index, TextureArray2D src, TextureArray2D dst, int iteration, CancellationToken ct)
+        {
+            ct.ThrowIfCancellationRequested();
+            var filter = args.Filters[index];
+            filter.Shader.Run(args.Images, src, dst, args.LayerLevelBuffer, iteration);
+            args.Sync.Set();
+
+            var step = 1.0f / args.Filters.Count;
+            args.Progress.Progress = index * step + iteration * step * 0.5f;
+            args.Progress.What = filter.Name;
+
+            return args.Sync.WaitForGpuAsync(ct);
         }
 
         internal void ResetImage(TextureCache cache)

@@ -80,8 +80,9 @@ namespace ImageFramework.Model.Shader
                 }
             }
 
-            // remove uav binding
+            // remove texture bindings
             dev.Compute.SetUnorderedAccessView(0, null);
+            dev.Compute.SetShaderResource(0, null);
         }
 
         /// <summary>

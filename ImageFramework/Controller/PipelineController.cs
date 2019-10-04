@@ -24,7 +24,7 @@ namespace ImageFramework.Controller
         private readonly Models models;
         private readonly TextureCache textureCache;
         private readonly UploadBuffer<LayerLevelFilter> layerLevelBuffer;
-
+        private readonly SyncQuery syncQuery;
         public PipelineController(Models models)
         {
             this.models = models;
@@ -39,6 +39,7 @@ namespace ImageFramework.Controller
 
             textureCache = new TextureCache(models.Images);
             layerLevelBuffer = new UploadBuffer<LayerLevelFilter>(1);
+            syncQuery = new SyncQuery();
 
             this.models.Filter.PropertyChanged += FilterOnPropertyChanged;
             this.models.Filter.ParameterChanged += FilterOnParameterChanged;
@@ -91,7 +92,8 @@ namespace ImageFramework.Controller
                 LayerLevelBuffer = layerLevelBuffer,
                 Progress = models.Progress,
                 TextureCache = textureCache,
-                Filters = null
+                Filters = null,
+                Sync = syncQuery
             };
 
             for (var i = 0; i < models.Pipelines.Count; i++)
@@ -174,6 +176,7 @@ namespace ImageFramework.Controller
         {
             textureCache?.Dispose();
             layerLevelBuffer?.Dispose();
+            syncQuery?.Dispose();
         }
     }
 }
