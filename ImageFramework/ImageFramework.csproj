@@ -68,6 +68,7 @@
     <Compile Include="DirectX\Device.cs" />
     <Compile Include="DirectX\DownloadBuffer.cs" />
     <Compile Include="DirectX\Structs\PixelValueData.cs" />
+    <Compile Include="DirectX\Structs\StatisticsData.cs" />
     <Compile Include="DirectX\SyncQuery.cs" />
     <Compile Include="DirectX\Shader.cs" />
     <Compile Include="DirectX\Structs\LayerLevelFilter.cs" />
@@ -123,14 +124,16 @@
     <Compile Include="Model\Equation\Token\ValueToken.cs" />
     <Compile Include="Model\ImagesModel.cs" />
     <Compile Include="Model\Models.cs" />
+    <Compile Include="Model\PreprocessModel.cs" />
     <Compile Include="Model\ProgressModel.cs" />
     <Compile Include="Model\Shader\FilterShader.cs" />
     <Compile Include="Model\Shader\ImageCombineShader.cs" />
     <Compile Include="Model\Shader\PixelValueShader.cs" />
     <Compile Include="Model\Shader\QuadShader.cs" />
     <Compile Include="Model\Shader\ConvertFormatShader.cs" />
-    <Compile Include="Model\Statistics\ColorSpace.cs" />
-    <Compile Include="Model\Statistics\StatisticsModel.cs" />
+    <Compile Include="Model\Shader\StatisticsShader.cs" />
+    <Compile Include="Model\Shader\DefaultStatisticsShader.cs" />
+    <Compile Include="Model\StatisticsModel.cs" />
     <Compile Include="Utility\TextureCache.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

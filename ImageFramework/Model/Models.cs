@@ -31,11 +31,15 @@ namespace ImageFramework.Model
 
         public ProgressModel Progress { get; }
 
+        internal TextureCache TextureCache { get; }
+
         private readonly List<ImagePipeline> pipelines = new List<ImagePipeline>();
 
         private readonly PipelineController pipelineController;
 
         private readonly PixelValueShader pixelValueShader = new PixelValueShader();
+
+        private readonly PreprocessModel preprocess;
 
         public Models(int numPipelines = 1)
         {
@@ -48,6 +52,8 @@ namespace ImageFramework.Model
             Export = new ExportModel();
             Progress = new ProgressModel();
             Filter = new FiltersModel();
+            preprocess = new PreprocessModel();
+            TextureCache = new TextureCache(Images);
 
             for (int i = 0; i < numPipelines; ++i)
             {
@@ -73,9 +79,18 @@ namespace ImageFramework.Model
         }
 
         /// <inheritdoc cref="PixelValueShader.Run"/>
-        public Color GetPixelValue(TextureArray2D image, int x, int y, int layer, int mipmap, int radius = 0)
+        public Color GetPixelValue(TextureArray2D image, int x, int y, int layer = 0, int mipmap = 0, int radius = 0)
         {
             return pixelValueShader.Run(image, x, y, layer, mipmap, radius);
+        }
+
+        /// <summary>
+        /// gets statistics about from the image
+        /// </summary>
+        /// <returns></returns>
+        public StatisticsModel GetStatistics(TextureArray2D image, int layer = 0, int mipmap = 0)
+        {
+            return preprocess.GetStatistics(image, layer, mipmap, pixelValueShader, TextureCache);
         }
 
         /// <summary>
@@ -172,8 +187,10 @@ namespace ImageFramework.Model
         public void Dispose()
         {
             Export?.Dispose();
+            TextureCache?.Dispose();
             Images?.Dispose();
             Filter?.Dispose();
+            preprocess?.Dispose();
             foreach (var imagePipeline in pipelines)
             {
                 imagePipeline.Dispose();

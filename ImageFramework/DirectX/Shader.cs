@@ -18,7 +18,7 @@ namespace ImageFramework.DirectX
             Compute
         }
 
-        private readonly ShaderFlags flags = ShaderFlags.WarningsAreErrors
+        private readonly ShaderFlags flags = ShaderFlags.WarningsAreErrors | ShaderFlags.IeeeStrictness | ShaderFlags.EnableStrictness
 #if DEBUG
                                              | ShaderFlags.Debug | ShaderFlags.SkipOptimization;
 #else
