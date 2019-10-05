@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ImageFramework.DirectX;
 using ImageViewer.DirectX;
+using ImageViewer.Models;
 using SharpDX.Direct3D11;
 using Device = ImageFramework.DirectX.Device;
 
@@ -26,11 +27,27 @@ namespace ImageViewer
     {
         private SwapChain chain = null;
 
+        private ModelsEx models;
+        public ViewModels.ViewModels ViewModel;
+
         public MainWindow()
         {
             InitializeComponent();
 
+            try
+            {
+                models = new ModelsEx(this);
+                ViewModel = new ViewModels.ViewModels(models);
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                throw;
+            }
 
+            DataContext = ViewModel;
+            Width = models.Settings.WindowWidth;
+            Height = models.Settings.WindowHeight;
         }
 
 
@@ -47,6 +64,12 @@ namespace ImageViewer
 
 
             chain.EndFrame();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            ViewModel.Dispose();
+            base.OnClosed(e);
         }
     }
 }
