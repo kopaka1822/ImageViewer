@@ -42,8 +42,7 @@ namespace ImageFramework.Model.Shader
                 Height = source.GetHeight(mipmap),
                 Stride = 2,
                 Layer = layer,
-                RefNan = float.NaN,
-                FirstTime = true,
+                FirstTime = true
             };
             var curWidth = curData.Width;
             cbuffer.SetData(curData);
@@ -135,7 +134,6 @@ cbuffer InputBuffer : register(b0) {{
     uint2 size;
     uint stride;
     uint layer;
-    float refNan;
     bool firstTime;
 }};
 

@@ -15,6 +15,5 @@ namespace ImageFramework.DirectX.Structs
         public int Stride;
         public int Layer;
         public bool FirstTime;
-        public float RefNan;
     }
 }

@@ -12,8 +12,6 @@ namespace ImageFramework.Model.Shader
         // CIELAB lightness (0-100): http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/POYNTON1/ColorFAQ.html#RTFToC4
         public float Lightness;
         public float Alpha;
-        // HSV saturation
-        public float Saturation;
     }
 
     internal class DefaultStatisticsShader : StatisticsShader<DefaultStatistics>
@@ -32,10 +30,8 @@ float4 res;
 res.r = dot(a.rgb, float3(0.2125, 0.7154, 0.0721));
 // (video) luma (sRGB). Uses NTSC luminance vector
 res.g = dot(toSrgb(a).rgb, float3(0.299, 0.587, 0.114));
-// saturation
-float sMax = clamp(max(max(a.r, a.g), a.b), 0.0, 1.0);
-float sMin = clamp(min(min(a.r, a.g), a.b), 0.0, 1.0);
-res.b = sMax == 0.0 ? 0.0 : (sMax - sMin) / sMax;
+// lightness
+res.b = max(116.0 * pow(res.r, 1.0 / 3.0) - 16.0, 0.0);
 // keep alpha
 res.a = a.a;
 return res;
@@ -47,9 +43,8 @@ return res;
             return new DefaultStatistics
             {
                 Luminance = color.Red,
-                Lightness = Math.Max((float)(116.0 * Math.Pow(color.Red, 1.0f / 3.0f) - 16.0), 0.0f),
                 Luma = color.Green,
-                Saturation = color.Blue,
+                Lightness = color.Blue,
                 Alpha = color.Alpha
             };
         }
