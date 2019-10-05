@@ -18,6 +18,7 @@ namespace ImageFramework.Model.Shader
         private readonly DirectX.Shader convert;
         private readonly QuadShader quad;
         private readonly UploadBuffer<LayerLevelOffsetData> cbuffer;
+
         public ConvertFormatShader()
         {
             var dev = DirectX.Device.Get();
@@ -33,7 +34,8 @@ namespace ImageFramework.Model.Shader
         /// <param name="dstFormat">destination format</param>
         /// <param name="mipmap">mipmap to export, -1 for all mipmaps</param>
         /// <param name="layer">layer to export, -1 for all layers</param>
-        public TextureArray2D Convert(TextureArray2D texture, SharpDX.DXGI.Format dstFormat, int mipmap = -1, int layer = -1)
+        public TextureArray2D Convert(TextureArray2D texture, SharpDX.DXGI.Format dstFormat, int mipmap = -1,
+            int layer = -1)
         {
             return Convert(texture, dstFormat, mipmap, layer, false, 0, 0, 0, 0);
         }
@@ -51,7 +53,8 @@ namespace ImageFramework.Model.Shader
         /// <param name="width">if crop: width of the destination image</param>
         /// <param name="height">if crop: height of the destination image</param>
         /// <returns></returns>
-        public TextureArray2D Convert(TextureArray2D texture, SharpDX.DXGI.Format dstFormat, int mipmap, int layer, bool crop, int xOffset, int yOffset, int width, int height)
+        public TextureArray2D Convert(TextureArray2D texture, SharpDX.DXGI.Format dstFormat, int mipmap, int layer,
+            bool crop, int xOffset, int yOffset, int width, int height)
         {
             Debug.Assert(ImageFormat.IsSupported(dstFormat));
             Debug.Assert(ImageFormat.IsSupported(texture.Format));
@@ -61,10 +64,10 @@ namespace ImageFramework.Model.Shader
             int nMipmaps = mipmap == -1 ? texture.NumMipmaps : 1;
             int nLayer = layer == -1 ? texture.NumLayers : 1;
 
-            if(nMipmaps > 1 && crop)
+            if (nMipmaps > 1 && crop)
                 throw new Exception("cropping is only supported when converting a single mipmap");
 
-            if(!crop)
+            if (!crop)
             {
                 width = texture.GetWidth(firstMipmap);
                 height = texture.GetHeight(firstMipmap);
@@ -101,7 +104,7 @@ namespace ImageFramework.Model.Shader
 
             // remove bindings
             dev.Pixel.SetShaderResource(0, null);
-            dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            dev.OutputMerger.SetRenderTargets((RenderTargetView) null);
 
             return res;
         }
@@ -138,38 +141,6 @@ float4 main(PixelIn i) : SV_TARGET
             convert?.Dispose();
             quad?.Dispose();
             cbuffer?.Dispose();
-        }
-
-        public static string FromSrgbFunction()
-        {
-            return
-                @"float4 fromSrgb(float4 c){
-    float3 r;
-    [unroll]
-    for(int i = 0; i < 3; ++i){
-        if(c[i] > 1.0) r[i] = 1.0;
-        else if(c[i] < 0.0) r[i] = 0.0;
-        else if(c[i] <= 0.04045) r[i] = c[i] / 12.92;
-        else r[i] = pow((c[i] + 0.055)/1.055, 2.4);
-    }
-    return float4(r, c.a);
-}";
-        }
-
-        public static string ToSrgbFunction()
-        {
-            return
-                @"float4 toSrgb(float4 c){
-    float3 r;
-    [unroll]
-    for(int i = 0; i < 3; ++i){
-        if( c[i] > 1.0) r[i] = 1.0;
-        else if( c[i] < 0.0) r[i] = 0.0;
-        else if( c[i] <= 0.0031308) r[i] = 12.92 * c[i];
-        else r[i] = 1.055 * pow(c[i], 0.41666) - 0.055;
-    }
-    return float4(r, c.a);
-}";
         }
     }
 }

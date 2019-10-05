@@ -75,5 +75,39 @@ namespace ImageFramework.Utility
             if (size % alignment == 0) return size;
             return size + alignment - (size % alignment);
         }
+
+        public static string FromSrgbFunction()
+        {
+            return
+                @"
+float4 fromSrgb(float4 c){
+    float3 r;
+    [unroll]
+    for(int i = 0; i < 3; ++i){
+        if(c[i] > 1.0) r[i] = 1.0;
+        else if(c[i] < 0.0) r[i] = 0.0;
+        else if(c[i] <= 0.04045) r[i] = c[i] / 12.92;
+        else r[i] = pow((c[i] + 0.055)/1.055, 2.4);
+    }
+    return float4(r, c.a);
+}";
+        }
+
+        public static string ToSrgbFunction()
+        {
+            return
+                @"
+float4 toSrgb(float4 c){
+    float3 r;
+    [unroll]
+    for(int i = 0; i < 3; ++i){
+        if( c[i] > 1.0) r[i] = 1.0;
+        else if( c[i] < 0.0) r[i] = 0.0;
+        else if( c[i] <= 0.0031308) r[i] = 12.92 * c[i];
+        else r[i] = 1.055 * pow(c[i], 0.41666) - 0.055;
+    }
+    return float4(r, c.a);
+}";
+        }
     }
 }

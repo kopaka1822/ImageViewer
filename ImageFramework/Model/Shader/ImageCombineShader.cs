@@ -60,8 +60,8 @@ namespace ImageFramework.Model.Shader
 " + GetTextureBindings(numImages) +
 GetTextureGetters(numImages) +
 GetHelperFunctions() +
-ConvertFormatShader.FromSrgbFunction() +
-ConvertFormatShader.ToSrgbFunction() +
+Utility.Utility.FromSrgbFunction() +
+Utility.Utility.ToSrgbFunction() +
 "\nRWTexture2DArray<float4> out_tex : register(u0);\n" +
 $"[numthreads({LocalSize},{LocalSize}, 1)]" +
 $@"

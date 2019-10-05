@@ -22,7 +22,6 @@ namespace ImageFramework.Controller
     internal class PipelineController : IDisposable
     {
         private readonly Models models;
-        private readonly TextureCache textureCache;
         private readonly UploadBuffer<LayerLevelFilter> layerLevelBuffer;
         private readonly SyncQuery syncQuery;
         public PipelineController(Models models)
@@ -37,7 +36,6 @@ namespace ImageFramework.Controller
                 pipe.Alpha.PropertyChanged += (sender, e) => PipelineFormulaOnPropertyChanged(pipe, pipe.Alpha, e);
             }
 
-            textureCache = new TextureCache(models.Images);
             layerLevelBuffer = new UploadBuffer<LayerLevelFilter>(1);
             syncQuery = new SyncQuery();
 
@@ -91,7 +89,7 @@ namespace ImageFramework.Controller
                 Images = models.Images,
                 LayerLevelBuffer = layerLevelBuffer,
                 Progress = models.Progress,
-                TextureCache = textureCache,
+                TextureCache = models.TextureCache,
                 Filters = null,
                 Sync = syncQuery
             };
@@ -155,7 +153,7 @@ namespace ImageFramework.Controller
                 case nameof(ImagePipeline.HasChanges):
                     if (sender.HasChanges)
                     {
-                        sender.ResetImage(textureCache);
+                        sender.ResetImage(models.TextureCache);
                     }
                     break;
                 case nameof(ImagePipeline.IsValid):
@@ -174,7 +172,6 @@ namespace ImageFramework.Controller
 
         public void Dispose()
         {
-            textureCache?.Dispose();
             layerLevelBuffer?.Dispose();
             syncQuery?.Dispose();
         }
