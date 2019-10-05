@@ -7,6 +7,7 @@
         xmlns:interop="clr-namespace:System.Windows.Interop;assembly=PresentationFramework"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:views="clr-namespace:ImageViewer.Views"
         mc:Ignorable="d"
         Title="MainWindow" 
         Height="450" 
@@ -21,163 +22,59 @@
     </i:Interaction.Triggers>
 
     <DockPanel>
-        <Menu 
-            DockPanel.Dock="Top" 
-            Background="#fff" 
-            Padding="0 0 0 2">
+        <views:MenuBar DockPanel.Dock="Top"/>
 
-            <MenuItem Header="File">
-                <MenuItem 
-                    Header="_Open"
-                    Command="{Binding OpenCommand}"
-                  IsEnabled="{Binding Progress.NotProcessing}">
-                    <MenuItem.Icon>
-                        <Image Source="Icons/open.png"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem 
-                    Header="_Import"
-                    Command="{Binding ImportCommand}"
-                    IsEnabled="{Binding Progress.NotProcessing}">
-                    <MenuItem.Icon>
-                        <Image Source="Icons/import.png"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem
-                    Header="Import Equation Image"
-                    IsEnabled="{Binding Progress.NotProcessing}">
-                    <MenuItem.Icon>
-                        <Image Source="Icons/import.png"/>
-                    </MenuItem.Icon>
-                    <MenuItem 
-                        Header="Equation 1"
-                        Command="{Binding ImportEquationImageCommand}">
-                        <MenuItem.CommandParameter>
-                            <system:Int32>0</system:Int32>
-                        </MenuItem.CommandParameter>
-                    </MenuItem>
-                    <MenuItem 
-                        Header="Equation 2"
-                        Command="{Binding ImportEquationImageCommand}">
-                        <MenuItem.CommandParameter>
-                            <system:Int32>1</system:Int32>
-                        </MenuItem.CommandParameter>
-                    </MenuItem>
-                    <MenuItem 
-                        Header="Equation 3"
-                        Command="{Binding ImportEquationImageCommand}">
-                        <MenuItem.CommandParameter>
-                            <system:Int32>2</system:Int32>
-                        </MenuItem.CommandParameter>
-                    </MenuItem>
-                    <MenuItem 
-                        Header="Equation 4"
-                        Command="{Binding ImportEquationImageCommand}">
-                        <MenuItem.CommandParameter>
-                            <system:Int32>3</system:Int32>
-                        </MenuItem.CommandParameter>
-                    </MenuItem>
-                </MenuItem>
-                <Separator/>
-                <MenuItem 
-                    Header="_Export"
-                    Command="{Binding ExportCommand}"
-                    IsEnabled="{Binding Progress.NotProcessing}">
-                    <MenuItem.Icon>
-                        <Image Source="Icons/save.png"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-            </MenuItem>
-            <!--END FILE-->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-            <MenuItem Header="_View">
-                <MenuItem 
-                    Header="Linear Interpolation" 
-                    IsCheckable="True"
-                    IsChecked="{Binding Display.LinearInterpolation}"/>
-                <MenuItem
-                    Header="Show Crop Box"
-                    IsCheckable="True"
-                    IsChecked="{Binding Display.ShowCropRectangle}"
-                    ToolTip="Shows the crop box if cropping is enabled for export"
-                    />
-                <MenuItem Header="_Grayscale">
-                    <MenuItem 
-                        Header="_Disabled" 
-                        IsCheckable="True"
-                        IsChecked="{Binding Display.IsGrayscaleDisabled}"/>
-                    <MenuItem 
-                        Header="_Red" 
-                        IsCheckable="True"
-                        IsChecked="{Binding Display.IsGrayscaleRed}"/>
-                    <MenuItem 
-                        Header="_Green" 
-                        IsCheckable="True"
-                        IsChecked="{Binding Display.IsGrayscaleGreen}"/>
-                    <MenuItem 
-                        Header="_Blue" 
-                        IsCheckable="True"
-                        IsChecked="{Binding Display.IsGrayscaleBlue}"/>
-                    <MenuItem 
-                        Header="_Alpha" 
-                        IsCheckable="True"
-                        IsChecked="{Binding Display.IsGrayscaleAlpha}"/>
-                    <MenuItem.Icon>
-                        <Image Source="Icons/grayscale.png"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem 
-                    Header="_Pixel Display"
-                    Command="{Binding ShowPixelDisplayCommand}">
-                    <MenuItem.Icon>
-                        <Image Source="Icons/displayconfig.png"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-            </MenuItem>
-            <!--END VIEW-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="200" MaxWidth="{Binding ElementName=Window, Path=ActualWidth}"/>
+                </Grid.ColumnDefinitions>
 
-            <MenuItem Header="Tools">
-                <MenuItem 
-                    Header="Generate Mipmaps"
-                    Command="{Binding GenerateMipmapsCommand}"
-                    IsEnabled="{Binding Progress.NotProcessing}">
-                    <MenuItem.Icon>
-                        <Image 
-                            Source="Icons/image.png"
-                            Width="16" 
-                            Height="16"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem 
-                    Header="Delete Mipmaps"
-                    Command="{Binding DeleteMipmapsCommand}"
-                    IsEnabled="{Binding Progress.NotProcessing}">
-                    <MenuItem.Icon>
-                        <Image 
-                            Source="Icons/cancel.png"
-                            Width="16" 
-                            Height="16"/>
-                    </MenuItem.Icon>
-                </MenuItem>
-            </MenuItem>
-            <!--END TOOLS-->
+                <Border
+                    x:Name="BorderHost"
+                    Background="Black"/>
 
-            <MenuItem Header="Help">
-                <MenuItem 
-                    Header="About"
-                    Command="{Binding HelpAboutCommand}"/>
-                <MenuItem
-                    Header="Equation"
-                    Command="{Binding HelpEquationCommand}"/>
-                <MenuItem
-                    Header="Filter Manual"
-                    Command="{Binding HelpFilterManualCommand}"
-                    />
-            </MenuItem>
-        </Menu>
+                <GridSplitter 
+                    Grid.Column="1"
+                    Width="5"
+                    HorizontalAlignment="Stretch"
+                    Background="#e2e2e2"/>
 
-        <Border
-            x:Name="BorderHost"
-            Background="Black"/>
+                <TabControl
+                    Grid.Column="2"
+                    DockPanel.Dock="Left"
+                    HorizontalAlignment="Stretch"
+                    Background="#eee"
+                    BorderThickness="0 0 0 0"
+                    x:Name="TabControl"   
+                >
+                    <TabItem 
+                        Header="Images"
+                        Foreground="{Binding Equations.TabItemColor}"
+                    >
+                        <views:ImagesTab/>
+                    </TabItem>
+                    <TabItem 
+                        Header="Filter"
+                        Foreground="{Binding Filter.TabItemColor}"
+                    >
+                        <views:FilterTab/>
+                    </TabItem>
+                    <TabItem Header="Statistics"
+                             x:Name="StatisticsTabItem">
+                        <views:StatisticsTab/>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+
+            <views:StatusBar Grid.Row="1"/>
+        </Grid>
     </DockPanel>
 </Window>
