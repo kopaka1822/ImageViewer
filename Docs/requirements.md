@@ -8,11 +8,11 @@
 - [x] export ktx, dds
 - [x] crop image before export
 - [x] combine images with custom formula
-- [ ] use custom shader/filter on each image
-- [ ] disable filter per image
-- [ ] custom parameters in filter (int, float, bool, image)
+- [x] use custom shader/filter on each image
+- [x] disable filter per image
+- [x] custom parameters in filter (int, float, bool, image)
 - [x] generate/delete image mipmaps
-- [ ] get basic image statistics (average, min, max)
+- [x] get basic image statistics (average, min, max)
 - [ ] import custom formula as image
 - [ ] generate cube map from 6 images
 
