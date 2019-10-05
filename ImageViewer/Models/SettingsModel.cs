@@ -14,6 +14,7 @@ namespace ImageViewer.Models
         public int WindowWidth { get; set; } = 800;
 
         public int WindowHeight { get; set; } = 600;
+        public bool IsMaximized { get; set; } = false;
 
         public event PropertyChangedEventHandler PropertyChanged;
 

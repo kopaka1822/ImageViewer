@@ -5,26 +5,179 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ImageViewer"
         xmlns:interop="clr-namespace:System.Windows.Interop;assembly=PresentationFramework"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="MainWindow" 
         Height="450" 
-        Width="800"
-        Loaded="OnLoaded">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        Width="600"
+        Loaded="OnLoaded"
+        Icon="Icons/app.png">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="SizeChanged">
+            <i:InvokeCommandAction Command="{Binding ResizeCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+
+    <DockPanel>
+        <Menu 
+            DockPanel.Dock="Top" 
+            Background="#fff" 
+            Padding="0 0 0 2">
+
+            <MenuItem Header="File">
+                <MenuItem 
+                    Header="_Open"
+                    Command="{Binding OpenCommand}"
+                  IsEnabled="{Binding Progress.NotProcessing}">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/open.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem 
+                    Header="_Import"
+                    Command="{Binding ImportCommand}"
+                    IsEnabled="{Binding Progress.NotProcessing}">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/import.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem
+                    Header="Import Equation Image"
+                    IsEnabled="{Binding Progress.NotProcessing}">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/import.png"/>
+                    </MenuItem.Icon>
+                    <MenuItem 
+                        Header="Equation 1"
+                        Command="{Binding ImportEquationImageCommand}">
+                        <MenuItem.CommandParameter>
+                            <system:Int32>0</system:Int32>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem 
+                        Header="Equation 2"
+                        Command="{Binding ImportEquationImageCommand}">
+                        <MenuItem.CommandParameter>
+                            <system:Int32>1</system:Int32>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem 
+                        Header="Equation 3"
+                        Command="{Binding ImportEquationImageCommand}">
+                        <MenuItem.CommandParameter>
+                            <system:Int32>2</system:Int32>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem 
+                        Header="Equation 4"
+                        Command="{Binding ImportEquationImageCommand}">
+                        <MenuItem.CommandParameter>
+                            <system:Int32>3</system:Int32>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                </MenuItem>
+                <Separator/>
+                <MenuItem 
+                    Header="_Export"
+                    Command="{Binding ExportCommand}"
+                    IsEnabled="{Binding Progress.NotProcessing}">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/save.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <!--END FILE-->
+
+            <MenuItem Header="_View">
+                <MenuItem 
+                    Header="Linear Interpolation" 
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.LinearInterpolation}"/>
+                <MenuItem
+                    Header="Show Crop Box"
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.ShowCropRectangle}"
+                    ToolTip="Shows the crop box if cropping is enabled for export"
+                    />
+                <MenuItem Header="_Grayscale">
+                    <MenuItem 
+                        Header="_Disabled" 
+                        IsCheckable="True"
+                        IsChecked="{Binding Display.IsGrayscaleDisabled}"/>
+                    <MenuItem 
+                        Header="_Red" 
+                        IsCheckable="True"
+                        IsChecked="{Binding Display.IsGrayscaleRed}"/>
+                    <MenuItem 
+                        Header="_Green" 
+                        IsCheckable="True"
+                        IsChecked="{Binding Display.IsGrayscaleGreen}"/>
+                    <MenuItem 
+                        Header="_Blue" 
+                        IsCheckable="True"
+                        IsChecked="{Binding Display.IsGrayscaleBlue}"/>
+                    <MenuItem 
+                        Header="_Alpha" 
+                        IsCheckable="True"
+                        IsChecked="{Binding Display.IsGrayscaleAlpha}"/>
+                    <MenuItem.Icon>
+                        <Image Source="Icons/grayscale.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem 
+                    Header="_Pixel Display"
+                    Command="{Binding ShowPixelDisplayCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="Icons/displayconfig.png"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <!--END VIEW-->
+
+            <MenuItem Header="Tools">
+                <MenuItem 
+                    Header="Generate Mipmaps"
+                    Command="{Binding GenerateMipmapsCommand}"
+                    IsEnabled="{Binding Progress.NotProcessing}">
+                    <MenuItem.Icon>
+                        <Image 
+                            Source="Icons/image.png"
+                            Width="16" 
+                            Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem 
+                    Header="Delete Mipmaps"
+                    Command="{Binding DeleteMipmapsCommand}"
+                    IsEnabled="{Binding Progress.NotProcessing}">
+                    <MenuItem.Icon>
+                        <Image 
+                            Source="Icons/cancel.png"
+                            Width="16" 
+                            Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
+            <!--END TOOLS-->
+
+            <MenuItem Header="Help">
+                <MenuItem 
+                    Header="About"
+                    Command="{Binding HelpAboutCommand}"/>
+                <MenuItem
+                    Header="Equation"
+                    Command="{Binding HelpEquationCommand}"/>
+                <MenuItem
+                    Header="Filter Manual"
+                    Command="{Binding HelpFilterManualCommand}"
+                    />
+            </MenuItem>
+        </Menu>
 
         <Border
             x:Name="BorderHost"
             Background="Black"/>
-
-        <Button
-            Grid.Column="1"
-            Content="Test"
-            Click="ButtonBase_OnClick">
-
-        </Button>
-    </Grid>
+    </DockPanel>
 </Window>
