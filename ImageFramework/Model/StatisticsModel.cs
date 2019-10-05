@@ -14,6 +14,6 @@ namespace ImageFramework.Model
         /// <summary>
         /// image has an active alpha channel if at least one pixel has alpha unequal to one
         /// </summary>
-        public bool HasAlpha => Min.Alpha < 1.0f;
+        public bool HasAlpha => Min.Alpha < 1.0f || Max.Alpha > 1.0f;
     }
 }

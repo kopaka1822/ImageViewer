@@ -52,6 +52,8 @@ namespace ImageConsole
             AddCommand(new ExportQualityCommand());
 
             AddCommand(new TellPixelCommand());
+            AddCommand(new StatisticsCommand());
+            AddCommand(new TellAlphaCommand());
 
             AddCommand(new HelpCommand(commands));
         }

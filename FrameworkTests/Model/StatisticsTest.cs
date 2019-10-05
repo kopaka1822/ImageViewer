@@ -32,11 +32,27 @@ namespace FrameworkTests.Model
             var stats = models.GetStatistics(models.Pipelines[0].Image);
 
             // calculate (alpha) statistics by hand
-            var cpuStats = CalcCpuStats(models.Pipelines[0].Image.GetPixelColors(0, 0));
+            //var cpuStats = CalcCpuStats(models.Pipelines[0].Image.GetPixelColors(0, 0));
 
-            Assert.AreEqual(stats.Min.Alpha, cpuStats.Min);
-            Assert.AreEqual(stats.Max.Alpha, cpuStats.Max);
-            Assert.AreEqual(stats.Avg.Alpha, cpuStats.Avg, 0.01f);
+            // alpha
+            Assert.AreEqual(1.0f, stats.Min.Alpha);
+            Assert.AreEqual(1.0f, stats.Max.Alpha);
+            Assert.AreEqual(1.0f, stats.Avg.Alpha, 0.01f);
+
+            // luminance
+            Assert.AreEqual(0.0f, stats.Min.Luminance);
+            Assert.AreEqual(1.0f, stats.Max.Luminance, 0.01f);
+            Assert.AreEqual(0.5f, stats.Avg.Luminance, 0.01f);
+
+            // luma
+            Assert.AreEqual(0.0f, stats.Min.Luma);
+            Assert.AreEqual(1.0f, stats.Max.Luma, 0.01f);
+            Assert.AreEqual(0.5f, stats.Avg.Luma, 0.01f);
+
+            // lightness
+            Assert.AreEqual(0.0f, stats.Min.Lightness);
+            Assert.AreEqual(100.0f, stats.Max.Lightness, 0.5f);
+            Assert.AreEqual(50.0f, stats.Avg.Lightness, 0.5f);
         }
 
         [TestMethod]
