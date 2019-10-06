@@ -1,0 +1,54 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:ImageViewer.Views.Theme">
+
+    <LinearGradientBrush x:Key="DisabledBackground" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="#f4f4f4" Offset="1"/>
+        <GradientStop Color="#c2c2c2" Offset="0"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="DisabledBackgroundBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="#f4f4f4" Offset="0"/>
+        <GradientStop Color="#d7d7d7" Offset="0.7"/>
+        <GradientStop Color="#c2c2c2" Offset="1"/>
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="OuterBorderDisabled" Color="#cfcfcf"/>
+
+
+    <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
+    <Style TargetType="{x:Type GroupBox}">
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Margin" Value="4"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type GroupBox}">
+                    <Grid SnapsToDevicePixels="true">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Border x:Name="Header" Grid.Column="0" Grid.Row="0" Padding="3" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1,1,1,0">
+                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" ContentSource="Header" RecognizesAccessKey="True"/>
+                        </Border>
+                        <Border x:Name="Container" Grid.Column="0" Grid.Row="1" Padding="3" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1,1,1,1">
+                            <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="Header" Property="Background" Value="{StaticResource DisabledBackgroundBrush}"/>
+                            <Setter TargetName="Container" Property="Background" Value="{StaticResource DisabledBackground}"/>
+                            <Setter Property="Foreground" Value="{StaticResource BorderBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
