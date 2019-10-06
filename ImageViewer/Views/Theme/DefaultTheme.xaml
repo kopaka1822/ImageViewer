@@ -1,5 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:ImageViewer.Views.Theme">
-    <SolidColorBrush x:Key="BackgroundBrush" Color="#eee"/>    
+    <SolidColorBrush x:Key="BackgroundBrush" Color="#eee"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="#e2e2e2"/>
+    <SolidColorBrush x:Key="FontColor" Color="Black"/>
+    <SolidColorBrush x:Key="HoverBrush" Color="#0074E8" Opacity="0.5"/>
 </ResourceDictionary>

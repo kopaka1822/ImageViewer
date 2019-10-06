@@ -11,16 +11,63 @@
                     DefaultSource="Views/Theme/DefaultTheme.xaml"
                     WhiteSource="Views/Theme/WhiteTheme.xaml"
                     DarkSource="Views/Theme/DarkTheme.xaml"/>
+
+                <ResourceDictionary Source="Views/Theme/MenuStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <!--<ResourceDictionary x:Key="Styles">-->
-                <Style TargetType="Control" x:Key="BaseStyle">
-                    <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
-                </Style>
+            <Style TargetType="Control" x:Key="BaseStyle">
+                <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{StaticResource FontColor}"/>
+            </Style>
+
             <Style TargetType="TabControl" BasedOn="{StaticResource BaseStyle}">
 
             </Style>
-            <!--</ResourceDictionary>-->
+            <Style TargetType="TabItem" x:Key="TabItem" BasedOn="{StaticResource BaseStyle}">
+                <Setter Property="OverridesDefaultStyle" Value="True"/>
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TabItem">
+                            <Grid Name="Panel">
+                                <ContentPresenter x:Name="ContentSite"
+                                                  VerticalAlignment="Center"
+                                                  HorizontalAlignment="Center"
+                                                  ContentSource="Header"
+                                                  Margin="10,2"/>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="Panel" Property="Background" Value="{StaticResource HoverBrush}" />
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="False">
+                                    <Setter TargetName="Panel" Property="Background" Value="{StaticResource BackgroundBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>                
+            </Style>
+
+            <Style TargetType="StatusBar" BasedOn="{StaticResource BaseStyle}"/>
+
+            <Style TargetType="TextBox" BasedOn="{StaticResource BaseStyle}"/>
+            <Style TargetType="Label" BasedOn="{StaticResource BaseStyle}"/>
+            <Style TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{StaticResource FontColor}"/>
+            </Style>
+
+            <Style TargetType="Window" x:Key="WindowStyle" BasedOn="{StaticResource BaseStyle}">
+                
+            </Style>
+
+            <Style TargetType="DockPanel">
+                <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+            </Style>
+
+            <Style TargetType="GridSplitter" BasedOn="{StaticResource BaseStyle}">
+                <Setter Property="Background" Value="{StaticResource BorderBrush}"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
