@@ -7,9 +7,7 @@
              xmlns:dd="urn:gong-wpf-dragdrop"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="300">
-    <ScrollViewer 
-                            VerticalScrollBarVisibility="Auto"
-                            Foreground="Black">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Border Padding="5">
             <StackPanel IsEnabled="{Binding Progress.NotProcessing}">
                 <!--Image Label + Import Button-->
@@ -19,38 +17,38 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock 
-                                            Text="Images:" 
-                                            VerticalAlignment="Center"/>
+                        Text="Images:" 
+                        VerticalAlignment="Center"/>
                     <Button 
-                                            Grid.Column="1" 
-                                            Width="110" 
-                                            HorizontalAlignment="Right"
-                                            Command="{Binding ImportCommand}">
+                        Grid.Column="1" 
+                        Width="110" 
+                        HorizontalAlignment="Right"
+                        Command="{Binding ImportCommand}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="21"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <Image 
-                                                    Source="../Icons/import.png"
-                                                    Margin="0 0 5 0"/>
+                                Source="../Icons/import.png"
+                                Margin="0 0 5 0"/>
                             <TextBlock 
-                                                    Grid.Column="1" 
-                                                    Text="Import Image"/>
+                                Grid.Column="1" 
+                                Text="Import Image"/>
                         </Grid>
                     </Button>
                 </Grid>
 
                 <ListBox 
-                                        SelectedIndex="0" 
-                                        ScrollViewer.VerticalScrollBarVisibility="Visible"                       
-                                        Height="180"
-                                        Margin="0 0 0 5"
-                                        ItemsSource="{Binding Images.ImageListItems}"
-                                        SelectedItem="{Binding Images.SelectedImageListItem}"
-                                        dd:DragDrop.IsDragSource="True"
-                                        dd:DragDrop.IsDropTarget="True"
-                                        dd:DragDrop.DropHandler="{Binding Images}"/>
+                    SelectedIndex="0" 
+                    ScrollViewer.VerticalScrollBarVisibility="Visible"                       
+                    Height="180"
+                    Margin="0 0 0 5"
+                    ItemsSource="{Binding Images.ImageListItems}"
+                    SelectedItem="{Binding Images.SelectedImageListItem}"
+                    dd:DragDrop.IsDragSource="True"
+                    dd:DragDrop.IsDropTarget="True"
+                    dd:DragDrop.DropHandler="{Binding Images}"/>
 
                 <Button
                                             Command="{Binding Equations.Apply}"

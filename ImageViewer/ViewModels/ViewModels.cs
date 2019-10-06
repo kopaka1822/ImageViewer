@@ -14,12 +14,16 @@ namespace ImageViewer.ViewModels
         private readonly ModelsEx models;
 
         public DisplayViewModel Display { get; }
+        public ProgressViewModel Progress { get; }
 
+        public ImagesViewModel Images { get; }
         public ViewModels(ModelsEx models)
         {
             this.models = models;
 
             Display = new DisplayViewModel(models);
+            Progress = new ProgressViewModel(models);
+            Images = new ImagesViewModel(models);
 
             // commands
             OpenCommand = new OpenCommand(models);
