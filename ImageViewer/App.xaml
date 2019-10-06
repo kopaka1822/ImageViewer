@@ -14,6 +14,7 @@
 
                 <ResourceDictionary Source="Views/Theme/MenuStyle.xaml"/>
                 <ResourceDictionary Source="Views/Theme/TabItemStyle.xaml"/>
+                <ResourceDictionary Source="Views/Theme/ButtonStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <Style TargetType="Control" x:Key="BaseStyle">
