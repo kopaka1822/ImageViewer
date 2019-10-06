@@ -13,6 +13,7 @@
                     DarkSource="Views/Theme/DarkTheme.xaml"/>
 
                 <ResourceDictionary Source="Views/Theme/MenuStyle.xaml"/>
+                <ResourceDictionary Source="Views/Theme/TabItemStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <Style TargetType="Control" x:Key="BaseStyle">
@@ -23,31 +24,7 @@
             <Style TargetType="TabControl" BasedOn="{StaticResource BaseStyle}">
 
             </Style>
-            <Style TargetType="TabItem" x:Key="TabItem" BasedOn="{StaticResource BaseStyle}">
-                <Setter Property="OverridesDefaultStyle" Value="True"/>
-                <Setter Property="SnapsToDevicePixels" Value="True"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="TabItem">
-                            <Grid Name="Panel">
-                                <ContentPresenter x:Name="ContentSite"
-                                                  VerticalAlignment="Center"
-                                                  HorizontalAlignment="Center"
-                                                  ContentSource="Header"
-                                                  Margin="10,2"/>
-                            </Grid>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter TargetName="Panel" Property="Background" Value="{StaticResource HoverBrush}" />
-                                </Trigger>
-                                <Trigger Property="IsSelected" Value="False">
-                                    <Setter TargetName="Panel" Property="Background" Value="{StaticResource BackgroundBrush}" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>                
-            </Style>
+
 
             <Style TargetType="StatusBar" BasedOn="{StaticResource BaseStyle}"/>
 
