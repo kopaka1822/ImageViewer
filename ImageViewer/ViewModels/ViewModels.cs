@@ -30,6 +30,7 @@ namespace ImageViewer.ViewModels
             ShowPixelDisplayCommand = new ShowPixelDisplayCommand(models);
             GenerateMipmapsCommand = new GenerateMipmapsCommand(models);
             DeleteMipmapsCommand = new DeleteMipmapsCommand(models);
+            HelpCommand = new HelpDialogCommand(models);
 
             ResizeWindow = new ResizeWindowCommand(models);
             SetThemeCommand = new SetThemeCommand(models);
@@ -56,5 +57,7 @@ namespace ImageViewer.ViewModels
 
         public ICommand GenerateMipmapsCommand { get; }
         public ICommand DeleteMipmapsCommand { get; }
+
+        public ICommand HelpCommand { get; }
     }
 }
