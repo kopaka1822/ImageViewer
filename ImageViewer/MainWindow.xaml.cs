@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ImageFramework.DirectX;
+using ImageViewer.Controller;
 using ImageViewer.DirectX;
 using ImageViewer.Models;
 using SharpDX.Direct3D11;
@@ -29,6 +30,7 @@ namespace ImageViewer
 
         private ModelsEx models;
         public ViewModels.ViewModels ViewModel;
+
 
         public MainWindow()
         {
@@ -48,6 +50,15 @@ namespace ImageViewer
             DataContext = ViewModel;
             Width = models.Settings.WindowWidth;
             Height = models.Settings.WindowHeight;
+
+            // handle startup arguments
+            if (App.StartupArgs.Length == 0) return;
+
+            var import = new ImportDialogController(models);
+            foreach (var arg in App.StartupArgs)
+            {
+                import.ImportImage(arg);
+            }
         }
 
 
