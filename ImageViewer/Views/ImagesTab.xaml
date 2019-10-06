@@ -51,11 +51,11 @@
                     dd:DragDrop.DropHandler="{Binding Images}"/>
 
                 <Button
-                                            Command="{Binding Equations.Apply}"
-                                            Content="Apply"
-                                            Width="80"
-                                            HorizontalAlignment="Right"
-                                            Margin="0 0 0 5"/>
+                    Command="{Binding Equations.Apply}"
+                    Content="Apply"
+                    Width="80"
+                    HorizontalAlignment="Right"
+                    Margin="0 0 0 5"/>
 
                 <Separator Height="2"/>
 

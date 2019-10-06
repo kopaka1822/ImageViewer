@@ -56,30 +56,40 @@ namespace ImageFramework.Model.Equation
         public int MaxImageId { get; private set; }
 
         // the converted formula
-        public string Converted { get; private set; } 
+        public string Converted { get; private set; }
+
+        public struct TestResults
+        {
+            /// if null, test is valid
+            public string Error;
+            /// max image id
+            public int MaxId;
+        }
 
         /// <summary>
         /// tests if the given formula is valid
         /// </summary>
         /// <param name="f">formula to test</param>
         /// <returns>null if valid, error string if invalid</returns>
-        public string TestFormula(string f)
+        public TestResults TestFormula(string f)
         {
             try
             {
                 var eq = new Equation(f);
                 eq.GetHlslExpression();
+
+                return new TestResults
+                {
+                    MaxId = eq.MaxImageId
+                };
             }
             catch (Exception e)
             {
-                return e.Message;
+                return new TestResults
+                {
+                    Error = e.Message
+                };
             }
-            return null;
-        }
-
-        private bool TestFormulaValid()
-        {
-            return TestFormula(Formula) == null;
         }
 
         /// <summary>

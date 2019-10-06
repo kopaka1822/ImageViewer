@@ -19,6 +19,10 @@ namespace ImageViewer.Models
         public ModelsEx(MainWindow window)
         : base(4)
         {
+            // only enabled first pipeline
+            for (int i = 1; i < NumPipelines; ++i)
+                Pipelines[i].IsEnabled = false;
+
             Settings = new SettingsModel();
             Window = new WindowModel(window);
             Display = new DisplayModel(this);
