@@ -184,7 +184,7 @@ namespace ImageFramework.Model
             }
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             Export?.Dispose();
             TextureCache?.Dispose();

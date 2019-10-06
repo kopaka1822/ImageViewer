@@ -30,4 +30,30 @@ namespace ImageViewer.Commands
             remove { }
         }
     }
+
+    /// <inheritdoc />
+    /// <summary>
+    /// command with parameter type that can always be executed
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public abstract class SimpleCommand<T> : ICommand
+    {
+        public bool CanExecute(object parameter)
+        {
+            return true;
+        }
+
+        public void Execute(object parameter)
+        {
+            Execute((T)parameter);
+        }
+
+        public abstract void Execute(T parameter);
+
+        public event EventHandler CanExecuteChanged
+        {
+            add { }
+            remove { }
+        }
+    }
 }

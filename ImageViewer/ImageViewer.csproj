@@ -80,7 +80,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\ResizeWindowCommand.cs" />
+    <Compile Include="Commands\SetThemeCommand.cs" />
     <Compile Include="Commands\SimpleCommand.cs" />
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="ViewModels\ViewModels.cs" />

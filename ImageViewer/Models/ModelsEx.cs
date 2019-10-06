@@ -24,5 +24,11 @@ namespace ImageViewer.Models
 
             resizeController = new ResizeController(this);
         }
+
+        public override void Dispose()
+        {
+            Settings.Save();
+            base.Dispose();
+        }
     }
 }
