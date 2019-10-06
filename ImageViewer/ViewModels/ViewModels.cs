@@ -17,6 +17,8 @@ namespace ImageViewer.ViewModels
         public ProgressViewModel Progress { get; }
 
         public ImagesViewModel Images { get; }
+
+        public EquationsViewModel Equations { get; }
         public ViewModels(ModelsEx models)
         {
             this.models = models;
@@ -24,6 +26,7 @@ namespace ImageViewer.ViewModels
             Display = new DisplayViewModel(models);
             Progress = new ProgressViewModel(models);
             Images = new ImagesViewModel(models);
+            Equations = new EquationsViewModel(models);
 
             // commands
             OpenCommand = new OpenCommand(models);

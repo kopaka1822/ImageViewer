@@ -80,6 +80,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\DeleteMipmapsCommand.cs" />
     <Compile Include="Commands\ExportCommand.cs" />
@@ -96,6 +97,9 @@
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
     <Compile Include="ViewModels\DisplayViewModel.cs" />
+    <Compile Include="ViewModels\EquationsViewModel.cs" />
+    <Compile Include="ViewModels\EquationViewModel.cs" />
+    <Compile Include="ViewModels\FormulaViewModel.cs" />
     <Compile Include="ViewModels\ImagesViewModel.cs" />
     <Compile Include="ViewModels\ProgressViewModel.cs" />
     <Compile Include="ViewModels\ViewModels.cs" />
