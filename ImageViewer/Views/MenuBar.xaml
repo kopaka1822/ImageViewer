@@ -151,14 +151,25 @@
         <MenuItem Header="Help">
             <MenuItem 
                     Header="About"
-                    Command="{Binding HelpAboutCommand}"/>
-            <MenuItem
+                    Command="{Binding HelpCommand}">
+                <MenuItem.CommandParameter>
+                    <system:String>help/about.md</system:String>
+                </MenuItem.CommandParameter>
+            </MenuItem>
+                <MenuItem
                     Header="Equation"
-                    Command="{Binding HelpEquationCommand}"/>
-            <MenuItem
+                    Command="{Binding HelpCommand}">
+                    <MenuItem.CommandParameter>
+                        <system:String>help/equation.md</system:String>
+                    </MenuItem.CommandParameter>
+            </MenuItem>
+                <MenuItem
                     Header="Filter Manual"
-                    Command="{Binding HelpFilterManualCommand}"
-                    />
-        </MenuItem>
+                    Command="{Binding HelpCommand}">
+                    <MenuItem.CommandParameter>
+                        <system:String>help/filter_manual.md</system:String>
+                    </MenuItem.CommandParameter>
+            </MenuItem>
+            </MenuItem>
     </Menu>
 </UserControl>
