@@ -17,6 +17,7 @@ namespace ImageViewer.Models
         private readonly ResizeController resizeController;
 
         public ModelsEx(MainWindow window)
+        : base(4)
         {
             Settings = new SettingsModel();
             Window = new WindowModel(window);
