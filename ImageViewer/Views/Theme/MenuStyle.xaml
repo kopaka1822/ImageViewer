@@ -22,15 +22,11 @@
 
 
     <Geometry x:Key="Checkmark">M 0,5.1 L 1.7,5.2 L 3.4,7.1 L 8,0.4 L 9.2,0 L 3.3,10.8 Z</Geometry>
-    <LinearGradientBrush x:Key="MenuItemSelectionFill" EndPoint="0,1" StartPoint="0,0">
-        <GradientStop Color="#34C5EBFF" Offset="0"/>
-        <GradientStop Color="#3481D8FF" Offset="1"/>
-    </LinearGradientBrush>
 
     <ControlTemplate x:Key="{ComponentResourceKey ResourceId=SubmenuItemTemplateKey, TypeInTargetAssembly={x:Type MenuItem}}" TargetType="{x:Type MenuItem}">
         <Grid SnapsToDevicePixels="true">
-            <Rectangle x:Name="Bg" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="1" RadiusX="2" RadiusY="2"/>
-            <Rectangle Margin="1" x:Name="InnerBorder" RadiusX="2" RadiusY="2"/>
+            <Rectangle x:Name="Bg" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="1"/>
+            <Rectangle Margin="1" x:Name="InnerBorder"/>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition MinWidth="24" Width="Auto" SharedSizeGroup="MenuItemIconColumnGroup"/>
@@ -41,8 +37,8 @@
                     <ColumnDefinition Width="17"/>
                 </Grid.ColumnDefinitions>
                 <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Margin="1" x:Name="Icon" VerticalAlignment="Center" ContentSource="Icon"/>
-                <Border Visibility="Hidden" Margin="1" x:Name="GlyphPanel" Width="22" Height="22" Background="#E6EFF4" BorderBrush="#CDD3E6" BorderThickness="1" CornerRadius="3">
-                    <Path FlowDirection="LeftToRight" x:Name="Glyph" Width="9" Height="11" Fill="#0C12A1" Data="{StaticResource Checkmark}"/>
+                <Border Visibility="Hidden" Margin="1" x:Name="GlyphPanel" Width="22" Height="22" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BackgroundBrush}" BorderThickness="1">
+                    <Path FlowDirection="LeftToRight" x:Name="Glyph" Width="9" Height="11" Fill="{StaticResource FontColor}" Data="{StaticResource Checkmark}"/>
                 </Border>
                 <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Margin="{TemplateBinding Padding}" Grid.Column="2" ContentSource="Header" RecognizesAccessKey="True"/>
                 <TextBlock Margin="{TemplateBinding Padding}" Grid.Column="4" Text="{TemplateBinding InputGestureText}"/>
@@ -72,7 +68,7 @@
     <ControlTemplate x:Key="{ComponentResourceKey ResourceId=SubmenuContent, TypeInTargetAssembly={x:Type FrameworkElement}}" TargetType="{x:Type ContentControl}">
         <Border Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
             <Grid>
-                <Rectangle HorizontalAlignment="Left" Margin="2" Width="28" Fill="{StaticResource BackgroundBrush}" RadiusX="2" RadiusY="2"/>
+                <Rectangle HorizontalAlignment="Left" Margin="2" Width="28" Fill="{StaticResource BackgroundBrush}"/>
                 <Rectangle HorizontalAlignment="Left" Margin="30,2,0,2" Width="1" Fill="Transparent"/>
                 <Rectangle HorizontalAlignment="Left" Margin="31,2,0,2" Width="1" Fill="Transparent"/>
                 <ContentPresenter Margin="1,0" Grid.ColumnSpan="2"/>
@@ -222,7 +218,7 @@
 
     <ControlTemplate x:Key="{ComponentResourceKey ResourceId=TopLevelItemTemplateKey, TypeInTargetAssembly={x:Type MenuItem}}" TargetType="{x:Type MenuItem}">
         <Grid SnapsToDevicePixels="true">
-            <Rectangle x:Name="OuterBorder" RadiusX="2" RadiusY="2"/>
+            <Rectangle x:Name="OuterBorder"/>
             <Rectangle Margin="1" x:Name="Bg" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="1" RadiusX="1" RadiusY="1"/>
             <Rectangle Margin="2" x:Name="InnerBorder"/>
             <DockPanel>
@@ -261,8 +257,8 @@
 
     <ControlTemplate x:Key="{ComponentResourceKey ResourceId=SubmenuHeaderTemplateKey, TypeInTargetAssembly={x:Type MenuItem}}" TargetType="{x:Type MenuItem}">
         <Grid SnapsToDevicePixels="true">
-            <Rectangle x:Name="Bg" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="1" RadiusX="2" RadiusY="2"/>
-            <Rectangle Margin="1" x:Name="InnerBorder" Stroke="Transparent" StrokeThickness="1" RadiusX="2" RadiusY="2"/>
+            <Rectangle x:Name="Bg" Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="1"/>
+            <Rectangle Margin="1" x:Name="InnerBorder" Stroke="Transparent" StrokeThickness="1"/>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition MinWidth="24" Width="Auto" SharedSizeGroup="MenuItemIconColumnGroup"/>
