@@ -24,6 +24,77 @@ namespace ImageViewer.ViewModels
         public DisplayViewModel(ModelsEx models)
         {
             this.models = models;
+            this.selectedSplitMode = AvailableSplitModes[models.Display.Split == DisplayModel.SplitMode.Vertical ? 0 : 1];
+            models.PropertyChanged += ModelsOnPropertyChanged;
+            models.Display.PropertyChanged += DisplayOnPropertyChanged;
+        }
+
+        private void DisplayOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(DisplayModel.LinearInterpolation):
+                    OnPropertyChanged(nameof(LinearInterpolation));
+                    break;
+
+                case nameof(DisplayModel.ShowCropRectangle):
+                    OnPropertyChanged(nameof(ShowCropRectangle));
+                    break;
+
+                case nameof(DisplayModel.ActiveLayer):
+                    SelectedLayer = AvailableLayers.Count != 0
+                        ? AvailableLayers[models.Display.ActiveLayer]
+                        : EmptyLayer;
+                    break;
+
+                case nameof(DisplayModel.ActiveMipmap):
+                    SelectedMipMap = AvailableMipMaps.Count != 0
+                        ? AvailableMipMaps[models.Display.ActiveMipmap]
+                        : EmptyMipMap;
+                    break;
+
+                case nameof(DisplayModel.AvailableViews):
+                    CreateViewModes();
+                    break;
+
+                case nameof(DisplayModel.ActiveView):
+                    var selected = EmptyViewMode;
+                    foreach (var item in AvailableViewModes)
+                    {
+                        if (item.Cargo == models.Display.ActiveView)
+                            selected = item;
+                    }
+
+                    SelectedViewMode = selected;
+
+                    OnPropertyChanged(nameof(ChooseLayers));
+                    OnPropertyChanged(nameof(Zoom));
+                    break;
+
+                case nameof(DisplayModel.Split):
+                    SelectedSplitMode =
+                        AvailableSplitModes[models.Display.Split == DisplayModel.SplitMode.Vertical ? 0 : 1];
+                    break;
+
+                case nameof(DisplayModel.TexelPosition):
+                    OnPropertyChanged(nameof(TexelPosition));
+                    break;
+
+                case nameof(DisplayModel.Aperture):
+                case nameof(DisplayModel.Zoom):
+                    OnPropertyChanged(nameof(Zoom));
+                    break;
+            }
+        }
+
+        private void ModelsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ImageFramework.Model.Models.NumEnabled):
+                    OnPropertyChanged(nameof(EnableSplitMode));
+                    break;
+            }
         }
 
         public bool LinearInterpolation
@@ -53,7 +124,7 @@ namespace ImageViewer.ViewModels
         public bool EnableMipMaps => AvailableMipMaps.Count > 1;
         public Visibility EnableLayers => AvailableLayers.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
         public Visibility EnableViewModes => AvailableViewModes.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
-        public bool EnableSplitMode => models.Equations.GetVisibles().Count == 2;
+        public bool EnableSplitMode => models.NumEnabled == 2;
 
         // layers are fixed for cube maps
         public bool ChooseLayers => models.Display.ActiveView == DisplayModel.ViewMode.Single ||
@@ -116,11 +187,11 @@ namespace ImageViewer.ViewModels
             }
         }
 
-        /*public string Zoom
+        public string Zoom
         {
             get => models.Display.ActiveView.IsDegree() ?
-                        Math.Round((Decimal)(models.Display.Aperture * 180.0 / Math.PI), 2).ToString(App.GetCulture()) + "°" :
-                        Math.Round((Decimal)(models.Display.Zoom * 100.0f), 2).ToString(App.GetCulture()) + "%";
+                        Math.Round((Decimal)(models.Display.Aperture * 180.0 / Math.PI), 2).ToString(ImageFramework.Model.Models.Culture) + "°" :
+                        Math.Round((Decimal)(models.Display.Zoom * 100.0f), 2).ToString(ImageFramework.Model.Models.Culture) + "%";
 
             set
             {
@@ -130,7 +201,7 @@ namespace ImageViewer.ViewModels
                 if (value.Length > 0 && (value.EndsWith("%") || value.EndsWith("°")))
                     value = value.Remove(value.Length - 1, 1);
                 // extract float
-                if (float.TryParse(value, NumberStyles.Float, App.GetCulture(), out float converted))
+                if (float.TryParse(value, NumberStyles.Float, ImageFramework.Model.Models.Culture, out float converted))
                 {
                     if (models.Display.ActiveView.IsDegree())
                     {
@@ -146,7 +217,7 @@ namespace ImageViewer.ViewModels
                     // TODO do something
                 }
             }
-        }*/
+        }
 
         private void CreateMipMapList()
         {

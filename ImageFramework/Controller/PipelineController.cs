@@ -97,7 +97,7 @@ namespace ImageFramework.Controller
             for (var i = 0; i < models.Pipelines.Count; i++)
             {
                 var pipe = models.Pipelines[i];
-                if (pipe.HasChanges && pipe.IsValid)
+                if (pipe.HasChanges && pipe.IsValid && pipe.IsEnabled)
                 {
                     if (pipe.UseFilter)
                     {
