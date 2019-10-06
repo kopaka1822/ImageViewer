@@ -29,6 +29,8 @@ namespace ImageViewer.Models
             }
         }
 
+        public string ImagePath { get; set; }
+
         public void Save()
         {
             Settings.Default.Save();

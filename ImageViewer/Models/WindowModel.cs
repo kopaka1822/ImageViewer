@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -19,9 +20,14 @@ namespace ImageViewer.Models
         private readonly Stack<Window> windowStack = new Stack<Window>();
         public Size ClientSize { get; private set; } = new Size(0, 0);
 
+        public string ExecutionPath { get; }
+        public string AssemblyPath { get; }
+
         public WindowModel(MainWindow window)
         {
             Window = window;
+            AssemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            ExecutionPath = System.IO.Path.GetDirectoryName(AssemblyPath);
 
             window.Loaded += WindowOnLoaded;
             window.BorderHost.DragOver += (o, args) => args.Effects = DragDropEffects.Copy;
@@ -82,6 +88,21 @@ namespace ImageViewer.Models
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void ShowErrorDialog(string message)
+        {
+#if DEBUG
+            var res = MessageBoxResult.None;
+            message += ". Do you want to debug the application?";          
+            res = MessageBox.Show(TopmostWindow, message, "Error", MessageBoxButton.YesNo, MessageBoxImage.Error);
+            
+            if (res == MessageBoxResult.Yes)
+                Debugger.Break();
+#else
+            
+            MessageBox.Show(TopmostWindow, message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+#endif
         }
     }
 }

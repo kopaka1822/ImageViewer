@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:ImageViewer.Views" 
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
-             d:DesignHeight="20" 
+             d:DesignHeight="24" 
              d:DesignWidth="400">
     <Menu 
         DockPanel.Dock="Top" 

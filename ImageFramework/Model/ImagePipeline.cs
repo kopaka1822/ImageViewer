@@ -188,6 +188,7 @@ namespace ImageFramework.Model
             {
                 cache.StoreTexture(Image);
                 Image = null;
+                OnPropertyChanged(nameof(Image));
             }
         }
 

@@ -13,11 +13,20 @@ namespace ImageViewer.ViewModels
     {
         private readonly ModelsEx models;
 
+        public DisplayViewModel Display { get; }
+
         public ViewModels(ModelsEx models)
         {
             this.models = models;
 
+            Display = new DisplayViewModel(models);
+
             // commands
+            OpenCommand = new OpenCommand(models);
+            ImportCommand = new ImportCommand(models);
+            ImportEquationImageCommand = new ImportEquationImageCommand(models);
+            ExportCommand = new ExportCommand(models);
+
             ResizeWindow = new ResizeWindowCommand(models);
             SetThemeCommand = new SetThemeCommand(models);
         }
@@ -30,5 +39,13 @@ namespace ImageViewer.ViewModels
         public ICommand ResizeWindow { get; }
 
         public ICommand SetThemeCommand { get; }
+
+        public ICommand OpenCommand { get; }
+
+        public ICommand ImportCommand { get; }
+
+        public ICommand ImportEquationImageCommand { get; }
+
+        public ICommand ExportCommand { get; }
     }
 }
