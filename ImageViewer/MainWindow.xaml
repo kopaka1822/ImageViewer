@@ -35,7 +35,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="3"/>
                     <ColumnDefinition Width="200" MaxWidth="{Binding ElementName=Window, Path=ActualWidth}"/>
                 </Grid.ColumnDefinitions>
 
@@ -45,7 +45,7 @@
 
                 <GridSplitter 
                     Grid.Column="1"
-                    Width="5"
+                    Width="3"
                     HorizontalAlignment="Stretch"/>
 
                 <TabControl
