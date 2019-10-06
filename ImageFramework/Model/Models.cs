@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ImageFramework.Annotations;
 using ImageFramework.Controller;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
@@ -18,7 +21,7 @@ using Device = ImageFramework.DirectX.Device;
 
 namespace ImageFramework.Model
 {
-    public class Models : IDisposable
+    public class Models : IDisposable, INotifyPropertyChanged
     {
         public static readonly CultureInfo Culture = new CultureInfo("en-US");
 
@@ -26,6 +29,8 @@ namespace ImageFramework.Model
         public ImagesModel Images { get; }
         public FiltersModel Filter { get; }
         public IReadOnlyList<ImagePipeline> Pipelines { get; }
+
+        public int NumEnabled => Pipelines.Count(pipe => pipe.IsEnabled);
 
         public ExportModel Export { get; }
 
@@ -58,11 +63,22 @@ namespace ImageFramework.Model
             for (int i = 0; i < numPipelines; ++i)
             {
                 pipelines.Add(new ImagePipeline(i));
+                pipelines.Last().PropertyChanged += PipeOnPropertyChanged;
             }
             Pipelines = pipelines;
 
             // pipeline controller
             pipelineController = new PipelineController(this);
+        }
+
+        private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ImagePipeline.IsEnabled):
+                    OnPropertyChanged(nameof(NumEnabled));
+                    break;
+            }
         }
 
         /// <summary>
@@ -138,6 +154,31 @@ namespace ImageFramework.Model
         }
 
         /// <summary>
+        /// returns ids of all enabled pipeline
+        /// </summary>
+        public List<int> GetEnabledPipelines()
+        {
+            var res = new List<int>();
+            for(int i = 0; i < Pipelines.Count; ++i)
+                if(Pipelines[i].IsEnabled)
+                    res.Add(i);
+
+            return res;
+        }
+
+        /// <summary>
+        /// returns the id of the first enabled pipeline
+        /// throws exception if nothing is visible
+        /// </summary>
+        public int GetFirstEnabledPipeline()
+        {
+            for(int i = 0; i < Pipelines.Count; ++i)
+                if (Pipelines[i].IsEnabled)
+                    return i;
+            throw new Exception("no pipeline enabled");
+        }
+
+        /// <summary>
         /// Forces all pending pipeline changes to be computed
         /// </summary>
         public void Apply()
@@ -197,6 +238,14 @@ namespace ImageFramework.Model
             }
             pipelineController?.Dispose();
             pixelValueShader?.Dispose();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

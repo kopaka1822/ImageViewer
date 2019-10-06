@@ -89,7 +89,6 @@
     <Compile Include="Commands\SetThemeCommand.cs" />
     <Compile Include="Commands\SimpleCommand.cs" />
     <Compile Include="Controller\ImportDialogController.cs" />
-    <Compile Include="Models\EquatinsModel.cs" />
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="ViewModels\DisplayViewModel.cs" />
     <Compile Include="ViewModels\ViewModels.cs" />

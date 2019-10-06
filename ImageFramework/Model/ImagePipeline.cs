@@ -60,6 +60,22 @@ namespace ImageFramework.Model
             }
         }
 
+        private bool isEnabled = true;
+        
+        /// <summary>
+        /// indicates if this formula will be updated during a call to apply
+        /// </summary>
+        public bool IsEnabled
+        {
+            get => isEnabled;
+            set
+            {
+                if(value == isEnabled) return;
+                isEnabled = value;
+                OnPropertyChanged(nameof(IsEnabled));
+            }
+        }
+
         private bool hasChanges = true;
 
         /// <summary>

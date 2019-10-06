@@ -325,4 +325,23 @@ namespace ImageViewer.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
+
+    /// <summary>
+    /// extension methods for view mode enumeration
+    /// </summary>
+    public static class ViewModeExtension
+    {
+        public static bool IsDegree(this DisplayModel.ViewMode vm)
+        {
+            switch (vm)
+            {
+                case DisplayModel.ViewMode.CubeCrossView:
+                case DisplayModel.ViewMode.Single:
+                case DisplayModel.ViewMode.Empty:
+                    return false;
+                default:
+                    return true;
+            }
+        }
+    }
 }
