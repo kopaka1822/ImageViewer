@@ -13,7 +13,7 @@
 - [x] custom parameters in filter (int, float, bool, image)
 - [x] generate/delete image mipmaps
 - [x] get basic image statistics (average, min, max)
-- [ ] import custom formula as image
+- [x] import custom formula as image
 - [ ] generate cube map from 6 images
 
 # Image Viewer Requirements
