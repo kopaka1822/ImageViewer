@@ -61,18 +61,18 @@
 
                 <!--Split Mode-->
                 <TextBlock 
-                                        Text="Split Mode:" 
-                                        Margin="0 0 0 5"/>
+                    Text="Split Mode:" 
+                    Margin="0 0 0 5"/>
                 <ComboBox 
-                                        Margin="0 0 0 5"
-                                        IsEnabled="{Binding Display.EnableSplitMode}"
-                                        SelectedItem="{Binding Display.SelectedSplitMode}"
-                                        ItemsSource="{Binding Display.AvailableSplitModes}"/>
+                    Margin="0 0 0 5"
+                    IsEnabled="{Binding Display.EnableSplitMode}"
+                    SelectedItem="{Binding Display.SelectedSplitMode}"
+                    ItemsSource="{Binding Display.AvailableSplitModes}"/>
 
                 <!--Equation 1-->
                 <GroupBox 
-                                        Header="Equation 1" 
-                                        Margin="0 0 0 5">
+                    Header="Equation 1" 
+                    Margin="0 0 0 5">
                     <StackPanel>
                         <Grid Margin="0 5 0 5">
                             <Grid.ColumnDefinitions>
@@ -81,8 +81,8 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Visible: "/>
                             <CheckBox 
-                                                    Grid.Column="1"
-                                                    IsChecked="{Binding Equations.Equation1.IsVisible}"/>
+                                Grid.Column="1"
+                                IsChecked="{Binding Equations.Equation1.IsVisible}"/>
                         </Grid>
                         <Grid Margin="0 0 0 5">
                             <Grid.ColumnDefinitions>
@@ -91,9 +91,9 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Use Filter: "/>
                             <CheckBox 
-                                                    Grid.Column="1"
-                                                    IsChecked="{Binding Equations.Equation1.UseFilter}"
-                                                    IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
+                                Grid.Column="1"
+                                IsChecked="{Binding Equations.Equation1.UseFilter}"
+                                IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
                         </Grid>
                         <Grid Margin="0 0 0 5">
                             <Grid.ColumnDefinitions>
@@ -102,10 +102,10 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="RGB: "/>
                             <local:CustomTextBox 
-                                                    Grid.Column="1"
-                                                    Text="{Binding Equations.Equation1.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                                    Margin="0 0 0 5"
-                                                    IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
+                                Grid.Column="1"
+                                Text="{Binding Equations.Equation1.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                Margin="0 0 0 5"
+                                IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
                         </Grid>
                         <Grid Margin="0 0 0 5">
                             <Grid.ColumnDefinitions>
@@ -114,18 +114,18 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Alpha: "/>
                             <local:CustomTextBox 
-                                                    Grid.Column="1"
-                                                    Text="{Binding Equations.Equation1.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                                    Margin="0 0 0 5"
-                                                    IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
+                                Grid.Column="1"
+                                Text="{Binding Equations.Equation1.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                Margin="0 0 0 5"
+                                IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
                         </Grid>
                     </StackPanel>
                 </GroupBox>
 
                 <!--Equation 2-->
                 <GroupBox 
-                                        Header="Equation 2" 
-                                        Margin="0 0 0 5">
+                    Header="Equation 2" 
+                    Margin="0 0 0 5">
                     <StackPanel>
                         <Grid Margin="0 5 0 5">
                             <Grid.ColumnDefinitions>
@@ -134,8 +134,8 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Visible: "/>
                             <CheckBox 
-                                                    Grid.Column="1"
-                                                    IsChecked="{Binding Equations.Equation2.IsVisible}"/>
+                                Grid.Column="1"
+                                IsChecked="{Binding Equations.Equation2.IsVisible}"/>
                         </Grid>
                         <Grid Margin="0 0 0 5">
                             <Grid.ColumnDefinitions>
@@ -144,9 +144,9 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Use Filter: "/>
                             <CheckBox 
-                                                    Grid.Column="1"
-                                                    IsChecked="{Binding Equations.Equation2.UseFilter}"
-                                                    IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
+                                Grid.Column="1"
+                                IsChecked="{Binding Equations.Equation2.UseFilter}"
+                                IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
                         </Grid>
                         <Grid Margin="0 0 0 5">
                             <Grid.ColumnDefinitions>
@@ -155,10 +155,10 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="RGB: "/>
                             <local:CustomTextBox 
-                                                    Grid.Column="1"
-                                                    Text="{Binding Equations.Equation2.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                                    Margin="0 0 0 5"
-                                                    IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
+                                Grid.Column="1"
+                                Text="{Binding Equations.Equation2.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                Margin="0 0 0 5"
+                                IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
                         </Grid>
                         <Grid Margin="0 0 0 5">
                             <Grid.ColumnDefinitions>
@@ -167,18 +167,18 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Alpha: " Height="23" VerticalAlignment="Top"/>
                             <local:CustomTextBox 
-                                                    Grid.Column="1"
-                                                    Text="{Binding Equations.Equation2.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                                    Margin="0 0 0 5"
-                                                    IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
+                                Grid.Column="1"
+                                Text="{Binding Equations.Equation2.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                Margin="0 0 0 5"
+                                IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
                         </Grid>
                     </StackPanel>
                 </GroupBox>
 
                 <!--Equation 3-->
                 <GroupBox 
-                                        Header="Equation 3" 
-                                        Margin="0 0 0 5">
+                    Header="Equation 3" 
+                    Margin="0 0 0 5">
                     <StackPanel>
                         <Grid Margin="0 5 0 5">
                             <Grid.ColumnDefinitions>
@@ -187,8 +187,8 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Visible: "/>
                             <CheckBox 
-                                                    Grid.Column="1"
-                                                    IsChecked="{Binding Equations.Equation3.IsVisible}"/>
+                                Grid.Column="1"
+                                IsChecked="{Binding Equations.Equation3.IsVisible}"/>
                         </Grid>
                         <Grid Margin="0 0 0 5">
                             <Grid.ColumnDefinitions>
@@ -197,9 +197,9 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Use Filter: "/>
                             <CheckBox 
-                                                    Grid.Column="1"
-                                                    IsChecked="{Binding Equations.Equation3.UseFilter}"
-                                                    IsEnabled="{Binding Equations.Equation3.IsVisible}"/>
+                                Grid.Column="1"
+                                IsChecked="{Binding Equations.Equation3.UseFilter}"
+                                IsEnabled="{Binding Equations.Equation3.IsVisible}"/>
                         </Grid>
                         <Grid Margin="0 0 0 5">
                             <Grid.ColumnDefinitions>
@@ -208,10 +208,10 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="RGB: "/>
                             <local:CustomTextBox 
-                                                    Grid.Column="1"
-                                                    Text="{Binding Equations.Equation3.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                                    Margin="0 0 0 5"
-                                                    IsEnabled="{Binding Equations.Equation3.IsVisible}"/>
+                                Grid.Column="1"
+                                Text="{Binding Equations.Equation3.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                Margin="0 0 0 5"
+                                IsEnabled="{Binding Equations.Equation3.IsVisible}"/>
                         </Grid>
                         <Grid Margin="0 0 0 5">
                             <Grid.ColumnDefinitions>
@@ -220,18 +220,18 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Alpha: " Height="23" VerticalAlignment="Top"/>
                             <local:CustomTextBox 
-                                                    Grid.Column="1"
-                                                    Text="{Binding Equations.Equation3.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                                    Margin="0 0 0 5"
-                                                    IsEnabled="{Binding Equations.Equation3.IsVisible}"/>
+                                Grid.Column="1"
+                                Text="{Binding Equations.Equation3.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                Margin="0 0 0 5"
+                                IsEnabled="{Binding Equations.Equation3.IsVisible}"/>
                         </Grid>
                     </StackPanel>
                 </GroupBox>
 
                 <!--Equation 4-->
                 <GroupBox 
-                                        Header="Equation 4" 
-                                        Margin="0 0 0 5">
+                    Header="Equation 4" 
+                    Margin="0 0 0 5">
                     <StackPanel>
                         <Grid Margin="0 5 0 5">
                             <Grid.ColumnDefinitions>
@@ -240,8 +240,8 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Visible: "/>
                             <CheckBox 
-                                                    Grid.Column="1"
-                                                    IsChecked="{Binding Equations.Equation4.IsVisible}"/>
+                                Grid.Column="1"
+                                IsChecked="{Binding Equations.Equation4.IsVisible}"/>
                         </Grid>
                         <Grid Margin="0 0 0 5">
                             <Grid.ColumnDefinitions>
@@ -250,9 +250,9 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Use Filter: "/>
                             <CheckBox 
-                                                    Grid.Column="1"
-                                                    IsChecked="{Binding Equations.Equation4.UseFilter}"
-                                                    IsEnabled="{Binding Equations.Equation4.IsVisible}"/>
+                                Grid.Column="1"
+                                IsChecked="{Binding Equations.Equation4.UseFilter}"
+                                IsEnabled="{Binding Equations.Equation4.IsVisible}"/>
                         </Grid>
                         <Grid Margin="0 0 0 5">
                             <Grid.ColumnDefinitions>
@@ -261,10 +261,10 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="RGB: "/>
                             <local:CustomTextBox 
-                                                    Grid.Column="1"
-                                                    Text="{Binding Equations.Equation4.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                                    Margin="0 0 0 5"
-                                                    IsEnabled="{Binding Equations.Equation4.IsVisible}"/>
+                                Grid.Column="1"
+                                Text="{Binding Equations.Equation4.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                Margin="0 0 0 5"
+                                IsEnabled="{Binding Equations.Equation4.IsVisible}"/>
                         </Grid>
                         <Grid Margin="0 0 0 5">
                             <Grid.ColumnDefinitions>
@@ -273,10 +273,10 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Alpha: " Height="23" VerticalAlignment="Top"/>
                             <local:CustomTextBox 
-                                                    Grid.Column="1"
-                                                    Text="{Binding Equations.Equation4.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                                    Margin="0 0 0 5"
-                                                    IsEnabled="{Binding Equations.Equation4.IsVisible}"/>
+                                Grid.Column="1"
+                                Text="{Binding Equations.Equation4.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                Margin="0 0 0 5"
+                                IsEnabled="{Binding Equations.Equation4.IsVisible}"/>
                         </Grid>
                     </StackPanel>
                 </GroupBox>
