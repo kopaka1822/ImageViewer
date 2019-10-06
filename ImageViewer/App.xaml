@@ -2,8 +2,24 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:ImageViewer"
+             xmlns:theme="clr-namespace:ImageViewer.Views.Theme"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <theme:ThemeDictionary
+                    WhiteSource="Views/Theme/WhiteTheme.xaml"
+                    DarkSource="Views/Theme/DarkTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <!--<ResourceDictionary x:Key="Styles">-->
+                <Style TargetType="Control" x:Key="BaseStyle">
+                    <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+                </Style>
+            <Style TargetType="TabControl" BasedOn="{StaticResource BaseStyle}">
+
+            </Style>
+            <!--</ResourceDictionary>-->
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -51,7 +51,7 @@
                     Grid.Column="2"
                     DockPanel.Dock="Left"
                     HorizontalAlignment="Stretch"
-                    Background="#eee"
+                    
                     BorderThickness="0 0 0 0"
                     x:Name="TabControl"   
                 >
