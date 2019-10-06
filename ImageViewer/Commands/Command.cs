@@ -19,7 +19,7 @@ namespace ImageViewer.Commands
 
         public void Execute(object parameter) => Execute();
 
-        public abstract bool Execute();
+        public abstract void Execute();
 
         public event EventHandler CanExecuteChanged;
 

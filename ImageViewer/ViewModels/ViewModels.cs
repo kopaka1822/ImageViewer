@@ -27,6 +27,10 @@ namespace ImageViewer.ViewModels
             ImportEquationImageCommand = new ImportEquationImageCommand(models);
             ExportCommand = new ExportCommand(models);
 
+            ShowPixelDisplayCommand = new ShowPixelDisplayCommand(models);
+            GenerateMipmapsCommand = new GenerateMipmapsCommand(models);
+            DeleteMipmapsCommand = new DeleteMipmapsCommand(models);
+
             ResizeWindow = new ResizeWindowCommand(models);
             SetThemeCommand = new SetThemeCommand(models);
         }
@@ -47,5 +51,10 @@ namespace ImageViewer.ViewModels
         public ICommand ImportEquationImageCommand { get; }
 
         public ICommand ExportCommand { get; }
+
+        public ICommand ShowPixelDisplayCommand { get; }
+
+        public ICommand GenerateMipmapsCommand { get; }
+        public ICommand DeleteMipmapsCommand { get; }
     }
 }
