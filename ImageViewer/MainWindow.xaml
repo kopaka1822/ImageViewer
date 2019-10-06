@@ -13,7 +13,8 @@
         Height="450" 
         Width="600"
         Loaded="OnLoaded"
-        Icon="Icons/app.png">
+        Icon="Icons/app.png"
+        Style="{StaticResource WindowStyle}">
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="SizeChanged">
@@ -22,7 +23,8 @@
     </i:Interaction.Triggers>
 
     <DockPanel>
-        <views:MenuBar DockPanel.Dock="Top"/>
+        <views:MenuBar 
+                DockPanel.Dock="Top"/>
 
         <Grid>
             <Grid.RowDefinitions>
@@ -44,8 +46,7 @@
                 <GridSplitter 
                     Grid.Column="1"
                     Width="5"
-                    HorizontalAlignment="Stretch"
-                    Background="#e2e2e2"/>
+                    HorizontalAlignment="Stretch"/>
 
                 <TabControl
                     Grid.Column="2"

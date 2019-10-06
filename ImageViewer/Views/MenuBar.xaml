@@ -10,7 +10,6 @@
              d:DesignWidth="400">
     <Menu 
         DockPanel.Dock="Top" 
-        Background="#fff" 
         Padding="0 0 0 2">
 
         <MenuItem Header="File">
