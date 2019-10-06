@@ -8,6 +8,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <theme:ThemeDictionary
+                    DefaultSource="Views/Theme/DefaultTheme.xaml"
                     WhiteSource="Views/Theme/WhiteTheme.xaml"
                     DarkSource="Views/Theme/DarkTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>

@@ -10,9 +10,9 @@ namespace ImageViewer.Views.Theme
 {
     public class ThemeDictionary : ResourceDictionary
     {
-        enum Themes
+        public enum Themes
         {
-            //Default,
+            Default,
             White,
             Dark,
             Size
@@ -27,6 +27,15 @@ namespace ImageViewer.Views.Theme
                 themeIdx = 0;
 
             curTheme = (Themes) themeIdx;
+        }
+
+        public Uri DefaultSource
+        {
+            set
+            {
+                if(curTheme == Themes.Default)
+                    UpdateSource(value);
+            }
         }
 
         public Uri WhiteSource

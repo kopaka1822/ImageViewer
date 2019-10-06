@@ -19,6 +19,7 @@ namespace ImageViewer.ViewModels
 
             // commands
             ResizeWindow = new ResizeWindowCommand(models);
+            SetThemeCommand = new SetThemeCommand(models);
         }
 
         public void Dispose()
@@ -27,5 +28,7 @@ namespace ImageViewer.ViewModels
         }
 
         public ICommand ResizeWindow { get; }
+
+        public ICommand SetThemeCommand { get; }
     }
 }
