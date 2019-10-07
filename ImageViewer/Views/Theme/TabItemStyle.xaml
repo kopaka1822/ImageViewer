@@ -11,34 +11,6 @@
         </Setter>
     </Style>
 
-    <SolidColorBrush x:Key="TabItemSelectedBackground" Color="#F9F9F9"/>
-    <SolidColorBrush x:Key="TabItemHotBorderBrush" Color="#3C7FB1"/>
-    <SolidColorBrush x:Key="TabItemDisabledBorderBrush" Color="#FFC9C7BA"/>
-
-
-    <!--Disabled-->
-    <LinearGradientBrush x:Key="TabItemDisabledBackground" EndPoint="0,1" StartPoint="0,0">
-        <GradientStop Color="#b4b4b4" Offset="1"/>
-        <GradientStop Color="#dfdfdf" Offset="0"/>
-    </LinearGradientBrush>
-
-    <SolidColorBrush x:Key="TabControlInnerBorderDisabled" Color="#cfcfcf"/>
-
-    <LinearGradientBrush x:Key="TabItemSideDisabledBackground" EndPoint="0,1" StartPoint="0,0">
-        <GradientStop Color="#f4f4f4" Offset="0"/>
-        <GradientStop Color="#d7d7d7" Offset="0.7"/>
-        <GradientStop Color="#c2c2c2" Offset="1"/>
-    </LinearGradientBrush>
-
-    <LinearGradientBrush x:Key="TabItemSideDisabledBorderBrush" EndPoint="0,1" StartPoint="0,0">
-        <GradientStop Color="#f6f6f6" Offset="0"/>
-        <GradientStop Color="#f6f6f6" Offset="0.7"/>
-        <GradientStop Color="#c2c2c2" Offset="1"/>
-    </LinearGradientBrush>
-
-
-
-
     <Style TargetType="{x:Type TabItem}">
         <Setter Property="FocusVisualStyle" Value="{StaticResource TabItemFocusVisual}"/>
         <Setter Property="Foreground" Value="White"/>
@@ -75,9 +47,9 @@
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
    
-                            <Setter Property="Background" TargetName="Bd" Value="{StaticResource TabItemDisabledBackground}"/>
-                            <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource TabControlInnerBorderDisabled}"/>
-                            <Setter Property="Foreground" Value="{StaticResource TabControlOuterBorderDisabled}"/>
+                            <Setter Property="Background" TargetName="Bd" Value="{StaticResource DisabledBackgroundBrush}"/>
+                            <Setter Property="BorderBrush" TargetName="Bd" Value="{StaticResource BorderBrush}"/>
+                            <Setter Property="Foreground" Value="{StaticResource DisabledFontBrush}"/>
                         </Trigger>
                         <Trigger Property="TabStripPlacement" Value="Left">
                             <Setter Property="LayoutTransform">
