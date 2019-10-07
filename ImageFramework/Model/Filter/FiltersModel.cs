@@ -104,7 +104,7 @@ namespace ImageFramework.Model.Filter
             model.PropertyChanged += (sender, e) => OnParameterChanged(model, e.PropertyName);
         }
 
-        private void DisposeUnusedFilter(IReadOnlyList<FilterModel> newList, IReadOnlyList<FilterModel> oldList)
+        public static void DisposeUnusedFilter(IReadOnlyList<FilterModel> newList, IReadOnlyList<FilterModel> oldList)
         {
             foreach (var old in oldList)
             {

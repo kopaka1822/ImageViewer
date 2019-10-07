@@ -17,6 +17,7 @@ namespace ImageViewer.ViewModels
         public ProgressViewModel Progress { get; }
 
         public ImagesViewModel Images { get; }
+        public FiltersViewModel Filter { get; }
 
         public EquationsViewModel Equations { get; }
         public ViewModels(ModelsEx models)
@@ -27,6 +28,7 @@ namespace ImageViewer.ViewModels
             Progress = new ProgressViewModel(models);
             Images = new ImagesViewModel(models);
             Equations = new EquationsViewModel(models);
+            Filter = new FiltersViewModel(models);
 
             // commands
             OpenCommand = new OpenCommand(models);
@@ -41,6 +43,8 @@ namespace ImageViewer.ViewModels
 
             ResizeWindow = new ResizeWindowCommand(models);
             SetThemeCommand = new SetThemeCommand(models);
+
+            AddFilterCommand = new AddFilterCommand(models, Filter);
         }
 
         public void Dispose()
@@ -66,5 +70,7 @@ namespace ImageViewer.ViewModels
         public ICommand DeleteMipmapsCommand { get; }
 
         public ICommand HelpCommand { get; }
+
+        public ICommand AddFilterCommand { get; }
     }
 }

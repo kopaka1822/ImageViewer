@@ -30,6 +30,7 @@ namespace ImageViewer.Models
         }
 
         public string ImagePath { get; set; }
+        public string FilterPath { get; set; }
 
         public void Save()
         {
