@@ -6,4 +6,6 @@
     <SolidColorBrush x:Key="FontColor" Color="#C8C8C8"/>
     <SolidColorBrush x:Key="HoverBrush" Color="#094771"/>
     <SolidColorBrush x:Key="ClickBrush" Color="#0d68a5"/>
+    <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="#555555"/>
+    <SolidColorBrush x:Key="DisabledFontBrush" Color="#E0E0E0"/>
 </ResourceDictionary>
