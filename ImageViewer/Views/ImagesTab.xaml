@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="300">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Border Padding="5">
+        <Border Padding="5" IsEnabled="False">
             <StackPanel IsEnabled="{Binding Progress.NotProcessing}">
                 <!--Image Label + Import Button-->
                 <Grid  Margin="0 0 0 2">
