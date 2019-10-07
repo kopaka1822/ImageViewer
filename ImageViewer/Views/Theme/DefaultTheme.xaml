@@ -8,4 +8,5 @@
     <SolidColorBrush x:Key="ClickBrush" Color="#0059B3" Opacity="0.5"/>
     <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="#F4F4F4"/>
     <SolidColorBrush x:Key="DisabledFontBrush" Color="#707070"/>
+    <SolidColorBrush x:Key="ListingBackgroundBrush" Color="White"/>
 </ResourceDictionary>
