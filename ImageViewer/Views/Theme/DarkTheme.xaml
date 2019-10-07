@@ -2,10 +2,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:ImageViewer.Views.Theme">
     <SolidColorBrush x:Key="BackgroundBrush" Color="#333333"/>
-    <SolidColorBrush x:Key="BorderBrush" Color="#555"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="#555555"/>
     <SolidColorBrush x:Key="FontBrush" Color="#C8C8C8"/>
     <SolidColorBrush x:Key="HoverBrush" Color="#094771"/>
     <SolidColorBrush x:Key="ClickBrush" Color="#0d68a5"/>
-    <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="#555555"/>
-    <SolidColorBrush x:Key="DisabledFontBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="#292929"/>
+    <SolidColorBrush x:Key="DisabledFontBrush" Color="#555555"/>
 </ResourceDictionary>

@@ -7,5 +7,5 @@
     <SolidColorBrush x:Key="HoverBrush" Color="#0074E8" Opacity="0.5"/>
     <SolidColorBrush x:Key="ClickBrush" Color="#0059B3" Opacity="0.5"/>
     <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="White"/>
-    <SolidColorBrush x:Key="DisabledFontBrush" Color="#F4F4F4"/>
+    <SolidColorBrush x:Key="DisabledFontBrush" Color="#DDDDDD"/>
 </ResourceDictionary>

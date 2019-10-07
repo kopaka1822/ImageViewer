@@ -27,13 +27,18 @@
 
             </Style>
 
-
             <Style TargetType="StatusBar" BasedOn="{StaticResource BaseStyle}"/>
 
             <Style TargetType="TextBox" BasedOn="{StaticResource BaseStyle}"/>
             <Style TargetType="Label" BasedOn="{StaticResource BaseStyle}"/>
+
             <Style TargetType="TextBlock">
                 <Setter Property="Foreground" Value="{StaticResource FontBrush}"/>
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Foreground" Value="{StaticResource DisabledFontBrush}" />
+                    </Trigger>
+                </Style.Triggers>
             </Style>
 
             <Style TargetType="Window" x:Key="WindowStyle" BasedOn="{StaticResource BaseStyle}">
