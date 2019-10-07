@@ -29,7 +29,7 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="false">
-                            <Setter TargetName="Header" Property="Background" Value="{StaticResource DisabledBackgroundBrushBrush}"/>
+                            <Setter TargetName="Header" Property="Background" Value="{StaticResource DisabledBackgroundBrush}"/>
                             <Setter TargetName="Container" Property="Background" Value="{StaticResource DisabledBackgroundBrush}"/>
                             <Setter Property="Foreground" Value="{StaticResource BorderBrush}"/>
                         </Trigger>
