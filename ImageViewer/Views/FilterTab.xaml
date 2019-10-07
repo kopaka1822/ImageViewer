@@ -8,8 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="250">
     <ScrollViewer 
-                            VerticalScrollBarVisibility="Auto"
-                            Foreground="Black">
+        VerticalScrollBarVisibility="Auto">
         <Border Padding="5">
             <StackPanel IsEnabled="{Binding Progress.NotProcessing}">
                 <!--Filter Label + Import Button-->
@@ -19,56 +18,56 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock 
-                                            Text="Filter:" 
-                                            VerticalAlignment="Center"/>
+                        Text="Filter:" 
+                        VerticalAlignment="Center"/>
                     <Button 
-                                            Grid.Column="1" 
-                                            Width="110" 
-                                            HorizontalAlignment="Right"
-                                            Command="{Binding AddFilterCommand}">
+                        Grid.Column="1" 
+                        Width="110" 
+                        HorizontalAlignment="Right"
+                        Command="{Binding AddFilterCommand}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="21"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Image 
-                                                    Source="../Icons/tonemap.png"
-                                                    Margin="0 0 5 0"/>
+                                Source="../Icons/tonemap.png"
+                                Margin="0 0 5 0"/>
                             <TextBlock 
-                                                    Grid.Column="1" 
-                                                    Text="Add Filter"/>
+                                Grid.Column="1" 
+                                Text="Add Filter"/>
                         </Grid>
                     </Button>
                 </Grid>
 
                 <ListBox 
-                                        Height="180"
-                                        ScrollViewer.VerticalScrollBarVisibility="Visible"
-                                        Margin="0 0 0 5"
-                                        ItemsSource="{Binding Filter.AvailableFilter}"
-                                        SelectedItem="{Binding Filter.SelectedFilter}"
-                                        dd:DragDrop.IsDragSource="True"
-                                        dd:DragDrop.IsDropTarget="True"
-                                        dd:DragDrop.DropHandler="{Binding Filter}">
+                    Height="180"
+                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                    Margin="0 0 0 5"
+                    ItemsSource="{Binding Filter.AvailableFilter}"
+                    SelectedItem="{Binding Filter.SelectedFilter}"
+                    dd:DragDrop.IsDragSource="True"
+                    dd:DragDrop.IsDropTarget="True"
+                    dd:DragDrop.DropHandler="{Binding Filter}">
                 </ListBox>
 
                 <StackPanel 
-                                        Orientation="Horizontal"
-                                        HorizontalAlignment="Right">
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
 
                     <Button
-                                            Content="Apply"
-                                            Width="80"
-                                            HorizontalAlignment="Right"
-                                            Margin="0 0 5 5"
-                                            Command="{Binding Filter.ApplyCommand}"/>
+                        Content="Apply"
+                        Width="80"
+                        HorizontalAlignment="Right"
+                        Margin="0 0 5 5"
+                        Command="{Binding Filter.ApplyCommand}"/>
 
                     <Button
-                                            Content="Cancel"
-                                            Width="80"
-                                            HorizontalAlignment="Right"
-                                            Margin="0 0 0 5"
-                                            Command="{Binding Filter.CancelCommand}"/>
+                        Content="Cancel"
+                        Width="80"
+                        HorizontalAlignment="Right"
+                        Margin="0 0 0 5"
+                        Command="{Binding Filter.CancelCommand}"/>
                 </StackPanel>
 
 

@@ -45,6 +45,8 @@ namespace ImageFramework.Model.Filter
             }
         }
 
+        public int NumPipelines => isPipelineEnabled.Length;
+
         private bool[] isPipelineEnabled;
 
         /// <summary>

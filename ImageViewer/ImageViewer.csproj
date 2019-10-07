@@ -80,7 +80,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\AddFilterCommand.cs" />
+    <Compile Include="Commands\ApplyFiltersCommand.cs" />
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
+    <Compile Include="Commands\CancelFiltersCommand.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\DeleteMipmapsCommand.cs" />
     <Compile Include="Commands\ExportCommand.cs" />
@@ -99,6 +102,14 @@
     <Compile Include="ViewModels\DisplayViewModel.cs" />
     <Compile Include="ViewModels\EquationsViewModel.cs" />
     <Compile Include="ViewModels\EquationViewModel.cs" />
+    <Compile Include="ViewModels\FiltersViewModel.cs" />
+    <Compile Include="ViewModels\Filter\BoolFilterParameterViewModel.cs" />
+    <Compile Include="ViewModels\Filter\FilterParametersViewModel.cs" />
+    <Compile Include="ViewModels\Filter\FilterParameterViewModelBase.cs" />
+    <Compile Include="ViewModels\Filter\FloatFilterParameterViewModel.cs" />
+    <Compile Include="ViewModels\Filter\IFilterParameterViewModel.cs" />
+    <Compile Include="ViewModels\Filter\IntFilterParameterViewModel.cs" />
+    <Compile Include="ViewModels\Filter\TextureFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\FormulaViewModel.cs" />
     <Compile Include="ViewModels\ImagesViewModel.cs" />
     <Compile Include="ViewModels\ProgressViewModel.cs" />
@@ -114,6 +125,11 @@
     <Compile Include="Views\FilterTab.xaml.cs">
       <DependentUpon>FilterTab.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Filter\BoolFilterParameterView.cs" />
+    <Compile Include="Views\Filter\FilterListBoxItem.cs" />
+    <Compile Include="Views\Filter\FloatFilterParameterView.cs" />
+    <Compile Include="Views\Filter\IntFilterParameterView.cs" />
+    <Compile Include="Views\Filter\TextureFilterParameterView.cs" />
     <Compile Include="Views\ImagesTab.xaml.cs">
       <DependentUpon>ImagesTab.xaml</DependentUpon>
     </Compile>
