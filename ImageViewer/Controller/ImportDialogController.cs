@@ -42,12 +42,19 @@ namespace ImageViewer.Controller
 
         public void ImportImage(string file)
         {
-            using (var img = IO.LoadImage(file))
+            try
             {
-                // create texture
-                var tex = new TextureArray2D(img);
+                using (var img = IO.LoadImage(file))
+                {
+                    // create texture
+                    var tex = new TextureArray2D(img);
 
-                ImportTexture(tex, file, img.OriginalFormat);
+                    ImportTexture(tex, file, img.OriginalFormat);
+                }
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e.Message);
             }
         }
 

@@ -33,10 +33,17 @@ namespace ImageViewer.Commands
             if (ofd.ShowDialog(models.Window.TopmostWindow) != true) return;
 
             // create model
-            var model = models.CreateFilter(ofd.FileName);
+            try
+            {
+                var model = models.CreateFilter(ofd.FileName);
 
-            // add to filter list
-            viewModel.AddFilter(model);
+                // add to filter list
+                viewModel.AddFilter(model);
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e.Message);
+            }
         }
     }
 }

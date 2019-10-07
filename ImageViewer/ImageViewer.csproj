@@ -96,6 +96,7 @@
     <Compile Include="Commands\SetThemeCommand.cs" />
     <Compile Include="Commands\ShowPixelDisplayCommand.cs" />
     <Compile Include="Commands\SimpleCommand.cs" />
+    <Compile Include="Controller\ComputeImageController.cs" />
     <Compile Include="Controller\ImportDialogController.cs" />
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />

@@ -15,7 +15,7 @@ namespace ImageViewer.Models
         public SettingsModel Settings { get; }
 
         private readonly ResizeController resizeController;
-
+        private readonly ComputeImageController computeImageController;
         public ModelsEx(MainWindow window)
         : base(4)
         {
@@ -28,6 +28,7 @@ namespace ImageViewer.Models
             Display = new DisplayModel(this);
 
             resizeController = new ResizeController(this);
+            computeImageController = new ComputeImageController(this);
         }
 
         public override void Dispose()
