@@ -52,7 +52,9 @@ namespace ImageFramework.DirectX
                 while (!Device.Get().GetQueryEventData(query))
                 {
                     ct.ThrowIfCancellationRequested();
-                    Thread.Yield();
+                    //Thread.Yield();
+                    
+                    Thread.Sleep(10);
                 }
 
                 isActive = false;
