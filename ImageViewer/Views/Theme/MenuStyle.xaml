@@ -8,7 +8,7 @@
 
     <Style TargetType="{x:Type Menu}">
         <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
-        <Setter Property="Foreground" Value="{StaticResource FontColor}"/>
+        <Setter Property="Foreground" Value="{StaticResource FontBrush}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Menu}">
@@ -38,7 +38,7 @@
                 </Grid.ColumnDefinitions>
                 <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Margin="1" x:Name="Icon" VerticalAlignment="Center" ContentSource="Icon"/>
                 <Border Visibility="Hidden" Margin="1" x:Name="GlyphPanel" Width="22" Height="22" Background="{StaticResource BackgroundBrush}" BorderBrush="{StaticResource BackgroundBrush}" BorderThickness="1">
-                    <Path FlowDirection="LeftToRight" x:Name="Glyph" Width="9" Height="11" Fill="{StaticResource FontColor}" Data="{StaticResource Checkmark}"/>
+                    <Path FlowDirection="LeftToRight" x:Name="Glyph" Width="9" Height="11" Fill="{StaticResource FontBrush}" Data="{StaticResource Checkmark}"/>
                 </Border>
                 <ContentPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" Margin="{TemplateBinding Padding}" Grid.Column="2" ContentSource="Header" RecognizesAccessKey="True"/>
                 <TextBlock Margin="{TemplateBinding Padding}" Grid.Column="4" Text="{TemplateBinding InputGestureText}"/>

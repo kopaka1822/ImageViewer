@@ -20,7 +20,7 @@
 
             <Style TargetType="Control" x:Key="BaseStyle">
                 <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
-                <Setter Property="Foreground" Value="{StaticResource FontColor}"/>
+                <Setter Property="Foreground" Value="{StaticResource FontBrush}"/>
             </Style>
 
             <Style TargetType="TabControl" BasedOn="{StaticResource BaseStyle}">
@@ -33,7 +33,7 @@
             <Style TargetType="TextBox" BasedOn="{StaticResource BaseStyle}"/>
             <Style TargetType="Label" BasedOn="{StaticResource BaseStyle}"/>
             <Style TargetType="TextBlock">
-                <Setter Property="Foreground" Value="{StaticResource FontColor}"/>
+                <Setter Property="Foreground" Value="{StaticResource FontBrush}"/>
             </Style>
 
             <Style TargetType="Window" x:Key="WindowStyle" BasedOn="{StaticResource BaseStyle}">
