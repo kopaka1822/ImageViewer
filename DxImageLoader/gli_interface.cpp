@@ -6,7 +6,7 @@
 
 std::unique_ptr<image::Image> gli_load(const char* filename)
 {
-	gli::texture2d_array tex(gli::load(filename));
+	gli::texture tex(gli::load(filename));
 	if (tex.empty())
 		throw std::exception("error opening file");
 	auto originalFormat = tex.format();
@@ -14,8 +14,18 @@ std::unique_ptr<image::Image> gli_load(const char* filename)
 	// convert image format if not compatible
 	if(!image::isSupported(tex.format()))
 	{
+		if (gli::is_compressed(tex.format()))
+			throw std::runtime_error("compressed texture formats are not supported yet");
+
 		const auto newFormat = image::getSupportedFormat(tex.format());
-		tex = gli::convert(tex, newFormat);
+		if(tex.base_face() > 1)
+		{
+			tex = gli::convert(gli::texture2d_array(tex), newFormat);
+		}
+		else
+		{
+			tex = gli::convert(gli::texture_cube_array(tex), newFormat);
+		}
 	}
 
 	std::unique_ptr<image::Image> res = std::make_unique<image::Image>();
