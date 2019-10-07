@@ -18,6 +18,7 @@
                 <ResourceDictionary Source="Views/Theme/ButtonStyle.xaml"/>
                 <ResourceDictionary Source="Views/Theme/GroupBoxStyle.xaml"/>
                 <ResourceDictionary Source="Views/Theme/ComboBoxStyle.xaml"/>
+                <ResourceDictionary Source="Views/Theme/CheckBoxStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <Style TargetType="Control" x:Key="BaseStyle">
