@@ -52,6 +52,10 @@
             <Style TargetType="GridSplitter" BasedOn="{StaticResource BaseStyle}">
                 <Setter Property="Background" Value="{StaticResource BorderBrush}"/>
             </Style>
+
+            <Style TargetType="ListBox" BasedOn="{StaticResource BaseStyle}">
+                <Setter Property="Background" Value="{StaticResource ListingBackgroundBrush}"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
