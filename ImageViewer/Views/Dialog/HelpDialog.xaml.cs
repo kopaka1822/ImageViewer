@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ImageViewer.Models;
 using Markdig;
+using Markdig.Renderers;
 
 namespace ImageViewer.Views.Dialog
 {
@@ -41,11 +42,26 @@ namespace ImageViewer.Views.Dialog
                 Close();
                 IsValid = false;
                 return;
-            }
+            } 
 
+            //var pipe = new MarkdownPipeline();
             // convert markup into htm
             var pipe = new Markdig.MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
             var html = Markdig.Markdown.ToHtml(text, pipe);
+
+            // get correct pixel colors
+            var bg = (SolidColorBrush)FindResource("BackgroundBrush");
+            var fg = (SolidColorBrush)FindResource("FontBrush");
+            var bgCol = new byte[]{bg.Color.R, bg.Color.G, bg.Color.B};
+            var fgCol = new byte[]{fg.Color.R, fg.Color.G, fg.Color.B};
+            var bgColString = BitConverter.ToString(bgCol).Replace("-", String.Empty);
+            var fgColString = BitConverter.ToString(fgCol).Replace("-", String.Empty);
+
+            html = $@"
+<body style=""background-color:#{bgColString}; color:#{fgColString};"">
+{html}
+</body>
+";
 
             // display markup in browser
             Browser.NavigateToString(html);
