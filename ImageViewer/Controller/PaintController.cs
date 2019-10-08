@@ -6,12 +6,15 @@ using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
 using ImageViewer.DirectX;
 using ImageViewer.Models;
+using SharpDX.Mathematics.Interop;
+using Color = ImageFramework.Utility.Color;
 
 namespace ImageViewer.Controller
 {
@@ -22,7 +25,7 @@ namespace ImageViewer.Controller
         private readonly ViewModeController viewMode;
         private SwapChain swapChain = null;
         private bool scheduledRedraw = false;
-
+        private RawColor4 clearColor;
         public PaintController(ModelsEx models)
         {
             this.models = models;
@@ -43,6 +46,15 @@ namespace ImageViewer.Controller
             }
 
             models.Window.Window.Loaded += WindowOnLoaded;
+
+            // clear color
+            var bgBrush = (SolidColorBrush)models.Window.Window.FindResource("BackgroundBrush");
+            var tmpColor = new Color(bgBrush.Color.ScR, bgBrush.Color.ScG, bgBrush.Color.ScB, 1.0f);
+            tmpColor = tmpColor.ToSrgb();
+            clearColor.R = tmpColor.Red;
+            clearColor.G = tmpColor.Green;
+            clearColor.B = tmpColor.Blue;
+            clearColor.A = 1.0f;
         }
 
         private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -111,7 +123,14 @@ namespace ImageViewer.Controller
 
             swapChain.BeginFrame();
 
-            // paint stuff
+            var dev = Device.Get();
+
+            var size = models.Window.ClientSize;
+            dev.Rasterizer.SetViewport(0.0f, 0.0f, size.Width, size.Height);
+            dev.Rasterizer.SetScissorRectangle(0, 0, size.Width, size.Height);
+            dev.ClearRenderTargetView(swapChain.Rtv, clearColor);
+            
+
             viewMode.Repaint();
 
             swapChain.EndFrame();
@@ -128,6 +147,7 @@ namespace ImageViewer.Controller
                 case nameof(DisplayModel.Aperture):
                 case nameof(DisplayModel.LinearInterpolation):
                 case nameof(DisplayModel.ShowCropRectangle):
+                case nameof(DisplayModel.Multiplier):
                     ScheduleRedraw();
                     break;
             }

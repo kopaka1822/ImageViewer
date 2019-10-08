@@ -13,7 +13,8 @@
         Height="450" 
         Width="600"
         Icon="Icons/app.png"
-        Style="{StaticResource WindowStyle}">
+        Style="{StaticResource WindowStyle}"
+        x:Name="Window">
 
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="SizeChanged">

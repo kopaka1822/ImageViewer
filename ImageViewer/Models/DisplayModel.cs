@@ -86,6 +86,20 @@ namespace ImageViewer.Models
             }
         }
 
+        private float multiplier = 1.0f;
+
+        public float Multiplier
+        {
+            get => multiplier;
+            set
+            {
+                var clamped = Math.Max(float.Epsilon, value);
+                if(clamped == multiplier) return;
+                multiplier = clamped;
+                OnPropertyChanged(nameof(Multiplier));
+            }
+        }
+
         private float aperture = (float)Math.PI / 2.0f;
         public float Aperture
         {
