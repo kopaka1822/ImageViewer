@@ -25,7 +25,8 @@ namespace ImageViewer.ViewModels
     public class FiltersViewModel : INotifyPropertyChanged, IDropTarget
     {
         private readonly ModelsEx models;
-
+        private readonly SolidColorBrush changesBrush;
+        private readonly SolidColorBrush noChangesBrush;
         private class FilterItem : IDisposable
         {
             public FilterModel Model { get; }
@@ -63,6 +64,9 @@ namespace ImageViewer.ViewModels
             this.models = models;
             this.ApplyCommand = new ApplyFiltersCommand(this);
             this.CancelCommand = new CancelFiltersCommand(this);
+
+            changesBrush = new SolidColorBrush(Color.FromRgb(237, 28, 36));
+            noChangesBrush = (SolidColorBrush)models.Window.Window.FindResource("FontBrush");
         }
 
         private List<FilterListBoxItem> availableFilter = new List<FilterListBoxItem>();
@@ -131,7 +135,7 @@ namespace ImageViewer.ViewModels
             }
         }
 
-        public Brush TabItemColor => HasChanges ? new SolidColorBrush(Color.FromRgb(237, 28, 36)) : new SolidColorBrush(Color.FromRgb(0, 0, 0));
+        public Brush TabItemColor => HasChanges ? changesBrush : noChangesBrush;
 
         public void AddFilter(FilterModel filter)
         {
