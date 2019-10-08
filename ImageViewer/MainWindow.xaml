@@ -12,7 +12,6 @@
         Title="MainWindow" 
         Height="450" 
         Width="600"
-        Loaded="OnLoaded"
         Icon="Icons/app.png"
         Style="{StaticResource WindowStyle}">
 

@@ -26,8 +26,6 @@ namespace ImageViewer
     /// </summary>
     public partial class MainWindow : Window
     {
-        private SwapChain chain = null;
-
         private ModelsEx models;
         public ViewModels.ViewModels ViewModel;
 
@@ -59,22 +57,6 @@ namespace ImageViewer
             {
                 import.ImportImage(arg);
             }
-        }
-
-
-        private void OnLoaded(object sender, RoutedEventArgs e)
-        {
-            var adapter = new SwapChainAdapter(BorderHost);
-            BorderHost.Child = adapter;
-            chain = adapter.SwapChain;
-        }
-
-        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-        {
-            chain.BeginFrame();
-
-
-            chain.EndFrame();
         }
 
         protected override void OnClosed(EventArgs e)

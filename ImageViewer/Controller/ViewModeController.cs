@@ -33,6 +33,12 @@ namespace ImageViewer.Controller
             dxHost.MouseUp += DxHostOnMouseUp;
             dxHost.MouseLeave += DxHostOnMouseLeave;
             dxHost.MouseMove += DxHostOnMouseMove;
+            models.Window.Repaint += WindowOnRepaint;
+        }
+
+        private void WindowOnRepaint(object sender, EventArgs e)
+        {
+            
         }
 
         private void DxHostOnMouseMove(object sender, MouseEventArgs e)
