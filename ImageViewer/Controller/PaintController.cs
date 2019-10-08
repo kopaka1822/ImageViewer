@@ -124,13 +124,13 @@ namespace ImageViewer.Controller
             swapChain.BeginFrame();
 
             var dev = Device.Get();
+            dev.ClearRenderTargetView(swapChain.Rtv, clearColor);
 
             var size = models.Window.ClientSize;
             dev.Rasterizer.SetViewport(0.0f, 0.0f, size.Width, size.Height);
             dev.Rasterizer.SetScissorRectangle(0, 0, size.Width, size.Height);
-            dev.ClearRenderTargetView(swapChain.Rtv, clearColor);
+            dev.OutputMerger.SetRenderTargets(swapChain.Rtv);
             
-
             viewMode.Repaint();
 
             swapChain.EndFrame();
