@@ -24,6 +24,7 @@ namespace ImageViewer.Controller
         private Point mousePosition = new Point(0);
         private readonly Border dxHost;
         private ITextureView currentView = new EmptyView();
+        private TextureViewData viewData;
 
         public ViewModeController(ModelsEx models)
         {
@@ -35,6 +36,8 @@ namespace ImageViewer.Controller
             dxHost.MouseUp += DxHostOnMouseUp;
             dxHost.MouseLeave += DxHostOnMouseLeave;
             dxHost.MouseMove += DxHostOnMouseMove;
+
+            viewData = new TextureViewData();
         }
 
         public void Repaint()
@@ -177,7 +180,7 @@ namespace ImageViewer.Controller
                         switch (models.Display.ActiveView)
                         {
                             case DisplayModel.ViewMode.Single:
-                                currentView = new SingleTextureView(models);
+                                currentView = new SingleTextureView(models, viewData);
                                 break;
                             case DisplayModel.ViewMode.Polar:
                                 currentView = new PolarTextureView(models);
@@ -186,7 +189,7 @@ namespace ImageViewer.Controller
                                 currentView = new CubeTextureView(models);
                                 break;
                             case DisplayModel.ViewMode.CubeCrossView:
-                                currentView = new CubeCrossTextureView(models);
+                                currentView = new CubeCrossTextureView(models, viewData);
                                 break;
                             default:
                                 currentView = new EmptyView();
@@ -204,6 +207,7 @@ namespace ImageViewer.Controller
         public void Dispose()
         {
             currentView?.Dispose();
+            viewData?.Dispose();
         }
     }
 }

@@ -109,5 +109,40 @@ float4 toSrgb(float4 c){
     return float4(r, c.a);
 }";
         }
+
+        public struct Int2
+        {
+            public int X;
+            public int Y;
+        }
+
+        /// <summary>
+        /// transforms coordinates from [-1, 1] to [0, imagesize - 1].
+        /// clamps values if coordinates are not within range
+        /// </summary>
+        /// <param name="x">[-1, 1]</param>
+        /// <param name="y">[-1, 1]</param>
+        /// <param name="imageWidth">width in pixels</param>
+        /// <param name="imageHeight">height in pixel</param>
+        /// <returns></returns>
+        public static Int2 CanonicalToTexelCoordinates(float x, float y, int imageWidth, int imageHeight)
+        {
+            // trans mouse is betweem [-1,1] in texture coordinates => to [0,1]
+            x += 1.0f;
+            x /= 2.0f;
+
+            y += 1.0f;
+            y /= 2.0f;
+
+            // clamp value
+            x = Math.Min(0.9999f, Math.Max(0.0f, x));
+            y = Math.Min(0.9999f, Math.Max(0.0f, y));
+
+            // scale with mipmap level
+            x *= (float)imageWidth;
+            y *= (float)imageHeight;
+
+            return new Int2{X = (int)(x), Y = (int)(y)};
+        }
     }
 }
