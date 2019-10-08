@@ -18,7 +18,7 @@ namespace ImageViewer.Models
 
         private readonly ResizeController resizeController;
         private readonly ComputeImageController computeImageController;
-        private readonly ViewModeController viewModeController;
+        private readonly PaintController paintController;
         public ModelsEx(MainWindow window)
         : base(4)
         {
@@ -37,13 +37,13 @@ namespace ImageViewer.Models
 
             resizeController = new ResizeController(this);
             computeImageController = new ComputeImageController(this);
-            viewModeController = new ViewModeController(this);
+            paintController = new PaintController(this);
         }
 
         public override void Dispose()
         {
             Settings?.Save();
-            viewModeController?.Dispose();
+            paintController?.Dispose();
             base.Dispose();
         }
     }
