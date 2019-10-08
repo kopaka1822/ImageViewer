@@ -16,7 +16,10 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <WebBrowser x:Name="Browser"/>
+        <WebBrowser 
+            x:Name="Browser"
+            
+            />
         <Button 
             Grid.Row="1"
             Content="OK"
