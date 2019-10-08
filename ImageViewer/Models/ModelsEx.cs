@@ -14,6 +14,8 @@ namespace ImageViewer.Models
 
         public SettingsModel Settings { get; }
 
+        public IReadOnlyList<StatisticModel> Statistics { get; }
+
         private readonly ResizeController resizeController;
 
         public ModelsEx(MainWindow window)
@@ -26,6 +28,11 @@ namespace ImageViewer.Models
             Settings = new SettingsModel();
             Window = new WindowModel(window);
             Display = new DisplayModel(this);
+
+            var stats = new List<StatisticModel>();
+            for(int i = 0; i < NumPipelines; ++i)
+                stats.Add(new StatisticModel(this, i));
+            Statistics = stats;
 
             resizeController = new ResizeController(this);
         }

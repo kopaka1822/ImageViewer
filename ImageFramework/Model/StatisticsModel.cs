@@ -15,5 +15,7 @@ namespace ImageFramework.Model
         /// image has an active alpha channel if at least one pixel has alpha unequal to one
         /// </summary>
         public bool HasAlpha => Min.Alpha < 1.0f || Max.Alpha > 1.0f;
+
+        public static readonly StatisticsModel Zero = new StatisticsModel{Avg = DefaultStatistics.Zero, Max = DefaultStatistics.Zero, Min = DefaultStatistics.Zero};
     }
 }
