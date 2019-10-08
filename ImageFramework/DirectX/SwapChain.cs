@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace ImageFramework.DirectX
         private readonly SharpDX.DXGI.SwapChain chain;
         private readonly int bufferCount = 2;
         private readonly SwapChainFlags flags = SwapChainFlags.None;
-        private float col = 0.0f;
+        private RenderTargetView curView;
 
         public SwapChain(IntPtr hwnd, int width, int height)
         {
@@ -26,12 +27,24 @@ namespace ImageFramework.DirectX
                 ModeDescription = new ModeDescription(width, height, new Rational(0, 1), Format.R8G8B8A8_UNorm),
                 OutputHandle = hwnd,
                 SampleDescription = new SampleDescription(1, 0),
-                SwapEffect = SwapEffect.Discard,
+                SwapEffect = SwapEffect.FlipDiscard,
                 Usage = Usage.RenderTargetOutput
             };
 
             var device = Device.Get();
             chain = new SharpDX.DXGI.SwapChain(device.FactoryHandle, device.Handle, desc);
+        }
+
+        /// <summary>
+        /// current render target view
+        /// </summary>
+        public RenderTargetView Rtv
+        {
+            get
+            {
+                Debug.Assert(curView != null);
+                return curView;
+            }
         }
 
         public void Resize(int width, int height)
@@ -41,21 +54,19 @@ namespace ImageFramework.DirectX
 
         public void BeginFrame()
         {
+            Debug.Assert(curView == null);
+
             using (var backBuffer = chain.GetBackBuffer<Texture2D>(0))
             {
-                using (var renderTarget = new RenderTargetView(Device.Get().Handle, backBuffer))
-                {
-                    col = 1.0f - col;
-                    Device.Get().ClearRenderTargetView(renderTarget, new RawColor4(col, 0.0f, 0.0f, 1.0f));
-                }
+                curView = new RenderTargetView(Device.Get().Handle, backBuffer);
             }
-           
         }
 
         public void EndFrame()
         {
             chain.Present(1, PresentFlags.None);
-            
+            curView?.Dispose();
+            curView = null;
         }
 
         public void Dispose()
