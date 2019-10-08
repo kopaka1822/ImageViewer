@@ -44,21 +44,14 @@ namespace ImageFramework.DirectX
         /// <summary>
         /// waits for the query to finish
         /// </summary>
-        public Task WaitForGpuAsync(CancellationToken ct)
+        public async Task WaitForGpuAsync(CancellationToken ct)
         {
             Debug.Assert(isActive);
-            return Task.Run(() =>
-            {
-                while (!Device.Get().GetQueryEventData(query))
-                {
-                    ct.ThrowIfCancellationRequested();
-                    //Thread.Yield();
-                    
-                    Thread.Sleep(10);
-                }
 
-                isActive = false;
-            }, ct);
+            while (!Device.Get().GetQueryEventData(query))
+            {
+                await Task.Delay(10, ct);
+            }
         }
 
         public void Dispose()
