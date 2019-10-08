@@ -17,7 +17,8 @@ namespace ImageViewer.ViewModels
     {
         private readonly EquationViewModel[] viewModels;
         private readonly ModelsEx models;
-
+        private readonly SolidColorBrush changesBrush;
+        private readonly SolidColorBrush noChangesBrush;
         public EquationsViewModel(ModelsEx models)
         {
             this.models = models;
@@ -28,6 +29,9 @@ namespace ImageViewer.ViewModels
                 viewModels[i] = new EquationViewModel(models, i);
                 viewModels[i].PropertyChanged += OnPropertyChanged;
             }
+
+            changesBrush = new SolidColorBrush(Color.FromRgb(237, 28, 36));
+            noChangesBrush = (SolidColorBrush) models.Window.Window.FindResource("FontBrush");
         }
 
         private void UpdateHasChanges()
@@ -78,7 +82,7 @@ namespace ImageViewer.ViewModels
             }
         }
 
-        public Brush TabItemColor => HasChanges ? new SolidColorBrush(Color.FromRgb(237, 28, 36)) : new SolidColorBrush(Color.FromRgb(0, 0, 0));
+        public Brush TabItemColor => HasChanges ? changesBrush : noChangesBrush;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
