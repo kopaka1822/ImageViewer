@@ -7,7 +7,10 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using ImageFramework.Annotations;
+using ImageFramework.DirectX;
+using ImageViewer.DirectX;
 using Size = System.Drawing.Size;
 
 namespace ImageViewer.Models
@@ -15,6 +18,8 @@ namespace ImageViewer.Models
     public class WindowModel : INotifyPropertyChanged
     {
         public MainWindow Window { get; }
+
+        private SwapChain swapChain = null;
         public Window TopmostWindow => windowStack.Peek();
 
         private readonly Stack<Window> windowStack = new Stack<Window>();
@@ -22,6 +27,8 @@ namespace ImageViewer.Models
 
         public string ExecutionPath { get; }
         public string AssemblyPath { get; }
+
+        public event EventHandler Repaint;
 
         public WindowModel(MainWindow window)
         {
@@ -51,6 +58,10 @@ namespace ImageViewer.Models
 
         private void WindowOnLoaded(object sender, RoutedEventArgs e)
         {
+            var adapter = new SwapChainAdapter(Window.BorderHost);
+            Window.BorderHost.Child = adapter;
+            swapChain = adapter.SwapChain;
+
             // set initial client size dimensions
             var source = PresentationSource.FromVisual(Window);
             var scalingX = source.CompositionTarget.TransformToDevice.M11;
@@ -79,7 +90,11 @@ namespace ImageViewer.Models
         /// </summary>
         public void RedrawFrame()
         {
-            throw new NotImplementedException();
+            if (!issuedRedraw)
+            {
+                Dispatcher.CurrentDispatcher.BeginInvoke((Action) OnRepaint);
+                issuedRedraw = true;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -103,6 +118,16 @@ namespace ImageViewer.Models
             
             MessageBox.Show(TopmostWindow, message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 #endif
+        }
+
+        protected virtual void OnRepaint()
+        {
+            issuedRedraw = false;
+            if (swapChain == null) return;
+
+            swapChain.BeginFrame();
+            Repaint?.Invoke(this, EventArgs.Empty);
+            swapChain.EndFrame();
         }
     }
 }
