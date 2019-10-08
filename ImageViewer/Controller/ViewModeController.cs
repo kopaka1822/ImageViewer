@@ -33,10 +33,9 @@ namespace ImageViewer.Controller
             dxHost.MouseUp += DxHostOnMouseUp;
             dxHost.MouseLeave += DxHostOnMouseLeave;
             dxHost.MouseMove += DxHostOnMouseMove;
-            models.Window.Repaint += WindowOnRepaint;
         }
 
-        private void WindowOnRepaint(object sender, EventArgs e)
+        public void Repaint()
         {
             
         }
@@ -63,8 +62,6 @@ namespace ImageViewer.Controller
 
             models.Display.TexelPosition = currentView.GetTexelPosition(
                 ConvertToCanonical(new Vector2(mousePosition.X, mousePosition.Y)));
-
-            models.Window.RedrawFrame();
         }
 
         private void DxHostOnMouseLeave(object sender, MouseEventArgs e)
@@ -101,8 +98,6 @@ namespace ImageViewer.Controller
             );
 
             models.Display.TexelPosition = currentView.GetTexelPosition(canMouse);
-
-            models.Window.RedrawFrame();
         }
 
         private Vector2 ConvertToCanonical(Vector2 windowCoord)
@@ -140,20 +135,11 @@ namespace ImageViewer.Controller
                                 currentView = new EmptyView();
                                 break;
                         }
-                        
-                        models.Window.RedrawFrame();
                     }
                     catch (Exception err)
                     {
                         models.Window.ShowErrorDialog(err.Message);
                     }
-                    break;
-
-                case nameof(DisplayModel.ActiveLayer):
-                case nameof(DisplayModel.ActiveMipmap):
-                case nameof(DisplayModel.Zoom):
-                case nameof(DisplayModel.Aperture):
-                    this.models.Window.RedrawFrame();
                     break;
             }
         }
