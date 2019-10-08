@@ -4,44 +4,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.Utility;
 using ImageViewer.Models;
 using SharpDX;
 using Point = System.Drawing.Point;
 
 namespace ImageViewer.Controller.TextureViews
 {
-    public class SingleTextureView : ITextureView
+    public class SingleTextureView : PlainTextureView
     {
-        private readonly ModelsEx models;
-
-        public SingleTextureView(ModelsEx models)
+        public SingleTextureView(ModelsEx models, TextureViewData data)
+        : base(models, data)
         {
-            this.models = models;
         }
 
-        public void Dispose()
+        public override void Draw(TextureArray2D texture)
         {
-            throw new NotImplementedException();
+            DrawLayer(Matrix.Identity, models.Display.ActiveLayer, texture);
         }
 
-        public void Draw(TextureArray2D texture)
+        public override Point GetTexelPosition(Vector2 mouse)
         {
-            throw new NotImplementedException();
-        }
+            var transMouse = GetDirectXMouseCoordinates(mouse);
+            var pt = Utility.CanonicalToTexelCoordinates(transMouse.X, transMouse.Y,
+                models.Images.GetWidth(models.Display.ActiveMipmap),
+                models.Images.GetHeight(models.Display.ActiveMipmap));
 
-        public void OnScroll(float amount, Vector2 mouse)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void OnDrag(Vector2 diff)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Point GetTexelPosition(Vector2 mouse)
-        {
-            throw new NotImplementedException();
+            return new Point(pt.X, pt.Y);
         }
     }
 }
