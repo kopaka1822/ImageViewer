@@ -99,6 +99,7 @@
     <Compile Include="Controller\ComputeImageController.cs" />
     <Compile Include="Controller\ImportDialogController.cs" />
     <Compile Include="Models\SettingsModel.cs" />
+    <Compile Include="Models\StatisticModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
     <Compile Include="ViewModels\DisplayViewModel.cs" />
     <Compile Include="ViewModels\EquationsViewModel.cs" />
@@ -114,6 +115,8 @@
     <Compile Include="ViewModels\FormulaViewModel.cs" />
     <Compile Include="ViewModels\ImagesViewModel.cs" />
     <Compile Include="ViewModels\ProgressViewModel.cs" />
+    <Compile Include="ViewModels\StatisticsViewModel.cs" />
+    <Compile Include="ViewModels\StatisticViewModel.cs" />
     <Compile Include="ViewModels\ViewModels.cs" />
     <Compile Include="Views\ComboBoxItem.cs" />
     <Compile Include="Views\CustomTextBox.cs" />

@@ -6,7 +6,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Annotations;
+using ImageFramework.Model.Shader;
 using ImageViewer.Properties;
+using ImageViewer.ViewModels;
 using ImageViewer.Views.Theme;
 
 namespace ImageViewer.Models
@@ -31,6 +33,8 @@ namespace ImageViewer.Models
 
         public string ImagePath { get; set; }
         public string FilterPath { get; set; }
+
+        public DefaultStatistics.Values StatisticsChannel { get; set; }
 
         public void Save()
         {

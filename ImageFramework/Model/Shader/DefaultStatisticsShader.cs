@@ -1,10 +1,19 @@
 ﻿using System;
+using System.Diagnostics;
 using ImageFramework.Utility;
 
 namespace ImageFramework.Model.Shader
 {
     public struct DefaultStatistics
     {
+        public enum Values
+        {
+            Luminance,
+            Luma,
+            Lightness,
+            Alpha
+        }
+
         // luminance: http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/POYNTON1/ColorFAQ.html#RTFToC3
         public float Luminance;
         // luma: http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/POYNTON1/ColorFAQ.html#RTFToC11
@@ -12,6 +21,24 @@ namespace ImageFramework.Model.Shader
         // CIELAB lightness (0-100): http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/POYNTON1/ColorFAQ.html#RTFToC4
         public float Lightness;
         public float Alpha;
+        public static readonly DefaultStatistics Zero = new DefaultStatistics{Alpha = 0.0f, Luminance = 0.0f, Lightness = 0.0f, Luma = 0.0f};
+
+        public float Get(Values value)
+        {
+            switch (value)
+            {
+                case Values.Luminance:
+                    return Luminance;
+                case Values.Luma:
+                    return Luma;
+                case Values.Lightness:
+                    return Lightness;
+                case Values.Alpha:
+                    return Alpha;
+            }
+            Debug.Assert(false);
+            return 0.0f;
+        }
     }
 
     internal class DefaultStatisticsShader : StatisticsShader<DefaultStatistics>

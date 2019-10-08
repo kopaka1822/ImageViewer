@@ -9,29 +9,22 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Border Padding="5">
             <StackPanel>
-                <TextBlock 
-                                        Text="Color Space:"
-                                        Margin="0 0 0 2"/>
-                <ComboBox
-                                        Margin="0 0 0 5"
-                                        ItemsSource="{Binding Statistics.AvailableColorSpaces}"
-                                        SelectedItem="{Binding Statistics.SelectedColorSpace}"/>
                 <TextBlock
-                                        Text="Component"
-                                        Margin="0 0 0 2"/>
+                    Text="Component"
+                    Margin="0 0 0 2"/>
                 <ComboBox
-                                        Margin="0 0 0 5"
-                                        ItemsSource="{Binding Statistics.AvailableChannels}"
-                                        SelectedItem="{Binding Statistics.SelectedChannel}"/>
+                    Margin="0 0 0 5"
+                    ItemsSource="{Binding Statistics.AvailableChannels}"
+                    SelectedItem="{Binding Statistics.SelectedChannel}"/>
                 <TextBlock 
-                                        Text="Double click box to copy content to clipboard"
-                                        Margin="0 0 0 5"
-                                        TextWrapping="Wrap"/>
+                    Text="Double click box to copy content to clipboard"
+                    Margin="0 0 0 5"
+                    TextWrapping="Wrap"/>
 
                 <GroupBox
-                                        Header="Equation 1"
-                                        Margin="0 0 0 5"
-                                        Visibility="{Binding Statistics.Equation1.Visibility}">
+                    Header="Equation 1"
+                    Margin="0 0 0 5"
+                    Visibility="{Binding Statistics.Equation1.Visibility}">
 
                     <Grid>
                         <Grid.ColumnDefinitions>
