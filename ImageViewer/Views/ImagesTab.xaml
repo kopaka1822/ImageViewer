@@ -6,9 +6,11 @@
              xmlns:local="clr-namespace:ImageViewer.Views" 
              xmlns:dd="urn:gong-wpf-dragdrop"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="300">
+             d:DesignHeight="450" 
+             d:DesignWidth="300"
+             >
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Border Padding="5" IsEnabled="False">
+        <Border Padding="5">
             <StackPanel IsEnabled="{Binding Progress.NotProcessing}">
                 <!--Image Label + Import Button-->
                 <Grid  Margin="0 0 0 2">

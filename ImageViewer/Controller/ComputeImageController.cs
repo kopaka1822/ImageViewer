@@ -14,7 +14,7 @@ namespace ImageViewer.Controller
     public class ComputeImageController
     {
         private readonly ModelsEx models;
-        private bool isRunning = false;
+        private bool scheduled = false;
 
         public ComputeImageController(ModelsEx models)
         {
@@ -33,29 +33,37 @@ namespace ImageViewer.Controller
                 case nameof(ImagePipeline.Image):
                     // if image changed to null => recompute
                     if(pipe.Image == null)
-                        SheduleRecompute();
+                        ScheduleRecompute();
                     break;
                 case nameof(ImagePipeline.IsValid):
                     // if image changed from invalid to valid => recompute
                     if(pipe.IsValid)
-                        SheduleRecompute();
+                        ScheduleRecompute();
+                    break;
+                case nameof(ImagePipeline.IsEnabled):
+                    // change from not enabled to enabled
+                    if(pipe.IsEnabled)
+                        ScheduleRecompute();
                     break;
             }
         }
 
-        private void SheduleRecompute()
+        private void ScheduleRecompute()
         {
+            if (scheduled) return;
+            scheduled = true;
             Dispatcher.CurrentDispatcher.BeginInvoke((Action)(Execute));
         }
 
         public void Execute()
         {
+#pragma warning disable 4014
             ExecuteAsync();
+#pragma warning restore 4014
         }
 
         private async Task ExecuteAsync()
         {
-            isRunning = true;
             try
             {
                 var cts = new CancellationTokenSource();
@@ -63,7 +71,7 @@ namespace ImageViewer.Controller
             }
             finally
             {
-                isRunning = false;
+                scheduled = false;
             }
         }
     }
