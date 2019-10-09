@@ -65,7 +65,7 @@ VertexOut main(uint id: SV_VertexID) {{
     canonical = texcoord * float2(2, -2) + float2(-1, 1);
 
     o.projPos = float4(canonical, 0, 1);
-    o.projPos = transform * o.projPos;
+    o.projPos = mul(transform, o.projPos);
 
     o.viewDir = normalize((transform * float4(canonical.xy, farplane, 0.0)).xyz);    
 
@@ -80,7 +80,7 @@ VertexOut main(uint id: SV_VertexID) {{
             return $@"
 TextureCube<float4> tex : register(t0);
 
-SamplerState sampler : register(s0);
+SamplerState texSampler : register(s0);
 
 cbuffer InfoBuffer : register(b0) {{
     matrix transform;
@@ -92,7 +92,7 @@ cbuffer InfoBuffer : register(b0) {{
 {Utility.ToSrgbFunction()}
 
 float4 main(float3 viewDir : VIEWDIR) : SV_TARGET {{
-    float4 color = tex.Sample(sampler, viewDir);
+    float4 color = tex.Sample(texSampler, viewDir);
     color.rgb *= multiplier;
     // TODO cropping?
     return toSrgb(color);

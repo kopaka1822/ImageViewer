@@ -61,31 +61,38 @@ namespace ImageFramework.DirectX
         {
             ShaderType = type;
 
-            using (var byteCode = ShaderBytecode.Compile(
-                source,
-                "main",
-                GetProfile(type),
-                flags,
-                EffectFlags.None,
-                debugName,
-                SecondaryDataFlags.None,
-                null))
+            try
             {
-                switch (type)
+                using (var byteCode = ShaderBytecode.Compile(
+                    source,
+                    "main",
+                    GetProfile(type),
+                    flags,
+                    EffectFlags.None,
+                    debugName,
+                    SecondaryDataFlags.None,
+                    null))
                 {
-                    case Type.Vertex:
-                        vertex = new VertexShader(Device.Get().Handle, byteCode);
-                        break;
-                    case Type.Pixel:
-                        pixel = new PixelShader(Device.Get().Handle, byteCode);
-                        break;
-                    case Type.Compute:
-                        compute = new ComputeShader(Device.Get().Handle, byteCode);
-                        break;
-                    default:
-                        Debug.Assert(false);
-                        break;
+                    switch (type)
+                    {
+                        case Type.Vertex:
+                            vertex = new VertexShader(Device.Get().Handle, byteCode);
+                            break;
+                        case Type.Pixel:
+                            pixel = new PixelShader(Device.Get().Handle, byteCode);
+                            break;
+                        case Type.Compute:
+                            compute = new ComputeShader(Device.Get().Handle, byteCode);
+                            break;
+                        default:
+                            Debug.Assert(false);
+                            break;
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"{debugName} compilation failed: {e.Message}\nsource:\n{source}");
             }
         }
 

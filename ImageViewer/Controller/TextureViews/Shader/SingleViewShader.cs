@@ -62,7 +62,7 @@ VertexOut main(uint id: SV_VertexID) {{
     VertexOut o;
     o.texcoord = float2((id << 1) & 2, id & 2);
     o.projPos = float4(o.texcoord * float2(2, -2) + float2(-1, 1), 0, 1);
-    o.projPos = transform * o.projPos;
+    o.projPos = mul(transform, o.projPos);
     return o;
 }};
 ";
@@ -73,7 +73,7 @@ VertexOut main(uint id: SV_VertexID) {{
             return $@"
 Texture2D<float4> tex : register(t0);
 
-SamplerState sampler : register(s0);
+SamplerState texSampler : register(s0);
 
 cbuffer InfoBuffer : register(b0) {{
     matrix transform;
@@ -84,7 +84,7 @@ cbuffer InfoBuffer : register(b0) {{
 {Utility.ToSrgbFunction()}
 
 float4 main(float2 texcoord : TEXCOORD) : SV_TARGET {{
-    float4 color = tex.Sample(sampler, texcoord);
+    float4 color = tex.Sample(texSampler, texcoord);
     color.rgb *= multiplier;
     {ApplyColorCrop("texcoord")}
     return toSrgb(color);
