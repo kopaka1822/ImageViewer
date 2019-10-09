@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Utility;
-using SharpDX;
 
 namespace ImageViewer.Controller.TextureViews.Shader
 {
-    public class PolarViewShader : ViewShader
+    public class CubeViewShader : ViewShader
     {
-        public PolarViewShader() 
-            : base(GetVertexSource(), GetPixelSource(), "Polar")
+        public CubeViewShader() 
+            : base(GetVertexSource(), GetPixelSource(), "Cube")
         {
 
         }
@@ -21,7 +20,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
             return $@"
 struct VertexOut {{
     float4 projPos : SV_POSITION;
-    float3 rayDir : RAYDIR;  
+    float3 viewDir : VIEWDIR;  
 }};
 
 cbuffer InfoBuffer : register(b0) {{
@@ -39,8 +38,7 @@ VertexOut main(uint id: SV_VertexID) {{
     o.projPos = float4(canonical, 0, 1);
     o.projPos = transform * o.projPos;
 
-    o.rayDir = normalize((transform * float4(canonical.xy, farplane, 0.0)).xyz);    
-    o.rayDir.y *= -1.0;
+    o.viewDir = normalize((transform * float4(canonical.xy, farplane, 0.0)).xyz);    
 
     return o;
 }};
@@ -51,7 +49,7 @@ VertexOut main(uint id: SV_VertexID) {{
         public static string GetPixelSource()
         {
             return $@"
-Texture2D<float4> tex : register(t0);
+TextureCube<float4> tex : register(t0);
 
 SamplerState sampler : register(s0);
 
@@ -64,22 +62,10 @@ cbuffer InfoBuffer : register(b0) {{
 
 {Utility.ToSrgbFunction()}
 
-float4 main(float3 raydir : RAYDIR) : SV_TARGET {{
-    const float PI = 3.14159265358979323846264;
-    float2 polarDirection;
-    float3 normalizedDirection = normalize(raydir);
-    // t computation
-    polarDirection.y = acos(normalizedDirection.y) / PI;
-    // s computation
-    polarDirection.x = normalizedDirection.x == 0 ? 
-        PI / 2.0 * sign(normalizedDirection.z) :
-        atan2(normalizedDirection.z, normalizedDirection.x);
-    polarDirection.x = polarDirection.x / (2.0 * PI) + 0.25;
-    if(polarDirection.x < 0.0) polarDirection.x += 1.0;
-    
-    float4 color = tex.Sample(sampler, polarDirection);
+float4 main(float3 viewDir : VIEWDIR) : SV_TARGET {{
+    float4 color = tex.Sample(sampler, viewDir);
     color.rgb *= multiplier;
-    {ApplyColorCrop("polarDirection")}
+    // TODO cropping?
     return toSrgb(color);
 }}
 ";

@@ -93,23 +93,18 @@ namespace ImageViewer.Controller.TextureViews
             return Matrix.Scaling(1.0f, -1.0f, 1.0f);
         }
 
-        protected void DrawLayer(Matrix offset, int layer, TextureArray2D texture)
+        protected void DrawLayer(Matrix offset, int layer, ShaderResourceView texture)
         {
-            if (texture == null) return;
-
+            var dev = ImageFramework.DirectX.Device.Get();
             var finalTransform = offset * GetTransform();
 
             // draw the checkers background
-            var dev = ImageFramework.DirectX.Device.Get();
+            data.Checkers.Run(data.Buffer, finalTransform);
 
             // blend over the final image
-
-
             dev.OutputMerger.BlendState = data.AlphaBlendState;
 
-            // bind sampler, update cbuffer
-
-            // draw quad
+            shader.Run(data.Buffer, finalTransform, data.GetCrop(models, layer), models.Display.Multiplier, texture, data.GetSampler(models.Display.LinearInterpolation));
 
             dev.OutputMerger.BlendState = data.DefaultBlendState;
         }

@@ -20,7 +20,9 @@ namespace ImageViewer.Controller.TextureViews
 
         public override void Draw(TextureArray2D texture)
         {
-            DrawLayer(Matrix.Identity, models.Display.ActiveLayer, texture);
+            if (texture == null) return;
+
+            DrawLayer(Matrix.Identity, models.Display.ActiveLayer, texture.GetSrView(models.Export.Layer, models.Export.Mipmap));
         }
 
         public override Point GetTexelPosition(Vector2 mouse)

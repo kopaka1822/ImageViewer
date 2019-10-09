@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using ImageFramework.DirectX;
+using ImageFramework.Model.Export;
+using ImageViewer.Controller.TextureViews.Shader;
+using ImageViewer.Models;
+using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.Mathematics.Interop;
 
@@ -16,6 +22,10 @@ namespace ImageViewer.Controller.TextureViews
         public SamplerState LinearSampler { get; }
 
         public SamplerState PointSampler { get; }
+
+        public UploadBuffer<ViewBufferData> Buffer { get; }
+
+        public CheckersShader Checkers { get; }
         public TextureViewData()
         {
             var dev = ImageFramework.DirectX.Device.Get();
@@ -25,6 +35,10 @@ namespace ImageViewer.Controller.TextureViews
 
             LinearSampler = CreateSamplerState(true);
             PointSampler = CreateSamplerState(false);
+
+            Buffer = new UploadBuffer<ViewBufferData>(1);
+
+            Checkers = new CheckersShader();
         }
 
         private static BlendState CreateBlendState(bool enable, BlendOption src, BlendOption dst)
@@ -75,6 +89,45 @@ namespace ImageViewer.Controller.TextureViews
             AlphaBlendState?.Dispose();
             LinearSampler?.Dispose();
             PointSampler?.Dispose();
+            Buffer?.Dispose();
+            Checkers?.Dispose();
+        }
+
+        public Vector4 GetCrop(ModelsEx models, int layer)
+        {
+            if (models.Export.Layer != -1) // only single layer
+            {
+                // darken due to layer mismatch?
+                if (models.Export.IsExporting && models.Export.Layer != layer)
+                {
+                    // everything is gray
+                    return Vector4.Zero;
+                }
+
+                if (models.Export.UseCropping && (models.Export.IsExporting || models.Display.ShowCropRectangle))
+                {
+                    int mipmap = models.Export.AllowCropping ? models.Export.Mipmap : 0;
+                    float cropMaxX = models.Images.GetWidth(mipmap) - 1;
+                    float cropMaxY = models.Images.GetHeight(mipmap) - 1;
+
+                    Vector4 res;
+                    // crop start x
+                    res.X = models.Export.CropStartX / cropMaxX;
+                    res.Y = models.Export.CropEndX / cropMaxX;
+                    res.Z = models.Export.CropStartY / cropMaxY;
+                    res.W = models.Export.CropEndY / cropMaxY;
+
+                    return res;
+                }
+            }
+
+            // nothing is gray
+            return new Vector4(0.0f, 1.0f, 0.0f, 1.0f);
+        }
+
+        public SamplerState GetSampler(bool displayLinearInterpolation)
+        {
+            return displayLinearInterpolation ? LinearSampler : PointSampler;
         }
     }
 }

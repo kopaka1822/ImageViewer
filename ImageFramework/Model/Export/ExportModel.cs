@@ -67,8 +67,12 @@ namespace ImageFramework.Model.Export
                 if(value == mipmap) return;
                 mipmap = value;
                 OnPropertyChanged(nameof(Mipmap));
+                OnPropertyChanged(nameof(AllowCropping));
             }
         }
+
+        // cropping is only allowed if a single mipmap is exported (-1 = all mipmaps will be exported)
+        public bool AllowCropping => Mipmap != -1;
 
         private int layer = -1;
 
@@ -108,6 +112,22 @@ namespace ImageFramework.Model.Export
 
         public static int QualityMin = 1;
         public static int QualityMax = 100;
+
+        private bool isExporting = false;
+
+        /// <summary>
+        /// indicates if the exporting dialog is open
+        /// </summary>
+        public bool IsExporting
+        {
+            get => isExporting;
+            set
+            {
+                if(value == isExporting) return;
+                isExporting = value;
+                OnPropertyChanged(nameof(IsExporting));
+            }
+        }
 
         private bool useCropping = false;
 
