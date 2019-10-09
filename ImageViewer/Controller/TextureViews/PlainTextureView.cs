@@ -80,12 +80,13 @@ namespace ImageViewer.Controller.TextureViews
         protected Vector2 GetDirectXMouseCoordinates(Vector2 mouse)
         {
             // Matrix Coordinate system is reversed (left handed)
-            var vec = new Vector4((float)mouse.X, (float)mouse.Y, 0.0f, 1.0f);
-            var trans = (GetOrientation() * GetTransform());
+            var vec = new Vector4(mouse.X, mouse.Y, 0.0f, 1.0f);
+            var trans = GetTransform() * GetOrientation();
+            trans.Invert();
 
             Vector4.Transform(ref vec, ref trans, out var res);
 
-            return new Vector2(res.X, res.Y);
+            return new Vector2(res.X, -res.Y);
         }
 
         private Matrix GetOrientation()
@@ -97,7 +98,7 @@ namespace ImageViewer.Controller.TextureViews
         {
             var dev = ImageFramework.DirectX.Device.Get();
             var finalTransform = offset * GetTransform();
-
+            
             // draw the checkers background
             data.Checkers.Run(data.Buffer, finalTransform);
             
