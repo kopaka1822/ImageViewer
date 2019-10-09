@@ -20,7 +20,7 @@ namespace ImageFramework.DirectX
 
         private readonly ShaderFlags flags = ShaderFlags.WarningsAreErrors | ShaderFlags.IeeeStrictness | ShaderFlags.EnableStrictness
 #if DEBUG
-                                             | ShaderFlags.Debug | ShaderFlags.SkipOptimization;
+                                             | ShaderFlags.Debug | ShaderFlags.SkipOptimization | ShaderFlags.DebugNameForBinary;
 #else
                                              | ShaderFlags.OptimizationLevel3;
 #endif
