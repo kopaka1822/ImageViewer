@@ -7,7 +7,7 @@ namespace ImageFramework.Model.Shader
 {
     internal class ImageCombineShader : IDisposable
     {
-        private const int LocalSize = 8;
+        private const int LocalSize = 32;
 
         private DirectX.Shader shader;
 

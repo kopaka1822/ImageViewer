@@ -67,7 +67,7 @@ namespace FrameworkTests.Model
 
             // calculate (alpha) statistics by hand
             var cpuStats = CalcCpuStats(models.Pipelines[0].Image.GetPixelColors(0, 0));
-
+            
             Assert.AreEqual(cpuStats.Min, stats.Min.Alpha);
             Assert.AreEqual(cpuStats.Max, stats.Max.Alpha);
             Assert.AreEqual(cpuStats.Avg, stats.Avg.Alpha, 0.01f);

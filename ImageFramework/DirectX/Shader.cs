@@ -19,11 +19,12 @@ namespace ImageFramework.DirectX
         }
 
         private readonly ShaderFlags flags = ShaderFlags.WarningsAreErrors | ShaderFlags.IeeeStrictness | ShaderFlags.EnableStrictness
-#if DEBUG
-                                             | ShaderFlags.Debug | ShaderFlags.SkipOptimization | ShaderFlags.DebugNameForBinary;
-#else
+// shader debugging does not work atm. anyways..
+//#if DEBUG
+//                                             | ShaderFlags.Debug | ShaderFlags.SkipOptimization | ShaderFlags.DebugNameForBinary;
+//#else
                                              | ShaderFlags.OptimizationLevel3;
-#endif
+//#endif
         private VertexShader vertex;
         public VertexShader Vertex
         {

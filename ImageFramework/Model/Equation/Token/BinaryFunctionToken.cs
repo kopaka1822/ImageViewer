@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 
 namespace ImageFramework.Model.Equation.Token
 {
@@ -21,9 +22,16 @@ namespace ImageFramework.Model.Equation.Token
             if (!IsHlslFunction())
                 throw new Exception("invalid string as function name: " + funcName);
 
+            var val1 = value1.ToHlsl();
+            var val2 = value2.ToHlsl();
+
+            if (funcName == "pow")
+                val1 = $"max({val1}, 0.0)"; // do this to suppress warning and undefined behaviour
+
             if (convertToRgb)
-                return "float4(f3(" + funcName + "((" + value1.ToHlsl() + ").xyz,(" + value2.ToHlsl() + ").xyz)), 1.0)";
-            return funcName + "(" + value1.ToHlsl() + "," + value2.ToHlsl() + ")";
+                return "float4(f3(" + funcName + "((" + val1 + ").xyz,(" + val2 + ").xyz)), 1.0)";
+
+            return funcName + "(" + val1 + "," + val2 + ")";
         }
 
         private bool IsHlslFunction()

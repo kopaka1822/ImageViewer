@@ -42,7 +42,8 @@ namespace ImageFramework.Model.Shader
                 Height = source.GetHeight(mipmap),
                 Stride = 2,
                 Layer = layer,
-                FirstTime = true
+                FirstTime = true,
+                TrueBool = true
             };
             var curWidth = curData.Width;
             cbuffer.SetData(curData);
@@ -135,6 +136,7 @@ cbuffer InputBuffer : register(b0) {{
     uint stride;
     uint layer;
     bool firstTime;
+    bool trueBool;
 }};
 
 {GetFunctions()}
@@ -160,8 +162,11 @@ float4 zeroNans(float4 v) {{
     float4 res = v;
     [unroll]
     for(uint i = 0; i < 4; ++i) {{
+        float vi = v[i];
+        if(!trueBool) vi = 0.0; // true bool is always true, so this won't be executed
+
         // little trick to detect nans because v[i] != v[i] will be optimized away.
-        if(!(v[i] < 0.0) && !(v[i] > 0.0))
+        if(v[i] != vi)
             res[i] = 0.0;
     }}
     return res;

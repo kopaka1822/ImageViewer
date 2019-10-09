@@ -332,7 +332,7 @@ namespace ImageFramework.DirectX
             {
                 ArraySize = NumLayers,
                 BindFlags = flags,
-                CpuAccessFlags = CpuAccessFlags.Read | CpuAccessFlags.Write,
+                CpuAccessFlags = CpuAccessFlags.None,
                 Format = Format,
                 Height = Height,
                 MipLevels = NumMipmaps,
