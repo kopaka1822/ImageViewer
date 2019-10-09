@@ -61,8 +61,8 @@ cbuffer InfoBuffer : register(b0) {{
 
 VertexOut main(uint id: SV_VertexID) {{
     VertexOut o;
-    float canonical = float2((id << 1) & 2, id & 2);
-    canonical = texcoord * float2(2, -2) + float2(-1, 1);
+    float2 canonical = float2((id << 1) & 2, id & 2);
+    canonical = canonical * float2(2, -2) + float2(-1, 1);
 
     o.projPos = float4(canonical, 0, 1);
     o.projPos = mul(transform, o.projPos);
@@ -91,8 +91,13 @@ cbuffer InfoBuffer : register(b0) {{
 
 {Utility.ToSrgbFunction()}
 
-float4 main(float3 viewDir : VIEWDIR) : SV_TARGET {{
-    float4 color = tex.Sample(texSampler, viewDir);
+struct PixelIn {{
+    float4 projPos : SV_POSITION;
+    float3 viewDir : VIEWDIR;  
+}};
+
+float4 main(PixelIn i) : SV_TARGET {{
+    float4 color = tex.Sample(texSampler, i.viewDir);
     color.rgb *= multiplier;
     // TODO cropping?
     return toSrgb(color);
