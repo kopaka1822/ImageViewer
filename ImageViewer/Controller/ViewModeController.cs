@@ -183,10 +183,10 @@ namespace ImageViewer.Controller
                                 currentView = new SingleTextureView(models, viewData);
                                 break;
                             case DisplayModel.ViewMode.Polar:
-                                currentView = new PolarTextureView(models);
+                                currentView = new PolarTextureView(models, viewData);
                                 break;
                             case DisplayModel.ViewMode.CubeMap:
-                                currentView = new CubeTextureView(models);
+                                currentView = new CubeTextureView(models, viewData);
                                 break;
                             case DisplayModel.ViewMode.CubeCrossView:
                                 currentView = new CubeCrossTextureView(models, viewData);

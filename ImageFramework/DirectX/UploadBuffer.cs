@@ -13,7 +13,7 @@ namespace ImageFramework.DirectX
     /// <summary>
     /// this should be used to upload data to the gpu or for constant buffers that update frequently
     /// </summary>
-    internal class UploadBuffer<T> : IDisposable where T : struct
+    public class UploadBuffer<T> : IDisposable where T : struct
     {
         public readonly Buffer Handle;
         private readonly int elementCount;

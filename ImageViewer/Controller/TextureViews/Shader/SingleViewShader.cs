@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.DirectX;
 using ImageFramework.Utility;
+using SharpDX;
+using SharpDX.Direct3D11;
+using Device = ImageFramework.DirectX.Device;
 
 namespace ImageViewer.Controller.TextureViews.Shader
 {
@@ -14,6 +18,27 @@ namespace ImageViewer.Controller.TextureViews.Shader
         : base(GetVertexSource(), GetPixelSource(), "Single")
         {
             
+        }
+
+        public void Run(UploadBuffer<ViewBufferData> buffer, Matrix transform, Vector4 crop, float multiplier, ShaderResourceView texture, SamplerState sampler)
+        {
+            buffer.SetData(new ViewBufferData
+            {
+                Transform = transform,
+                Crop = crop,
+                Multiplier = multiplier
+            });
+
+            var dev = Device.Get();
+            BindShader(dev);
+
+            dev.Vertex.SetConstantBuffer(0, buffer.Handle);
+            dev.Pixel.SetConstantBuffer(0 , buffer.Handle);
+
+            dev.Pixel.SetShaderResource(0, texture);
+            dev.Pixel.SetSampler(0, sampler);
+
+            dev.DrawQuad();
         }
 
         public static string GetVertexSource()
@@ -48,7 +73,7 @@ SamplerState sampler : register(s0);
 
 cbuffer InfoBuffer : register(b0) {{
     matrix transform;
-    int4 crop;
+    float4 crop;
     float multiplier;
 }};
 

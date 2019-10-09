@@ -19,18 +19,21 @@ namespace ImageViewer.Controller.TextureViews
 
         public override void Draw(TextureArray2D texture)
         {
+            if (texture == null) return;
+
+            var mip = models.Export.Mipmap;
             // -x
-            DrawLayer(Matrix.Translation(-2.0f, 0.0f, 0.0f), 1, texture);
+            DrawLayer(Matrix.Translation(-2.0f, 0.0f, 0.0f), 1, texture.GetSrView(1, mip));
             // -y
-            DrawLayer(Matrix.Translation(0.0f, -2.0f, 0.0f), 3, texture);
+            DrawLayer(Matrix.Translation(0.0f, -2.0f, 0.0f), 3, texture.GetSrView(3, mip));
             // +y
-            DrawLayer(Matrix.Translation(0.0f, 2.0f, 0.0f), 2, texture);
+            DrawLayer(Matrix.Translation(0.0f, 2.0f, 0.0f), 2, texture.GetSrView(2, mip));
             // +z
-            DrawLayer(Matrix.Translation(0.0f, 0.0f, 0.0f), 4, texture);
+            DrawLayer(Matrix.Translation(0.0f, 0.0f, 0.0f), 4, texture.GetSrView(4, mip));
             // +x
-            DrawLayer(Matrix.Translation(2.0f, 0.0f, 0.0f), 0, texture);
+            DrawLayer(Matrix.Translation(2.0f, 0.0f, 0.0f), 0, texture.GetSrView(0, mip));
             // -z
-            DrawLayer(Matrix.Translation(4.0f, 0.0f, 0.0f), 5, texture);
+            DrawLayer(Matrix.Translation(4.0f, 0.0f, 0.0f), 5, texture.GetSrView(5, mip));
         }
 
         public override Point GetTexelPosition(Vector2 mouse)
