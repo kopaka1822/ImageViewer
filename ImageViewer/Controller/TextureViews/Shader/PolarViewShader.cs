@@ -66,7 +66,6 @@ VertexOut main(uint id: SV_VertexID) {{
     canonical = canonical * float2(2, -2) + float2(-1, 1);
 
     o.projPos = float4(canonical, 0, 1);
-    o.projPos = mul(transform, o.projPos);
 
     o.rayDir = normalize(mul(transform, float4(canonical.xy, farplane, 0.0)).xyz);    
     o.rayDir.y *= -1.0;
