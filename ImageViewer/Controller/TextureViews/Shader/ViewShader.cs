@@ -30,6 +30,12 @@ namespace ImageViewer.Controller.TextureViews.Shader
             dev.Pixel.Set(pixel.Pixel);
         }
 
+        protected void UnbindShader(Device dev)
+        {
+            dev.Vertex.Set(null);
+            dev.Pixel.Set(null);
+        }
+
         public void Dispose()
         {
             vertex?.Dispose();

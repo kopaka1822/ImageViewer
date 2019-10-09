@@ -37,7 +37,12 @@ namespace ImageViewer.Controller.TextureViews
             var dev = Device.Get();
             dev.OutputMerger.BlendState = data.AlphaBlendState;
 
-            // TODO use shader
+            shader.Run(data.Buffer, GetTransform(),
+                data.GetCrop(models, models.Display.ActiveLayer),
+                models.Display.Multiplier, CalcFarplane(), 
+                texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap), 
+                data.GetSampler(models.Display.LinearInterpolation)
+            );
 
             dev.OutputMerger.BlendState = data.DefaultBlendState;
         }
