@@ -158,15 +158,19 @@ struct ComputeIn {{
     uint3 group : SV_GROUPID;
 }};
 
+bool isNan(float v) {{
+    float vi = v;
+    if(!trueBool) vi = 0.0; // true bool is always true, so this won't be executed
+
+    // little trick to detect nans because v[i] != v[i] will be optimized away.
+    return v != vi;
+}}
+
 float4 zeroNans(float4 v) {{
     float4 res = v;
     [unroll]
     for(uint i = 0; i < 4; ++i) {{
-        float vi = v[i];
-        if(!trueBool) vi = 0.0; // true bool is always true, so this won't be executed
-
-        // little trick to detect nans because v[i] != v[i] will be optimized away.
-        if(v[i] != vi)
+        if(isNan(v[i]))
             res[i] = 0.0;
     }}
     return res;
