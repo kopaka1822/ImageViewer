@@ -62,8 +62,8 @@ cbuffer InfoBuffer : register(b0) {{
 
 VertexOut main(uint id: SV_VertexID) {{
     VertexOut o;
-    float canonical = float2((id << 1) & 2, id & 2);
-    canonical = texcoord * float2(2, -2) + float2(-1, 1);
+    float2 canonical = float2((id << 1) & 2, id & 2);
+    canonical = canonical * float2(2, -2) + float2(-1, 1);
 
     o.projPos = float4(canonical, 0, 1);
     o.projPos = mul(transform, o.projPos);
@@ -93,10 +93,15 @@ cbuffer InfoBuffer : register(b0) {{
 
 {Utility.ToSrgbFunction()}
 
-float4 main(float3 raydir : RAYDIR) : SV_TARGET {{
+struct PixelIn {{
+    float4 projPos : SV_POSITION;
+    float3 rayDir : RAYDIR;  
+}};
+
+float4 main(PixelIn i) : SV_TARGET {{
     const float PI = 3.14159265358979323846264;
     float2 polarDirection;
-    float3 normalizedDirection = normalize(raydir);
+    float3 normalizedDirection = normalize(i.rayDir);
     // t computation
     polarDirection.y = acos(normalizedDirection.y) / PI;
     // s computation

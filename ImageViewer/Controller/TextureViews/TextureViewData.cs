@@ -69,13 +69,13 @@ namespace ImageViewer.Controller.TextureViews
             var dev = ImageFramework.DirectX.Device.Get();
             var desc = new SamplerStateDescription
             {
-                AddressU = TextureAddressMode.Wrap,
-                AddressV = TextureAddressMode.Wrap,
-                AddressW = TextureAddressMode.Wrap,
+                AddressU = TextureAddressMode.Clamp,
+                AddressV = TextureAddressMode.Clamp,
+                AddressW = TextureAddressMode.Clamp,
                 BorderColor = new RawColor4(),
-                ComparisonFunction = Comparison.Always,
-                Filter = linear ? Filter.MaximumMinMagMipLinear : Filter.ComparisonMinMagMipPoint,
-                MaximumAnisotropy = 0,
+                ComparisonFunction = Comparison.Never,
+                Filter = linear ? Filter.MaximumMinMagMipLinear : Filter.MinMagMipPoint,
+                MaximumAnisotropy = 1,
                 MaximumLod = float.MaxValue,
                 MinimumLod = 0,
                 MipLodBias = 0

@@ -221,6 +221,7 @@ namespace ImageFramework.DirectX
 
         public void DrawQuad()
         {
+            context.InputAssembler.InputLayout = null;
             context.Draw(4, 0);
         }
 

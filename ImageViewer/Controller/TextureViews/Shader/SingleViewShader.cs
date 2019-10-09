@@ -83,10 +83,15 @@ cbuffer InfoBuffer : register(b0) {{
 
 {Utility.ToSrgbFunction()}
 
-float4 main(float2 texcoord : TEXCOORD) : SV_TARGET {{
-    float4 color = tex.Sample(texSampler, texcoord);
+struct PixelIn {{
+    float4 projPos : SV_POSITION;
+    float2 texcoord : TEXCOORD;  
+}};
+
+float4 main(PixelIn i) : SV_TARGET {{
+    float4 color = tex.Sample(texSampler, i.texcoord);
     color.rgb *= multiplier;
-    {ApplyColorCrop("texcoord")}
+    {ApplyColorCrop("i.texcoord")}
     return toSrgb(color);
 }}
 ";
