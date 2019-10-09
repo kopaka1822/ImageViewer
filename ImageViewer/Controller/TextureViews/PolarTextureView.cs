@@ -4,44 +4,79 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.Utility;
+using ImageViewer.Controller.TextureViews.Shader;
 using ImageViewer.Models;
 using SharpDX;
 using Point = System.Drawing.Point;
 
 namespace ImageViewer.Controller.TextureViews
 {
-    public class PolarTextureView : ITextureView
+    public class PolarTextureView : ProjectionTextureView
     {
-        private readonly ModelsEx models;
+        private readonly PolarViewShader shader;
 
-        public PolarTextureView(ModelsEx models)
+        public PolarTextureView(ModelsEx models, TextureViewData data)
+        : base(models, data)
         {
-            this.models = models;
+            shader = new PolarViewShader();
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
-            throw new NotImplementedException();
+            shader?.Dispose();
+            base.Dispose();
         }
 
-        public void Draw(TextureArray2D texture)
+        public override void Draw(TextureArray2D texture)
         {
-            throw new NotImplementedException();
+            if (texture == null) return;
+
+            base.Draw(texture);
+
+            var dev = Device.Get();
+            dev.OutputMerger.BlendState = data.AlphaBlendState;
+
+            // TODO use shader
+
+            dev.OutputMerger.BlendState = data.DefaultBlendState;
         }
 
-        public void OnScroll(float amount, Vector2 mouse)
+        public override Point GetTexelPosition(Vector2 mouse)
         {
-            throw new NotImplementedException();
+            // calculate farplane
+            var viewDir = new Vector4(mouse.X, mouse.Y, CalcFarplane(), 0.0f);
+            var trans = GetTransform() * GetLeftHandedOrientation();
+            Vector4.Transform(ref viewDir, ref trans, out var transformedViewDir);
+            viewDir = transformedViewDir;
+            viewDir.Normalize();
+
+            // determine pixel coordinate from view dir
+            var polarDirection = new Vector2();
+            // t computation
+            polarDirection.Y = (float)(Math.Acos(viewDir.Y) / Math.PI);
+
+            //  computation
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            polarDirection.X = viewDir.X == 0.0 ? (float)(Math.PI / 2 * Math.Sign(viewDir.Z)) : (float)(Math.Atan2(viewDir.Z, viewDir.X));
+            polarDirection.X = (float)(polarDirection.X / (2.0 * Math.PI) + 0.25);
+
+            if (polarDirection.X < 0.0)
+                polarDirection.X += 1.0f;
+            if (polarDirection.Y < 0.0)
+                polarDirection.Y += 1.0f;
+
+            var canonical = (polarDirection * 2.0f) - Vector2.One;
+            var pt = Utility.CanonicalToTexelCoordinates(canonical.X, canonical.Y,
+                models.Images.GetWidth(models.Display.ActiveMipmap),
+                models.Images.GetHeight(models.Display.ActiveMipmap));
+
+            return new Point(pt.X, pt.Y);
         }
 
-        public void OnDrag(Vector2 diff)
+        protected override Matrix GetOrientation()
         {
-            throw new NotImplementedException();
-        }
-
-        public Point GetTexelPosition(Vector2 mouse)
-        {
-            throw new NotImplementedException();
+            return Matrix.Scaling(-1.0f, -1.0f, 1.0f);
         }
     }
 }
