@@ -62,7 +62,7 @@ cbuffer InfoBuffer : register(b0) {{
 
 VertexOut main(uint id: SV_VertexID) {{
     VertexOut o;
-    float2 canonical = float2((id << 1) & 2, id & 2);
+    float2 canonical = float2(((id << 1) & 2) / 2, (id & 2) / 2);
     canonical = canonical * float2(2, -2) + float2(-1, 1);
 
     o.projPos = float4(canonical, 0, 1);

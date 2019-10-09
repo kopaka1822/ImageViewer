@@ -48,7 +48,7 @@ cbuffer InfoBuffer : register(b0) {{
 
 VertexOut main(uint id: SV_VertexID) {{
     VertexOut o;
-    float2 texcoord = float2((id << 1) & 2, id & 2);
+    float2 texcoord = float2(((id << 1) & 2) / 2, (id & 2) / 2);
     o.projPos = float4(texcoord * float2(2, -2) + float2(-1, 1), 0, 1);
     o.projPos = mul(transform, o.projPos);
     return o;

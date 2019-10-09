@@ -100,7 +100,7 @@ namespace ImageViewer.Controller.TextureViews
 
             // draw the checkers background
             data.Checkers.Run(data.Buffer, finalTransform);
-
+            
             // blend over the final image
             dev.OutputMerger.BlendState = data.AlphaBlendState;
 
