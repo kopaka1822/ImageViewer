@@ -84,18 +84,20 @@ namespace ImageViewer.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public void ShowErrorDialog(string message)
+        public void ShowErrorDialog(string message, string where = "")
         {
+            where = String.IsNullOrEmpty(where) ? "Error" : "Error " + where;
+
 #if DEBUG
             var res = MessageBoxResult.None;
             message += ". Do you want to debug the application?";          
-            res = MessageBox.Show(TopmostWindow, message, "Error", MessageBoxButton.YesNo, MessageBoxImage.Error);
+            res = MessageBox.Show(TopmostWindow, message, where, MessageBoxButton.YesNo, MessageBoxImage.Error);
             
             if (res == MessageBoxResult.Yes)
                 Debugger.Break();
 #else
             
-            MessageBox.Show(TopmostWindow, message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(TopmostWindow, message, where, MessageBoxButton.OK, MessageBoxImage.Error);
 #endif
         }
     }

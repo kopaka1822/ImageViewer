@@ -16,7 +16,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
         public CheckersShader()
         {
             vertex = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Vertex, GetVertexSource(), "CheckersVertexShader");
-            pixel = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Pixel, GetVertexSource(), "CheckersPixelShader");
+            pixel = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Pixel, GetPixelSource(), "CheckersPixelShader");
         }
 
         public void Run(UploadBuffer<ViewBufferData> buffer, Matrix transform)
@@ -49,8 +49,8 @@ cbuffer InfoBuffer : register(b0) {{
 VertexOut main(uint id: SV_VertexID) {{
     VertexOut o;
     float2 texcoord = float2((id << 1) & 2, id & 2);
-    o.projPos = float4(o.texcoord * float2(2, -2) + float2(-1, 1), 0, 1);
-    o.projPos = transform * o.projPos;
+    o.projPos = float4(texcoord * float2(2, -2) + float2(-1, 1), 0, 1);
+    o.projPos = mul(transform, o.projPos);
     return o;
 }};
 ";
@@ -59,7 +59,7 @@ VertexOut main(uint id: SV_VertexID) {{
         private static string GetPixelSource()
         {
             return $@"
-float4 main(float4 pos : SV_POSITION) {{
+float4 main(float4 pos : SV_POSITION) : SV_TARGET {{
     uint2 pixel = int2(pos.xy);
     pixel /= uint2(10, 10);
     bool isDark = ((pixel.x & 1) == 0);

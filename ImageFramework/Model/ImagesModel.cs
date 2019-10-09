@@ -143,6 +143,7 @@ namespace ImageFramework.Model
             {
                 InitDimensions(image);
                 images.Add(new ImageData(image, name, originalFormat));
+                PrevNumImages = 0;
                 OnPropertyChanged(nameof(NumImages));
                 OnPropertyChanged(nameof(NumLayers));
                 OnPropertyChanged(nameof(NumMipmaps));

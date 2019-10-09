@@ -122,18 +122,26 @@ namespace ImageViewer.Controller
             if (swapChain == null) return;
 
             swapChain.BeginFrame();
+            try
+            {
+                var dev = Device.Get();
+                dev.ClearRenderTargetView(swapChain.Rtv, clearColor);
 
-            var dev = Device.Get();
-            dev.ClearRenderTargetView(swapChain.Rtv, clearColor);
+                var size = models.Window.ClientSize;
+                dev.Rasterizer.SetViewport(0.0f, 0.0f, size.Width, size.Height);
+                dev.Rasterizer.SetScissorRectangle(0, 0, size.Width, size.Height);
+                dev.OutputMerger.SetRenderTargets(swapChain.Rtv);
 
-            var size = models.Window.ClientSize;
-            dev.Rasterizer.SetViewport(0.0f, 0.0f, size.Width, size.Height);
-            dev.Rasterizer.SetScissorRectangle(0, 0, size.Width, size.Height);
-            dev.OutputMerger.SetRenderTargets(swapChain.Rtv);
-            
-            viewMode.Repaint();
-
-            swapChain.EndFrame();
+                viewMode.Repaint();
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e.Message, "during repaint");
+            }
+            finally
+            {
+                swapChain.EndFrame();
+            }
         }
 
         private void DisplayOnPropertyChanged(object sender, PropertyChangedEventArgs e)

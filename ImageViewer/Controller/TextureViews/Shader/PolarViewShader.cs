@@ -66,9 +66,9 @@ VertexOut main(uint id: SV_VertexID) {{
     canonical = texcoord * float2(2, -2) + float2(-1, 1);
 
     o.projPos = float4(canonical, 0, 1);
-    o.projPos = transform * o.projPos;
+    o.projPos = mul(transform, o.projPos);
 
-    o.rayDir = normalize((transform * float4(canonical.xy, farplane, 0.0)).xyz);    
+    o.rayDir = normalize(mul(transform, float4(canonical.xy, farplane, 0.0)).xyz);    
     o.rayDir.y *= -1.0;
 
     return o;
@@ -82,7 +82,7 @@ VertexOut main(uint id: SV_VertexID) {{
             return $@"
 Texture2D<float4> tex : register(t0);
 
-SamplerState sampler : register(s0);
+SamplerState texSampler : register(s0);
 
 cbuffer InfoBuffer : register(b0) {{
     matrix transform;
@@ -106,7 +106,7 @@ float4 main(float3 raydir : RAYDIR) : SV_TARGET {{
     polarDirection.x = polarDirection.x / (2.0 * PI) + 0.25;
     if(polarDirection.x < 0.0) polarDirection.x += 1.0;
     
-    float4 color = tex.Sample(sampler, polarDirection);
+    float4 color = tex.Sample(texSampler, polarDirection);
     color.rgb *= multiplier;
     {ApplyColorCrop("polarDirection")}
     return toSrgb(color);
