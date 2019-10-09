@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SharpDX.Mathematics.Interop;
 
 namespace ImageFramework.DirectX.Structs
 {
@@ -14,6 +15,7 @@ namespace ImageFramework.DirectX.Structs
         public int Height;
         public int Stride;
         public int Layer;
-        public bool FirstTime;
+        public RawBool FirstTime;
+        public RawBool TrueBool;
     }
 }

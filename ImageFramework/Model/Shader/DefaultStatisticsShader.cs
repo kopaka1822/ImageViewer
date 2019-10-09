@@ -58,7 +58,7 @@ res.r = dot(a.rgb, float3(0.2125, 0.7154, 0.0721));
 // (video) luma (sRGB). Uses NTSC luminance vector
 res.g = dot(toSrgb(a).rgb, float3(0.299, 0.587, 0.114));
 // lightness
-res.b = max(116.0 * pow(res.r, 1.0 / 3.0) - 16.0, 0.0);
+res.b = max(116.0 * pow(max(res.r, 0.0), 1.0 / 3.0) - 16.0, 0.0);
 // keep alpha
 res.a = a.a;
 return res;
