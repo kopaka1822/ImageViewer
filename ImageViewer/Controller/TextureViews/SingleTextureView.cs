@@ -28,6 +28,7 @@ namespace ImageViewer.Controller.TextureViews
         public override Point GetTexelPosition(Vector2 mouse)
         {
             var transMouse = GetDirectXMouseCoordinates(mouse);
+
             var pt = Utility.CanonicalToTexelCoordinates(transMouse.X, transMouse.Y,
                 models.Images.GetWidth(models.Display.ActiveMipmap),
                 models.Images.GetHeight(models.Display.ActiveMipmap));

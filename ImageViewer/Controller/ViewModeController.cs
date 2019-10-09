@@ -164,7 +164,7 @@ namespace ImageViewer.Controller
         {
             return new Vector2(
                 (float)(windowCoord.X * 2.0 / models.Window.ClientSize.Width - 1.0),
-                (float)(windowCoord.Y * -2.0 / models.Window.ClientSize.Height + 1.0)
+                (float)(windowCoord.Y * 2.0 / models.Window.ClientSize.Height - 1.0)
             );
         }
 
