@@ -105,6 +105,8 @@
     <Compile Include="Controller\TextureViews\ITextureView.cs" />
     <Compile Include="Controller\TextureViews\PlainTextureView.cs" />
     <Compile Include="Controller\TextureViews\PolarTextureView.cs" />
+    <Compile Include="Controller\TextureViews\ProjectionTextureView.cs" />
+    <Compile Include="Controller\TextureViews\Shader\PolarViewShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\SingleViewShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\ViewShader.cs" />
     <Compile Include="Controller\TextureViews\SingleTextureView.cs" />
