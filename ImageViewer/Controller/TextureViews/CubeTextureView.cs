@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Utility;
+using ImageViewer.Controller.TextureViews.Shader;
 using ImageViewer.Models;
 using SharpDX;
 using Point = System.Drawing.Point;
@@ -13,12 +14,17 @@ namespace ImageViewer.Controller.TextureViews
 {
     public class CubeTextureView : PolarTextureView
     {
+        private readonly CubeViewShader shader;
+
         public CubeTextureView(ModelsEx models, TextureViewData data)
-        : base(models, data)
-        {}
+            : base(models, data)
+        {
+            shader = new CubeViewShader();
+        }
 
         public override void Dispose()
         {
+            shader?.Dispose();
             base.Dispose();
         }
 
@@ -31,7 +37,7 @@ namespace ImageViewer.Controller.TextureViews
             var dev = Device.Get();
             dev.OutputMerger.BlendState = data.AlphaBlendState;
 
-            // TODO shader
+            shader.Run(data.Buffer, GetTransform(), models.Display.Multiplier, CalcFarplane(), texture.View, data.GetSampler(models.Display.LinearInterpolation));
 
             dev.OutputMerger.BlendState = data.DefaultBlendState;
         }

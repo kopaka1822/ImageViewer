@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.DirectX;
 using ImageFramework.Utility;
+using SharpDX;
+using SharpDX.Direct3D11;
+using Device = ImageFramework.DirectX.Device;
 
 namespace ImageViewer.Controller.TextureViews.Shader
 {
@@ -15,7 +19,32 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
         }
 
-        public static string GetVertexSource()
+        public void Run(UploadBuffer<ViewBufferData> buffer, Matrix transform, float multiplier, float farplane, ShaderResourceView texture, SamplerState sampler)
+        {
+            buffer.SetData(new ViewBufferData
+            {
+                Transform = transform,
+                Multiplier = multiplier,
+                Farplane = farplane
+            });
+
+            var dev = Device.Get();
+            BindShader(dev);
+
+            dev.Vertex.SetConstantBuffer(0, buffer.Handle);
+            dev.Pixel.SetConstantBuffer(0, buffer.Handle);
+
+            dev.Pixel.SetShaderResource(0, texture);
+            dev.Pixel.SetSampler(0, sampler);
+
+            dev.DrawQuad();
+
+            // unbind
+            dev.Pixel.SetShaderResource(0, null);
+            UnbindShader(dev);
+        }
+
+        private static string GetVertexSource()
         {
             return $@"
 struct VertexOut {{
@@ -46,7 +75,7 @@ VertexOut main(uint id: SV_VertexID) {{
 ";
         }
 
-        public static string GetPixelSource()
+        private static string GetPixelSource()
         {
             return $@"
 TextureCube<float4> tex : register(t0);

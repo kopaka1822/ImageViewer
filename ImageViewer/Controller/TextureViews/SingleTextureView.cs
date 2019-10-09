@@ -22,7 +22,7 @@ namespace ImageViewer.Controller.TextureViews
         {
             if (texture == null) return;
 
-            DrawLayer(Matrix.Identity, models.Display.ActiveLayer, texture.GetSrView(models.Export.Layer, models.Export.Mipmap));
+            DrawLayer(Matrix.Identity, models.Display.ActiveLayer, texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap));
         }
 
         public override Point GetTexelPosition(Vector2 mouse)

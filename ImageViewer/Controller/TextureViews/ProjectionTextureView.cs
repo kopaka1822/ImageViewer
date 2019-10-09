@@ -27,8 +27,7 @@ namespace ImageViewer.Controller.TextureViews
 
         public virtual void Draw(TextureArray2D texture)
         {
-            // TODO draw checkers
-            throw new NotImplementedException();
+            data.Checkers.Run(data.Buffer, Matrix.Identity);
         }
 
         public void OnScroll(float amount, Vector2 mouse)

@@ -39,6 +39,10 @@ namespace ImageViewer.Controller.TextureViews.Shader
             dev.Pixel.SetSampler(0, sampler);
 
             dev.DrawQuad();
+
+            // unbind
+            dev.Pixel.SetShaderResource(0, null);
+            UnbindShader(dev);
         }
 
         public static string GetVertexSource()
