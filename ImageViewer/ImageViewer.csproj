@@ -94,6 +94,7 @@
     <Compile Include="Commands\OpenCommand.cs" />
     <Compile Include="Commands\ResizeWindowCommand.cs" />
     <Compile Include="Commands\SetThemeCommand.cs" />
+    <Compile Include="Commands\ShowPixelColorCommand.cs" />
     <Compile Include="Commands\ShowPixelDisplayCommand.cs" />
     <Compile Include="Commands\SimpleCommand.cs" />
     <Compile Include="Controller\ClientDropController.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="Controller\ViewModeController.cs" />
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Models\StatisticModel.cs" />
+    <Compile Include="ViewModels\Dialog\PixelColorViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
     <Compile Include="ViewModels\DisplayViewModel.cs" />
     <Compile Include="ViewModels\EquationsViewModel.cs" />
@@ -140,6 +142,9 @@
     <Compile Include="Views\CustomTextBox.cs" />
     <Compile Include="Views\Dialog\HelpDialog.xaml.cs">
       <DependentUpon>HelpDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\PixelColorDialog.xaml.cs">
+      <DependentUpon>PixelColorDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\PixelDisplayDialog.xaml.cs">
       <DependentUpon>PixelDisplayDialog.xaml</DependentUpon>
@@ -183,6 +188,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\Dialog\HelpDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\PixelColorDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

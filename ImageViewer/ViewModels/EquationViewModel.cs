@@ -144,9 +144,6 @@ namespace ImageViewer.ViewModels
             }
         }
 
-
-        // => model.TexelColor.ToDecimalString(true, 3);
-
         private void RecomputeTexelColor()
         {
             if (!model.IsEnabled) return;

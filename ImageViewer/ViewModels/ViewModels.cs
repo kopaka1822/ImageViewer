@@ -41,6 +41,7 @@ namespace ImageViewer.ViewModels
             ExportCommand = new ExportCommand(models);
 
             ShowPixelDisplayCommand = new ShowPixelDisplayCommand(models);
+            ShowPixelColorCommand = new ShowPixelColorCommand(models);
             GenerateMipmapsCommand = new GenerateMipmapsCommand(models);
             DeleteMipmapsCommand = new DeleteMipmapsCommand(models);
             HelpCommand = new HelpDialogCommand(models);
@@ -89,6 +90,8 @@ namespace ImageViewer.ViewModels
         public ICommand ExportCommand { get; }
 
         public ICommand ShowPixelDisplayCommand { get; }
+
+        public ICommand ShowPixelColorCommand { get; }
 
         public ICommand GenerateMipmapsCommand { get; }
         public ICommand DeleteMipmapsCommand { get; }

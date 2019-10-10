@@ -112,6 +112,11 @@ namespace ImageFramework.Utility
             return $"{ScalarToByte(Red)} {ScalarToByte(Green)} {ScalarToByte(Blue)}" + (showAlpha ? $" {ScalarToByte(Alpha)}" : "");
         }
 
+        public string ToFloatString(bool showAlpha)
+        {
+            return $"{FloatToString(Red)} {FloatToString(Green)} {FloatToString(Blue)}" + (showAlpha ? $" {FloatToString(Alpha)}" : "");
+        }
+
         /// <summary>
         /// clamps color values between 0.0 and 1.0
         /// </summary>
@@ -214,6 +219,11 @@ namespace ImageFramework.Utility
             }
 
             return str;
+        }
+
+        private static string FloatToString(float val)
+        {
+            return val.ToString("G", Models.Culture);
         }
     }
 }

@@ -16,6 +16,25 @@
         Style="{StaticResource WindowStyle}"
         x:Name="Window">
 
+<Window.Resources>
+    <ContextMenu x:Key="ClientContextMenu">
+        <MenuItem
+            Header="Pixel Color"
+            Command="{Binding ShowPixelColorCommand}">
+            <MenuItem.Icon>
+                <Image Source="Icons/eyedropper.png"/>
+            </MenuItem.Icon>
+            </MenuItem>
+        <MenuItem
+            Header="Pixel Display"
+            Command="{Binding ShowPixelDisplayCommand}">
+            <MenuItem.Icon>
+                <Image Source="Icons/displayconfig.png"/>
+            </MenuItem.Icon>
+            </MenuItem>
+    </ContextMenu>
+</Window.Resources>
+
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="SizeChanged">
             <i:InvokeCommandAction Command="{Binding ResizeCommand}"/>
@@ -41,7 +60,8 @@
 
                 <Border
                     x:Name="BorderHost"
-                    Background="Black"/>
+                    Background="Black"
+                    ContextMenu="{StaticResource ClientContextMenu}"/>
 
                 <GridSplitter 
                     Grid.Column="1"
