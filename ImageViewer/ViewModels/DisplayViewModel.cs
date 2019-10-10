@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using ImageFramework.Annotations;
+using ImageFramework.Model;
 using ImageViewer.Models;
 using ImageViewer.Views;
 
@@ -27,6 +28,22 @@ namespace ImageViewer.ViewModels
             this.selectedSplitMode = AvailableSplitModes[models.Display.Split == DisplayModel.SplitMode.Vertical ? 0 : 1];
             models.PropertyChanged += ModelsOnPropertyChanged;
             models.Display.PropertyChanged += DisplayOnPropertyChanged;
+            models.Images.PropertyChanged += ImagesOnPropertyChanged;
+
+            CreateViewModes();
+        }
+
+        private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ImagesModel.NumMipmaps):
+                    CreateMipMapList();
+                    break;
+                case nameof(ImagesModel.NumLayers):
+                    CreateLayersList();
+                    break;
+            }
         }
 
         private void DisplayOnPropertyChanged(object sender, PropertyChangedEventArgs e)
