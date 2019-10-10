@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImageViewer.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="250">
+             d:DesignHeight="800" d:DesignWidth="250">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Border Padding="5">
             <StackPanel>
@@ -288,6 +288,11 @@
                                                 Grid.Row="3"/>
                     </Grid>
                 </GroupBox>
+
+                <TextBlock 
+                    Margin="0 4 0 0"
+                    TextWrapping="Wrap" 
+                    Text="{Binding Statistics.ChannelDescription}"/>
             </StackPanel>
         </Border>
     </ScrollViewer>
