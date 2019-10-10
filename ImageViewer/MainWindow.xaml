@@ -9,7 +9,7 @@
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         xmlns:views="clr-namespace:ImageViewer.Views"
         mc:Ignorable="d"
-        Title="MainWindow" 
+        Title="{Binding Images.WindowTitle}" 
         Height="450" 
         Width="600"
         Icon="Icons/app.png"

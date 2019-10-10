@@ -45,7 +45,7 @@ namespace ImageViewer.ViewModels
             DeleteMipmapsCommand = new DeleteMipmapsCommand(models);
             HelpCommand = new HelpDialogCommand(models);
 
-            ResizeWindow = new ResizeWindowCommand(models);
+            ResizeCommand = new ResizeWindowCommand(models);
             SetThemeCommand = new SetThemeCommand(models);
 
             AddFilterCommand = new AddFilterCommand(models, Filter);
@@ -76,7 +76,7 @@ namespace ImageViewer.ViewModels
             models?.Dispose();
         }
 
-        public ICommand ResizeWindow { get; }
+        public ICommand ResizeCommand { get; }
 
         public ICommand SetThemeCommand { get; }
 
