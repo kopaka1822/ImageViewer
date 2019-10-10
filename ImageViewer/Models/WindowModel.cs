@@ -34,8 +34,6 @@ namespace ImageViewer.Models
             ExecutionPath = System.IO.Path.GetDirectoryName(AssemblyPath);
 
             window.Loaded += WindowOnLoaded;
-            window.BorderHost.DragOver += (o, args) => args.Effects = DragDropEffects.Copy;
-            window.BorderHost.AllowDrop = true;
 
             windowStack.Push(window);
         }
