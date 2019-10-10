@@ -12,4 +12,6 @@ An image viewer for anyone related to computer graphics.
 - App Icon made by https://www.flaticon.com/authors/smashicons Smashicons from https://www.flaticon.com/
 - Other Icons were taken from the Visual Studio Image Library
 
+### Other
+- Descriptions for luminance, luma and lightness inspired by: [Color FAQ](http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/POYNTON1/ColorFAQ.html)
 
