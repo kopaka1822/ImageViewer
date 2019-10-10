@@ -21,12 +21,14 @@ namespace ImageViewer.ViewModels
     {
         private readonly ModelsEx models;
         private readonly ImportDialogController import;
-
+        private readonly string versionString;
         public ImagesViewModel(ModelsEx models)
         {
             this.models = models;
             import = new ImportDialogController(models);
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
+
+            versionString = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
         }
 
         private void ImagesOnPropertyChanged(object o, PropertyChangedEventArgs args)
@@ -50,7 +52,7 @@ namespace ImageViewer.ViewModels
         {
             get
             {
-                if (this.models.Images.NumImages == 0) return "Texture Viewer";
+                if (this.models.Images.NumImages == 0) return "Texture Viewer " + versionString;
                 var res = System.IO.Path.GetFileNameWithoutExtension(models.Images.Images[0].Filename);
 
                 if (this.models.Images.NumImages > 1)
