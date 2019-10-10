@@ -37,7 +37,7 @@ namespace ImageViewer.Controller.TextureViews
             var dev = Device.Get();
             dev.OutputMerger.BlendState = data.AlphaBlendState;
 
-            shader.Run(data.Buffer, GetTransform(), models.Display.Multiplier, CalcFarplane(), texture.CubeView, data.GetSampler(models.Display.LinearInterpolation));
+            shader.Run(data.Buffer, GetTransform(), models.Display.Multiplier, CalcFarplane(), texture.GetCubeView(models.Display.ActiveMipmap), data.GetSampler(models.Display.LinearInterpolation));
 
             dev.OutputMerger.BlendState = data.DefaultBlendState;
         }
@@ -46,7 +46,7 @@ namespace ImageViewer.Controller.TextureViews
         {
             // left handed coordinate system
             var transform = GetTransform();
-            var preViewDir = new Vector4((float) mouse.X, (float) mouse.Y, CalcFarplane(), 0.0f);
+            var preViewDir = new Vector4(mouse.X, -mouse.Y, CalcFarplane(), 0.0f);
             Vector4.Transform(ref preViewDir, ref transform, out var viewDir);
 
             viewDir.Normalize();

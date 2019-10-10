@@ -23,12 +23,11 @@ namespace ImageFramework.DirectX
         public int NumLayers { get; }
         public ShaderResourceView View { get; private set; }
 
-        public ShaderResourceView CubeView { get; private set; }
-
         public Format Format { get; }
 
         private readonly Texture2D handle;
         private ShaderResourceView[] views;
+        private ShaderResourceView[] cubeViews;
         private RenderTargetView[] rtViews;
         private UnorderedAccessView[] uaViews;
 
@@ -75,6 +74,14 @@ namespace ImageFramework.DirectX
         public ShaderResourceView GetSrView(int layer, int mipmap)
         {
             return views[GetTextureIndex(layer, mipmap)];
+        }
+
+        public ShaderResourceView GetCubeView(int mipmap)
+        {
+            Debug.Assert(cubeViews != null);
+            Debug.Assert(mipmap < NumMipmaps);
+            Debug.Assert(mipmap >= 0);
+            return cubeViews[mipmap];
         }
 
         public RenderTargetView GetRtView(int layer, int mipmap)
@@ -208,6 +215,14 @@ namespace ImageFramework.DirectX
                 }
             }
 
+            if (cubeViews != null)
+            {
+                foreach (var view in cubeViews)
+                {
+                    view?.Dispose();
+                }
+            }
+
             if (rtViews != null)
             {
                 foreach (var renderTargetView in rtViews)
@@ -225,7 +240,6 @@ namespace ImageFramework.DirectX
             }
 
             View?.Dispose();
-            CubeView?.Dispose();
             handle?.Dispose();
         }
 
@@ -250,18 +264,22 @@ namespace ImageFramework.DirectX
 
             if (NumLayers == 6)
             {
-                var cubeDesc = new ShaderResourceViewDescription
+                cubeViews = new ShaderResourceView[NumMipmaps];
+                for (int curMipmap = 0; curMipmap < NumMipmaps; ++curMipmap)
                 {
-                    Dimension = ShaderResourceViewDimension.TextureCube,
-                    Format = Format,
-                    TextureCube = new ShaderResourceViewDescription.TextureCubeResource
+                    var cubeDesc = new ShaderResourceViewDescription
                     {
-                        MipLevels = NumMipmaps,
-                        MostDetailedMip = 0
-                    }
-                };
+                        Dimension = ShaderResourceViewDimension.TextureCube,
+                        Format = Format,
+                        TextureCube = new ShaderResourceViewDescription.TextureCubeResource
+                        {
+                            MipLevels = 1,
+                            MostDetailedMip = curMipmap
+                        }
+                    };
 
-                CubeView = new ShaderResourceView(Device.Get().Handle, handle, cubeDesc);
+                    cubeViews[curMipmap] = new ShaderResourceView(Device.Get().Handle, handle, cubeDesc);
+                }
             }
 
             // single slice views
