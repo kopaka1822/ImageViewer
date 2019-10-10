@@ -63,23 +63,19 @@ namespace ImageViewer.Models
             get => Settings.Default.FilterPath ?? "";
             set => Settings.Default.FilterPath = value;
         }
-
-        public string LastExtension
-        {
-            get => Settings.Default.LastExtension ?? "";
-            set => Settings.Default.LastExtension = value;
-        }
-
-        public string LastFormat
-        {
-            get => Settings.Default.LastFormat ?? "";
-            set => Settings.Default.LastFormat = value;
-        }
-
         public DefaultStatistics.Values StatisticsChannel
         {
             get => (DefaultStatistics.Values) Settings.Default.StatisticsChannel;
             set => Settings.Default.StatisticsChannel = (int) value;
+        }
+
+        /// <summary>
+        /// json export quality
+        /// </summary>
+        public int LastQuality
+        {
+            get => Settings.Default.LastQuality;
+            set => Settings.Default.LastQuality = value;
         }
 
         public void Save()

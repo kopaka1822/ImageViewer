@@ -98,5 +98,16 @@ namespace ImageViewer.Models
             MessageBox.Show(TopmostWindow, message, where, MessageBoxButton.OK, MessageBoxImage.Error);
 #endif
         }
+
+        public void ShowInfoDialog(string message, string title = "Info")
+        {
+            MessageBox.Show(TopmostWindow, message, title, MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        public bool ShowYesNoDialog(string message, string title)
+        {
+            return MessageBox.Show(TopmostWindow, message, title, MessageBoxButton.YesNo, MessageBoxImage.Question,
+                       MessageBoxResult.Yes) == MessageBoxResult.Yes;
+        }
     }
 }

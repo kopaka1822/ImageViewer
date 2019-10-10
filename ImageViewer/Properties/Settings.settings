@@ -23,11 +23,8 @@
     <Setting Name="StatisticsChannel" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="LastExtension" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="LastFormat" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+    <Setting Name="LastQuality" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">98</Value>
     </Setting>
   </Settings>
 </SettingsFile>

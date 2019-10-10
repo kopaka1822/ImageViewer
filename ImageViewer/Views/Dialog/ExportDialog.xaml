@@ -1,0 +1,163 @@
+﻿<Window x:Class="ImageViewer.Views.Dialog.ExportDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImageViewer.Views.Dialog" 
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="Export"
+        Height="300"
+        Width="400"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#eee"
+        Icon="../../Icons/app.png"
+        Style="{StaticResource WindowStyle}">
+    <Grid>
+        <Border Padding="5">
+            <StackPanel>
+                <Grid Margin="0 0 0 5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock 
+                        Grid.Column="0" 
+                        Text="Filename: "/>
+                    <TextBox 
+                        Grid.Column="1" 
+                        IsEnabled="False"
+                        Text="{Binding Filename}"/>
+                </Grid>
+                <!-- QUALITY -->
+                <Grid 
+                  Margin="0 0 0 5"
+                  Visibility="{Binding HasQuality}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock 
+                        Grid.Column="0" 
+                        Text="Quality: "/>
+                    <xctk:IntegerUpDown
+                        Grid.Column="1"
+                        Width="80"
+                        Margin="0 0 5 0"
+                        Value="{Binding Quality}"
+                        Minimum="{Binding MinQuality}"
+                        Maximum="{Binding MaxQuality}"
+                        HorizontalAlignment="Left"/>
+                </Grid>
+                <!-- LAYER -->
+                <Grid Margin="0 0 0 5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Layer:"/>
+                    <ComboBox 
+                        Grid.Column="1"
+                        IsEnabled="{Binding EnableLayers}"
+                        ItemsSource="{Binding AvailableLayers}"
+                        SelectedItem="{Binding SelectedLayer}"/>
+                </Grid>
+                <!-- MIPMAPS -->
+                <Grid Margin="0 0 0 5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Mipmap:"/>
+                    <ComboBox 
+                        Grid.Column="1"
+                        IsEnabled="{Binding EnableMipmaps}"
+                        ItemsSource="{Binding AvailableMipmaps}"
+                        SelectedItem="{Binding SelectedMipmap}"/>
+                </Grid>
+                <!-- Format -->
+                <Grid Margin="0 0 0 5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Format:"/>
+                    <ComboBox 
+                        Grid.Column="1"
+                        IsEnabled="{Binding EnableFormat}"
+                        ItemsSource="{Binding AvailableFormat}"
+                        SelectedItem="{Binding SelectedFormat}"/>
+                </Grid>
+
+                <!-- Crop -->
+                <GroupBox Margin="0 0 0 15">
+                    <GroupBox.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Crop:" Margin="0 0 5 0" HorizontalAlignment="Center"/>
+                            <CheckBox 
+                                HorizontalAlignment="Center"
+                                IsChecked="{Binding UseCropping}"
+                                IsEnabled="{Binding AllowCropping}"/>
+                        </StackPanel>
+                    </GroupBox.Header>
+                    <StackPanel HorizontalAlignment="Center">
+                        <StackPanel 
+                            Orientation="Horizontal"
+                            Margin="0 0 0 5">
+                            <TextBlock Text="X from: " Width="45"/>
+                            <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="0 0 5 0"
+                                Value="{Binding CropStartX}"/>
+                            <TextBlock Text="to:" Margin="0 0 5 0"/>
+                            <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="0 0 5 0"
+                                Value="{Binding CropEndX}"/>
+                        </StackPanel>
+                        <StackPanel
+                            Orientation="Horizontal">
+                            <TextBlock Text="Y from: " Width="45"/>
+                            <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="0 0 5 0"
+                                Value="{Binding CropStartY}"/>
+                            <TextBlock Text="to:" Margin="0 0 5 0"/>
+                            <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="0 0 5 0"
+                                Value="{Binding CropEndY}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                </GroupBox>
+
+                <Grid HorizontalAlignment="Right">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button 
+                        Content="_Export" 
+                        Margin="0 0 10 0" 
+                        Width="60"
+                        Click="ButtonExport_OnClick"
+                        IsEnabled="{Binding IsValid}"
+                        />
+                    <Button 
+                        Grid.Column="1" 
+                        Content="_Cancel" 
+                        Width="60"
+                        Click="ButtonCancel_OnClick"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
