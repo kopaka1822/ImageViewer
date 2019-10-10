@@ -8,6 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageViewer.Models;
@@ -31,6 +32,35 @@ namespace ImageViewer.ViewModels
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
 
             CreateViewModes();
+        }
+
+        public bool HasKeyToInvoke(Key key)
+        {
+            switch (key)
+            {
+                case Key.Add:
+                case Key.OemPlus:
+                case Key.Subtract:
+                case Key.OemMinus:
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void InvokeKey(Key key)
+        {
+            switch (key)
+            {
+                case Key.Add:
+                case Key.OemPlus:
+                    models.Display.IncreaseMultiplier();
+                    break;
+                case Key.Subtract:
+                case Key.OemMinus:
+                    models.Display.DecreaseMultiplier();
+                    break;
+            }
         }
 
         private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -101,6 +131,10 @@ namespace ImageViewer.ViewModels
                 case nameof(DisplayModel.Zoom):
                     OnPropertyChanged(nameof(Zoom));
                     break;
+
+                case nameof(DisplayModel.Multiplier):
+                    OnPropertyChanged(nameof(Multiplier));
+                    break;
             }
         }
 
@@ -161,6 +195,8 @@ namespace ImageViewer.ViewModels
                     models.Display.ActiveMipmap = selectedMipMap.Cargo;
             }
         }
+
+        public string Multiplier => models.Display.MultiplierString;
 
         private ComboBoxItem<int> selectedLayer = EmptyLayer;
         public ComboBoxItem<int> SelectedLayer

@@ -30,7 +30,13 @@
 
             </Style>
 
-            <Style TargetType="StatusBar" BasedOn="{StaticResource BaseStyle}"/>
+            <Style TargetType="StatusBar" BasedOn="{StaticResource BaseStyle}">
+                <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            </Style>
+
+            <Style TargetType="StatusBarItem" BasedOn="{StaticResource BaseStyle}">
+                <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            </Style>
 
             <Style TargetType="Label" BasedOn="{StaticResource BaseStyle}"/>
 
