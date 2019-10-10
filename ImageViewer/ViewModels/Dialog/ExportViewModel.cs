@@ -47,7 +47,7 @@ namespace ImageViewer.ViewModels.Dialog
             Debug.Assert(selectedMipmap.Cargo == models.Export.Mipmap);
 
             // all layer option for ktx and dds
-            if (models.Images.NumLayers > 1 && (extension == ".ktx" || extension == ".dds"))
+            if (models.Images.NumLayers > 1 && (extension == "ktx" || extension == "dds"))
             {
                 AvailableLayers.Add(new ComboBoxItem<int>("All Layer", -1));
                 selectedLayer = AvailableLayers.Last();
@@ -55,7 +55,7 @@ namespace ImageViewer.ViewModels.Dialog
             }
 
             // all mipmaps option for ktx and dds
-            if (models.Images.NumMipmaps > 1 && (extension == ".ktx" || extension == ".dds"))
+            if (models.Images.NumMipmaps > 1 && (extension == "ktx" || extension == "dds"))
             {
                 AvailableMipmaps.Add(new ComboBoxItem<int>("All Mipmaps", -1));
                 selectedMipmap = AvailableMipmaps.Last();
@@ -227,7 +227,7 @@ namespace ImageViewer.ViewModels.Dialog
             set => models.Export.CropEndY = value;
         }
 
-        public Visibility HasQuality => extension == ".jpg" ? Visibility.Visible : Visibility.Collapsed;
+        public Visibility HasQuality => extension == "jpg" ? Visibility.Visible : Visibility.Collapsed;
         public int MinQuality => ExportModel.QualityMin;
         public int MaxQuality => ExportModel.QualityMax;
         public int Quality

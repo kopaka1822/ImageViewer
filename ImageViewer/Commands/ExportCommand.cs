@@ -116,9 +116,11 @@ namespace ImageViewer.Commands
             if (sfd.ShowDialog() != true)
                 return;
 
-            exportExtension = System.IO.Path.GetExtension(sfd.FileName);
+            exportExtension = System.IO.Path.GetExtension(sfd.FileName).Substring(1);
             exportDirectory = System.IO.Path.GetDirectoryName(sfd.FileName);
 
+            models.Export.Mipmap = models.Display.ActiveMipmap;
+            models.Export.Layer = models.Display.ActiveLayer;
             var viewModel = new ExportViewModel(models, exportExtension, exportFormat.Value, sfd.FileName);
             var dia = new ExportDialog(viewModel);
 
@@ -126,6 +128,7 @@ namespace ImageViewer.Commands
 
             var desc = new ExportDescription(sfd.FileName, exportExtension, models.Export);
             desc.TrySetFormat(viewModel.SelectedFormatValue);
+            desc.Multiplier = multiplier;
 
             try
             {
@@ -140,13 +143,13 @@ namespace ImageViewer.Commands
 
         private static Dictionary<string, string> filter = new Dictionary<string, string>
         {
-            {".png", "PNG (*.png)|*.png" },
-            {".bmp", "BMP (*.bmp)|*.bmp" },
-            {".jpg", "JPEG (*.jpg)|*.jpg" },
-            {".hdr", "HDR (*.hdr)|*.hdr" },
-            {".pfm", "Portable float map (*.pfm)|*.pfm" },
-            {".dds", "Khronos Texture (*.ktx)|*.ktx" },
-            {".ktx", "DirectDraw Surface (*.dds)|*.dds" },
+            {"png", "PNG (*.png)|*.png" },
+            {"bmp", "BMP (*.bmp)|*.bmp" },
+            {"jpg", "JPEG (*.jpg)|*.jpg" },
+            {"hdr", "HDR (*.hdr)|*.hdr" },
+            {"pfm", "Portable float map (*.pfm)|*.pfm" },
+            {"dds", "Khronos Texture (*.ktx)|*.ktx" },
+            {"ktx", "DirectDraw Surface (*.dds)|*.dds" },
         };
 
         private static string GetFilter(string preferred)

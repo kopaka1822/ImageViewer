@@ -34,10 +34,11 @@ namespace ImageFramework.Model.Shader
         /// <param name="dstFormat">destination format</param>
         /// <param name="mipmap">mipmap to export, -1 for all mipmaps</param>
         /// <param name="layer">layer to export, -1 for all layers</param>
+        /// <param name="multiplier">rgb channels will be multiplied by this value</param>
         public TextureArray2D Convert(TextureArray2D texture, SharpDX.DXGI.Format dstFormat, int mipmap = -1,
-            int layer = -1)
-        {
-            return Convert(texture, dstFormat, mipmap, layer, false, 0, 0, 0, 0);
+            int layer = -1, float multiplier = 1.0f)
+       {
+            return Convert(texture, dstFormat, mipmap, layer, multiplier, false, 0, 0, 0, 0);
         }
 
         /// <summary>
@@ -47,6 +48,7 @@ namespace ImageFramework.Model.Shader
         /// <param name="dstFormat">destination format</param>
         /// <param name="mipmap">mipmap to export, -1 for all mipmaps</param>
         /// <param name="layer">layer to export, -1 for all layers</param>
+        /// <param name="multiplier">rgb channels will be multiplied by this value</param>
         /// <param name="crop">indicates if the image should be cropped, only works with 1 mipmap to export</param>
         /// <param name="xOffset">if crop: offset in source image</param>
         /// <param name="yOffset">if crop: offset in source image</param>
@@ -54,7 +56,7 @@ namespace ImageFramework.Model.Shader
         /// <param name="height">if crop: height of the destination image</param>
         /// <returns></returns>
         public TextureArray2D Convert(TextureArray2D texture, SharpDX.DXGI.Format dstFormat, int mipmap, int layer,
-            bool crop, int xOffset, int yOffset, int width, int height)
+            float multiplier, bool crop, int xOffset, int yOffset, int width, int height)
         {
             Debug.Assert(ImageFormat.IsSupported(dstFormat));
             Debug.Assert(ImageFormat.IsSupported(texture.Format));
@@ -92,7 +94,8 @@ namespace ImageFramework.Model.Shader
                         Layer = curLayer + firstLayer,
                         Level = curMipmap + firstMipmap,
                         Xoffset = xOffset,
-                        Yoffset = yOffset
+                        Yoffset = yOffset,
+                        Multiplier = multiplier
                     });
 
                     dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
@@ -120,6 +123,7 @@ cbuffer InfoBuffer : register(b0)
     uint level;
     uint xoffset;
     uint yoffset;
+    float multiplier;
 };
 
 struct PixelIn
@@ -131,7 +135,7 @@ struct PixelIn
 float4 main(PixelIn i) : SV_TARGET
 {
     float4 coord = i.projPos;
-    return in_tex.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), layer)];
+    return multiplier * in_tex.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), layer)];
 }
 ";
         }
