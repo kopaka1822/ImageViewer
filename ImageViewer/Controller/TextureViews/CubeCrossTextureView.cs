@@ -21,7 +21,7 @@ namespace ImageViewer.Controller.TextureViews
         {
             if (texture == null) return;
 
-            var mip = models.Export.Mipmap;
+            var mip = models.Display.ActiveMipmap;
             // -x
             DrawLayer(Matrix.Translation(-2.0f, 0.0f, 0.0f), 1, texture.GetSrView(1, mip));
             // -y
