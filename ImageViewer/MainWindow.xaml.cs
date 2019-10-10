@@ -48,6 +48,8 @@ namespace ImageViewer
             DataContext = ViewModel;
             Width = models.Settings.WindowWidth;
             Height = models.Settings.WindowHeight;
+            if (models.Settings.IsMaximized)
+                WindowState = WindowState.Maximized;
 
             // handle startup arguments
             if (App.StartupArgs.Length == 0) return;
