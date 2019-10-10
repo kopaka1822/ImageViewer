@@ -109,25 +109,13 @@ namespace ImageViewer.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string LastExtension {
+        [global::System.Configuration.DefaultSettingValueAttribute("98")]
+        public int LastQuality {
             get {
-                return ((string)(this["LastExtension"]));
+                return ((int)(this["LastQuality"]));
             }
             set {
-                this["LastExtension"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string LastFormat {
-            get {
-                return ((string)(this["LastFormat"]));
-            }
-            set {
-                this["LastFormat"] = value;
+                this["LastQuality"] = value;
             }
         }
     }
