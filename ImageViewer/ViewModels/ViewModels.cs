@@ -26,6 +26,7 @@ namespace ImageViewer.ViewModels
         {
             this.models = models;
 
+            // view models
             Display = new DisplayViewModel(models);
             Progress = new ProgressViewModel(models);
             Images = new ImagesViewModel(models);
@@ -48,6 +49,26 @@ namespace ImageViewer.ViewModels
             SetThemeCommand = new SetThemeCommand(models);
 
             AddFilterCommand = new AddFilterCommand(models, Filter);
+
+            // key input
+            models.Window.Window.KeyUp += WindowOnKeyUp;
+        }
+
+        private void WindowOnKeyUp(object sender, KeyEventArgs e)
+        {
+            if (Filter.HasKeyToInvoke(e.Key))
+            {
+                // invoke the key
+                Filter.InvokeKey(e.Key);
+
+                if (Filter.ApplyCommand.CanExecute(null))
+                    Filter.ApplyCommand.Execute(null);
+
+                return;
+            }
+
+            if(Display.HasKeyToInvoke(e.Key))
+                Display.InvokeKey(e.Key);
         }
 
         public void Dispose()

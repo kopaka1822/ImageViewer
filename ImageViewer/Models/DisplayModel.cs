@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.RightsManagement;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -86,17 +87,47 @@ namespace ImageViewer.Models
             }
         }
 
-        private float multiplier = 1.0f;
+
+        // for values >= 0 => multiplier = pow(2, multiplierExponent)
+        // for values < 0 => multiplier = pow(2, 1 / abs(multiplierExponent))
+        private int multiplierExponent = 0;
+        private static int maxMultiplier = 60;
+
+        public void IncreaseMultiplier()
+        {
+            if (multiplierExponent >= maxMultiplier) return;
+
+            ++multiplierExponent;
+            OnPropertyChanged(nameof(Multiplier));
+        }
+
+        public void DecreaseMultiplier()
+        {
+            if (multiplierExponent <= -maxMultiplier) return;
+
+            --multiplierExponent;
+            OnPropertyChanged(nameof(Multiplier));
+        }
 
         public float Multiplier
         {
-            get => multiplier;
-            set
+            get
             {
-                var clamped = Math.Max(float.Epsilon, value);
-                if(clamped == multiplier) return;
-                multiplier = clamped;
-                OnPropertyChanged(nameof(Multiplier));
+                if (multiplierExponent >= 0)
+                    return (float)Math.Pow(2.0, multiplierExponent);
+                return (float)(1.0 / Math.Pow(2.0f, -multiplierExponent));
+            }
+        }
+
+        public string MultiplierString
+        {
+            get
+            {
+                var num = (long)1 << Math.Abs(multiplierExponent);
+                var str = num.ToString();
+                if (multiplierExponent < 0)
+                    return "1/" + str;
+                return str;
             }
         }
 

@@ -8,13 +8,11 @@
              d:DesignHeight="25" d:DesignWidth="1000">
     <StatusBar 
                 Grid.Row="1" 
-                BorderThickness="0 1 0 0"
-                BorderBrush="DarkGray">
+                BorderThickness="0 1 0 0">
         <!-- MOUSE POSITION -->
         <StatusBarItem 
                     Width="100" 
                     HorizontalAlignment="Left" 
-                    BorderBrush="DarkGray" 
                     BorderThickness="0 0 1 0">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -32,10 +30,20 @@
             </Grid>
         </StatusBarItem>
 
+        <StatusBarItem
+            HorizontalAlignment="Left"
+            BorderThickness="0 0 1 0"
+            MinWidth="40"
+            ToolTip="Colors will be multiplied by this value before displaying">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="x "/>
+                <TextBlock Text="{Binding Display.Multiplier}"/>
+            </StackPanel>
+        </StatusBarItem>
+
         <!-- MOUSE POSITION COLOR 1 -->
         <StatusBarItem  
                     HorizontalAlignment="Left" 
-                    BorderBrush="DarkGray" 
                     BorderThickness="0 0 1 0"
                     Visibility="{Binding Equations.Equation1.Visibility}">
             <Grid>
@@ -59,7 +67,6 @@
         <!-- MOUSE POSITION COLOR 2 -->
         <StatusBarItem 
                     HorizontalAlignment="Left" 
-                    BorderBrush="DarkGray" 
                     BorderThickness="0 0 1 0"
                     Visibility="{Binding Equations.Equation2.Visibility}">
             <Grid>
@@ -83,7 +90,6 @@
         <!-- MOUSE POSITION COLOR 3 -->
         <StatusBarItem 
                     HorizontalAlignment="Left" 
-                    BorderBrush="DarkGray" 
                     BorderThickness="0 0 1 0"
                     Visibility="{Binding Equations.Equation3.Visibility}">
             <Grid>
@@ -107,7 +113,6 @@
         <!-- MOUSE POSITION COLOR 4 -->
         <StatusBarItem 
                     HorizontalAlignment="Left" 
-                    BorderBrush="DarkGray" 
                     BorderThickness="0 0 1 0"
                     Visibility="{Binding Equations.Equation4.Visibility}">
             <Grid>
@@ -132,7 +137,6 @@
         <StatusBarItem 
                     Width="100" 
                     HorizontalAlignment="Right" 
-                    BorderBrush="DarkGray" 
                     BorderThickness="0 0 1 0">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -156,7 +160,6 @@
         <StatusBarItem 
                     Width="150" 
                     HorizontalAlignment="Left" 
-                    BorderBrush="DarkGray" 
                     BorderThickness="0 0 1 0"
                     Visibility="{Binding Display.EnableViewModes}">
             <Grid>
@@ -181,7 +184,6 @@
         <StatusBarItem 
                     Width="150" 
                     HorizontalAlignment="Left" 
-                    BorderBrush="DarkGray" 
                     BorderThickness="0 0 1 0"
                     Visibility="{Binding Display.EnableLayers}">
             <Grid>
@@ -207,7 +209,6 @@
         <StatusBarItem 
                     Width="150" 
                     HorizontalAlignment="Left" 
-                    BorderBrush="DarkGray" 
                     BorderThickness="0 0 1 0"
                     IsEnabled="{Binding Display.EnableMipMaps}">
             <Grid>
