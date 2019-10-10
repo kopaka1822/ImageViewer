@@ -50,11 +50,12 @@ namespace ImageViewer.Controller.TextureViews
         public override Point GetTexelPosition(Vector2 mouse)
         {
             // calculate farplane
-            var viewDir = new Vector4(mouse.X, mouse.Y, CalcFarplane(), 0.0f);
-            var trans = GetTransform() * GetLeftHandedOrientation();
+            var viewDir = new Vector4(mouse.X, -mouse.Y, CalcFarplane(), 0.0f);
+            var trans = GetTransform();
             Vector4.Transform(ref viewDir, ref trans, out var transformedViewDir);
             viewDir = transformedViewDir;
             viewDir.Normalize();
+            viewDir.Y *= -1.0f;
 
             // determine pixel coordinate from view dir
             var polarDirection = new Vector2();
