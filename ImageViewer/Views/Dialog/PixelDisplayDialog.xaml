@@ -53,18 +53,6 @@
                                     Maximum="{Binding MaxRadius}"/>
             </Grid>
 
-            <!-- Alpha -->
-            <Grid Margin="0 0 0 5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="90"/>
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Show Alpha:"/>
-                <CheckBox 
-                    Grid.Column="1"
-                    IsChecked="{Binding Alpha}"/>
-            </Grid>
-
             <!-- Buttons -->
             <StackPanel 
                 Orientation="Horizontal"

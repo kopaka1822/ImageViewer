@@ -22,14 +22,16 @@ namespace ImageViewer.Views.Dialog
     {
         public struct Element
         {
-            public Element(ImageFramework.Utility.Color color, int id)
+            public Element(ImageFramework.Utility.Color color, int id, bool alpha)
             {
                 this.color = color;
                 this.imageId = id;
+                this.alpha = alpha;
             }
 
             public ImageFramework.Utility.Color color;
             public int imageId;
+            public bool alpha;
         }
 
 
@@ -60,7 +62,7 @@ namespace ImageViewer.Views.Dialog
             g.Children.Add(GetTextBox("Srgb", 1, 1));
             g.Children.Add(GetTextBox("Hex", 2, 1));
 
-            g.DataContext = new PixelColorViewModel(element.color);
+            g.DataContext = new PixelColorViewModel(element.color, element.alpha);
 
             var groupBox = new GroupBox();
             groupBox.Header = "Equation " + (element.imageId + 1).ToString();

@@ -16,12 +16,14 @@ namespace ImageViewer.ViewModels
     public class EquationViewModel : INotifyPropertyChanged
     {
         private readonly ImagePipeline model;
+        private readonly StatisticModel statistics;
         private readonly ModelsEx models;
         private readonly int imageId;
 
         public EquationViewModel(ModelsEx models, int imageId)
         {
             this.model = models.Pipelines[imageId];
+            this.statistics = models.Statistics[imageId];
             this.models = models;
             this.imageId = imageId;
             this.Color = new FormulaViewModel(model.Color, models.Images, this);
@@ -54,7 +56,6 @@ namespace ImageViewer.ViewModels
                     RecomputeTexelColor();
                     break;
                 case nameof(DisplayModel.TexelDisplay):
-                case nameof(DisplayModel.TexelDisplayAlpha):
                 case nameof(DisplayModel.TexelDecimalPlaces):
                     OnPropertyChanged(nameof(TexelColor));
                     break;
@@ -136,9 +137,9 @@ namespace ImageViewer.ViewModels
 
                 if (models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.SrgbDecimal ||
                     models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.LinearDecimal)
-                    res = c.ToDecimalString(models.Display.TexelDisplayAlpha, models.Display.TexelDecimalPlaces);
+                    res = c.ToDecimalString(statistics.Stats.HasAlpha, models.Display.TexelDecimalPlaces);
                 else
-                    res = c.ToBitString(models.Display.TexelDisplayAlpha);
+                    res = c.ToBitString(statistics.Stats.HasAlpha);
 
                 return $"E{imageId + 1}: " + res;
             }
