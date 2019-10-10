@@ -23,6 +23,8 @@ namespace ImageFramework.DirectX
         public int NumLayers { get; }
         public ShaderResourceView View { get; private set; }
 
+        public ShaderResourceView CubeView { get; private set; }
+
         public Format Format { get; }
 
         private readonly Texture2D handle;
@@ -223,6 +225,7 @@ namespace ImageFramework.DirectX
             }
 
             View?.Dispose();
+            CubeView?.Dispose();
             handle?.Dispose();
         }
 
@@ -244,6 +247,22 @@ namespace ImageFramework.DirectX
                 }
             };
             View = new ShaderResourceView(Device.Get().Handle, handle, defaultDesc);
+
+            if (NumLayers == 6)
+            {
+                var cubeDesc = new ShaderResourceViewDescription
+                {
+                    Dimension = ShaderResourceViewDimension.TextureCube,
+                    Format = Format,
+                    TextureCube = new ShaderResourceViewDescription.TextureCubeResource
+                    {
+                        MipLevels = NumMipmaps,
+                        MostDetailedMip = 0
+                    }
+                };
+
+                CubeView = new ShaderResourceView(Device.Get().Handle, handle, cubeDesc);
+            }
 
             // single slice views
             views = new ShaderResourceView[NumLayers * NumMipmaps];
@@ -328,6 +347,10 @@ namespace ImageFramework.DirectX
             if (createUav)
                 flags |= BindFlags.UnorderedAccess;
 
+            var optionFlags = ResourceOptionFlags.GenerateMipMaps;
+            if (NumLayers == 6)
+                optionFlags |= ResourceOptionFlags.TextureCube;
+
             return new Texture2DDescription
             {
                 ArraySize = NumLayers,
@@ -336,7 +359,7 @@ namespace ImageFramework.DirectX
                 Format = Format,
                 Height = Height,
                 MipLevels = NumMipmaps,
-                OptionFlags = ResourceOptionFlags.GenerateMipMaps,
+                OptionFlags = optionFlags,
                 SampleDescription = new SampleDescription(1, 0),
                 Usage = ResourceUsage.Default,
                 Width = Width

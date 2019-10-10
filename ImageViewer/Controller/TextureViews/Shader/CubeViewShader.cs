@@ -66,7 +66,7 @@ VertexOut main(uint id: SV_VertexID) {{
 
     o.projPos = float4(canonical, 0, 1);
 
-    o.viewDir = normalize((transform * float4(canonical.xy, farplane, 0.0)).xyz);    
+    o.viewDir = normalize(mul(transform, float4(canonical.xy, farplane, 0.0)).xyz);    
 
     return o;
 }};
