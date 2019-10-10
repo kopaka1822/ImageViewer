@@ -15,10 +15,31 @@ namespace ImageViewer.Models
 {
     public class SettingsModel : INotifyPropertyChanged
     {
-        public int WindowWidth { get; set; } = 800;
+        public int WindowWidth
+        {
+            get => Settings.Default.WindowWidth;
+            set
+            {
+                if(value > 0)
+                    Settings.Default.WindowWidth = value;
+            } 
+        }
 
-        public int WindowHeight { get; set; } = 600;
-        public bool IsMaximized { get; set; } = false;
+        public int WindowHeight
+        {
+            get => Settings.Default.WindowHeight;
+            set
+            {
+                if (value > 0)
+                    Settings.Default.WindowHeight = value;
+            }
+        }
+
+        public bool IsMaximized
+        {
+            get => Settings.Default.IsMaximized;
+            set => Settings.Default.IsMaximized = value;
+        }
 
         public ThemeDictionary.Themes Theme
         {
@@ -31,10 +52,35 @@ namespace ImageViewer.Models
             }
         }
 
-        public string ImagePath { get; set; }
-        public string FilterPath { get; set; }
+        public string ImagePath
+        {
+            get => Settings.Default.ImagePath ?? "";
+            set => Settings.Default.ImagePath = value;
+        }
 
-        public DefaultStatistics.Values StatisticsChannel { get; set; }
+        public string FilterPath
+        {
+            get => Settings.Default.FilterPath ?? "";
+            set => Settings.Default.FilterPath = value;
+        }
+
+        public string LastExtension
+        {
+            get => Settings.Default.LastExtension ?? "";
+            set => Settings.Default.LastExtension = value;
+        }
+
+        public string LastFormat
+        {
+            get => Settings.Default.LastFormat ?? "";
+            set => Settings.Default.LastFormat = value;
+        }
+
+        public DefaultStatistics.Values StatisticsChannel
+        {
+            get => (DefaultStatistics.Values) Settings.Default.StatisticsChannel;
+            set => Settings.Default.StatisticsChannel = (int) value;
+        }
 
         public void Save()
         {
