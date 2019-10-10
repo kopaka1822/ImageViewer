@@ -261,18 +261,6 @@ namespace ImageViewer.Models
             }
         }
 
-        private bool texelDisplayAlpha = true;
-        public bool TexelDisplayAlpha
-        {
-            get => texelDisplayAlpha;
-            set
-            {
-                if (value == texelDisplayAlpha) return;
-                texelDisplayAlpha = value;
-                OnPropertyChanged(nameof(TexelDisplayAlpha));
-            }
-        }
-
         public int MinTexelRadius { get; } = 0;
         public int MaxTexelRadius { get; } = 10;
 

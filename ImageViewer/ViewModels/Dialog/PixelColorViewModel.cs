@@ -13,12 +13,12 @@ namespace ImageViewer.ViewModels.Dialog
         private readonly string srgbColor;
         private readonly string hexColor;
 
-        public PixelColorViewModel(Color color)
+        public PixelColorViewModel(Color color, bool showAlpha)
         {
-            decimalColor = $"{ToFloat(color.Red)}, {ToFloat(color.Green)}, {ToFloat(color.Blue)}, {ToFloat(color.Alpha)}";
+            decimalColor = $"{ToFloat(color.Red)}, {ToFloat(color.Green)}, {ToFloat(color.Blue)}" + (showAlpha ? $", {ToFloat(color.Alpha)}" : "");
             var srgb = color.ToSrgb();
-            srgbColor = $"{ToBit(srgb.Red)}, {ToBit(srgb.Green)}, {ToBit(srgb.Blue)}, {ToBit(srgb.Alpha)}";
-            hexColor = $"#{ToHex(srgb.Red)}{ToHex(srgb.Green)}{ToHex(srgb.Blue)}{ToHex(srgb.Alpha)}";
+            srgbColor = $"{ToBit(srgb.Red)}, {ToBit(srgb.Green)}, {ToBit(srgb.Blue)}" + (showAlpha ? $", {ToBit(srgb.Alpha)}" : "");
+            hexColor = $"#{ToHex(srgb.Red)}{ToHex(srgb.Green)}{ToHex(srgb.Blue)}" + (showAlpha ? $"{ToHex(srgb.Alpha)}" : "");
         }
 
         private static string ToFloat(float c)

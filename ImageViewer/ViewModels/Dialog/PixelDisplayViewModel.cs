@@ -21,7 +21,6 @@ namespace ImageViewer.ViewModels.Dialog
             this.models.Display.PropertyChanged += DisplayOnPropertyChanged;
             this.decimalPlaces = models.Display.TexelDecimalPlaces;
             this.radius = models.Display.TexelRadius;
-            this.alpha = models.Display.TexelDisplayAlpha;
 
             AvailableFormats.Add(new ComboBoxItem<DisplayModel.TexelDisplayMode>("decimal linear", DisplayModel.TexelDisplayMode.LinearDecimal));
             AvailableFormats.Add(new ComboBoxItem<DisplayModel.TexelDisplayMode>("decimal srgb", DisplayModel.TexelDisplayMode.SrgbDecimal));
@@ -40,9 +39,6 @@ namespace ImageViewer.ViewModels.Dialog
                     break;
                 case nameof(DisplayModel.TexelRadius):
                     Radius = models.Display.TexelRadius;
-                    break;
-                case nameof(DisplayModel.TexelDisplayAlpha):
-                    Alpha = models.Display.TexelDisplayAlpha;
                     break;
                 case nameof(DisplayModel.TexelDisplay):
                     SelectedFormat = AvailableFormats.Find(box => box.Cargo == models.Display.TexelDisplay);
@@ -79,18 +75,6 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
-        private bool alpha;
-        public bool Alpha
-        {
-            get => alpha;
-            set
-            {
-                if (value == alpha) return;
-                alpha = value;
-                OnPropertyChanged(nameof(Alpha));
-            }
-        }
-
         public List<ComboBoxItem<DisplayModel.TexelDisplayMode>> AvailableFormats { get; } = new List<ComboBoxItem<DisplayModel.TexelDisplayMode>>();
 
         private ComboBoxItem<DisplayModel.TexelDisplayMode> selectedFormat;
@@ -115,7 +99,6 @@ namespace ImageViewer.ViewModels.Dialog
             models.Display.TexelDisplay = SelectedFormat.Cargo;
             models.Display.TexelDecimalPlaces = DecimalPlaces;
             models.Display.TexelRadius = Radius;
-            models.Display.TexelDisplayAlpha = Alpha;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
