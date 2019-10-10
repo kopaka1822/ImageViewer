@@ -239,10 +239,11 @@ namespace ImageFramework.Model.Export
             }
 
             // image is ready for export!
-            if (image.Format != desc.StagingFormat.DxgiFormat || croppingActive)
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if (image.Format != desc.StagingFormat.DxgiFormat || croppingActive || desc.Multiplier != 1.0f)
             {
                 using (var tmpTex = convert.Convert(image, desc.StagingFormat.DxgiFormat, Mipmap, Layer,
-                    UseCropping, CropStartX, CropStartY, CropEndX - CropStartX + 1, CropEndY - CropStartY + 1))
+                    desc.Multiplier, UseCropping, CropStartX, CropStartY, CropEndX - CropStartX + 1, CropEndY - CropStartY + 1))
                 {
                     // the final texture only has the relevant layers and mipmaps
                     ExportTexture(tmpTex, desc, -1, -1);

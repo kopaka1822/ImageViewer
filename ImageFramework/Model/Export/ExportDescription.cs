@@ -14,6 +14,11 @@ namespace ImageFramework.Model.Export
 
         public string Extension { get; }
 
+        /// <summary>
+        /// RGB colors will be multiplied by this value before exporting
+        /// </summary>
+        public float Multiplier { get; set; } = 1.0f;
+
         public string FullFilename => Filename + "." + Extension;
 
         // destination file format

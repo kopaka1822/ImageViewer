@@ -12,5 +12,6 @@ namespace ImageFramework.DirectX.Structs
         public int Level;
         public int Xoffset;
         public int Yoffset;
+        public float Multiplier;
     }
 }
