@@ -129,10 +129,13 @@ namespace ImageFramework.Controller
             switch (e.PropertyName)
             {
                 case nameof(ImagesModel.NumImages):
+                    bool wasDeletion = models.Images.PrevNumImages > models.Images.NumImages;
                     // update valid status
                     foreach (var pipe in models.Pipelines)
                     {
                         UpdateFormulaValidity(pipe, models.Images.NumImages);
+                        if (wasDeletion)
+                            pipe.HasChanges = true;
                     }
                     break;
                 case nameof(ImagesModel.ImageOrder):
