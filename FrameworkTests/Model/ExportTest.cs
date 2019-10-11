@@ -32,9 +32,9 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void ExportLdr()
         {
-            CompareAfterExport(TestData.Directory + "small.bmp", ExportDir + "small", "bmp", GliFormat.RGB8_SRGB_PACK8);
-            CompareAfterExport(TestData.Directory + "small.bmp", ExportDir + "small", "png", GliFormat.RGB8_SRGB_PACK8);
-            CompareAfterExport(TestData.Directory + "small.bmp", ExportDir + "small", "jpg", GliFormat.RGB8_SRGB_PACK8);
+            CompareAfterExport(TestData.Directory + "small.bmp", ExportDir + "small", "bmp", GliFormat.RGB8_SRGB);
+            CompareAfterExport(TestData.Directory + "small.bmp", ExportDir + "small", "png", GliFormat.RGB8_SRGB);
+            CompareAfterExport(TestData.Directory + "small.bmp", ExportDir + "small", "jpg", GliFormat.RGB8_SRGB);
         }
 
         [TestMethod]
@@ -47,7 +47,7 @@ namespace FrameworkTests.Model
             model.Export.LdrExportMode = ExportModel.LdrMode.UNorm;
             model.Apply();
 
-            model.ExportPipelineImage(ExportDir + "unorm", "bmp", GliFormat.RGB8_SRGB_PACK8);
+            model.ExportPipelineImage(ExportDir + "unorm", "bmp", GliFormat.RGB8_SRGB);
 
             TestData.CompareWithSmall(IO.LoadImage(ExportDir + "unorm.bmp"), Color.Channel.Rgb);
         }
@@ -65,7 +65,7 @@ namespace FrameworkTests.Model
             model.Export.CropEndY = 2;
             model.Apply();
 
-            model.ExportPipelineImage(ExportDir + "cropped", "dds", GliFormat.RGBA8_SRGB_PACK8);
+            model.ExportPipelineImage(ExportDir + "cropped", "dds", GliFormat.RGBA8_SRGB);
             var newTex = new TextureArray2D(IO.LoadImage(ExportDir + "cropped.dds"));
 
             TestData.TestCheckersLevel1(newTex.GetPixelColors(0, 0));
@@ -74,25 +74,25 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void ExportPfm()
         {
-            CompareAfterExport(TestData.Directory + "small.pfm", ExportDir + "small", "pfm", GliFormat.RGB32_SFLOAT_PACK32);
+            CompareAfterExport(TestData.Directory + "small.pfm", ExportDir + "small", "pfm", GliFormat.RGB32_SFLOAT);
         }
 
         [TestMethod]
         public void ExportHdr()
         {
-            CompareAfterExport(TestData.Directory + "small.hdr", ExportDir + "small", "hdr", GliFormat.RGB32_SFLOAT_PACK32);
+            CompareAfterExport(TestData.Directory + "small.hdr", ExportDir + "small", "hdr", GliFormat.RGB32_SFLOAT);
         }
 
         [TestMethod]
         public void ExportDds()
         {
-            CompareAfterExport(TestData.Directory + "checkers.dds", ExportDir + "checkers", "dds", GliFormat.RGB8_SRGB_PACK8);
+            CompareAfterExport(TestData.Directory + "checkers.dds", ExportDir + "checkers", "dds", GliFormat.RGB8_SRGB);
         }
 
         [TestMethod]
         public void ExportKtx()
         {
-            CompareAfterExport(TestData.Directory + "small.ktx", ExportDir + "small", "ktx", GliFormat.RGBA32_SFLOAT_PACK32, Color.Channel.Rgba);
+            CompareAfterExport(TestData.Directory + "small.ktx", ExportDir + "small", "ktx", GliFormat.RGBA32_SFLOAT, Color.Channel.Rgba);
         }
 
         private void CompareAfterExport(string inputImage, string outputImage, string outputExtension, GliFormat format, Color.Channel channels = Color.Channel.Rgb, float tolerance = 0.01f)
