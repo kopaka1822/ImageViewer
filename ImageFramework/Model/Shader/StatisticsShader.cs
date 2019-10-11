@@ -12,7 +12,7 @@ namespace ImageFramework.Model.Shader
     public abstract class StatisticsShader<ResultT> : IDisposable
     {
         private DirectX.Shader shader;
-        private readonly int LocalSize = 1; // TODO increase local size
+        private readonly int LocalSize = 128;
         private readonly UploadBuffer<StatisticsData> cbuffer;
 
         protected StatisticsShader()
