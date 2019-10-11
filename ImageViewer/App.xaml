@@ -79,6 +79,11 @@
 
             <Style TargetType="ListBox" BasedOn="{StaticResource BaseStyle}">
                 <Setter Property="Background" Value="{StaticResource ListingBackgroundBrush}"/>
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Background" Value="{StaticResource DisabledBackgroundBrush}"/>
+                    </Trigger>
+                </Style.Triggers>
             </Style>
 
             <Style TargetType="ToolTip" BasedOn="{StaticResource BaseStyle}"/>

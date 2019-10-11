@@ -119,6 +119,7 @@ namespace ImageViewer.Commands
                 return;
 
             exportExtension = System.IO.Path.GetExtension(sfd.FileName).Substring(1);
+            var exportFilename = System.IO.Path.GetFileNameWithoutExtension(sfd.FileName);
             exportDirectory = System.IO.Path.GetDirectoryName(sfd.FileName);
 
             models.Export.Mipmap = models.Display.ActiveMipmap;
@@ -128,7 +129,7 @@ namespace ImageViewer.Commands
 
             if (models.Window.ShowDialog(dia) != true) return;
 
-            var desc = new ExportDescription(sfd.FileName, exportExtension, models.Export);
+            var desc = new ExportDescription(exportFilename, exportExtension, models.Export);
             desc.TrySetFormat(viewModel.SelectedFormatValue);
             desc.Multiplier = multiplier;
 
