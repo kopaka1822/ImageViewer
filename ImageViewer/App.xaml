@@ -19,6 +19,7 @@
                 <ResourceDictionary Source="Views/Theme/GroupBoxStyle.xaml"/>
                 <ResourceDictionary Source="Views/Theme/ComboBoxStyle.xaml"/>
                 <ResourceDictionary Source="Views/Theme/CheckBoxStyle.xaml"/>
+                <ResourceDictionary Source="Views/Theme/ContextMenuStyle.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <Style TargetType="Control" x:Key="BaseStyle">
@@ -79,6 +80,8 @@
             <Style TargetType="ListBox" BasedOn="{StaticResource BaseStyle}">
                 <Setter Property="Background" Value="{StaticResource ListingBackgroundBrush}"/>
             </Style>
+
+            <Style TargetType="ToolTip" BasedOn="{StaticResource BaseStyle}"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
