@@ -22,10 +22,10 @@ namespace ImageViewer.ViewModels.Dialog
             this.decimalPlaces = models.Display.TexelDecimalPlaces;
             this.radius = models.Display.TexelRadius;
 
-            AvailableFormats.Add(new ComboBoxItem<DisplayModel.TexelDisplayMode>("decimal linear", DisplayModel.TexelDisplayMode.LinearDecimal));
-            AvailableFormats.Add(new ComboBoxItem<DisplayModel.TexelDisplayMode>("decimal srgb", DisplayModel.TexelDisplayMode.SrgbDecimal));
-            AvailableFormats.Add(new ComboBoxItem<DisplayModel.TexelDisplayMode>("byte linear", DisplayModel.TexelDisplayMode.LinearByte));
-            AvailableFormats.Add(new ComboBoxItem<DisplayModel.TexelDisplayMode>("byte srgb", DisplayModel.TexelDisplayMode.SrgbByte));
+            AvailableFormats.Add(new ComboBoxItem<DisplayModel.TexelDisplayMode>("decimal (linear)", DisplayModel.TexelDisplayMode.LinearDecimal));
+            AvailableFormats.Add(new ComboBoxItem<DisplayModel.TexelDisplayMode>("float (linear)", DisplayModel.TexelDisplayMode.LinearFloat));
+            AvailableFormats.Add(new ComboBoxItem<DisplayModel.TexelDisplayMode>("decimal (sRGB)", DisplayModel.TexelDisplayMode.SrgbDecimal));
+            AvailableFormats.Add(new ComboBoxItem<DisplayModel.TexelDisplayMode>("byte (sRGB)", DisplayModel.TexelDisplayMode.SrgbByte));
 
             selectedFormat = AvailableFormats.Find(box => box.Cargo == models.Display.TexelDisplay);
         }

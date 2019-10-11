@@ -138,7 +138,9 @@ namespace ImageViewer.ViewModels
                 if (models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.SrgbDecimal ||
                     models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.LinearDecimal)
                     res = c.ToDecimalString(statistics.Stats.HasAlpha, models.Display.TexelDecimalPlaces);
-                else
+                else if (models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.LinearFloat)
+                    res = c.ToFloatString(statistics.Stats.HasAlpha, models.Display.TexelDecimalPlaces);
+                else // byte 
                     res = c.ToBitString(statistics.Stats.HasAlpha);
 
                 return $"E{imageId + 1}: " + res;

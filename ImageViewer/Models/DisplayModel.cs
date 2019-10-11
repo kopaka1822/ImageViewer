@@ -36,7 +36,7 @@ namespace ImageViewer.Models
         public enum TexelDisplayMode
         {
             LinearDecimal,
-            LinearByte,
+            LinearFloat,
             SrgbDecimal,
             SrgbByte
         }

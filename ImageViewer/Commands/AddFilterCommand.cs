@@ -31,6 +31,7 @@ namespace ImageViewer.Commands
             };
 
             if (ofd.ShowDialog(models.Window.TopmostWindow) != true) return;
+            models.Settings.FilterPath = System.IO.Path.GetDirectoryName(ofd.FileName);
 
             // create model
             try
