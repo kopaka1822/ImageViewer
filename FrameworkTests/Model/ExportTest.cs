@@ -72,9 +72,33 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void ExportAllJpg()
+        {
+            TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "jpg");
+        }
+
+        [TestMethod]
+        public void ExportAllPng()
+        {
+            TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "png");
+        }
+
+        [TestMethod]
+        public void ExportAllBmp()
+        {
+            TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "bmp");
+        }
+
+        [TestMethod]
         public void ExportPfm()
         {
             CompareAfterExport(TestData.Directory + "small.pfm", ExportDir + "small", "pfm", GliFormat.RGB32_SFLOAT);
+        }
+
+        [TestMethod]
+        public void ExportAllPfm()
+        {
+            TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "pfm");
         }
 
         [TestMethod]
@@ -84,15 +108,33 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void ExportAllHdr()
+        {
+            TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "hdr");
+        }
+
+        [TestMethod]
         public void ExportDds()
         {
             CompareAfterExport(TestData.Directory + "checkers.dds", ExportDir + "checkers", "dds", GliFormat.RGB8_SRGB);
         }
 
         [TestMethod]
+        public void ExportAllDds()
+        {
+            TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "dds");
+        }
+
+        [TestMethod]
         public void ExportKtx()
         {
             CompareAfterExport(TestData.Directory + "small.ktx", ExportDir + "small", "ktx", GliFormat.RGBA32_SFLOAT, Color.Channel.Rgba);
+        }
+
+        [TestMethod]
+        public void ExportAllKtx()
+        {
+            TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "ktx");
         }
 
         private void CompareAfterExport(string inputImage, string outputImage, string outputExtension, GliFormat format, Color.Channel channels = Color.Channel.Rgb, float tolerance = 0.01f)
@@ -113,6 +155,28 @@ namespace FrameworkTests.Model
                     var expColor = origTex.GetPixelColors(curLayer, curMipmap);
 
                     TestData.CompareColors(origColors, expColor, channels, tolerance);
+                }
+            }
+        }
+
+        private void TryExportAllFormats(string inputImage, string outputImage, string outputExtension)
+        {
+            var model = new Models(1);
+            model.AddImageFromFile(inputImage);
+            model.Apply();
+            var tex = model.Pipelines[0].Image;
+
+            var eFmt = model.Export.Formats.First(fmt => fmt.Extension == outputExtension);
+
+            foreach (var format in eFmt.Formats)
+            {
+                try
+                {
+                    model.Export.Export(tex, new ExportDescription(outputImage, outputExtension, model.Export));
+                }
+                catch (Exception e)
+                {
+                    throw new Exception($"export failed for format {format}:\n{e.Message}");
                 }
             }
         }
