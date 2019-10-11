@@ -99,21 +99,24 @@
                 Header="_Theme">
                 <MenuItem
                     Header="Default"
-                    Command="{Binding SetThemeCommand}">
+                    Command="{Binding SetThemeCommand}"
+                    IsEnabled="{Binding SetThemeCommand.DefaultEnabled}">
                     <MenuItem.CommandParameter>
                         <system:Int32>0</system:Int32>
                     </MenuItem.CommandParameter>
                 </MenuItem>
                 <MenuItem
                     Header="White"
-                    Command="{Binding SetThemeCommand}">
+                    Command="{Binding SetThemeCommand}"
+                    IsEnabled="{Binding SetThemeCommand.WhiteEnabled}">
                     <MenuItem.CommandParameter>
                         <system:Int32>1</system:Int32>
                     </MenuItem.CommandParameter>
                 </MenuItem>
                 <MenuItem
                     Header="Dark"
-                    Command="{Binding SetThemeCommand}">
+                    Command="{Binding SetThemeCommand}"
+                    IsEnabled="{Binding SetThemeCommand.DarkEnabled}">
                     <MenuItem.CommandParameter>
                         <system:Int32>2</system:Int32>
                     </MenuItem.CommandParameter>
