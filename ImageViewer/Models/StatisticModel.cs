@@ -30,8 +30,15 @@ namespace ImageViewer.Models
         {
             switch (e.PropertyName)
             {
-                case nameof(DisplayModel.ActiveMipmap):
                 case nameof(DisplayModel.ActiveLayer):
+                    if (display.ActiveView == DisplayModel.ViewMode.CubeCrossView ||
+                        display.ActiveView == DisplayModel.ViewMode.CubeMap)
+                        return; // does not need to be recomputed
+
+                    UpdateStatistics();
+                    break;
+                case nameof(DisplayModel.ActiveMipmap):
+                case nameof(DisplayModel.ActiveView):
                     UpdateStatistics();
                     break;
             }
@@ -51,7 +58,23 @@ namespace ImageViewer.Models
         {
             if (pipe.Image != null)
             {
-                Stats = models.GetStatistics(pipe.Image, display.ActiveLayer, display.ActiveMipmap);
+                if (display.ActiveView == DisplayModel.ViewMode.CubeCrossView ||
+                    display.ActiveView == DisplayModel.ViewMode.CubeMap)
+                {
+                    // compute for all layers
+                    Stats = StatisticsModel.Zero;
+                    for (int i = 0; i < models.Images.NumLayers; ++i)
+                    {
+                        Stats.Plus(models.GetStatistics(pipe.Image, i, display.ActiveMipmap));
+                    }
+
+                    Stats.Divide((float) models.Images.NumLayers);
+                }
+                else // compute for single layer
+                {
+                    Stats = models.GetStatistics(pipe.Image, display.ActiveLayer, display.ActiveMipmap);
+                }
+                
                 OnPropertyChanged(nameof(Stats));
             }
             else

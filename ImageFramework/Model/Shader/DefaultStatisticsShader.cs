@@ -39,6 +39,22 @@ namespace ImageFramework.Model.Shader
             Debug.Assert(false);
             return 0.0f;
         }
+
+        public void Plus(DefaultStatistics other)
+        {
+            Luminance += other.Luminance;
+            Luma += other.Luma;
+            Lightness += other.Lightness;
+            Alpha += other.Alpha;
+        }
+
+        public void Divide(float value)
+        {
+            Luminance /= value;
+            Luma /= value;
+            Lightness /= value;
+            Alpha /= value;
+        }
     }
 
     internal class DefaultStatisticsShader : StatisticsShader<DefaultStatistics>
