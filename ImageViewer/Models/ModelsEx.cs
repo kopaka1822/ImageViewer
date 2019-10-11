@@ -34,7 +34,7 @@ namespace ImageViewer.Models
 
             var stats = new List<StatisticModel>();
             for(int i = 0; i < NumPipelines; ++i)
-                stats.Add(new StatisticModel(this, i));
+                stats.Add(new StatisticModel(this, Display, i));
             Statistics = stats;
 
             resizeController = new ResizeController(this);
