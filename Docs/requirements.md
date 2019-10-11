@@ -20,15 +20,15 @@
 
 # Image Viewer Requirements
 
-- [ ] view image slice (1 layer, 1 mipmap)
-- [ ] view image cubemap (layer == 6)
-- [ ] view all cubemap layers in one view (layer == 6)
-- [ ] view polar coordinate maps (layer == 1)
-- [ ] modify displayed brightness with +/- keys (don't change pixel colors itself)
-- [ ] show multiple image equations at once (up to 4)
-- [ ] open multiple windows
+- [x] view image slice (1 layer, 1 mipmap)
+- [x] view image cubemap (layer == 6)
+- [x] view all cubemap layers in one view (layer == 6)
+- [x] view polar coordinate maps (layer == 1)
+- [x] modify displayed brightness with +/- keys (don't change pixel colors itself)
+- [x] show multiple image equations at once (up to 4)
+- [x] open multiple windows
 - [ ] enable/disable linear interpolation for output
-- [ ] show export crop box
-- [ ] display texel in linear/srgb
-- [ ] display texel values summed over a radius
-- [ ] help windows for equations and filter
+- [x] show export crop box
+- [ ] display texel in linear/srgb/float
+- [x] display texel values summed over a radius
+- [x] help windows for equations and filter
