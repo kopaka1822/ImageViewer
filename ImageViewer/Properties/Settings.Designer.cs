@@ -130,5 +130,29 @@ namespace ImageViewer.Properties {
                 this["UpdateSettings"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int TexelDisplayMode {
+            get {
+                return ((int)(this["TexelDisplayMode"]));
+            }
+            set {
+                this["TexelDisplayMode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public int TexelDecimalCount {
+            get {
+                return ((int)(this["TexelDecimalCount"]));
+            }
+            set {
+                this["TexelDecimalCount"] = value;
+            }
+        }
     }
 }

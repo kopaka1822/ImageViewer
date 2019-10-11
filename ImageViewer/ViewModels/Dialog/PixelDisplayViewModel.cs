@@ -19,35 +19,43 @@ namespace ImageViewer.ViewModels.Dialog
         {
             this.models = models;
             this.models.Display.PropertyChanged += DisplayOnPropertyChanged;
-            this.decimalPlaces = models.Display.TexelDecimalPlaces;
+            this.models.Settings.PropertyChanged += SettingsOnPropertyChanged;
+            this.decimalPlaces = models.Settings.TexelDecimalPlaces;
             this.radius = models.Display.TexelRadius;
 
-            AvailableFormats.Add(new ComboBoxItem<DisplayModel.TexelDisplayMode>("decimal (linear)", DisplayModel.TexelDisplayMode.LinearDecimal));
-            AvailableFormats.Add(new ComboBoxItem<DisplayModel.TexelDisplayMode>("float (linear)", DisplayModel.TexelDisplayMode.LinearFloat));
-            AvailableFormats.Add(new ComboBoxItem<DisplayModel.TexelDisplayMode>("decimal (sRGB)", DisplayModel.TexelDisplayMode.SrgbDecimal));
-            AvailableFormats.Add(new ComboBoxItem<DisplayModel.TexelDisplayMode>("byte (sRGB)", DisplayModel.TexelDisplayMode.SrgbByte));
+            AvailableFormats.Add(new ComboBoxItem<SettingsModel.TexelDisplayMode>("decimal (linear)", SettingsModel.TexelDisplayMode.LinearDecimal));
+            AvailableFormats.Add(new ComboBoxItem<SettingsModel.TexelDisplayMode>("float (linear)", SettingsModel.TexelDisplayMode.LinearFloat));
+            AvailableFormats.Add(new ComboBoxItem<SettingsModel.TexelDisplayMode>("decimal (sRGB)", SettingsModel.TexelDisplayMode.SrgbDecimal));
+            AvailableFormats.Add(new ComboBoxItem<SettingsModel.TexelDisplayMode>("byte (sRGB)", SettingsModel.TexelDisplayMode.SrgbByte));
 
-            selectedFormat = AvailableFormats.Find(box => box.Cargo == models.Display.TexelDisplay);
+            selectedFormat = AvailableFormats.Find(box => box.Cargo == models.Settings.TexelDisplay);
+        }
+
+        private void SettingsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(SettingsModel.TexelDecimalPlaces):
+                    DecimalPlaces = models.Settings.TexelDecimalPlaces;
+                    break;
+                case nameof(SettingsModel.TexelDisplay):
+                    SelectedFormat = AvailableFormats.Find(box => box.Cargo == models.Settings.TexelDisplay);
+                    break;
+            }
         }
 
         private void DisplayOnPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
             switch (args.PropertyName)
             {
-                case nameof(DisplayModel.TexelDecimalPlaces):
-                    DecimalPlaces = models.Display.TexelDecimalPlaces;
-                    break;
                 case nameof(DisplayModel.TexelRadius):
                     Radius = models.Display.TexelRadius;
-                    break;
-                case nameof(DisplayModel.TexelDisplay):
-                    SelectedFormat = AvailableFormats.Find(box => box.Cargo == models.Display.TexelDisplay);
                     break;
             }
         }
 
-        public int MinDecimalPlaces => models.Display.MinTexelDecimalPlaces;
-        public int MaxDecimalPlaces => models.Display.MaxTexelDecimalPlaces;
+        public int MinDecimalPlaces => models.Settings.MinTexelDecimalPlaces;
+        public int MaxDecimalPlaces => models.Settings.MaxTexelDecimalPlaces;
         public int MinRadius => models.Display.MinTexelRadius;
         public int MaxRadius => models.Display.MaxTexelRadius;
 
@@ -75,10 +83,10 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
-        public List<ComboBoxItem<DisplayModel.TexelDisplayMode>> AvailableFormats { get; } = new List<ComboBoxItem<DisplayModel.TexelDisplayMode>>();
+        public List<ComboBoxItem<SettingsModel.TexelDisplayMode>> AvailableFormats { get; } = new List<ComboBoxItem<SettingsModel.TexelDisplayMode>>();
 
-        private ComboBoxItem<DisplayModel.TexelDisplayMode> selectedFormat;
-        public ComboBoxItem<DisplayModel.TexelDisplayMode> SelectedFormat
+        private ComboBoxItem<SettingsModel.TexelDisplayMode> selectedFormat;
+        public ComboBoxItem<SettingsModel.TexelDisplayMode> SelectedFormat
         {
             get => selectedFormat;
             set
@@ -96,8 +104,8 @@ namespace ImageViewer.ViewModels.Dialog
 
         public void Apply()
         {
-            models.Display.TexelDisplay = SelectedFormat.Cargo;
-            models.Display.TexelDecimalPlaces = DecimalPlaces;
+            models.Settings.TexelDisplay = SelectedFormat.Cargo;
+            models.Settings.TexelDecimalPlaces = DecimalPlaces;
             models.Display.TexelRadius = Radius;
         }
 

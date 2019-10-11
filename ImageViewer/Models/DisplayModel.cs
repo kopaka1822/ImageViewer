@@ -33,14 +33,6 @@ namespace ImageViewer.Models
             Horizontal
         }
 
-        public enum TexelDisplayMode
-        {
-            LinearDecimal,
-            LinearFloat,
-            SrgbDecimal,
-            SrgbByte
-        }
-
         private readonly ImageFramework.Model.Models models;
 
         private List<ViewMode> availableViews = new List<ViewMode>() { ViewMode.Empty };
@@ -245,22 +237,6 @@ namespace ImageViewer.Models
             }
         }
 
-        public int MinTexelDecimalPlaces { get; } = 2;
-        public int MaxTexelDecimalPlaces { get; } = 10;
-
-        private int texelDecimalPlaces = 3;
-        public int TexelDecimalPlaces
-        {
-            get => texelDecimalPlaces;
-            set
-            {
-                var clamped = Math.Min(Math.Max(value, MinTexelDecimalPlaces), MaxTexelDecimalPlaces);
-                if (clamped == texelDecimalPlaces) return;
-                texelDecimalPlaces = clamped;
-                OnPropertyChanged(nameof(TexelDecimalPlaces));
-            }
-        }
-
         public int MinTexelRadius { get; } = 0;
         public int MaxTexelRadius { get; } = 10;
 
@@ -274,18 +250,6 @@ namespace ImageViewer.Models
                 if (texelRadius == clamped) return;
                 texelRadius = clamped;
                 OnPropertyChanged(nameof(TexelRadius));
-            }
-        }
-
-        private TexelDisplayMode texelDisplay = TexelDisplayMode.LinearDecimal;
-        public TexelDisplayMode TexelDisplay
-        {
-            get => texelDisplay;
-            set
-            {
-                if (value == texelDisplay) return;
-                texelDisplay = value;
-                OnPropertyChanged(nameof(TexelDisplay));
             }
         }
 
