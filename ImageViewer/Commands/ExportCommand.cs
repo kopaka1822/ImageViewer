@@ -94,7 +94,9 @@ namespace ImageViewer.Commands
 
             if (exportExtension == null)
             {
-                exportExtension = System.IO.Path.GetExtension(firstImage)?.Substring(1);
+                exportExtension = System.IO.Path.GetExtension(firstImage);
+                if (exportExtension != null && exportExtension.StartsWith("."))
+                    exportExtension = exportExtension.Substring(1);
             }
 
             if (exportFormat == null)

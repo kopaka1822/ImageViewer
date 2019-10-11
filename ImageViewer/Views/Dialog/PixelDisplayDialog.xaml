@@ -11,7 +11,8 @@
         SizeToContent="Height"
         ResizeMode="NoResize"
         Icon="../../Icons/displayconfig.png"
-        Style="{StaticResource WindowStyle}">
+        Style="{StaticResource WindowStyle}"
+        WindowStartupLocation="CenterOwner">
     <Border Padding="5">
         <StackPanel>
             <!-- FORMAT -->

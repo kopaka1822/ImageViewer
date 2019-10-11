@@ -10,7 +10,8 @@
         Width="280"
         ResizeMode="NoResize"
         SizeToContent="Height"
-        Style="{StaticResource WindowStyle}">
+        Style="{StaticResource WindowStyle}"
+        WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <Thickness x:Key="DefaultMargin" Top="0" Left="0" Right="0" Bottom="2"/>
     </Window.Resources>

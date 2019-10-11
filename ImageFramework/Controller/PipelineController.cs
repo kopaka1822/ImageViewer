@@ -117,7 +117,7 @@ namespace ImageFramework.Controller
             var res = new List<FilterModel>();
             foreach (var filter in models.Filter.Filter)
             {
-                if(filter.IsPipelineEnabled(index))
+                if(filter.IsEnabledFor(index))
                     res.Add(filter);
             }
 
