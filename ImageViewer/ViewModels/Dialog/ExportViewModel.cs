@@ -75,6 +75,9 @@ namespace ImageViewer.ViewModels.Dialog
                     SelectedFormat = AvailableFormat.Last();
             }
 
+            if (SelectedFormat == null)
+                SelectedFormat = AvailableFormat[0];
+
             models.Export.PropertyChanged += ExportOnPropertyChanged;
         }
 
