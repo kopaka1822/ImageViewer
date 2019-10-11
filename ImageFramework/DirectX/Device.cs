@@ -202,7 +202,23 @@ namespace ImageFramework.DirectX
         private void SetDefaults()
         {
             InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
-            
+
+            var desc = new RasterizerStateDescription
+            {
+                CullMode = CullMode.None,
+                DepthBias = 0,
+                DepthBiasClamp = 0,
+                FillMode = FillMode.Solid,
+                IsAntialiasedLineEnabled = false,
+                IsDepthClipEnabled = false,
+                IsFrontCounterClockwise = true,
+                IsMultisampleEnabled = false,
+                IsScissorEnabled = true,
+                SlopeScaledDepthBias = 0.0f
+            };
+            var defaultState = new RasterizerState(Handle, desc);
+
+            context.Rasterizer.State = defaultState;
         }
 
         /// <summary>
