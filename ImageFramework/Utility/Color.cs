@@ -112,9 +112,9 @@ namespace ImageFramework.Utility
             return $"{ScalarToByte(Red)} {ScalarToByte(Green)} {ScalarToByte(Blue)}" + (showAlpha ? $" {ScalarToByte(Alpha)}" : "");
         }
 
-        public string ToFloatString(bool showAlpha)
+        public string ToFloatString(bool showAlpha, int decimalPlaces)
         {
-            return $"{FloatToString(Red)} {FloatToString(Green)} {FloatToString(Blue)}" + (showAlpha ? $" {FloatToString(Alpha)}" : "");
+            return $"{FloatToString(Red, decimalPlaces)} {FloatToString(Green, decimalPlaces)} {FloatToString(Blue, decimalPlaces)}" + (showAlpha ? $" {FloatToString(Alpha, decimalPlaces)}" : "");
         }
 
         /// <summary>
@@ -221,9 +221,20 @@ namespace ImageFramework.Utility
             return str;
         }
 
-        private static string FloatToString(float val)
+        private static string FloatToString(float val, int decimalPlaces)
         {
-            return val.ToString("G", Models.Culture);
+            var numPlaces = 7 + decimalPlaces;
+
+            var format = "e" + (decimalPlaces - 1);
+            var res = val.ToString(format, Models.Culture);
+
+            // add whitespaces if number too short
+            while (res.Length < numPlaces)
+            {
+                res = " " + res;
+            }
+
+            return res;
         }
     }
 }
