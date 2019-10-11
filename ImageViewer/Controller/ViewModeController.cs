@@ -165,6 +165,7 @@ namespace ImageViewer.Controller
             {
                 mouseDown = true;
                 e.Handled = true;
+                dxHost.Focus();
             }
                 
 

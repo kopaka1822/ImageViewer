@@ -61,7 +61,8 @@
                 <Border
                     x:Name="BorderHost"
                     Background="Black"
-                    ContextMenu="{StaticResource ClientContextMenu}"/>
+                    ContextMenu="{StaticResource ClientContextMenu}"
+                    Focusable="True"/>
 
                 <GridSplitter 
                     Grid.Column="1"

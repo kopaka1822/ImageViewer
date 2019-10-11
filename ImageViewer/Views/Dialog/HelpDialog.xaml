@@ -9,7 +9,8 @@
         Height="450" 
         Width="400"
         Icon="../../Icons/help.png"
-        Style="{StaticResource WindowStyle}">
+        Style="{StaticResource WindowStyle}"
+        WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
