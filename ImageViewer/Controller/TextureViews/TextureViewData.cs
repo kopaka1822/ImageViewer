@@ -74,7 +74,7 @@ namespace ImageViewer.Controller.TextureViews
                 AddressW = TextureAddressMode.Clamp,
                 BorderColor = new RawColor4(),
                 ComparisonFunction = Comparison.Never,
-                Filter = linear ? Filter.MaximumMinMagMipLinear : Filter.MinMagMipPoint,
+                Filter = linear ? Filter.MinMagLinearMipPoint : Filter.MinMagMipPoint,
                 MaximumAnisotropy = 1,
                 MaximumLod = float.MaxValue,
                 MinimumLod = 0,

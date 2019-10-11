@@ -27,8 +27,8 @@
 - [x] modify displayed brightness with +/- keys (don't change pixel colors itself)
 - [x] show multiple image equations at once (up to 4)
 - [x] open multiple windows
-- [ ] enable/disable linear interpolation for output
+- [x] enable/disable linear interpolation for output
 - [x] show export crop box
-- [ ] display texel in linear/srgb/float
+- [x] display texel in linear/srgb/float
 - [x] display texel values summed over a radius
 - [x] help windows for equations and filter
