@@ -97,5 +97,12 @@ float4 toSrgb(float4 c){
 
             return new Int2{X = (int)(x), Y = (int)(y)};
         }
+
+        public static T Clamp<T>(T val, T min, T max) where T : IComparable<T>
+        {
+            if (val.CompareTo(min) < 0) return min;
+            if (val.CompareTo(max) > 0) return max;
+            return val;
+        }
     }
 }

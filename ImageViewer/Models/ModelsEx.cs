@@ -20,6 +20,7 @@ namespace ImageViewer.Models
         private readonly ComputeImageController computeImageController;
         private readonly ClientDropController clientDropController;
         private readonly PaintController paintController;
+        private readonly CropController cropController;
         public ModelsEx(MainWindow window)
         : base(4)
         {
@@ -40,6 +41,7 @@ namespace ImageViewer.Models
             computeImageController = new ComputeImageController(this);
             paintController = new PaintController(this);
             clientDropController = new ClientDropController(this);
+            cropController = new CropController(this);
         }
 
         public override void Dispose()

@@ -99,6 +99,7 @@
     <Compile Include="Commands\SimpleCommand.cs" />
     <Compile Include="Controller\ClientDropController.cs" />
     <Compile Include="Controller\ComputeImageController.cs" />
+    <Compile Include="Controller\CropController.cs" />
     <Compile Include="Controller\ImportDialogController.cs" />
     <Compile Include="Controller\PaintController.cs" />
     <Compile Include="Controller\TextureViews\CubeCrossTextureView.cs" />
