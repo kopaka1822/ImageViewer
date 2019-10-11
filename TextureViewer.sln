@@ -3,13 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29306.81
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageLoader", "ImageLoader\ImageLoader.vcxproj", "{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextureViewer", "TextureViewer\TextureViewer.csproj", "{E339B099-A84E-41D9-A3F8-F437764CC86D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC} = {8AA2D64F-E272-4458-9FDE-7290DE68F4EC}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageFramework", "ImageFramework\ImageFramework.csproj", "{1FCF1E39-B845-409F-842D-CCA7CB21DC06}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D7F88FA5-B8FF-4BBF-B583-54B41B9B6851} = {D7F88FA5-B8FF-4BBF-B583-54B41B9B6851}
@@ -36,39 +29,6 @@ Global
 		TestDebug|x86 = TestDebug|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.Debug|x64.ActiveCfg = Debug|x64
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.Debug|x64.Build.0 = Debug|x64
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.Debug|x86.ActiveCfg = Debug|Win32
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.Debug|x86.Build.0 = Debug|Win32
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.Release|Any CPU.ActiveCfg = Release|Win32
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.Release|x64.ActiveCfg = Release|x64
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.Release|x64.Build.0 = Release|x64
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.Release|x86.ActiveCfg = Release|Win32
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.Release|x86.Build.0 = Release|Win32
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.TestDebug|Any CPU.ActiveCfg = TestDebug|Win32
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.TestDebug|x64.ActiveCfg = TestDebug|x64
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.TestDebug|x64.Build.0 = TestDebug|x64
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.TestDebug|x86.ActiveCfg = TestDebug|Win32
-		{8AA2D64F-E272-4458-9FDE-7290DE68F4EC}.TestDebug|x86.Build.0 = TestDebug|Win32
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.Debug|x64.ActiveCfg = Debug|x64
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.Debug|x64.Build.0 = Debug|x64
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.Debug|x86.Build.0 = Debug|Any CPU
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.Release|x64.ActiveCfg = Release|x64
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.Release|x64.Build.0 = Release|x64
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.Release|x86.ActiveCfg = Release|Any CPU
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.Release|x86.Build.0 = Release|Any CPU
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.TestDebug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.TestDebug|Any CPU.Build.0 = Debug|Any CPU
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.TestDebug|x64.ActiveCfg = Debug|Any CPU
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.TestDebug|x64.Build.0 = Debug|Any CPU
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.TestDebug|x86.ActiveCfg = Debug|Any CPU
-		{E339B099-A84E-41D9-A3F8-F437764CC86D}.TestDebug|x86.Build.0 = Debug|Any CPU
 		{1FCF1E39-B845-409F-842D-CCA7CB21DC06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1FCF1E39-B845-409F-842D-CCA7CB21DC06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FCF1E39-B845-409F-842D-CCA7CB21DC06}.Debug|x64.ActiveCfg = Debug|x64
