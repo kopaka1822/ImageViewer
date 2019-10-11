@@ -14,13 +14,27 @@ namespace ImageViewer.Models
     public class StatisticModel : INotifyPropertyChanged
     {
         private readonly ImageFramework.Model.Models models;
+        private readonly DisplayModel display;
         private readonly ImagePipeline pipe;
 
-        public StatisticModel(ImageFramework.Model.Models models, int index)
+        public StatisticModel(ImageFramework.Model.Models models, DisplayModel display, int index)
         {
             this.models = models;
+            this.display = display;
             pipe = this.models.Pipelines[index];
             pipe.PropertyChanged += PipeOnPropertyChanged;
+            display.PropertyChanged += DisplayOnPropertyChanged;
+        }
+
+        private void DisplayOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(DisplayModel.ActiveMipmap):
+                case nameof(DisplayModel.ActiveLayer):
+                    UpdateStatistics();
+                    break;
+            }
         }
 
         private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -28,22 +42,24 @@ namespace ImageViewer.Models
             switch (e.PropertyName)
             {
                 case nameof(ImagePipeline.Image):
-                    if(pipe.Image != null)
-                        UpdateStatistics(); // image was refreshed
-                    else
-                    {
-                        Stats = StatisticsModel.Zero;
-                        OnPropertyChanged(nameof(Stats));
-                    }
+                    UpdateStatistics();
                     break;
             }
         }
 
         private void UpdateStatistics()
         {
-            // TODO calculate statistics for all layers and one mipmap
-            Stats = models.GetStatistics(pipe.Image);
-            OnPropertyChanged(nameof(Stats));
+            if (pipe.Image != null)
+            {
+                Stats = models.GetStatistics(pipe.Image, display.ActiveLayer, display.ActiveMipmap);
+                OnPropertyChanged(nameof(Stats));
+            }
+            else
+            {
+                Stats = StatisticsModel.Zero;
+                OnPropertyChanged(nameof(Stats));
+            }
+            
         }
 
         public StatisticsModel Stats { get; private set; } = StatisticsModel.Zero;
