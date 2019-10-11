@@ -223,10 +223,13 @@ namespace ImageFramework.Utility
 
         private static string FloatToString(float val, int decimalPlaces)
         {
-            var numPlaces = 7 + decimalPlaces;
+            var numPlaces = 6 + decimalPlaces;
 
             var format = "e" + (decimalPlaces - 1);
             var res = val.ToString(format, Models.Culture);
+            // exponent has three places but float has only precision for 2 places in decimal
+            if (res[res.Length - 3] == '0')
+                res = res.Remove(res.Length - 3, 1);
 
             // add whitespaces if number too short
             while (res.Length < numPlaces)

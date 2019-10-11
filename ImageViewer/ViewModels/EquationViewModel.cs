@@ -35,6 +35,18 @@ namespace ImageViewer.ViewModels
 
             this.model.PropertyChanged += ModelOnPropertyChanged;
             this.models.Display.PropertyChanged += DisplayOnPropertyChanged;
+            this.models.Settings.PropertyChanged += SettingsOnPropertyChanged;
+        }
+
+        private void SettingsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(SettingsModel.TexelDecimalPlaces):
+                case nameof(SettingsModel.TexelDisplay):
+                    OnPropertyChanged(nameof(TexelColor));
+                    break;
+            }
         }
 
         private void FormulaOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -54,10 +66,6 @@ namespace ImageViewer.ViewModels
                 case nameof(DisplayModel.TexelPosition):
                 case nameof(DisplayModel.TexelRadius):
                     RecomputeTexelColor();
-                    break;
-                case nameof(DisplayModel.TexelDisplay):
-                case nameof(DisplayModel.TexelDecimalPlaces):
-                    OnPropertyChanged(nameof(TexelColor));
                     break;
             }
         }
@@ -129,17 +137,17 @@ namespace ImageViewer.ViewModels
             get
             {
                 var c = texelColor;
-                if (models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.SrgbByte ||
-                    models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.SrgbDecimal)
+                if (models.Settings.TexelDisplay == SettingsModel.TexelDisplayMode.SrgbByte ||
+                    models.Settings.TexelDisplay == SettingsModel.TexelDisplayMode.SrgbDecimal)
                     c = c.ToSrgb();
 
                 string res;
 
-                if (models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.SrgbDecimal ||
-                    models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.LinearDecimal)
-                    res = c.ToDecimalString(statistics.Stats.HasAlpha, models.Display.TexelDecimalPlaces);
-                else if (models.Display.TexelDisplay == DisplayModel.TexelDisplayMode.LinearFloat)
-                    res = c.ToFloatString(statistics.Stats.HasAlpha, models.Display.TexelDecimalPlaces);
+                if (models.Settings.TexelDisplay == SettingsModel.TexelDisplayMode.SrgbDecimal ||
+                    models.Settings.TexelDisplay == SettingsModel.TexelDisplayMode.LinearDecimal)
+                    res = c.ToDecimalString(statistics.Stats.HasAlpha, models.Settings.TexelDecimalPlaces);
+                else if (models.Settings.TexelDisplay == SettingsModel.TexelDisplayMode.LinearFloat)
+                    res = c.ToFloatString(statistics.Stats.HasAlpha, models.Settings.TexelDecimalPlaces);
                 else // byte 
                     res = c.ToBitString(statistics.Stats.HasAlpha);
 

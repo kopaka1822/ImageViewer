@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageFramework.Model.Shader;
+using ImageFramework.Utility;
 using ImageViewer.Properties;
 using ImageViewer.ViewModels;
 using ImageViewer.Views.Theme;
@@ -15,6 +16,14 @@ namespace ImageViewer.Models
 {
     public class SettingsModel : INotifyPropertyChanged
     {
+        public enum TexelDisplayMode
+        {
+            LinearDecimal,
+            LinearFloat,
+            SrgbDecimal,
+            SrgbByte
+        }
+
         public SettingsModel()
         {
             // required if assembly version changes
@@ -25,6 +34,20 @@ namespace ImageViewer.Models
                 Save();
             }
             
+            Settings.Default.PropertyChanged += DefaultOnPropertyChanged;
+        }
+
+        private void DefaultOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(Settings.Default.TexelDisplayMode):
+                    OnPropertyChanged(nameof(TexelDisplay));
+                    break;
+                case nameof(Settings.Default.TexelDecimalCount):
+                    OnPropertyChanged(nameof(TexelDecimalPlaces));
+                    break;
+            }
         }
 
         public int WindowWidth
@@ -88,6 +111,25 @@ namespace ImageViewer.Models
         {
             get => Settings.Default.LastQuality;
             set => Settings.Default.LastQuality = value;
+        }
+
+        public TexelDisplayMode TexelDisplay
+        {
+            get => (TexelDisplayMode)Settings.Default.TexelDisplayMode;
+            set => Settings.Default.TexelDisplayMode = (int) value;
+        }
+
+        public int MinTexelDecimalPlaces { get; } = 2;
+        public int MaxTexelDecimalPlaces { get; } = 10;
+
+        public int TexelDecimalPlaces
+        {
+            get => Settings.Default.TexelDecimalCount;
+            set
+            {
+                var clamp = Utility.Clamp(value, MinTexelDecimalPlaces, MaxTexelDecimalPlaces);
+                Settings.Default.TexelDecimalCount = clamp;
+            }
         }
 
         public void Save()
