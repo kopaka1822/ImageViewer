@@ -18,16 +18,16 @@ namespace ImageFramework.ImageLoader
             GliFormat = format;
             switch (format)
             {
-                case GliFormat.RGBA32_SFLOAT_PACK32:
+                case GliFormat.RGBA32_SFLOAT:
                     DxgiFormat = Format.R32G32B32A32_Float;
                     break;
-                case GliFormat.RGBA8_SRGB_PACK8:
+                case GliFormat.RGBA8_SRGB:
                     DxgiFormat = Format.R8G8B8A8_UNorm_SRgb;
                     break;
-                case GliFormat.RGBA8_UNORM_PACK8:
+                case GliFormat.RGBA8_UNORM:
                     DxgiFormat = Format.R8G8B8A8_UNorm;
                     break;
-                case GliFormat.RGBA8_SNORM_PACK8:
+                case GliFormat.RGBA8_SNORM:
                     DxgiFormat = Format.R8G8B8A8_SNorm;
                     break;
                 default:
@@ -42,16 +42,16 @@ namespace ImageFramework.ImageLoader
             switch (format)
             {
                 case Format.R32G32B32A32_Float:
-                    GliFormat = GliFormat.RGBA32_SFLOAT_PACK32;
+                    GliFormat = GliFormat.RGBA32_SFLOAT;
                     break;
                 case Format.R8G8B8A8_UNorm_SRgb:
-                    GliFormat = GliFormat.RGBA8_SRGB_PACK8;
+                    GliFormat = GliFormat.RGBA8_SRGB;
                     break;
                 case Format.R8G8B8A8_UNorm:
-                    GliFormat = GliFormat.RGBA8_UNORM_PACK8;
+                    GliFormat = GliFormat.RGBA8_UNORM;
                     break;
                 case Format.R8G8B8A8_SNorm:
-                    GliFormat = GliFormat.RGBA8_SNORM_PACK8;
+                    GliFormat = GliFormat.RGBA8_SNORM;
                     break;
                 default:
                     Debug.Assert(false);

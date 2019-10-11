@@ -55,13 +55,13 @@ namespace ImageFramework.Model.Export
                 switch (model.LdrExportMode)
                 {
                     case ExportModel.LdrMode.Srgb:
-                        StagingFormat = new ImageFormat(GliFormat.RGBA8_SRGB_PACK8);
+                        StagingFormat = new ImageFormat(GliFormat.RGBA8_SRGB);
                         break;
                     case ExportModel.LdrMode.UNorm:
-                        StagingFormat = new ImageFormat(GliFormat.RGBA8_UNORM_PACK8);
+                        StagingFormat = new ImageFormat(GliFormat.RGBA8_UNORM);
                         break;
                     case ExportModel.LdrMode.SNorm:
-                        StagingFormat = new ImageFormat(GliFormat.RGBA8_SNORM_PACK8);
+                        StagingFormat = new ImageFormat(GliFormat.RGBA8_SNORM);
                         break;
                     default:
                         Debug.Assert(false);
@@ -70,7 +70,7 @@ namespace ImageFramework.Model.Export
             }
             else
             {
-                StagingFormat = new ImageFormat(GliFormat.RGBA32_SFLOAT_PACK32);
+                StagingFormat = new ImageFormat(GliFormat.RGBA32_SFLOAT);
             }
         }
 
