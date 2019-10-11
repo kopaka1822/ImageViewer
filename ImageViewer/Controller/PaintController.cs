@@ -37,8 +37,8 @@ namespace ImageViewer.Controller
             models.Window.PropertyChanged += WindowOnPropertyChanged;
 
             // client mouse events
-            models.Window.Window.BorderHost.MouseMove += (sender, e) => ScheduleRedraw();
-            models.Window.Window.BorderHost.MouseWheel += (sender, e) => ScheduleRedraw();
+            models.Window.Window.BorderHost.PreviewMouseMove += (sender, e) => ScheduleRedraw();
+            models.Window.Window.BorderHost.PreviewMouseWheel += (sender, e) => ScheduleRedraw();
 
             foreach (var pipe in models.Pipelines)
             {

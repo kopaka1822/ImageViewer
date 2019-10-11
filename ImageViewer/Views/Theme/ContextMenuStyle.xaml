@@ -22,9 +22,6 @@
                             <Setter TargetName="Border"
                                     Property="Padding"
                                     Value="0,3,0,3" />
-                            <Setter TargetName="Border"
-                                    Property="CornerRadius"
-                                    Value="4" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

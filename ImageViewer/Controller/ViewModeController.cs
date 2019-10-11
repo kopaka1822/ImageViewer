@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Threading;
 using ImageViewer.Controller.TextureViews;
 using ImageViewer.Models;
 using SharpDX;
@@ -25,6 +26,7 @@ namespace ImageViewer.Controller
         private readonly Border dxHost;
         private ITextureView currentView = new EmptyView();
         private TextureViewData viewData;
+        private bool recomputeScheduled = false;
 
         public ViewModeController(ModelsEx models)
         {
@@ -38,6 +40,22 @@ namespace ImageViewer.Controller
             dxHost.MouseMove += DxHostOnMouseMove;
 
             viewData = new TextureViewData();
+        }
+
+        private void DispatchRecomputeTexelColor()
+        {
+            if (recomputeScheduled) return;
+            
+            Dispatcher.CurrentDispatcher.BeginInvoke((Action) RecomputeTexelColor);
+            recomputeScheduled = true;
+        }
+
+        private void RecomputeTexelColor()
+        {
+            recomputeScheduled = false;
+
+            models.Display.TexelPosition = currentView.GetTexelPosition(
+                ConvertToCanonical(new Vector2(mousePosition.X, mousePosition.Y)));
         }
 
         public void Repaint()
@@ -118,10 +136,11 @@ namespace ImageViewer.Controller
                 }
             }
 
+            // set handle to true to keep getting mouse move events
+            e.Handled = true;
             mousePosition = newPosition;
 
-            models.Display.TexelPosition = currentView.GetTexelPosition(
-                ConvertToCanonical(new Vector2(mousePosition.X, mousePosition.Y)));
+            DispatchRecomputeTexelColor();
         }
 
         private void DxHostOnMouseLeave(object sender, MouseEventArgs e)
@@ -132,14 +151,22 @@ namespace ImageViewer.Controller
         private void DxHostOnMouseUp(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
+            {
                 mouseDown = false;
+                e.Handled = true;
+            }
+                
             mousePosition = new Point((int)e.GetPosition(dxHost).X, (int)e.GetPosition(dxHost).Y);
         }
 
         private void DxHostOnMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
+            {
                 mouseDown = true;
+                e.Handled = true;
+            }
+                
 
             mousePosition = new Point((int)e.GetPosition(dxHost).X, (int)e.GetPosition(dxHost).Y);
         }
@@ -157,7 +184,7 @@ namespace ImageViewer.Controller
                 canMouse
             );
 
-            models.Display.TexelPosition = currentView.GetTexelPosition(canMouse);
+            DispatchRecomputeTexelColor();
         }
 
         private Vector2 ConvertToCanonical(Vector2 windowCoord)
