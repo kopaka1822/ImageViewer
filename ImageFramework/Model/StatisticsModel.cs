@@ -7,9 +7,9 @@ namespace ImageFramework.Model
     /// </summary>
     public class StatisticsModel
     {
-        public DefaultStatistics Avg { get; internal set; }
-        public DefaultStatistics Min { get; internal set; }
-        public DefaultStatistics Max { get; internal set; }
+        public DefaultStatistics Avg;
+        public DefaultStatistics Min;
+        public DefaultStatistics Max;
 
         /// <summary>
         /// image has an active alpha channel if at least one pixel has alpha unequal to one
