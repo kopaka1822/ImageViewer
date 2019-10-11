@@ -89,6 +89,7 @@ namespace ImageViewer.Controller
                 case nameof(ExportModel.UseCropping):
                 case nameof(ExportModel.Mipmap):
                 case nameof(ExportModel.Layer):
+                case nameof(ExportModel.IsExporting):
                     ScheduleRedraw();
                     break;
             }

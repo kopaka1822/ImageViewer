@@ -46,6 +46,9 @@ namespace ImageViewer.ViewModels.Dialog
             selectedMipmap = AvailableMipmaps[models.Export.Mipmap];
             Debug.Assert(selectedMipmap.Cargo == models.Export.Mipmap);
 
+            // set crop borders
+
+
             // all layer option for ktx and dds
             if (models.Images.NumLayers > 1 && (extension == "ktx" || extension == "dds"))
             {

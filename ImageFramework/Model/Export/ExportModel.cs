@@ -148,7 +148,7 @@ namespace ImageFramework.Model.Export
             get => cropStartX;
             set
             {
-                Debug.Assert(UseCropping);
+                //Debug.Assert(UseCropping);
                 if (value == cropStartX) return;
                 cropStartX = value;
                 OnPropertyChanged(nameof(CropStartX));
@@ -162,7 +162,7 @@ namespace ImageFramework.Model.Export
             get => cropStartY;
             set
             {
-                Debug.Assert(UseCropping);
+                //Debug.Assert(UseCropping);
                 if (value == cropStartY) return;
                 cropStartY = value;
                 OnPropertyChanged(nameof(CropStartY));
@@ -176,7 +176,7 @@ namespace ImageFramework.Model.Export
             get => cropEndX;
             set
             {
-                Debug.Assert(UseCropping);
+                //Debug.Assert(UseCropping);
                 if (value == cropEndX) return;
                 cropEndX = value;
                 OnPropertyChanged(nameof(CropEndX));
@@ -190,7 +190,7 @@ namespace ImageFramework.Model.Export
             get => cropEndY;
             set
             {
-                Debug.Assert(UseCropping);
+                //Debug.Assert(UseCropping);
                 if (value == cropEndY) return;
                 cropEndY = value;
                 OnPropertyChanged(nameof(CropEndY));
