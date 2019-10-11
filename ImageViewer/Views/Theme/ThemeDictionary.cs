@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using ImageViewer.Models;
 using ImageViewer.Properties;
 
 namespace ImageViewer.Views.Theme
@@ -22,11 +23,12 @@ namespace ImageViewer.Views.Theme
 
         public ThemeDictionary()
         {
-            var themeIdx = Settings.Default.Theme;
-            if (themeIdx < 0 || themeIdx >= (int) (Themes.Size))
-                themeIdx = 0;
-
-            curTheme = (Themes) themeIdx;
+            var settings = new SettingsModel();
+            if ((uint) settings.Theme >= (uint)Themes.Size)
+            {
+                settings.Theme = Themes.Default;
+            }
+            curTheme = settings.Theme;
         }
 
         public Uri DefaultSource

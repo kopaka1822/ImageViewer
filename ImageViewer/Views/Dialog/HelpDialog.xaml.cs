@@ -66,6 +66,9 @@ namespace ImageViewer.Views.Dialog
             // display markup in browser
             Browser.NavigateToString(html);
             Browser.Navigating += BrowserOnNavigating;
+
+            // set window title
+            Title = "Help - Version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
         }
 
 

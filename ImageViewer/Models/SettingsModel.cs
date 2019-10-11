@@ -15,6 +15,18 @@ namespace ImageViewer.Models
 {
     public class SettingsModel : INotifyPropertyChanged
     {
+        public SettingsModel()
+        {
+            // required if assembly version changes
+            if (Settings.Default.UpdateSettings)
+            {
+                Settings.Default.Upgrade();
+                Settings.Default.UpdateSettings = false;
+                Save();
+            }
+            
+        }
+
         public int WindowWidth
         {
             get => Settings.Default.WindowWidth;
