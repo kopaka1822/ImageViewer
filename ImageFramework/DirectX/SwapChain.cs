@@ -17,8 +17,14 @@ namespace ImageFramework.DirectX
         private readonly SwapChainFlags flags = SwapChainFlags.None;
         private RenderTargetView curView;
 
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+
         public SwapChain(IntPtr hwnd, int width, int height)
         {
+            Width = width;
+            Height = height;
+
             var desc = new SwapChainDescription
             {
                 BufferCount = bufferCount,
@@ -49,6 +55,8 @@ namespace ImageFramework.DirectX
 
         public void Resize(int width, int height)
         {
+            Width = width;
+            Height = height;
             chain.ResizeBuffers(bufferCount, width, height, Format.Unknown, flags);
         }
 

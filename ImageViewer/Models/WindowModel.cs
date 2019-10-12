@@ -52,23 +52,19 @@ namespace ImageViewer.Models
         }
 
         private void WindowOnLoaded(object sender, RoutedEventArgs e)
-        {
-            // set initial client size dimensions
-            var source = PresentationSource.FromVisual(Window);
-            var scalingX = source.CompositionTarget.TransformToDevice.M11;
-            var scalingY = source.CompositionTarget.TransformToDevice.M22;
-            var w = (int) (Window.BorderHost.ActualWidth * scalingX);
-            var h = (int) (Window.BorderHost.ActualHeight * scalingY);
-
-            ClientSize = new Size(w, h);
+        { 
+            ClientSize = new Size(
+                (int)(Window.BorderHost.ActualWidth),
+                (int)(Window.BorderHost.ActualHeight)
+            );
             OnPropertyChanged(nameof(ClientSize));
 
             // change size event
             Window.BorderHost.SizeChanged += (sender2, args2) =>
             {
                 ClientSize = new Size(
-                    (int)(Window.BorderHost.ActualWidth * scalingX), 
-                    (int)(Window.BorderHost.ActualHeight * scalingY)
+                    (int)(Window.BorderHost.ActualWidth), 
+                    (int)(Window.BorderHost.ActualHeight)
                 );
                 OnPropertyChanged(nameof(ClientSize));
             };

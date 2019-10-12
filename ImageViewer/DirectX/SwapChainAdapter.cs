@@ -17,16 +17,22 @@ namespace ImageViewer.DirectX
         private readonly Border parent;
         public SwapChain SwapChain { get; private set; } = null;
         private IntPtr hWnd = IntPtr.Zero;
+        private double scalingX;
+        private double scalingY;
 
         public SwapChainAdapter(Border parent)
         {
             this.parent = parent;
+            // set initial client size dimensions
+            var source = PresentationSource.FromVisual(parent);
+            scalingX = source.CompositionTarget.TransformToDevice.M11;
+            scalingY = source.CompositionTarget.TransformToDevice.M22;
             parent.SizeChanged += ParentOnSizeChanged;
         }
 
         private void ParentOnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            SwapChain?.Resize((int)parent.ActualWidth, (int)parent.ActualHeight);
+            SwapChain?.Resize((int)(parent.ActualWidth * scalingX), (int)(parent.ActualHeight * scalingY));
         }
 
         protected override HandleRef BuildWindowCore(HandleRef hwndParent)
@@ -47,7 +53,7 @@ namespace ImageViewer.DirectX
                 0 // param
             );
 
-            SwapChain = new SwapChain(hWnd, (int)parent.ActualWidth, (int)parent.ActualHeight);
+            SwapChain = new SwapChain(hWnd, (int)(parent.ActualWidth * scalingX), (int)(parent.ActualHeight * scalingY));
 
             return new HandleRef(this, hWnd);
         }

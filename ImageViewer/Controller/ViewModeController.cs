@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,10 +59,13 @@ namespace ImageViewer.Controller
                 ConvertToCanonical(new Vector2(mousePosition.X, mousePosition.Y)));
         }
 
-        public void Repaint()
+        /// <summary>
+        /// draws the active view
+        /// </summary>
+        /// <param name="size">actual size in pixel, not dpi independent size</param>
+        public void Repaint(Size size)
         {
             var dev = Device.Get();
-            var size = models.Window.ClientSize;
 
             var visible = models.GetEnabledPipelines();
             if (visible.Count == 1)

@@ -15,6 +15,7 @@ using ImageViewer.DirectX;
 using ImageViewer.Models;
 using SharpDX.Mathematics.Interop;
 using Color = ImageFramework.Utility.Color;
+using Size = System.Drawing.Size;
 
 namespace ImageViewer.Controller
 {
@@ -100,6 +101,8 @@ namespace ImageViewer.Controller
             var adapter = new SwapChainAdapter(models.Window.Window.BorderHost);
             models.Window.Window.BorderHost.Child = adapter;
             swapChain = adapter.SwapChain;
+
+            swapChain.Resize(models.Window.ClientSize.Width, models.Window.ClientSize.Height);
         }
 
         /// <summary>
@@ -128,12 +131,12 @@ namespace ImageViewer.Controller
                 var dev = Device.Get();
                 dev.ClearRenderTargetView(swapChain.Rtv, clearColor);
 
-                var size = models.Window.ClientSize;
+                var size = new Size(swapChain.Width, swapChain.Height);
                 dev.Rasterizer.SetViewport(0.0f, 0.0f, size.Width, size.Height);
                 dev.Rasterizer.SetScissorRectangle(0, 0, size.Width, size.Height);
                 dev.OutputMerger.SetRenderTargets(swapChain.Rtv);
 
-                viewMode.Repaint();
+                viewMode.Repaint(size);
             }
             catch (Exception e)
             {
