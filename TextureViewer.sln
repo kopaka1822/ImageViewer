@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrameworkTests", "Framework
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageConsole", "ImageConsole\ImageConsole.csproj", "{30D45348-6B50-4A12-BE22-9B16B4B1A2A0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThumbnailHandler", "ThumbnailHandler\ThumbnailHandler.vcxproj", "{4A25BFFD-D34D-419B-AC91-1B343E87205F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +119,22 @@ Global
 		{30D45348-6B50-4A12-BE22-9B16B4B1A2A0}.TestDebug|x64.Build.0 = Debug|Any CPU
 		{30D45348-6B50-4A12-BE22-9B16B4B1A2A0}.TestDebug|x86.ActiveCfg = Debug|Any CPU
 		{30D45348-6B50-4A12-BE22-9B16B4B1A2A0}.TestDebug|x86.Build.0 = Debug|Any CPU
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.Debug|x64.ActiveCfg = Debug|x64
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.Debug|x64.Build.0 = Debug|x64
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.Debug|x86.ActiveCfg = Debug|Win32
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.Debug|x86.Build.0 = Debug|Win32
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.Release|Any CPU.ActiveCfg = Release|Win32
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.Release|x64.ActiveCfg = Release|x64
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.Release|x64.Build.0 = Release|x64
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.Release|x86.ActiveCfg = Release|Win32
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.Release|x86.Build.0 = Release|Win32
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.TestDebug|Any CPU.ActiveCfg = Release|x64
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.TestDebug|Any CPU.Build.0 = Release|x64
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.TestDebug|x64.ActiveCfg = Debug|x64
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.TestDebug|x64.Build.0 = Debug|x64
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.TestDebug|x86.ActiveCfg = Debug|Win32
+		{4A25BFFD-D34D-419B-AC91-1B343E87205F}.TestDebug|x86.Build.0 = Debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
