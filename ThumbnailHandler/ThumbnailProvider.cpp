@@ -60,6 +60,9 @@ IFACEMETHODIMP_(ULONG) ThumbnailProvider::Release()
 
 HRESULT ThumbnailProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 {
+	if (m_initialized)
+		return HRESULT_FROM_WIN32(ERROR_ALREADY_INITIALIZED);
+
 	std::wstring wpath(pszFilePath);
 	std::string spath;
 	spath.resize(wpath.size());
@@ -67,11 +70,17 @@ HRESULT ThumbnailProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 		spath[i] = char(wpath[i]);
 
 	//m_model.ClearImages();
-	m_model.OpenImage(spath);
-	//auto size = m_model.GetSize(0);
-	//m_width = size.x;
-	//m_height = size.y;
+	try
+	{
+		m_model.OpenImage(spath);
+		m_model.Sync();
+	}
+	catch (...)
+	{
+		return S_FALSE;
+	}
 
+	m_initialized = true;
 	return S_OK;
 }
 
@@ -88,6 +97,8 @@ HRESULT ThumbnailProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 IFACEMETHODIMP ThumbnailProvider::GetThumbnail(UINT cx, HBITMAP* phbmp,
 	WTS_ALPHATYPE* pdwAlpha)
 {
+	if (!m_initialized) return S_FALSE;
+
 	int width = 0, height = 0;
 	auto data = m_model.GenThumbnail(cx, width, height);
 	

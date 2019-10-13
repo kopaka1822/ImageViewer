@@ -73,6 +73,13 @@ namespace ImageFramework::detail
 			return available > 0;
 		}
 
+		void Flush()
+		{
+			assert(m_type == StdIn);
+			FlushFileBuffers(m_write);
+		}
+
+
 		std::string ReadLine() const
 		{
 			assert(m_type == StdOut);

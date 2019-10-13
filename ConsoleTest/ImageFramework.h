@@ -127,12 +127,12 @@ namespace ImageFramework
 		try
 		{
 			m_in.Write("-close\n");
+			m_in.Flush();
+			TerminateProcess(m_info.hProcess, 0);
+			WaitForSingleObject(m_info.hProcess, 10000);
 		}
 		catch (...)
-		{
-		}
-
-		WaitForSingleObject(m_info.hProcess, INFINITE);
+		{}
 
 		CloseHandle(m_info.hProcess);
 		CloseHandle(m_info.hThread);
