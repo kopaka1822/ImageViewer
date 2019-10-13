@@ -109,18 +109,17 @@ STDAPI DllRegisterServer(void)
 		// this handler would otherwise show cached blank thumbnails.
 		SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
 
-		HKEY classKey = nullptr;
-		DWORD one = 1;
-		RegOpenKeyExA(HKEY_CLASSES_ROOT, "CLSID\\{C84C299F-F84E-41DB-A736-389953162C3D}", 0, KEY_WRITE, &classKey);
-		RegSetValueExA(classKey, "DisableProcessIsolation", 0, REG_DWORD, reinterpret_cast<BYTE*>(&one), sizeof(one));
-		RegCloseKey(classKey);
-		// set registry
+		// set registry fo IInitializeWithFile to work
 		// 
 		// HKEY_CLASSES_ROOT
 		//  CLSID
 		// 	 {C84C299F-F84E-41DB-A736-389953162C3D}
 		// 	 DisableProcessIsolation = 1
-		// /
+		HKEY classKey = nullptr;
+		DWORD one = 1;
+		RegOpenKeyExA(HKEY_CLASSES_ROOT, "CLSID\\{C84C299F-F84E-41DB-A736-389953162C3D}", 0, KEY_WRITE, &classKey);
+		RegSetValueExA(classKey, "DisableProcessIsolation", 0, REG_DWORD, reinterpret_cast<BYTE*>(&one), sizeof(one));
+		RegCloseKey(classKey);
 	}
 
 	return hr;

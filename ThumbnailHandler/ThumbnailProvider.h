@@ -33,7 +33,7 @@ protected:
 private:
 	// Reference count of component.
 	long m_cRef;
-	//ImageFramework::Model m_model;
+	ImageFramework::Model m_model;
 	int m_width;
 	int m_height;
 };

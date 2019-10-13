@@ -60,15 +60,14 @@ IFACEMETHODIMP_(ULONG) ThumbnailProvider::Release()
 
 HRESULT ThumbnailProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 {
-	//std::wstring wpath(pszFilePath);
-	//std::string spath;
-	//spath.resize(wpath.size());
-	//for (size_t i = 0; i < wpath.size(); ++i)
-	//	spath[i] = char(wpath[i]);
+	std::wstring wpath(pszFilePath);
+	std::string spath;
+	spath.resize(wpath.size());
+	for (size_t i = 0; i < wpath.size(); ++i)
+		spath[i] = char(wpath[i]);
 
 	//m_model.ClearImages();
-	//m_model.OpenImage(spath);
-	//m_model.OpenImage("F:\\git\\ImageViewer\\FrameworkTests\\TestData\\checkers.dds");
+	m_model.OpenImage(spath);
 	//auto size = m_model.GetSize(0);
 	//m_width = size.x;
 	//m_height = size.y;
@@ -89,14 +88,11 @@ HRESULT ThumbnailProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 IFACEMETHODIMP ThumbnailProvider::GetThumbnail(UINT cx, HBITMAP* phbmp,
 	WTS_ALPHATYPE* pdwAlpha)
 {
-	//int width = 0, height = 0;
-	//auto data = m_model.GenThumbnail(cx, width, height);
+	int width = 0, height = 0;
+	auto data = m_model.GenThumbnail(cx, width, height);
 	
-	//*phbmp = CreateBitmap(width, height, 1, 32, data.data());
+	*phbmp = CreateBitmap(width, height, 1, 32, data.data());
 	
-	std::vector<uint8_t> data;
-	data.resize(cx * cx * 4, 55);
-	*phbmp = CreateBitmap(cx, cx, 1, 32, data.data());
 	*pdwAlpha = WTSAT_ARGB;
 
 	return S_OK;
