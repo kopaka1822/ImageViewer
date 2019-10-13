@@ -74,6 +74,7 @@
     <Compile Include="Model\Shader\ConvertFormatShaderTest.cs" />
     <Compile Include="Model\Shader\PixelValueShaderTest.cs" />
     <Compile Include="Model\StatisticsTest.cs" />
+    <Compile Include="Model\ThumbnailTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestData.cs" />
   </ItemGroup>
