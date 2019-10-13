@@ -9,80 +9,272 @@ namespace ImageFramework
 	class Model
 	{
 	public:
-		Model() : 
-		m_info({}),
-		m_in(detail::Pipeline::StdIn), m_out(detail::Pipeline::StdOut), m_err(detail::Pipeline::StdOut)
+		struct Int2
 		{
-			STARTUPINFOA st;
-			ZeroMemory(&st, sizeof(st));
-			st.cb = sizeof(st);
-			st.hStdError = m_err.GetWrite();
-			st.hStdOutput = m_out.GetWrite();
-			st.hStdInput = m_in.GetRead();
-			st.dwFlags = STARTF_USESTDHANDLES;
-			//st.dwX = 10;
-			//st.dwY = 10;
-			//st.dwXSize = 200;
-			//st.dwYSize = 200;
-			//st.dwXCountChars = 50;
-			//st.dwYCountChars = 20;
-			//st.dwFlags |= STARTF_USEPOSITION | STARTF_USESIZE | STARTF_USECOUNTCHARS | STARTF_USESHOWWINDOW;
-			//st.wShowWindow = SW_SHOW;
+			int x;
+			int y;
+		};
 
-			char args[] = "ImageConsole.exe -cin";
-			if (!CreateProcessA(
-				"ImageConsole.exe",
-				args,
-				nullptr,
-				nullptr,
-				TRUE,
-				NORMAL_PRIORITY_CLASS | CREATE_NO_WINDOW,
-				nullptr,
-				nullptr,
-				&st,
-				&m_info
-			)) throw std::runtime_error("could not launch ImageConsole.exe");
-		}
+		Model();
 
-		~Model()
-		{
-			try
-			{
-				m_in.Write("-close\n");
-			}catch (...){}
+		~Model();
 
-			WaitForSingleObject(m_info.hProcess, INFINITE);
+		/// opens image
+		void OpenImage(std::string_view filename);
+		/// deletes image
+		void DeleteImage(int index);
+		/// deletes all images
+		void ClearImages();
+		/// moves image to a new index
+		void MoveImage(int oldIndex, int newIndex);
+		/// sets image combine equation
+		void SetEquation(std::string_view color, std::string_view alpha = nullptr);
 
-			CloseHandle(m_info.hProcess);
-			CloseHandle(m_info.hThread);
-		}
+		/// add filter to the filter list
+		void OpenFilter(std::string_view filename);
+		/// deletes filter from filter list
+		void DeleteFilter(int index);
+		/// deletes all filter
+		void ClearFilter();
+		/// sets filter parameter of the filter at filterIndex
+		void SetFilterParam(int filterIndex, std::string_view paramName, std::string_view value);
 
-		void Open(std::string_view filename)
-		{
-			m_in.Write("-open \"");
-			m_in.Write(std::string(filename));
-			m_in.Write("\"\n");
+		int GetNumLayers() const;
+		int GetNumMipmaps() const;
+		/// generates mipmaps or overwrites existing ones
+		void GenMipmaps();
+		/// deletes all mipmaps
+		void DeleteMipmaps();
+		/// returns size of the mipmap
+		Int2 GetSize(int mipmap) const;
+		bool IsAlpha() const;
 
-			auto err = m_err.Read(true);
-			if (!err.empty())
-				throw std::runtime_error(err);
-		}
+		void SetExportLayer(int layer);
+		void SetExportMipmap(int mipmap);
+		void SetExportQuality(int quality);
+		void SetExportCropping(int xStart, int yStart, int xEnd, int yEnd);
+		void DisableExportCropping();
 
-		int GetNumLayers()
-		{
-			m_in.Write("-telllayers\n");
+		/// waits for all console input to be finished
+		void Sync() const;
 
-			auto res = m_out.Read(false);
-			assert(!res.empty());
-			return std::stol(res);
-		}
+		// TODO export, stats, tellfilterparams, tellformats, tellpixel
 	private:
+		std::string ReadLine() const
+		{
+			while(true)
+			{
+				if (m_err.CanRead())
+					throw std::runtime_error(m_err.ReadLine());
+
+				if (m_out.CanRead())
+					return m_out.ReadLine();
+
+				Yield();
+			}
+		}
 
 	private:
 		PROCESS_INFORMATION m_info;
-		detail::Pipeline m_in;
+		mutable detail::Pipeline m_in;
 		detail::Pipeline m_out;
 		detail::Pipeline m_err;
 	};
+
+	inline Model::Model() :
+	m_info({}),
+		m_in(detail::Pipeline::StdIn), m_out(detail::Pipeline::StdOut), m_err(detail::Pipeline::StdOut)
+	{
+		STARTUPINFOA st;
+		ZeroMemory(&st, sizeof(st));
+		st.cb = sizeof(st);
+		st.hStdError = m_err.GetWrite();
+		st.hStdOutput = m_out.GetWrite();
+		st.hStdInput = m_in.GetRead();
+		st.dwFlags = STARTF_USESTDHANDLES;
+
+		char args[] = "ImageConsole.exe -cin -silent";
+		if (!CreateProcessA(
+			"ImageConsole.exe",
+			args,
+			nullptr,
+			nullptr,
+			TRUE,
+			NORMAL_PRIORITY_CLASS | CREATE_NO_WINDOW,
+			nullptr,
+			nullptr,
+			&st,
+			&m_info
+		)) throw std::runtime_error("could not launch ImageConsole.exe");
+	}
+
+	inline Model::~Model()
+	{
+		try
+		{
+			m_in.Write("-close\n");
+		}
+		catch (...)
+		{
+		}
+
+		WaitForSingleObject(m_info.hProcess, INFINITE);
+
+		CloseHandle(m_info.hProcess);
+		CloseHandle(m_info.hThread);
+	}
+
+	inline void Model::OpenImage(std::string_view filename)
+	{
+		m_in.Write("-open \"");
+		m_in.Write(filename);
+		m_in.Write("\"\n");
+	}
+
+	inline void Model::DeleteImage(int index)
+	{
+		m_in.Write("-delete ");
+		m_in.Write(std::to_string(index));
+		m_in.Write("\n");
+	}
+
+	inline void Model::ClearImages()
+	{
+		m_in.Write("-delete\n");
+	}
+
+	inline void Model::MoveImage(int oldIndex, int newIndex)
+	{
+		m_in.Write("-move ");
+		m_in.Write(std::to_string(oldIndex));
+		m_in.Write(" ");
+		m_in.Write(std::to_string(newIndex));
+		m_in.Write("\n");
+	}
+
+	inline void Model::OpenFilter(std::string_view filename)
+	{
+		m_in.Write("-addfilter \"");
+		m_in.Write(filename);
+		m_in.Write("\"\n");
+	}
+
+	inline void Model::DeleteFilter(int index)
+	{
+		m_in.Write("-deletefilter ");
+		m_in.Write(std::to_string(index));
+		m_in.Write("\n");
+	}
+
+	inline void Model::ClearFilter()
+	{
+		m_in.Write("-deletefilter\n");
+	}
+
+	inline void Model::SetFilterParam(int filterIndex, std::string_view paramName, std::string_view value)
+	{
+		m_in.Write("-filterparam ");
+		m_in.Write(std::to_string(filterIndex));
+		m_in.Write(" \"");
+		m_in.Write(paramName);
+		m_in.Write("\" ");
+		m_in.Write(value);
+		m_in.Write("\n");
+	}
+
+	inline void Model::SetEquation(std::string_view color, std::string_view alpha)
+	{
+		m_in.Write("-equation \"");
+		m_in.Write(color);
+		if (alpha.data())
+		{
+			m_in.Write("\" \"");
+			m_in.Write(alpha);
+		}
+		m_in.Write("\"\n");
+	}
+
+	inline int Model::GetNumLayers() const
+	{
+		m_in.Write("-telllayers\n");
+		return std::stol(ReadLine());
+	}
+
+	inline int Model::GetNumMipmaps() const
+	{
+		m_in.Write("-tellmipmaps\n");
+		return std::stol(ReadLine());
+	}
+
+	inline void Model::GenMipmaps()
+	{
+		m_in.Write("-genmipmaps\n");
+	}
+
+	inline void Model::DeleteMipmaps()
+	{
+		m_in.Write("-deletemipmaps\n");
+	}
+
+	inline Model::Int2 Model::GetSize(int mipmap) const
+	{
+		m_in.Write("-tellsize");
+		Int2 res;
+		res.x = std::stol(ReadLine());
+		res.y = std::stol(ReadLine());
+		return res;
+	}
+
+	inline bool Model::IsAlpha() const
+	{
+		m_in.Write("-tellapha");
+		return ReadLine() == "True";
+	}
+
+	inline void Model::SetExportLayer(int layer)
+	{
+		m_in.Write("-exportlayer ");
+		m_in.Write(std::to_string(layer));
+		m_in.Write("\n");
+	}
+
+	inline void Model::SetExportMipmap(int mipmap)
+	{
+		m_in.Write("-exportmipmap ");
+		m_in.Write(std::to_string(mipmap));
+		m_in.Write("\n");
+	}
+
+	inline void Model::SetExportQuality(int quality)
+	{
+		m_in.Write("-exportquality ");
+		m_in.Write(std::to_string(quality));
+		m_in.Write("\n");
+	}
+
+	inline void Model::SetExportCropping(int xStart, int yStart, int xEnd, int yEnd)
+	{
+		m_in.Write("-exportcrop true ");
+		m_in.Write(std::to_string(xStart));
+		m_in.Write(" ");
+		m_in.Write(std::to_string(yStart));
+		m_in.Write(" ");
+		m_in.Write(std::to_string(xEnd));
+		m_in.Write(" ");
+		m_in.Write(std::to_string(yEnd));
+		m_in.Write("\n");
+	}
+
+	inline void Model::DisableExportCropping()
+	{
+		m_in.Write("-exportcrop false\n");
+	}
+
+	inline void Model::Sync() const
+	{
+		// execute simple command where the client needs to respond
+		m_in.Write("-telllayers\n");
+		ReadLine();
+	}
 }
 

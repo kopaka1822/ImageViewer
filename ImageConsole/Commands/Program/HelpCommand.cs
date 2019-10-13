@@ -43,15 +43,15 @@ namespace ImageConsole.Commands.Program
             Console.Error.WriteLine("Commands:");
             foreach (var command in entries)
             {
-                Console.Error.Write(command.Key + " " + command.Value.Arguments);
+                Console.Out.Write(command.Key + " " + command.Value.Arguments);
                 // write padding spaces
                 var curChars = command.Key.Length + command.Value.Arguments.Length;
                 while (curChars++ < maxChars)
                 {
-                    Console.Write(" ");
+                    Console.Out.Write(" ");
                 }
 
-                Console.Error.WriteLine(command.Value.Description);
+                Console.Out.WriteLine(command.Value.Description);
             }
         }
     }

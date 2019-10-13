@@ -51,7 +51,7 @@ namespace ImageFramework::detail
 			return m_write;
 		}
 
-		void Write(const std::string& text)
+		void Write(std::string_view text)
 		{
 			assert(m_type == StdIn);
 			DWORD written = 0;
@@ -59,31 +59,56 @@ namespace ImageFramework::detail
 				throw std::runtime_error("WriteFile");
 		}
 
-		std::string Read(bool peek) const
+		bool CanRead() const
 		{
 			assert(m_type == StdOut);
 
-			std::array<char, 4096> buffer;
-			DWORD numRead = DWORD(buffer.size());
+			if (!m_pendingRead.empty()) return true;
+
+			DWORD available = 0;
+			if (!PeekNamedPipe(m_read, nullptr, 0, nullptr, &available, nullptr))
+				throw std::runtime_error("PeekNamedPipe");
+
+			return available > 0;
+		}
+
+		std::string ReadLine() const
+		{
+			assert(m_type == StdOut);
+
 			std::string result;
+			std::array<char, 4096> buffer;
 
-			if(peek)
+			do
 			{
-				DWORD available = 0;
-				if (!PeekNamedPipe(m_read, NULL, 0, NULL, &available, NULL))
-					throw std::runtime_error("PeekNamedPipe");
+				if (!m_pendingRead.empty())
+				{
+					// append until end of line
+					auto it = m_pendingRead.find_first_of('\n');
+					if (it != std::string::npos)
+					{
+						// only append until end of line and return
+						result.append(m_pendingRead.c_str(), it);
+						m_pendingRead = m_pendingRead.substr(it + 1);
 
-				if (!available) return result; // nothing to read yet
-			}
+						if (result.back() == '\r')
+							result.pop_back();
 
-			while (numRead >= buffer.size())
-			{
-				auto res = ReadFile(m_read, buffer.data(), DWORD(buffer.size()), &numRead, NULL);
-				if (!res) break;
-				result.append(buffer.data(), numRead);
-			}
+						return result;
+					}
 
-			return result;
+					// append all and wait for more
+					result.append(m_pendingRead);
+					m_pendingRead.resize(0);
+				}
+
+				DWORD numRead = DWORD(buffer.size());
+				
+				if (!ReadFile(m_read, buffer.data(), DWORD(buffer.size()), &numRead, NULL))
+					throw std::runtime_error("ReadFile");
+
+				m_pendingRead.append(buffer.data(), numRead);
+			} while (true);
 		}
 
 		~Pipeline()
@@ -93,6 +118,8 @@ namespace ImageFramework::detail
 		}
 
 	private:
+		mutable std::string m_pendingRead;
+
 		HANDLE m_read = nullptr;
 		HANDLE m_write = nullptr;
 		Type m_type;
