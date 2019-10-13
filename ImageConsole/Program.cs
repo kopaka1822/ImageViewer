@@ -59,6 +59,8 @@ namespace ImageConsole
             AddCommand(new TellAlphaCommand());
 
             AddCommand(new HelpCommand(commands));
+
+            AddCommand(new ThumbnailCommand());
         }
 
         private void AddCommand(Command c)

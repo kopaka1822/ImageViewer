@@ -104,10 +104,9 @@ namespace ImageFramework.Model
         }
 
         /// <inheritdoc cref="ThumbnailModel.CreateThumbnail"/>
-        public TextureArray2D CreateThumbnail(int size, TextureArray2D texture,
-            SharpDX.DXGI.Format dstFormat = Format.R8G8B8A8_UNorm_SRgb, int layer = 0, int mipmap = 0)
+        public TextureArray2D CreateThumbnail(int size, TextureArray2D texture, int layer = 0, int mipmap = 0)
         {
-            return thumbnail.CreateThumbnail(size, texture, dstFormat, layer, mipmap);
+            return thumbnail.CreateThumbnail(size, texture, Format.R8G8B8A8_UNorm_SRgb, layer, mipmap);
         }
 
         /// <summary>

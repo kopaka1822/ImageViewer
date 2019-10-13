@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <cassert>
 #include <array>
+#include <vector>
 
 namespace ImageFramework::detail
 {
@@ -77,7 +78,6 @@ namespace ImageFramework::detail
 			assert(m_type == StdOut);
 
 			std::string result;
-			std::array<char, 4096> buffer;
 
 			do
 			{
@@ -102,12 +102,37 @@ namespace ImageFramework::detail
 					m_pendingRead.resize(0);
 				}
 
-				DWORD numRead = DWORD(buffer.size());
-				
-				if (!ReadFile(m_read, buffer.data(), DWORD(buffer.size()), &numRead, NULL))
-					throw std::runtime_error("ReadFile");
+				FillPendingRead();
+			} while (true);
+		}
 
-				m_pendingRead.append(buffer.data(), numRead);
+		std::vector<uint8_t> ReadBinary(DWORD numBytes) const
+		{
+			std::vector<uint8_t> res;
+			res.resize(numBytes);
+			auto cur = res.begin();
+
+			do
+			{
+				if (!m_pendingRead.empty())
+				{
+					if (m_pendingRead.size() < numBytes)
+					{
+						// copy all of pending read
+						cur = std::copy(m_pendingRead.begin(), m_pendingRead.end(), cur);
+						numBytes -= m_pendingRead.size();
+						m_pendingRead.resize(0);
+					}
+					else
+					{
+						// only copy requested amount
+						std::copy(m_pendingRead.begin(), m_pendingRead.begin() + numBytes, cur);
+						m_pendingRead = m_pendingRead.substr(numBytes);
+						return res;
+					}
+
+					FillPendingRead();
+				}
 			} while (true);
 		}
 
@@ -118,6 +143,17 @@ namespace ImageFramework::detail
 		}
 
 	private:
+		void FillPendingRead() const
+		{
+			std::array<char, 4096> buffer;
+			DWORD numRead = DWORD(buffer.size());
+
+			if (!ReadFile(m_read, buffer.data(), DWORD(buffer.size()), &numRead, NULL))
+				throw std::runtime_error("ReadFile");
+
+			m_pendingRead.append(buffer.data(), numRead);
+		}
+
 		mutable std::string m_pendingRead;
 
 		HANDLE m_read = nullptr;

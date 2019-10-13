@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <minwinbase.h>
 #include "Pipeline.h"
+#include <vector>
 
 namespace ImageFramework
 {
@@ -58,6 +59,21 @@ namespace ImageFramework
 		/// waits for all console input to be finished
 		void Sync() const;
 
+		/// generates a thumbnail with the specified size
+		/// \param size max width/height
+		/// \param dstWidth (out) width of the generated thumbnail
+		/// \param dstHeight (out) height of the generated thumbnail
+		std::vector<uint8_t> GenThumbnail(int size, int& dstWidth, int& dstHeight)
+		{
+			m_in.Write("-thumbnail ");
+			m_in.Write(std::to_string(size));
+			m_in.Write("\n");
+
+			dstWidth = std::stol(ReadLine());
+			dstHeight = std::stol(ReadLine());
+			return ReadBinary(dstWidth * dstHeight * 4);
+		}
+
 		// TODO export, stats, tellfilterparams, tellformats, tellpixel
 	private:
 		std::string ReadLine() const
@@ -72,6 +88,11 @@ namespace ImageFramework
 
 				Yield();
 			}
+		}
+
+		std::vector<uint8_t> ReadBinary(DWORD numBytes)
+		{
+			return m_out.ReadBinary(numBytes);
 		}
 
 	private:
