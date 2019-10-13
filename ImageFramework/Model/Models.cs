@@ -36,6 +36,8 @@ namespace ImageFramework.Model
 
         public ProgressModel Progress { get; }
 
+        private ThumbnailModel thumbnail;
+
         internal TextureCache TextureCache { get; }
 
         private readonly List<ImagePipeline> pipelines = new List<ImagePipeline>();
@@ -59,6 +61,7 @@ namespace ImageFramework.Model
             Filter = new FiltersModel();
             preprocess = new PreprocessModel();
             TextureCache = new TextureCache(Images);
+            thumbnail = new ThumbnailModel();
 
             for (int i = 0; i < numPipelines; ++i)
             {
@@ -98,6 +101,13 @@ namespace ImageFramework.Model
         public Color GetPixelValue(TextureArray2D image, int x, int y, int layer = 0, int mipmap = 0, int radius = 0)
         {
             return pixelValueShader.Run(image, x, y, layer, mipmap, radius);
+        }
+
+        /// <inheritdoc cref="ThumbnailModel.CreateThumbnail"/>
+        public TextureArray2D CreateThumbnail(int size, TextureArray2D texture,
+            SharpDX.DXGI.Format dstFormat = Format.R8G8B8A8_UNorm_SRgb, int layer = 0, int mipmap = 0)
+        {
+            return thumbnail.CreateThumbnail(size, texture, dstFormat, layer, mipmap);
         }
 
         /// <summary>

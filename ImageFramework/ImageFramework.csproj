@@ -137,6 +137,7 @@
     <Compile Include="Model\Shader\StatisticsShader.cs" />
     <Compile Include="Model\Shader\DefaultStatisticsShader.cs" />
     <Compile Include="Model\StatisticsModel.cs" />
+    <Compile Include="Model\ThumbnailModel.cs" />
     <Compile Include="Utility\TextureCache.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
