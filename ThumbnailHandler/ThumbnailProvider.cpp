@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "DdsThumbnailProvider.h"
+#include "ThumbnailProvider.h"
 #include <Shlwapi.h>
 #include <Wincrypt.h>   // For CryptStringToBinary.
 #include <msxml6.h>
@@ -32,7 +32,7 @@ IFACEMETHODIMP ThumbnailProvider::QueryInterface(REFIID riid, void** ppv)
 	static const QITAB qit[] =
 	{
 		QITABENT(ThumbnailProvider, IThumbnailProvider),
-		QITABENT(ThumbnailProvider, IInitializeWithStream),
+		QITABENT(ThumbnailProvider, IInitializeWithFile),
 		{ 0 },
 	};
 	return QISearch(this, qit, riid, ppv);
@@ -58,15 +58,23 @@ IFACEMETHODIMP_(ULONG) ThumbnailProvider::Release()
 
 #pragma endregion
 
-#pragma region IInitializeWithStream
-
 HRESULT ThumbnailProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 {
-	m_path = pszFilePath;
+	//std::wstring wpath(pszFilePath);
+	//std::string spath;
+	//spath.resize(wpath.size());
+	//for (size_t i = 0; i < wpath.size(); ++i)
+	//	spath[i] = char(wpath[i]);
+
+	//m_model.ClearImages();
+	//m_model.OpenImage(spath);
+	//m_model.OpenImage("F:\\git\\ImageViewer\\FrameworkTests\\TestData\\checkers.dds");
+	//auto size = m_model.GetSize(0);
+	//m_width = size.x;
+	//m_height = size.y;
+
 	return S_OK;
 }
-
-#pragma endregion
 
 #pragma region IThumbnailProvider
 
@@ -81,18 +89,14 @@ HRESULT ThumbnailProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 IFACEMETHODIMP ThumbnailProvider::GetThumbnail(UINT cx, HBITMAP* phbmp,
 	WTS_ALPHATYPE* pdwAlpha)
 {
+	//int width = 0, height = 0;
+	//auto data = m_model.GenThumbnail(cx, width, height);
 	
-
-	// Create the COM imaging factory.
-	IWICImagingFactory* pImagingFactory;
-	HRESULT hr = CoCreateInstance(CLSID_WICImagingFactory, NULL,
-		CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pImagingFactory));
-	if (FAILED(hr)) return hr;
-
+	//*phbmp = CreateBitmap(width, height, 1, 32, data.data());
 	
-	std::vector<uint32_t> colors;
-	colors.resize(cx * cx, 0xFFFFFFFF);
-	*phbmp = CreateBitmap(cx, cx, 1, 32, colors.data());
+	std::vector<uint8_t> data;
+	data.resize(cx * cx * 4, 55);
+	*phbmp = CreateBitmap(cx, cx, 1, 32, data.data());
 	*pdwAlpha = WTSAT_ARGB;
 
 	return S_OK;

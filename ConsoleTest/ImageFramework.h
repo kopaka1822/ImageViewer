@@ -63,16 +63,7 @@ namespace ImageFramework
 		/// \param size max width/height
 		/// \param dstWidth (out) width of the generated thumbnail
 		/// \param dstHeight (out) height of the generated thumbnail
-		std::vector<uint8_t> GenThumbnail(int size, int& dstWidth, int& dstHeight)
-		{
-			m_in.Write("-thumbnail ");
-			m_in.Write(std::to_string(size));
-			m_in.Write("\n");
-
-			dstWidth = std::stol(ReadLine());
-			dstHeight = std::stol(ReadLine());
-			return ReadBinary(dstWidth * dstHeight * 4);
-		}
+		std::vector<uint8_t> GenThumbnail(int size, int& dstWidth, int& dstHeight);
 
 		// TODO export, stats, tellfilterparams, tellformats, tellpixel
 	private:
@@ -113,10 +104,12 @@ namespace ImageFramework
 		st.hStdOutput = m_out.GetWrite();
 		st.hStdInput = m_in.GetRead();
 		st.dwFlags = STARTF_USESTDHANDLES;
+		
 
 		char args[] = "ImageConsole.exe -cin -silent";
+		
 		if (!CreateProcessA(
-			"ImageConsole.exe",
+			"F:\\git\\ImageViewer\\x64\\Debug\\ImageConsole.exe",
 			args,
 			nullptr,
 			nullptr,
@@ -296,6 +289,17 @@ namespace ImageFramework
 		// execute simple command where the client needs to respond
 		m_in.Write("-telllayers\n");
 		ReadLine();
+	}
+
+	inline std::vector<uint8_t> Model::GenThumbnail(int size, int& dstWidth, int& dstHeight)
+	{
+		m_in.Write("-thumbnail ");
+		m_in.Write(std::to_string(size));
+		m_in.Write("\n");
+
+		dstWidth = std::stol(ReadLine());
+		dstHeight = std::stol(ReadLine());
+		return ReadBinary(dstWidth * dstHeight * 4);
 	}
 }
 

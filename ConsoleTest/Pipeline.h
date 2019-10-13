@@ -120,7 +120,7 @@ namespace ImageFramework::detail
 					{
 						// copy all of pending read
 						cur = std::copy(m_pendingRead.begin(), m_pendingRead.end(), cur);
-						numBytes -= m_pendingRead.size();
+						numBytes -= DWORD(m_pendingRead.size());
 						m_pendingRead.resize(0);
 					}
 					else
