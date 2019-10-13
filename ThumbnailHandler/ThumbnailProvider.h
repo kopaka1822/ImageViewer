@@ -4,6 +4,7 @@
 #include <thumbcache.h>     // For IThumbnailProvider
 #include <wincodec.h>       // Windows Imaging Codecs
 #include <string>
+#include "../ConsoleTest/ImageFramework.h"
 
 #pragma comment(lib, "windowscodecs.lib")
 
@@ -22,17 +23,17 @@ public:
 	HRESULT Initialize(LPCWSTR pszFilePath, DWORD grfMode) override;
 
 	// IThumbnailProvider
-	IFACEMETHODIMP GetThumbnail(UINT cx, HBITMAP* phbmp, WTS_ALPHATYPE* pdwAlpha);
+	IFACEMETHODIMP GetThumbnail(UINT cx, HBITMAP* phbmp, WTS_ALPHATYPE* pdwAlpha) override;
 
 	ThumbnailProvider();
 
 protected:
 	~ThumbnailProvider();
-
+	
 private:
 	// Reference count of component.
 	long m_cRef;
-
-	// Provided during initialization.
-	std::wstring m_path;
+	//ImageFramework::Model m_model;
+	int m_width;
+	int m_height;
 };
