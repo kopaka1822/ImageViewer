@@ -90,6 +90,7 @@
     <Compile Include="Commands\Image\TellLayersCommand.cs" />
     <Compile Include="Commands\Image\TellMipmapsCommand.cs" />
     <Compile Include="Commands\Image\TellSizeCommand.cs" />
+    <Compile Include="Commands\Program\SilentCommand.cs" />
     <Compile Include="Commands\StatisticsCommand.cs" />
     <Compile Include="Commands\TellAlphaCommand.cs" />
     <Compile Include="Commands\TellPixelCommand.cs" />

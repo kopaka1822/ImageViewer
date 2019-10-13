@@ -22,7 +22,7 @@ namespace ConsoleTest
 		{
 			ImageFramework::Model framework;
 
-			framework.Open(TestDirectory + "small.png");
+			framework.OpenImage(TestDirectory + "small.png");
 
 			Assert::AreEqual(1, framework.GetNumLayers());
 		}
@@ -30,8 +30,9 @@ namespace ConsoleTest
 		TEST_METHOD(OpenFailed)
 		{
 			ImageFramework::Model framework;
+			framework.OpenImage("dummy.png");
 
-			Assert::ExpectException<std::runtime_error>([&]() {framework.Open("dummy.png"); });
+			Assert::ExpectException<std::runtime_error>([&]() { framework.Sync(); });
 		}
 	};
 }

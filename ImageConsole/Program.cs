@@ -21,6 +21,8 @@ namespace ImageConsole
         public bool ReadCin { get; set; } = false;
         public bool Close { get; set; } = false;
 
+        public bool ShowProgress { get; set; } = true;
+
         private Program()
         {
             // setup commands
@@ -35,6 +37,7 @@ namespace ImageConsole
 
             AddCommand(new CinCommand(this));
             AddCommand(new CloseCommand(this));
+            AddCommand(new SilentCommand(this));
 
             AddCommand(new EquationCommand());
 
@@ -98,6 +101,8 @@ namespace ImageConsole
 
         private void ProgressOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (!ShowProgress) return;
+
             var pm = (ProgressModel) sender;
             switch (e.PropertyName)
             {
