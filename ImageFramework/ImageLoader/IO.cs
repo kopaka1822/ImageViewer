@@ -19,7 +19,9 @@ namespace ImageFramework.ImageLoader
             Format.R32G32B32A32_Float,
             Format.R8G8B8A8_UNorm_SRgb,
             Format.R8G8B8A8_UNorm,
-            Format.R8G8B8A8_SNorm
+            Format.R8G8B8A8_SNorm,
+            // extra format for thumbnails
+            Format.B8G8R8A8_UNorm_SRgb
         };
 
         /// <summary>

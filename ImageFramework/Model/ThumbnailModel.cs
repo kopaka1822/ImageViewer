@@ -53,7 +53,7 @@ namespace ImageFramework.Model
         /// <param name="mipmap">source mipmap</param>
         /// <returns>texture with width, height smaller or equal to size. One layer and one mipmap</returns>
         public TextureArray2D CreateThumbnail(int size, TextureArray2D texture,
-            SharpDX.DXGI.Format dstFormat = Format.R8G8B8A8_UNorm_SRgb, int layer = 0, int mipmap = 0)
+            SharpDX.DXGI.Format dstFormat, int layer, int mipmap)
         {
             Debug.Assert(ImageFormat.IsSupported(dstFormat));
             Debug.Assert(ImageFormat.IsSupported(texture.Format));
