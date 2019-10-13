@@ -146,6 +146,17 @@ namespace ImageFramework.DirectX
             }
         }
 
+        public unsafe byte[] GetBytes(int layer, int mipmap, uint size)
+        {
+            byte[] res = new byte[size];
+            fixed (byte* ptr = res)
+            {
+                CopyPixels(layer, mipmap, new IntPtr(ptr), size);
+            }
+
+            return res;
+        }
+
         public void CopyPixels(int layer, int mipmap, IntPtr destination, uint size)
         {
             // create staging texture

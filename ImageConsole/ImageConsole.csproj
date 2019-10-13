@@ -73,6 +73,7 @@
     <Compile Include="Commands\Export\ExportMipmapCommand.cs" />
     <Compile Include="Commands\Export\ExportQualityCommand.cs" />
     <Compile Include="Commands\Export\TellFormatsCommand.cs" />
+    <Compile Include="Commands\Export\ThumbnailCommand.cs" />
     <Compile Include="Commands\Filter\AddFilterCommand.cs" />
     <Compile Include="Commands\Filter\DeleteFilterCommand.cs" />
     <Compile Include="Commands\Filter\FilterParameterCommand.cs" />
