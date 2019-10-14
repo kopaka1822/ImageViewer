@@ -101,15 +101,17 @@ IFACEMETHODIMP ThumbnailProvider::GetThumbnail(UINT cx, HBITMAP* phbmp,
 	if (!m_isInitialized) return S_FALSE;
 
 	int width = 0, height = 0;
-	auto data = m_model->GenThumbnail(cx, width, height);
+	try
+	{
+		auto data = m_model->GenThumbnail(cx, width, height);
+		*phbmp = CreateBitmap(width, height, 1, 32, data.data());
 
-	//width = cx; height = cx;
-	//std::vector<uint8_t> data;
-	//data.resize(width * height * 4, 255);
-
-	*phbmp = CreateBitmap(width, height, 1, 32, data.data());
-	
-	*pdwAlpha = WTSAT_ARGB;
+		*pdwAlpha = WTSAT_ARGB;
+	}
+	catch (...)
+	{
+		return S_FALSE;
+	}
 
 	return S_OK;
 }
