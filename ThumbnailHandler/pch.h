@@ -8,7 +8,7 @@
 #define PCH_H
 
 // add headers that you want to pre-compile here
-#include "framework.h"
+#define WINDOWS_LEAN_AND_MEAN
 
 #include <windows.h>
 #include <Guiddef.h>
