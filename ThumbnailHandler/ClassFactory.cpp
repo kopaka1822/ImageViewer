@@ -6,11 +6,22 @@
 
 
 extern long g_cDllRef;
-
+extern HINSTANCE g_hInst;
 
 ClassFactory::ClassFactory() : m_cRef(1)
 {
 	InterlockedIncrement(&g_cDllRef);
+
+	// obtain file name with path
+	m_directory.resize(MAX_PATH, '\0');
+	GetModuleFileNameA(g_hInst, m_directory.data(), DWORD(m_directory.size()));
+	
+	// cut out file name
+	auto pos = m_directory.find_last_of('\\');
+	if(pos != std::string::npos)
+	{
+		m_directory.resize(pos + 1);
+	}
 }
 
 ClassFactory::~ClassFactory()
@@ -63,7 +74,7 @@ IFACEMETHODIMP ClassFactory::CreateInstance(IUnknown* pUnkOuter, REFIID riid, vo
 		hr = E_OUTOFMEMORY;
 
 		// Create the COM component.
-		ThumbnailProvider* pExt = new (std::nothrow) ThumbnailProvider();
+		ThumbnailProvider* pExt = new (std::nothrow) ThumbnailProvider(m_directory);
 		if (pExt)
 		{
 			// Query the specified interface.

@@ -16,7 +16,8 @@ namespace ImageFramework
 			int y;
 		};
 
-		Model();
+		/// \param consolePath location of ImageConsole.exe
+		Model(const std::string& consolePath = "ImageConsole.exe");
 
 		~Model();
 
@@ -93,7 +94,7 @@ namespace ImageFramework
 		detail::Pipeline m_err;
 	};
 
-	inline Model::Model() :
+	inline Model::Model(const std::string& consolePath) :
 	m_info({}),
 		m_in(detail::Pipeline::StdIn), m_out(detail::Pipeline::StdOut), m_err(detail::Pipeline::StdOut)
 	{
@@ -109,7 +110,7 @@ namespace ImageFramework
 		char args[] = "ImageConsole.exe -cin -silent";
 		
 		if (!CreateProcessA(
-			"F:\\git\\ImageViewer\\x64\\Debug\\ImageConsole.exe",
+			consolePath.c_str(),
 			args,
 			nullptr,
 			nullptr,

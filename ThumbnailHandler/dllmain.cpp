@@ -1,5 +1,6 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "pch.h"
+#include <string>
 
 // {C84C299F-F84E-41DB-A736-389953162C3D}
 const CLSID CLSID_ThumbnailProvider =
@@ -103,6 +104,7 @@ STDAPI DllRegisterServer(void)
 		RegisterShellExtThumbnailHandler(L".ktx", CLSID_ThumbnailProvider);
 		RegisterShellExtThumbnailHandler(L".pfm", CLSID_ThumbnailProvider);
 		RegisterShellExtThumbnailHandler(L".hdr", CLSID_ThumbnailProvider);	
+		RegisterShellExtThumbnailHandler(L".exr", CLSID_ThumbnailProvider);	
 		
 		// This tells the shell to invalidate the thumbnail cache. It is 
 		// important because any .* files viewed before registering 
@@ -150,6 +152,7 @@ STDAPI DllUnregisterServer(void)
 		UnregisterShellExtThumbnailHandler(L".ktx");
 		UnregisterShellExtThumbnailHandler(L".pfm");
 		UnregisterShellExtThumbnailHandler(L".hdr");
+		UnregisterShellExtThumbnailHandler(L".exr");
 	}
 
 	return hr;
