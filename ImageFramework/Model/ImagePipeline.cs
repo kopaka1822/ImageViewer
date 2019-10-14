@@ -36,6 +36,7 @@ namespace ImageFramework.Model
                 if(value == useFilter) return;
                 useFilter = value;
                 OnPropertyChanged(nameof(UseFilter));
+                HasChanges = true;
             }
         }
 
@@ -122,11 +123,13 @@ namespace ImageFramework.Model
 
                     shader.Run(args.Images, args.LayerLevelBuffer, texSrc);
 
+                    var color = texSrc.GetPixelColors(0, 0);
+
                     Image = texSrc;
                 }
 
                 // next, apply filter
-                if (UseFilter)
+                if (UseFilter && args.Filters.Count != 0)
                 {
                     Debug.Assert(args.Filters != null);
 

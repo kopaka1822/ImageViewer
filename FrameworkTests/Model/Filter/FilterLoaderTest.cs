@@ -95,6 +95,13 @@ namespace FrameworkTests.Model.Filter
             TestFilter("silhouette.hlsl");
         }
 
+        [TestMethod]
+        public void HeightToNormal()
+        {
+            TestFilter("heightToNormal.hlsl");
+        }
+
+
         private void TestFilter(string name)
         {
             var loader = new FilterLoader("filter/" + name);
