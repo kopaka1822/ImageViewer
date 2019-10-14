@@ -66,6 +66,7 @@ namespace ImageFramework.Model.Equation.Token
                 case "floor":
                 case "ceil":
                 case "frac":
+                case "trunc":
                     front = name + "(";
                     end = ")";
                     break;
@@ -76,6 +77,15 @@ namespace ImageFramework.Model.Equation.Token
                 case "length":
                     front = "f4(length((";
                     end = ").xyz))";
+                    break;
+                case "all":
+                case "any":
+                    front = $"f4({name}(";
+                    end = ")?1.0:0.0)";
+                    break;
+                case "radians":
+                    front = $"f4({name}((";
+                    end = ").x))";
                     break;
                 default:
                     front = null;
