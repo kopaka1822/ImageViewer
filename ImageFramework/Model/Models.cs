@@ -105,9 +105,9 @@ namespace ImageFramework.Model
 
         /// <inheritdoc cref="ThumbnailModel.CreateThumbnail"/>
         /// Image format will be BGRA8 because this is the format expected for windows bitmaps
-        public TextureArray2D CreateThumbnail(int size, TextureArray2D texture, int layer = 0, int mipmap = 0)
+        public TextureArray2D CreateThumbnail(int size, TextureArray2D texture, int layer = 0)
         {
-            return thumbnail.CreateThumbnail(size, texture, Format.B8G8R8A8_UNorm_SRgb, layer, mipmap);
+            return thumbnail.CreateThumbnail(size, texture, Format.B8G8R8A8_UNorm_SRgb, layer);
         }
 
         /// <summary>

@@ -283,15 +283,24 @@ namespace ImageFramework.Model
         }
 
         /// <summary>
+        /// computes the maximum amount of mipmap levels for the specified width and height
+        /// </summary>
+        /// <returns></returns>
+        public static int ComputeMaxMipLevels(int width, int height)
+        {
+            var resolution = Math.Max(width, height);
+            var maxMip = 1;
+            while ((resolution /= 2) > 0) ++maxMip;
+            return maxMip;
+        }
+
+        /// <summary>
         /// computes the maximum amount of mipmap levels for the current width and height
         /// </summary>
         /// <returns></returns>
         private int ComputeMaxMipLevels()
         {
-            var resolution = Math.Max(Width, Height);
-            var maxMip = 1;
-            while ((resolution /= 2) > 0) ++maxMip;
-            return maxMip;
+            return ComputeMaxMipLevels(Width, Height);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
