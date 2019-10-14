@@ -82,6 +82,7 @@ namespace ImageFramework
 				//Yield();
 				Sleep(1);
 			}
+			throw std::runtime_error("read line timeout expired");
 		}
 
 		std::vector<uint8_t> ReadBinary(DWORD numBytes)
