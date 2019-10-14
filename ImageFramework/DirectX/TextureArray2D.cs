@@ -104,8 +104,14 @@ namespace ImageFramework.DirectX
         {
             Debug.Assert(!HasMipmaps);
             var newTex = new TextureArray2D(NumLayers, levels, Width, Height, Format, uaViews != null);
-            // copy image data of first level
-            Device.Get().CopySubresource(handle, newTex.handle, 0, 0, Width, Height);
+
+            // copy all layers
+            for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
+            {
+                // copy image data of first level
+                Device.Get().CopySubresource(handle, newTex.handle, GetTextureIndex(curLayer, 0), newTex.GetTextureIndex(curLayer, 0), Width, Height);
+            }
+
             Device.Get().GenerateMips(newTex.View);
 
             return newTex;
@@ -115,11 +121,15 @@ namespace ImageFramework.DirectX
         /// creates a new texture that has only one mipmap level
         /// </summary>
         /// <returns></returns>
-        public TextureArray2D CloneWithoutMipmaps()
+        public TextureArray2D CloneWithoutMipmaps(int mipmap = 0)
         {
-            var newTex = new TextureArray2D(NumLayers, 1, Width, Height, Format, uaViews != null);
-            // copy data of first level
-            Device.Get().CopySubresource(handle, newTex.handle, 0, 0, Width, Height);
+            var newTex = new TextureArray2D(NumLayers, 1, GetWidth(mipmap), GetHeight(mipmap), Format, uaViews != null);
+
+            for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
+            {
+                // copy data of first level
+                Device.Get().CopySubresource(handle, newTex.handle, GetTextureIndex(curLayer, mipmap), newTex.GetTextureIndex(curLayer, 0), Width, Height);
+            }
 
             return newTex;
         }

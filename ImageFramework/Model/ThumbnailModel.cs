@@ -50,10 +50,9 @@ namespace ImageFramework.Model
         /// <param name="texture">source texture</param>
         /// <param name="dstFormat">destination texture format</param>
         /// <param name="layer">source layer</param>
-        /// <param name="mipmap">source mipmap</param>
         /// <returns>texture with width, height smaller or equal to size. One layer and one mipmap</returns>
         public TextureArray2D CreateThumbnail(int size, TextureArray2D texture,
-            SharpDX.DXGI.Format dstFormat, int layer, int mipmap)
+            SharpDX.DXGI.Format dstFormat, int layer)
         {
             Debug.Assert(ImageFormat.IsSupported(dstFormat));
             Debug.Assert(ImageFormat.IsSupported(texture.Format));
@@ -79,17 +78,41 @@ namespace ImageFramework.Model
             var dev = Device.Get();
             dev.Vertex.Set(quad.Vertex);
             dev.Pixel.Set(convert.Pixel);
-            // TODO compute which mipmap has the closest fit
-            dev.Pixel.SetShaderResource(0, texture.GetSrView(layer, mipmap));
+            
+            // compute which mipmap has the closest fit
+            var mipmap = 0;
+            var curWidth = texture.Width;
+            while (curWidth >= width)
+            {
+                ++mipmap;
+                curWidth /= 2;
+            }
+            // mipmap just jumped over the optimal size
+            mipmap = Math.Max(0, mipmap - 1);
+
+            TextureArray2D tmpTex = null;
+            if (texture.NumMipmaps < mipmap + 1)
+            {
+                // generate new texture with mipmaps
+                tmpTex = texture.GenerateMipmapLevels(mipmap + 1);
+                dev.Pixel.SetShaderResource(0, tmpTex.GetSrView(layer, mipmap));
+            }
+            else
+            {
+                dev.Pixel.SetShaderResource(0, texture.GetSrView(layer, mipmap));
+            }
+
             dev.Pixel.SetSampler(0, sampler);
 
             dev.OutputMerger.SetRenderTargets(res.GetRtView(0, 0));
             dev.SetViewScissors(width, height);
             dev.DrawQuad();
 
-            // rempve bindings
+            // remove bindings
             dev.Pixel.SetShaderResource(0, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+
+            tmpTex?.Dispose();
 
             return res;
         }
