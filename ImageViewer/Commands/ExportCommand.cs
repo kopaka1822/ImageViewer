@@ -129,7 +129,7 @@ namespace ImageViewer.Commands
 
             if (models.Window.ShowDialog(dia) != true) return;
 
-            var desc = new ExportDescription(exportFilename, exportExtension, models.Export);
+            var desc = new ExportDescription(exportDirectory + "/" + exportFilename, exportExtension, models.Export);
             desc.TrySetFormat(viewModel.SelectedFormatValue);
             desc.Multiplier = multiplier;
 
