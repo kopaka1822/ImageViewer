@@ -54,8 +54,8 @@ float4 toSrgb(float4 c){
     float3 r;
     [unroll]
     for(int i = 0; i < 3; ++i){
-        if( c[i] > 1.0) r[i] = 1.0;
-        else if( c[i] < 0.0) r[i] = 0.0;
+        if( c[i] >= 1.0) r[i] = 1.0;
+        else if( c[i] <= 0.0) r[i] = 0.0;
         else if( c[i] <= 0.0031308) r[i] = 12.92 * c[i];
         else r[i] = 1.055 * pow(abs(c[i]), 0.41666) - 0.055;
     }
