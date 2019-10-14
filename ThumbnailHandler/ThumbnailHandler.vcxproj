@@ -23,7 +23,7 @@
     <ProjectGuid>{4A25BFFD-D34D-419B-AC91-1B343E87205F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ThumbnailHandler</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

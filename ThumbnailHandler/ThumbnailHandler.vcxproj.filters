@@ -50,6 +50,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="thumbnail_readme.txt" />
+    <CopyFileToFolders Include="thumbnail_readme.txt" />
   </ItemGroup>
 </Project>
