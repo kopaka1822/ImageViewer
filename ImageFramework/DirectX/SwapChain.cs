@@ -33,7 +33,7 @@ namespace ImageFramework.DirectX
                 ModeDescription = new ModeDescription(width, height, new Rational(0, 1), Format.R8G8B8A8_UNorm),
                 OutputHandle = hwnd,
                 SampleDescription = new SampleDescription(1, 0),
-                SwapEffect = SwapEffect.Discard,
+                SwapEffect = SwapEffect.FlipSequential,
                 Usage = Usage.RenderTargetOutput
             };
 
