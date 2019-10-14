@@ -90,6 +90,8 @@ namespace ImageFramework.Model.Shader
         /// </summary>
         internal void UpdateParamBuffer()
         {
+            if (paramBuffer == null) return;
+
             var data = new int[parent.Parameters.Count];
             for (var i = 0; i < data.Length; ++i)
             {
