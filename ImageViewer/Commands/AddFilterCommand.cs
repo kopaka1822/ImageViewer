@@ -30,6 +30,12 @@ namespace ImageViewer.Commands
                 InitialDirectory = models.Settings.FilterPath
             };
 
+            // set initial folder if first start
+            if (string.IsNullOrEmpty(ofd.InitialDirectory))
+            {
+                ofd.InitialDirectory = models.Window.ExecutionPath + "\\Filter";
+            }
+
             if (ofd.ShowDialog(models.Window.TopmostWindow) != true) return;
             models.Settings.FilterPath = System.IO.Path.GetDirectoryName(ofd.FileName);
 
