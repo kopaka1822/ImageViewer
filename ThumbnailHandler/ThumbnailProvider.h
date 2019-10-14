@@ -5,6 +5,7 @@
 #include <wincodec.h>       // Windows Imaging Codecs
 #include <string>
 #include "../ConsoleTest/ImageFramework.h"
+#include <optional>
 
 #pragma comment(lib, "windowscodecs.lib")
 
@@ -33,6 +34,7 @@ protected:
 private:
 	// Reference count of component.
 	long m_cRef;
-	ImageFramework::Model m_model;
-	bool m_initialized = false;
+	std::optional<ImageFramework::Model> m_model;
+	std::string m_modelPath;
+	bool m_isInitialized = false;
 };
