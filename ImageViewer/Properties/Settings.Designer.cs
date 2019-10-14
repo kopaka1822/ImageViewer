@@ -154,5 +154,17 @@ namespace ImageViewer.Properties {
                 this["TexelDecimalCount"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool FlipYAxis {
+            get {
+                return ((bool)(this["FlipYAxis"]));
+            }
+            set {
+                this["FlipYAxis"] = value;
+            }
+        }
     }
 }

@@ -107,15 +107,15 @@ namespace ImageViewer.Controller.TextureViews
                 if (models.Export.UseCropping && (models.Export.IsExporting || models.Display.ShowCropRectangle))
                 {
                     int mipmap = models.Export.AllowCropping ? models.Export.Mipmap : 0;
-                    float cropMaxX = models.Images.GetWidth(mipmap) - 1;
-                    float cropMaxY = models.Images.GetHeight(mipmap) - 1;
+                    float cropMaxX = models.Images.GetWidth(mipmap);
+                    float cropMaxY = models.Images.GetHeight(mipmap);
 
                     Vector4 res;
                     // crop start x
                     res.X = models.Export.CropStartX / cropMaxX;
-                    res.Y = models.Export.CropEndX / cropMaxX;
+                    res.Y = (models.Export.CropEndX + 1) / cropMaxX;
                     res.Z = models.Export.CropStartY / cropMaxY;
-                    res.W = models.Export.CropEndY / cropMaxY;
+                    res.W = (models.Export.CropEndY + 1) / cropMaxY;
 
                     return res;
                 }

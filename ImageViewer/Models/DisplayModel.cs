@@ -314,6 +314,7 @@ namespace ImageViewer.Models
             );
         }
 
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

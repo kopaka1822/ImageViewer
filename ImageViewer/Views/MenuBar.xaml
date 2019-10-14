@@ -82,6 +82,10 @@
                     IsCheckable="True"
                     IsChecked="{Binding Display.LinearInterpolation}"/>
             <MenuItem
+                Header="Flip Y Axis"
+                IsCheckable="True"
+                IsChecked="{Binding Display.FlipYAxis}"/>
+            <MenuItem
                     Header="Show Crop Box"
                     IsCheckable="True"
                     IsChecked="{Binding Display.ShowCropRectangle}"
