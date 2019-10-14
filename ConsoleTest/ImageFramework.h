@@ -70,7 +70,8 @@ namespace ImageFramework
 	private:
 		std::string ReadLine() const
 		{
-			while(true)
+			// wait at most 10 seconds
+			for(int i = 0; i < 10000; ++i)
 			{
 				if (m_err.CanRead())
 					throw std::runtime_error(m_err.ReadLine());
@@ -78,7 +79,8 @@ namespace ImageFramework
 				if (m_out.CanRead())
 					return m_out.ReadLine();
 
-				Yield();
+				//Yield();
+				Sleep(1);
 			}
 		}
 

@@ -14,7 +14,7 @@ extern long g_cDllRef;
 
 ThumbnailProvider::ThumbnailProvider(const std::string& directory)
 	:
-m_cRef(1), m_model(directory + "ImageConsole.exe")
+m_cRef(1), m_modelPath(directory + "ImageConsole.exe")
 {
 	InterlockedIncrement(&g_cDllRef);
 }
@@ -60,7 +60,7 @@ IFACEMETHODIMP_(ULONG) ThumbnailProvider::Release()
 
 HRESULT ThumbnailProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 {
-	if (m_initialized)
+	if (m_model.has_value())
 		return HRESULT_FROM_WIN32(ERROR_ALREADY_INITIALIZED);
 
 	std::wstring wpath(pszFilePath);
@@ -72,15 +72,16 @@ HRESULT ThumbnailProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 	//m_model.ClearImages();
 	try
 	{
-		m_model.OpenImage(spath);
-		m_model.Sync();
+		m_model.emplace(m_modelPath);
+		m_model->OpenImage(spath);
+		m_model->Sync();
 	}
 	catch (...)
 	{
 		return S_FALSE;
 	}
 
-	m_initialized = true;
+	m_isInitialized = true;
 	return S_OK;
 }
 
@@ -97,11 +98,15 @@ HRESULT ThumbnailProvider::Initialize(LPCWSTR pszFilePath, DWORD grfMode)
 IFACEMETHODIMP ThumbnailProvider::GetThumbnail(UINT cx, HBITMAP* phbmp,
 	WTS_ALPHATYPE* pdwAlpha)
 {
-	if (!m_initialized) return S_FALSE;
+	if (!m_isInitialized) return S_FALSE;
 
 	int width = 0, height = 0;
-	auto data = m_model.GenThumbnail(cx, width, height);
-	
+	auto data = m_model->GenThumbnail(cx, width, height);
+
+	//width = cx; height = cx;
+	//std::vector<uint8_t> data;
+	//data.resize(width * height * 4, 255);
+
 	*phbmp = CreateBitmap(width, height, 1, 32, data.data());
 	
 	*pdwAlpha = WTSAT_ARGB;
