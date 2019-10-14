@@ -32,8 +32,12 @@ Most of the HLSL functions may be used as well:
 * floor(value)
 * ceil(value)
 * frac(value)
+* trunc(value)
 * normalize(value)*
 * length(value)*
+* all(value)
+* any(value)
+* radians(value)
 * min(value1, value2)
 * max(value1, value2)
 * pow(value1, value2)
@@ -42,6 +46,9 @@ Most of the HLSL functions may be used as well:
 * step(value1, value2)
 * cross(value1, value2)*
 * dot(value1, value2)*
+* distance(value1, value2)*
+* lerp(value1, value2, factor)
+* clamp(value, min, max)
 
 Additionaly you can use:
 

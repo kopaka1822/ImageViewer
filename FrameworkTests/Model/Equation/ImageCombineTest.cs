@@ -54,6 +54,7 @@ namespace FrameworkTests.Model.Equation
             TestFormula("floor(I0)");
             TestFormula("ceil(I0)");
             TestFormula("frac(I0)");
+            TestFormula("trunc(I0)");
         }
 
         [TestMethod]
@@ -68,6 +69,10 @@ namespace FrameworkTests.Model.Equation
 
             TestFormula("normalize(I0)");
             TestFormula("length(I0)");
+
+            TestFormula("all(I0)");
+            TestFormula("any(I0)");
+            TestFormula("radians(I0)");
         }
 
         [TestMethod]
@@ -82,6 +87,7 @@ namespace FrameworkTests.Model.Equation
 
             TestFormula("dot(1, 2)");
             TestFormula("cross(1, 2)");
+            TestFormula("distance(1, 2)");
         }
 
         [TestMethod]
@@ -98,6 +104,8 @@ namespace FrameworkTests.Model.Equation
         public void TertiaryFunctions()
         {
             TestFormula("rgb(1, 2, 3)");
+            TestFormula("lerp(1, 2, 0.5)");
+            TestFormula("clamp(1, 2, 3)");
         }
 
         public string GetEq(string formula)

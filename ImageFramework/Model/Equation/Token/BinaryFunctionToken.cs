@@ -47,6 +47,7 @@ namespace ImageFramework.Model.Equation.Token
                     return true;
                 case "dot":
                 case "cross":
+                case "distance":
                     convertToRgb = true;
                     return true;
 

@@ -19,14 +19,18 @@ namespace ImageFramework.Model.Equation.Token
 
         public override string ToHlsl()
         {
-            if (funcName == "rgb")
+            switch (funcName)
             {
-                // transform values into rgb vector
-                return $"float4(({value1.ToHlsl()}).x, " +
-                       $"({value2.ToHlsl()}).x, " +
-                       $"({value3.ToHlsl()}).x, 1.0)";
+                case "rgb":
+                    // transform values into rgb vector
+                    return $"float4(({value1.ToHlsl()}).x, " +
+                           $"({value2.ToHlsl()}).x, " +
+                           $"({value3.ToHlsl()}).x, 1.0)";
+                case "lerp":
+                    return $"lerp({value1.ToHlsl()}, {value2.ToHlsl()}, ({value3.ToHlsl()}).x)";
+                case "clamp":
+                    return $"clamp({value1.ToHlsl()}, {value2.ToHlsl()}, {value3.ToHlsl()})";
             }
-
             throw new Exception("invalid string as function name: " + funcName);
         }
     }
