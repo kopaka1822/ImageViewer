@@ -25,7 +25,7 @@ public:
 	// IThumbnailProvider
 	IFACEMETHODIMP GetThumbnail(UINT cx, HBITMAP* phbmp, WTS_ALPHATYPE* pdwAlpha) override;
 
-	ThumbnailProvider();
+	ThumbnailProvider(const std::string& directory);
 
 protected:
 	~ThumbnailProvider();

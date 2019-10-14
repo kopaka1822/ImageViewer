@@ -2,6 +2,7 @@
 
 #include <unknwn.h>     // For IClassFactory
 #include <windows.h>
+#include <string>
 
 
 class ClassFactory : public IClassFactory
@@ -23,4 +24,5 @@ protected:
 
 private:
 	long m_cRef;
+	std::string m_directory; // of the dll
 };

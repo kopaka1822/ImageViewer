@@ -293,19 +293,19 @@ HRESULT UnregisterShellExtThumbnailHandler(PCWSTR pszFileType)
 	// If pszFileType starts with '.', try to read the default value of the 
 	// HKCR\<File Type> key which contains the ProgID to which the file type 
 	// is linked.
-	if (*pszFileType == L'.')
-	{
-		wchar_t szDefaultVal[260];
-		hr = GetHKCRRegistryKeyAndValue(pszFileType, NULL, szDefaultVal,
-			sizeof(szDefaultVal));
-
-		// If the key exists and its default value is not empty, use the 
-		// ProgID as the file type.
-		if (SUCCEEDED(hr) && szDefaultVal[0] != L'\0')
-		{
-			pszFileType = szDefaultVal;
-		}
-	}
+	//if (*pszFileType == L'.')
+	//{
+	//	wchar_t szDefaultVal[260];
+	//	hr = GetHKCRRegistryKeyAndValue(pszFileType, NULL, szDefaultVal,
+	//		sizeof(szDefaultVal));
+	//
+	//	// If the key exists and its default value is not empty, use the 
+	//	// ProgID as the file type.
+	//	if (SUCCEEDED(hr) && szDefaultVal[0] != L'\0')
+	//	{
+	//		pszFileType = szDefaultVal;
+	//	}
+	//}
 
 	// Remove the registry key: 
 	// HKCR\<File Type>\shellex\{e357fccd-a995-4576-b01f-234630154e96}

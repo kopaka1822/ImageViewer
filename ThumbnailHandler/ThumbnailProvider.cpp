@@ -12,9 +12,9 @@
 extern HINSTANCE g_hInst;
 extern long g_cDllRef;
 
-ThumbnailProvider::ThumbnailProvider()
+ThumbnailProvider::ThumbnailProvider(const std::string& directory)
 	:
-m_cRef(1)
+m_cRef(1), m_model(directory + "ImageConsole.exe")
 {
 	InterlockedIncrement(&g_cDllRef);
 }
