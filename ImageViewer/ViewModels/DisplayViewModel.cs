@@ -30,8 +30,22 @@ namespace ImageViewer.ViewModels
             models.PropertyChanged += ModelsOnPropertyChanged;
             models.Display.PropertyChanged += DisplayOnPropertyChanged;
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
+            models.Settings.PropertyChanged += SettingsOnPropertyChanged;
 
             CreateViewModes();
+        }
+
+        private void SettingsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(SettingsModel.FlipYAxis):
+                    OnPropertyChanged(nameof(TexelPosition));
+                    OnPropertyChanged(nameof(FlipYAxis));
+                    OnPropertyChanged(nameof(DxSystemVisibility));
+                    OnPropertyChanged(nameof(GlSystemVisibility));
+                    break;
+            }
         }
 
         public bool HasKeyToInvoke(Key key)
@@ -158,6 +172,12 @@ namespace ImageViewer.ViewModels
         {
             get => models.Display.ShowCropRectangle;
             set => models.Display.ShowCropRectangle = value;
+        }
+
+        public bool FlipYAxis
+        {
+            get => models.Settings.FlipYAxis;
+            set => models.Settings.FlipYAxis = value;
         }
 
         public ObservableCollection<ComboBoxItem<int>> AvailableMipMaps { get; } = new ObservableCollection<ComboBoxItem<int>>();
@@ -326,7 +346,23 @@ namespace ImageViewer.ViewModels
                 OnPropertyChanged(nameof(EnableViewModes));
         }
 
-        public string TexelPosition => models.Display.TexelPosition.X + ", " + models.Display.TexelPosition.Y;
+        public string TexelPosition => models.Display.TexelPosition.X + ", " + GetTexelPositionY();
+
+        public Visibility DxSystemVisibility =>
+            models.Settings.FlipYAxis ? Visibility.Collapsed : Visibility.Visible;
+
+        public Visibility GlSystemVisibility =>
+            models.Settings.FlipYAxis ? Visibility.Visible : Visibility.Collapsed;
+
+        /// <summary>
+        /// respects flipping of texel coordinate
+        /// </summary>
+        private int GetTexelPositionY()
+        {
+            if (!models.Settings.FlipYAxis) return models.Display.TexelPosition.Y;
+            if (models.Images.NumImages == 0) return 0;
+            return models.Images.GetHeight(models.Display.ActiveMipmap) - models.Display.TexelPosition.Y - 1;
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

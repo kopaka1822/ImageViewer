@@ -362,5 +362,9 @@
     <Resource Include="Icons\tonemap.png" />
     <Resource Include="Icons\zoom.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\dx_system.png" />
+    <Resource Include="Icons\gl_system.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

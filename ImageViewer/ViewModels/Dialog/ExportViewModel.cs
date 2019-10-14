@@ -11,6 +11,7 @@ using System.Windows;
 using ImageFramework.Annotations;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
+using ImageFramework.Utility;
 using ImageViewer.Models;
 using ImageViewer.Views;
 
@@ -102,6 +103,7 @@ namespace ImageViewer.ViewModels.Dialog
                     break;
                 case nameof(ExportModel.CropStartY):
                     OnPropertyChanged(nameof(CropStartY));
+                    OnPropertyChanged(nameof(CropEndY));
                     OnPropertyChanged(nameof(IsValid));
                     break;
                 case nameof(ExportModel.CropEndX):
@@ -110,6 +112,7 @@ namespace ImageViewer.ViewModels.Dialog
                     break;
                 case nameof(ExportModel.CropEndY):
                     OnPropertyChanged(nameof(CropEndY));
+                    OnPropertyChanged(nameof(CropStartY));
                     OnPropertyChanged(nameof(IsValid));
                     break;
                 case nameof(ExportModel.Mipmap):
@@ -205,32 +208,79 @@ namespace ImageViewer.ViewModels.Dialog
         public bool AllowCropping => models.Export.AllowCropping;
 
         public int CropMinX => 0;
-        public int CropMaxX => models.Images.GetWidth(Math.Max(selectedMipmap.Cargo, 0));
+        public int CropMaxX => models.Images.GetWidth(Math.Max(selectedMipmap.Cargo, 0)) - 1;
         public int CropMinY => 0;
-        public int CropMaxY => models.Images.GetHeight(Math.Max(selectedMipmap.Cargo, 0));
+        public int CropMaxY => models.Images.GetHeight(Math.Max(selectedMipmap.Cargo, 0)) - 1;
 
         public int CropStartX
         {
             get => models.Export.CropStartX;
-            set => models.Export.CropStartX = value;
+            set
+            {
+                var clamped = Utility.Clamp(value, CropMinX, CropMaxX);
+                models.Export.CropStartX = clamped;
+
+                if(clamped != value) OnPropertyChanged(nameof(CropStartX));
+                CropEndX = CropEndX; // maybe adjust this value
+            }
         }
 
         public int CropStartY
         {
-            get => models.Export.CropStartY;
-            set => models.Export.CropStartY = value;
+            get => models.Settings.FlipYAxis ? FlipY(models.Export.CropEndY) : models.Export.CropStartY;
+            set
+            {
+                var clamped = Utility.Clamp(value, CropMinY, CropMaxY);
+                if (models.Settings.FlipYAxis)
+                {
+                    // set crop end y
+                    models.Export.CropEndY = FlipY(clamped);
+                }
+                else
+                {
+                    // set crop start y
+                    models.Export.CropStartY = clamped;
+                }
+
+                if (clamped != value) OnPropertyChanged(nameof(CropStartY));
+            }
         }
 
         public int CropEndX
         {
             get => models.Export.CropEndX;
-            set => models.Export.CropEndX = value;
+            set
+            {
+                var clamped = Utility.Clamp(value, CropMinX, CropMaxX);
+                models.Export.CropEndX = clamped;
+
+                if(clamped != value) OnPropertyChanged(nameof(CropEndX));
+            }
         }
 
         public int CropEndY
         {
-            get => models.Export.CropEndY;
-            set => models.Export.CropEndY = value;
+            get => models.Settings.FlipYAxis ? FlipY(models.Export.CropStartY) :  models.Export.CropEndY;
+            set
+            {
+                var clamped = Utility.Clamp(value, CropMinY, CropMaxY);
+                if (models.Settings.FlipYAxis)
+                {
+                    // set crop start y
+                    models.Export.CropStartY = FlipY(clamped);
+                }
+                else
+                {
+                    models.Export.CropEndY = clamped;
+                }
+
+                if(clamped != value) OnPropertyChanged(nameof(CropEndY));
+            }
+        }
+
+        private int FlipY(int value)
+        {
+            return CropMaxY - value;
         }
 
         public Visibility HasQuality => extension == "jpg" ? Visibility.Visible : Visibility.Collapsed;

@@ -20,10 +20,18 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Image 
-                            Source="../Icons/cross_arrow.png" 
-                            Width="16" 
-                            Height="16" 
-                            Margin="0 0 5 0"/>
+                    Source="../Icons/dx_system.png" 
+                    Width="16" 
+                    Height="16" 
+                    Margin="0 0 5 0"
+                    Visibility="{Binding Display.DxSystemVisibility, FallbackValue=Visible}"/>
+
+                <Image 
+                    Source="../Icons/gl_system.png" 
+                    Width="16" 
+                    Height="16" 
+                    Margin="0 0 5 0"
+                    Visibility="{Binding Display.GlSystemVisibility, FallbackValue=Collapsed}"/>
                 <TextBlock 
                             Text="{Binding Display.TexelPosition}" 
                             Grid.Column="1"/>

@@ -47,6 +47,9 @@ namespace ImageViewer.Models
                 case nameof(Settings.Default.TexelDecimalCount):
                     OnPropertyChanged(nameof(TexelDecimalPlaces));
                     break;
+                case nameof(Settings.Default.FlipYAxis):
+                    OnPropertyChanged(nameof(FlipYAxis));
+                    break;
             }
         }
 
@@ -130,6 +133,12 @@ namespace ImageViewer.Models
                 var clamp = Utility.Clamp(value, MinTexelDecimalPlaces, MaxTexelDecimalPlaces);
                 Settings.Default.TexelDecimalCount = clamp;
             }
+        }
+
+        public bool FlipYAxis
+        {
+            get => Settings.Default.FlipYAxis;
+            set => Settings.Default.FlipYAxis = value;
         }
 
         public void Save()
