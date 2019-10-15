@@ -40,6 +40,10 @@ namespace ImageFramework.Model
             }
         }
 
+        /// <summary>
+        /// indicates if the Image was taken from a texture cache or lend from the images model
+        /// </summary>
+        private bool cachedTexture = true;
         public TextureArray2D Image { get; internal set; }
 
         private bool isValid = false;
@@ -114,6 +118,20 @@ namespace ImageFramework.Model
             args.Progress.Progress = 0.0f;
             args.Progress.What = "resolving equation";
 
+            // early out if color and alpha are from an input image
+            if (Color.Formula.Length == 2 && Color.Formula.StartsWith("I") && Alpha.Formula == Color.Formula && (!UseFilter || args.Filters.Count == 0))
+            {
+                // just reference the input image
+                if (int.TryParse(Color.Formula.Substring(1), out var imgId))
+                {
+                    Image = args.Images.Images[imgId].Image;
+                    cachedTexture = false; // image was not taken from the image cache
+                    HasChanges = false;
+                    args.Progress.IsProcessing = false;
+                    return;
+                }
+            }
+
             try
             {
                 // first, use the combine shader
@@ -122,8 +140,6 @@ namespace ImageFramework.Model
                     var texSrc = args.TextureCache.GetTexture();
 
                     shader.Run(args.Images, args.LayerLevelBuffer, texSrc);
-
-                    var color = texSrc.GetPixelColors(0, 0);
 
                     Image = texSrc;
                 }
@@ -205,10 +221,15 @@ namespace ImageFramework.Model
         {
             if (Image != null)
             {
-                cache.StoreTexture(Image);
+                if(cachedTexture)
+                    cache.StoreTexture(Image); // taken from the cache
+                // otherwise it belongs to the image model
+
                 Image = null;
+                cachedTexture = true;
                 OnPropertyChanged(nameof(Image));
             }
+            
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

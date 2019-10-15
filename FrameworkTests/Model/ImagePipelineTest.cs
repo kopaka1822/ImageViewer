@@ -97,5 +97,21 @@ namespace FrameworkTests.Model
 
             TestData.CompareColors(refColors, colors);
         }
+
+        [TestMethod]
+        public void OptimizeTrivialFormula()
+        {
+            var model = new Models(1);
+            model.AddImageFromFile(TestData.Directory + "small.png");
+            model.AddImageFromFile(TestData.Directory + "small.pfm");
+            model.Apply();
+
+            Assert.IsTrue(ReferenceEquals(model.Pipelines[0].Image, model.Images.Images[0].Image));
+
+            model.Pipelines[0].Color.Formula = "I1";
+            model.Pipelines[0].Alpha.Formula = "I1";
+            model.Apply();
+            Assert.IsTrue(ReferenceEquals(model.Pipelines[0].Image, model.Images.Images[1].Image));
+        }
     }
 }
