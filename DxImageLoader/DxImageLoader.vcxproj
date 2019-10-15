@@ -90,9 +90,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;DXIMAGELOADER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;DXIMAGELOADER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;_ITERATOR_DEBUG_LEVEL 2</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -147,6 +148,7 @@
       <PreprocessorDefinitions>NDEBUG;DXIMAGELOADER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -157,8 +159,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\dependencies\compressonator\Compressonator\Header\Compressonator.h" />
     <ClInclude Include="..\dependencies\stb_image.h" />
     <ClInclude Include="..\dependencies\stb_image_write.h" />
+    <ClInclude Include="compress_interface.h" />
     <ClInclude Include="convert.h" />
     <ClInclude Include="exr_interface.h" />
     <ClInclude Include="framework.h" />
@@ -172,6 +176,7 @@
     <ClInclude Include="stbi_interface.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="compress_interface.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="exr_interface.cpp" />
     <ClCompile Include="gli_interface.cpp" />
@@ -185,6 +190,11 @@
     </ClCompile>
     <ClCompile Include="pfm_interface.cpp" />
     <ClCompile Include="stbi_interface.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\dependencies\compressonator\Compressonator\VS2015\CompressonatorLib.vcxproj">
+      <Project>{9ee67db2-4ad8-4b9a-ae58-2e536412033c}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

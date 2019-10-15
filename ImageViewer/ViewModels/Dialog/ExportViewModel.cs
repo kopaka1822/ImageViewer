@@ -79,7 +79,22 @@ namespace ImageViewer.ViewModels.Dialog
             if (SelectedFormat == null)
                 SelectedFormat = AvailableFormat[0];
 
+            // enable quality
+            if (extension == "jpg")
+            {
+                hasQualityValue = true;
+            }
+            else SetKtxDdsQuality();
+
             models.Export.PropertyChanged += ExportOnPropertyChanged;
+        }
+
+        private void SetKtxDdsQuality()
+        {
+            if (extension == "ktx" || extension == "dds")
+            {
+                HasQualityValue = SelectedFormat.Cargo.IsCompressed();
+            }
         }
 
         public void Dispose()
@@ -194,6 +209,7 @@ namespace ImageViewer.ViewModels.Dialog
                 if (value == null || value == selectedFormat) return;
                 selectedFormat = value;
                 OnPropertyChanged(nameof(SelectedFormat));
+                SetKtxDdsQuality();
             }
         }
 
@@ -283,7 +299,20 @@ namespace ImageViewer.ViewModels.Dialog
             return CropMaxY - value;
         }
 
-        public Visibility HasQuality => extension == "jpg" ? Visibility.Visible : Visibility.Collapsed;
+        private bool hasQualityValue = false;
+
+        private bool HasQualityValue
+        {
+            get => hasQualityValue;
+            set
+            {
+                if(value == hasQualityValue) return;
+                hasQualityValue = value;
+                OnPropertyChanged(nameof(HasQuality));
+            }
+        }
+
+        public Visibility HasQuality => HasQualityValue ? Visibility.Visible : Visibility.Collapsed;
         public int MinQuality => ExportModel.QualityMin;
         public int MaxQuality => ExportModel.QualityMax;
         public int Quality

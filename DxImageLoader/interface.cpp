@@ -188,9 +188,9 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 	try
 	{
 		if (ext == "dds")
-			gli_save_image(fullName.c_str(), *it->second, gli::format(format), false);
+			gli_save_image(fullName.c_str(), *it->second, gli::format(format), false, quality);
 		else if (ext == "ktx")
-			gli_save_image(fullName.c_str(), *it->second, gli::format(format), true);
+			gli_save_image(fullName.c_str(), *it->second, gli::format(format), true, quality);
 		else if (ext == "pfm" || ext == "hdr")
 		{
 			assertSingleLayerMip(*it->second);

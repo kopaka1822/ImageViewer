@@ -2,6 +2,7 @@
 #include "gli_interface.h"
 #include <gli/gli.hpp>
 #include <gli/gl.hpp>
+#include "compress_interface.h"
 
 // mofified copy of gli convert
 template <typename texture_type>
@@ -160,15 +161,17 @@ std::vector<uint32_t> dds_get_export_formats()
 	gli::format::FORMAT_RGB9E5_UFLOAT_PACK32,
 
 	// dds compressed
-	/*gli::format::FORMAT_RGB_DXT1_UNORM_BLOCK8,
-	gli::format::FORMAT_RGB_DXT1_SRGB_BLOCK8,
+	// DXT
+	//gli::format::FORMAT_RGB_DXT1_UNORM_BLOCK8,
+	//gli::format::FORMAT_RGB_DXT1_SRGB_BLOCK8,
 	gli::format::FORMAT_RGBA_DXT1_UNORM_BLOCK8,
 	gli::format::FORMAT_RGBA_DXT1_SRGB_BLOCK8,
 	gli::format::FORMAT_RGBA_DXT3_UNORM_BLOCK16,
 	gli::format::FORMAT_RGBA_DXT3_SRGB_BLOCK16,
-	gli::format::FORMAT_RGBA_DXT5_UNORM_BLOCK16,
 	gli::format::FORMAT_RGBA_DXT5_SRGB_BLOCK16,
-	gli::format::FORMAT_R_ATI1N_UNORM_BLOCK8,
+	gli::format::FORMAT_RGBA_DXT5_UNORM_BLOCK16,
+		
+	/*gli::format::FORMAT_R_ATI1N_UNORM_BLOCK8,
 	gli::format::FORMAT_R_ATI1N_SNORM_BLOCK8,
 	gli::format::FORMAT_RG_ATI2N_UNORM_BLOCK16,
 	gli::format::FORMAT_RG_ATI2N_SNORM_BLOCK16,
@@ -244,11 +247,20 @@ std::vector<uint32_t> ktx_get_export_formats()
 	return dds_get_export_formats();
 }
 
-void gli_save_image(const char* filename, const image::Image& image, gli::format format, bool ktx)
+void gli_save_image(const char* filename, const image::Image& image, gli::format format, bool ktx, int quality)
 {
 	gli::texture* tex = nullptr;
 	gli::texture2d_array tex2d;
 	gli::texture_cube texCube;
+
+	if(format != image.format && is_compressonator_format(format))
+	{
+		// use compressonator for texture compression
+		auto cimg = compressonator_convert_image(image, format, quality);
+		gli_save_image(filename, cimg, format, ktx, quality);
+		return;
+	}
+
 	bool isCube = image.layer.size() == 6;
 	// create texture storage
 	if(isCube)
