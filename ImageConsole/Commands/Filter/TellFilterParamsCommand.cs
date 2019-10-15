@@ -43,6 +43,8 @@ namespace ImageConsole.Commands.Filter
             {
                 Console.Out.WriteLine($"{tp.Name}: (image) {tp.Source}");
             }
+
+            Console.Out.WriteLine(); // signal params end
         }
     }
 }
