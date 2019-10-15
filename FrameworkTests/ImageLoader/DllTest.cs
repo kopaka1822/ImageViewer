@@ -79,5 +79,21 @@ namespace FrameworkTests.ImageLoader
         {
             VerifySmallHdr(IO.LoadImage(TestData.Directory + "small.ktx"), Color.Channel.Rgba);
         }
+
+        [TestMethod]
+        public void LoadDdsCubemap()
+        {
+            var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "cubemap.dds"));
+            Assert.AreEqual(6, tex.NumLayers);
+            Assert.AreEqual(3, tex.NumMipmaps);
+        }
+
+        [TestMethod]
+        public void LoadKtxCubemap()
+        {
+            var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "cubemap.ktx"));
+            Assert.AreEqual(6, tex.NumLayers);
+            Assert.AreEqual(3, tex.NumMipmaps);
+        }
     }
 }

@@ -15,7 +15,7 @@
 - [x] get basic image statistics (average, min, max)
 - [x] import custom formula as image
 - [ ] generate cube map from 6 images
-- [ ] open compressed formats
+- [x] open compressed formats
 - [ ] export compressed formats
 
 # Image Viewer Requirements
