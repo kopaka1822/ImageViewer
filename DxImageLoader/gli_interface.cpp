@@ -3,7 +3,45 @@
 #include <gli/gli.hpp>
 #include <gli/gl.hpp>
 
+// mofified copy of gli convert
+template <typename texture_type>
+inline texture_type convert_mod(texture_type const& Texture, gli::format Format)
+{
+	typedef float T;
+	typedef typename gli::texture::extent_type extent_type;
+	typedef typename texture_type::size_type size_type;
+	typedef typename extent_type::value_type component_type;
+	typedef typename gli::detail::convert<texture_type, T, gli::defaultp>::fetchFunc fetch_type;
+	typedef typename gli::detail::convert<texture_type, T, gli::defaultp>::writeFunc write_type;
 
+	GLI_ASSERT(!Texture.empty());
+	GLI_ASSERT(!is_compressed(Format));
+
+	fetch_type Fetch = gli::detail::convert<texture_type, T, gli::defaultp>::call(Texture.format()).Fetch;
+	write_type Write = gli::detail::convert<texture_type, T, gli::defaultp>::call(Format).Write;
+
+	gli::texture Storage(Texture.target(), Format, Texture.texture::extent(), Texture.layers(), Texture.faces(), Texture.levels(), Texture.swizzles());
+	texture_type Copy(Storage);
+
+	for (size_type Layer = 0; Layer < Texture.layers(); ++Layer)
+		for (size_type Face = 0; Face < Texture.faces(); ++Face)
+			for (size_type Level = 0; Level < Texture.levels(); ++Level)
+			{
+				extent_type const& Dimensions = Texture.texture::extent(Level);
+
+				for (component_type k = 0; k < Dimensions.z; ++k)
+					for (component_type j = 0; j < Dimensions.y; ++j)
+						for (component_type i = 0; i < Dimensions.x; ++i)
+						{
+							typename texture_type::extent_type const Texelcoord(extent_type(i, j, k));
+							Write(
+								Copy, Texelcoord, Layer, Face, Level,
+								Fetch(Texture, Texelcoord, Layer, Face, Level));
+						}
+			}
+
+	return texture_type(Copy);
+}
 std::unique_ptr<image::Image> gli_load(const char* filename)
 {
 	gli::texture tex(gli::load(filename));
@@ -14,17 +52,17 @@ std::unique_ptr<image::Image> gli_load(const char* filename)
 	// convert image format if not compatible
 	if(!image::isSupported(tex.format()))
 	{
-		if (gli::is_compressed(tex.format()))
-			throw std::runtime_error("compressed texture formats are not supported yet");
+		//if (gli::is_compressed(tex.format()))
+			//throw std::runtime_error("compressed texture formats are not supported yet");
 
 		const auto newFormat = image::getSupportedFormat(tex.format());
-		if(tex.base_face() > 1)
+		if(tex.faces() == 1)
 		{
-			tex = gli::convert(gli::texture2d_array(tex), newFormat);
+			tex = convert_mod(gli::texture2d_array(tex), newFormat);
 		}
 		else
 		{
-			tex = gli::convert(gli::texture_cube_array(tex), newFormat);
+			tex = convert_mod(gli::texture_cube_array(tex), newFormat);
 		}
 	}
 
