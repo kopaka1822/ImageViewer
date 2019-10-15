@@ -17,9 +17,12 @@ namespace ImageConsole.Commands
             avg
         }
 
-        public StatisticsCommand() 
+        private readonly ImageConsole.Program program;
+
+        public StatisticsCommand(ImageConsole.Program program) 
             : base("-stats", "[\"min/max/avg\"]", "prints the statistics. Default is avg")
         {
+            this.program = program;
         }
 
         public override void Execute(List<string> arguments, Models model)
@@ -33,26 +36,29 @@ namespace ImageConsole.Commands
             switch (mode)
             {
                 case StatMode.min:
-                    Print(stats.Min);
+                    Print(stats.Min, program.ShowProgress);
                     break;
                 case StatMode.max:
-                    Print(stats.Max);
+                    Print(stats.Max, program.ShowProgress);
                     break;
                 case StatMode.avg:
-                    Print(stats.Avg);
+                    Print(stats.Avg, program.ShowProgress);
                     break;
             }
         }
 
-        private void Print(DefaultStatistics statsMin)
+        private void Print(DefaultStatistics statsMin, bool showInfo)
         {
-            Console.Error.Write("luminance: ");
+            if(showInfo)
+                Console.Error.Write("luminance: ");
             Console.Out.WriteLine(statsMin.Luminance);
 
-            Console.Error.Write("lightness: ");
+            if(showInfo)
+                Console.Error.Write("lightness: ");
             Console.Out.WriteLine(statsMin.Lightness);
 
-            Console.Error.Write("luma: ");
+            if(showInfo)
+                Console.Error.Write("luma: ");
             Console.Out.WriteLine(statsMin.Luma);
         }
     }

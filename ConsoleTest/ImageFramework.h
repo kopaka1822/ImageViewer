@@ -1,5 +1,6 @@
 #pragma once
 #include "Pipeline.h"
+#include <string>
 
 namespace ImageFramework
 {
@@ -58,7 +59,7 @@ namespace ImageFramework
 		/// moves image to a new index
 		void MoveImage(int oldIndex, int newIndex);
 		/// sets image combine equation
-		void SetEquation(std::string_view color, std::string_view alpha = nullptr);
+		void SetEquation(std::string_view color, std::string_view alpha = std::string_view());
 
 		/// add filter to the filter list
 		void OpenFilter(std::string_view filename);
@@ -329,7 +330,10 @@ namespace ImageFramework
 
 	inline Model::Int2 Model::GetSize(int mipmap) const
 	{
-		m_in.Write("-tellsize");
+		m_in.Write("-tellsize ");
+		m_in.Write(std::to_string(mipmap));
+		m_in.Write("\n");
+
 		Int2 res;
 		res.x = std::stol(ReadLine());
 		res.y = std::stol(ReadLine());
@@ -338,7 +342,7 @@ namespace ImageFramework
 
 	inline bool Model::IsAlpha() const
 	{
-		m_in.Write("-tellapha");
+		m_in.Write("-tellalpha\n");
 		return ReadLine() == "True";
 	}
 

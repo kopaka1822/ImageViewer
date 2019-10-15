@@ -59,7 +59,7 @@ namespace ImageFramework.Model
             {
                 var tmp = Image.CloneWithoutMipmaps();
                 Image.Dispose();
-                tmp = Image;
+                Image = tmp;
             }
 
 
