@@ -15,6 +15,7 @@ namespace ImageFramework.Model.Export
     {
         public enum LdrMode
         {
+            Undefined,
             Srgb,
             UNorm,
             SNorm
@@ -239,10 +240,11 @@ namespace ImageFramework.Model.Export
             }
 
             // image is ready for export!
+            var stagingFormat = desc.StagingFormat;
             // ReSharper disable once CompareOfFloatsByEqualityOperator
-            if (image.Format != desc.StagingFormat.DxgiFormat || croppingActive || desc.Multiplier != 1.0f)
+            if (image.Format != stagingFormat.DxgiFormat || croppingActive || desc.Multiplier != 1.0f)
             {
-                using (var tmpTex = convert.Convert(image, desc.StagingFormat.DxgiFormat, Mipmap, Layer,
+                using (var tmpTex = convert.Convert(image, stagingFormat.DxgiFormat, Mipmap, Layer,
                     desc.Multiplier, UseCropping, CropStartX, CropStartY, CropEndX - CropStartX + 1, CropEndY - CropStartY + 1))
                 {
                     // the final texture only has the relevant layers and mipmaps

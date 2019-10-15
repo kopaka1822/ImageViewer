@@ -27,6 +27,9 @@
     <Filter Include="Source Files\pch">
       <UniqueIdentifier>{8cd5d375-8cd5-471b-9ed4-f97898fb9ebe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\compressonator">
+      <UniqueIdentifier>{b79dc3ea-c92e-471d-a9cc-2c73ddd0c76c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Layer.h">
@@ -68,6 +71,12 @@
     <ClInclude Include="convert.h">
       <Filter>Source Files\Image</Filter>
     </ClInclude>
+    <ClInclude Include="..\dependencies\compressonator\Compressonator\Header\Compressonator.h">
+      <Filter>Source Files\compressonator</Filter>
+    </ClInclude>
+    <ClInclude Include="compress_interface.h">
+      <Filter>Source Files\compressonator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -93,6 +102,9 @@
     </ClCompile>
     <ClCompile Include="Image.cpp">
       <Filter>Source Files\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="compress_interface.cpp">
+      <Filter>Source Files\compressonator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
