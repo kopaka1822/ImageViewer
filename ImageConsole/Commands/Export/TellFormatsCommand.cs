@@ -28,6 +28,7 @@ namespace ImageConsole.Commands.Export
                         Console.Out.WriteLine(gliFormat.ToString());
                     }
 
+                    Console.Out.WriteLine(); // signal params end
                     return;
                 }
             }
