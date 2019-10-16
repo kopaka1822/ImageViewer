@@ -78,15 +78,33 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void GrayTestAllJpg()
+        {
+            TryExportAllFormatsAndCompareGray("jpg");
+        }
+
+        [TestMethod]
         public void ExportAllPng()
         {
             TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "png");
         }
 
         [TestMethod]
+        public void GrayTestAllPng()
+        {
+            TryExportAllFormatsAndCompareGray("png");
+        }
+
+        [TestMethod]
         public void ExportAllBmp()
         {
             TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "bmp");
+        }
+
+        [TestMethod]
+        public void GrayTestAllBmp()
+        {
+            TryExportAllFormatsAndCompareGray("bmp");
         }
 
         [TestMethod]
@@ -102,6 +120,12 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void GrayTestAllPfm()
+        {
+            TryExportAllFormatsAndCompareGray("pfm");
+        }
+
+        [TestMethod]
         public void ExportHdr()
         {
             CompareAfterExport(TestData.Directory + "small.hdr", ExportDir + "small", "hdr", GliFormat.RGB32_SFLOAT);
@@ -111,6 +135,12 @@ namespace FrameworkTests.Model
         public void ExportAllHdr()
         {
             TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "hdr");
+        }
+
+        [TestMethod]
+        public void GrayTestAllHdr()
+        {
+            TryExportAllFormatsAndCompareGray("hdr");
         }
 
         [TestMethod]
@@ -126,6 +156,12 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void GrayTestAllDds()
+        {
+            TryExportAllFormatsAndCompareGray("dds");
+        }
+
+        [TestMethod]
         public void ExportKtx()
         {
             CompareAfterExport(TestData.Directory + "small.ktx", ExportDir + "small", "ktx", GliFormat.RGBA32_SFLOAT, Color.Channel.Rgba);
@@ -135,6 +171,12 @@ namespace FrameworkTests.Model
         public void ExportAllKtx()
         {
             TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "ktx");
+        }
+
+        [TestMethod]
+        public void GrayTestAllKtx()
+        {
+            TryExportAllFormatsAndCompareGray("ktx");
         }
 
         private void CompareAfterExport(string inputImage, string outputImage, string outputExtension, GliFormat format, Color.Channel channels = Color.Channel.Rgb, float tolerance = 0.01f)
@@ -172,13 +214,63 @@ namespace FrameworkTests.Model
             {
                 try
                 {
-                    model.Export.Export(tex, new ExportDescription(outputImage, outputExtension, model.Export));
+                    var desc = new ExportDescription(outputImage, outputExtension, model.Export);
+                    desc.FileFormat = format;
+                    model.Export.Export(tex, desc);
                 }
                 catch (Exception e)
                 {
                     throw new Exception($"export failed for format {format}:\n{e.Message}");
                 }
             }
+        }
+
+        private void TryExportAllFormatsAndCompareGray(string outputExtension)
+        {
+            var model = new Models(1);
+            model.AddImageFromFile(TestData.Directory + "gray.png");
+            model.Apply();
+            var tex = model.Pipelines[0].Image;
+            model.Export.Quality = 100;
+
+            var eFmt = model.Export.Formats.First(fmt => fmt.Extension == outputExtension);
+
+            string errors = "";
+            int numErrors = 0;
+
+            var lastTexel = tex.Width * tex.Height - 1;
+            foreach (var format in eFmt.Formats)
+            {
+                try
+                {
+                    var desc = new ExportDescription(ExportDir + "gray", outputExtension, model.Export);
+                    desc.FileFormat = format;
+                    model.Export.Export(tex, desc);
+                    // load and compare gray tone
+                    using (var newTex = new TextureArray2D(IO.LoadImage(ExportDir + "gray." + outputExtension)))
+                    {
+                        Assert.AreEqual(3, newTex.Width);
+                        Assert.AreEqual(2, newTex.Height);
+                        var colors = newTex.GetPixelColors(0, 0);
+                        // compare last texel
+                        var grayColor = colors[lastTexel];
+
+                        float tolerance = 0.01f;
+                        if (format.IsLessThan8Bit())
+                            tolerance = 0.1f;
+
+                        Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
+                    }
+                }
+                catch (Exception e)
+                {
+                    errors += $"{format.ToString()}: {e.Message}\n";
+                    ++numErrors;
+                }
+            }
+
+            if(errors.Length > 0)
+                throw new Exception($"gray comparision failed for {numErrors}/{eFmt.Formats.Count} formats:\n" + errors);
         }
     }
 }
