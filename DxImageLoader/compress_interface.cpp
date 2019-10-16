@@ -64,19 +64,23 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSourc
 
 	case gli::format::FORMAT_RGB_DXT1_UNORM_BLOCK8: // BC 1
 	case gli::format::FORMAT_RGB_DXT1_SRGB_BLOCK8:
+		if (isSource) exInfo.swizzleRGB = true;
 		return CMP_FORMAT_DXT1;
 
 	case gli::format::FORMAT_RGBA_DXT1_UNORM_BLOCK8: // BC 1
 	case gli::format::FORMAT_RGBA_DXT1_SRGB_BLOCK8:
 		exInfo.useDxt1Alpha = true;
+		if (isSource) exInfo.swizzleRGB = true;
 		return CMP_FORMAT_DXT1;
 
 	case gli::format::FORMAT_RGBA_DXT3_SRGB_BLOCK16: // BC 2
 	case gli::format::FORMAT_RGBA_DXT3_UNORM_BLOCK16:
+		if (isSource) exInfo.swizzleRGB = true;
 		return CMP_FORMAT_DXT3;
 
 	case gli::format::FORMAT_RGBA_DXT5_SRGB_BLOCK16: // BC 3
 	case gli::format::FORMAT_RGBA_DXT5_UNORM_BLOCK16:
+		if (isSource) exInfo.swizzleRGB = true;
 		return CMP_FORMAT_DXT5;
 
 	case gli::format::FORMAT_R_ATI1N_UNORM_BLOCK8: // BC 4
@@ -86,6 +90,7 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSourc
 
 	case gli::format::FORMAT_RG_ATI2N_UNORM_BLOCK16: // BC 5
 	case gli::format::FORMAT_RG_ATI2N_SNORM_BLOCK16:
+		if (isSource) exInfo.swizzleRGB = true;
 		//exInfo.swizzleRGB = true;
 		//return CMP_FORMAT_ATI2N;
 		return CMP_FORMAT_ATI2N_XY;
