@@ -130,13 +130,13 @@ namespace ImageFramework.Model.Export
                 case GliFormat.L16_UNORM:
                 case GliFormat.A16_UNORM:
                 case GliFormat.LA16_UNORM:
-                case GliFormat.RGB_DXT1_UNORM_BLOCK8:
-                case GliFormat.RGBA_DXT1_UNORM_BLOCK8:
-                case GliFormat.RGBA_DXT3_UNORM_BLOCK16:
-                case GliFormat.RGBA_DXT5_UNORM_BLOCK16:
-                case GliFormat.R_ATI1N_UNORM_BLOCK8:
-                case GliFormat.RG_ATI2N_UNORM_BLOCK16:
-                case GliFormat.RGBA_BP_UNORM_BLOCK16:
+                case GliFormat.RGB_DXT1_UNORM:
+                case GliFormat.RGBA_DXT1_UNORM:
+                case GliFormat.RGBA_DXT3_UNORM:
+                case GliFormat.RGBA_DXT5_UNORM:
+                case GliFormat.R_ATI1N_UNORM:
+                case GliFormat.RG_ATI2N_UNORM:
+                case GliFormat.RGBA_BP_UNORM:
                 case GliFormat.RGB_ETC2_UNORM_BLOCK8:
                 case GliFormat.RGBA_ETC2_UNORM_BLOCK8:
                 case GliFormat.RGBA_ETC2_UNORM_BLOCK16:
@@ -181,8 +181,8 @@ namespace ImageFramework.Model.Export
                 case GliFormat.RG16_SNORM:
                 case GliFormat.RGB16_SNORM:
                 case GliFormat.RGBA16_SNORM:
-                case GliFormat.R_ATI1N_SNORM_BLOCK8:
-                case GliFormat.RG_ATI2N_SNORM_BLOCK16:
+                case GliFormat.R_ATI1N_SNORM:
+                case GliFormat.RG_ATI2N_SNORM:
                 case GliFormat.R_EAC_SNORM_BLOCK8:
                 case GliFormat.RG_EAC_SNORM_BLOCK16:
                     return ExportModel.LdrMode.SNorm;
@@ -195,11 +195,11 @@ namespace ImageFramework.Model.Export
                 case GliFormat.BGRA8_SRGB:
                 case GliFormat.RGBA8_SRGB_PACK32:
                 case GliFormat.BGR8_SRGB_PACK32:
-                case GliFormat.RGB_DXT1_SRGB_BLOCK8:
-                case GliFormat.RGBA_DXT1_SRGB_BLOCK8:
-                case GliFormat.RGBA_DXT3_SRGB_BLOCK16:
-                case GliFormat.RGBA_DXT5_SRGB_BLOCK16:
-                case GliFormat.RGBA_BP_SRGB_BLOCK16:
+                case GliFormat.RGB_DXT1_SRGB:
+                case GliFormat.RGBA_DXT1_SRGB:
+                case GliFormat.RGBA_DXT3_SRGB:
+                case GliFormat.RGBA_DXT5_SRGB:
+                case GliFormat.RGBA_BP_SRGB:
                 case GliFormat.RGB_ETC2_SRGB_BLOCK8:
                 case GliFormat.RGBA_ETC2_SRGB_BLOCK8:
                 case GliFormat.RGBA_ETC2_SRGB_BLOCK16:
@@ -310,8 +310,8 @@ namespace ImageFramework.Model.Export
                 case GliFormat.D32_SFLOAT:
                 case GliFormat.S8_UINT:
                 case GliFormat.D32_SFLOAT_S8_UINT_PACK64:
-                case GliFormat.RGB_BP_UFLOAT_BLOCK16:
-                case GliFormat.RGB_BP_SFLOAT_BLOCK16:
+                case GliFormat.RGB_BP_UFLOAT:
+                case GliFormat.RGB_BP_SFLOAT:
                     return ExportModel.LdrMode.Undefined;
             }
 
