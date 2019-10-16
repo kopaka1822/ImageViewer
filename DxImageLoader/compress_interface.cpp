@@ -31,7 +31,7 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSourc
 		return CMP_FORMAT_RGBA_32F; // not supported by converter
 
 		// compressed formats
-	case gli::format::FORMAT_RGBA_ASTC_10X10_SRGB_BLOCK16:
+	/*case gli::format::FORMAT_RGBA_ASTC_10X10_SRGB_BLOCK16:
 	case gli::format::FORMAT_RGBA_ASTC_10X10_UNORM_BLOCK16:
 	case gli::format::FORMAT_RGBA_ASTC_10X5_SRGB_BLOCK16:
 	case gli::format::FORMAT_RGBA_ASTC_10X5_UNORM_BLOCK16:
@@ -60,7 +60,7 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSourc
 	case gli::format::FORMAT_RGBA_ASTC_8X8_SRGB_BLOCK16:
 	case gli::format::FORMAT_RGBA_ASTC_8X8_UNORM_BLOCK16:
 		// TODO remember block dimensions
-		return CMP_FORMAT_ASTC;
+		return CMP_FORMAT_ASTC;*/
 
 	case gli::format::FORMAT_RGB_DXT1_UNORM_BLOCK8: // BC 1
 	case gli::format::FORMAT_RGB_DXT1_SRGB_BLOCK8:
@@ -105,7 +105,7 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSourc
 	case gli::format::FORMAT_RGBA_BP_SRGB_BLOCK16:
 		return CMP_FORMAT_BC7;
 
-	case gli::format::FORMAT_RGB_ATC_UNORM_BLOCK8:
+	/*case gli::format::FORMAT_RGB_ATC_UNORM_BLOCK8:
 		return CMP_FORMAT_ATC_RGB;
 	case gli::format::FORMAT_RGBA_ATCI_UNORM_BLOCK16:
 		return CMP_FORMAT_ATC_RGBA_Interpolated;
@@ -124,7 +124,7 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSourc
 		return CMP_FORMAT_ETC2_RGBA;
 
 	case gli::format::FORMAT_RGBA_ETC2_UNORM_BLOCK8:
-		return CMP_FORMAT_ETC2_SRGBA;
+		return CMP_FORMAT_ETC2_SRGBA;*/
 	}
 
 	exInfo.isCompressed = false;
