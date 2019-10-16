@@ -164,22 +164,22 @@ namespace ImageFramework.ImageLoader
         D24_UNORM_S8_UINT,
         D32_SFLOAT_S8_UINT_PACK64,
 
-        RGB_DXT1_UNORM_BLOCK8,
-        RGB_DXT1_SRGB_BLOCK8,
-        RGBA_DXT1_UNORM_BLOCK8,
-        RGBA_DXT1_SRGB_BLOCK8,
-        RGBA_DXT3_UNORM_BLOCK16,
-        RGBA_DXT3_SRGB_BLOCK16,
-        RGBA_DXT5_UNORM_BLOCK16,
-        RGBA_DXT5_SRGB_BLOCK16,
-        R_ATI1N_UNORM_BLOCK8,
-        R_ATI1N_SNORM_BLOCK8,
-        RG_ATI2N_UNORM_BLOCK16,
-        RG_ATI2N_SNORM_BLOCK16,
-        RGB_BP_UFLOAT_BLOCK16,
-        RGB_BP_SFLOAT_BLOCK16,
-        RGBA_BP_UNORM_BLOCK16,
-        RGBA_BP_SRGB_BLOCK16,
+        RGB_DXT1_UNORM,
+        RGB_DXT1_SRGB,
+        RGBA_DXT1_UNORM,
+        RGBA_DXT1_SRGB,
+        RGBA_DXT3_UNORM,
+        RGBA_DXT3_SRGB,
+        RGBA_DXT5_UNORM,
+        RGBA_DXT5_SRGB,
+        R_ATI1N_UNORM,
+        R_ATI1N_SNORM,
+        RG_ATI2N_UNORM,
+        RG_ATI2N_SNORM,
+        RGB_BP_UFLOAT,
+        RGB_BP_SFLOAT,
+        RGBA_BP_UNORM,
+        RGBA_BP_SRGB,
 
         RGB_ETC2_UNORM_BLOCK8,
         RGB_ETC2_SRGB_BLOCK8,
@@ -258,22 +258,22 @@ namespace ImageFramework.ImageLoader
         {
             switch (format)
             {
-                case GliFormat.RGB_DXT1_UNORM_BLOCK8:                    
-                case GliFormat.RGB_DXT1_SRGB_BLOCK8:                    
-                case GliFormat.RGBA_DXT1_UNORM_BLOCK8:                    
-                case GliFormat.RGBA_DXT1_SRGB_BLOCK8:                    
-                case GliFormat.RGBA_DXT3_UNORM_BLOCK16:                    
-                case GliFormat.RGBA_DXT3_SRGB_BLOCK16:                    
-                case GliFormat.RGBA_DXT5_UNORM_BLOCK16:                    
-                case GliFormat.RGBA_DXT5_SRGB_BLOCK16:                    
-                case GliFormat.R_ATI1N_UNORM_BLOCK8:                    
-                case GliFormat.R_ATI1N_SNORM_BLOCK8:                    
-                case GliFormat.RG_ATI2N_UNORM_BLOCK16:                    
-                case GliFormat.RG_ATI2N_SNORM_BLOCK16:
-                case GliFormat.RGB_BP_UFLOAT_BLOCK16:
-                case GliFormat.RGB_BP_SFLOAT_BLOCK16:
-                case GliFormat.RGBA_BP_UNORM_BLOCK16:                    
-                case GliFormat.RGBA_BP_SRGB_BLOCK16:                    
+                case GliFormat.RGB_DXT1_UNORM:                    
+                case GliFormat.RGB_DXT1_SRGB:                    
+                case GliFormat.RGBA_DXT1_UNORM:                    
+                case GliFormat.RGBA_DXT1_SRGB:                    
+                case GliFormat.RGBA_DXT3_UNORM:                    
+                case GliFormat.RGBA_DXT3_SRGB:                    
+                case GliFormat.RGBA_DXT5_UNORM:                    
+                case GliFormat.RGBA_DXT5_SRGB:                    
+                case GliFormat.R_ATI1N_UNORM:                    
+                case GliFormat.R_ATI1N_SNORM:                    
+                case GliFormat.RG_ATI2N_UNORM:                    
+                case GliFormat.RG_ATI2N_SNORM:
+                case GliFormat.RGB_BP_UFLOAT:
+                case GliFormat.RGB_BP_SFLOAT:
+                case GliFormat.RGBA_BP_UNORM:                    
+                case GliFormat.RGBA_BP_SRGB:                    
                 case GliFormat.RGB_ETC2_UNORM_BLOCK8:                   
                 case GliFormat.RGB_ETC2_SRGB_BLOCK8:                    
                 case GliFormat.RGBA_ETC2_UNORM_BLOCK8:                    
@@ -485,20 +485,20 @@ namespace ImageFramework.ImageLoader
                     return false;*/
 
                 // compressed formats are all 8 bit i think
-                case GliFormat.RGB_DXT1_UNORM_BLOCK8:
-                case GliFormat.RGB_DXT1_SRGB_BLOCK8:
-                case GliFormat.RGBA_DXT1_UNORM_BLOCK8:
-                case GliFormat.RGBA_DXT1_SRGB_BLOCK8:
-                case GliFormat.RGBA_DXT3_UNORM_BLOCK16:
-                case GliFormat.RGBA_DXT3_SRGB_BLOCK16:
-                case GliFormat.RGBA_DXT5_UNORM_BLOCK16:
-                case GliFormat.RGBA_DXT5_SRGB_BLOCK16:
-                case GliFormat.R_ATI1N_UNORM_BLOCK8:
-                case GliFormat.R_ATI1N_SNORM_BLOCK8:
-                case GliFormat.RG_ATI2N_UNORM_BLOCK16:
-                case GliFormat.RG_ATI2N_SNORM_BLOCK16:
-                case GliFormat.RGBA_BP_UNORM_BLOCK16:
-                case GliFormat.RGBA_BP_SRGB_BLOCK16:
+                case GliFormat.RGB_DXT1_UNORM:
+                case GliFormat.RGB_DXT1_SRGB:
+                case GliFormat.RGBA_DXT1_UNORM:
+                case GliFormat.RGBA_DXT1_SRGB:
+                case GliFormat.RGBA_DXT3_UNORM:
+                case GliFormat.RGBA_DXT3_SRGB:
+                case GliFormat.RGBA_DXT5_UNORM:
+                case GliFormat.RGBA_DXT5_SRGB:
+                case GliFormat.R_ATI1N_UNORM:
+                case GliFormat.R_ATI1N_SNORM:
+                case GliFormat.RG_ATI2N_UNORM:
+                case GliFormat.RG_ATI2N_SNORM:
+                case GliFormat.RGBA_BP_UNORM:
+                case GliFormat.RGBA_BP_SRGB:
                 case GliFormat.RGB_ETC2_UNORM_BLOCK8:
                 case GliFormat.RGB_ETC2_SRGB_BLOCK8:
                 case GliFormat.RGBA_ETC2_UNORM_BLOCK8:
@@ -592,36 +592,36 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.RGB9E5_UFLOAT:
                     return "Three partial-precision floating-point numbers encoded into a single 32-bit value all sharing the same 5-bit exponent. There is no sign bit, and there is a shared 5-bit biased (15) exponent and a 9-bit mantissa for each channel";
 
-                case GliFormat.RGB_DXT1_UNORM_BLOCK8:
-                case GliFormat.RGB_DXT1_SRGB_BLOCK8:
+                case GliFormat.RGB_DXT1_UNORM:
+                case GliFormat.RGB_DXT1_SRGB:
                     return "Three color channels (5 bits:6 bits:5 bits) (BC1)";
 
-                case GliFormat.RGBA_DXT1_UNORM_BLOCK8:
-                case GliFormat.RGBA_DXT1_SRGB_BLOCK8:
+                case GliFormat.RGBA_DXT1_UNORM:
+                case GliFormat.RGBA_DXT1_SRGB:
                     return "Three color channels (5 bits:6 bits:5 bits), with 1 bit of alpha (BC1)";
 
-                case GliFormat.RGBA_DXT3_UNORM_BLOCK16:
-                case GliFormat.RGBA_DXT3_SRGB_BLOCK16:
+                case GliFormat.RGBA_DXT3_UNORM:
+                case GliFormat.RGBA_DXT3_SRGB:
                     return "Three color channels (5 bits:6 bits:5 bits), with 4 bits of alpha (BC2)";
 
-                case GliFormat.RGBA_DXT5_UNORM_BLOCK16:
-                case GliFormat.RGBA_DXT5_SRGB_BLOCK16:
+                case GliFormat.RGBA_DXT5_UNORM:
+                case GliFormat.RGBA_DXT5_SRGB:
                     return "Three color channels (5 bits:6 bits:5 bits) with 8 bits of alpha (BC3)";
 
-                case GliFormat.R_ATI1N_UNORM_BLOCK8:
-                case GliFormat.R_ATI1N_SNORM_BLOCK8:
+                case GliFormat.R_ATI1N_UNORM:
+                case GliFormat.R_ATI1N_SNORM:
                     return "One color channel (8 bits) (BC4)";
 
-                case GliFormat.RG_ATI2N_UNORM_BLOCK16:
-                case GliFormat.RG_ATI2N_SNORM_BLOCK16:
+                case GliFormat.RG_ATI2N_UNORM:
+                case GliFormat.RG_ATI2N_SNORM:
                     return "Two color channels (8 bits:8 bits) (GreenBlue) (BC5)";
 
-                case GliFormat.RGB_BP_UFLOAT_BLOCK16:
-                case GliFormat.RGB_BP_SFLOAT_BLOCK16:
+                case GliFormat.RGB_BP_UFLOAT:
+                case GliFormat.RGB_BP_SFLOAT:
                     return "Three color channels (16 bits:16 bits:16 bits) in \"half\" floating point (BC6). \"Half\" floating point is a 16 bit value that consists of an optional sign bit, a 5 bit biased exponent, and a 10 or 11 bit mantissa";
 
-                case GliFormat.RGBA_BP_UNORM_BLOCK16:
-                case GliFormat.RGBA_BP_SRGB_BLOCK16:
+                case GliFormat.RGBA_BP_UNORM:
+                case GliFormat.RGBA_BP_SRGB:
                     return "Three color channels (4 to 7 bits per channel) with 0 to 8 bits of alpha (BC7)";
 
                 /*case GliFormat.RGB_ETC2_UNORM_BLOCK8:
