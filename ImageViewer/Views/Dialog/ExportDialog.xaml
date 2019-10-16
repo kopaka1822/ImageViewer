@@ -7,8 +7,8 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="Export"
-        Height="300"
         Width="400"
+        SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Icon="../../Icons/app.png"
@@ -92,7 +92,7 @@
                 </Grid>
 
                 <!-- Crop -->
-                <GroupBox Margin="0 0 0 15">
+                <GroupBox>
                     <GroupBox.Header>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Crop:" Margin="0 0 5 0" HorizontalAlignment="Center"/>
@@ -137,6 +137,11 @@
                     </StackPanel>
 
                 </GroupBox>
+
+                <TextBlock 
+                    Margin="0 15 0 15"
+                    Text="{Binding Description}"
+                    TextWrapping="Wrap"/>
 
                 <Grid HorizontalAlignment="Right">
                     <Grid.ColumnDefinitions>

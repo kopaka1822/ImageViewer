@@ -71,7 +71,7 @@ namespace ImageViewer.ViewModels.Dialog
 
             foreach (var format in usedFormat.Formats)
             {
-                AvailableFormat.Add(new ComboBoxItem<GliFormat>(format.ToString(), format));
+                AvailableFormat.Add(new ComboBoxItem<GliFormat>(format.ToString(), format, format.GetDescription()));
                 if (format == preferredFormat)
                     SelectedFormat = AvailableFormat.Last();
             }
@@ -209,11 +209,14 @@ namespace ImageViewer.ViewModels.Dialog
                 if (value == null || value == selectedFormat) return;
                 selectedFormat = value;
                 OnPropertyChanged(nameof(SelectedFormat));
+                OnPropertyChanged(nameof(Description));
                 SetKtxDdsQuality();
             }
         }
 
         public GliFormat SelectedFormatValue => selectedFormat.Cargo;
+
+        public string Description => selectedFormat.Cargo.GetDescription();
 
         public bool UseCropping
         {
