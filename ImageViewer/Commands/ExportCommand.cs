@@ -132,6 +132,7 @@ namespace ImageViewer.Commands
             var desc = new ExportDescription(exportDirectory + "/" + exportFilename, exportExtension, models.Export);
             desc.TrySetFormat(viewModel.SelectedFormatValue);
             desc.Multiplier = multiplier;
+            exportFormat = desc.FileFormat;
 
             try
             {
