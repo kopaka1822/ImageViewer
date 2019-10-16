@@ -14,6 +14,8 @@ namespace FrameworkTests
     {
         public static string Directory = "../../FrameworkTests/TestData/";
 
+        public static readonly float Gray = 0.2119141f; // value of small.png gray and gray.png
+
         private static readonly Color[] smallData = new Color[]
         {
             new Color(1.0f, 0.0f, 0.0f, 0.5f), new Color(0.0f, 1.0f, 0.0f, 0.5f), new Color(0.0f, 0.0f, 1.0f, 0.5f),

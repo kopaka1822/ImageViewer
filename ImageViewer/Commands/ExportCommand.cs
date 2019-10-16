@@ -151,8 +151,8 @@ namespace ImageViewer.Commands
             {"jpg", "JPEG (*.jpg)|*.jpg" },
             {"hdr", "HDR (*.hdr)|*.hdr" },
             {"pfm", "Portable float map (*.pfm)|*.pfm" },
-            {"dds", "Khronos Texture (*.ktx)|*.ktx" },
-            {"ktx", "DirectDraw Surface (*.dds)|*.dds" },
+            {"ktx", "Khronos Texture (*.ktx)|*.ktx" },
+            {"dds", "DirectDraw Surface (*.dds)|*.dds" },
         };
 
         private static string GetFilter(string preferred)

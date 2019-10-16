@@ -45,17 +45,20 @@ namespace ImageFramework.Utility
 
         public Color(byte r, byte g, byte b, byte a, bool isSigned = false)
         {
-            Red = r / 255.0f;
-            Green = g / 255.0f;
-            Blue = b / 255.0f;
-            Alpha = a / 255.0f;
-            
-            if(isSigned)
+            if (isSigned)
             {
-                Red = Red * 2.0f - 1.0f;
-                Green = Green * 2.0f - 1.0f;
-                Blue = Blue * 2.0f - 1.0f;
-                Alpha = Alpha * 2.0f - 1.0f;
+                // according to dx spec. 127 maps to 1.0, -127 and -128 maps to -1.0
+                Red = Math.Max((sbyte) r / 127.0f, -1.0f);
+                Green = Math.Max((sbyte) g / 127.0f, -1.0f);
+                Blue = Math.Max((sbyte) b / 127.0f, -1.0f);
+                Alpha = Math.Max((sbyte) a / 127.0f, -1.0f);
+            }
+            else
+            {
+                Red = r / 255.0f;
+                Green = g / 255.0f;
+                Blue = b / 255.0f;
+                Alpha = a / 255.0f;
             }
         }
 
