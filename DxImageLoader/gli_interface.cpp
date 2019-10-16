@@ -61,12 +61,11 @@ std::unique_ptr<image::Image> gli_load(const char* filename)
 		throw std::exception("error opening file");
 	auto originalFormat = tex.format();
 
-	// convert image format if not compatible
-	if(!image::isSupported(tex.format()))
-	{
-		//if (gli::is_compressed(tex.format()))
-			//throw std::runtime_error("compressed texture formats are not supported yet");
+	bool useCompressonator = is_compressonator_format(tex.format());
 
+	// convert image format if not compatible
+	if(!image::isSupported(tex.format()) && !useCompressonator)
+	{
 		const auto newFormat = image::getSupportedFormat(tex.format());
 		if(tex.faces() == 1)
 		{
@@ -109,7 +108,11 @@ std::unique_ptr<image::Image> gli_load(const char* filename)
 		}
 	}
 
-	return res;
+	if (!useCompressonator) return res;
+
+	// decompress image data
+	const auto newFormat = image::getSupportedFormat(tex.format());
+	return compressonator_convert_image(*res, newFormat, 100);
 }
 
 std::vector<uint32_t> dds_get_export_formats()
@@ -173,16 +176,15 @@ std::vector<uint32_t> dds_get_export_formats()
 
 	// dds compressed
 	// DXT
-	//gli::format::FORMAT_RGB_DXT1_UNORM_BLOCK8,
-	//gli::format::FORMAT_RGB_DXT1_SRGB_BLOCK8,
+	gli::format::FORMAT_RGB_DXT1_UNORM_BLOCK8,
+	gli::format::FORMAT_RGB_DXT1_SRGB_BLOCK8,
 	gli::format::FORMAT_RGBA_DXT1_UNORM_BLOCK8,
 	gli::format::FORMAT_RGBA_DXT1_SRGB_BLOCK8,
 	gli::format::FORMAT_RGBA_DXT3_UNORM_BLOCK16,
 	gli::format::FORMAT_RGBA_DXT3_SRGB_BLOCK16,
 	gli::format::FORMAT_RGBA_DXT5_SRGB_BLOCK16,
 	gli::format::FORMAT_RGBA_DXT5_UNORM_BLOCK16,
-		
-	/*gli::format::FORMAT_R_ATI1N_UNORM_BLOCK8,
+	gli::format::FORMAT_R_ATI1N_UNORM_BLOCK8,
 	gli::format::FORMAT_R_ATI1N_SNORM_BLOCK8,
 	gli::format::FORMAT_RG_ATI2N_UNORM_BLOCK16,
 	gli::format::FORMAT_RG_ATI2N_SNORM_BLOCK16,
@@ -190,7 +192,7 @@ std::vector<uint32_t> dds_get_export_formats()
 	gli::format::FORMAT_RGB_BP_SFLOAT_BLOCK16,
 	gli::format::FORMAT_RGBA_BP_UNORM_BLOCK16,
 	gli::format::FORMAT_RGBA_BP_SRGB_BLOCK16,
-	gli::format::FORMAT_RGB_ETC2_UNORM_BLOCK8,
+	/*gli::format::FORMAT_RGB_ETC2_UNORM_BLOCK8,
 	gli::format::FORMAT_RGB_ETC2_SRGB_BLOCK8,
 	gli::format::FORMAT_RGBA_ETC2_UNORM_BLOCK8,
 	gli::format::FORMAT_RGBA_ETC2_SRGB_BLOCK8,
@@ -268,7 +270,7 @@ void gli_save_image(const char* filename, const image::Image& image, gli::format
 	{
 		// use compressonator for texture compression
 		auto cimg = compressonator_convert_image(image, format, quality);
-		gli_save_image(filename, cimg, format, ktx, quality);
+		gli_save_image(filename, *cimg, format, ktx, quality);
 		return;
 	}
 

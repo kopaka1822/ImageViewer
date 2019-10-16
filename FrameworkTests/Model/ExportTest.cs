@@ -30,12 +30,23 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
-        public void ExportLdr()
+        public void ExportJpg()
+        {
+            CompareAfterExport(TestData.Directory + "small.bmp", ExportDir + "small", "jpg", GliFormat.RGB8_SRGB, Color.Channel.Rgb, 0.1f);
+        }
+
+        [TestMethod]
+        public void ExportBmp()
         {
             CompareAfterExport(TestData.Directory + "small.bmp", ExportDir + "small", "bmp", GliFormat.RGB8_SRGB);
-            CompareAfterExport(TestData.Directory + "small.bmp", ExportDir + "small", "png", GliFormat.RGB8_SRGB);
-            CompareAfterExport(TestData.Directory + "small.bmp", ExportDir + "small", "jpg", GliFormat.RGB8_SRGB);
         }
+
+        [TestMethod]
+        public void ExportPng()
+        {
+            CompareAfterExport(TestData.Directory + "small.bmp", ExportDir + "small", "png", GliFormat.RGB8_SRGB);
+        }
+
 
         [TestMethod]
         public void ExportLdrUnorm()
@@ -185,7 +196,8 @@ namespace FrameworkTests.Model
             model.AddImageFromFile(inputImage);
             model.Apply();
             var origTex = model.Pipelines[0].Image;
-            
+            model.Export.Quality = 100;
+
             model.Export.Export(origTex, new ExportDescription(outputImage, outputExtension, model.Export){FileFormat = format});
             var expTex = new TextureArray2D(IO.LoadImage(outputImage + "." + outputExtension));
 
@@ -194,7 +206,7 @@ namespace FrameworkTests.Model
                 for (int curMipmap = 0; curMipmap < origTex.NumMipmaps; ++curMipmap)
                 {
                     var origColors = origTex.GetPixelColors(curLayer, curMipmap);
-                    var expColor = origTex.GetPixelColors(curLayer, curMipmap);
+                    var expColor = expTex.GetPixelColors(curLayer, curMipmap);
 
                     TestData.CompareColors(origColors, expColor, channels, tolerance);
                 }
@@ -209,6 +221,8 @@ namespace FrameworkTests.Model
             var tex = model.Pipelines[0].Image;
 
             var eFmt = model.Export.Formats.First(fmt => fmt.Extension == outputExtension);
+            string errors = "";
+            int numErrors = 0;
 
             foreach (var format in eFmt.Formats)
             {
@@ -220,9 +234,13 @@ namespace FrameworkTests.Model
                 }
                 catch (Exception e)
                 {
-                    throw new Exception($"export failed for format {format}:\n{e.Message}");
+                    errors += $"{format}: {e.Message}\n";
+                    ++numErrors;
                 }
             }
+
+            if (errors.Length > 0)
+                throw new Exception($"export failed for {numErrors}/{eFmt.Formats.Count} formats:\n" + errors);
         }
 
         private void TryExportAllFormatsAndCompareGray(string outputExtension)
@@ -239,6 +257,7 @@ namespace FrameworkTests.Model
             int numErrors = 0;
 
             var lastTexel = tex.Width * tex.Height - 1;
+            Color[] colors = null;
             foreach (var format in eFmt.Formats)
             {
                 try
@@ -251,7 +270,7 @@ namespace FrameworkTests.Model
                     {
                         Assert.AreEqual(3, newTex.Width);
                         Assert.AreEqual(2, newTex.Height);
-                        var colors = newTex.GetPixelColors(0, 0);
+                        colors = newTex.GetPixelColors(0, 0);
                         // compare last texel
                         var grayColor = colors[lastTexel];
 
@@ -259,7 +278,10 @@ namespace FrameworkTests.Model
                         if (format.IsLessThan8Bit())
                             tolerance = 0.1f;
 
-                        Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
+                        // some formats don't write to red
+                        // ReSharper disable once CompareOfFloatsByEqualityOperator
+                        if(grayColor.Red != 0.0f) Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
+                        else Assert.AreEqual(TestData.Gray, grayColor.Green, tolerance);
                     }
                 }
                 catch (Exception e)
