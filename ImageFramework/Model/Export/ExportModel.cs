@@ -23,7 +23,7 @@ namespace ImageFramework.Model.Export
 
         public IReadOnlyList<ExportFormatModel> Formats { get; }
 
-        private readonly ConvertFormatShader convert = new ConvertFormatShader();
+        internal readonly ConvertFormatShader convert = new ConvertFormatShader();
 
         public ExportModel()
         {

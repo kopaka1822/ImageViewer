@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FrameworkTests.DirectX;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
@@ -11,6 +12,8 @@ using ImageFramework.Model.Export;
 using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDX.Direct3D11;
+using SharpDX.DXGI;
+using Device = ImageFramework.DirectX.Device;
 
 namespace FrameworkTests.Model
 {
@@ -203,6 +206,61 @@ namespace FrameworkTests.Model
             TryExportAllFormatsAndCompareGray("ktx");
         }
 
+        /// <summary>
+        /// tests if all dds formats actually run on gpu
+        /// </summary>
+        [TestMethod]
+        public void DdsDirectXCompability()
+        {
+            var model = new Models(1);
+            model.AddImageFromFile(TestData.Directory + "small_scaled.png");
+            model.Apply();
+            model.Export.Quality = 100;
+            var origTex = model.Pipelines[0].Image;
+            var origColors = origTex.GetPixelColors(0, 0);
+            Color[] newColors = null;
+
+            var eFmt = model.Export.Formats.First(fmt => fmt.Extension == "dds");
+            string errors = "";
+            int numErrors = 0;
+
+            foreach (var format in eFmt.Formats)
+            {
+                try
+                {
+                    // export to dds
+                    var desc = new ExportDescription(ExportDir + "tmp", "dds", model.Export);
+                    desc.FileFormat = format;
+                    model.Export.Export(origTex, desc);
+
+                    // load with directx dds loader
+                    DDSTextureLoader.CreateDDSTextureFromFile(Device.Get().Handle, Device.Get().ContextHandle, ExportDir + "tmp.dds",
+                        out var resource, out var resourceView, 0, out var alphaMode);
+
+                    // convert to obtain color data
+                    using (var newTex = model.Export.convert.ConvertFromRaw(resourceView, origTex.Width, origTex.Height,
+                        Format.R32G32B32A32_Float))
+                    {
+                        resourceView.Dispose();
+                        resource.Dispose();
+
+                        newColors = newTex.GetPixelColors(0, 0);
+                        // only compare with red channel since some formats only store red
+                        TestData.CompareColors(origColors, newColors, Color.Channel.R, 0.1f);
+                    }
+                }
+                catch (Exception e)
+                {
+                    errors += $"{format}: {e.Message}\n";
+                    ++numErrors;
+                }
+            }
+
+            if (errors.Length > 0)
+                throw new Exception($"directX compability failed for {numErrors}/{eFmt.Formats.Count} formats:\n" + errors);
+        }
+
+
         private void CompareAfterExport(string inputImage, string outputImage, string outputExtension, GliFormat format, Color.Channel channels = Color.Channel.Rgb, float tolerance = 0.01f)
         {
             var model = new Models(1);
@@ -308,5 +366,7 @@ namespace FrameworkTests.Model
             if(errors.Length > 0)
                 throw new Exception($"gray comparision failed for {numErrors}/{eFmt.Formats.Count} formats:\n" + errors);
         }
+
+        
     }
 }
