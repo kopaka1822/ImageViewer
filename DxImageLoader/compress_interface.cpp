@@ -9,10 +9,11 @@ struct ExFormatInfo
 {
 	bool useDxt1Alpha = false;
 	bool isCompressed = true;
+	bool swizzleRGB = false;
 	CMP_DWORD widthMultiplier = 0; // 0 for compressed formats. width multiplier to get pitch
 };
 
-CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo)
+CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSource)
 { 
 	switch (format) { 
 		// formats used by the exporter
@@ -21,6 +22,8 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo)
 	case gli::format::FORMAT_RGBA8_SNORM_PACK8:
 		exInfo.isCompressed = false;
 		exInfo.widthMultiplier = 4;
+		//if (isSource) return CMP_FORMAT_ARGB_8888; // for some reason channels get swizzled
+		//if (!isSource) return CMP_FORMAT_BGRA_8888;
 		return CMP_FORMAT_RGBA_8888;
 	case gli::format::FORMAT_RGBA32_SFLOAT_PACK32:
 		exInfo.isCompressed = false;
@@ -78,12 +81,14 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo)
 
 	case gli::format::FORMAT_R_ATI1N_UNORM_BLOCK8: // BC 4
 	case gli::format::FORMAT_R_ATI1N_SNORM_BLOCK8:
+		exInfo.swizzleRGB = true;
 		return CMP_FORMAT_ATI1N;
 
 	case gli::format::FORMAT_RG_ATI2N_UNORM_BLOCK16: // BC 5
 	case gli::format::FORMAT_RG_ATI2N_SNORM_BLOCK16:
-		return CMP_FORMAT_ATI2N;
-		//return CMP_FORMAT_ATI2N_XY;
+		//exInfo.swizzleRGB = true;
+		//return CMP_FORMAT_ATI2N;
+		return CMP_FORMAT_ATI2N_XY;
 
 	case gli::format::FORMAT_RGB_BP_UFLOAT_BLOCK16: // BC 6
 		return CMP_FORMAT_BC6H;
@@ -117,10 +122,23 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo)
 		return CMP_FORMAT_ETC2_SRGBA;
 	}
 
+	exInfo.isCompressed = false;
 	return CMP_FORMAT_Unknown;
 }
 
-void copy_level(const image::Mipmap& src, image::Mipmap& dst,
+// exchanges R and B channels
+void swizzleMipmap(image::Mipmap& mip, CMP_FORMAT format)
+{
+	assert(format == CMP_FORMAT_RGBA_8888);
+
+	for(auto i = mip.bytes.begin(), end = mip.bytes.end(); i < end; i += 4)
+	{
+		// change R and B
+		std::swap(*i, *(i + 2));
+	}
+}
+
+void copy_level(image::Mipmap& src, image::Mipmap& dst,
 	CMP_FORMAT srcFormat, CMP_FORMAT dstFormat, 
 	const ExFormatInfo& srcInfo, const ExFormatInfo& dstInfo, float quality)
 {
@@ -135,10 +153,12 @@ void copy_level(const image::Mipmap& src, image::Mipmap& dst,
 	srcTex.dwPitch = srcInfo.widthMultiplier * srcTex.dwWidth;
 	srcTex.dwDataSize = CMP_DWORD(src.bytes.size());
 	srcTex.format = srcFormat;
-	srcTex.pData = const_cast<CMP_BYTE*>(src.bytes.data());
+	srcTex.pData = src.bytes.data();
 	srcTex.nBlockWidth = 0;
 	srcTex.nBlockHeight = 0;
 	srcTex.nBlockDepth = 0;
+	if (!srcInfo.isCompressed && (srcInfo.swizzleRGB || dstInfo.swizzleRGB))
+		swizzleMipmap(src, srcFormat);
 
 	// fill out dst texture
 	CMP_Texture dstTex;
@@ -163,13 +183,19 @@ void copy_level(const image::Mipmap& src, image::Mipmap& dst,
 	options.dwnumThreads = CMP_DWORD(nThreads);
 	options.bDXT1UseAlpha = srcInfo.useDxt1Alpha || dstInfo.useDxt1Alpha;
 
+	options.bUseGPUCompress = true;
+	options.nGPUDecode = CMP_GPUDecode::GPUDecode_DIRECTX;
+
 	// compress texture
 	auto status = CMP_ConvertTexture(&srcTex, &dstTex, &options, nullptr, 0, 0);
 	if (status != CMP_OK)
 		throw std::runtime_error("texture compression failed");
+
+	if (!dstInfo.isCompressed && (srcInfo.swizzleRGB || dstInfo.swizzleRGB))
+		swizzleMipmap(dst, dstFormat);
 }
 
-std::unique_ptr<image::Image> compressonator_convert_image(const image::Image& image, gli::format format, int quality)
+std::unique_ptr<image::Image> compressonator_convert_image(image::Image& image, gli::format format, int quality)
 {
 	auto resPtr = std::make_unique<image::Image>();
 	image::Image& res = *resPtr;
@@ -179,14 +205,14 @@ std::unique_ptr<image::Image> compressonator_convert_image(const image::Image& i
 	res.layer.resize(image.layer.size());
 
 	ExFormatInfo srcFormatInfo;
-	const auto srcFormat = get_cmp_format(image.format, srcFormatInfo);
+	const auto srcFormat = get_cmp_format(image.format, srcFormatInfo, true);
 	ExFormatInfo dstFormatInfo;
-	const auto dstFormat = get_cmp_format(format, dstFormatInfo);
+	const auto dstFormat = get_cmp_format(format, dstFormatInfo, false);
 	const float fquality = quality / 100.0f;
 
 	for(size_t layer = 0; layer < image.layer.size(); ++layer)
 	{
-		const auto& srcMips = image.layer[layer].mipmaps;
+		auto& srcMips = image.layer[layer].mipmaps;
 
 		// create mipmap levels
 		res.layer[layer].mipmaps.resize(srcMips.size());
@@ -205,9 +231,6 @@ std::unique_ptr<image::Image> compressonator_convert_image(const image::Image& i
 bool is_compressonator_format(gli::format format)
 {
 	ExFormatInfo i;
-	auto conv = get_cmp_format(format, i);
-	if (conv == CMP_FORMAT_Unknown || conv == CMP_FORMAT_RGBA_8888 || conv == CMP_FORMAT_RGBA_32F)
-		return false; // only compressed formats should be processed
-
-	return true;
+	auto conv = get_cmp_format(format, i, true);
+	return i.isCompressed;
 }

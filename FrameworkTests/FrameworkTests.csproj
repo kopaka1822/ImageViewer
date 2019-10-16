@@ -64,6 +64,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DirectX\DDSTextureLoader.cs" />
     <Compile Include="DirectX\TextureArray2DTests.cs" />
     <Compile Include="ImageLoader\DllTest.cs" />
     <Compile Include="Model\Filter\FilterLoaderTest.cs" />

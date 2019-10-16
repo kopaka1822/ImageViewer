@@ -10,6 +10,7 @@ using ImageFramework.ImageLoader;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Device = SharpDX.Direct3D11.Device;
+using Resource = ImageFramework.ImageLoader.Resource;
 
 namespace ImageFramework.Model.Shader
 {
@@ -108,6 +109,45 @@ namespace ImageFramework.Model.Shader
             // remove bindings
             dev.Pixel.SetShaderResource(0, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView) null);
+
+            return res;
+        }
+
+        /// <summary>
+        /// for unit testing purposes. Converts naked srv to TextureArray2D
+        /// </summary>
+        /// <param name="srv"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <param name="dstFormat"></param>
+        /// <returns></returns>
+        internal TextureArray2D ConvertFromRaw(SharpDX.Direct3D11.ShaderResourceView srv, int width, int height, SharpDX.DXGI.Format dstFormat)
+        {
+            var res = new TextureArray2D(1, 1, width, height, dstFormat, false);
+
+            var dev = DirectX.Device.Get();
+            dev.Vertex.Set(quad.Vertex);
+            dev.Pixel.Set(convert.Pixel);
+
+            dev.Pixel.SetShaderResource(0, srv);
+
+            cbuffer.SetData(new LayerLevelOffsetData
+            {
+                Layer = 0,
+                Level = 0,
+                Xoffset = 0,
+                Yoffset = 0,
+                Multiplier = 1.0f
+            });
+
+            dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
+            dev.OutputMerger.SetRenderTargets(res.GetRtView(0, 0));
+            dev.SetViewScissors(width, height);
+            dev.DrawQuad();
+
+            // remove bindings
+            dev.Pixel.SetShaderResource(0, null);
+            dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
 
             return res;
         }

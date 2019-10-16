@@ -192,6 +192,7 @@ namespace ImageFramework.DirectX
         public InputAssemblerStage InputAssembler => context.InputAssembler;
         public OutputMergerStage OutputMerger => context.OutputMerger;
         public RasterizerStage Rasterizer => context.Rasterizer;
+        public DeviceContext ContextHandle => context;
 
         public void Dispose()
         {
