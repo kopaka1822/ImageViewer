@@ -160,13 +160,62 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void ExportDds()
         {
-            CompareAfterExport(TestData.Directory + "small.pfm", ExportDir + "small", "dds", GliFormat.RGB8_SRGB);
+            CompareAfterExport(TestData.Directory + "small.pfm", ExportDir + "small", "dds", GliFormat.RGBA8_SRGB);
         }
 
         [TestMethod]
         public void ExportCompressedDds()
         {
             CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_DXT1_SRGB);
+        }
+
+        [TestMethod]
+        public void Dxt1()
+        {
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_DXT1_SRGB);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_DXT1_UNORM);
+        }
+
+        [TestMethod]
+        public void Dxt3()
+        {
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_DXT3_SRGB);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_DXT3_UNORM);
+        }
+
+        [TestMethod]
+        public void Dxt5()
+        {
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_DXT5_SRGB);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_DXT5_UNORM);
+        }
+
+        [TestMethod]
+        public void Atin1()
+        {
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.R_ATI1N_UNORM, Color.Channel.R);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.R_ATI1N_SNORM, Color.Channel.R);
+        }
+
+        [TestMethod]
+        public void Atin2()
+        {
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RG_ATI2N_UNORM, Color.Channel.R | Color.Channel.G);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RG_ATI2N_SNORM, Color.Channel.R | Color.Channel.G);
+        }
+
+        [TestMethod]
+        public void BC6()
+        {
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGB_BP_UFLOAT);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGB_BP_SFLOAT);
+        }
+
+        [TestMethod]
+        public void BC7()
+        {
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_BP_SRGB);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_BP_UNORM);
         }
 
         [TestMethod]
