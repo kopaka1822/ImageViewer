@@ -18,6 +18,12 @@ inline texture_type convert_mod(texture_type const& Texture, gli::format Format)
 	GLI_ASSERT(!Texture.empty());
 	GLI_ASSERT(!is_compressed(Format));
 
+	const auto isSrgb = gli::is_srgb(Texture.format());
+	const auto isCompressed = gli::is_compressed(Texture.format());
+
+	// for some reason the gli loader doesn't revert srgb compression in this case
+	const auto convertFromSrgb = isSrgb && isCompressed;
+
 	fetch_type Fetch = gli::detail::convert<texture_type, T, gli::defaultp>::call(Texture.format()).Fetch;
 	write_type Write = gli::detail::convert<texture_type, T, gli::defaultp>::call(Format).Write;
 
@@ -35,14 +41,19 @@ inline texture_type convert_mod(texture_type const& Texture, gli::format Format)
 						for (component_type i = 0; i < Dimensions.x; ++i)
 						{
 							typename texture_type::extent_type const Texelcoord(extent_type(i, j, k));
+							auto texel = Fetch(Texture, Texelcoord, Layer, Face, Level);
+							if (convertFromSrgb)
+								texel = gli::convertSRGBToLinear(texel);
+
 							Write(
 								Copy, Texelcoord, Layer, Face, Level,
-								Fetch(Texture, Texelcoord, Layer, Face, Level));
+								texel);
 						}
 			}
 
 	return texture_type(Copy);
 }
+
 std::unique_ptr<image::Image> gli_load(const char* filename)
 {
 	gli::texture tex(gli::load(filename));
