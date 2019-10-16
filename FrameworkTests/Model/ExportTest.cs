@@ -157,7 +157,13 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void ExportDds()
         {
-            CompareAfterExport(TestData.Directory + "checkers.dds", ExportDir + "checkers", "dds", GliFormat.RGB8_SRGB);
+            CompareAfterExport(TestData.Directory + "small.pfm", ExportDir + "small", "dds", GliFormat.RGB8_SRGB);
+        }
+
+        [TestMethod]
+        public void ExportCompressedDds()
+        {
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_DXT1_SRGB);
         }
 
         [TestMethod]
@@ -176,6 +182,13 @@ namespace FrameworkTests.Model
         public void ExportKtx()
         {
             CompareAfterExport(TestData.Directory + "small.ktx", ExportDir + "small", "ktx", GliFormat.RGBA32_SFLOAT, Color.Channel.Rgba);
+        }
+
+
+        [TestMethod]
+        public void ExportCompressedKtx()
+        {
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "ktx", GliFormat.RGBA_DXT1_SRGB);
         }
 
         [TestMethod]
@@ -280,8 +293,9 @@ namespace FrameworkTests.Model
 
                         // some formats don't write to red
                         // ReSharper disable once CompareOfFloatsByEqualityOperator
-                        if(grayColor.Red != 0.0f) Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
-                        else Assert.AreEqual(TestData.Gray, grayColor.Green, tolerance);
+                        //if(grayColor.Red != 0.0f) Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
+                        Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
+                        //else Assert.AreEqual(TestData.Gray, grayColor.Green, tolerance);
                     }
                 }
                 catch (Exception e)
