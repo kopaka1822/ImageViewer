@@ -21,6 +21,8 @@ namespace ImageViewer.Commands
         private string exportDirectory = null;
         private string exportExtension = null;
         private GliFormat? exportFormat = null;
+        private int? exportMipmap = null;
+        private int? exportLayer = null;
 
         public ExportCommand(ModelsEx models)
         {

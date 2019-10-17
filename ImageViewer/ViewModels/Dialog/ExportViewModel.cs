@@ -87,6 +87,12 @@ namespace ImageViewer.ViewModels.Dialog
             else SetKtxDdsQuality();
 
             models.Export.PropertyChanged += ExportOnPropertyChanged;
+
+            if (models.Export.CropEndX == 0 && models.Export.CropEndY == 0)
+            {
+                // assume cropping was not set
+                SetMaxCropping();
+            }
         }
 
         private void SetKtxDdsQuality()
@@ -95,6 +101,14 @@ namespace ImageViewer.ViewModels.Dialog
             {
                 HasQualityValue = SelectedFormat.Cargo.IsCompressed();
             }
+        }
+
+        private void SetMaxCropping()
+        {
+            CropStartX = 0;
+            CropStartY = 0;
+            CropEndX = CropMaxX;
+            CropEndY = CropMaxY;
         }
 
         public void Dispose()
@@ -136,6 +150,18 @@ namespace ImageViewer.ViewModels.Dialog
                     else
                         selectedMipmap = AvailableMipmaps[models.Export.Mipmap];
                     OnPropertyChanged(nameof(SelectedMipmap));
+                    OnPropertyChanged(nameof(UseCropping));
+                    OnPropertyChanged(nameof(CropMaxX));
+                    OnPropertyChanged(nameof(CropMaxY));
+                    // refit start and end since dimensions changed
+                    CropStartX = CropStartX;
+                    CropStartY = CropStartY;
+                    CropEndX = CropEndX;
+                    CropEndY = CropEndY;
+                    // force change on y components because coordinate flipping
+                    OnPropertyChanged(nameof(CropStartY));
+                    OnPropertyChanged(nameof(CropEndY));
+                    OnPropertyChanged(nameof(IsValid));
                     break;
                 case nameof(ExportModel.Layer):
                     if (models.Export.Layer < 0)
@@ -182,6 +208,10 @@ namespace ImageViewer.ViewModels.Dialog
                 //selectedLayer = value;
                 models.Export.Layer = value.Cargo;
                 //OnPropertyChanged(nameof(SelectedLayer));
+                
+                // preview layer
+                if(value.Cargo >= 0)
+                    models.Display.ActiveLayer = value.Cargo;
             }
         }
 
@@ -197,6 +227,8 @@ namespace ImageViewer.ViewModels.Dialog
                 //OnPropertyChanged(nameof(SelectedMipmap));
                 OnPropertyChanged(nameof(CropMaxX));
                 OnPropertyChanged(nameof(CropMaxY));
+                // preview mipmap
+                models.Display.ActiveMipmap = Math.Max(value.Cargo, 0);
             }
         }
 
