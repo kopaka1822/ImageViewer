@@ -233,10 +233,20 @@ namespace ImageFramework.Model.Export
                 if (CropEndY != image.GetHeight(mipIdx) - 1) croppingActive = true;
             }
 
+            bool alignmentActive = false;
+            if (desc.FileFormat.IsCompressed())
+            {
+                var mipIdx = Math.Max(Mipmap, 0);
+                if (image.GetWidth(mipIdx) % desc.FileFormat.GetAlignmentX() != 0)
+                    alignmentActive = true;
+                if (image.GetHeight(mipIdx) % desc.FileFormat.GetAlignmentY() != 0)
+                    alignmentActive = true;
+            }
+
             // image is ready for export!
             var stagingFormat = desc.StagingFormat;
             // ReSharper disable once CompareOfFloatsByEqualityOperator
-            if (image.Format != stagingFormat.DxgiFormat || croppingActive || desc.Multiplier != 1.0f)
+            if (image.Format != stagingFormat.DxgiFormat || croppingActive || desc.Multiplier != 1.0f || alignmentActive)
             {
                 using (var tmpTex = convert.Convert(image, stagingFormat.DxgiFormat, Mipmap, Layer,
                     desc.Multiplier, UseCropping, CropStartX, CropStartY, CropEndX - CropStartX + 1, CropEndY - CropStartY + 1,
