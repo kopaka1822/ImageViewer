@@ -173,9 +173,6 @@ namespace ImageViewer.ViewModels.Dialog
                 case nameof(ExportModel.Quality):
                     OnPropertyChanged(nameof(Quality));
                     break;
-                case nameof(ExportModel.AllowCropping):
-                    OnPropertyChanged(nameof(AllowCropping));
-                    break;
             }
         }
 
@@ -255,8 +252,6 @@ namespace ImageViewer.ViewModels.Dialog
             get => models.Export.UseCropping;
             set => models.Export.UseCropping = value;
         }
-
-        public bool AllowCropping => models.Export.AllowCropping;
 
         public int CropMinX => 0;
         public int CropMaxX => models.Images.GetWidth(Math.Max(selectedMipmap.Cargo, 0)) - 1;

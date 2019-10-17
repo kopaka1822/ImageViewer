@@ -106,7 +106,7 @@ namespace ImageViewer.Controller.TextureViews
 
                 if (models.Export.UseCropping && (models.Export.IsExporting || models.Display.ShowCropRectangle))
                 {
-                    int mipmap = models.Export.AllowCropping ? models.Export.Mipmap : 0;
+                    int mipmap = Math.Max(models.Export.Mipmap, 0);
                     float cropMaxX = models.Images.GetWidth(mipmap);
                     float cropMaxY = models.Images.GetHeight(mipmap);
 
