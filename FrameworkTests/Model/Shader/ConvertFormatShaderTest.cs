@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -83,6 +84,19 @@ namespace FrameworkTests.Model.Shader
 
             // should be the same as first mipmap level
             TestData.TestCheckersLevel1(newTex.GetPixelColors(0, 0));
+        }
+
+        [TestMethod]
+        public void Alignment()
+        {
+            var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "unaligned.png"));
+            Assert.AreEqual(3, tex.Width % 4);
+            Assert.AreEqual(1, tex.Height % 4);
+            
+            // convert with 4 texel alignment
+            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, 0, 1.0f, false, 0, 0, 0, 0, 4, 4);
+            Assert.AreEqual(0, newTex.Width % 4);
+            Assert.AreEqual(0, newTex.Height % 4);
         }
     }
 }
