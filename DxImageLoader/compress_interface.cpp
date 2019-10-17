@@ -187,9 +187,12 @@ void copy_level(image::Mipmap& src, image::Mipmap& dst,
 	static const size_t nThreads = std::thread::hardware_concurrency();
 	options.dwnumThreads = CMP_DWORD(nThreads);
 	options.bDXT1UseAlpha = srcInfo.useDxt1Alpha || dstInfo.useDxt1Alpha;
-
+	options.nAlphaThreshold = 127;
 	options.bUseGPUCompress = true;
+	options.bUseGPUDecompress = true;
+	options.nComputeWith = CMP_Compute_type::Compute_OPENCL;
 	options.nGPUDecode = CMP_GPUDecode::GPUDecode_DIRECTX;
+
 
 	// compress texture
 	auto status = CMP_ConvertTexture(&srcTex, &dstTex, &options, nullptr, 0, 0);
@@ -205,7 +208,7 @@ std::unique_ptr<image::Image> compressonator_convert_image(image::Image& image, 
 	auto resPtr = std::make_unique<image::Image>();
 	image::Image& res = *resPtr;
 	res.format = format;
-	res.original = format;
+	res.original = image.original;
 	// create layer
 	res.layer.resize(image.layer.size());
 
