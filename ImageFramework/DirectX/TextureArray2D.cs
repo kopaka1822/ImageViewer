@@ -118,6 +118,14 @@ namespace ImageFramework.DirectX
         }
 
         /// <summary>
+        /// inplace mipmap regeneration based on the number of internal layers
+        /// </summary>
+        public void RegenerateMipmapLevels()
+        {
+            Device.Get().GenerateMips(View);
+        }
+
+        /// <summary>
         /// creates a new texture that has only one mipmap level
         /// </summary>
         /// <returns></returns>

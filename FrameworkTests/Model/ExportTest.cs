@@ -86,6 +86,30 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void ExportCroppedWithMipmaps()
+        {
+            var model = new Models(1);
+            model.AddImageFromFile(TestData.Directory + "checkers.dds");
+            model.Export.Mipmap = -1;
+            model.Export.UseCropping = true;
+            model.Export.CropStartX = 1;
+            model.Export.CropEndX = 2;
+            model.Export.CropStartY = 1;
+            model.Export.CropEndY = 2;
+            model.Apply();
+
+            model.ExportPipelineImage(ExportDir + "cropped", "dds", GliFormat.RGBA8_SRGB);
+            var newTex = new TextureArray2D(IO.LoadImage(ExportDir + "cropped.dds"));
+
+            Assert.AreEqual(2, newTex.Width);
+            Assert.AreEqual(2, newTex.Height);
+            Assert.AreEqual(2, newTex.NumMipmaps);
+
+            TestData.TestCheckersLevel1(newTex.GetPixelColors(0, 0));
+            TestData.TestCheckersLevel2(newTex.GetPixelColors(0, 1));
+        }
+
+        [TestMethod]
         public void ExportAllJpg()
         {
             TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "jpg");

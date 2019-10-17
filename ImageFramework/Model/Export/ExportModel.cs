@@ -68,12 +68,8 @@ namespace ImageFramework.Model.Export
                 if(value == mipmap) return;
                 mipmap = value;
                 OnPropertyChanged(nameof(Mipmap));
-                OnPropertyChanged(nameof(AllowCropping));
             }
         }
-
-        // cropping is only allowed if a single mipmap is exported (-1 = all mipmaps will be exported)
-        public bool AllowCropping => Mipmap != -1;
 
         private int layer = -1;
 
@@ -212,10 +208,7 @@ namespace ImageFramework.Model.Export
             bool croppingActive = false;
             if (UseCropping)
             {
-                if(image.HasMipmaps && Mipmap == -1)
-                    throw new Exception("cropping can only be used when a single mipmap is selected");
-
-                var mipIdx = Mipmap == -1 ? 0 : Mipmap;
+                var mipIdx = Math.Max(Mipmap, 0);
                
                 // general boundaries
                 if(CropStartX < 0 || CropStartX >= image.GetWidth(mipIdx))

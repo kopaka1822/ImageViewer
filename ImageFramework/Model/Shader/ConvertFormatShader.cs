@@ -67,8 +67,13 @@ namespace ImageFramework.Model.Shader
             int nMipmaps = mipmap == -1 ? texture.NumMipmaps : 1;
             int nLayer = layer == -1 ? texture.NumLayers : 1;
 
-            if (nMipmaps > 1 && crop)
-                throw new Exception("cropping is only supported when converting a single mipmap");
+            bool recomputeMips = nMipmaps > 1 && crop;
+            if (recomputeMips)
+            {
+                // number of mipmaps might have changed
+                nMipmaps = ImagesModel.ComputeMaxMipLevels(width, height);
+                recomputeMips = nMipmaps > 1;
+            }
 
             if (!crop)
             {
@@ -103,12 +108,19 @@ namespace ImageFramework.Model.Shader
                     dev.OutputMerger.SetRenderTargets(res.GetRtView(curLayer, curMipmap));
                     dev.SetViewScissors(res.GetWidth(curMipmap), res.GetHeight(curMipmap));
                     dev.DrawQuad();
+
+                    if(recomputeMips) break; // only write most detailed mipmap
                 }
             }
 
             // remove bindings
             dev.Pixel.SetShaderResource(0, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView) null);
+
+            if (recomputeMips)
+            {
+                res.RegenerateMipmapLevels();
+            }
 
             return res;
         }
