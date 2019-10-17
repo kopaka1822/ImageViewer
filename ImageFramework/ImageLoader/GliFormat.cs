@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -332,6 +333,28 @@ namespace ImageFramework.ImageLoader
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// returns required alignment or 0 is not required
+        /// </summary>
+        public static int GetAlignmentX(this GliFormat format)
+        {
+            if (!format.IsCompressed()) return 0;
+
+            // true for all BC formats. The rest is not supported atm.
+            return 4;
+        }
+
+        /// <summary>
+        /// returns required alignment or 0 is not required
+        /// </summary>
+        public static int GetAlignmentY(this GliFormat format)
+        {
+            if (!format.IsCompressed()) return 0;
+
+            // true for all BC formats. The rest is not supported atm.
+            return 4;
         }
 
         public static bool IsAtMost8bit(this GliFormat format)

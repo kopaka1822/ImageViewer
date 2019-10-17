@@ -243,9 +243,15 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
-        public void ExportAllDds()
+        public void ExportAllUncompressedDds()
         {
-            TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "dds");
+            TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "dds", FormatFilter.Uncompressed);
+        }
+
+        [TestMethod]
+        public void ExportAllCompressedDds()
+        {
+            TryExportAllFormats(TestData.Directory + "small_scaled.png", ExportDir + "tmp", "dds", FormatFilter.Compressed);
         }
 
         [TestMethod]
@@ -268,9 +274,15 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
-        public void ExportAllKtx()
+        public void ExportAllUncompressedKtx()
         {
-            TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "ktx");
+            TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "ktx", FormatFilter.Uncompressed);
+        }
+
+        [TestMethod]
+        public void ExportAllCompressedKtx()
+        {
+            TryExportAllFormats(TestData.Directory + "small_scaled.png", ExportDir + "tmp", "ktx", FormatFilter.Compressed);
         }
 
         [TestMethod]
@@ -357,7 +369,15 @@ namespace FrameworkTests.Model
             }
         }
 
-        private void TryExportAllFormats(string inputImage, string outputImage, string outputExtension)
+        [Flags]
+        enum FormatFilter
+        {
+            Uncompressed = 1,
+            Compressed = 1 << 1,
+            All = 0xFFFFFFF
+        }
+
+        private void TryExportAllFormats(string inputImage, string outputImage, string outputExtension, FormatFilter filter = FormatFilter.All)
         {
             var model = new Models(1);
             model.AddImageFromFile(inputImage);
@@ -370,6 +390,12 @@ namespace FrameworkTests.Model
 
             foreach (var format in eFmt.Formats)
             {
+                if (format.IsCompressed())
+                {
+                    if ((FormatFilter.Compressed & filter) == 0) continue;
+                }
+                else if((FormatFilter.Uncompressed & filter) == 0) continue;       
+
                 try
                 {
                     var desc = new ExportDescription(outputImage, outputExtension, model.Export);
@@ -412,8 +438,8 @@ namespace FrameworkTests.Model
                     // load and compare gray tone
                     using (var newTex = new TextureArray2D(IO.LoadImage(ExportDir + "gray." + outputExtension)))
                     {
-                        Assert.AreEqual(3, newTex.Width);
-                        Assert.AreEqual(2, newTex.Height);
+                        Assert.AreEqual(8, newTex.Width);
+                        Assert.AreEqual(4, newTex.Height);
                         colors = newTex.GetPixelColors(0, 0);
                         // compare last texel
                         var grayColor = colors[lastTexel];
