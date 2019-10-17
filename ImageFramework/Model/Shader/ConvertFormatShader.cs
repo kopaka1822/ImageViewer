@@ -39,7 +39,7 @@ namespace ImageFramework.Model.Shader
         public TextureArray2D Convert(TextureArray2D texture, SharpDX.DXGI.Format dstFormat, int mipmap = -1,
             int layer = -1, float multiplier = 1.0f)
        {
-            return Convert(texture, dstFormat, mipmap, layer, multiplier, false, 0, 0, 0, 0);
+            return Convert(texture, dstFormat, mipmap, layer, multiplier, false, 0, 0, 0, 0, 0, 0);
         }
 
         /// <summary>
@@ -55,17 +55,57 @@ namespace ImageFramework.Model.Shader
         /// <param name="yOffset">if crop: offset in source image</param>
         /// <param name="width">if crop: width of the destination image</param>
         /// <param name="height">if crop: height of the destination image</param>
+        /// <param name="alignX">if nonzero: texture width will be aligned to this (rounded down)</param>
+        /// <param name="alignY">if nonzero: texture height will be aligned to this (rounded down)</param>
         /// <returns></returns>
         public TextureArray2D Convert(TextureArray2D texture, SharpDX.DXGI.Format dstFormat, int mipmap, int layer,
-            float multiplier, bool crop, int xOffset, int yOffset, int width, int height)
+            float multiplier, bool crop, int xOffset, int yOffset, int width, int height, int alignX, int alignY)
         {
             Debug.Assert(ImageFormat.IsSupported(dstFormat));
             Debug.Assert(ImageFormat.IsSupported(texture.Format));
 
+            // set width, height mipmap
             int firstMipmap = Math.Max(mipmap, 0);
             int firstLayer = Math.Max(layer, 0);
             int nMipmaps = mipmap == -1 ? texture.NumMipmaps : 1;
             int nLayer = layer == -1 ? texture.NumLayers : 1;
+
+            // set correct width, height, offsets
+            if (!crop)
+            {
+                width = texture.GetWidth(firstMipmap);
+                height = texture.GetHeight(firstMipmap);
+                xOffset = 0;
+                yOffset = 0;
+            }
+
+            // adjust to alignment
+            if (alignX != 0)
+            {
+                if (width % alignX != 0)
+                {
+                    if (width < alignX)
+                        throw new Exception(
+                            $"image needs to be aligned to {alignX} but width is only {width}. Width should be at least {alignX}");
+                    crop = true;
+                    var remainder = width % alignX;
+
+                    xOffset += remainder / 2;
+                    width -= remainder;
+                }
+            }
+            // adjust to alignment
+            if (alignY != 0)
+            {
+                if (height % alignY != 0)
+                {
+                    if(height < alignY) throw new Exception($"image needs to be aligned to {alignY} but height is only {height}. Height should be at least {alignY}");
+                    crop = true;
+                    var remainder = height % alignY;
+                    yOffset += remainder / 2;
+                    height -= remainder;
+                }
+            }
 
             bool recomputeMips = nMipmaps > 1 && crop;
             if (recomputeMips)
@@ -73,14 +113,6 @@ namespace ImageFramework.Model.Shader
                 // number of mipmaps might have changed
                 nMipmaps = ImagesModel.ComputeMaxMipLevels(width, height);
                 recomputeMips = nMipmaps > 1;
-            }
-
-            if (!crop)
-            {
-                width = texture.GetWidth(firstMipmap);
-                height = texture.GetHeight(firstMipmap);
-                xOffset = 0;
-                yOffset = 0;
             }
 
             var res = new TextureArray2D(nLayer, nMipmaps, width, height, dstFormat, false);

@@ -76,7 +76,7 @@ namespace FrameworkTests.Model.Shader
             TestData.TestCheckersLevel1(tex.GetPixelColors(0, 1));
             TestData.TestCheckersLevel2(tex.GetPixelColors(0, 2));
 
-            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, -1, 1.0f, true, 1, 1, 2, 2);
+            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, -1, 1.0f, true, 1, 1, 2, 2, 0, 0);
             Assert.AreEqual(1, newTex.NumMipmaps);
             Assert.AreEqual(2, newTex.GetWidth(0));
             Assert.AreEqual(2, newTex.GetHeight(0));

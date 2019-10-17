@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
@@ -238,7 +239,8 @@ namespace ImageFramework.Model.Export
             if (image.Format != stagingFormat.DxgiFormat || croppingActive || desc.Multiplier != 1.0f)
             {
                 using (var tmpTex = convert.Convert(image, stagingFormat.DxgiFormat, Mipmap, Layer,
-                    desc.Multiplier, UseCropping, CropStartX, CropStartY, CropEndX - CropStartX + 1, CropEndY - CropStartY + 1))
+                    desc.Multiplier, UseCropping, CropStartX, CropStartY, CropEndX - CropStartX + 1, CropEndY - CropStartY + 1,
+                    desc.FileFormat.GetAlignmentX(), desc.FileFormat.GetAlignmentY()))
                 {
                     // the final texture only has the relevant layers and mipmaps
                     ExportTexture(tmpTex, desc, -1, -1);
