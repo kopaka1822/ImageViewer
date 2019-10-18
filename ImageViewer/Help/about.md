@@ -1,5 +1,7 @@
 # Texture Viewer 
 
+[Equations](equation.md)
+
 An image viewer for anyone related to computer graphics.
 
 ![](app.png)
