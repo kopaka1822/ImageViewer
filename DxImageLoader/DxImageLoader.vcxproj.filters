@@ -30,6 +30,9 @@
     <Filter Include="Source Files\compressonator">
       <UniqueIdentifier>{b79dc3ea-c92e-471d-a9cc-2c73ddd0c76c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Docs">
+      <UniqueIdentifier>{bcc359f8-a3e6-4178-8107-2121fe8a439f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Layer.h">
@@ -106,5 +109,24 @@
     <ClCompile Include="compress_interface.cpp">
       <Filter>Source Files\compressonator</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Docs\about.md">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="..\Docs\equation.md">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="..\Docs\filter_manual.md">
+      <Filter>Docs</Filter>
+    </None>
+    <None Include="..\Docs\README.md">
+      <Filter>Docs</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\Docs\requirements.md">
+      <Filter>Docs</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
