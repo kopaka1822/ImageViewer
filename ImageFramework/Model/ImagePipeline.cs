@@ -128,6 +128,7 @@ namespace ImageFramework.Model
                     cachedTexture = false; // image was not taken from the image cache
                     HasChanges = false;
                     args.Progress.IsProcessing = false;
+                    OnPropertyChanged(nameof(Image));
                     return;
                 }
             }
