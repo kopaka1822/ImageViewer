@@ -1,16 +1,12 @@
 # Texture Viewer 
 
-[Equations](equation.md)
-
 An image viewer for anyone related to computer graphics.
-
-![](app.png)
 
 ## Credits
 
 ### Texture Viewer Developers
-- Felix Bruell @koppaka1822
-- Johannes Jendersie @Jojendersie
+- Felix Bruell
+- Johannes Jendersie
 
 ### Icons
 - App Icon made by https://www.flaticon.com/authors/smashicons Smashicons from https://www.flaticon.com/
