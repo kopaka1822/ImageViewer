@@ -25,7 +25,9 @@ System Requirements:
 - .Net 4.6.1
 - DirextX 11 compatible graphics card
 
-TODO
+Version 3.1 x64 Windows: TODO
+
+Version 2.1 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/raw/Release/Build/Texture%20Viewer.zip)
 
 ## View Modes
 ### Simple Images
@@ -55,7 +57,7 @@ I0 and I1 are the pixels from the first and the second image. sRGB values are in
 
 ## Custom HLSL Compute Shader Filter
 
-Filter are HLSL compute shader that can be imported by the ImageViewer. Only a single function needs to be implemented that will be called for each pixel of the image. User defined parameters can be set within the GUI. Some filter, like the gaussian blur, are already implemented and can be imported via the filter tab:
+Filter are HLSL compute shader that can be imported by the ImageViewer. Only a single function needs to be implemented that will be called for each pixel of the image. User defined parameters can be set from within the GUI. Some filter, like the gaussian blur, are already implemented and can be imported via the filter tab:
 
 ![](img/filter.jpg)
 
