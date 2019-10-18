@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using ImageViewer.Models;
 using Markdig;
 using Markdig.Renderers;
+using Path = System.IO.Path;
 
 namespace ImageViewer.Views.Dialog
 {
@@ -25,11 +26,23 @@ namespace ImageViewer.Views.Dialog
     public partial class HelpDialog : Window
     {
         public bool IsValid { get; private set; } = true;
-
+        private string curDirectory;
+        private readonly ModelsEx models;
         public HelpDialog(ModelsEx models, string filename)
         {
             InitializeComponent();
+            this.models = models;
 
+            LoadPage(filename);
+
+            // set window title
+            Title = "Help - Version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+            Browser.Navigating += BrowserOnNavigating;
+        }
+
+        private void LoadPage(string filename)
+        {
             string text = "";
             try
             {
@@ -42,7 +55,16 @@ namespace ImageViewer.Views.Dialog
                 Close();
                 IsValid = false;
                 return;
-            } 
+            }
+
+            curDirectory = Path.GetFullPath(Path.GetDirectoryName(filename));
+            curDirectory += '/';
+
+            var fileDirectory = curDirectory.Replace('\\', '/');
+            fileDirectory = "file:///" + fileDirectory + "/";
+
+            // correct links
+            text = text.Replace("![](", "![](" + fileDirectory);
 
             //var pipe = new MarkdownPipeline();
             // convert markup into htm
@@ -52,8 +74,8 @@ namespace ImageViewer.Views.Dialog
             // get correct pixel colors
             var bg = (SolidColorBrush)FindResource("BackgroundBrush");
             var fg = (SolidColorBrush)FindResource("FontBrush");
-            var bgCol = new byte[]{bg.Color.R, bg.Color.G, bg.Color.B};
-            var fgCol = new byte[]{fg.Color.R, fg.Color.G, fg.Color.B};
+            var bgCol = new byte[] { bg.Color.R, bg.Color.G, bg.Color.B };
+            var fgCol = new byte[] { fg.Color.R, fg.Color.G, fg.Color.B };
             var bgColString = BitConverter.ToString(bgCol).Replace("-", String.Empty);
             var fgColString = BitConverter.ToString(fgCol).Replace("-", String.Empty);
 
@@ -62,23 +84,25 @@ namespace ImageViewer.Views.Dialog
 {html}
 </body>
 ";
-
             // display markup in browser
             Browser.NavigateToString(html);
-            Browser.Navigating += BrowserOnNavigating;
-
-            // set window title
-            Title = "Help - Version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
         }
-
 
         private void BrowserOnNavigating(object sender, NavigatingCancelEventArgs args)
         {
+            if (args.Uri == null) return;
+
             // dont open web page in the embedded browser
             if (args.Uri.ToString().StartsWith("http") || args.Uri.ToString().StartsWith("www"))
             {
                 args.Cancel = true;
                 System.Diagnostics.Process.Start(args.Uri.ToString());
+            }
+            else
+            {
+                args.Cancel = true;
+                // open other markdown page
+                LoadPage(curDirectory + args.Uri.LocalPath);
             }
         }
 
