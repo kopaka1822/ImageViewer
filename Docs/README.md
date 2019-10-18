@@ -4,57 +4,52 @@ An image viewer for anyone related to computer graphics.
 
 ## Download
 
-Version 2.1 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/raw/Release/Build/Texture%20Viewer.zip)
+System Requirements:
+- x64 bit
+- .Net 4.6.1
+- DirextX 11 compatible graphics card
+
+TODO
 
 ## File Formats
 
 Currently the following image formats can be imported:
 * PNG, JPG, BMP
 * HDR, PFM
-* KTX, DDS
-* EXR (based on [tinyexr](https://github.com/syoyo/tinyexr))
+* uncompressed DDS, KTX
+* block compression (BC1-BC7) for DDS, KTX
+* EXR
 
 Exporting is supported for:
 * PNG, JPG, BMP
 * HDR, PFM
-* KTX, DDS
+* KTX, DDS (uncompressed and block compression)
+
+[Used Libraries](about.md)
 
 ## View Modes
 ### Simple Images
 The status bar displays the current texture coordinates (cursor) along with the corresponding RGBA color values in linear color space. The display type can be changed from linear color space to Srgb color space via: View->Pixel Display->Format.
 
-![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/transparent.png)
+![](img/transparent.jpg)
 
 ### Images with multiple mipmaps and faces
 
-Select preferred mipmap level and layer (face) of DDS and KTX textures:
+Select a specific mipmap level and layer (face) of DDS and KTX textures and view cubemaps in projection or crossview:
 
-![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/layer_level_view.png)
+![](img/cube_level.jpg)
 
-View cubemaps in crossview:
+### Lat-Long Polar Images
 
+View the raw polar image or look around in polar mode:
 
-![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/cross_view.png)
+![](img/polar.jpg)
 
-View and navigate through cubemaps in a projection view:
-
-![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/cube_view.png)
-
-### Polar Images
-
-View the raw polar image:
-
-![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/balcony_raw.png)
-
-View and navigate through the polar image in a projection view:
-
-![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/balcony_polar.png)
-
-## Image Manipulation
+## Side By Side Comparision and Image Formula
 
 Add a custom or predefined filter to your image:
 
-![alt text](https://github.com/kopaka1822/ImageViewer/blob/master/examples/balcony_tonemapper.png)
+![](https://github.com/kopaka1822/ImageViewer/blob/master/examples/balcony_tonemapper.png)
 
 Or define a custom filter like this. Filter are GLSL compute shader. The work group size will be set by the application and only the main method needs to be implemented (this method will be called once for every pixel). The detailed filter guide can be found [here](https://github.com/kopaka1822/ImageViewer/blob/master/TextureViewer/Help/filter_manual.md).
 
