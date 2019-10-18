@@ -9,8 +9,8 @@ An image viewer for anyone related to computer graphics.
 ## Credits
 
 ### Texture Viewer Developers
-- Felix Bruell
-- Johannes Jendersie
+- Felix Bruell @koppaka1822
+- Johannes Jendersie @Jojendersie
 
 ### Icons
 - App Icon made by https://www.flaticon.com/authors/smashicons Smashicons from https://www.flaticon.com/
