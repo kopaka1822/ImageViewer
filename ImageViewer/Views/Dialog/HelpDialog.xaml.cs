@@ -28,10 +28,13 @@ namespace ImageViewer.Views.Dialog
         public bool IsValid { get; private set; } = true;
         private string curDirectory;
         private readonly ModelsEx models;
+        private Stack<string> history;
+
         public HelpDialog(ModelsEx models, string filename)
         {
             InitializeComponent();
             this.models = models;
+            history = new Stack<string>();
 
             LoadPage(filename);
 
@@ -41,7 +44,7 @@ namespace ImageViewer.Views.Dialog
             Browser.Navigating += BrowserOnNavigating;
         }
 
-        private void LoadPage(string filename)
+        private void LoadPage(string filename, bool isBacklink = false)
         {
             string text = "";
             try
@@ -65,6 +68,14 @@ namespace ImageViewer.Views.Dialog
 
             // correct links
             text = text.Replace("![](", "![](" + fileDirectory);
+
+            // add back link
+            if (history.Count > 0)
+            {
+                text += "\n[Back](back)";
+            }
+            
+            history.Push(filename);
 
             //var pipe = new MarkdownPipeline();
             // convert markup into htm
@@ -97,6 +108,12 @@ namespace ImageViewer.Views.Dialog
             {
                 args.Cancel = true;
                 System.Diagnostics.Process.Start(args.Uri.ToString());
+            }
+            else if (args.Uri.LocalPath == "back" && history.Count > 1)
+            {
+                args.Cancel = true;
+                history.Pop();
+                LoadPage(history.Pop(), true);
             }
             else
             {
