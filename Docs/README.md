@@ -1,6 +1,6 @@
 # Image Viewer and Tonemapper
 
-An image viewer for anyone related to computer graphics.
+An image viewer for anyone related to computer graphics. It supports quick side-by-side comparison, arithmetic image manipulation, customisable filter effects (HLSL) and 360° views.
 
 ## File Formats
 
