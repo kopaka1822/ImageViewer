@@ -84,4 +84,4 @@ float4 filter(int2 pixelCoord, int2 size)
 }
 ```
 
-The detailed filter guide can be found [here](https://github.com/kopaka1822/ImageViewer/blob/master/TextureViewer/Help/filter_manual.md).
+The detailed filter guide can be found [here](filter_manual.md).
