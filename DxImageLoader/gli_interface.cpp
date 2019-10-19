@@ -3,6 +3,7 @@
 #include <gli/gli.hpp>
 #include <gli/gl.hpp>
 #include "compress_interface.h"
+#include "ktx_interface.h"
 
 // mofified copy of gli convert
 template <typename texture_type>

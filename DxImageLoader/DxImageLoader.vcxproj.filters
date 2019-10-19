@@ -33,6 +33,9 @@
     <Filter Include="Docs">
       <UniqueIdentifier>{bcc359f8-a3e6-4178-8107-2121fe8a439f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ktx">
+      <UniqueIdentifier>{eeebfb23-90b2-47c0-a59e-0eaa4705cc99}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Layer.h">
@@ -80,6 +83,9 @@
     <ClInclude Include="compress_interface.h">
       <Filter>Source Files\compressonator</Filter>
     </ClInclude>
+    <ClInclude Include="ktx_interface.h">
+      <Filter>Source Files\ktx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -109,24 +115,17 @@
     <ClCompile Include="compress_interface.cpp">
       <Filter>Source Files\compressonator</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Docs\about.md">
-      <Filter>Docs</Filter>
-    </None>
-    <None Include="..\Docs\equation.md">
-      <Filter>Docs</Filter>
-    </None>
-    <None Include="..\Docs\filter_manual.md">
-      <Filter>Docs</Filter>
-    </None>
-    <None Include="..\Docs\README.md">
-      <Filter>Docs</Filter>
-    </None>
+    <ClCompile Include="ktx_interface.cpp">
+      <Filter>Source Files\ktx</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="..\Docs\requirements.md">
       <Filter>Docs</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\about.md" />
+    <CopyFileToFolders Include="..\Docs\equation.md" />
+    <CopyFileToFolders Include="..\Docs\filter_manual.md" />
+    <CopyFileToFolders Include="..\Docs\README.md" />
   </ItemGroup>
 </Project>

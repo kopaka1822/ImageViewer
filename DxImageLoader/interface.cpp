@@ -11,6 +11,7 @@
 #include "exr_interface.h"
 #include <map>
 #include "convert.h"
+#include "ktx_interface.h"
 
 static int s_currentID = 1;
 static std::unordered_map<int, std::unique_ptr<image::Image>> s_resources;
@@ -57,7 +58,11 @@ int image_open(const char* filename)
 		{
 			res = pfm_load(filename);
 		}
-		else if (hasEnding(fname, ".dds") || hasEnding(fname, ".ktx"))
+		else if(hasEnding(fname, ".ktx2"))
+		{
+			res = ktx_load(filename);
+		}
+		else if (hasEnding(fname, ".dds") || hasEnding(fname, ".ktx2"))
 		{
 			res = gli_load(filename);
 		}

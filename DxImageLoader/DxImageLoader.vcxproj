@@ -169,6 +169,7 @@
     <ClInclude Include="gli_interface.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="interface.h" />
+    <ClInclude Include="ktx_interface.h" />
     <ClInclude Include="Layer.h" />
     <ClInclude Include="Mipmap.h" />
     <ClInclude Include="pch.h" />
@@ -182,6 +183,7 @@
     <ClCompile Include="gli_interface.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="interface.cpp" />
+    <ClCompile Include="ktx_interface.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
