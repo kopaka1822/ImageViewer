@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using ImageFramework.Annotations;
+using ImageFramework.Model;
 using ImageViewer.Models;
 
 namespace ImageViewer.ViewModels
@@ -16,6 +17,7 @@ namespace ImageViewer.ViewModels
         private readonly int index;
         private readonly ModelsEx models;
         private readonly StatisticModel model;
+        private readonly ImagePipeline pipe;
         private readonly StatisticsViewModel viewModel;
 
         public StatisticViewModel(int index, ModelsEx models, StatisticsViewModel viewModel)
@@ -24,10 +26,21 @@ namespace ImageViewer.ViewModels
             this.models = models;
             this.viewModel = viewModel;
             this.model = models.Statistics[index];
-            
+            this.pipe = models.Pipelines[index];
 
             viewModel.PropertyChanged += ViewModelOnPropertyChanged;
             model.PropertyChanged += ModelOnPropertyChanged;
+            pipe.PropertyChanged += PipeOnPropertyChanged;
+        }
+
+        private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ImagePipeline.IsEnabled):
+                    OnPropertyChanged(nameof(Visibility));
+                    break;
+            }
         }
 
         private void ModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
