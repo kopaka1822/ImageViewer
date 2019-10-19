@@ -111,22 +111,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Docs\about.md">
-      <Filter>Docs</Filter>
-    </None>
-    <None Include="..\Docs\equation.md">
-      <Filter>Docs</Filter>
-    </None>
-    <None Include="..\Docs\filter_manual.md">
-      <Filter>Docs</Filter>
-    </None>
-    <None Include="..\Docs\README.md">
-      <Filter>Docs</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <CopyFileToFolders Include="..\Docs\requirements.md">
       <Filter>Docs</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\about.md" />
+    <CopyFileToFolders Include="..\Docs\equation.md" />
+    <CopyFileToFolders Include="..\Docs\filter_manual.md" />
+    <CopyFileToFolders Include="..\Docs\README.md" />
   </ItemGroup>
 </Project>

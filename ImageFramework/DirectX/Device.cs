@@ -34,7 +34,7 @@ namespace ImageFramework.DirectX
 #if DEBUG
             flags |= DeviceCreationFlags.Debug;
 #endif
-            Handle = new SharpDX.Direct3D11.Device(DriverType.Hardware, flags, new FeatureLevel[]{FeatureLevel.Level_11_1});
+            Handle = new SharpDX.Direct3D11.Device(DriverType.Hardware, flags, new FeatureLevel[]{FeatureLevel.Level_11_0});
 
             // obtain the factory that created the device
             var obj = Handle.QueryInterface<SharpDX.DXGI.Device>();

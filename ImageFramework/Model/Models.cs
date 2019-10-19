@@ -44,7 +44,7 @@ namespace ImageFramework.Model
 
         private readonly PipelineController pipelineController;
 
-        private readonly PixelValueShader pixelValueShader = new PixelValueShader();
+        private readonly PixelValueShader pixelValueShader;
 
         private readonly PreprocessModel preprocess;
 
@@ -53,6 +53,7 @@ namespace ImageFramework.Model
             NumPipelines = numPipelines;
 
             CheckDeviceCapabilities();
+            pixelValueShader = new PixelValueShader();
 
             // models
             Images = new ImagesModel();
