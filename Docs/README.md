@@ -4,17 +4,12 @@ An image viewer for anyone related to computer graphics. It supports quick side-
 
 ## File Formats
 
-Currently the following image formats can be imported:
+Currently the following image formats can be used:
 * PNG, JPG, BMP
 * HDR, PFM
 * uncompressed DDS, KTX
 * block compression (BC1-BC7) for DDS, KTX
-* EXR
-
-Exporting is supported for:
-* PNG, JPG, BMP
-* HDR, PFM
-* KTX, DDS (uncompressed and block compression)
+* EXR (only import)
 
 [Used Libraries](about.md)
 
