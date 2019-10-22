@@ -27,5 +27,19 @@ namespace FrameworkTests.Model.Shader
             // compare with gimp reference
             TestData.CompareColors(reference.GetPixelColors(0, 0), res.GetPixelColors(0, 0));
         }
+
+        [TestMethod]
+        public void MitchelXYScale()
+        {
+            var shader = new MitchellNetravaliScaleShader();
+            var checkers = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere.png"));
+
+            var res = shader.Run(checkers, 20, 40);
+
+            var reference = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere_scaled.png"));
+
+            // compare with gimp reference
+            TestData.CompareColors(reference.GetPixelColors(0, 0), res.GetPixelColors(0, 0));
+        }
     }
 }
