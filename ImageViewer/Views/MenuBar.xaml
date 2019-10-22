@@ -130,6 +130,16 @@
         <!--END VIEW-->
 
         <MenuItem Header="Tools">
+            <MenuItem Header="Scale"
+                      Command="{Binding ShowScaleCommand}"
+                      IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/scale.png"
+                        Width="16" 
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
             <MenuItem 
                     Header="Generate Mipmaps"
                     Command="{Binding GenerateMipmapsCommand}"
