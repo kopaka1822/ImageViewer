@@ -59,7 +59,7 @@ namespace ImageFramework.Model
             sharedModel = new SharedModel();
 
             // models
-            Images = new ImagesModel();
+            Images = new ImagesModel(sharedModel.ScaleShader);
             Export = new ExportModel(sharedModel);
             Progress = new ProgressModel();
             Filter = new FiltersModel();

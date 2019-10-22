@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
+using ImageFramework.Model.Shader;
 using SharpDX.DXGI;
 
 namespace ImageFramework.Model
@@ -25,6 +26,7 @@ namespace ImageFramework.Model
         }
 
         private Dimension[] dimensions = null;
+        private MitchellNetravaliScaleShader scaleShader;
 
         public class MipmapMismatch : Exception
         {
@@ -66,6 +68,13 @@ namespace ImageFramework.Model
             public void Dispose()
             {
                 Image?.Dispose();
+            }
+
+            public void Scale(int width, int height, MitchellNetravaliScaleShader scale)
+            {
+                var tmp = scale.Run(Image, width, height);
+                Image.Dispose();
+                Image = tmp;
             }
         }
 
@@ -127,8 +136,9 @@ namespace ImageFramework.Model
 
         #endregion
 
-        public ImagesModel()
+        public ImagesModel(MitchellNetravaliScaleShader scaleShader)
         {
+            this.scaleShader = scaleShader;
             Images = images;
         }
 
@@ -267,6 +277,29 @@ namespace ImageFramework.Model
             dimensions[0].Height = h;
 
             OnPropertyChanged(nameof(NumMipmaps));
+        }
+
+        /// <summary>
+        /// scales all images to the given dimensions
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        public void ScaleImages(int width, int height)
+        {
+            if (NumImages == 0) return;
+            if (Width == width || Height == height) return;
+            var prevMipmaps = NumMipmaps;
+
+            foreach (var imageData in Images)
+            {
+                imageData.Scale(width, height, scaleShader);
+            }
+
+            InitDimensions(images[0].Image);
+            OnPropertyChanged(nameof(Width));
+            OnPropertyChanged(nameof(Height));
+            if(prevMipmaps != NumMipmaps)
+                OnPropertyChanged(nameof(NumMipmaps));
         }
 
         private void InitDimensions(TextureArray2D image)
