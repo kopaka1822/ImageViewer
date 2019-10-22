@@ -14,17 +14,18 @@ namespace FrameworkTests.Model.Shader
     [TestClass]
     public class ScaleShaderTest
     {
-        /*[TestMethod]
+        [TestMethod]
         public void MitchelUpscale()
         {
             var shader = new MitchellNetravaliScaleShader();
             var checkers = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere.png"));
 
             var res = shader.Run(checkers, 62, 31);
-            var export = new ExportModel();
-            export.Mipmap = 0;
-            var des = new ExportDescription( TestData.Directory + "upscale", "png", export) {FileFormat = GliFormat.RGB8_SRGB};
-            export.Export(res, des);
-        }*/
+
+            var reference = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere_up.png"));
+
+            // compare with gimp reference
+            TestData.CompareColors(reference.GetPixelColors(0, 0), res.GetPixelColors(0, 0));
+        }
     }
 }

@@ -124,8 +124,8 @@ float4 main(PixelIn i) : SV_TARGET
     int2 coords[4];
     coords[0] = floor(centerX - 1.5) * dir + yOffset;
     coords[1] = floor(centerX - 0.5) * dir + yOffset;
-    coords[2] = floor(centerX + 1.5) * dir + yOffset;
-    coords[3] = floor(centerX + 2.5) * dir + yOffset;
+    coords[2] = floor(centerX + 0.5) * dir + yOffset;
+    coords[3] = floor(centerX + 1.5) * dir + yOffset;
 
     float4 colors[4];
     [unroll]
@@ -133,14 +133,14 @@ float4 main(PixelIn i) : SV_TARGET
         colors[p] = in_tex[clamp(int2(coords[p]), int2(0, 0), size - int2(1, 1))];
 
     // distance between center and coords[1]
-    float d = centerX - floor(centerX - 0.5);
+    float d = centerX - floor(centerX - 0.5) - 0.5;
 
     // calculate color
     const float B = 0.0f;
     const float C = 0.5f;
 
-    float4 res = ((-B/6.0-C) * colors[0] + (-B/3.0-C+2.0) * colors[1] + (3.0/2.0*B+C-2.0) * colors[2] + (B/6.0+C) * colors[3]) * d * d * d;
-    res += ((1.0/2.0*B+2.0*C) * colors[0] + (2.0*B+C-3.0) * colors[1] + (-5.0/2.0*B-2.0*C+3.0) * colors[2] - C * colors[3]) * d * d;
+    float4 res = ((-B/6.0-C) * colors[0] + (-3.0/2.0*B-C+2.0) * colors[1] + (3.0/2.0*B+C-2.0) * colors[2] + (B/6.0+C) * colors[3]) * d * d * d;
+    res += ((B/2.0+2.0*C) * colors[0] + (2.0*B+C-3.0) * colors[1] + (-5.0/2.0*B-2.0*C+3.0) * colors[2] - C * colors[3]) * d * d;
     res += ((-B/2.0-C) * colors[0] + (B/2.0+C) * colors[2]) * d;
     res += B/6.0 * colors[0] + (-B/3.0+1.0) * colors[1] + B/6.0 * colors[2];
 
