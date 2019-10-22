@@ -17,9 +17,9 @@ namespace ImageFramework.Model.Shader
         private readonly QuadShader quad;
         private readonly UploadBuffer<DirSizeData> cbuffer;
 
-        public MitchellNetravaliScaleShader()
+        public MitchellNetravaliScaleShader(QuadShader quad)
         {
-            quad = new QuadShader();
+            this.quad = quad;
             shader = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(), "MitchellNetravaliScale");
             cbuffer = new UploadBuffer<DirSizeData>(1);
         }
@@ -154,7 +154,7 @@ float4 main(PixelIn i) : SV_TARGET
         public void Dispose()
         {
             shader?.Dispose();
-            quad?.Dispose();
+            cbuffer?.Dispose();
         }
     }
 }

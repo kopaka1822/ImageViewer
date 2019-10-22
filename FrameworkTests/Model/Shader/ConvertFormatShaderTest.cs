@@ -22,7 +22,7 @@ namespace FrameworkTests.Model.Shader
         [TestInitialize]
         public void Init()
         {
-            shader = new ConvertFormatShader();
+            shader = new ConvertFormatShader(new QuadShader());
         }
 
         [TestCleanup]

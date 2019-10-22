@@ -138,6 +138,7 @@
     <Compile Include="Model\Shader\ConvertFormatShader.cs" />
     <Compile Include="Model\Shader\StatisticsShader.cs" />
     <Compile Include="Model\Shader\DefaultStatisticsShader.cs" />
+    <Compile Include="Model\SharedModel.cs" />
     <Compile Include="Model\StatisticsModel.cs" />
     <Compile Include="Model\ThumbnailModel.cs" />
     <Compile Include="Utility\TextureCache.cs" />

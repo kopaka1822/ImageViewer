@@ -23,9 +23,9 @@ namespace ImageFramework.Model
         private readonly DirectX.Shader convert;
         private readonly SamplerState sampler;
 
-        public ThumbnailModel()
+        public ThumbnailModel(QuadShader quad)
         {
-            quad = new QuadShader();
+            this.quad = quad;
             convert = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(), "ThumbnailPixelShader");
             var samplerDesc = new SamplerStateDescription
             {

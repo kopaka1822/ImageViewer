@@ -40,6 +40,8 @@ namespace ImageFramework.Model
 
         internal TextureCache TextureCache { get; }
 
+        private readonly SharedModel sharedModel;
+
         private readonly List<ImagePipeline> pipelines = new List<ImagePipeline>();
 
         private readonly PipelineController pipelineController;
@@ -54,15 +56,16 @@ namespace ImageFramework.Model
 
             CheckDeviceCapabilities();
             pixelValueShader = new PixelValueShader();
+            sharedModel = new SharedModel();
 
             // models
             Images = new ImagesModel();
-            Export = new ExportModel();
+            Export = new ExportModel(sharedModel);
             Progress = new ProgressModel();
             Filter = new FiltersModel();
             preprocess = new PreprocessModel();
             TextureCache = new TextureCache(Images);
-            thumbnail = new ThumbnailModel();
+            thumbnail = new ThumbnailModel(sharedModel.QuadShader);
 
             for (int i = 0; i < numPipelines; ++i)
             {
@@ -249,6 +252,7 @@ namespace ImageFramework.Model
             }
             pipelineController?.Dispose();
             pixelValueShader?.Dispose();
+            sharedModel?.Dispose();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
