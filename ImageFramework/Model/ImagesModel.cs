@@ -287,7 +287,7 @@ namespace ImageFramework.Model
         public void ScaleImages(int width, int height)
         {
             if (NumImages == 0) return;
-            if (Width == width || Height == height) return;
+            if (Width == width && Height == height) return;
             var prevMipmaps = NumMipmaps;
 
             foreach (var imageData in Images)
@@ -296,6 +296,7 @@ namespace ImageFramework.Model
             }
 
             InitDimensions(images[0].Image);
+
             OnPropertyChanged(nameof(Width));
             OnPropertyChanged(nameof(Height));
             if(prevMipmaps != NumMipmaps)
