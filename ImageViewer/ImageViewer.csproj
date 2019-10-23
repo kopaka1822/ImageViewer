@@ -92,6 +92,7 @@
     <Compile Include="Commands\DeleteMipmapsCommand.cs" />
     <Compile Include="Commands\ExportCommand.cs" />
     <Compile Include="Commands\GenerateMipmapsCommand.cs" />
+    <Compile Include="Commands\GifExportCommand.cs" />
     <Compile Include="Commands\HelpDialogCommand.cs" />
     <Compile Include="Commands\ImportCommand.cs" />
     <Compile Include="Commands\ImportEquationImageCommand.cs" />
@@ -126,6 +127,7 @@
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Models\StatisticModel.cs" />
     <Compile Include="ViewModels\Dialog\ExportViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\GifExportViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelColorViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ScaleViewModel.cs" />
@@ -150,6 +152,9 @@
     <Compile Include="Views\CustomTextBox.cs" />
     <Compile Include="Views\Dialog\ExportDialog.xaml.cs">
       <DependentUpon>ExportDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\GifExportDialog.xaml.cs">
+      <DependentUpon>GifExportDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\HelpDialog.xaml.cs">
       <DependentUpon>HelpDialog.xaml</DependentUpon>
@@ -202,6 +207,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\Dialog\ExportDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\GifExportDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
