@@ -107,6 +107,7 @@
     <Compile Include="Model\Filter\Parameter\ModificationType.cs" />
     <Compile Include="Model\Filter\Parameter\ParameterType.cs" />
     <Compile Include="Model\Filter\Parameter\TextureFilterParameterModel.cs" />
+    <Compile Include="Model\GifModel.cs" />
     <Compile Include="Model\ImagePipeline.cs" />
     <Compile Include="Model\Equation\Markov\BinaryFunctionRule.cs" />
     <Compile Include="Model\Equation\Markov\BracketRule.cs" />
@@ -131,6 +132,7 @@
     <Compile Include="Model\PreprocessModel.cs" />
     <Compile Include="Model\ProgressModel.cs" />
     <Compile Include="Model\Shader\FilterShader.cs" />
+    <Compile Include="Model\Shader\GifShader.cs" />
     <Compile Include="Model\Shader\ImageCombineShader.cs" />
     <Compile Include="Model\Shader\MitchellNetravaliScaleShader.cs" />
     <Compile Include="Model\Shader\PixelValueShader.cs" />
@@ -148,6 +150,9 @@
     <Compile Include="Utility\Utility.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="AnimatedGif">
+      <Version>1.0.5</Version>
+    </PackageReference>
     <PackageReference Include="SharpDX.D3DCompiler">
       <Version>4.2.0</Version>
     </PackageReference>
