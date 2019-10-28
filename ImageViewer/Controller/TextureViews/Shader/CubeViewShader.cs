@@ -58,7 +58,6 @@ cbuffer InfoBuffer : register(b0) {{
     float4 crop;
     float multiplier;
     float farplane;
-    bool useAbs;
 }};
 
 VertexOut main(uint id: SV_VertexID) {{
@@ -88,6 +87,7 @@ cbuffer InfoBuffer : register(b0) {{
     float4 crop;
     float multiplier;
     float farplane;
+    bool useAbs;
 }};
 
 {Utility.ToSrgbFunction()}
