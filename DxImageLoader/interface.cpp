@@ -62,7 +62,7 @@ int image_open(const char* filename)
 		{
 			res = ktx_load(filename);
 		}
-		else if (hasEnding(fname, ".dds") || hasEnding(fname, ".ktx2"))
+		else if (hasEnding(fname, ".dds") || hasEnding(fname, ".ktx"))
 		{
 			res = gli_load(filename);
 		}
