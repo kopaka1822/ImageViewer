@@ -9,4 +9,4 @@
 	url = https://github.com/syoyo/tinyexr.git
 [submodule "dependencies/compressonator"]
 	path = dependencies/compressonator
-	url = git@github.com:kopaka1822/Compressonator.git
+	url = https://github.com/kopaka1822/Compressonator.git
