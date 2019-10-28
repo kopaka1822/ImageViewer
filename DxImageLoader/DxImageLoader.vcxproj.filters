@@ -89,6 +89,9 @@
     <ClInclude Include="ktx_interface.h">
       <Filter>Source Files\ktx</Filter>
     </ClInclude>
+    <ClInclude Include="VkFormat.h">
+      <Filter>Source Files\ktx</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

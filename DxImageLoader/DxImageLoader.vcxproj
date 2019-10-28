@@ -179,6 +179,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="pfm_interface.h" />
     <ClInclude Include="stbi_interface.h" />
+    <ClInclude Include="VkFormat.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="compress_interface.cpp" />
