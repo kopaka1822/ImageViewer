@@ -36,6 +36,9 @@
     <Filter Include="Source Files\ktx">
       <UniqueIdentifier>{eeebfb23-90b2-47c0-a59e-0eaa4705cc99}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dll">
+      <UniqueIdentifier>{f0959f41-7625-49a6-987e-9e60b6f7214e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Layer.h">
@@ -127,5 +130,11 @@
     <CopyFileToFolders Include="..\Docs\equation.md" />
     <CopyFileToFolders Include="..\Docs\filter_manual.md" />
     <CopyFileToFolders Include="..\Docs\README.md" />
+    <CopyFileToFolders Include="..\dependencies\lib\glew32.dll">
+      <Filter>dll</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\dependencies\lib\libktx.gl.dll">
+      <Filter>dll</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
