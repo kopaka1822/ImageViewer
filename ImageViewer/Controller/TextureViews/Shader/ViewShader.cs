@@ -24,6 +24,18 @@ namespace ImageViewer.Controller.TextureViews.Shader
                    "color.rgb = min(color.rgb, float3(1.0, 1.0, 1.0)) * float3(0.5, 0.5, 0.5);\n";
         }
 
+        /// <summary>
+        /// adds srgb conversion and conditional abs
+        /// </summary>
+        /// <returns></returns>
+        protected static string ApplyColorTransform()
+        {
+            return @"
+if(useAbs) color.rgb = abs(color.rgb);
+color = toSrgb(color);
+";
+        }
+
         protected void BindShader(Device dev)
         {
             dev.Vertex.Set(vertex.Vertex);

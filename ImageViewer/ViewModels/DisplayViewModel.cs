@@ -100,6 +100,10 @@ namespace ImageViewer.ViewModels
                     OnPropertyChanged(nameof(LinearInterpolation));
                     break;
 
+                case nameof(DisplayModel.DisplayNegative):
+                    OnPropertyChanged(nameof(DisplayNegative));
+                    break;
+
                 case nameof(DisplayModel.ShowCropRectangle):
                     OnPropertyChanged(nameof(ShowCropRectangle));
                     break;
@@ -168,6 +172,12 @@ namespace ImageViewer.ViewModels
         {
             get => models.Display.LinearInterpolation;
             set => models.Display.LinearInterpolation = value;
+        }
+
+        public bool DisplayNegative
+        {
+            get => models.Display.DisplayNegative;
+            set => models.Display.DisplayNegative = value;
         }
 
         public bool ShowCropRectangle

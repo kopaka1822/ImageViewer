@@ -200,6 +200,19 @@ namespace ImageViewer.Models
             }
         }
 
+        private bool displayNegative = true;
+
+        public bool DisplayNegative
+        {
+            get => displayNegative;
+            set
+            {
+                if (value == displayNegative) return;
+                displayNegative = value;
+                OnPropertyChanged(nameof(DisplayNegative));
+            }
+        }
+
         private bool showCropRectangle = true;
         public bool ShowCropRectangle
         {

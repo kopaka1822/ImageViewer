@@ -13,5 +13,6 @@ namespace ImageViewer.Controller.TextureViews
         public Vector4 Crop;
         public float Multiplier;
         public float Farplane;
+        public int UseAbs;
     }
 }

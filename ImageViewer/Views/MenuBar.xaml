@@ -81,6 +81,10 @@
                     Header="Linear Interpolation" 
                     IsCheckable="True"
                     IsChecked="{Binding Display.LinearInterpolation}"/>
+            <MenuItem 
+                Header="Display Absolute Values" 
+                IsCheckable="True"
+                IsChecked="{Binding Display.DisplayNegative}"/>
             <MenuItem
                 Header="Flip Y Axis"
                 IsCheckable="True"
