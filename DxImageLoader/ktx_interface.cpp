@@ -33,6 +33,12 @@ std::unique_ptr<image::IImage> ktx_load(const char* filename)
 		ktex->numFaces * ktex->numLayers, ktex->numLevels,
 		ktex->baseWidth, ktex->baseHeight);
 
+	//auto ktxSize = ktxTexture_GetSize(ktex);
+	//assert(ktxSize == res->getSize());
+	//err = ktxTexture_LoadImageData(ktex, res->getData(), res->getSize());
+	//if (err != KTX_SUCCESS)
+	//	throw std::runtime_error(std::string("could not load image data: ") + ktxErrorString(err));
+
 	ktx_uint32_t dstLayer = 0;
 	for(ktx_uint32_t srcLayer = 0; srcLayer < ktex->numLayers; ++srcLayer)
 	{
@@ -41,11 +47,14 @@ std::unique_ptr<image::IImage> ktx_load(const char* filename)
 			for(ktx_uint32_t mip = 0; mip < ktex->numLevels; ++mip)
 			{
 				ktx_size_t offset = 0;
-				ktxTexture_GetImageOffset(ktex, ktx_uint32_t(srcFace), ktx_uint32_t(srcLayer), ktx_uint32_t(mip), &offset);
-
+				ktxTexture_GetImageOffset(ktex, ktx_uint32_t(mip), ktx_uint32_t(srcLayer), ktx_uint32_t(srcFace), &offset);
+				//ktex2->vtbl->GetImageOffset(ktex, mip, srcLayer, srcFace, &offset);
+				auto ktxLvlSize = ktxTexture_GetImageSize(ktex, ktx_uint32_t(mip));
 				uint32_t size;
 				auto dstData = res->getData(dstLayer, mip, size);
+				assert(ktxLvlSize == size);
 				memcpy(dstData, ktex->pData + offset, size);
+				
 			}
 			++dstLayer;
 		}
