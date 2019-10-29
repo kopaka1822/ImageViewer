@@ -105,7 +105,7 @@ namespace ImageViewer.Controller.TextureViews
             // blend over the final image
             dev.OutputMerger.BlendState = data.AlphaBlendState;
 
-            shader.Run(data.Buffer, finalTransform, data.GetCrop(models, layer), models.Display.Multiplier, texture, data.GetSampler(models.Display.LinearInterpolation));
+            shader.Run(data.Buffer, finalTransform, data.GetCrop(models, layer), models.Display.Multiplier, models.Display.DisplayNegative, texture, data.GetSampler(models.Display.LinearInterpolation));
 
             dev.OutputMerger.BlendState = data.DefaultBlendState;
         }

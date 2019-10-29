@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
+using ImageFramework.Model.Shader;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDX.DXGI;
 
@@ -17,7 +18,7 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void MinifyCheckers()
         {
-            var model = new ThumbnailModel();
+            var model = new ThumbnailModel(new QuadShader());
             var checkers = new TextureArray2D(IO.LoadImage(TestData.Directory + "checkers.dds"));
 
             var res = model.CreateThumbnail(2, checkers, Format.R8G8B8A8_UNorm_SRgb, 0);
@@ -32,7 +33,7 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void MinifyCheckersMissingMipmaps()
         {
-            var model = new ThumbnailModel();
+            var model = new ThumbnailModel(new QuadShader());
             var checkers = new TextureArray2D(IO.LoadImage(TestData.Directory + "checkers.dds"));
             var lvl0Checkers = checkers.CloneWithoutMipmaps();
 
@@ -48,7 +49,7 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void MagnifyCheckers()
         {
-            var model = new ThumbnailModel();
+            var model = new ThumbnailModel(new QuadShader());
             var checkers = new TextureArray2D(IO.LoadImage(TestData.Directory + "checkers.dds"));
             var lvl1Checkers = checkers.CloneWithoutMipmaps(1);
 

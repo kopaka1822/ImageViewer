@@ -58,8 +58,8 @@ namespace ImageConsole.Commands
             Console.Out.WriteLine(statsMin.Lightness);
 
             if(showInfo)
-                Console.Error.Write("luma: ");
-            Console.Out.WriteLine(statsMin.Luma);
+                Console.Error.Write("average: ");
+            Console.Out.WriteLine(statsMin.Average);
         }
     }
 }

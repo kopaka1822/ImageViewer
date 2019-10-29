@@ -19,13 +19,14 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
         }
 
-        public void Run(UploadBuffer<ViewBufferData> buffer, Matrix transform, float multiplier, float farplane, ShaderResourceView texture, SamplerState sampler)
+        public void Run(UploadBuffer<ViewBufferData> buffer, Matrix transform, float multiplier, float farplane, bool useAbs, ShaderResourceView texture, SamplerState sampler)
         {
             buffer.SetData(new ViewBufferData
             {
                 Transform = transform,
                 Multiplier = multiplier,
-                Farplane = farplane
+                Farplane = farplane,
+                UseAbs = useAbs ? 1 : 0
             });
 
             var dev = Device.Get();
@@ -86,6 +87,7 @@ cbuffer InfoBuffer : register(b0) {{
     float4 crop;
     float multiplier;
     float farplane;
+    bool useAbs;
 }};
 
 {Utility.ToSrgbFunction()}
@@ -99,7 +101,8 @@ float4 main(PixelIn i) : SV_TARGET {{
     float4 color = tex.Sample(texSampler, i.viewDir);
     color.rgb *= multiplier;
     // TODO cropping?
-    return toSrgb(color);
+    {ApplyColorTransform()}
+    return color;
 }}
 ";
         }

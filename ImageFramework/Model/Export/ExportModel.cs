@@ -24,10 +24,12 @@ namespace ImageFramework.Model.Export
 
         public IReadOnlyList<ExportFormatModel> Formats { get; }
 
-        internal readonly ConvertFormatShader convert = new ConvertFormatShader();
+        internal readonly ConvertFormatShader convert;
 
-        public ExportModel()
+        internal ExportModel(SharedModel shared)
         {
+            convert = new ConvertFormatShader(shared.QuadShader);
+
             var formats = new List<ExportFormatModel>();
             formats.Add(new ExportFormatModel("png"));
             formats.Add(new ExportFormatModel("jpg"));

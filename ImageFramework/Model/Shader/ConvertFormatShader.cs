@@ -20,11 +20,11 @@ namespace ImageFramework.Model.Shader
         private readonly QuadShader quad;
         private readonly UploadBuffer<LayerLevelOffsetData> cbuffer;
 
-        public ConvertFormatShader()
+        public ConvertFormatShader(QuadShader quad)
         {
             var dev = DirectX.Device.Get();
             convert = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(), "ConvertFormatShader");
-            quad = new QuadShader();
+            this.quad = quad;
             cbuffer = new UploadBuffer<LayerLevelOffsetData>(1);
         }
 
@@ -227,7 +227,6 @@ float4 main(PixelIn i) : SV_TARGET
         public void Dispose()
         {
             convert?.Dispose();
-            quad?.Dispose();
             cbuffer?.Dispose();
         }
     }

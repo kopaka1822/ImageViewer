@@ -70,6 +70,7 @@
     <Compile Include="Controller\PipelineController.cs" />
     <Compile Include="DirectX\Device.cs" />
     <Compile Include="DirectX\DownloadBuffer.cs" />
+    <Compile Include="DirectX\Structs\DirSizeData.cs" />
     <Compile Include="DirectX\Structs\PixelValueData.cs" />
     <Compile Include="DirectX\Structs\StatisticsData.cs" />
     <Compile Include="DirectX\SyncQuery.cs" />
@@ -106,6 +107,7 @@
     <Compile Include="Model\Filter\Parameter\ModificationType.cs" />
     <Compile Include="Model\Filter\Parameter\ParameterType.cs" />
     <Compile Include="Model\Filter\Parameter\TextureFilterParameterModel.cs" />
+    <Compile Include="Model\GifModel.cs" />
     <Compile Include="Model\ImagePipeline.cs" />
     <Compile Include="Model\Equation\Markov\BinaryFunctionRule.cs" />
     <Compile Include="Model\Equation\Markov\BracketRule.cs" />
@@ -130,12 +132,15 @@
     <Compile Include="Model\PreprocessModel.cs" />
     <Compile Include="Model\ProgressModel.cs" />
     <Compile Include="Model\Shader\FilterShader.cs" />
+    <Compile Include="Model\Shader\GifShader.cs" />
     <Compile Include="Model\Shader\ImageCombineShader.cs" />
+    <Compile Include="Model\Shader\MitchellNetravaliScaleShader.cs" />
     <Compile Include="Model\Shader\PixelValueShader.cs" />
     <Compile Include="Model\Shader\QuadShader.cs" />
     <Compile Include="Model\Shader\ConvertFormatShader.cs" />
     <Compile Include="Model\Shader\StatisticsShader.cs" />
     <Compile Include="Model\Shader\DefaultStatisticsShader.cs" />
+    <Compile Include="Model\SharedModel.cs" />
     <Compile Include="Model\StatisticsModel.cs" />
     <Compile Include="Model\ThumbnailModel.cs" />
     <Compile Include="Utility\TextureCache.cs" />
@@ -145,6 +150,9 @@
     <Compile Include="Utility\Utility.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="AnimatedGif">
+      <Version>1.0.5</Version>
+    </PackageReference>
     <PackageReference Include="SharpDX.D3DCompiler">
       <Version>4.2.0</Version>
     </PackageReference>

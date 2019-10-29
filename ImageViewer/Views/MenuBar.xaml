@@ -81,6 +81,10 @@
                     Header="Linear Interpolation" 
                     IsCheckable="True"
                     IsChecked="{Binding Display.LinearInterpolation}"/>
+            <MenuItem 
+                Header="Display Absolute Values" 
+                IsCheckable="True"
+                IsChecked="{Binding Display.DisplayNegative}"/>
             <MenuItem
                 Header="Flip Y Axis"
                 IsCheckable="True"
@@ -130,6 +134,16 @@
         <!--END VIEW-->
 
         <MenuItem Header="Tools">
+            <MenuItem Header="Scale"
+                      Command="{Binding ShowScaleCommand}"
+                      IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/scale.png"
+                        Width="16" 
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
             <MenuItem 
                     Header="Generate Mipmaps"
                     Command="{Binding GenerateMipmapsCommand}"
@@ -150,6 +164,14 @@
                             Source="../Icons/cancel.png"
                             Width="16" 
                             Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem 
+                Header="Animated Gif Export"
+                Command="{Binding GifExportCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image Source="../Icons/save.png"/>
                 </MenuItem.Icon>
             </MenuItem>
         </MenuItem>

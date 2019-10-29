@@ -39,7 +39,7 @@ namespace ImageViewer.Controller.TextureViews
 
             shader.Run(data.Buffer, GetTransform(),
                 data.GetCrop(models, models.Display.ActiveLayer),
-                models.Display.Multiplier, CalcFarplane(), 
+                models.Display.Multiplier, CalcFarplane(), models.Display.DisplayNegative,
                 texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap), 
                 data.GetSampler(models.Display.LinearInterpolation)
             );

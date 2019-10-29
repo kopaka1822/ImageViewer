@@ -115,7 +115,7 @@ namespace ImageViewer.Commands
                 FileName = proposedFilename
             };
 
-            if (sfd.ShowDialog() != true)
+            if (sfd.ShowDialog(models.Window.TopmostWindow) != true)
                 return;
 
             exportExtension = System.IO.Path.GetExtension(sfd.FileName).Substring(1);

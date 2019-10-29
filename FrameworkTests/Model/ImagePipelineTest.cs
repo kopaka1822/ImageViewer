@@ -113,5 +113,24 @@ namespace FrameworkTests.Model
             model.Apply();
             Assert.IsTrue(ReferenceEquals(model.Pipelines[0].Image, model.Images.Images[1].Image));
         }
+
+        [TestMethod]
+        public void Scale()
+        {
+            var model = new Models(1);
+            model.AddImageFromFile(TestData.Directory + "small.png");
+            model.Apply();
+
+            Assert.IsFalse(model.Pipelines[0].HasChanges);
+
+            model.Images.ScaleImages(5, 6);
+            Assert.IsTrue(model.Pipelines[0].HasChanges);
+
+            model.Apply();
+            Assert.AreEqual(5, model.Images.Width);
+            Assert.AreEqual(6, model.Images.Height);
+            Assert.AreEqual(5, model.Pipelines[0].Image.Width);
+            Assert.AreEqual(6, model.Pipelines[0].Image.Height);
+        }
     }
 }

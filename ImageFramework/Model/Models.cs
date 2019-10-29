@@ -34,17 +34,21 @@ namespace ImageFramework.Model
 
         public ExportModel Export { get; }
 
+        public GifModel Gif { get; }
+
         public ProgressModel Progress { get; }
 
         private ThumbnailModel thumbnail;
 
         internal TextureCache TextureCache { get; }
 
+        private readonly SharedModel sharedModel;
+
         private readonly List<ImagePipeline> pipelines = new List<ImagePipeline>();
 
         private readonly PipelineController pipelineController;
 
-        private readonly PixelValueShader pixelValueShader = new PixelValueShader();
+        private readonly PixelValueShader pixelValueShader;
 
         private readonly PreprocessModel preprocess;
 
@@ -53,15 +57,18 @@ namespace ImageFramework.Model
             NumPipelines = numPipelines;
 
             CheckDeviceCapabilities();
+            pixelValueShader = new PixelValueShader();
+            sharedModel = new SharedModel();
 
             // models
-            Images = new ImagesModel();
-            Export = new ExportModel();
+            Images = new ImagesModel(sharedModel.ScaleShader);
+            Export = new ExportModel(sharedModel);
+            Gif = new GifModel(sharedModel.QuadShader);
             Progress = new ProgressModel();
             Filter = new FiltersModel();
             preprocess = new PreprocessModel();
             TextureCache = new TextureCache(Images);
-            thumbnail = new ThumbnailModel();
+            thumbnail = new ThumbnailModel(sharedModel.QuadShader);
 
             for (int i = 0; i < numPipelines; ++i)
             {
@@ -238,6 +245,7 @@ namespace ImageFramework.Model
         public virtual void Dispose()
         {
             Export?.Dispose();
+            Gif?.Dispose();
             TextureCache?.Dispose();
             Images?.Dispose();
             Filter?.Dispose();
@@ -248,6 +256,7 @@ namespace ImageFramework.Model
             }
             pipelineController?.Dispose();
             pixelValueShader?.Dispose();
+            sharedModel?.Dispose();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
