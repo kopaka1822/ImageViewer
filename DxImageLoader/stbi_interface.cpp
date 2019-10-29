@@ -31,52 +31,73 @@ gli::format getSrgbFormat(int numComponents)
 	return gli::FORMAT_UNDEFINED;
 }
 
-std::unique_ptr<image::Image> stb_image_load(const char* filename)
+class StbImage final : public image::IImage
 {
-	// create resource with one layer
-	auto res = std::make_unique<image::Image>();
-	res->layer.emplace_back();
-	res->layer[0].mipmaps.emplace_back();
-	auto& mipmap = res->layer[0].mipmaps[0];
-
-	//stbi_set_flip_vertically_on_load(true);
-	if (stbi_is_hdr(filename))
+public:
+	StbImage(const char* filename)
 	{
-		// load hdr file
-		int nComponents = 0;
-		float* data = stbi_loadf(filename, reinterpret_cast<int*>(&mipmap.width),
-			reinterpret_cast<int*>(&mipmap.height), &nComponents, 4);
-		if (!data)
-			throw std::exception("error during reading file");
+		//stbi_set_flip_vertically_on_load(true);
+		if (stbi_is_hdr(filename))
+		{
+			// load hdr file
+			int nComponents = 0;
+			m_data = reinterpret_cast<stbi_uc*>(stbi_loadf(filename, &m_width, &m_height, &nComponents, 4));
+			if (!m_data)
+				throw std::exception("error during reading file");
 
-		res->original = getFloatFormat(nComponents);
-		res->format = gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
-		size_t mipSize = mipmap.width * mipmap.height * 4 * 4;
-		mipmap.bytes.resize(mipSize);
-		memcpy(mipmap.bytes.data(), data, mipSize);
+			m_original = getFloatFormat(nComponents);
+			m_format = gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
+			m_size = m_width * m_height * 4 * 4;
+		}
+		else
+		{
+			// load ldr file
+			int nComponents = 0;
+			m_data = stbi_load(filename, &m_width, &m_height, &nComponents, 4);
+			if (!m_data)
+				throw std::exception("error during reading file");
 
-		stbi_image_free(data);
-	}
-	else
-	{
-		// load ldr file
-		int nComponents = 0;
-		stbi_uc* data = stbi_load(filename, reinterpret_cast<int*>(&mipmap.width),
-			reinterpret_cast<int*>(&mipmap.height), &nComponents, 4);
-		if (!data)
-			throw std::exception("error during reading file");
-
-		res->original = getSrgbFormat(nComponents);
-		res->format = gli::format::FORMAT_RGBA8_SRGB_PACK8;
-
-		size_t mipSize = mipmap.width * mipmap.height * 4;
-		mipmap.bytes.resize(mipSize);
-		memcpy(mipmap.bytes.data(), data, mipSize);
-
-		stbi_image_free(data);
+			m_original = getSrgbFormat(nComponents);
+			m_format = gli::format::FORMAT_RGBA8_SRGB_PACK8;
+			m_size = m_width * m_height * 4;
+		}
 	}
 
-	return res;
+	~StbImage()
+	{
+		stbi_image_free(m_data);
+	}
+
+	uint32_t getNumLayers() const override { return 1; }
+	uint32_t getNumMipmaps() const override { return 1; }
+	uint32_t getWidth(uint32_t mipmap) const override { return m_width; }
+	uint32_t getHeight(uint32_t mipmap) const override { return m_height; }
+	gli::format getFormat() const override { return m_format; }
+	gli::format getOriginalFormat() const override { return m_original; }
+	uint8_t* getData(uint32_t layer, uint32_t mipmap, uint32_t& size) override
+	{
+		size = m_size;
+		return m_data;
+	}
+	const uint8_t* getData(uint32_t layer, uint32_t mipmap, uint32_t& size) const override
+	{
+		size = m_size;	
+		return m_data;
+	}
+
+private:
+	stbi_uc* m_data = nullptr;
+	int m_width = 0;
+	int m_height = 0;
+	uint32_t m_size = 0;
+	gli::format m_original;
+	gli::format m_format;
+};
+
+std::unique_ptr<image::IImage> stb_image_load(const char* filename)
+{
+	return std::make_unique<StbImage>(filename);
+	
 }
 
 std::vector<uint32_t> stb_image_get_export_formats(const char* extension)

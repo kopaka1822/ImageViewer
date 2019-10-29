@@ -170,6 +170,7 @@
     <ClInclude Include="convert.h" />
     <ClInclude Include="exr_interface.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GliImage.h" />
     <ClInclude Include="gli_interface.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="interface.h" />
@@ -185,6 +186,7 @@
     <ClCompile Include="compress_interface.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="exr_interface.cpp" />
+    <ClCompile Include="GliImage.cpp" />
     <ClCompile Include="gli_interface.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="interface.cpp" />

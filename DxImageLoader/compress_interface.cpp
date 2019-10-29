@@ -132,44 +132,41 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSourc
 }
 
 // exchanges R and B channels
-void swizzleMipmap(image::Mipmap& mip, CMP_FORMAT format)
+void swizzleMipmap(uint8_t* data, uint32_t size, CMP_FORMAT format)
 {
 	assert(format == CMP_FORMAT_RGBA_8888);
 
-	for(auto i = mip.bytes.begin(), end = mip.bytes.end(); i < end; i += 4)
+	for(auto i = data, end = data + size; i < end; i += 4)
 	{
 		// change R and B
 		std::swap(*i, *(i + 2));
 	}
 }
 
-void copy_level(image::Mipmap& src, image::Mipmap& dst,
+void copy_level(uint8_t* srcDat, uint8_t* dstDat, uint32_t width, uint32_t height, uint32_t srcSize, uint32_t dstSize,
 	CMP_FORMAT srcFormat, CMP_FORMAT dstFormat, 
 	const ExFormatInfo& srcInfo, const ExFormatInfo& dstInfo, float quality)
 {
-	dst.width = src.width;
-	dst.height = src.height;
-
 	// fill out src texture
 	CMP_Texture srcTex;
 	srcTex.dwSize = sizeof(srcTex);
-	srcTex.dwWidth = src.width;
-	srcTex.dwHeight = src.height;
+	srcTex.dwWidth = width;
+	srcTex.dwHeight = height;
 	srcTex.dwPitch = srcInfo.widthMultiplier * srcTex.dwWidth;
-	srcTex.dwDataSize = CMP_DWORD(src.bytes.size());
+	srcTex.dwDataSize = CMP_DWORD(srcSize);
 	srcTex.format = srcFormat;
-	srcTex.pData = src.bytes.data();
+	srcTex.pData = srcDat;
 	srcTex.nBlockWidth = 0;
 	srcTex.nBlockHeight = 0;
 	srcTex.nBlockDepth = 0;
 	if (!srcInfo.isCompressed && (srcInfo.swizzleRGB || dstInfo.swizzleRGB))
-		swizzleMipmap(src, srcFormat);
+		swizzleMipmap(srcDat, srcSize, srcFormat);
 
 	// fill out dst texture
 	CMP_Texture dstTex;
 	dstTex.dwSize = sizeof(srcTex);
-	dstTex.dwWidth = src.width;
-	dstTex.dwHeight = src.height;
+	dstTex.dwWidth = width;
+	dstTex.dwHeight = height;
 	dstTex.dwPitch = dstInfo.widthMultiplier * dstTex.dwWidth;
 	dstTex.format = dstFormat;
 	dstTex.nBlockWidth = 0;
@@ -177,8 +174,9 @@ void copy_level(image::Mipmap& src, image::Mipmap& dst,
 	dstTex.nBlockDepth = 0;
 	if (dstInfo.isCompressed) dstTex.dwDataSize = CMP_CalculateBufferSize(&dstTex);
 	else dstTex.dwDataSize = dstTex.dwPitch * dstTex.dwHeight;
-	dst.bytes.resize(dstTex.dwDataSize);
-	dstTex.pData = dst.bytes.data();
+	//dst.bytes.resize(dstTex.dwDataSize);
+	assert(dstSize >= dstTex.dwDataSize);
+	dstTex.pData = dstDat;
 
 	// set compress options
 	CMP_CompressOptions options = {};
@@ -200,40 +198,35 @@ void copy_level(image::Mipmap& src, image::Mipmap& dst,
 		throw std::runtime_error("texture compression failed");
 
 	if (!dstInfo.isCompressed && (srcInfo.swizzleRGB || dstInfo.swizzleRGB))
-		swizzleMipmap(dst, dstFormat);
+		swizzleMipmap(dstDat, dstSize, dstFormat);
 }
 
-std::unique_ptr<image::Image> compressonator_convert_image(image::Image& image, gli::format format, int quality)
+void compressonator_convert_image(image::IImage& src, image::IImage& dst, int quality)
 {
-	auto resPtr = std::make_unique<image::Image>();
-	image::Image& res = *resPtr;
-	res.format = format;
-	res.original = image.original;
-	// create layer
-	res.layer.resize(image.layer.size());
+	assert(src.getNumLayers() == dst.getNumLayers());
+	assert(src.getNumMipmaps() == dst.getNumMipmaps());
+	assert(src.getWidth(0) == dst.getWidth(0));
+	assert(src.getHeight(0  ) == dst.getHeight(0));
 
 	ExFormatInfo srcFormatInfo;
-	const auto srcFormat = get_cmp_format(image.format, srcFormatInfo, true);
+	const auto srcFormat = get_cmp_format(src.getFormat(), srcFormatInfo, true);
 	ExFormatInfo dstFormatInfo;
-	const auto dstFormat = get_cmp_format(format, dstFormatInfo, false);
+	const auto dstFormat = get_cmp_format(dst.getFormat(), dstFormatInfo, false);
 	const float fquality = quality / 100.0f;
 
-	for(size_t layer = 0; layer < image.layer.size(); ++layer)
+	for(size_t layer = 0; layer < src.getNumLayers(); ++layer)
 	{
-		auto& srcMips = image.layer[layer].mipmaps;
-
-		// create mipmap levels
-		res.layer[layer].mipmaps.resize(srcMips.size());
-		auto& dstMips = res.layer[layer].mipmaps;
-
 		// copy mipmap levels
-		for(size_t mipmap = 0; mipmap < srcMips.size(); ++mipmap)
+		for(size_t mipmap = 0; mipmap < src.getNumMipmaps(); ++mipmap)
 		{
-			copy_level(srcMips[mipmap], dstMips[mipmap], srcFormat, dstFormat, srcFormatInfo, dstFormatInfo, fquality);
+			uint32_t srcSize;
+			auto srcDat = src.getData(layer, mipmap, srcSize);
+			uint32_t dstSize;
+			auto dstDat = dst.getData(layer, mipmap, dstSize);
+			copy_level(srcDat, dstDat, src.getWidth(mipmap), src.getHeight(mipmap), 
+				srcSize, dstSize, srcFormat, dstFormat, srcFormatInfo, dstFormatInfo, fquality);
 		}
 	}
-
-	return resPtr;
 }
 
 bool is_compressonator_format(gli::format format)

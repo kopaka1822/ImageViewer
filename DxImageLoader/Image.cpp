@@ -1,6 +1,14 @@
 #include "pch.h"
 #include "Image.h"
 
+image::SimpleImage::SimpleImage(gli::format originalFormat, gli::format internalFormat, int width, int height,
+	int pixelByteSize)
+	:
+m_width(width), m_height(height), m_original(originalFormat), m_format(internalFormat)
+{
+	m_data.resize(width * height * pixelByteSize);
+}
+
 uint32_t image::pixelSize(gli::format format)
 {
 	assert(isSupported(format));

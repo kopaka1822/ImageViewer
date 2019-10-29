@@ -7,10 +7,11 @@
 #include "VkFormat.h"
 #include <unordered_map>
 #include <string>
+#include "GliImage.h"
 
 gli::format convertFormat(VkFormat format);
 
-std::unique_ptr<image::Image> ktx_load(const char* filename)
+std::unique_ptr<image::IImage> ktx_load(const char* filename)
 {
 	ktxTexture* ktex;
 	auto err = ktxTexture_CreateFromNamedFile(filename, KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktex);
@@ -22,41 +23,29 @@ std::unique_ptr<image::Image> ktx_load(const char* filename)
 
 	ktxTexture2* ktex2 = reinterpret_cast<ktxTexture2*>(ktex);
 
-	auto res = std::make_unique<image::Image>();
-	// TODO conversion from VK_FORMAT to gli format
-	res->original = convertFormat(VkFormat(ktex2->vkFormat));
-	if (res->original == gli::FORMAT_UNDEFINED)
+	auto format = convertFormat(VkFormat(ktex2->vkFormat));
+
+	if (format == gli::FORMAT_UNDEFINED)
 		throw std::runtime_error("could not interpret format id " + std::to_string(ktex2->vkFormat));
 
-	// TODO conversion to one of the supported formats (see image.h). gli can probably be used to do the conversion
-	res->format = res->original;
-	res->layer.resize(ktex->numFaces * ktex->numLayers);
+	// store data in gli storage to be able to convert it easily
+	auto res = std::make_unique<GliImage>(format, 
+		ktex->numFaces * ktex->numLayers, ktex->numLevels,
+		ktex->baseWidth, ktex->baseHeight);
 
-	size_t dstLayer = 0;
-	for(size_t srcLayer = 0; srcLayer < ktex->numLayers; ++srcLayer)
+	ktx_uint32_t dstLayer = 0;
+	for(ktx_uint32_t srcLayer = 0; srcLayer < ktex->numLayers; ++srcLayer)
 	{
-		for(size_t srcFace = 0; srcFace < ktex->numFaces; ++srcFace)
+		for(ktx_uint32_t srcFace = 0; srcFace < ktex->numFaces; ++srcFace)
 		{
-			res->layer[dstLayer].mipmaps.resize(ktex->numLevels);
-			size_t width = ktex->baseWidth;
-			size_t height = ktex->baseHeight;
-			size_t depth = ktex->baseDepth;
-			assert(depth == 1);
-
-			for(size_t mip = 0; mip < ktex->numLevels; ++mip)
+			for(ktx_uint32_t mip = 0; mip < ktex->numLevels; ++mip)
 			{
-				auto& dstMip = res->layer[dstLayer].mipmaps[mip];
-				dstMip.width = uint32_t(width);
-				dstMip.height = uint32_t(height);
-				auto mipSize = ktxTexture_GetImageSize(ktex, ktx_uint32_t(mip));
-				dstMip.bytes.resize(mipSize);
 				ktx_size_t offset = 0;
 				ktxTexture_GetImageOffset(ktex, ktx_uint32_t(srcFace), ktx_uint32_t(srcLayer), ktx_uint32_t(mip), &offset);
 
-				memcpy(dstMip.bytes.data(), ktex->pData + offset, mipSize);
-
-				width = std::max(width / 2, size_t(1));
-				height = std::max(height / 2, size_t(1));
+				uint32_t size;
+				auto dstData = res->getData(dstLayer, mip, size);
+				memcpy(dstData, ktex->pData + offset, size);
 			}
 			++dstLayer;
 		}
@@ -64,7 +53,9 @@ std::unique_ptr<image::Image> ktx_load(const char* filename)
 
 	ktxTexture_Destroy(ktex);
 
-	return res;
+	if (image::isSupported(res->getFormat())) return res;
+
+	return res->convert(image::getSupportedFormat(res->getFormat()), 100);
 }
 
 gli::format convertFormat(VkFormat format)

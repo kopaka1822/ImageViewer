@@ -3,10 +3,8 @@
 #define TINYEXR_IMPLEMENTATION
 #include "../dependencies/tinyexr/tinyexr.h"
 
-std::unique_ptr<image::Image> openexr_load(const char* filename)
+std::unique_ptr<image::IImage> openexr_load(const char* filename)
 {
-	auto res = std::make_unique<image::Image>();
-
 	float* out = nullptr; // width * height * RGBA
 	int width = 0;
 	int height = 0;
@@ -16,21 +14,18 @@ std::unique_ptr<image::Image> openexr_load(const char* filename)
 	if (ret != TINYEXR_SUCCESS)
 		throw std::runtime_error(err);
 
-	// create single image mipmap
-	image::Mipmap mipmap;
-	size_t imgSize = width * height * 16; // float * rgba
-	mipmap.bytes.resize(imgSize);
-	mipmap.depth = 1;
-	mipmap.width = width;
-	mipmap.height = height;
+	auto res = std::make_unique<image::SimpleImage>(
+		gli::format::FORMAT_RGBA32_SFLOAT_PACK32, 
+		gli::format::FORMAT_RGBA32_SFLOAT_PACK32,
+		width, height, 4 * 4
+	);
 
-	memcpy(mipmap.bytes.data(), out, imgSize);
+	uint32_t imgSize;
+	auto dst = res->getData(0, 0, imgSize);
 
-	res->format = gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
-	res->original = gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
+	memcpy(dst, out, imgSize);
 
-	res->layer.emplace_back();
-	res->layer[0].mipmaps.push_back(std::move(mipmap));
+	free(out);
 
 	return res;
 }

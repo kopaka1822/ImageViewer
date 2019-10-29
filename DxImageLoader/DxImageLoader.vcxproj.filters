@@ -92,6 +92,9 @@
     <ClInclude Include="VkFormat.h">
       <Filter>Source Files\ktx</Filter>
     </ClInclude>
+    <ClInclude Include="GliImage.h">
+      <Filter>Source Files\gli</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -123,6 +126,9 @@
     </ClCompile>
     <ClCompile Include="ktx_interface.cpp">
       <Filter>Source Files\ktx</Filter>
+    </ClCompile>
+    <ClCompile Include="GliImage.cpp">
+      <Filter>Source Files\gli</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
