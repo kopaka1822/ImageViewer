@@ -38,7 +38,6 @@ std::unique_ptr<image::IImage> ktx_load(const char* filename)
 	//err = ktxTexture_LoadImageData(ktex, res->getData(), res->getSize());
 	//if (err != KTX_SUCCESS)
 	//	throw std::runtime_error(std::string("could not load image data: ") + ktxErrorString(err));
-
 	ktx_uint32_t dstLayer = 0;
 	for(ktx_uint32_t srcLayer = 0; srcLayer < ktex->numLayers; ++srcLayer)
 	{
@@ -62,9 +61,16 @@ std::unique_ptr<image::IImage> ktx_load(const char* filename)
 
 	ktxTexture_Destroy(ktex);
 
-	if (image::isSupported(res->getFormat())) return res;
+	if (!image::isSupported(res->getFormat()))
+	{
+		res = res->convert(image::getSupportedFormat(res->getFormat()), 100);
+	}
 
-	return res->convert(image::getSupportedFormat(res->getFormat()), 100);
+	if(ktex->orientation.y == KTX_ORIENT_Y_UP)
+
+		res->flip();
+	
+	return res;
 }
 
 gli::format convertFormat(VkFormat format)

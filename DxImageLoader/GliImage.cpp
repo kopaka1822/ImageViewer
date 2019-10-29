@@ -84,6 +84,12 @@ void GliImage::saveDds(const char* filename) const
 	else gli::save_dds(m_array, filename);
 }
 
+void GliImage::flip()
+{
+	if (m_isCube) m_cube = gli::flip(m_cube);
+	else m_array = gli::flip(m_array);
+}
+
 GliImage::GliImage(gli::format format, gli::format original, size_t nLayer, size_t nFaces, size_t nLevel, size_t width,
 	size_t height) :
 GliImageBase(initTex(nFaces), original)

@@ -29,7 +29,7 @@ public:
 	}
 
 	uint8_t* getData() { return reinterpret_cast<uint8_t*>(m_base.data()); }
-	uint32_t getSize() { return m_base.size(); }
+	uint32_t getSize() { return uint32_t(m_base.size()); }
 protected:
 	gli::texture& m_base;
 	gli::format m_original;
@@ -46,6 +46,7 @@ public:
 	std::unique_ptr<GliImage> convert(gli::format format, int quality);
 	void saveKtx(const char* filename) const;
 	void saveDds(const char* filename) const;
+	void flip();
 private:
 	// helper to choose the correct internal format. This is later required for format conversions
 	gli::texture& initTex(size_t nFaces);
