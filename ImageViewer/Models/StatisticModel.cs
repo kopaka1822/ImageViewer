@@ -62,7 +62,7 @@ namespace ImageViewer.Models
                     display.ActiveView == DisplayModel.ViewMode.CubeMap)
                 {
                     // compute for all layers
-                    Stats = StatisticsModel.Zero;
+                    Stats = StatisticsModel.Init;
                     for (int i = 0; i < models.Images.NumLayers; ++i)
                     {
                         Stats.Plus(models.GetStatistics(pipe.Image, i, display.ActiveMipmap));

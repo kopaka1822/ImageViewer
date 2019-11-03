@@ -22,6 +22,8 @@ namespace ImageFramework.Model.Shader
         public float Lightness;
         public float Alpha;
         public static readonly DefaultStatistics Zero = new DefaultStatistics{Alpha = 0.0f, Luminance = 0.0f, Lightness = 0.0f, Average = 0.0f};
+        public static readonly DefaultStatistics MinStats = new DefaultStatistics{Alpha = float.MinValue, Luminance = float.MinValue, Lightness = float.MinValue, Average = float.MinValue};
+        public static readonly DefaultStatistics MaxStats = new DefaultStatistics{ Alpha = float.MaxValue, Luminance = float.MaxValue, Lightness = float.MaxValue, Average = float.MaxValue };
 
         public float Get(Values value)
         {
@@ -46,6 +48,22 @@ namespace ImageFramework.Model.Shader
             Average += other.Average;
             Lightness += other.Lightness;
             Alpha += other.Alpha;
+        }
+
+        public void Min(DefaultStatistics other)
+        {
+            Luminance = Math.Min(Luminance, other.Luminance);
+            Average = Math.Min(Average, other.Average);
+            Lightness = Math.Min(Lightness, other.Lightness);
+            Luminance = Math.Min(Luminance, other.Luminance);
+        }
+
+        public void Max(DefaultStatistics other)
+        {
+            Luminance = Math.Max(Luminance, other.Luminance);
+            Average = Math.Max(Average, other.Average);
+            Lightness = Math.Max(Lightness, other.Lightness);
+            Luminance = Math.Max(Luminance, other.Luminance);
         }
 
         public void Divide(float value)
