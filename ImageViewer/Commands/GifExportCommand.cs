@@ -73,13 +73,14 @@ namespace ImageViewer.Commands
             var dia = new GifExportDialog(viewModel);
             if (models.Window.ShowDialog(dia) != true) return;
             
-            models.Gif.CreateGif(img1, img2, new GifModel.Config
+            throw new NotImplementedException();
+            /*models.Gif.CreateGif(img1, img2, new GifModel.Config
             {
                 Filename = sfd.FileName,
                 FramesPerSecond = viewModel.FramesPerSecond,
                 SliderWidth = viewModel.SliderSize,
                 NumSeconds = viewModel.TotalSeconds
-            });
+            });*/
         }
     }
 }

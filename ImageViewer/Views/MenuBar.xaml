@@ -166,14 +166,14 @@
                             Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
-            <MenuItem 
+            <!--<MenuItem 
                 Header="Animated Gif Export"
                 Command="{Binding GifExportCommand}"
                 IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
                     <Image Source="../Icons/save.png"/>
                 </MenuItem.Icon>
-            </MenuItem>
+            </MenuItem>-->
         </MenuItem>
         <!--END TOOLS-->
 

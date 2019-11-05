@@ -46,7 +46,7 @@ namespace ImageViewer.ViewModels
             GenerateMipmapsCommand = new GenerateMipmapsCommand(models);
             DeleteMipmapsCommand = new DeleteMipmapsCommand(models);
             HelpCommand = new HelpDialogCommand(models);
-            GifExportCommand = new GifExportCommand(models);
+            //GifExportCommand = new GifExportCommand(models);
 
             ResizeCommand = new ResizeWindowCommand(models);
             SetThemeCommand = new SetThemeCommand(models);
@@ -104,6 +104,6 @@ namespace ImageViewer.ViewModels
 
         public ICommand AddFilterCommand { get; }
 
-        public ICommand GifExportCommand { get; }
+        //public ICommand GifExportCommand { get; }
     }
 }

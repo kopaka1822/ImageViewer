@@ -34,7 +34,7 @@ namespace ImageFramework.Model
 
         public ExportModel Export { get; }
 
-        public GifModel Gif { get; }
+        //public GifModel Gif { get; }
 
         public ProgressModel Progress { get; }
 
@@ -63,7 +63,7 @@ namespace ImageFramework.Model
             // models
             Images = new ImagesModel(sharedModel.ScaleShader);
             Export = new ExportModel(sharedModel);
-            Gif = new GifModel(sharedModel.QuadShader);
+            //Gif = new GifModel(sharedModel.QuadShader);
             Progress = new ProgressModel();
             Filter = new FiltersModel();
             preprocess = new PreprocessModel();
@@ -245,7 +245,7 @@ namespace ImageFramework.Model
         public virtual void Dispose()
         {
             Export?.Dispose();
-            Gif?.Dispose();
+            //Gif?.Dispose();
             TextureCache?.Dispose();
             Images?.Dispose();
             Filter?.Dispose();

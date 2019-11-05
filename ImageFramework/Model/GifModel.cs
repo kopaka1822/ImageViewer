@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using AnimatedGif;
 using ImageFramework.DirectX;
 using ImageFramework.Model.Shader;
 using Microsoft.SqlServer.Server;
@@ -15,6 +13,9 @@ using Format = SharpDX.DXGI.Format;
 
 namespace ImageFramework.Model
 {
+    /// <summary>
+    /// temporarily removed due to bad results
+    /// </summary>
     public class GifModel : IDisposable
     {
         private readonly GifShader shader;
@@ -36,9 +37,9 @@ namespace ImageFramework.Model
         {
             Debug.Assert(left.Width == right.Width);
             Debug.Assert(left.Height == right.Height);
-
+            throw new NotImplementedException();
             // delay in milliseconds
-            int delay = 1000 / cfg.FramesPerSecond;
+            /*int delay = 1000 / cfg.FramesPerSecond;
             var img = new Bitmap(left.GetWidth(mipmap), left.GetHeight(mipmap));
             var lockRect = new Rectangle(0, 0, img.Width, img.Height);
             var bytesPerFrame = (uint)(img.Width * img.Height * 4);
@@ -74,7 +75,7 @@ namespace ImageFramework.Model
                         gif.AddFrame(img, quality: GifQuality.Bit8);
                     }
                 }
-            }
+            }*/
         }
 
         public void Dispose()
