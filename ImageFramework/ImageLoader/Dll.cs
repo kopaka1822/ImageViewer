@@ -15,7 +15,7 @@ namespace ImageFramework.ImageLoader
         public static extern int image_open(string filename);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int image_allocate(uint format, int width, int height, int layer, int mipmaps);
+        public static extern int image_allocate(uint format, int width, int height, int depth, int layer, int mipmaps);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         public static extern void image_release(int id);
@@ -25,7 +25,7 @@ namespace ImageFramework.ImageLoader
             out int nLayer, out int nMipmaps);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void image_info_mipmap(int id, int mipmap, out int width, out int height);
+        public static extern void image_info_mipmap(int id, int mipmap, out int width, out int height, out int depth);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr image_get_mipmap(int id, int layer, int mipmap, out uint size);

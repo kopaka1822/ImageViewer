@@ -61,66 +61,82 @@ std::unique_ptr<GliImage> GliImage::convert(gli::format format, int quality)
 	if(is_compressonator_format(format) || is_compressonator_format(m_base.format())) // convert to compressed format
 	{
 		// compressed format, use compressonator to compress
-		auto dst = std::make_unique<GliImage>(format, m_original, m_base.layers(), m_base.faces(), m_base.levels(), m_base.extent().x, m_base.extent().y);
+		auto dst = std::make_unique<GliImage>(format, m_original, m_base.layers(), m_base.faces(), m_base.levels(), m_base.extent().x, m_base.extent().y, m_base.extent().z);
 		compressonator_convert_image(*this, *dst, quality);
 		return dst;
 	}
 	else // uncompressed format => use gli convert method
 	{
-		if (m_isCube) return std::make_unique<GliImage>(convert_mod(m_cube, format), m_original);
+		if (m_type == Cubes) return std::make_unique<GliImage>(convert_mod(m_cube, format), m_original);
+		if (m_type == Volume) return std::make_unique<GliImage>(convert_mod(m_volume, format), m_original);
 		return std::make_unique<GliImage>(convert_mod(m_array, format), m_original);
 	}
 }
 
 void GliImage::saveKtx(const char* filename) const
 {
-	if (m_isCube) gli::save_ktx(m_cube, filename);
+	if (m_type == Cubes) gli::save_ktx(m_cube, filename);
+	else if (m_type == Volume) gli::save_ktx(m_volume, filename);
 	else gli::save_ktx(m_array, filename);
 }
 
 void GliImage::saveDds(const char* filename) const
 {
-	if (m_isCube) gli::save_dds(m_cube, filename);
+	if (m_type == Cubes) gli::save_dds(m_cube, filename);
+	else if (m_type == Volume) gli::save_dds(m_volume, filename);
 	else gli::save_dds(m_array, filename);
 }
 
 void GliImage::flip()
 {
-	if (m_isCube) m_cube = gli::flip(m_cube);
-	else m_array = gli::flip(m_array);
+	if (m_type == Cubes) m_cube = gli::flip(m_cube);
+	//else if (m_type == Volume) m_volume = gli::flip(m_volume);
+	else if(m_type == Planes) m_array = gli::flip(m_array);
 }
 
 GliImage::GliImage(gli::format format, gli::format original, size_t nLayer, size_t nFaces, size_t nLevel, size_t width,
-	size_t height) :
-GliImageBase(initTex(nFaces), original)
+	size_t height, size_t depth) :
+GliImageBase(initTex(nFaces, depth), original)
 {
-	if (m_isCube) m_cube = gli::texture_cube_array(format, gli::extent2d{ width, height }, nLayer, nLevel);
+	if (m_type == Cubes) m_cube = gli::texture_cube_array(format, gli::extent2d{ width, height }, nLayer, nLevel);
+	else if (m_type == Volume)
+	{
+		assert(nLayer == 0);
+		m_volume = gli::texture3d(format, gli::extent3d{ width, height, depth }, nLevel);
+	}
 	else m_array = gli::texture2d_array(format, gli::extent2d{ width, height }, nLayer, nLevel);
 }
 
-GliImage::GliImage(gli::format format, size_t nLayer, size_t nLevel, size_t width, size_t height)
+GliImage::GliImage(gli::format format, size_t nLayer, size_t nLevel, size_t width, size_t height, size_t depth)
 	:
 // create cube map array if nLayer == 6, otherwise 2d array
-GliImage(format, format, nLayer == 6? 1 : nLayer, nLayer == 6 ? 6 : 1, nLevel, width, height)
+GliImage(format, format, nLayer == 6? 1 : nLayer, nLayer == 6 ? 6 : 1, nLevel, width, height, depth)
 {}
 
 GliImage::GliImage(const gli::texture& tex, gli::format original) :
-	GliImageBase(initTex(tex.faces()), original)
+	GliImageBase(initTex(tex.faces(), tex.extent().z), original)
 {
 	if (tex.empty())
 		throw std::runtime_error("could not load image");
 
-	if (m_isCube) m_cube = gli::texture_cube_array(tex);
+	if (m_type == Cubes) m_cube = gli::texture_cube_array(tex);
+	else if (m_type == Volume) m_volume = gli::texture3d(tex);
 	else m_array = gli::texture2d_array(tex);
-}
+} 
 
-gli::texture& GliImage::initTex(size_t nFaces)
+gli::texture& GliImage::initTex(size_t nFaces, size_t depth)
 {
+	if(depth > 1)
+	{
+		m_type = Volume;
+		return m_volume;
+	}
+
 	if(nFaces == 6)
 	{
-		m_isCube = true;
+		m_type = Cubes;
 		return m_cube;
 	}
-	m_isCube = false;
+	m_type = Planes;
 	return m_array;
 }

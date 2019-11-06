@@ -31,7 +31,7 @@ std::unique_ptr<image::IImage> ktx_load(const char* filename)
 	// store data in gli storage to be able to convert it easily
 	auto res = std::make_unique<GliImage>(format, 
 		ktex->numFaces * ktex->numLayers, ktex->numLevels,
-		ktex->baseWidth, ktex->baseHeight);
+		ktex->baseWidth, ktex->baseHeight, ktex->baseDepth);
 
 	//auto ktxSize = ktxTexture_GetSize(ktex);
 	//assert(ktxSize == res->getSize());

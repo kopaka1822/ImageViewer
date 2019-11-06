@@ -274,7 +274,7 @@ namespace ImageFramework.Model.Export
             int nLayer = layer == -1 ? texture.NumLayers : 1;
 
             using (var img = IO.CreateImage(desc.StagingFormat, texture.GetWidth(firstMipmap),
-                texture.GetHeight(firstMipmap), nLayer, nMipmaps))
+                texture.GetHeight(firstMipmap), 1, nLayer, nMipmaps))
             {
                 // fill with data
                 for (int curLayer = 0; curLayer < nLayer; ++curLayer)

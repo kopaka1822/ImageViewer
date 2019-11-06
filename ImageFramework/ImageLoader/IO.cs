@@ -38,9 +38,9 @@ namespace ImageFramework.ImageLoader
             return new Image(res, file, nLayer, nMipmaps, new ImageFormat((GliFormat)gliFormat), (GliFormat)originalFormat);
         }
 
-        public static Image CreateImage(ImageFormat format, int width, int height, int layer, int mipmaps)
+        public static Image CreateImage(ImageFormat format, int width, int height, int depth, int layer, int mipmaps)
         {
-            var res = new Resource((uint)format.GliFormat, width, height, layer, mipmaps);
+            var res = new Resource((uint)format.GliFormat, width, height, depth, layer, mipmaps);
 
             return new Image(res, "tmp", layer, mipmaps, format, format.GliFormat);
         }

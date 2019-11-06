@@ -72,6 +72,7 @@ public:
 	uint32_t getNumMipmaps() const override { return 1; }
 	uint32_t getWidth(uint32_t mipmap) const override { return m_width; }
 	uint32_t getHeight(uint32_t mipmap) const override { return m_height; }
+	uint32_t getDepth(uint32_t mipmap) const override { return 1; }
 	gli::format getFormat() const override { return m_format; }
 	gli::format getOriginalFormat() const override { return m_original; }
 	uint8_t* getData(uint32_t layer, uint32_t mipmap, uint32_t& size) override

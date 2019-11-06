@@ -38,6 +38,8 @@ inline void assertSingleLayerMip(const image::IImage& image)
 		throw std::runtime_error("expected single layer image");
 	if (image.getNumMipmaps() != 1)
 		throw std::runtime_error("expected single mipmap image");
+	if (image.getDepth(0) != 1)
+		throw std::runtime_error("expected 2D texture (depth = 1)");
 }
 
 int image_open(const char* filename)
@@ -87,9 +89,9 @@ int image_open(const char* filename)
 	return id;
 }
 
-int image_allocate(uint32_t format, int width, int height, int layer, int mipmaps)
+int image_allocate(uint32_t format, int width, int height, int depth, int layer, int mipmaps)
 {
-	auto res = std::make_unique<GliImage>(gli::format(format), layer, mipmaps, width, height);
+	auto res = std::make_unique<GliImage>(gli::format(format), layer, mipmaps, width, height, depth);
 	if(!image::isSupported(res->getFormat()))
 	{
 		set_error("image format is not supported for allocate");
@@ -126,7 +128,7 @@ void image_info(int id, uint32_t& format, uint32_t& originalFormat, int& nLayer,
 	}
 }
 
-void image_info_mipmap(int id, int mipmap, int& width, int& height)
+void image_info_mipmap(int id, int mipmap, int& width, int& height, int& depth)
 {
 	auto it = s_resources.find(id);
 	if (it == s_resources.end())
@@ -140,6 +142,7 @@ void image_info_mipmap(int id, int mipmap, int& width, int& height)
 
 	width = it->second->getWidth(mipmap);
 	height = it->second->getHeight(mipmap);
+	depth = it->second->getDepth(mipmap);
 }
 
 unsigned char* image_get_mipmap(int id, int layer, int mipmap, uint32_t& size)

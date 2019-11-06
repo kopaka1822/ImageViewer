@@ -14,9 +14,10 @@ EXPORT(int) image_open(const char* filename);
 /// \param format dxgi texture format (must be one of the compatible formats, see Image.h)
 /// \param width width in pixels
 /// \param height height in pixels
+/// \param depth depth in pixels
 /// \param layer number of layers
 /// \param mipmaps number of mipmap levels 
-EXPORT(int) image_allocate(uint32_t format, int width, int height, int layer, int mipmaps);
+EXPORT(int) image_allocate(uint32_t format, int width, int height, int depth, int layer, int mipmaps);
 
 /// \brief releases all resources from the file with the given id
 EXPORT(void) image_release(int id);
@@ -26,7 +27,7 @@ EXPORT(void) image_release(int id);
 EXPORT(void) image_info(int id, uint32_t& format, uint32_t& originalFormat, int& nLayer, int& nMipmaps);
 
 /// \brief retrieve info for one mipmap
-EXPORT(void) image_info_mipmap(int id, int mipmap, int& width, int& height);
+EXPORT(void) image_info_mipmap(int id, int mipmap, int& width, int& height, int& depth);
 
 /// \brief get mipmap bytes
 /// \return mipmap data. Can also be used to write mipmap data

@@ -50,6 +50,8 @@ namespace ImageFramework.ImageLoader
         public int NumMipmaps => Layers.Count > 0 ? Layers[0].Mipmaps.Count : 0;
         public int NumLayers => Layers.Count;
 
+        public bool Is3D => NumMipmaps > 0 && Layers[0].Mipmaps[0].Depth > 1;
+
         public void Dispose()
         {
             Resource.Dispose();

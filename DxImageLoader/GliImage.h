@@ -13,6 +13,7 @@ public:
 	uint32_t getNumMipmaps() const override final { return uint32_t(m_base.levels()); }
 	uint32_t getWidth(uint32_t mipmap) const override final { return m_base.extent(mipmap).x; }
 	uint32_t getHeight(uint32_t mipmap) const override final { return m_base.extent(mipmap).y; }
+	uint32_t getDepth(uint32_t mipmap) const override final { return m_base.extent(mipmap).z; }
 	gli::format getFormat() const override final { return m_base.format(); }
 	gli::format getOriginalFormat() const override final { return m_original; }
 	uint8_t* getData(uint32_t layer, uint32_t mipmap, uint32_t& size) override final
@@ -39,8 +40,8 @@ class GliImage final : public GliImageBase
 {
 public:
 	GliImage(const gli::texture& tex);
-	GliImage(gli::format format, gli::format original, size_t nLayer, size_t nFaces, size_t nLevel, size_t width, size_t height);
-	GliImage(gli::format format, size_t nLayer, size_t nLevel, size_t width, size_t height);
+	GliImage(gli::format format, gli::format original, size_t nLayer, size_t nFaces, size_t nLevel, size_t width, size_t height, size_t depth);
+	GliImage(gli::format format, size_t nLayer, size_t nLevel, size_t width, size_t height, size_t depth);
 	GliImage(const gli::texture& tex, gli::format original);
 
 	std::unique_ptr<GliImage> convert(gli::format format, int quality);
@@ -49,9 +50,17 @@ public:
 	void flip();
 private:
 	// helper to choose the correct internal format. This is later required for format conversions
-	gli::texture& initTex(size_t nFaces);
+	gli::texture& initTex(size_t nFaces, size_t depth);
+
+	enum Type
+	{
+		Cubes,
+		Planes,
+		Volume
+	};
 
 	gli::texture_cube_array m_cube;
 	gli::texture2d_array m_array;
-	bool m_isCube;
+	gli::texture3d m_volume;
+	Type m_type;
 };
