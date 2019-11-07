@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Mime;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -150,6 +151,16 @@ namespace ImageViewer.ViewModels.Dialog
         private void Cancel()
         {
             models.Window.TopmostWindow.DialogResult = false;
+        }
+
+        public List<TextureArray2D> GetTextures()
+        {
+            var res = new List<TextureArray2D>();
+            foreach (var imageItem in ListItems)
+            {
+                res.Add(imageItem.Image);
+            }
+            return res;
         }
 
         public ICommand ImportCommand { get; }

@@ -14,14 +14,16 @@ namespace ImageFramework.Model
     {
         public MitchellNetravaliScaleShader ScaleShader { get; }
         public QuadShader QuadShader { get; } = new QuadShader();
-
+        public ConvertFormatShader Convert { get; }
         public SharedModel()
         {
             ScaleShader = new MitchellNetravaliScaleShader(QuadShader);
+            Convert = new ConvertFormatShader(QuadShader);
         }
 
         public void Dispose()
         {
+            Convert?.Dispose();
             ScaleShader?.Dispose();
             QuadShader?.Dispose();
         }

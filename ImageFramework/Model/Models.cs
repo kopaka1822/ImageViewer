@@ -150,6 +150,27 @@ namespace ImageFramework.Model
         }
 
         /// <summary>
+        /// takes a list of textures and combines them into an array.
+        /// </summary>
+        /// <param name="textures">list of images with same dimensions and no layers</param>
+        /// <returns>combined image</returns>
+        public TextureArray2D CombineToArray(List<TextureArray2D> textures)
+        {
+            if (textures.Count == 0) return null;
+            var first = textures[0];
+            var tex = new TextureArray2D(textures.Count, first.NumMipmaps, first.Width, first.Height, Format.R32G32B32A32_Float, false);
+            for(int i = 0; i < textures.Count; ++i)
+            {
+                for (int curMip = 0; curMip < first.NumMipmaps; ++curMip)
+                {
+                    sharedModel.Convert.CopyLayer(textures[i], 0, curMip, tex, i, curMip);
+                }
+            }
+
+            return tex;
+        }
+
+        /// <summary>
         /// exports a pipeline image with the given format and extension.
         /// Apply will be called by this method if required
         /// </summary>
@@ -244,7 +265,6 @@ namespace ImageFramework.Model
 
         public virtual void Dispose()
         {
-            Export?.Dispose();
             //Gif?.Dispose();
             TextureCache?.Dispose();
             Images?.Dispose();
