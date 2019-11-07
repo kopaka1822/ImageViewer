@@ -1,0 +1,95 @@
+﻿<Window x:Class="ImageViewer.Views.Dialog.ArrayImportDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImageViewer.Views.Dialog"
+        xmlns:dd="urn:gong-wpf-dragdrop"
+        mc:Ignorable="d"
+        Title="Array Import" 
+        ResizeMode="NoResize"
+        Width="300"
+        SizeToContent="Height"
+        Icon="../../Icons/import.png"
+        Style="{StaticResource WindowStyle}"
+        WindowStartupLocation="CenterOwner">
+    <Border Padding="5">
+        <StackPanel>
+
+            <Button 
+                Width="110" 
+                HorizontalAlignment="Right"
+                Command="{Binding ImportCommand}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="21"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Image 
+                        Source="../../Icons/import.png"
+                        Margin="0 0 5 0"/>
+                    <TextBlock 
+                        Grid.Column="1" 
+                        Text="Import Image"/>
+                </Grid>
+            </Button>
+
+            <ListBox 
+                MinHeight="300"
+                ScrollViewer.VerticalScrollBarVisibility="Visible"
+                Margin="0 0 0 5"
+                ItemsSource="{Binding ListItems}"
+                dd:DragDrop.IsDragSource="True"
+                dd:DragDrop.IsDropTarget="True"
+                dd:DragDrop.DropHandler="{Binding}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid 
+                            ToolTip="{Binding Filename}"
+                            HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <Button
+                                Width="16"
+                                Height="16"
+                                Margin="0 0 5 0"
+                                Command="{Binding DeleteCommand}">
+                                <Image Source="../../Icons/cancel.png"/>
+                            </Button>
+
+                            <TextBlock 
+                                Grid.Column="1"
+                                Text="{Binding ShortFilename}"
+                                VerticalAlignment="Center"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            
+            <TextBlock 
+                Visibility="{Binding CubeHelpVisibility, FallbackValue=Visible}"
+                Text="For Cubmaps: x+ x- y+ y- z+ z-"
+                Margin="0 0 0 5"/>
+
+            <!-- Buttons -->
+            <StackPanel 
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                Margin="0 5 0 0">
+                <Button 
+                    Content="_Apply" 
+                    Margin="0 0 10 0" 
+                    Width="60"
+                    Command="{Binding ApplyCommand}"
+                />
+                <Button 
+                    Content="_Cancel"
+                    Width="60"
+                    Command="{Binding CancelCommand}"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>
