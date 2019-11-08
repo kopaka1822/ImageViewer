@@ -4,7 +4,7 @@ Filters are simple HLSL compute shader with a custom entry point: `float4 filter
 
 ### Source Image:
 
-The source image can be accesed via `Texture2D src_image`. This is a texture view of the currently processed layer and mipmap. Additionally, you can use the global variables `uint layer` and `uint level` to get information about the currently processed layer or mipmap level.
+The source image can be accesed via `Texture2D src_image`. This is a texture view of the currently processed layer and mipmap. Additionally, you can use the global variables `uint layer` and `uint level` to get information about the currently processed layer or mipmap level. If you need to acces a custom layer/mipmap you can use `Texture2DArray src_image_ex` to get the view of the entire resource.
 
 ## Additional Preprocessor directives:
 ### Settings:
