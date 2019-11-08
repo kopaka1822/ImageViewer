@@ -30,8 +30,27 @@ namespace ImageViewer.Commands
                 var textures = viewModel.GetTextures();
 
                 var res = models.CombineToArray(textures);
-                models.Images.AddImage(res, "TextureArray", GliFormat.UNDEFINED);
+
+                models.Images.AddImage(res, 
+                    GetPrettyFilename(viewModel.ListItems[0].Filename, textures.Count), 
+                    viewModel.ListItems[0].Format);
             }
+        }
+
+        private string GetPrettyFilename(string fullPath, int numTextures)
+        {
+            if (numTextures != 6) return fullPath;
+
+            var filename = System.IO.Path.GetFileName(fullPath);
+            if (filename == null) return fullPath;
+            if (!filename.StartsWith("x")) return fullPath;
+
+            // use directory name
+            var path = System.IO.Path.GetDirectoryName(fullPath);
+            if (path == null) return fullPath;
+            var actualDir = System.IO.Path.GetFileName(path);
+            if (actualDir.Length != 0) return actualDir;
+            return fullPath;
         }
     }
 }

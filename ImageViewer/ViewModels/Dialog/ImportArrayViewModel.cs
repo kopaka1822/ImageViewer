@@ -66,6 +66,8 @@ namespace ImageViewer.ViewModels.Dialog
             public string Filename { get; set; }
             public string ShortFilename { get; set; }
             public ICommand DeleteCommand { get; set; }
+
+            public GliFormat Format { get; set; }
         }
 
         public ObservableCollection<ImageItem> ListItems { get; } = new ObservableCollection<ImageItem>();
@@ -125,7 +127,8 @@ namespace ImageViewer.ViewModels.Dialog
                     {
                         Filename = filename,
                         ShortFilename = System.IO.Path.GetFileNameWithoutExtension(filename),
-                        Image = new TextureArray2D(img)
+                        Image = new TextureArray2D(img),
+                        Format = img.OriginalFormat
                     };
                     listItem.DeleteCommand = new ActionCommand(() => DeleteItem(listItem));
                     ListItems.Add(listItem);
