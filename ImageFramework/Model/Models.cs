@@ -34,6 +34,9 @@ namespace ImageFramework.Model
 
         public ExportModel Export { get; }
 
+        // soft reset that clears images, filters and resets formulas
+        public event EventHandler SoftReset;
+
         //public GifModel Gif { get; }
 
         public ProgressModel Progress { get; }
@@ -94,7 +97,9 @@ namespace ImageFramework.Model
             {
                 pipe.Color.Formula = "I" + id;
                 pipe.Alpha.Formula = "I" + id;
+                ++id;
             }
+            OnSoftReset();
         }
 
         private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -314,6 +319,11 @@ namespace ImageFramework.Model
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected virtual void OnSoftReset()
+        {
+            SoftReset?.Invoke(this, EventArgs.Empty);
         }
     }
 }

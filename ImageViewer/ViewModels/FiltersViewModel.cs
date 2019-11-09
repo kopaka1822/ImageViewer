@@ -64,9 +64,16 @@ namespace ImageViewer.ViewModels
             this.models = models;
             this.ApplyCommand = new ApplyFiltersCommand(this);
             this.CancelCommand = new CancelFiltersCommand(this);
+            this.models.SoftReset += ModelsOnSoftReset;
 
             changesBrush = new SolidColorBrush(Color.FromRgb(237, 28, 36));
             noChangesBrush = (SolidColorBrush)models.Window.Window.FindResource("FontBrush");
+        }
+
+        private void ModelsOnSoftReset(object sender, EventArgs e)
+        {
+            items.Clear();
+            UpdateAvailableFilter();
         }
 
         private List<FilterListBoxItem> availableFilter = new List<FilterListBoxItem>();
