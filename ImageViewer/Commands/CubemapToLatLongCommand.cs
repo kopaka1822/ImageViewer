@@ -38,6 +38,21 @@ namespace ImageViewer.Commands
 
         public override void Execute()
         {
+            // make sure only one image is visible
+            if (models.NumEnabled != 1)
+            {
+                models.Window.ShowErrorDialog("Exactly one image equation should be visible when exporting.");
+                return;
+            }
+
+            var pipeId = models.GetFirstEnabledPipeline();
+            var srcTex = models.Pipelines[pipeId].Image;
+            if (srcTex == null) return; // not yet computed?
+
+            var firstImage = models.Images.Images[models.Pipelines[pipeId].Color.FirstImageId];
+            var texName = firstImage.Filename;
+            var origFormat = firstImage.OriginalFormat;
+
             var vm = new ResolutionViewModel(2);
             var dia = new ResolutionDialog
             {
@@ -45,7 +60,12 @@ namespace ImageViewer.Commands
             };
             if (models.Window.ShowDialog(dia) != true) return;
 
-            throw new NotImplementedException();
+            var tex = models.ConvertToLatLong(srcTex, vm.Width);
+
+            // clear all images
+            models.Reset();
+
+            models.Images.AddImage(tex, texName, origFormat);
         }
     }
 }

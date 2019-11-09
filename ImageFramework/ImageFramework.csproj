@@ -131,6 +131,7 @@
     <Compile Include="Model\Models.cs" />
     <Compile Include="Model\PreprocessModel.cs" />
     <Compile Include="Model\ProgressModel.cs" />
+    <Compile Include="Model\Shader\ConvertPolarShader.cs" />
     <Compile Include="Model\Shader\FilterShader.cs" />
     <Compile Include="Model\Shader\GifShader.cs" />
     <Compile Include="Model\Shader\ImageCombineShader.cs" />

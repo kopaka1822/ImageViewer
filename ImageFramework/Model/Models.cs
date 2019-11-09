@@ -50,6 +50,8 @@ namespace ImageFramework.Model
 
         private readonly PixelValueShader pixelValueShader;
 
+        private readonly ConvertPolarShader polarConvertShader;
+
         private readonly PreprocessModel preprocess;
 
         public Models(int numPipelines = 1)
@@ -59,6 +61,7 @@ namespace ImageFramework.Model
             CheckDeviceCapabilities();
             pixelValueShader = new PixelValueShader();
             sharedModel = new SharedModel();
+            polarConvertShader = new ConvertPolarShader(sharedModel.QuadShader);
 
             // models
             Images = new ImagesModel(sharedModel.ScaleShader);
@@ -79,6 +82,19 @@ namespace ImageFramework.Model
 
             // pipeline controller
             pipelineController = new PipelineController(this);
+        }
+
+        // removes all images, filters and resets equations
+        public void Reset()
+        {
+            Images.Clear();
+            Filter.Clear();
+            int id = 0;
+            foreach (var pipe in Pipelines)
+            {
+                pipe.Color.Formula = "I" + id;
+                pipe.Alpha.Formula = "I" + id;
+            }
         }
 
         private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -168,6 +184,18 @@ namespace ImageFramework.Model
             }
 
             return tex;
+        }
+
+        /// converts lat long to cubemap
+        public TextureArray2D ConvertToCubemap(TextureArray2D latLong, int resolution)
+        {
+            return polarConvertShader.ConvertToCube(latLong, resolution);
+        }
+
+        /// converts cubemap to lat long
+        public TextureArray2D ConvertToLatLong(TextureArray2D cube, int resolution)
+        {
+            return polarConvertShader.ConvertToLatLong(cube, resolution);
         }
 
         /// <summary>
@@ -270,6 +298,7 @@ namespace ImageFramework.Model
             Images?.Dispose();
             Filter?.Dispose();
             preprocess?.Dispose();
+            polarConvertShader?.Dispose();
             foreach (var imagePipeline in pipelines)
             {
                 imagePipeline.Dispose();

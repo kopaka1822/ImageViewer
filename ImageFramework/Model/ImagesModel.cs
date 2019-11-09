@@ -184,6 +184,18 @@ namespace ImageFramework.Model
             }
         }
 
+        public void Clear()
+        {
+            PrevNumImages = NumImages;
+            Dispose();
+
+            // everything was resettet
+            OnPropertyChanged(nameof(NumLayers));
+            OnPropertyChanged(nameof(NumMipmaps));
+            OnPropertyChanged(nameof(Width));
+            OnPropertyChanged(nameof(Height));
+        }
+
         public void DeleteImage(int imageId)
         {
             Debug.Assert(imageId >= 0 && imageId < NumImages);
