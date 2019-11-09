@@ -4,11 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.ImageLoader;
 using ImageFramework.Utility;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+using Resource = SharpDX.Direct3D11.Resource;
 
 namespace ImageFramework.DirectX
 {
@@ -17,8 +19,9 @@ namespace ImageFramework.DirectX
         private readonly SharpDX.Direct3D11.Texture3D handle;
         private ShaderResourceView[] views;
         private UnorderedAccessView[] uaViews;
+        private RenderTargetView[] rtViews;
 
-        public Texture3D(int numMipmaps, int width, int height, int depth, Format format)
+        public Texture3D(int numMipmaps, int width, int height, int depth, Format format, bool createUav)
         {
             Width = width;
             Height = height;
@@ -27,9 +30,10 @@ namespace ImageFramework.DirectX
             NumMipmaps = numMipmaps;
             Format = format;
 
-            handle = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, CreateTextureDescription());
+            handle = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, CreateTextureDescription(createUav));
+            resourceHandle = handle;
 
-            CreateTextureViews();
+            CreateTextureViews(createUav);
         }
 
         public Texture3D(ImageLoader.Image image, int layer = 0)
@@ -52,30 +56,56 @@ namespace ImageFramework.DirectX
                 data[idx].RowPitch = data[idx].SlicePitch / mip.Height;
             }
 
-            handle = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, CreateTextureDescription(), data);
-            CreateTextureViews();
+            handle = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, CreateTextureDescription(false), data);
+            resourceHandle = handle;
+            CreateTextureViews(false);
         }
 
         public Texture3D Clone()
         {
-            var newTex = new Texture3D(NumMipmaps, Width, Height, Depth, Format);
+            var newTex = new Texture3D(NumMipmaps, Width, Height, Depth, Format, uaViews != null);
 
             Device.Get().CopyResource(handle, newTex.handle);
             return newTex;
         }
 
-        public override Color[] GetPixelColors(int layer, int mipmap)
-        {
-            Debug.Assert(layer == 0);
-            return GetPixelColors(mipmap);
-        }
-
         public Color[] GetPixelColors(int mipmap)
         {
-            throw new NotImplementedException();
+            return GetPixelColors(0, mipmap);
         }
 
-        private Texture3DDescription CreateTextureDescription()
+        protected override Resource GetStagingTexture(int layer, int mipmap)
+        {
+            Debug.Assert(IO.SupportedFormats.Contains(Format));
+
+            Debug.Assert(layer == 0);
+            Debug.Assert(mipmap >= 0);
+            Debug.Assert(mipmap < NumMipmaps);
+
+            var desc = new Texture3DDescription
+            {
+                Width = GetWidth(mipmap),
+                Height = GetHeight(mipmap),
+                Depth = GetDepth(mipmap),
+                Format = Format,
+                MipLevels = 1,
+                BindFlags = BindFlags.None,
+                CpuAccessFlags = CpuAccessFlags.Read,
+                OptionFlags = ResourceOptionFlags.None,
+                Usage = ResourceUsage.Staging
+            };
+
+            // create staging texture
+            var staging = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, desc);
+            
+            // copy data to staging texture
+            Device.Get().CopySubresource(handle, staging, GetSubresourceIndex(layer, mipmap), 0, 
+                GetWidth(mipmap), GetHeight(mipmap), GetDepth(mipmap));
+
+            return staging;
+        }
+
+        private Texture3DDescription CreateTextureDescription(bool createUav)
         {
             Debug.Assert(NumLayers > 0);
             Debug.Assert(NumMipmaps > 0);
@@ -84,13 +114,18 @@ namespace ImageFramework.DirectX
             Debug.Assert(Depth > 0);
             Debug.Assert(Format != Format.Unknown);
 
+            // render target required for mip map generation
+            BindFlags flags = BindFlags.ShaderResource | BindFlags.RenderTarget;
+            if (createUav)
+                flags |= BindFlags.UnorderedAccess;
+
             return new Texture3DDescription
             {
                 Format = Format,
                 Width = Width,
                 Height = Height,
                 Depth = Depth,
-                BindFlags = BindFlags.ShaderResource | BindFlags.UnorderedAccess | BindFlags.RenderTarget,
+                BindFlags = flags,
                 CpuAccessFlags = CpuAccessFlags.None,
                 MipLevels = NumMipmaps,
                 OptionFlags = ResourceOptionFlags.GenerateMipMaps,
@@ -112,7 +147,7 @@ namespace ImageFramework.DirectX
             return views[mipmap];
         }
 
-        private void CreateTextureViews()
+        private void CreateTextureViews(bool createUav)
         {
             Debug.Assert(handle != null);
 
@@ -129,7 +164,9 @@ namespace ImageFramework.DirectX
             });
 
             views = new ShaderResourceView[NumMipmaps];
-            uaViews = new UnorderedAccessView[NumMipmaps];
+            rtViews = new RenderTargetView[NumMipmaps];
+            if(createUav)
+                uaViews = new UnorderedAccessView[NumMipmaps];
 
             for (int curMip = 0; curMip < NumMipmaps; ++curMip)
             {
@@ -144,17 +181,30 @@ namespace ImageFramework.DirectX
                     }
                 });
 
-                uaViews[curMip] = new UnorderedAccessView(Device.Get().Handle, handle, new UnorderedAccessViewDescription
+                rtViews[curMip] = new RenderTargetView(Device.Get().Handle, handle, new RenderTargetViewDescription
                 {
-                    Dimension = UnorderedAccessViewDimension.Texture3D,
+                    Dimension = RenderTargetViewDimension.Texture3D,
                     Format = Format,
-                    Texture3D = new UnorderedAccessViewDescription.Texture3DResource
+                    Texture3D = new RenderTargetViewDescription.Texture3DResource
                     {
-                        FirstWSlice = 0,
                         MipSlice = curMip,
-                        WSize = Depth
+                        FirstDepthSlice = 0,
+                        DepthSliceCount = -1 // all slices
                     }
                 });
+
+                if(createUav)
+                    uaViews[curMip] = new UnorderedAccessView(Device.Get().Handle, handle, new UnorderedAccessViewDescription
+                    {
+                        Dimension = UnorderedAccessViewDimension.Texture3D,
+                        Format = Format,
+                        Texture3D = new UnorderedAccessViewDescription.Texture3DResource
+                        {
+                            FirstWSlice = 0,
+                            MipSlice = curMip,
+                            WSize = -1 // all slices
+                        }
+                    });
             }
         }
 
@@ -174,6 +224,14 @@ namespace ImageFramework.DirectX
                 foreach (var unorderedAccessView in uaViews)
                 {
                     unorderedAccessView?.Dispose();
+                }
+            }
+
+            if (rtViews != null)
+            {
+                foreach (var renderTargetView in rtViews)
+                {
+                    renderTargetView?.Dispose();
                 }
             }
             View?.Dispose();

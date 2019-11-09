@@ -11,6 +11,7 @@ using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+using Resource = ImageFramework.ImageLoader.Resource;
 
 namespace ImageFramework.DirectX
 {
@@ -32,6 +33,7 @@ namespace ImageFramework.DirectX
             this.Format = format;
            
             handle = new SharpDX.Direct3D11.Texture2D(Device.Get().Handle, CreateTextureDescription(createUav));
+            resourceHandle = handle;
 
             CreateTextureViews(createUav);
         }
@@ -59,6 +61,7 @@ namespace ImageFramework.DirectX
             }
 
             handle = new Texture2D(Device.Get().Handle, CreateTextureDescription(false), data);
+            resourceHandle = handle;
 
             CreateTextureViews(false);
         }
@@ -101,7 +104,7 @@ namespace ImageFramework.DirectX
             for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
             {
                 // copy image data of first level
-                Device.Get().CopySubresource(handle, newTex.handle, GetSubresourceIndex(curLayer, 0), newTex.GetSubresourceIndex(curLayer, 0), Width, Height);
+                Device.Get().CopySubresource(handle, newTex.handle, GetSubresourceIndex(curLayer, 0), newTex.GetSubresourceIndex(curLayer, 0), Width, Height, 1);
             }
 
             Device.Get().GenerateMips(newTex.View);
@@ -128,7 +131,7 @@ namespace ImageFramework.DirectX
             for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
             {
                 // copy data of first level
-                Device.Get().CopySubresource(handle, newTex.handle, GetSubresourceIndex(curLayer, mipmap), newTex.GetSubresourceIndex(curLayer, 0), Width, Height);
+                Device.Get().CopySubresource(handle, newTex.handle, GetSubresourceIndex(curLayer, mipmap), newTex.GetSubresourceIndex(curLayer, 0), Width, Height, 1);
             }
 
             return newTex;
@@ -146,38 +149,7 @@ namespace ImageFramework.DirectX
             return newTex;
         }
 
-        public override Color[] GetPixelColors(int layer, int mipmap)
-        {
-            // create staging texture
-            using (var staging = GetStagingTexture(layer, mipmap))
-            {
-                // obtain data from staging resource
-                return Device.Get().GetColorData(staging, 0, GetWidth(mipmap), GetHeight(mipmap));
-            }
-        }
-
-        public unsafe byte[] GetBytes(int layer, int mipmap, uint size)
-        {
-            byte[] res = new byte[size];
-            fixed (byte* ptr = res)
-            {
-                CopyPixels(layer, mipmap, new IntPtr(ptr), size);
-            }
-
-            return res;
-        }
-
-        public void CopyPixels(int layer, int mipmap, IntPtr destination, uint size)
-        {
-            // create staging texture
-            using (var staging = GetStagingTexture(layer, mipmap))
-            {
-                // obtain data from staging resource
-                Device.Get().GetData(staging, 0, GetWidth(mipmap), GetHeight(mipmap), destination, size);
-            }
-        }
-
-        private Texture2D GetStagingTexture(int layer, int mipmap)
+        protected override SharpDX.Direct3D11.Resource GetStagingTexture(int layer, int mipmap)
         {
             Debug.Assert(IO.SupportedFormats.Contains(Format));
 
@@ -206,7 +178,7 @@ namespace ImageFramework.DirectX
             // copy data to staging resource
             Device.Get().CopySubresource(handle, staging,
                 GetSubresourceIndex(layer, mipmap), 0,
-                GetWidth(mipmap), GetHeight(mipmap)
+                GetWidth(mipmap), GetHeight(mipmap), 1
             );
 
             return staging;

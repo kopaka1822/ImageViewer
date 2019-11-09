@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+using Resource = SharpDX.Direct3D11.Resource;
 
 namespace ImageFramework.DirectX
 {
@@ -23,9 +24,9 @@ namespace ImageFramework.DirectX
 
         public ShaderResourceView View { get; protected set; }
 
-        public abstract UnorderedAccessView GetUaView(int mipmap);
+        protected Resource resourceHandle;
 
-        public abstract Color[] GetPixelColors(int layer, int mipmap);
+        public abstract UnorderedAccessView GetUaView(int mipmap);
 
         public int GetWidth(int mipmap)
         {
@@ -50,6 +51,39 @@ namespace ImageFramework.DirectX
             Debug.Assert(mipmap >= 0);
 
             return layer * NumMipmaps + mipmap;
+        }
+
+        protected abstract Resource GetStagingTexture(int layer, int mipmap);
+
+        public Color[] GetPixelColors(int layer, int mipmap)
+        {
+            // create staging texture
+            using (var staging = GetStagingTexture(layer, mipmap))
+            {
+                // obtain data from staging resource
+                return Device.Get().GetColorData(staging, Format, 0, GetWidth(mipmap), GetHeight(mipmap), GetDepth(mipmap));
+            }
+        }
+
+        public unsafe byte[] GetBytes(int layer, int mipmap, uint size)
+        {
+            byte[] res = new byte[size];
+            fixed (byte* ptr = res)
+            {
+                CopyPixels(layer, mipmap, new IntPtr(ptr), size);
+            }
+
+            return res;
+        }
+
+        public void CopyPixels(int layer, int mipmap, IntPtr destination, uint size)
+        {
+            // create staging texture
+            using (var staging = GetStagingTexture(layer, mipmap))
+            {
+                // obtain data from staging resource
+                Device.Get().GetData(staging, Format, 0, GetWidth(mipmap), GetHeight(mipmap), GetDepth(mipmap), destination, size);
+            }
         }
     }
 }

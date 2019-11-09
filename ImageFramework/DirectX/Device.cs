@@ -63,9 +63,9 @@ namespace ImageFramework.DirectX
         /// <summary>
         /// copies entire subresource
         /// </summary>
-        public void CopySubresource(Resource src, Resource dst, int srcSubresource, int dstSubresource, int width, int height)
+        public void CopySubresource(Resource src, Resource dst, int srcSubresource, int dstSubresource, int width, int height, int depth)
         {
-            context.CopySubresourceRegion(src, srcSubresource, new ResourceRegion(0, 0, 0, width, height, 1), 
+            context.CopySubresourceRegion(src, srcSubresource, new ResourceRegion(0, 0, 0, width, height, depth), 
                 dst, dstSubresource);
         }
 
@@ -74,46 +74,50 @@ namespace ImageFramework.DirectX
             context.GenerateMips(res);
         }
 
-        public byte[] GetData(Resource res, int subresource, int width, int height, int pixelByteSize)
+        public byte[] GetData(Resource res, int subresource, int width, int height, int depth, int pixelByteSize)
         {
-            var result = new byte[width * height * pixelByteSize];
+            var result = new byte[width * height * depth * pixelByteSize];
             var data = context.MapSubresource(res, subresource, MapMode.Read, MapFlags.None);
             int srcOffset = 0;
             int dstOffset = 0;
             int rowSize = width * pixelByteSize;
             Debug.Assert(rowSize <= data.RowPitch);
 
-            for (int curY = 0; curY < height; ++curY)
-            {
-                Marshal.Copy(data.DataPointer + srcOffset, result, dstOffset, rowSize);
+            for(int curZ = 0; curZ < depth; ++curZ)
+                for (int curY = 0; curY < height; ++curY)
+                {
+                    Marshal.Copy(data.DataPointer + srcOffset, result, dstOffset, rowSize);
 
-                srcOffset += data.RowPitch;
-                dstOffset += rowSize;
-            }
+                    srcOffset += data.RowPitch;
+                    dstOffset += rowSize;
+                }
 
             context.UnmapSubresource(res, subresource);
 
             return result;
         }
 
-        public void GetData(Texture2D res, int subresource, int width, int height, IntPtr dst, uint size)
+        public void GetData(Resource res, Format format, int subresource, int width, int height, int depth, IntPtr dst, uint size)
         {
-            Debug.Assert(IO.SupportedFormats.Contains(res.Description.Format));
+            Debug.Assert(IO.SupportedFormats.Contains(format));
             int pixelSize = 4;
-            if (res.Description.Format == Format.R32G32B32A32_Float)
+            if (format == Format.R32G32B32A32_Float)
                 pixelSize = 16;
 
             // verify expected size
-            Debug.Assert((uint)(height * width * pixelSize) == size);
+            Debug.Assert((uint)(height * width * depth * pixelSize) == size);
 
             var data = context.MapSubresource(res, subresource, MapMode.Read, MapFlags.None);
             int rowSize = width * pixelSize;
 
-            for (int curY = 0; curY < height; ++curY)
+            for (int curZ = 0; curZ < depth; ++curZ)
             {
-                Dll.CopyMemory(dst, data.DataPointer, (uint)rowSize);
-                dst += rowSize;
-                data.DataPointer += data.RowPitch;
+                for (int curY = 0; curY < height; ++curY)
+                {
+                    Dll.CopyMemory(dst, data.DataPointer, (uint)rowSize);
+                    dst += rowSize;
+                    data.DataPointer += data.RowPitch;
+                }
             }
 
             context.UnmapSubresource(res, subresource);
@@ -145,14 +149,14 @@ namespace ImageFramework.DirectX
         /// Mainly for debug purposes
         /// </summary>
         /// <returns></returns>
-        public unsafe Color[] GetColorData(Texture2D res, int subresource, int width, int height)
+        public unsafe Color[] GetColorData(Resource res, Format format, int subresource, int width, int height, int depth)
         {
-            Debug.Assert(IO.SupportedFormats.Contains(res.Description.Format));
+            Debug.Assert(IO.SupportedFormats.Contains(format));
 
-            if (res.Description.Format == Format.R32G32B32A32_Float)
+            if (format == Format.R32G32B32A32_Float)
             {
-                var tmp = GetData(res, subresource, width, height, 4 * 4);
-                var result = new Color[width * height];
+                var tmp = GetData(res, subresource, width, height, depth, 4 * 4);
+                var result = new Color[width * height * depth];
                 fixed (byte* pBuffer = tmp)
                 {
                     for (int i = 0; i < result.Length; i++)
@@ -163,10 +167,10 @@ namespace ImageFramework.DirectX
             }
             else
             {
-                var tmp = GetData(res, subresource, width, height, 4);
-                var result = new Color[width * height];
-                bool isSigned = res.Description.Format == Format.R8G8B8A8_SNorm;
-                bool isSrgb = res.Description.Format == Format.R8G8B8A8_UNorm_SRgb;
+                var tmp = GetData(res, subresource, width, height, depth, 4);
+                var result = new Color[width * height * depth];
+                bool isSigned = format == Format.R8G8B8A8_SNorm;
+                bool isSrgb = format == Format.R8G8B8A8_UNorm_SRgb;
                 fixed (byte* pBuffer = tmp)
                 {
                     for (int dst = 0, src = 0; dst < result.Length; ++dst, src += 4)
