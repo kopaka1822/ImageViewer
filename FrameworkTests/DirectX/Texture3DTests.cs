@@ -24,7 +24,7 @@ namespace FrameworkTests.DirectX
         }
 
         [TestMethod]
-        public void TestMipmaps()
+        public void TestMipmapLoad()
         {
             var tex = new Texture3D(IO.LoadImage(TestData.Directory + "checkers3d.dds"));
             Assert.AreEqual(4, tex.Width);
@@ -39,6 +39,24 @@ namespace FrameworkTests.DirectX
             TestData.TestCheckersLevel1(GetSlice(tex.GetPixelColors(1), 0, 2 * 2));
 
             TestData.TestCheckersLevel2(tex.GetPixelColors(2));
+        }
+
+        [TestMethod]
+        public void TestMipmapGen()
+        {
+            var original = new Texture3D(IO.LoadImage(TestData.Directory + "checkers3d.dds"));
+            var tex = original.CloneWithoutMipmaps();
+
+            // check first two slices
+            TestData.TestCheckersLevel0(GetSlice(tex.GetPixelColors(0), 0, 4 * 4));
+            TestData.TestCheckersLevel0(GetSlice(tex.GetPixelColors(0), 4 * 4, 4 * 4));
+
+            // gen mipmaps
+            tex = tex.GenerateMipmapLevels(3);
+
+            TestData.CompareColors(original.GetPixelColors(0), tex.GetPixelColors(0));
+            TestData.CompareColors(original.GetPixelColors(1), tex.GetPixelColors(1));
+            TestData.CompareColors(original.GetPixelColors(2), tex.GetPixelColors(2));
         }
     }
 }
