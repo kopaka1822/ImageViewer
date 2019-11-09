@@ -79,7 +79,9 @@
     <Compile Include="DirectX\Structs\LayerLevelOffsetData.cs" />
     <Compile Include="DirectX\Structs\LayerLevelData.cs" />
     <Compile Include="DirectX\SwapChain.cs" />
+    <Compile Include="DirectX\Texture3D.cs" />
     <Compile Include="DirectX\TextureArray2D.cs" />
+    <Compile Include="DirectX\TextureBase.cs" />
     <Compile Include="DirectX\UploadBuffer.cs" />
     <Compile Include="ImageLoader\Dll.cs" />
     <Compile Include="ImageLoader\GliFormat.cs" />

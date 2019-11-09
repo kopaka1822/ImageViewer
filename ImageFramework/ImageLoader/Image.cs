@@ -47,6 +47,13 @@ namespace ImageFramework.ImageLoader
             return 0;
         }
 
+        public int GetDepth(int mipmap)
+        {
+            if (Layers.Count > 0 && (uint)mipmap < Layers[0].Mipmaps.Count)
+                return Layers[0].Mipmaps[mipmap].Depth;
+            return 0;
+        }
+
         public int NumMipmaps => Layers.Count > 0 ? Layers[0].Mipmaps.Count : 0;
         public int NumLayers => Layers.Count;
 

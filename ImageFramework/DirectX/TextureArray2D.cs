@@ -14,17 +14,8 @@ using SharpDX.DXGI;
 
 namespace ImageFramework.DirectX
 {
-    public class TextureArray2D : IDisposable
+    public class TextureArray2D : TextureBase, IDisposable
     {
-        public int Width { get; }
-        public int Height { get; }
-        public int NumMipmaps { get; }
-        public bool HasMipmaps => NumMipmaps > 1;
-        public int NumLayers { get; }
-        public ShaderResourceView View { get; private set; }
-
-        public Format Format { get; }
-
         private readonly Texture2D handle;
         private ShaderResourceView[] views;
         private ShaderResourceView[] cubeViews;
@@ -35,10 +26,10 @@ namespace ImageFramework.DirectX
         {
             Width = width;
             Height = height;
+            Depth = 1;
             NumMipmaps = numMipmaps;
             NumLayers = numLayer;
             this.Format = format;
-
            
             handle = new SharpDX.Direct3D11.Texture2D(Device.Get().Handle, CreateTextureDescription(createUav));
 
@@ -49,6 +40,7 @@ namespace ImageFramework.DirectX
         {
             Width = image.GetWidth(0);
             Height = image.GetHeight(0);
+            Depth = 1;
             NumMipmaps = image.NumMipmaps;
             NumLayers = image.NumLayers;
             Format = image.Format.DxgiFormat;
@@ -59,7 +51,7 @@ namespace ImageFramework.DirectX
                 for (int curMipmap = 0; curMipmap < NumMipmaps; ++curMipmap)
                 {
                     var mip = image.Layers[curLayer].Mipmaps[curMipmap];
-                    var idx = GetTextureIndex(curLayer, curMipmap);
+                    var idx = GetSubresourceIndex(curLayer, curMipmap);
                     data[idx].DataPointer = mip.Bytes;
                     // The distance (in bytes) from the beginning of one line of a texture to the next line.
                     data[idx].Pitch = (int)(mip.Size / mip.Height);
@@ -73,7 +65,7 @@ namespace ImageFramework.DirectX
 
         public ShaderResourceView GetSrView(int layer, int mipmap)
         {
-            return views[GetTextureIndex(layer, mipmap)];
+            return views[GetSubresourceIndex(layer, mipmap)];
         }
 
         public ShaderResourceView GetCubeView(int mipmap)
@@ -86,10 +78,10 @@ namespace ImageFramework.DirectX
 
         public RenderTargetView GetRtView(int layer, int mipmap)
         {
-            return rtViews[GetTextureIndex(layer, mipmap)];
+            return rtViews[GetSubresourceIndex(layer, mipmap)];
         }
 
-        public UnorderedAccessView GetUaView(int mipmap)
+        public override UnorderedAccessView GetUaView(int mipmap) 
         {
             Debug.Assert(uaViews != null);
             Debug.Assert(mipmap < NumMipmaps);
@@ -109,7 +101,7 @@ namespace ImageFramework.DirectX
             for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
             {
                 // copy image data of first level
-                Device.Get().CopySubresource(handle, newTex.handle, GetTextureIndex(curLayer, 0), newTex.GetTextureIndex(curLayer, 0), Width, Height);
+                Device.Get().CopySubresource(handle, newTex.handle, GetSubresourceIndex(curLayer, 0), newTex.GetSubresourceIndex(curLayer, 0), Width, Height);
             }
 
             Device.Get().GenerateMips(newTex.View);
@@ -136,7 +128,7 @@ namespace ImageFramework.DirectX
             for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
             {
                 // copy data of first level
-                Device.Get().CopySubresource(handle, newTex.handle, GetTextureIndex(curLayer, mipmap), newTex.GetTextureIndex(curLayer, 0), Width, Height);
+                Device.Get().CopySubresource(handle, newTex.handle, GetSubresourceIndex(curLayer, mipmap), newTex.GetSubresourceIndex(curLayer, 0), Width, Height);
             }
 
             return newTex;
@@ -154,7 +146,7 @@ namespace ImageFramework.DirectX
             return newTex;
         }
 
-        public Color[] GetPixelColors(int layer, int mipmap)
+        public override Color[] GetPixelColors(int layer, int mipmap)
         {
             // create staging texture
             using (var staging = GetStagingTexture(layer, mipmap))
@@ -213,25 +205,11 @@ namespace ImageFramework.DirectX
 
             // copy data to staging resource
             Device.Get().CopySubresource(handle, staging,
-                GetTextureIndex(layer, mipmap), 0,
+                GetSubresourceIndex(layer, mipmap), 0,
                 GetWidth(mipmap), GetHeight(mipmap)
             );
 
             return staging;
-        }
-
-        public int GetWidth(int mipmap)
-        {
-            Debug.Assert(mipmap >= 0);
-            Debug.Assert(mipmap < NumMipmaps);
-            return Math.Max(1, Width >> mipmap);
-        }
-
-        public int GetHeight(int mipmap)
-        {
-            Debug.Assert(mipmap >= 0);
-            Debug.Assert(mipmap < NumMipmaps);
-            return Math.Max(1, Height >> mipmap);
         }
 
         public void Dispose()
@@ -331,7 +309,7 @@ namespace ImageFramework.DirectX
                         }
                     };
 
-                    views[GetTextureIndex(curLayer, curMipmap)] = new ShaderResourceView(Device.Get().Handle, handle, desc);
+                    views[GetSubresourceIndex(curLayer, curMipmap)] = new ShaderResourceView(Device.Get().Handle, handle, desc);
 
                     var rtDesc = new RenderTargetViewDescription
                     {
@@ -345,7 +323,7 @@ namespace ImageFramework.DirectX
                         }
                     };
 
-                    rtViews[GetTextureIndex(curLayer, curMipmap)] = new RenderTargetView(Device.Get().Handle, handle, rtDesc);
+                    rtViews[GetSubresourceIndex(curLayer, curMipmap)] = new RenderTargetView(Device.Get().Handle, handle, rtDesc);
                 }
             }
 
@@ -369,16 +347,6 @@ namespace ImageFramework.DirectX
                     uaViews[curMipmap] = new UnorderedAccessView(Device.Get().Handle, handle, desc);
                 }
             }
-        }
-
-        private int GetTextureIndex(int layer, int mipmap)
-        {
-            Debug.Assert(layer < NumLayers);
-            Debug.Assert(mipmap < NumMipmaps);
-            Debug.Assert(layer >= 0);
-            Debug.Assert(mipmap >= 0);
-
-            return layer * NumMipmaps + mipmap;
         }
 
         private Texture2DDescription CreateTextureDescription(bool createUav)
