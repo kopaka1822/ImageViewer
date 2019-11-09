@@ -154,6 +154,7 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <Separator/>
             <MenuItem 
                     Header="Generate Mipmaps"
                     Command="{Binding GenerateMipmapsCommand}"
@@ -174,6 +175,30 @@
                             Source="../Icons/cancel.png"
                             Width="16" 
                             Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
+
+            <Separator/>
+            <MenuItem
+                Header="LatLong to Cubemap"
+                Command="{Binding LatLongToCubemapCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/cube.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem
+                Header="Cubemap to LatLong"
+                Command="{Binding CubemapToLatLongCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/image_long.png"
+                        Width="16"
+                        Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
             <!--<MenuItem 

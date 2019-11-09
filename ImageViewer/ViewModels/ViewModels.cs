@@ -48,6 +48,8 @@ namespace ImageViewer.ViewModels
             HelpCommand = new HelpDialogCommand(models);
             //GifExportCommand = new GifExportCommand(models);
             ImportArrayCommand = new ImportArrayCommand(models);
+            LatLongToCubemapCommand = new LatLongToCubemapCommand(models);
+            CubemapToLatLongCommand = new CubemapToLatLongCommand(models);
 
             ResizeCommand = new ResizeWindowCommand(models);
             SetThemeCommand = new SetThemeCommand(models);
@@ -108,5 +110,8 @@ namespace ImageViewer.ViewModels
         //public ICommand GifExportCommand { get; }
 
         public ICommand ImportArrayCommand { get; }
+
+        public ICommand LatLongToCubemapCommand { get; }
+        public ICommand CubemapToLatLongCommand { get; }
     }
 }

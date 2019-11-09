@@ -89,6 +89,7 @@
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
     <Compile Include="Commands\CancelFiltersCommand.cs" />
     <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\CubemapToLatLongCommand.cs" />
     <Compile Include="Commands\DeleteMipmapsCommand.cs" />
     <Compile Include="Commands\ExportCommand.cs" />
     <Compile Include="Commands\GenerateMipmapsCommand.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="Commands\ImportArrayCommand.cs" />
     <Compile Include="Commands\ImportCommand.cs" />
     <Compile Include="Commands\ImportEquationImageCommand.cs" />
+    <Compile Include="Commands\LatLongToCubemapCommand.cs" />
     <Compile Include="Commands\OpenCommand.cs" />
     <Compile Include="Commands\ResizeWindowCommand.cs" />
     <Compile Include="Commands\SetThemeCommand.cs" />
@@ -132,6 +134,7 @@
     <Compile Include="ViewModels\Dialog\ImportArrayViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelColorViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\ResolutionViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ScaleViewModel.cs" />
     <Compile Include="ViewModels\DisplayViewModel.cs" />
     <Compile Include="ViewModels\EquationsViewModel.cs" />
@@ -169,6 +172,9 @@
     </Compile>
     <Compile Include="Views\Dialog\PixelDisplayDialog.xaml.cs">
       <DependentUpon>PixelDisplayDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\ResolutionDialog.xaml.cs">
+      <DependentUpon>ResolutionDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\ScaleDialog.xaml.cs">
       <DependentUpon>ScaleDialog.xaml</DependentUpon>
@@ -232,6 +238,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialog\PixelDisplayDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\ResolutionDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -386,6 +396,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\scale.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\image_long.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\cube.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
