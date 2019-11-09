@@ -14,12 +14,9 @@ using Resource = SharpDX.Direct3D11.Resource;
 
 namespace ImageFramework.DirectX
 {
-    public class Texture3D : TextureBase, IDisposable
+    public class Texture3D : TextureBase<Texture3D>
     {
         private readonly SharpDX.Direct3D11.Texture3D handle;
-        private ShaderResourceView[] views;
-        private UnorderedAccessView[] uaViews;
-        private RenderTargetView[] rtViews;
 
         public Texture3D(int numMipmaps, int width, int height, int depth, Format format, bool createUav)
         {
@@ -31,7 +28,6 @@ namespace ImageFramework.DirectX
             Format = format;
 
             handle = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, CreateTextureDescription(createUav));
-            resourceHandle = handle;
 
             CreateTextureViews(createUav);
         }
@@ -57,16 +53,18 @@ namespace ImageFramework.DirectX
             }
 
             handle = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, CreateTextureDescription(false), data);
-            resourceHandle = handle;
             CreateTextureViews(false);
         }
 
-        public Texture3D Clone()
+        public override Texture3D Create(int numLayer, int numMipmaps, int width, int height, int depth, Format format, bool createUav)
         {
-            var newTex = new Texture3D(NumMipmaps, Width, Height, Depth, Format, uaViews != null);
+            Debug.Assert(numLayer == 1);
+            return new Texture3D(numMipmaps, width, height, depth, format, createUav);
+        }
 
-            Device.Get().CopyResource(handle, newTex.handle);
-            return newTex;
+        protected override Resource GetHandle()
+        {
+            return handle;
         }
 
         public Color[] GetPixelColors(int mipmap)
@@ -131,13 +129,6 @@ namespace ImageFramework.DirectX
                 OptionFlags = ResourceOptionFlags.GenerateMipMaps,
                 Usage = ResourceUsage.Default
             };
-        }
-
-        public override UnorderedAccessView GetUaView(int mipmap)
-        {
-            Debug.Assert(mipmap >= 0);
-            Debug.Assert(mipmap < NumMipmaps);
-            return uaViews[mipmap];
         }
 
         public ShaderResourceView GetSrView(int mipmap)
@@ -206,35 +197,6 @@ namespace ImageFramework.DirectX
                         }
                     });
             }
-        }
-
-        public void Dispose()
-        {
-            handle?.Dispose();
-            if (views != null)
-            {
-                foreach (var shaderResourceView in views)
-                {
-                    shaderResourceView?.Dispose();
-                }
-            }
-
-            if (uaViews != null)
-            {
-                foreach (var unorderedAccessView in uaViews)
-                {
-                    unorderedAccessView?.Dispose();
-                }
-            }
-
-            if (rtViews != null)
-            {
-                foreach (var renderTargetView in rtViews)
-                {
-                    renderTargetView?.Dispose();
-                }
-            }
-            View?.Dispose();
         }
     }
 }

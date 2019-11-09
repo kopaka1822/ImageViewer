@@ -15,13 +15,10 @@ using Resource = ImageFramework.ImageLoader.Resource;
 
 namespace ImageFramework.DirectX
 {
-    public class TextureArray2D : TextureBase, IDisposable
+    public class TextureArray2D : TextureBase<TextureArray2D>
     {
         private readonly Texture2D handle;
-        private ShaderResourceView[] views;
         private ShaderResourceView[] cubeViews;
-        private RenderTargetView[] rtViews;
-        private UnorderedAccessView[] uaViews;
 
         public TextureArray2D(int numLayer, int numMipmaps, int width, int height, Format format, bool createUav)
         {
@@ -33,7 +30,6 @@ namespace ImageFramework.DirectX
             this.Format = format;
            
             handle = new SharpDX.Direct3D11.Texture2D(Device.Get().Handle, CreateTextureDescription(createUav));
-            resourceHandle = handle;
 
             CreateTextureViews(createUav);
         }
@@ -61,14 +57,8 @@ namespace ImageFramework.DirectX
             }
 
             handle = new Texture2D(Device.Get().Handle, CreateTextureDescription(false), data);
-            resourceHandle = handle;
 
             CreateTextureViews(false);
-        }
-
-        public ShaderResourceView GetSrView(int layer, int mipmap)
-        {
-            return views[GetSubresourceIndex(layer, mipmap)];
         }
 
         public ShaderResourceView GetCubeView(int mipmap)
@@ -77,76 +67,6 @@ namespace ImageFramework.DirectX
             Debug.Assert(mipmap < NumMipmaps);
             Debug.Assert(mipmap >= 0);
             return cubeViews[mipmap];
-        }
-
-        public RenderTargetView GetRtView(int layer, int mipmap)
-        {
-            return rtViews[GetSubresourceIndex(layer, mipmap)];
-        }
-
-        public override UnorderedAccessView GetUaView(int mipmap) 
-        {
-            Debug.Assert(uaViews != null);
-            Debug.Assert(mipmap < NumMipmaps);
-            Debug.Assert(mipmap >= 0);
-            return uaViews[mipmap];
-        }
-
-        /// <summary>
-        /// generates new mipmaps
-        /// </summary>
-        public TextureArray2D GenerateMipmapLevels(int levels)
-        {
-            Debug.Assert(!HasMipmaps);
-            var newTex = new TextureArray2D(NumLayers, levels, Width, Height, Format, uaViews != null);
-
-            // copy all layers
-            for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
-            {
-                // copy image data of first level
-                Device.Get().CopySubresource(handle, newTex.handle, GetSubresourceIndex(curLayer, 0), newTex.GetSubresourceIndex(curLayer, 0), Width, Height, 1);
-            }
-
-            Device.Get().GenerateMips(newTex.View);
-
-            return newTex;
-        }
-
-        /// <summary>
-        /// inplace mipmap regeneration based on the number of internal layers
-        /// </summary>
-        public void RegenerateMipmapLevels()
-        {
-            Device.Get().GenerateMips(View);
-        }
-
-        /// <summary>
-        /// creates a new texture that has only one mipmap level
-        /// </summary>
-        /// <returns></returns>
-        public TextureArray2D CloneWithoutMipmaps(int mipmap = 0)
-        {
-            var newTex = new TextureArray2D(NumLayers, 1, GetWidth(mipmap), GetHeight(mipmap), Format, uaViews != null);
-
-            for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
-            {
-                // copy data of first level
-                Device.Get().CopySubresource(handle, newTex.handle, GetSubresourceIndex(curLayer, mipmap), newTex.GetSubresourceIndex(curLayer, 0), Width, Height, 1);
-            }
-
-            return newTex;
-        }
-
-        /// <summary>
-        /// performs a deep gpu copy of the textures
-        /// </summary>
-        /// <returns></returns>
-        public TextureArray2D Clone()
-        {
-            var newTex = new TextureArray2D(NumLayers, NumMipmaps, Width, Height, Format, uaViews != null);
-
-            Device.Get().CopyResource(handle, newTex.handle);
-            return newTex;
         }
 
         protected override SharpDX.Direct3D11.Resource GetStagingTexture(int layer, int mipmap)
@@ -184,16 +104,19 @@ namespace ImageFramework.DirectX
             return staging;
         }
 
-        public void Dispose()
+        public override TextureArray2D Create(int numLayer, int numMipmaps, int width, int height, int depth, Format format, bool createUav)
         {
-            if (views != null)
-            {
-                foreach (var shaderResourceView in views)
-                {
-                    shaderResourceView?.Dispose();
-                }
-            }
+            Debug.Assert(depth == 1);
+            return new TextureArray2D(numLayer, numMipmaps, width, height, format, createUav);
+        }
 
+        protected override SharpDX.Direct3D11.Resource GetHandle()
+        {
+            return handle;
+        }
+
+        public override void Dispose()
+        {
             if (cubeViews != null)
             {
                 foreach (var view in cubeViews)
@@ -202,24 +125,7 @@ namespace ImageFramework.DirectX
                 }
             }
 
-            if (rtViews != null)
-            {
-                foreach (var renderTargetView in rtViews)
-                {
-                    renderTargetView?.Dispose();
-                }
-            }
-
-            if (uaViews != null)
-            {
-                foreach (var unorderedAccessView in uaViews)
-                {
-                    unorderedAccessView?.Dispose();
-                }
-            }
-
-            View?.Dispose();
-            handle?.Dispose();
+            base.Dispose();
         }
 
         private void CreateTextureViews(bool createUav)

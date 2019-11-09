@@ -11,7 +11,7 @@ using Resource = SharpDX.Direct3D11.Resource;
 
 namespace ImageFramework.DirectX
 {
-    public abstract class TextureBase
+    public abstract class TextureBase<T> : IDisposable where T : TextureBase<T>
     {
         public int Width { get; protected set; }
 
@@ -22,11 +22,29 @@ namespace ImageFramework.DirectX
         public int NumLayers { get; protected set; }
         public Format Format { get; protected set; }
 
+        protected UnorderedAccessView[] uaViews;
+        protected RenderTargetView[] rtViews;
+        protected ShaderResourceView[] views;
+
         public ShaderResourceView View { get; protected set; }
 
-        protected Resource resourceHandle;
+        public ShaderResourceView GetSrView(int layer, int mipmap)
+        {
+            return views[GetSubresourceIndex(layer, mipmap)];
+        }
 
-        public abstract UnorderedAccessView GetUaView(int mipmap);
+        public RenderTargetView GetRtView(int layer, int mipmap)
+        {
+            return rtViews[GetSubresourceIndex(layer, mipmap)];
+        }
+
+        public UnorderedAccessView GetUaView(int mipmap)
+        {
+            Debug.Assert(uaViews != null);
+            Debug.Assert(mipmap < NumMipmaps);
+            Debug.Assert(mipmap >= 0);
+            return uaViews[mipmap];
+        }
 
         public int GetWidth(int mipmap)
         {
@@ -84,6 +102,94 @@ namespace ImageFramework.DirectX
                 // obtain data from staging resource
                 Device.Get().GetData(staging, Format, 0, GetWidth(mipmap), GetHeight(mipmap), GetDepth(mipmap), destination, size);
             }
+        }
+
+        /// <summary>
+        /// generates new mipmaps
+        /// </summary>
+        public T GenerateMipmapLevels(int levels)
+        {
+            Debug.Assert(!HasMipmaps);
+            var newTex = Create(NumLayers, levels, Width, Height, Depth, Format, uaViews != null);
+
+            // copy all layers
+            for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
+            {
+                // copy image data of first level
+                Device.Get().CopySubresource(GetHandle(), newTex.GetHandle(), GetSubresourceIndex(curLayer, 0), newTex.GetSubresourceIndex(curLayer, 0), Width, Height, Depth);
+            }
+
+            Device.Get().GenerateMips(newTex.View);
+
+            return newTex;
+        }
+
+        /// <summary>
+        /// inplace mipmap regeneration based on the number of internal levels
+        /// </summary>
+        public void RegenerateMipmapLevels()
+        {
+            Device.Get().GenerateMips(View);
+        }
+
+        /// <summary>
+        /// creates a new texture that has only one mipmap level
+        /// </summary>
+        /// <returns></returns>
+        public T CloneWithoutMipmaps(int mipmap = 0)
+        {
+            var newTex = Create(NumLayers, 1, GetWidth(mipmap), GetHeight(mipmap), GetDepth(mipmap), Format,
+                uaViews != null);
+
+            for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
+            {
+                // copy data of first level
+                Device.Get().CopySubresource(GetHandle(), newTex.GetHandle(), GetSubresourceIndex(curLayer, mipmap), newTex.GetSubresourceIndex(curLayer, 0), Width, Height, Depth);
+            }
+
+            return newTex;
+        }
+
+        public T Clone()
+        {
+            var newTex = Create(NumLayers, NumMipmaps, Width, Height, Depth, Format, uaViews != null);
+
+            Device.Get().CopyResource(GetHandle(), newTex.GetHandle());
+            return newTex;
+        }
+
+        public abstract T Create(int numLayer, int numMipmaps, int width, int height, int depth, Format format,
+            bool createUav);
+
+        protected abstract Resource GetHandle();
+
+        public virtual void Dispose()
+        {
+            GetHandle()?.Dispose();
+            if (views != null)
+            {
+                foreach (var shaderResourceView in views)
+                {
+                    shaderResourceView?.Dispose();
+                }
+            }
+
+            if (uaViews != null)
+            {
+                foreach (var unorderedAccessView in uaViews)
+                {
+                    unorderedAccessView?.Dispose();
+                }
+            }
+
+            if (rtViews != null)
+            {
+                foreach (var renderTargetView in rtViews)
+                {
+                    renderTargetView?.Dispose();
+                }
+            }
+            View?.Dispose();
         }
     }
 }
