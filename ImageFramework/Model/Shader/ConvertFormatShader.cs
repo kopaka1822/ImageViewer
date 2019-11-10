@@ -17,14 +17,16 @@ namespace ImageFramework.Model.Shader
 {
     public class ConvertFormatShader : IDisposable
     {
-        private readonly DirectX.Shader convert;
+        private readonly DirectX.Shader convert2D;
+        private readonly DirectX.Shader convert3D;
         private readonly QuadShader quad;
         private readonly UploadBuffer<LayerLevelOffsetData> cbuffer;
 
         public ConvertFormatShader(QuadShader quad)
         {
             var dev = DirectX.Device.Get();
-            convert = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(), "ConvertFormatShader");
+            convert2D = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(ShaderBuilder.Builder2D), "ConvertFormatShader2D");
+            convert3D = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(ShaderBuilder.Builder3D), "ConvertFormatShader3D");
             this.quad = quad;
             cbuffer = new UploadBuffer<LayerLevelOffsetData>(1);
         }
@@ -37,10 +39,9 @@ namespace ImageFramework.Model.Shader
         /// <param name="mipmap">mipmap to export, -1 for all mipmaps</param>
         /// <param name="layer">layer to export, -1 for all layers</param>
         /// <param name="multiplier">rgb channels will be multiplied by this value</param>
-        public TextureArray2D Convert(TextureArray2D texture, SharpDX.DXGI.Format dstFormat, int mipmap = -1,
-            int layer = -1, float multiplier = 1.0f)
+        public ITexture Convert(ITexture texture, SharpDX.DXGI.Format dstFormat, int mipmap = -1, int layer = -1, float multiplier = 1.0f)
        {
-            return Convert(texture, dstFormat, mipmap, layer, multiplier, false, 0, 0, 0, 0, 0, 0);
+            return Convert(texture, dstFormat, mipmap, layer, multiplier, false, Size3.Zero, Size3.Zero, Size3.Zero);
        }
 
         /// <summary>
@@ -52,15 +53,12 @@ namespace ImageFramework.Model.Shader
         /// <param name="layer">layer to export, -1 for all layers</param>
         /// <param name="multiplier">rgb channels will be multiplied by this value</param>
         /// <param name="crop">indicates if the image should be cropped, only works with 1 mipmap to export</param>
-        /// <param name="xOffset">if crop: offset in source image</param>
-        /// <param name="yOffset">if crop: offset in source image</param>
-        /// <param name="width">if crop: width of the destination image</param>
-        /// <param name="height">if crop: height of the destination image</param>
-        /// <param name="alignX">if nonzero: texture width will be aligned to this (rounded down)</param>
-        /// <param name="alignY">if nonzero: texture height will be aligned to this (rounded down)</param>
+        /// <param name="offset">if crop: offset in source image</param>
+        /// <param name="size">if crop: size of the destination image</param>
+        /// <param name="align">if nonzero: texture width will be aligned to this (rounded down)</param>
         /// <returns></returns>
-        public TextureArray2D Convert(TextureArray2D texture, SharpDX.DXGI.Format dstFormat, int mipmap, int layer,
-            float multiplier, bool crop, int xOffset, int yOffset, int width, int height, int alignX, int alignY)
+        public ITexture Convert(ITexture texture, SharpDX.DXGI.Format dstFormat, int mipmap, int layer, float multiplier, bool crop, 
+            Size3 offset, Size3 size, Size3 align)
         {
             Debug.Assert(ImageFormat.IsSupported(dstFormat));
             Debug.Assert(ImageFormat.IsSupported(texture.Format));
@@ -74,38 +72,25 @@ namespace ImageFramework.Model.Shader
             // set correct width, height, offsets
             if (!crop)
             {
-                var dim = texture.Size.GetMip(firstMipmap);
-                width = dim.Width;
-                height = dim.Height;
-                xOffset = 0;
-                yOffset = 0;
+                size = texture.Size.GetMip(firstMipmap);
+                offset = Size3.Zero;
             }
 
-            // adjust to alignment
-            if (alignX != 0)
+            // adjust alignments
+            for (int i = 0; i < 3; ++i)
             {
-                if (width % alignX != 0)
+                if (align[i] != 0)
                 {
-                    if (width < alignX)
-                        throw new Exception(
-                            $"image needs to be aligned to {alignX} but width is only {width}. Width should be at least {alignX}");
-                    crop = true;
-                    var remainder = width % alignX;
+                    if (size[i] % align[i] != 0)
+                    {
+                        if (size[i] < align[i])
+                            throw new Exception($"image needs to be aligned to {align[i]} but one axis is only {size[i]}. Axis should be at least {align[i]}");
 
-                    xOffset += remainder / 2;
-                    width -= remainder;
-                }
-            }
-            // adjust to alignment
-            if (alignY != 0)
-            {
-                if (height % alignY != 0)
-                {
-                    if(height < alignY) throw new Exception($"image needs to be aligned to {alignY} but height is only {height}. Height should be at least {alignY}");
-                    crop = true;
-                    var remainder = height % alignY;
-                    yOffset += remainder / 2;
-                    height -= remainder;
+                        crop = true;
+                        var remainder = size[i] % align[i];
+                        offset[i] = offset[i] + remainder / 2;
+                        size[i] = size[i] - remainder;
+                    }
                 }
             }
 
@@ -113,15 +98,16 @@ namespace ImageFramework.Model.Shader
             if (recomputeMips)
             {
                 // number of mipmaps might have changed
-                nMipmaps = ImagesModel.ComputeMaxMipLevels(Math.Max(width, height));
+                nMipmaps = ImagesModel.ComputeMaxMipLevels(size);
                 recomputeMips = nMipmaps > 1;
             }
 
-            var res = new TextureArray2D(nLayer, nMipmaps, new Size3(width, height), dstFormat, false);
+            var res = texture.Create(nLayer, nMipmaps, size, dstFormat, false);
 
             var dev = DirectX.Device.Get();
-            dev.Vertex.Set(quad.Vertex);
-            dev.Pixel.Set(convert.Pixel);
+            quad.Bind(texture.Is3D);
+            if(texture.Is3D) dev.Pixel.Set(convert3D.Pixel);
+            else dev.Pixel.Set(convert2D.Pixel);
 
             dev.Pixel.SetShaderResource(0, texture.View);
 
@@ -131,10 +117,10 @@ namespace ImageFramework.Model.Shader
                 {
                     cbuffer.SetData(new LayerLevelOffsetData
                     {
-                        Layer = curLayer + firstLayer,
+                        Layer = curLayer + firstLayer + offset.Z,
                         Level = curMipmap + firstMipmap,
-                        Xoffset = xOffset,
-                        Yoffset = yOffset,
+                        Xoffset = offset.X,
+                        Yoffset = offset.Y,
                         Multiplier = multiplier
                     });
 
@@ -142,7 +128,7 @@ namespace ImageFramework.Model.Shader
                     dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
                     dev.OutputMerger.SetRenderTargets(res.GetRtView(curLayer, curMipmap));
                     dev.SetViewScissors(dim.Width, dim.Height);
-                    dev.DrawQuad();
+                    dev.DrawFullscreenTriangle(dim.Depth);
 
                     if(recomputeMips) break; // only write most detailed mipmap
                 }
@@ -151,6 +137,7 @@ namespace ImageFramework.Model.Shader
             // remove bindings
             dev.Pixel.SetShaderResource(0, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView) null);
+            quad.Unbind();
 
             if (recomputeMips)
             {
@@ -168,8 +155,8 @@ namespace ImageFramework.Model.Shader
             var res = new TextureArray2D(1, 1, size, dstFormat, false);
 
             var dev = DirectX.Device.Get();
-            dev.Vertex.Set(quad.Vertex);
-            dev.Pixel.Set(convert.Pixel);
+            quad.Bind(false);
+            dev.Pixel.Set(convert2D.Pixel);
 
             dev.Pixel.SetShaderResource(0, srv);
 
@@ -190,41 +177,44 @@ namespace ImageFramework.Model.Shader
             // remove bindings
             dev.Pixel.SetShaderResource(0, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            quad.Unbind();
 
             return res;
         }
 
-        private static string GetSource()
+        private static string GetSource(IShaderBuilder builder)
         {
-            return @"
-Texture2DArray<float4> in_tex : register(t0);
+            return $@"
+{builder.SrvType} in_tex : register(t0);
 
 cbuffer InfoBuffer : register(b0)
-{
-    uint layer;
+{{
+    uint layer; // contains offset z for 3d textures
     uint level;
     uint xoffset;
     uint yoffset;
     float multiplier;
-};
+}};
 
 struct PixelIn
-{
+{{
     float2 texcoord : TEXCOORD;
     float4 projPos : SV_POSITION;
-};
+    uint depth : SV_RenderTargetArrayIndex;
+}};
 
 float4 main(PixelIn i) : SV_TARGET
-{
+{{
     float4 coord = i.projPos;
-    return multiplier * in_tex.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), layer)];
-}
+    return multiplier * in_tex.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), layer + i.depth)];
+}}
 ";
         }
 
         public void Dispose()
         {
-            convert?.Dispose();
+            convert2D?.Dispose();
+            convert3D?.Dispose();
             cbuffer?.Dispose();
         }
     }

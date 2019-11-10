@@ -77,7 +77,7 @@ namespace ImageFramework.Model
             var res = new TextureArray2D(1, 1, new Size3(width, height), dstFormat, false);
 
             var dev = Device.Get();
-            dev.Vertex.Set(quad.Vertex);
+            quad.Bind(false);
             dev.Pixel.Set(convert.Pixel);
             
             // compute which mipmap has the closest fit
@@ -112,6 +112,7 @@ namespace ImageFramework.Model
             // remove bindings
             dev.Pixel.SetShaderResource(0, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            quad.Unbind();
 
             tmpTex?.Dispose();
 

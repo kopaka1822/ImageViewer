@@ -191,6 +191,7 @@ namespace ImageFramework.DirectX
         }
 
         public VertexShaderStage Vertex => context.VertexShader;
+        public GeometryShaderStage Geometry => context.GeometryShader;
         public PixelShaderStage Pixel => context.PixelShader;
         public ComputeShaderStage Compute => context.ComputeShader;
         public InputAssemblerStage InputAssembler => context.InputAssembler;
@@ -244,6 +245,14 @@ namespace ImageFramework.DirectX
         {
             context.InputAssembler.InputLayout = null;
             context.Draw(4, 0);
+        }
+
+        public void DrawFullscreenTriangle(int count = 1)
+        {
+            context.InputAssembler.InputLayout = null;
+            InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
+            context.Draw(3 * count, 0);
+            InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
         }
 
         public void UpdateBufferData<T>(Buffer buffer, T data) where T : struct

@@ -15,7 +15,8 @@ namespace ImageFramework.DirectX
         {
             Vertex,
             Pixel,
-            Compute
+            Compute,
+            Geometry
         }
 
         private readonly ShaderFlags flags = ShaderFlags.WarningsAreErrors | ShaderFlags.IeeeStrictness | ShaderFlags.EnableStrictness
@@ -56,6 +57,18 @@ namespace ImageFramework.DirectX
                 return compute;
             }
         }
+
+        private GeometryShader geometry;
+
+        public GeometryShader Geometry
+        {
+            get
+            {
+                Debug.Assert(ShaderType == Type.Geometry);
+                return geometry;
+            }
+        }
+
         public Type ShaderType { get; }
 
         public Shader(Type type, string source, string debugName)
@@ -85,6 +98,9 @@ namespace ImageFramework.DirectX
                         case Type.Compute:
                             compute = new ComputeShader(Device.Get().Handle, byteCode);
                             break;
+                        case Type.Geometry:
+                            geometry = new GeometryShader(Device.Get().Handle, byteCode);
+                            break;
                         default:
                             Debug.Assert(false);
                             break;
@@ -104,6 +120,7 @@ namespace ImageFramework.DirectX
                 case Type.Vertex: return "vs_5_0";
                 case Type.Pixel: return "ps_5_0";
                 case Type.Compute: return "cs_5_0";
+                case Type.Geometry: return "gs_5_0";
                 default: Debug.Assert(false);
                     return "";
             }
@@ -114,6 +131,7 @@ namespace ImageFramework.DirectX
             vertex?.Dispose();
             pixel?.Dispose();
             compute?.Dispose();
+            geometry?.Dispose();
         }
     }
 }

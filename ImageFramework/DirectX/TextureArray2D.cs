@@ -66,6 +66,8 @@ namespace ImageFramework.DirectX
             return cubeViews[mipmap];
         }
 
+        public override bool Is3D => false;
+
         protected override SharpDX.Direct3D11.Resource GetStagingTexture(int layer, int mipmap)
         {
             Debug.Assert(IO.SupportedFormats.Contains(Format));

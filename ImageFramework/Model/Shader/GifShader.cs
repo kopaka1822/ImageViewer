@@ -34,8 +34,8 @@ namespace ImageFramework.Model.Shader
             Debug.Assert(borderLocation >= 0);
             Debug.Assert(borderLocation < width);
 
+            quad.Bind(false);
             var dev = Device.Get();
-            dev.Vertex.Set(quad.Vertex);
             dev.Pixel.Set(pixel.Pixel);
 
             // update buffer
@@ -57,6 +57,7 @@ namespace ImageFramework.Model.Shader
             dev.Pixel.SetShaderResource(0, null);
             dev.Pixel.SetShaderResource(1, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            quad.Unbind();
         }
 
         private static string GetSource()

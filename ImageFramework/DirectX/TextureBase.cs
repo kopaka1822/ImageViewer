@@ -20,6 +20,8 @@ namespace ImageFramework.DirectX
         public int NumLayers { get; protected set; }
         public Format Format { get; protected set; }
 
+        public abstract bool Is3D { get; }
+
         protected UnorderedAccessView[] uaViews;
         protected RenderTargetView[] rtViews;
         protected ShaderResourceView[] views;

@@ -9,6 +9,7 @@ using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Shader;
+using ImageFramework.Utility;
 
 namespace ImageFramework.Model.Export
 {
@@ -286,9 +287,10 @@ namespace ImageFramework.Model.Export
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (image.Format != stagingFormat.DxgiFormat || croppingActive || desc.Multiplier != 1.0f || alignmentActive)
             {
-                using (var tmpTex = convert.Convert((TextureArray2D)image, stagingFormat.DxgiFormat, Mipmap, Layer,
-                    desc.Multiplier, UseCropping, CropStartX, CropStartY, CropEndX - CropStartX + 1, CropEndY - CropStartY + 1,
-                    desc.FileFormat.GetAlignmentX(), desc.FileFormat.GetAlignmentY()))
+                using (var tmpTex = convert.Convert(image, stagingFormat.DxgiFormat, Mipmap, Layer,
+                    desc.Multiplier, UseCropping, new Size3(CropStartX, CropStartY, CropStartZ),
+                    new Size3(CropEndX - CropStartX + 1, CropEndY - CropStartY + 1, CropEndZ - CropStartZ + 1),
+                    new Size3(desc.FileFormat.GetAlignmentX(), desc.FileFormat.GetAlignmentY(), 0)))
                 {
                     // the final texture only has the relevant layers and mipmaps
                     ExportTexture(tmpTex, desc, -1, -1);

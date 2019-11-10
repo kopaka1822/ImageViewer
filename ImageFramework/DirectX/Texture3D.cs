@@ -68,6 +68,8 @@ namespace ImageFramework.DirectX
             return GetPixelColors(0, mipmap);
         }
 
+        public override bool Is3D => true;
+
         protected override Resource GetStagingTexture(int layer, int mipmap)
         {
             Debug.Assert(IO.SupportedFormats.Contains(Format));

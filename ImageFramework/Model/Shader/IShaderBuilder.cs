@@ -24,9 +24,12 @@ namespace ImageFramework.Model.Shader
     {
         public static IShaderBuilder Get(Type type)
         {
-            if(type == typeof(TextureArray2D)) return new ShaderBuilder2D();
-            if(type == typeof(Texture3D)) return new ShaderBuilder3D();
+            if(type == typeof(TextureArray2D)) return Builder2D;
+            if(type == typeof(Texture3D)) return Builder3D;
             throw new Exception("no shader builder available for " + type.Name);
         }
+
+        public static readonly IShaderBuilder Builder2D = new ShaderBuilder2D();
+        public static readonly IShaderBuilder Builder3D = new ShaderBuilder3D();
     }
 }

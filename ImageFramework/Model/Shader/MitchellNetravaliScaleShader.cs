@@ -67,8 +67,8 @@ namespace ImageFramework.Model.Shader
 
         private void Apply(TextureArray2D src, TextureArray2D dst, int dirX, int dirY)
         {
+            quad.Bind(false);
             var dev = Device.Get();
-            dev.Vertex.Set(quad.Vertex);
             dev.Pixel.Set(shader.Pixel);
 
             cbuffer.SetData(new DirSizeData
@@ -91,6 +91,7 @@ namespace ImageFramework.Model.Shader
 
             dev.Pixel.SetShaderResource(0, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            quad.Unbind();
         }
 
         private static string GetSource()

@@ -77,7 +77,7 @@ namespace FrameworkTests.Model.Shader
             TestData.TestCheckersLevel1(tex.GetPixelColors(0, 1));
             TestData.TestCheckersLevel2(tex.GetPixelColors(0, 2));
 
-            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, -1, 1.0f, true, 1, 1, 2, 2, 0, 0);
+            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, -1, 1.0f, true, new Size3(1, 1, 0), new Size3(2, 2), Size3.Zero);
             Assert.AreEqual(1, newTex.NumMipmaps);
             Assert.AreEqual(2, newTex.Size.Width);
             Assert.AreEqual(2, newTex.Size.Height);
@@ -94,7 +94,7 @@ namespace FrameworkTests.Model.Shader
             Assert.AreEqual(1, tex.Size.Height % 4);
             
             // convert with 4 texel alignment
-            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, 0, 1.0f, false, 0, 0, 0, 0, 4, 4);
+            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, 0, 1.0f, false, Size3.Zero, Size3.Zero, new Size3(4, 4, 0));
             Assert.AreEqual(0, newTex.Size.Width % 4);
             Assert.AreEqual(0, newTex.Size.Height % 4);
         }

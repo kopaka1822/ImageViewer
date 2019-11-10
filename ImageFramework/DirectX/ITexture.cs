@@ -15,6 +15,7 @@ namespace ImageFramework.DirectX
         Size3 Size { get; }
         int NumMipmaps { get; }
         bool HasMipmaps { get; }
+        bool Is3D { get; }
         int NumLayers { get; }
         Format Format { get; }
 
@@ -32,6 +33,11 @@ namespace ImageFramework.DirectX
 
         ITexture GenerateMipmapLevels(int levels);
         ITexture CloneWithoutMipmaps(int mipmap = 0);
+
+        /// <summary>
+        /// inplace mipmap regeneration based on the number of internal levels
+        /// </summary>
+        void RegenerateMipmapLevels();
         ITexture Create(int numLayer, int numMipmaps, Size3 size, Format format, bool createUav);
 
         ITexture Clone();
