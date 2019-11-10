@@ -94,7 +94,7 @@ namespace ImageFramework.Model
             if (texture.NumMipmaps < mipmap + 1)
             {
                 // generate new texture with mipmaps
-                tmpTex = texture.GenerateMipmapLevels(mipmap + 1);
+                tmpTex = texture.GenerateMipmapLevelsT(mipmap + 1);
                 dev.Pixel.SetShaderResource(0, tmpTex.GetSrView(layer, mipmap));
             }
             else

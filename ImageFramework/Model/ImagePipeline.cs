@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
@@ -33,18 +34,28 @@ namespace ImageFramework.Model
             get => useFilter;
             set
             {
-                if(value == useFilter) return;
+                if (value == useFilter) return;
                 useFilter = value;
                 OnPropertyChanged(nameof(UseFilter));
                 HasChanges = true;
             }
         }
 
+        private bool isEnabled = true;
+
         /// <summary>
-        /// indicates if the Image was taken from a texture cache or lend from the images model
+        /// indicates if this formula will be updated during a call to apply
         /// </summary>
-        private bool cachedTexture = true;
-        public TextureArray2D Image { get; internal set; }
+        public bool IsEnabled
+        {
+            get => isEnabled;
+            set
+            {
+                if (value == isEnabled) return;
+                isEnabled = value;
+                OnPropertyChanged(nameof(IsEnabled));
+            }
+        }
 
         private bool isValid = false;
 
@@ -57,27 +68,11 @@ namespace ImageFramework.Model
             get => isValid;
             internal set
             {
-                if(value == isValid) return;
+                if (value == isValid) return;
                 isValid = value;
                 OnPropertyChanged(nameof(IsValid));
                 if (!isValid) // final image must be recomputed if formula got invalid
                     HasChanges = true;
-            }
-        }
-
-        private bool isEnabled = true;
-        
-        /// <summary>
-        /// indicates if this formula will be updated during a call to apply
-        /// </summary>
-        public bool IsEnabled
-        {
-            get => isEnabled;
-            set
-            {
-                if(value == isEnabled) return;
-                isEnabled = value;
-                OnPropertyChanged(nameof(IsEnabled));
             }
         }
 
@@ -91,11 +86,18 @@ namespace ImageFramework.Model
             get => hasChanges;
             set
             {
-                if(value == hasChanges) return;
+                if (value == hasChanges) return;
                 hasChanges = value;
                 OnPropertyChanged(nameof(HasChanges));
             }
         }
+
+        /// <summary>
+        /// indicates if the Image was taken from a texture cache or lend from the images model
+        /// </summary>
+        private bool cachedTexture = true;
+
+        public ITexture Image { get; private set; }
 
         internal class UpdateImageArgs
         {
@@ -136,7 +138,7 @@ namespace ImageFramework.Model
             try
             {
                 // first, use the combine shader
-                using (var shader = new ImageCombineShader(Color.Converted, Alpha.Converted, args.Images.NumImages))
+                using (var shader = new ImageCombineShader(Color.Converted, Alpha.Converted, args.Images.NumImages, ShaderBuilder.Get(args.Images.ImageType)))
                 {
                     var texSrc = args.TextureCache.GetTexture();
 
@@ -151,7 +153,7 @@ namespace ImageFramework.Model
                     Debug.Assert(args.Filters != null);
 
                     // get a second texture and swap between source and destination image
-                    TextureArray2D[] tex = new TextureArray2D[2];
+                    ITexture[] tex = new ITexture[2];
                     tex[0] = Image;
                     Image = null;
                     tex[1] = args.TextureCache.GetTexture();
@@ -173,7 +175,7 @@ namespace ImageFramework.Model
                                 srcIdx = 1 - srcIdx;
                         }
                     }
-                    catch(Exception)
+                    catch (Exception)
                     {
                         args.TextureCache.StoreTexture(tex[0]);
                         args.TextureCache.StoreTexture(tex[1]);
@@ -204,11 +206,11 @@ namespace ImageFramework.Model
             }
         }
 
-        private Task DoFilterIterationAsync(UpdateImageArgs args, int index, TextureArray2D src, TextureArray2D dst, int iteration, CancellationToken ct)
+        private Task DoFilterIterationAsync(UpdateImageArgs args, int index, ITexture src, ITexture dst, int iteration, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
             var filter = args.Filters[index];
-            filter.Shader.Run(args.Images, src, dst, args.LayerLevelBuffer, iteration);
+            filter.Shader.Run(args.Images, (TextureArray2D)src, (TextureArray2D)dst, args.LayerLevelBuffer, iteration);
             args.Sync.Set();
 
             var step = 1.0f / args.Filters.Count;
@@ -222,7 +224,7 @@ namespace ImageFramework.Model
         {
             if (Image != null)
             {
-                if(cachedTexture)
+                if (cachedTexture)
                     cache.StoreTexture(Image); // taken from the cache
                 // otherwise it belongs to the image model
 
@@ -230,7 +232,12 @@ namespace ImageFramework.Model
                 cachedTexture = true;
                 OnPropertyChanged(nameof(Image));
             }
-            
+
+        }
+
+        public void Dispose()
+        {
+            Image?.Dispose();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -239,11 +246,6 @@ namespace ImageFramework.Model
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public void Dispose()
-        {
-            Image?.Dispose();
         }
     }
 }

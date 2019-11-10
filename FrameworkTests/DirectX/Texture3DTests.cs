@@ -45,14 +45,14 @@ namespace FrameworkTests.DirectX
         public void TestMipmapGen()
         {
             var original = new Texture3D(IO.LoadImage(TestData.Directory + "checkers3d.dds"));
-            var tex = original.CloneWithoutMipmaps();
+            var tex = original.CloneWithoutMipmapsT();
 
             // check first two slices
             TestData.TestCheckersLevel0(GetSlice(tex.GetPixelColors(0), 0, 4 * 4));
             TestData.TestCheckersLevel0(GetSlice(tex.GetPixelColors(0), 4 * 4, 4 * 4));
 
             // gen mipmaps
-            tex = tex.GenerateMipmapLevels(3);
+            tex = tex.GenerateMipmapLevelsT(3);
 
             TestData.CompareColors(original.GetPixelColors(0), tex.GetPixelColors(0));
             TestData.CompareColors(original.GetPixelColors(1), tex.GetPixelColors(1));

@@ -11,7 +11,7 @@
 
         public override string ToHlsl()
         {
-            return $"GetTexture{Id.ToString(Models.Culture)}(coord.xy)";
+            return $"GetTexture{Id.ToString(Models.Culture)}(coord)";
         }
     }
 }

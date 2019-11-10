@@ -56,7 +56,7 @@ namespace ImageFramework.DirectX
             CreateTextureViews(false);
         }
 
-        public override Texture3D Create(int numLayer, int numMipmaps, int width, int height, int depth, Format format, bool createUav)
+        public override Texture3D CreateT(int numLayer, int numMipmaps, int width, int height, int depth, Format format, bool createUav)
         {
             Debug.Assert(numLayer == 1);
             return new Texture3D(numMipmaps, width, height, depth, format, createUav);

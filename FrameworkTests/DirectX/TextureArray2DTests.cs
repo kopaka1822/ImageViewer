@@ -29,14 +29,14 @@ namespace FrameworkTests.DirectX
             TestData.TestCheckersLevel2(tex.GetPixelColors(0, 2));
 
             // remove mipmaps
-            tex = tex.CloneWithoutMipmaps();
+            tex = tex.CloneWithoutMipmapsT();
             Assert.AreEqual(1, tex.NumMipmaps);
             Assert.AreEqual(4, tex.Width);
             Assert.AreEqual(4, tex.Height);
             TestData.TestCheckersLevel0(tex.GetPixelColors(0, 0));
 
             // generate mipmaps again
-            tex = tex.GenerateMipmapLevels(3);
+            tex = tex.GenerateMipmapLevelsT(3);
             Assert.AreEqual(3, tex.NumMipmaps);
             Assert.AreEqual(4, tex.Width);
             Assert.AreEqual(4, tex.Height);

@@ -120,7 +120,7 @@ namespace FrameworkTests.Model.Equation
         /// <param name="formula"></param>
         public void TestFormula(string formula)
         {
-            using (var shader = new ImageCombineShader(GetEq(formula), GetEq("1"), 2))
+            using (var shader = new ImageCombineShader(GetEq(formula), GetEq("1"), 2, new ShaderBuilder2D()))
             {
                 
             }

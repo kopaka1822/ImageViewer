@@ -8,9 +8,9 @@ using SharpDX.DXGI;
 
 namespace ImageFramework.Utility
 {
-    internal class TextureCache : IDisposable
+    internal class TextureCache
     {
-        private readonly Stack<TextureArray2D> textures = new Stack<TextureArray2D>(2);
+        private readonly Stack<ITexture> textures = new Stack<ITexture>(2);
         private readonly ImagesModel images;
 
         public TextureCache(ImagesModel images)
@@ -23,23 +23,22 @@ namespace ImageFramework.Utility
         /// returns one unused texture if available. creates a new texture if not textures were available
         /// </summary>
         /// <returns></returns>
-        public TextureArray2D GetTexture()
+        public ITexture GetTexture()
         {
             if (textures.Count > 0) return textures.Pop();
 
             // make new texture with the current configuration
-            return new TextureArray2D(images.NumLayers, images.NumMipmaps,
-                images.GetWidth(0), images.GetHeight(0), Format.R32G32B32A32_Float, true);
+            return images.CreateEmptyTexture();
         }
 
         /// <summary>
         /// stores the textures for later use
         /// </summary>
         /// <param name="tex"></param>
-        public void StoreTexture(TextureArray2D tex)
+        public void StoreTexture(ITexture tex)
         {
             Debug.Assert(tex != null);
-            if (tex.NumMipmaps == images.NumMipmaps && tex.NumMipmaps == images.NumLayers)
+            if (images.HasMatchingProperties(tex))
             {
                 // can be used for later
                 textures.Push(tex);
@@ -56,9 +55,9 @@ namespace ImageFramework.Utility
         /// </summary>
         private void Clear()
         {
-            foreach (var textureArray2D in textures)
+            foreach (var tex in textures)
             {
-                textureArray2D.Dispose();
+                tex.Dispose();
             }
             textures.Clear();
         }
@@ -68,7 +67,9 @@ namespace ImageFramework.Utility
             if (args.PropertyName == nameof(ImagesModel.NumLayers) ||
                 args.PropertyName == nameof(ImagesModel.NumMipmaps) ||
                 args.PropertyName == nameof(ImagesModel.Width) ||
-                args.PropertyName == nameof(ImagesModel.Height))
+                args.PropertyName == nameof(ImagesModel.Height) || 
+                args.PropertyName == nameof(ImagesModel.Depth) || 
+                args.PropertyName == nameof(ImagesModel.ImageType))
                 Clear();
         }
 

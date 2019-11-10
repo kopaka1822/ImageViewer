@@ -35,7 +35,7 @@ namespace FrameworkTests.Model
         {
             var model = new ThumbnailModel(new QuadShader());
             var checkers = new TextureArray2D(IO.LoadImage(TestData.Directory + "checkers.dds"));
-            var lvl0Checkers = checkers.CloneWithoutMipmaps();
+            var lvl0Checkers = checkers.CloneWithoutMipmapsT();
 
             var res = model.CreateThumbnail(2, lvl0Checkers, Format.R8G8B8A8_UNorm_SRgb, 0);
 
@@ -51,7 +51,7 @@ namespace FrameworkTests.Model
         {
             var model = new ThumbnailModel(new QuadShader());
             var checkers = new TextureArray2D(IO.LoadImage(TestData.Directory + "checkers.dds"));
-            var lvl1Checkers = checkers.CloneWithoutMipmaps(1);
+            var lvl1Checkers = checkers.CloneWithoutMipmapsT(1);
 
             var res = model.CreateThumbnail(4, lvl1Checkers, Format.R8G8B8A8_UNorm_SRgb, 0);
 

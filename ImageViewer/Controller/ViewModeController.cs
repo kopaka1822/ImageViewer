@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
+using ImageFramework.DirectX;
 using ImageViewer.Controller.TextureViews;
 using ImageViewer.Models;
 using SharpDX;
@@ -71,7 +72,7 @@ namespace ImageViewer.Controller
             if (visible.Count == 1)
             {
                 // draw single image
-                currentView.Draw(models.Pipelines[visible[0]].Image);
+                currentView.Draw((TextureArray2D)models.Pipelines[visible[0]].Image);
             }
             else if (visible.Count == 2)
             {
@@ -86,7 +87,7 @@ namespace ImageViewer.Controller
                     dev.Rasterizer.SetScissorRectangle(0, 0, size.Width, scissorsPos.Y);
 
                 // first image
-                currentView.Draw(models.Pipelines[visible[0]].Image);
+                currentView.Draw((TextureArray2D)models.Pipelines[visible[0]].Image);
 
                 if (models.Display.Split == DisplayModel.SplitMode.Vertical)
                     dev.Rasterizer.SetScissorRectangle(scissorsPos.X, 0, size.Width, size.Height);
@@ -94,7 +95,7 @@ namespace ImageViewer.Controller
                     dev.Rasterizer.SetScissorRectangle(0, scissorsPos.Y, size.Width, size.Height);
 
                 // second image
-                currentView.Draw(models.Pipelines[visible[1]].Image);
+                currentView.Draw((TextureArray2D)models.Pipelines[visible[1]].Image);
             }
             else if (visible.Count == 3 || visible.Count == 4)
             {
@@ -104,20 +105,20 @@ namespace ImageViewer.Controller
 
                 // upper left
                 dev.Rasterizer.SetScissorRectangle(0, 0, scissorsPos.X, scissorsPos.Y);
-                currentView.Draw(models.Pipelines[visible[0]].Image);
+                currentView.Draw((TextureArray2D)models.Pipelines[visible[0]].Image);
 
                 // upper right
                 dev.Rasterizer.SetScissorRectangle(scissorsPos.X, 0, size.Width, scissorsPos.Y);
-                currentView.Draw(models.Pipelines[visible[1]].Image);
+                currentView.Draw((TextureArray2D)models.Pipelines[visible[1]].Image);
 
                 // draw third texture (entire bottom if only 3 are visible, lower left if 4 are visible)
                 dev.Rasterizer.SetScissorRectangle(0, scissorsPos.Y, visible.Count == 3 ? size.Width : scissorsPos.X, size.Height);
-                currentView.Draw(models.Pipelines[visible[2]].Image);
+                currentView.Draw((TextureArray2D)models.Pipelines[visible[2]].Image);
 
                 if(visible.Count == 4)
                 {
                     dev.Rasterizer.SetScissorRectangle(scissorsPos.X, scissorsPos.Y, size.Width, size.Height);
-                    currentView.Draw(models.Pipelines[visible[3]].Image);
+                    currentView.Draw((TextureArray2D)models.Pipelines[visible[3]].Image);
                 }
             }
         }

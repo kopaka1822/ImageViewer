@@ -28,7 +28,7 @@ namespace ImageFramework.Model.Shader
 
         internal ResultT Run(PixelValueShader pixelValueShader, TextureArray2D source, TextureCache cache, int layer = 0, int mipmap = 0)
         {
-            var texDst = cache.GetTexture();
+            var texDst = (TextureArray2D)cache.GetTexture();
             
             // copy pixels from the source image into a texture from the texture cache
             var dev = Device.Get();
@@ -56,7 +56,7 @@ namespace ImageFramework.Model.Shader
 
             // swap textures
             curData.FirstTime = false;
-            var texSrc = cache.GetTexture();
+            var texSrc = (TextureArray2D)cache.GetTexture();
 
             // do scan in x direction from right to left
             while (curWidth > 2)

@@ -197,7 +197,7 @@ namespace ImageFramework.Model.Export
             }
         }
 
-        public void Export(TextureArray2D image, ExportDescription desc)
+        public void Export(ITexture image, ExportDescription desc)
         {
             Debug.Assert(image != null);
 
@@ -250,7 +250,7 @@ namespace ImageFramework.Model.Export
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (image.Format != stagingFormat.DxgiFormat || croppingActive || desc.Multiplier != 1.0f || alignmentActive)
             {
-                using (var tmpTex = convert.Convert(image, stagingFormat.DxgiFormat, Mipmap, Layer,
+                using (var tmpTex = convert.Convert((TextureArray2D)image, stagingFormat.DxgiFormat, Mipmap, Layer,
                     desc.Multiplier, UseCropping, CropStartX, CropStartY, CropEndX - CropStartX + 1, CropEndY - CropStartY + 1,
                     desc.FileFormat.GetAlignmentX(), desc.FileFormat.GetAlignmentY()))
                 {
@@ -260,7 +260,7 @@ namespace ImageFramework.Model.Export
             }
             else
             {
-                ExportTexture(image, desc, Mipmap, Layer);
+                ExportTexture((TextureArray2D)image, desc, Mipmap, Layer);
             }
         }
 

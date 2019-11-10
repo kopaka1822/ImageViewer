@@ -11,7 +11,7 @@ using Resource = SharpDX.Direct3D11.Resource;
 
 namespace ImageFramework.DirectX
 {
-    public abstract class TextureBase<T> : IDisposable where T : TextureBase<T>
+    public abstract class TextureBase<T> : ITexture where T : TextureBase<T>
     {
         public int Width { get; protected set; }
 
@@ -104,13 +104,15 @@ namespace ImageFramework.DirectX
             }
         }
 
-        /// <summary>
-        /// generates new mipmaps
-        /// </summary>
-        public T GenerateMipmapLevels(int levels)
+        public ITexture GenerateMipmapLevels(int levels)
+        {
+            return GenerateMipmapLevelsT(levels);
+        }
+
+        public T GenerateMipmapLevelsT(int levels)
         {
             Debug.Assert(!HasMipmaps);
-            var newTex = Create(NumLayers, levels, Width, Height, Depth, Format, uaViews != null);
+            var newTex = CreateT(NumLayers, levels, Width, Height, Depth, Format, uaViews != null);
 
             // copy all layers
             for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
@@ -132,13 +134,18 @@ namespace ImageFramework.DirectX
             Device.Get().GenerateMips(View);
         }
 
+        public ITexture CloneWithoutMipmaps(int mipmap = 0)
+        {
+            return CloneWithoutMipmapsT(mipmap);
+        }
+
         /// <summary>
         /// creates a new texture that has only one mipmap level
         /// </summary>
         /// <returns></returns>
-        public T CloneWithoutMipmaps(int mipmap = 0)
+        public T CloneWithoutMipmapsT(int mipmap = 0)
         {
-            var newTex = Create(NumLayers, 1, GetWidth(mipmap), GetHeight(mipmap), GetDepth(mipmap), Format,
+            var newTex = CreateT(NumLayers, 1, GetWidth(mipmap), GetHeight(mipmap), GetDepth(mipmap), Format,
                 uaViews != null);
 
             for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
@@ -150,15 +157,25 @@ namespace ImageFramework.DirectX
             return newTex;
         }
 
-        public T Clone()
+        public ITexture Clone()
         {
-            var newTex = Create(NumLayers, NumMipmaps, Width, Height, Depth, Format, uaViews != null);
+            return CloneT();
+        }
+
+        public T CloneT()
+        {
+            var newTex = CreateT(NumLayers, NumMipmaps, Width, Height, Depth, Format, uaViews != null);
 
             Device.Get().CopyResource(GetHandle(), newTex.GetHandle());
             return newTex;
         }
 
-        public abstract T Create(int numLayer, int numMipmaps, int width, int height, int depth, Format format,
+        public ITexture Create(int numLayer, int numMipmaps, int width, int height, int depth, Format format, bool createUav)
+        {
+            return CreateT(numLayer, numMipmaps, width, height, depth, format, createUav);
+        }
+
+        public abstract T CreateT(int numLayer, int numMipmaps, int width, int height, int depth, Format format,
             bool createUav);
 
         protected abstract Resource GetHandle();

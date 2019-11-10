@@ -4,7 +4,8 @@ using System.Linq;
  using System.Runtime.InteropServices;
  using System.Text;
 using System.Threading.Tasks;
-using SharpDX.DXGI;
+ using ImageFramework.DirectX;
+ using SharpDX.DXGI;
 
 namespace ImageFramework.ImageLoader
 {
@@ -36,6 +37,20 @@ namespace ImageFramework.ImageLoader
             Dll.image_info(res.Id, out var gliFormat, out var originalFormat, out var nLayer, out var nMipmaps);
 
             return new Image(res, file, nLayer, nMipmaps, new ImageFormat((GliFormat)gliFormat), (GliFormat)originalFormat);
+        }
+
+        /// <summary>
+        /// loads image into the correct texture type
+        /// </summary>
+        public static ITexture LoadImageTexture(string file, out GliFormat originalFormat)
+        {
+            using (var img = LoadImage(file))
+            {
+                originalFormat = img.OriginalFormat;
+
+                if(img.Is3D) return new Texture3D(img);
+                return new TextureArray2D(img);
+            }
         }
 
         public static Image CreateImage(ImageFormat format, int width, int height, int depth, int layer, int mipmaps)

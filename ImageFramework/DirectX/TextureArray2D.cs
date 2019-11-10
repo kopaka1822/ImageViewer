@@ -104,7 +104,7 @@ namespace ImageFramework.DirectX
             return staging;
         }
 
-        public override TextureArray2D Create(int numLayer, int numMipmaps, int width, int height, int depth, Format format, bool createUav)
+        public override TextureArray2D CreateT(int numLayer, int numMipmaps, int width, int height, int depth, Format format, bool createUav)
         {
             Debug.Assert(depth == 1);
             return new TextureArray2D(numLayer, numMipmaps, width, height, format, createUav);

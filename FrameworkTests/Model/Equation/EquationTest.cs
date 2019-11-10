@@ -13,7 +13,7 @@ namespace FrameworkTests.Model.Equation
         [TestMethod]
         public void BasicEquations()
         {
-            AssertEquals("I0", "GetTexture0(coord.xy)");
+            AssertEquals("I0", "GetTexture0(coord)");
 
             AssertThrow("I-1");
             AssertThrow("");

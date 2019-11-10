@@ -301,7 +301,7 @@ namespace FrameworkTests.Model
             model.AddImageFromFile(TestData.Directory + "small_scaled.png");
             model.Apply();
             model.Export.Quality = 100;
-            var origTex = model.Pipelines[0].Image;
+            var origTex = (TextureArray2D)model.Pipelines[0].Image;
             var origColors = origTex.GetPixelColors(0, 0);
             Color[] newColors = null;
 
@@ -351,7 +351,7 @@ namespace FrameworkTests.Model
             var model = new Models(1);
             model.AddImageFromFile(inputImage);
             model.Apply();
-            var origTex = model.Pipelines[0].Image;
+            var origTex = (TextureArray2D)model.Pipelines[0].Image;
             model.Export.Quality = 100;
 
             model.Export.Export(origTex, new ExportDescription(outputImage, outputExtension, model.Export){FileFormat = format});
@@ -382,7 +382,7 @@ namespace FrameworkTests.Model
             var model = new Models(1);
             model.AddImageFromFile(inputImage);
             model.Apply();
-            var tex = model.Pipelines[0].Image;
+            var tex = (TextureArray2D)model.Pipelines[0].Image;
 
             var eFmt = model.Export.Formats.First(fmt => fmt.Extension == outputExtension);
             string errors = "";
@@ -418,7 +418,7 @@ namespace FrameworkTests.Model
             var model = new Models(1);
             model.AddImageFromFile(TestData.Directory + "gray.png");
             model.Apply();
-            var tex = model.Pipelines[0].Image;
+            var tex = (TextureArray2D)model.Pipelines[0].Image;
             model.Export.Quality = 100;
 
             var eFmt = model.Export.Formats.First(fmt => fmt.Extension == outputExtension);

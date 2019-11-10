@@ -7,17 +7,17 @@ namespace ImageFramework.Model.Shader
 {
     internal class ImageCombineShader : IDisposable
     {
-        private const int LocalSize = 32;
-
         private DirectX.Shader shader;
+        private readonly IShaderBuilder builder;
 
-        public ImageCombineShader(string colorFormula, string alphaFormula, int numImages)
+        public ImageCombineShader(string colorFormula, string alphaFormula, int numImages, IShaderBuilder builder)
         {
+            this.builder = builder;
             shader = new DirectX.Shader(DirectX.Shader.Type.Compute,
-                GetShaderSource(colorFormula, alphaFormula, Math.Max(numImages, 1)), "ImageCombineShader");
+                GetShaderSource(colorFormula, alphaFormula, Math.Max(numImages, 1), builder), "ImageCombineShader");
         }
 
-        public void Run(ImagesModel images, UploadBuffer<LayerLevelFilter> constantBuffer, TextureArray2D target)
+        public void Run(ImagesModel images, UploadBuffer<LayerLevelFilter> constantBuffer, ITexture target)
         {
             var dev = Device.Get();
             dev.Compute.Set(shader.Compute);
@@ -32,6 +32,7 @@ namespace ImageFramework.Model.Shader
             {
                 var width = images.GetWidth(curMipmap);
                 var height = images.GetHeight(curMipmap);
+                var depth = images.GetDepth(curMipmap);
 
                 // dst image
                 dev.Compute.SetUnorderedAccessView(0, target.GetUaView(curMipmap));
@@ -40,7 +41,10 @@ namespace ImageFramework.Model.Shader
                 {
                     constantBuffer.SetData(new LayerLevelFilter{Layer = curLayer, Level = curMipmap});
                     dev.Compute.SetConstantBuffer(0, constantBuffer.Handle);
-                    dev.Dispatch(Utility.Utility.DivideRoundUp(width, LocalSize), Utility.Utility.DivideRoundUp(height, LocalSize));
+                    dev.Dispatch(
+                        Utility.Utility.DivideRoundUp(width, builder.LocalSizeX), 
+                        Utility.Utility.DivideRoundUp(height, builder.LocalSizeY),
+                        Utility.Utility.DivideRoundUp(depth, builder.LocalSizeZ));
                 }
             }
 
@@ -48,30 +52,33 @@ namespace ImageFramework.Model.Shader
             dev.Compute.SetUnorderedAccessView(0, null);
         }
 
-        private static string GetShaderSource(string colorFormula, string alphaFormula, int numImages)
+        private static string GetShaderSource(string colorFormula, string alphaFormula, int numImages, IShaderBuilder builder)
         {
             return
 // global variables
-@"cbuffer InfoBuffer
-{
+$@"cbuffer InfoBuffer
+{{
     uint layer;
     uint level;
-};
-" + GetTextureBindings(numImages) +
-GetTextureGetters(numImages) +
-GetHelperFunctions() +
-Utility.Utility.FromSrgbFunction() +
-Utility.Utility.ToSrgbFunction() +
-"\nRWTexture2DArray<float4> out_tex : register(u0);\n" +
-$"[numthreads({LocalSize},{LocalSize}, 1)]" +
-$@"
+}};
+{GetTextureBindings(numImages, builder)}
+{GetTextureGetters(numImages, builder)}
+{GetHelperFunctions()}
+{Utility.Utility.FromSrgbFunction()}
+{Utility.Utility.ToSrgbFunction()}
+{builder.UavType} out_tex : register(u0);
+[numthreads({builder.LocalSizeX}, {builder.LocalSizeY}, {builder.LocalSizeZ})]
 void main(uint3 coord : SV_DISPATCHTHREADID)
 {{
-    uint width, height, elements, numLvl;
-    texture0.GetDimensions(level, width, height, elements, numLvl);
+    uint width, height, depth, numLvl;
+    texture0.GetDimensions(level, width, height, depth, numLvl);
+    if(!{builder.Is3DString}) coord.z = layer;
+
     if(coord.x >= width || coord.y >= height) return;
+    if({builder.Is3DString} && coord.z >= depth) return;
+
     float4 color = {GetImageColor(colorFormula, alphaFormula)};
-    out_tex[uint3(coord.x, coord.y, layer)] = color;
+    out_tex[uint3(coord.x, coord.y, coord.z)] = color;
 }}
 ";
         }
@@ -81,25 +88,25 @@ void main(uint3 coord : SV_DISPATCHTHREADID)
             return $"float4(({color}).rgb, ({alpha}).a)";
         }
 
-        private static string GetTextureBindings(int numImages)
+        private static string GetTextureBindings(int numImages, IShaderBuilder builder)
         {
             var res = "";
             for (int i = 0; i < numImages; ++i)
             {
                 // binding
-                res += $"Texture2DArray<float4> texture{i} : register(t{i});\n";
+                res += $"{builder.SrvType} texture{i} : register(t{i});\n";
             }
 
             return res;
         }
 
-        private static string GetTextureGetters(int numImages)
+        private static string GetTextureGetters(int numImages, IShaderBuilder builder)
         {
             var res = "";
             for (int i = 0; i < numImages; ++i)
             {
-                res += $"float4 GetTexture{i}(uint2 pixel)" + "{\n";
-                res += $"return texture{i}.mips[level][uint3(pixel.x, pixel.y, layer)];" + "\n}\n";
+                res += $"float4 GetTexture{i}(uint3 pixel)" + "{\n";
+                res += $"return texture{i}.mips[level][uint3(pixel.x, pixel.y, pixel.z)];" + "\n}\n";
             }
 
             return res;
