@@ -174,7 +174,7 @@ namespace ImageViewer.ViewModels
             var texture = model.Image;
             if (texture == null) return;
 
-            var color = models.GetPixelValue(texture, models.Display.TexelPosition.X, models.Display.TexelPosition.Y,
+            var color = models.GetPixelValue(texture, new Size3(models.Display.TexelPosition.X, models.Display.TexelPosition.Y, 0),
                 models.Display.ActiveLayer, models.Display.ActiveMipmap, models.Display.TexelRadius);
 
             texelColor = color;

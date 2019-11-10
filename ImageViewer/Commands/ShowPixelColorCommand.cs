@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Model;
+using ImageFramework.Utility;
 using ImageViewer.Models;
 using ImageViewer.Views.Dialog;
 
@@ -56,7 +57,7 @@ namespace ImageViewer.Commands
                     var tex = models.Pipelines[i].Image;
                     if(tex == null) continue;
 
-                    var color = models.GetPixelValue(tex, models.Display.TexelPosition.X, models.Display.TexelPosition.Y,
+                    var color = models.GetPixelValue(tex, new Size3(models.Display.TexelPosition.X, models.Display.TexelPosition.Y, 0),
                         models.Display.ActiveLayer, models.Display.ActiveMipmap, models.Display.TexelRadius);
 
                     colors.Add(new PixelColorDialog.Element(color, i, models.Statistics[i].Stats.HasAlpha));

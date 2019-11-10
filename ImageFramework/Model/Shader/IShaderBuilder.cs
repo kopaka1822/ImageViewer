@@ -9,7 +9,10 @@ namespace ImageFramework.Model.Shader
 {
     public interface IShaderBuilder
     {
+        // all mipmaps, all layers
         string SrvType { get; }
+        // single mipmap, single layer
+        string SrvSingleType { get; }
         string UavType { get; }
 
         int LocalSizeX { get; }
@@ -18,6 +21,7 @@ namespace ImageFramework.Model.Shader
         bool Is3D { get; }
 
         string Is3DString { get; }
+
     }
 
     public static class ShaderBuilder

@@ -102,7 +102,7 @@ namespace ImageFramework.Model.Shader
             UnbindResources();
 
             // the result is in pixel 0 0 
-            var res = pixelValueShader.Run(texDst, 0, 0, layer, mipmap);
+            var res = pixelValueShader.Run(texDst, new Size3(0), layer, mipmap);
 
             // cleanup
             cache.StoreTexture(texSrc);

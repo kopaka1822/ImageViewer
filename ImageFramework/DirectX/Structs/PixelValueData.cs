@@ -10,10 +10,10 @@ namespace ImageFramework.DirectX.Structs
     {
         public int PixelX;
         public int PixelY;
-        /// width of image
-        public int Width;
-        /// height of image
-        public int Height;
+        public int PixelZ;
         public int Radius;
+        public int SizeX;
+        public int SizeY;
+        public int SizeZ;
     }
 }

@@ -10,6 +10,7 @@ namespace ImageFramework.Model.Shader
     public class ShaderBuilder2D : IShaderBuilder
     {
         public string SrvType => "Texture2DArray<float4>";
+        public string SrvSingleType => "Texture2D<float4>";
 
         public string UavType => "RWTexture2DArray<float4>";
 

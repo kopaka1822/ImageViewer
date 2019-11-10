@@ -107,9 +107,9 @@ namespace ImageFramework.Model
         }
        
         /// <inheritdoc cref="PixelValueShader.Run"/>
-        public Color GetPixelValue(ITexture image, int x, int y, int layer = 0, int mipmap = 0, int radius = 0)
+        public Color GetPixelValue(ITexture image, Size3 coord, int layer = 0, int mipmap = 0, int radius = 0)
         {
-            return pixelValueShader.Run((TextureArray2D)image, x, y, layer, mipmap, radius);
+            return pixelValueShader.Run(image, coord, layer, mipmap, radius);
         }
 
         /// <inheritdoc cref="ThumbnailModel.CreateThumbnail"/>

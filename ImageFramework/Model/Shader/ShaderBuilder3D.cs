@@ -9,6 +9,7 @@ namespace ImageFramework.Model.Shader
     public class ShaderBuilder3D : IShaderBuilder
     {
         public string SrvType => "Texture3D<float4>";
+        public string SrvSingleType => SrvType;
 
         public string UavType => "RWTexture3D<float4>";
 
