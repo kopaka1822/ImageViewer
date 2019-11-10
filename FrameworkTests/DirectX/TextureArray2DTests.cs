@@ -22,8 +22,8 @@ namespace FrameworkTests.DirectX
             // load checkers texture
             var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "checkers.dds"));
             Assert.AreEqual(3, tex.NumMipmaps);
-            Assert.AreEqual(4, tex.Width);
-            Assert.AreEqual(4, tex.Height);
+            Assert.AreEqual(4, tex.Size.Width);
+            Assert.AreEqual(4, tex.Size.Height);
             TestData.TestCheckersLevel0(tex.GetPixelColors(0, 0));
             TestData.TestCheckersLevel1(tex.GetPixelColors(0, 1));
             TestData.TestCheckersLevel2(tex.GetPixelColors(0, 2));
@@ -31,15 +31,15 @@ namespace FrameworkTests.DirectX
             // remove mipmaps
             tex = tex.CloneWithoutMipmapsT();
             Assert.AreEqual(1, tex.NumMipmaps);
-            Assert.AreEqual(4, tex.Width);
-            Assert.AreEqual(4, tex.Height);
+            Assert.AreEqual(4, tex.Size.Width);
+            Assert.AreEqual(4, tex.Size.Height);
             TestData.TestCheckersLevel0(tex.GetPixelColors(0, 0));
 
             // generate mipmaps again
             tex = tex.GenerateMipmapLevelsT(3);
             Assert.AreEqual(3, tex.NumMipmaps);
-            Assert.AreEqual(4, tex.Width);
-            Assert.AreEqual(4, tex.Height);
+            Assert.AreEqual(4, tex.Size.Width);
+            Assert.AreEqual(4, tex.Size.Height);
             TestData.TestCheckersLevel0(tex.GetPixelColors(0, 0));
             TestData.TestCheckersLevel1(tex.GetPixelColors(0, 1));
             TestData.TestCheckersLevel2(tex.GetPixelColors(0, 2));

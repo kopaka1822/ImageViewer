@@ -5,6 +5,7 @@ using System.Linq;
  using System.Text;
 using System.Threading.Tasks;
  using ImageFramework.DirectX;
+ using ImageFramework.Utility;
  using SharpDX.DXGI;
 
 namespace ImageFramework.ImageLoader
@@ -53,9 +54,9 @@ namespace ImageFramework.ImageLoader
             }
         }
 
-        public static Image CreateImage(ImageFormat format, int width, int height, int depth, int layer, int mipmaps)
+        public static Image CreateImage(ImageFormat format, Size3 size, int layer, int mipmaps)
         {
-            var res = new Resource((uint)format.GliFormat, width, height, depth, layer, mipmaps);
+            var res = new Resource((uint)format.GliFormat, size, layer, mipmaps);
 
             return new Image(res, "tmp", layer, mipmaps, format, format.GliFormat);
         }

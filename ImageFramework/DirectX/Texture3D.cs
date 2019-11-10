@@ -18,11 +18,9 @@ namespace ImageFramework.DirectX
     {
         private readonly SharpDX.Direct3D11.Texture3D handle;
 
-        public Texture3D(int numMipmaps, int width, int height, int depth, Format format, bool createUav)
+        public Texture3D(int numMipmaps, Size3 size, Format format, bool createUav)
         {
-            Width = width;
-            Height = height;
-            Depth = depth;
+            Size = size;
             NumLayers = 1;
             NumMipmaps = numMipmaps;
             Format = format;
@@ -34,9 +32,7 @@ namespace ImageFramework.DirectX
 
         public Texture3D(ImageLoader.Image image, int layer = 0)
         {
-            Width = image.GetWidth(0);
-            Height = image.GetHeight(0);
-            Depth = image.GetDepth(0);
+            Size = image.GetSize(0);
             NumLayers = 1;
             NumMipmaps = image.NumMipmaps;
             Format = image.Format.DxgiFormat;
@@ -56,10 +52,10 @@ namespace ImageFramework.DirectX
             CreateTextureViews(false);
         }
 
-        public override Texture3D CreateT(int numLayer, int numMipmaps, int width, int height, int depth, Format format, bool createUav)
+        public override Texture3D CreateT(int numLayer, int numMipmaps, Size3 size, Format format, bool createUav)
         {
             Debug.Assert(numLayer == 1);
-            return new Texture3D(numMipmaps, width, height, depth, format, createUav);
+            return new Texture3D(numMipmaps, size, format, createUav);
         }
 
         protected override Resource GetHandle()
@@ -80,11 +76,12 @@ namespace ImageFramework.DirectX
             Debug.Assert(mipmap >= 0);
             Debug.Assert(mipmap < NumMipmaps);
 
+            var mipDim = Size.GetMip(mipmap);
             var desc = new Texture3DDescription
             {
-                Width = GetWidth(mipmap),
-                Height = GetHeight(mipmap),
-                Depth = GetDepth(mipmap),
+                Width = mipDim.Width,
+                Height = mipDim.Height,
+                Depth = mipDim.Depth,
                 Format = Format,
                 MipLevels = 1,
                 BindFlags = BindFlags.None,
@@ -97,8 +94,7 @@ namespace ImageFramework.DirectX
             var staging = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, desc);
             
             // copy data to staging texture
-            Device.Get().CopySubresource(handle, staging, GetSubresourceIndex(layer, mipmap), 0, 
-                GetWidth(mipmap), GetHeight(mipmap), GetDepth(mipmap));
+            Device.Get().CopySubresource(handle, staging, GetSubresourceIndex(layer, mipmap), 0, mipDim);
 
             return staging;
         }
@@ -107,9 +103,7 @@ namespace ImageFramework.DirectX
         {
             Debug.Assert(NumLayers > 0);
             Debug.Assert(NumMipmaps > 0);
-            Debug.Assert(Width > 0);
-            Debug.Assert(Height > 0);
-            Debug.Assert(Depth > 0);
+            Debug.Assert(Size.Min > 0);
             Debug.Assert(Format != Format.Unknown);
 
             // render target required for mip map generation
@@ -120,9 +114,9 @@ namespace ImageFramework.DirectX
             return new Texture3DDescription
             {
                 Format = Format,
-                Width = Width,
-                Height = Height,
-                Depth = Depth,
+                Width = Size.Width,
+                Height = Size.Height,
+                Depth = Size.Depth,
                 BindFlags = flags,
                 CpuAccessFlags = CpuAccessFlags.None,
                 MipLevels = NumMipmaps,

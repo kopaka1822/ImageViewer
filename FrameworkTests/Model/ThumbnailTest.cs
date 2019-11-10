@@ -23,8 +23,8 @@ namespace FrameworkTests.Model
 
             var res = model.CreateThumbnail(2, checkers, Format.R8G8B8A8_UNorm_SRgb, 0);
 
-            Assert.AreEqual(2, res.Width);
-            Assert.AreEqual(2, res.Height);
+            Assert.AreEqual(2, res.Size.Width);
+            Assert.AreEqual(2, res.Size.Height);
 
             var colors = res.GetPixelColors(0, 0);
             TestData.TestCheckersLevel1(colors);
@@ -39,8 +39,8 @@ namespace FrameworkTests.Model
 
             var res = model.CreateThumbnail(2, lvl0Checkers, Format.R8G8B8A8_UNorm_SRgb, 0);
 
-            Assert.AreEqual(2, res.Width);
-            Assert.AreEqual(2, res.Height);
+            Assert.AreEqual(2, res.Size.Width);
+            Assert.AreEqual(2, res.Size.Height);
 
             var colors = res.GetPixelColors(0, 0);
             TestData.TestCheckersLevel1(colors);
@@ -55,8 +55,8 @@ namespace FrameworkTests.Model
 
             var res = model.CreateThumbnail(4, lvl1Checkers, Format.R8G8B8A8_UNorm_SRgb, 0);
 
-            Assert.AreEqual(4, res.Width);
-            Assert.AreEqual(4, res.Height);
+            Assert.AreEqual(4, res.Size.Width);
+            Assert.AreEqual(4, res.Size.Height);
 
             var colors = res.GetPixelColors(0, 0);
             TestData.TestCheckersLevel0(colors);

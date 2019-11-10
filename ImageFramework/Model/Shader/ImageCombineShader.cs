@@ -30,9 +30,7 @@ namespace ImageFramework.Model.Shader
 
             for (int curMipmap = 0; curMipmap < images.NumMipmaps; ++curMipmap)
             {
-                var width = images.GetWidth(curMipmap);
-                var height = images.GetHeight(curMipmap);
-                var depth = images.GetDepth(curMipmap);
+                var size = images.GetSize(curMipmap);
 
                 // dst image
                 dev.Compute.SetUnorderedAccessView(0, target.GetUaView(curMipmap));
@@ -42,9 +40,9 @@ namespace ImageFramework.Model.Shader
                     constantBuffer.SetData(new LayerLevelFilter{Layer = curLayer, Level = curMipmap});
                     dev.Compute.SetConstantBuffer(0, constantBuffer.Handle);
                     dev.Dispatch(
-                        Utility.Utility.DivideRoundUp(width, builder.LocalSizeX), 
-                        Utility.Utility.DivideRoundUp(height, builder.LocalSizeY),
-                        Utility.Utility.DivideRoundUp(depth, builder.LocalSizeZ));
+                        Utility.Utility.DivideRoundUp(size.Width, builder.LocalSizeX), 
+                        Utility.Utility.DivideRoundUp(size.Height, builder.LocalSizeY),
+                        Utility.Utility.DivideRoundUp(size.Depth, builder.LocalSizeZ));
                 }
             }
 

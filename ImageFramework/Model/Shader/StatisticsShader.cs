@@ -34,12 +34,13 @@ namespace ImageFramework.Model.Shader
             var dev = Device.Get();
             dev.Compute.Set(shader.Compute);
 
+            var dim = source.Size.GetMip(mipmap);
             var curData = new StatisticsData
             {
                 DirectionX = 1,
                 DirectionY = 0,
-                Width = source.GetWidth(mipmap),
-                Height = source.GetHeight(mipmap),
+                Width = dim.Width,
+                Height = dim.Height,
                 Stride = 2,
                 Layer = layer,
                 FirstTime = true,

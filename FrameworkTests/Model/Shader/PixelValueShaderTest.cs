@@ -23,10 +23,10 @@ namespace FrameworkTests.Model.Shader
             // recreate colors by picking them with the shader
             var shader = new PixelValueShader();
             var colors = new Color[refColors.Length];
-            for(int y = 0; y < tex.Height; ++y)
-                for (int x = 0; x < tex.Width; ++x)
+            for(int y = 0; y < tex.Size.Height; ++y)
+                for (int x = 0; x < tex.Size.Width; ++x)
                 {
-                    colors[y * tex.Width + x] = shader.Run(tex, x, y, 0, 0, 0);
+                    colors[y * tex.Size.Width + x] = shader.Run(tex, x, y, 0, 0, 0);
                 }
 
             TestData.CompareColors(refColors, colors, Color.Channel.Rgb);

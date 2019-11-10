@@ -63,9 +63,9 @@ namespace ImageFramework.DirectX
         /// <summary>
         /// copies entire subresource
         /// </summary>
-        public void CopySubresource(Resource src, Resource dst, int srcSubresource, int dstSubresource, int width, int height, int depth)
+        public void CopySubresource(Resource src, Resource dst, int srcSubresource, int dstSubresource, Size3 size)
         {
-            context.CopySubresourceRegion(src, srcSubresource, new ResourceRegion(0, 0, 0, width, height, depth), 
+            context.CopySubresourceRegion(src, srcSubresource, new ResourceRegion(0, 0, 0, size.Width, size.Height, size.Depth), 
                 dst, dstSubresource);
         }
 
@@ -74,17 +74,17 @@ namespace ImageFramework.DirectX
             context.GenerateMips(res);
         }
 
-        public byte[] GetData(Resource res, int subresource, int width, int height, int depth, int pixelByteSize)
+        public byte[] GetData(Resource res, int subresource, Size3 size, int pixelByteSize)
         {
-            var result = new byte[width * height * depth * pixelByteSize];
+            var result = new byte[size.Product * pixelByteSize];
             var data = context.MapSubresource(res, subresource, MapMode.Read, MapFlags.None);
             int srcOffset = 0;
             int dstOffset = 0;
-            int rowSize = width * pixelByteSize;
+            int rowSize = size.Width * pixelByteSize;
             Debug.Assert(rowSize <= data.RowPitch);
 
-            for(int curZ = 0; curZ < depth; ++curZ)
-                for (int curY = 0; curY < height; ++curY)
+            for(int curZ = 0; curZ < size.Depth; ++curZ)
+                for (int curY = 0; curY < size.Height; ++curY)
                 {
                     Marshal.Copy(data.DataPointer + srcOffset, result, dstOffset, rowSize);
 
@@ -97,7 +97,7 @@ namespace ImageFramework.DirectX
             return result;
         }
 
-        public void GetData(Resource res, Format format, int subresource, int width, int height, int depth, IntPtr dst, uint size)
+        public void GetData(Resource res, Format format, int subresource, Size3 dim, IntPtr dst, uint size)
         {
             Debug.Assert(IO.SupportedFormats.Contains(format));
             int pixelSize = 4;
@@ -105,14 +105,14 @@ namespace ImageFramework.DirectX
                 pixelSize = 16;
 
             // verify expected size
-            Debug.Assert((uint)(height * width * depth * pixelSize) == size);
+            Debug.Assert((uint)(dim.Product * pixelSize) == size);
 
             var data = context.MapSubresource(res, subresource, MapMode.Read, MapFlags.None);
-            int rowSize = width * pixelSize;
+            int rowSize = dim.Width * pixelSize;
 
-            for (int curZ = 0; curZ < depth; ++curZ)
+            for (int curZ = 0; curZ < dim.Depth; ++curZ)
             {
-                for (int curY = 0; curY < height; ++curY)
+                for (int curY = 0; curY < dim.Height; ++curY)
                 {
                     Dll.CopyMemory(dst, data.DataPointer, (uint)rowSize);
                     dst += rowSize;
@@ -149,14 +149,14 @@ namespace ImageFramework.DirectX
         /// Mainly for debug purposes
         /// </summary>
         /// <returns></returns>
-        public unsafe Color[] GetColorData(Resource res, Format format, int subresource, int width, int height, int depth)
+        public unsafe Color[] GetColorData(Resource res, Format format, int subresource, Size3 size)
         {
             Debug.Assert(IO.SupportedFormats.Contains(format));
 
             if (format == Format.R32G32B32A32_Float)
             {
-                var tmp = GetData(res, subresource, width, height, depth, 4 * 4);
-                var result = new Color[width * height * depth];
+                var tmp = GetData(res, subresource, size, 4 * 4);
+                var result = new Color[size.Product];
                 fixed (byte* pBuffer = tmp)
                 {
                     for (int i = 0; i < result.Length; i++)
@@ -167,8 +167,8 @@ namespace ImageFramework.DirectX
             }
             else
             {
-                var tmp = GetData(res, subresource, width, height, depth, 4);
-                var result = new Color[width * height * depth];
+                var tmp = GetData(res, subresource, size, 4);
+                var result = new Color[size.Product];
                 bool isSigned = format == Format.R8G8B8A8_SNorm;
                 bool isSrgb = format == Format.R8G8B8A8_UNorm_SRgb;
                 fixed (byte* pBuffer = tmp)

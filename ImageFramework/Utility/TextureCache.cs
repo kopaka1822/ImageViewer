@@ -66,9 +66,7 @@ namespace ImageFramework.Utility
         {
             if (args.PropertyName == nameof(ImagesModel.NumLayers) ||
                 args.PropertyName == nameof(ImagesModel.NumMipmaps) ||
-                args.PropertyName == nameof(ImagesModel.Width) ||
-                args.PropertyName == nameof(ImagesModel.Height) || 
-                args.PropertyName == nameof(ImagesModel.Depth) || 
+                args.PropertyName == nameof(ImagesModel.Size) || 
                 args.PropertyName == nameof(ImagesModel.ImageType))
                 Clear();
         }

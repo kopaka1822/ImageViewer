@@ -34,12 +34,14 @@ namespace ImageFramework.Model.Shader
         /// <returns></returns>
         public Color Run(TextureArray2D image, int x, int y, int layer, int mipmap, int radius = 0)
         {
+            var dim = image.Size.GetMip(mipmap);
+
             cbuffer.SetData(new PixelValueData
             {
                 PixelX = x,
                 PixelY = y,
-                Width = image.GetWidth(mipmap),
-                Height = image.GetHeight(mipmap),
+                Width = dim.Width,
+                Height = dim.Height,
                 Radius = radius
             });
 

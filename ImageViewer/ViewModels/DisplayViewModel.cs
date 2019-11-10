@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Input;
 using ImageFramework.Annotations;
 using ImageFramework.Model;
+using ImageFramework.Utility;
 using ImageViewer.Models;
 using ImageViewer.Views;
 
@@ -82,8 +83,7 @@ namespace ImageViewer.ViewModels
             switch (e.PropertyName)
             {
                 case nameof(ImagesModel.NumMipmaps):
-                case nameof(ImagesModel.Width):
-                case nameof(ImagesModel.Height):
+                case nameof(ImagesModel.Size):
                     CreateMipMapList();
                     break;
                 case nameof(ImagesModel.NumLayers):
@@ -306,26 +306,27 @@ namespace ImageViewer.ViewModels
 
 
         private int lastNumMipmaps = 0;
-        private int lastMipWidth = 0;
-        private int lastMipHeight = 0;
+        private Size3 lastMipSize = Size3.Zero;
         private void CreateMipMapList()
         {
             if (lastNumMipmaps == models.Images.NumMipmaps &&
-                lastMipWidth == models.Images.Width &&
-                lastMipHeight == models.Images.Height) return; // list is already up to date
+                lastMipSize == models.Images.Size) return; // list is already up to date
 
             var isEnabled = EnableMipMaps;
             AvailableMipMaps.Clear();
             for (var curMip = 0; curMip < models.Images.NumMipmaps; ++curMip)
             {
-                AvailableMipMaps.Add(new ComboBoxItem<int>(models.Images.GetWidth(curMip) + "x" + models.Images.GetHeight(curMip), curMip));
+                var txt = models.Images.GetWidth(curMip) + "x" + models.Images.GetHeight(curMip);
+                if (models.Images.Size.Depth > 1)
+                    txt += "x" + models.Images.GetDepth(curMip);
+
+                AvailableMipMaps.Add(new ComboBoxItem<int>(txt, curMip));
             }
 
             SelectedMipMap = AvailableMipMaps.Count != 0 ? AvailableMipMaps[0] : EmptyMipMap;
 
             lastNumMipmaps = models.Images.NumMipmaps;
-            lastMipWidth = models.Images.Width;
-            lastMipHeight = models.Images.Height;
+            lastMipSize = models.Images.Size;
 
             OnPropertyChanged(nameof(AvailableMipMaps));
             if (isEnabled != EnableMipMaps)

@@ -4,10 +4,12 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Shader;
+using ImageFramework.Utility;
 using SharpDX.DXGI;
 
 namespace ImageFramework.Model
@@ -15,14 +17,8 @@ namespace ImageFramework.Model
     public class ImagesModel : INotifyPropertyChanged, IDisposable
     {
         private MitchellNetravaliScaleShader scaleShader;
-        private struct Dimension
-        {
-            public int Width { get; set; }
-            public int Height { get; set; }
-            public int Depth { get; set; }
-        }
 
-        private Dimension[] dimensions = null;
+        private Size3[] dimensions = null;
 
         public class MipmapMismatch : Exception
         {
@@ -87,15 +83,6 @@ namespace ImageFramework.Model
         /// </summary>
         public bool IsHdr => Images.Any(imageData => imageData.IsHdr);
 
-        /// width for the biggest mipmap (or 0 if no images are present)
-        public int Width => Images.Count != 0 ? GetWidth(0) : 0;
-
-        /// height for the biggest mipmap (or 0 if no images are present)
-        public int Height => Images.Count != 0 ? GetHeight(0) : 0;
-
-        /// depth for the biggest mipmap (or 0 if no images are present)
-        public int Depth => Images.Count != 0 ? GetDepth(0) : 0;
-
         public Type ImageType => Images.Count == 0 ? null : Images[0].Image.GetType();
 
         // helper for many other models
@@ -104,7 +91,16 @@ namespace ImageFramework.Model
         /// </summary>
         public int PrevNumImages { get; protected set; } = 0;
 
-        /// width of the mipmap
+        public Size3 Size => Images.Count == 0 ? Size3.Zero : GetSize(0);
+
+        /// size of the mipmap
+        public Size3 GetSize(int mipmap)
+        {
+            Debug.Assert(Images.Count != 0);
+            Debug.Assert(mipmap < NumMipmaps && mipmap >= 0);
+            return dimensions[mipmap];
+        }
+
         public int GetWidth(int mipmap)
         {
             Debug.Assert(Images.Count != 0);
@@ -112,7 +108,6 @@ namespace ImageFramework.Model
             return dimensions[mipmap].Width;
         }
 
-        /// height of the mipmap
         public int GetHeight(int mipmap)
         {
             Debug.Assert(Images.Count != 0);
@@ -120,7 +115,6 @@ namespace ImageFramework.Model
             return dimensions[mipmap].Height;
         }
 
-        /// depth of the mipmap
         public int GetDepth(int mipmap)
         {
             Debug.Assert(Images.Count != 0);
@@ -133,9 +127,7 @@ namespace ImageFramework.Model
         {
             if (tex.NumLayers != NumLayers) return false;
             if (tex.NumMipmaps != NumMipmaps) return false;
-            if (tex.Width != Width) return false;
-            if (tex.Height != Height) return false;
-            if (tex.Depth != Depth) return false;
+            if (tex.Size != Size) return false;
             if (tex.GetType() != ImageType) return false;
             return true;
         }
@@ -162,9 +154,7 @@ namespace ImageFramework.Model
                 OnPropertyChanged(nameof(NumLayers));
                 OnPropertyChanged(nameof(NumMipmaps));
                 OnPropertyChanged(nameof(IsHdr));
-                OnPropertyChanged(nameof(Width));
-                OnPropertyChanged(nameof(Height));
-                OnPropertyChanged(nameof(Depth));
+                OnPropertyChanged(nameof(Size));
                 OnPropertyChanged(nameof(ImageType));
             }
             else // test if compatible with previous images
@@ -176,15 +166,14 @@ namespace ImageFramework.Model
                     throw new Exception(
                         $"{name}: Inconsistent amount of layers. Expected {NumLayers} got {image.NumLayers}");
 
-                if (image.GetWidth(0) != GetWidth(0) || image.GetHeight(0) != GetHeight(0) ||
-                    image.GetDepth(0) != GetDepth(0))
+                if (image.Size != Size)
                 {
-                    if (Depth > 1)
+                    if (Size.Depth > 1)
                         throw new Exception(
-                            $"{name}: Image resolution mismatch. Expected {GetWidth(0)}x{GetHeight(0)}x{GetDepth(0)} but got {image.GetWidth(0)}x{image.GetHeight(0)}x{image.GetDepth(0)}");
+                            $"{name}: Image resolution mismatch. Expected {Size.X}x{Size.Y}x{Size.Z} but got {image.Size.X}x{image.Size.Y}x{image.Size.Z}");
 
                     throw new Exception(
-                        $"{name}: Image resolution mismatch. Expected {GetWidth(0)}x{GetHeight(0)} but got {image.GetWidth(0)}x{image.GetHeight(0)}");
+                        $"{name}: Image resolution mismatch. Expected {Size.X}x{Size.Y} but got {image.Size.X}x{image.Size.Y}");
                 }
 
 
@@ -226,9 +215,7 @@ namespace ImageFramework.Model
                 // everything was resettet
                 OnPropertyChanged(nameof(NumLayers));
                 OnPropertyChanged(nameof(NumMipmaps));
-                OnPropertyChanged(nameof(Width));
-                OnPropertyChanged(nameof(Height));
-                OnPropertyChanged(nameof(Depth));
+                OnPropertyChanged(nameof(Size));
                 OnPropertyChanged(nameof(ImageType));
             }
         }
@@ -270,16 +257,7 @@ namespace ImageFramework.Model
             }
 
             // recalc dimensions array
-            var w = Width;
-            var h = Height;
-            dimensions = new Dimension[levels];
-            for (int i = 0; i < levels; ++i)
-            {
-                dimensions[i].Width = w;
-                dimensions[i].Height = h;
-                w = Math.Max(w / 2, 1);
-                h = Math.Max(h / 2, 1);
-            }
+            InitDimensions(Images[0].Image);
 
             OnPropertyChanged(nameof(NumMipmaps));
         }
@@ -292,23 +270,14 @@ namespace ImageFramework.Model
                 image.DeleteMipmaps();
             }
             // refresh dimensions array
-            var w = Width;
-            var h = Height;
-            dimensions = new Dimension[1];
-            dimensions[0].Width = w;
-            dimensions[0].Height = h;
+            InitDimensions(Images[0].Image);
 
             OnPropertyChanged(nameof(NumMipmaps));
         }
 
-        public static int ComputeMaxMipLevels(int width, int height, int depth)
+        public static int ComputeMaxMipLevels(Size3 size)
         {
-            return ComputeMaxMipLevels(width, Math.Max(height, depth));
-        }
-
-        public static int ComputeMaxMipLevels(int width, int height)
-        {
-            return ComputeMaxMipLevels(Math.Max(width, height));
+            return ComputeMaxMipLevels(size.Max);
         }
 
         public static int ComputeMaxMipLevels(int width)
@@ -321,12 +290,10 @@ namespace ImageFramework.Model
         /// <summary>
         /// scales all images to the given dimensions
         /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        public void ScaleImages(int width, int height)
+        public void ScaleImages(Size3 size)
         {
             if (NumImages == 0) return;
-            if (Width == width && Height == height) return;
+            if (Size == size) return;
             /*var prevMipmaps = NumMipmaps;
 
             foreach (var imageData in Images)
@@ -350,20 +317,15 @@ namespace ImageFramework.Model
         /// <returns></returns>
         private int ComputeMaxMipLevels()
         {
-            return ComputeMaxMipLevels(Width, Height);
+            return ComputeMaxMipLevels(Size.Max);
         }
 
         protected void InitDimensions(ITexture image)
         {
-            dimensions = new Dimension[image.NumMipmaps];
+            dimensions = new Size3[image.NumMipmaps];
             for (var i = 0; i < image.NumMipmaps; ++i)
             {
-                dimensions[i] = new Dimension
-                {
-                    Width = image.GetWidth(i),
-                    Height = image.GetHeight(i),
-                    Depth = image.GetDepth(i)
-                };
+                dimensions[i] = image.Size.GetMip(i);
             }
         }
 
@@ -386,7 +348,7 @@ namespace ImageFramework.Model
         public ITexture CreateEmptyTexture()
         {
             Debug.Assert(images.Count != 0);
-            return images[0].Image.Create(NumLayers, NumMipmaps, Width, Height, Depth, Format.R32G32B32A32_Float, true);
+            return images[0].Image.Create(NumLayers, NumMipmaps, Size, Format.R32G32B32A32_Float, true);
         }
     }
 }

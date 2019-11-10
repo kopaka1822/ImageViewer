@@ -57,8 +57,7 @@ namespace ImageFramework.Model.Shader
             {
                 // dst texture
                 dev.Compute.SetUnorderedAccessView(0, dst.GetUaView(curMipmap));
-                var width = image.GetWidth(curMipmap);
-                var height = image.GetHeight(curMipmap);
+                var size = image.GetSize(curMipmap);
 
                 for (int curLayer = 0; curLayer < image.NumLayers; ++curLayer)
                 {
@@ -76,7 +75,7 @@ namespace ImageFramework.Model.Shader
 
                     dev.Compute.SetConstantBuffer(0, cbuffer.Handle);
 
-                    dev.Dispatch(Utility.Utility.DivideRoundUp(width, localSize), Utility.Utility.DivideRoundUp(height, localSize));
+                    dev.Dispatch(Utility.Utility.DivideRoundUp(size.Width, localSize), Utility.Utility.DivideRoundUp(size.Height, localSize));
                 }
             }
 

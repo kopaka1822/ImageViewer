@@ -306,8 +306,7 @@ namespace ImageViewer.Models
                         RecomputeAspectRatio(lastClientSize);
                     }
                     break;
-                case nameof(ImagesModel.Width):
-                case nameof(ImagesModel.Height):
+                case nameof(ImagesModel.Size):
                     RecomputeAspectRatio(lastClientSize);
                     break;
             }

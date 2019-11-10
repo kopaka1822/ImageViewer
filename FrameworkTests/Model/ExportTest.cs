@@ -101,12 +101,54 @@ namespace FrameworkTests.Model
             model.ExportPipelineImage(ExportDir + "cropped", "dds", GliFormat.RGBA8_SRGB);
             var newTex = new TextureArray2D(IO.LoadImage(ExportDir + "cropped.dds"));
 
-            Assert.AreEqual(2, newTex.Width);
-            Assert.AreEqual(2, newTex.Height);
+            Assert.AreEqual(2, newTex.Size.Width);
+            Assert.AreEqual(2, newTex.Size.Height);
             Assert.AreEqual(2, newTex.NumMipmaps);
 
             TestData.TestCheckersLevel1(newTex.GetPixelColors(0, 0));
             TestData.TestCheckersLevel2(newTex.GetPixelColors(0, 1));
+        }
+
+        [TestMethod]
+        public void Export3DSimple()
+        {
+            var model = new Models(1);
+            var orig = IO.LoadImageTexture(TestData.Directory + "checkers3d.dds", out var format);
+            model.Images.AddImage(orig, "tsts", format);
+            model.Apply();
+            model.Export.Mipmap = -1;
+            
+            model.ExportPipelineImage(ExportDir + "tmp3d", "dds", format);
+
+            var newTex = IO.LoadImageTexture(ExportDir + "tmp3d.dds", out var newFormat);
+            Assert.AreEqual(format, newFormat);
+            Assert.AreEqual(orig.Size, newTex.Size);
+            Assert.AreEqual(orig.NumLayers, newTex.NumLayers);
+            Assert.AreEqual(orig.NumMipmaps, newTex.NumMipmaps);
+
+            TestData.CompareColors(orig.GetPixelColors(0, 0), newTex.GetPixelColors(0, 0));
+            TestData.CompareColors(orig.GetPixelColors(0, 1), newTex.GetPixelColors(0, 1));
+            TestData.CompareColors(orig.GetPixelColors(0, 2), newTex.GetPixelColors(0, 2));
+        }
+
+        [TestMethod]
+        public void Export3DChangeFormat() // only one mipmap + different format
+        {
+            var model = new Models(1);
+            var orig = IO.LoadImageTexture(TestData.Directory + "checkers3d.dds", out var format);
+            model.Images.AddImage(orig, "tsts", format);
+            model.Apply();
+
+            model.Export.Mipmap = 0;
+            model.ExportPipelineImage(ExportDir + "tmp3d", "dds", GliFormat.RGBA32_SFLOAT);
+
+            var newTex = IO.LoadImageTexture(ExportDir + "tmp3d.dds", out var newFormat);
+            Assert.AreEqual(GliFormat.RGBA32_SFLOAT, newFormat);
+            Assert.AreEqual(orig.Size, newTex.Size);
+            Assert.AreEqual(orig.NumLayers, newTex.NumLayers);
+            Assert.AreEqual(1, newTex.NumMipmaps);
+
+            TestData.CompareColors(orig.GetPixelColors(0, 0), newTex.GetPixelColors(0, 0));
         }
 
         [TestMethod]
@@ -323,8 +365,7 @@ namespace FrameworkTests.Model
                         out var resource, out var resourceView, 0, out var alphaMode);
 
                     // convert to obtain color data
-                    using (var newTex = model.Export.convert.ConvertFromRaw(resourceView, origTex.Width, origTex.Height,
-                        Format.R32G32B32A32_Float))
+                    using (var newTex = model.Export.convert.ConvertFromRaw(resourceView, origTex.Size, Format.R32G32B32A32_Float))
                     {
                         resourceView.Dispose();
                         resource.Dispose();
@@ -426,7 +467,7 @@ namespace FrameworkTests.Model
             string errors = "";
             int numErrors = 0;
 
-            var lastTexel = tex.Width * tex.Height - 1;
+            var lastTexel = tex.Size.Product - 1;
             Color[] colors = null;
             foreach (var format in eFmt.Formats)
             {
@@ -438,8 +479,8 @@ namespace FrameworkTests.Model
                     // load and compare gray tone
                     using (var newTex = new TextureArray2D(IO.LoadImage(ExportDir + "gray." + outputExtension)))
                     {
-                        Assert.AreEqual(8, newTex.Width);
-                        Assert.AreEqual(4, newTex.Height);
+                        Assert.AreEqual(8, newTex.Size.Width);
+                        Assert.AreEqual(4, newTex.Size.Height);
                         colors = newTex.GetPixelColors(0, 0);
                         // compare last texel
                         var grayColor = colors[lastTexel];

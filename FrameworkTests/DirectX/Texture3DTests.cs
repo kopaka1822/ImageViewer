@@ -27,9 +27,9 @@ namespace FrameworkTests.DirectX
         public void TestMipmapLoad()
         {
             var tex = new Texture3D(IO.LoadImage(TestData.Directory + "checkers3d.dds"));
-            Assert.AreEqual(4, tex.Width);
-            Assert.AreEqual(4, tex.Height);
-            Assert.AreEqual(4, tex.Depth);
+            Assert.AreEqual(4, tex.Size.Width);
+            Assert.AreEqual(4, tex.Size.Height);
+            Assert.AreEqual(4, tex.Size.Depth);
             Assert.AreEqual(3, tex.NumMipmaps);
 
             // check first two slices

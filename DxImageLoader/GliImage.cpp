@@ -101,7 +101,7 @@ GliImageBase(initTex(nFaces, depth), original)
 	if (m_type == Cubes) m_cube = gli::texture_cube_array(format, gli::extent2d{ width, height }, nLayer, nLevel);
 	else if (m_type == Volume)
 	{
-		assert(nLayer == 0);
+		assert(nLayer == 1);
 		m_volume = gli::texture3d(format, gli::extent3d{ width, height, depth }, nLevel);
 	}
 	else m_array = gli::texture2d_array(format, gli::extent2d{ width, height }, nLayer, nLevel);

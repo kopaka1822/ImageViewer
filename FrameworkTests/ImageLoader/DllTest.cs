@@ -20,8 +20,8 @@ namespace FrameworkTests.ImageLoader
         {
             Assert.AreEqual(1, image.NumMipmaps);
             Assert.AreEqual(1, image.NumLayers);
-            Assert.AreEqual(3, image.GetWidth(0));
-            Assert.AreEqual(3, image.GetHeight(0));
+            Assert.AreEqual(3, image.GetSize(0).Width);
+            Assert.AreEqual(3, image.GetSize(0).Height);
             Assert.AreEqual(Format.R8G8B8A8_UNorm_SRgb, image.Format.DxgiFormat);
 
             TestData.CompareWithSmall(image, channels);
@@ -31,8 +31,8 @@ namespace FrameworkTests.ImageLoader
         {
             Assert.AreEqual(1, image.NumMipmaps);
             Assert.AreEqual(1, image.NumLayers);
-            Assert.AreEqual(3, image.GetWidth(0));
-            Assert.AreEqual(3, image.GetHeight(0));
+            Assert.AreEqual(3, image.GetSize(0).Width);
+            Assert.AreEqual(3, image.GetSize(0).Height);
             Assert.AreEqual(Format.R32G32B32A32_Float, image.Format.DxgiFormat);
 
             TestData.CompareWithSmall(image, channels);

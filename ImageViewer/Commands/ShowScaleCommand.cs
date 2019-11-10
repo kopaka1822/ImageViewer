@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Model;
+using ImageFramework.Utility;
 using ImageViewer.Models;
 using ImageViewer.ViewModels.Dialog;
 using ImageViewer.Views.Dialog;
@@ -39,7 +40,7 @@ namespace ImageViewer.Commands
 
             if (models.Window.ShowDialog(dia) != true) return;
 
-            models.Images.ScaleImages(vm.Width, vm.Height);
+            models.Images.ScaleImages(new Size3(vm.Width, vm.Height));
         }
     }
 }

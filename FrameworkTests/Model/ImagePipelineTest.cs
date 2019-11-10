@@ -145,14 +145,14 @@ namespace FrameworkTests.Model
 
             Assert.IsFalse(model.Pipelines[0].HasChanges);
 
-            model.Images.ScaleImages(5, 6);
+            model.Images.ScaleImages( new Size3(5, 6));
             Assert.IsTrue(model.Pipelines[0].HasChanges);
 
             model.Apply();
-            Assert.AreEqual(5, model.Images.Width);
-            Assert.AreEqual(6, model.Images.Height);
-            Assert.AreEqual(5, model.Pipelines[0].Image.Width);
-            Assert.AreEqual(6, model.Pipelines[0].Image.Height);
+            Assert.AreEqual(5, model.Images.Size.Width);
+            Assert.AreEqual(6, model.Images.Size.Height);
+            Assert.AreEqual(5, model.Pipelines[0].Image.Size.Width);
+            Assert.AreEqual(6, model.Pipelines[0].Image.Size.Height);
         }
     }
 }

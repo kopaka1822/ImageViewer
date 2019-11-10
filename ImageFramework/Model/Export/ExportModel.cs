@@ -169,6 +169,19 @@ namespace ImageFramework.Model.Export
             }
         }
 
+        private int cropStartZ = 0;
+
+        public int CropStartZ
+        {
+            get => cropStartZ;
+            set
+            {
+                if (value == cropStartZ) return;
+                cropStartZ = value;
+                OnPropertyChanged(nameof(CropStartZ));
+            }
+        }
+
         private int cropEndX = 0;
 
         public int CropEndX
@@ -197,6 +210,19 @@ namespace ImageFramework.Model.Export
             }
         }
 
+        private int cropEndZ = 0;
+
+        public int CropEndZ
+        {
+            get => cropEndZ;
+            set
+            {
+                if (value == cropEndZ) return;
+                cropEndZ = value;
+                OnPropertyChanged(nameof(CropEndZ));
+            }
+        }
+
         public void Export(ITexture image, ExportDescription desc)
         {
             Debug.Assert(image != null);
@@ -214,34 +240,44 @@ namespace ImageFramework.Model.Export
                 var mipIdx = Math.Max(Mipmap, 0);
                
                 // general boundaries
-                if(CropStartX < 0 || CropStartX >= image.GetWidth(mipIdx))
+                var mipDim = image.Size.GetMip(mipIdx);
+
+                if(CropStartX < 0 || CropStartX >= mipDim.Width)
                     throw new Exception("export crop start x out of range: " + CropStartX);
-                if(CropStartY < 0 || CropStartY >= image.GetHeight(mipIdx))
+                if(CropStartY < 0 || CropStartY >= mipDim.Height)
                     throw new Exception("export crop start y out of range: " + CropStartY);
-                if(CropEndX < 0 || CropEndX >= image.GetWidth(mipIdx))
+                if(CropStartZ < 0 || CropStartZ >= mipDim.Depth)
+                    throw new Exception("export crop start z out of range: " + CropStartZ);
+
+                if (CropEndX < 0 || CropEndX >= mipDim.Width)
                     throw new Exception("export crop end x out of range: " + CropEndX);
-                if(CropEndY < 0 || CropEndY >= image.GetHeight(mipIdx))
+                if(CropEndY < 0 || CropEndY >= mipDim.Height)
                     throw new Exception("export crop end y out of range: " + CropEndY);
+                if(CropEndZ < 0 || CropEndZ >= mipDim.Depth)
+                    throw new Exception("export crop end z out of range: " + CropEndZ);
 
                 // end >= max
                 if(CropStartX > CropEndX)
                     throw new Exception("export crop start x must be smaller or equal to crop end x");
                 if (CropStartY > CropEndY)
                     throw new Exception("export crop start y must be smaller or equal to crop end y");
+                if(CropStartZ > CropEndZ)
+                    throw new Exception("export crop start z must be smaller or equal to crop end z");
 
                 // set cropping to active if the image was actually cropped
-                if (CropStartX != 0 || CropStartY != 0) croppingActive = true;
-                if (CropEndX != image.GetWidth(mipIdx) - 1) croppingActive = true;
-                if (CropEndY != image.GetHeight(mipIdx) - 1) croppingActive = true;
+                if (CropStartX != 0 || CropStartY != 0 || CropStartZ != 0) croppingActive = true;
+                if (CropEndX != mipDim.Width - 1) croppingActive = true;
+                if (CropEndY != mipDim.Height - 1) croppingActive = true;
+                if (CropEndZ != mipDim.Depth - 1) croppingActive = true;
             }
 
             bool alignmentActive = false;
             if (desc.FileFormat.IsCompressed())
             {
                 var mipIdx = Math.Max(Mipmap, 0);
-                if (image.GetWidth(mipIdx) % desc.FileFormat.GetAlignmentX() != 0)
+                if (image.Size.GetMip(mipIdx).Width % desc.FileFormat.GetAlignmentX() != 0)
                     alignmentActive = true;
-                if (image.GetHeight(mipIdx) % desc.FileFormat.GetAlignmentY() != 0)
+                if (image.Size.GetMip(mipIdx).Height % desc.FileFormat.GetAlignmentY() != 0)
                     alignmentActive = true;
             }
 
@@ -260,11 +296,11 @@ namespace ImageFramework.Model.Export
             }
             else
             {
-                ExportTexture((TextureArray2D)image, desc, Mipmap, Layer);
+                ExportTexture(image, desc, Mipmap, Layer);
             }
         }
 
-        private void ExportTexture(TextureArray2D texture, ExportDescription desc, int mipmap, int layer)
+        private void ExportTexture(ITexture texture, ExportDescription desc, int mipmap, int layer)
         {
             Debug.Assert(desc.StagingFormat.DxgiFormat == texture.Format);
 
@@ -273,8 +309,7 @@ namespace ImageFramework.Model.Export
             int firstLayer = Math.Max(layer, 0);
             int nLayer = layer == -1 ? texture.NumLayers : 1;
 
-            using (var img = IO.CreateImage(desc.StagingFormat, texture.GetWidth(firstMipmap),
-                texture.GetHeight(firstMipmap), 1, nLayer, nMipmaps))
+            using (var img = IO.CreateImage(desc.StagingFormat, texture.Size.GetMip(firstMipmap), nLayer, nMipmaps))
             {
                 // fill with data
                 for (int curLayer = 0; curLayer < nLayer; ++curLayer)

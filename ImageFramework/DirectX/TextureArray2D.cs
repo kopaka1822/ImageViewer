@@ -20,11 +20,10 @@ namespace ImageFramework.DirectX
         private readonly Texture2D handle;
         private ShaderResourceView[] cubeViews;
 
-        public TextureArray2D(int numLayer, int numMipmaps, int width, int height, Format format, bool createUav)
+        public TextureArray2D(int numLayer, int numMipmaps, Size3 size, Format format, bool createUav)
         {
-            Width = width;
-            Height = height;
-            Depth = 1;
+            Debug.Assert(size.Depth == 1);
+            Size = size;
             NumMipmaps = numMipmaps;
             NumLayers = numLayer;
             this.Format = format;
@@ -36,9 +35,7 @@ namespace ImageFramework.DirectX
 
         public TextureArray2D(ImageLoader.Image image)
         {
-            Width = image.GetWidth(0);
-            Height = image.GetHeight(0);
-            Depth = 1;
+            Size = image.GetSize(0);
             NumMipmaps = image.NumMipmaps;
             NumLayers = image.NumLayers;
             Format = image.Format.DxgiFormat;
@@ -78,14 +75,16 @@ namespace ImageFramework.DirectX
             Debug.Assert(layer >= 0);
             Debug.Assert(layer < NumLayers);
 
+            var newSize = Size.GetMip(mipmap);
+
             var desc = new Texture2DDescription
             {
                 ArraySize = 1,
                 BindFlags = BindFlags.None,
                 CpuAccessFlags = CpuAccessFlags.Read,
                 Format = Format,
-                Height = GetHeight(mipmap),
-                Width = GetWidth(mipmap),
+                Height = newSize.Height,
+                Width = newSize.Width,
                 MipLevels = 1,
                 OptionFlags = ResourceOptionFlags.None,
                 SampleDescription = new SampleDescription(1, 0),
@@ -98,16 +97,15 @@ namespace ImageFramework.DirectX
             // copy data to staging resource
             Device.Get().CopySubresource(handle, staging,
                 GetSubresourceIndex(layer, mipmap), 0,
-                GetWidth(mipmap), GetHeight(mipmap), 1
+                newSize
             );
 
             return staging;
         }
 
-        public override TextureArray2D CreateT(int numLayer, int numMipmaps, int width, int height, int depth, Format format, bool createUav)
+        public override TextureArray2D CreateT(int numLayer, int numMipmaps, Size3 size, Format format, bool createUav)
         {
-            Debug.Assert(depth == 1);
-            return new TextureArray2D(numLayer, numMipmaps, width, height, format, createUav);
+            return new TextureArray2D(numLayer, numMipmaps, size, format, createUav);
         }
 
         protected override SharpDX.Direct3D11.Resource GetHandle()
@@ -231,8 +229,7 @@ namespace ImageFramework.DirectX
         {
             Debug.Assert(NumLayers > 0);
             Debug.Assert(NumMipmaps > 0);
-            Debug.Assert(Width > 0);
-            Debug.Assert(Height > 0);
+            Debug.Assert(Size.Min > 0);
             Debug.Assert(Format != Format.Unknown);
 
             // render target required for mip map generation
@@ -250,12 +247,12 @@ namespace ImageFramework.DirectX
                 BindFlags = flags,
                 CpuAccessFlags = CpuAccessFlags.None,
                 Format = Format,
-                Height = Height,
+                Height = Size.Height,
                 MipLevels = NumMipmaps,
                 OptionFlags = optionFlags,
                 SampleDescription = new SampleDescription(1, 0),
                 Usage = ResourceUsage.Default,
-                Width = Width
+                Width = Size.Width
             };
         }
     }

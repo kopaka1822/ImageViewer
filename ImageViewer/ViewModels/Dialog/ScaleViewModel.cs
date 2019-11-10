@@ -15,8 +15,8 @@ namespace ImageViewer.ViewModels.Dialog
         public ScaleViewModel(ImageFramework.Model.Models models)
         {
             this.models = models;
-            Width = models.Images.Width;
-            Height = models.Images.Height;
+            Width = models.Images.Size.Width;
+            Height = models.Images.Size.Height;
         }
 
         public int Width { get; set; }

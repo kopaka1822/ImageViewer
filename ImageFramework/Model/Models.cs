@@ -165,7 +165,7 @@ namespace ImageFramework.Model
 
             // apply changes before exporting
             Apply();
-            Export.Export((TextureArray2D)Pipelines[pipelineId].Image, desc);
+            Export.Export(Pipelines[pipelineId].Image, desc);
         }
 
         public async Task ApplyAsync(CancellationToken ct)

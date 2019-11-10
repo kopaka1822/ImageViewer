@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.ImageLoader;
+using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Device = SharpDX.Direct3D11.Device;
@@ -40,7 +41,7 @@ namespace ImageFramework.Model.Shader
             int layer = -1, float multiplier = 1.0f)
        {
             return Convert(texture, dstFormat, mipmap, layer, multiplier, false, 0, 0, 0, 0, 0, 0);
-        }
+       }
 
         /// <summary>
         /// converts the texture into another format and performs cropping if requested
@@ -73,8 +74,9 @@ namespace ImageFramework.Model.Shader
             // set correct width, height, offsets
             if (!crop)
             {
-                width = texture.GetWidth(firstMipmap);
-                height = texture.GetHeight(firstMipmap);
+                var dim = texture.Size.GetMip(firstMipmap);
+                width = dim.Width;
+                height = dim.Height;
                 xOffset = 0;
                 yOffset = 0;
             }
@@ -111,11 +113,11 @@ namespace ImageFramework.Model.Shader
             if (recomputeMips)
             {
                 // number of mipmaps might have changed
-                nMipmaps = ImagesModel.ComputeMaxMipLevels(width, height);
+                nMipmaps = ImagesModel.ComputeMaxMipLevels(Math.Max(width, height));
                 recomputeMips = nMipmaps > 1;
             }
 
-            var res = new TextureArray2D(nLayer, nMipmaps, width, height, dstFormat, false);
+            var res = new TextureArray2D(nLayer, nMipmaps, new Size3(width, height), dstFormat, false);
 
             var dev = DirectX.Device.Get();
             dev.Vertex.Set(quad.Vertex);
@@ -136,9 +138,10 @@ namespace ImageFramework.Model.Shader
                         Multiplier = multiplier
                     });
 
+                    var dim = res.Size.GetMip(curMipmap);
                     dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
                     dev.OutputMerger.SetRenderTargets(res.GetRtView(curLayer, curMipmap));
-                    dev.SetViewScissors(res.GetWidth(curMipmap), res.GetHeight(curMipmap));
+                    dev.SetViewScissors(dim.Width, dim.Height);
                     dev.DrawQuad();
 
                     if(recomputeMips) break; // only write most detailed mipmap
@@ -160,14 +163,9 @@ namespace ImageFramework.Model.Shader
         /// <summary>
         /// for unit testing purposes. Converts naked srv to TextureArray2D
         /// </summary>
-        /// <param name="srv"></param>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="dstFormat"></param>
-        /// <returns></returns>
-        internal TextureArray2D ConvertFromRaw(SharpDX.Direct3D11.ShaderResourceView srv, int width, int height, SharpDX.DXGI.Format dstFormat)
+        internal TextureArray2D ConvertFromRaw(SharpDX.Direct3D11.ShaderResourceView srv, Size3 size, SharpDX.DXGI.Format dstFormat)
         {
-            var res = new TextureArray2D(1, 1, width, height, dstFormat, false);
+            var res = new TextureArray2D(1, 1, size, dstFormat, false);
 
             var dev = DirectX.Device.Get();
             dev.Vertex.Set(quad.Vertex);
@@ -186,7 +184,7 @@ namespace ImageFramework.Model.Shader
 
             dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
             dev.OutputMerger.SetRenderTargets(res.GetRtView(0, 0));
-            dev.SetViewScissors(width, height);
+            dev.SetViewScissors(size.Width, size.Height);
             dev.DrawQuad();
 
             // remove bindings

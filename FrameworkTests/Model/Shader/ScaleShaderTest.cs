@@ -7,6 +7,7 @@ using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
 using ImageFramework.Model.Shader;
+using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FrameworkTests.Model.Shader
@@ -20,7 +21,7 @@ namespace FrameworkTests.Model.Shader
             var shader = new MitchellNetravaliScaleShader(new QuadShader());
             var checkers = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere.png"));
 
-            var res = shader.Run(checkers, 62, 31);
+            var res = shader.Run(checkers, new Size3(62, 31));
 
             var reference = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere_up.png"));
 
@@ -34,7 +35,7 @@ namespace FrameworkTests.Model.Shader
             var shader = new MitchellNetravaliScaleShader(new QuadShader());
             var checkers = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere.png"));
 
-            var res = shader.Run(checkers, 20, 40);
+            var res = shader.Run(checkers, new Size3(20, 40));
 
             var reference = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere_scaled.png"));
 

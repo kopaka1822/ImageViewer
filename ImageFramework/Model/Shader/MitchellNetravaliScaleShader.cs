@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
+using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using Device = ImageFramework.DirectX.Device;
 
@@ -24,16 +25,16 @@ namespace ImageFramework.Model.Shader
             cbuffer = new UploadBuffer<DirSizeData>(1);
         }
 
-        public TextureArray2D Run(TextureArray2D src, int dstWidth, int dstHeight)
+        public TextureArray2D Run(TextureArray2D src, Size3 dstSize)
         {
-            Debug.Assert(dstWidth != src.Width || dstHeight != src.Height);
+            Debug.Assert(src.Size != dstSize);
             var genMipmaps = src.HasMipmaps;
             var numMipmaps = 1;
             if (genMipmaps)
-                numMipmaps = ImagesModel.ComputeMaxMipLevels(dstWidth, dstHeight);
+                numMipmaps = ImagesModel.ComputeMaxMipLevels(dstSize);
 
-            bool changeWidth = dstWidth != src.Width;
-            bool changeHeight = dstHeight != src.Height;
+            bool changeWidth = dstSize.Width != src.Size.Width;
+            bool changeHeight = dstSize.Height != src.Size.Height;
 
             if (changeWidth)
             {
@@ -42,14 +43,14 @@ namespace ImageFramework.Model.Shader
                 if (changeHeight) // only temporary texture with a single mipmap
                     curMips = 1;
                 
-                var tmp = new TextureArray2D(src.NumLayers, curMips, dstWidth, src.Height, src.Format, false);               
+                var tmp = new TextureArray2D(src.NumLayers, curMips, new Size3(dstSize.Width, src.Size.Height), src.Format, false);               
                 Apply(src, tmp, 1, 0);
                 src = tmp;
             }
 
             if (changeHeight)
             {
-                var tmp = new TextureArray2D(src.NumLayers, numMipmaps, dstWidth, dstHeight, src.Format, false);
+                var tmp = new TextureArray2D(src.NumLayers, numMipmaps, dstSize, src.Format, false);
 
                 Apply(src, tmp, 0, 1);
                 if (changeWidth) // delete temporary texture created by width invocation
@@ -74,12 +75,12 @@ namespace ImageFramework.Model.Shader
             {
                 DirX = dirX,
                 DirY = dirY,
-                SizeX = src.Width,
-                SizeY = src.Height
+                SizeX = src.Size.Width,
+                SizeY = src.Size.Height
             });
 
             dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
-            dev.SetViewScissors(dst.Width, dst.Height);
+            dev.SetViewScissors(dst.Size.Width, dst.Size.Height);
 
             for (var curLayer = 0; curLayer < src.NumLayers; ++curLayer)
             {

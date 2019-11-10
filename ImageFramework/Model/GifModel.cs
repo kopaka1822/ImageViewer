@@ -35,8 +35,8 @@ namespace ImageFramework.Model
 
         public void CreateGif(TextureArray2D left, TextureArray2D right, Config cfg, int layer = 0, int mipmap = 0)
         {
-            Debug.Assert(left.Width == right.Width);
-            Debug.Assert(left.Height == right.Height);
+            //Debug.Assert(left.Width == right.Width);
+            //Debug.Assert(left.Height == right.Height);
             throw new NotImplementedException();
             // delay in milliseconds
             /*int delay = 1000 / cfg.FramesPerSecond;

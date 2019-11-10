@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Utility;
 
 namespace ImageFramework.ImageLoader
 {
@@ -33,25 +34,11 @@ namespace ImageFramework.ImageLoader
             }
         }
 
-        public int GetWidth(int mipmap)
+        public Size3 GetSize(int mipmap)
         {
             if (Layers.Count > 0 && (uint)mipmap < Layers[0].Mipmaps.Count)
-                return Layers[0].Mipmaps[mipmap].Width;
-            return 0;
-        }
-
-        public int GetHeight(int mipmap)
-        {
-            if (Layers.Count > 0 && (uint)mipmap < Layers[0].Mipmaps.Count)
-                return Layers[0].Mipmaps[mipmap].Height;
-            return 0;
-        }
-
-        public int GetDepth(int mipmap)
-        {
-            if (Layers.Count > 0 && (uint)mipmap < Layers[0].Mipmaps.Count)
-                return Layers[0].Mipmaps[mipmap].Depth;
-            return 0;
+                return new Size3(Layers[0].Mipmaps[mipmap].Width, Layers[0].Mipmaps[mipmap].Height, Layers[0].Mipmaps[mipmap].Depth);
+            return Size3.Zero;
         }
 
         public int NumMipmaps => Layers.Count > 0 ? Layers[0].Mipmaps.Count : 0;

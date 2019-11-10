@@ -63,8 +63,8 @@ namespace FrameworkTests.Model.Shader
 
             var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 1);
             Assert.AreEqual(1, newTex.NumMipmaps);
-            Assert.AreEqual(2, newTex.GetWidth(0));
-            Assert.AreEqual(2, newTex.GetHeight(0));
+            Assert.AreEqual(2, newTex.Size.Width);
+            Assert.AreEqual(2, newTex.Size.Height);
 
             TestData.TestCheckersLevel1(newTex.GetPixelColors(0, 0));
         }
@@ -79,8 +79,8 @@ namespace FrameworkTests.Model.Shader
 
             var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, -1, 1.0f, true, 1, 1, 2, 2, 0, 0);
             Assert.AreEqual(1, newTex.NumMipmaps);
-            Assert.AreEqual(2, newTex.GetWidth(0));
-            Assert.AreEqual(2, newTex.GetHeight(0));
+            Assert.AreEqual(2, newTex.Size.Width);
+            Assert.AreEqual(2, newTex.Size.Height);
 
             // should be the same as first mipmap level
             TestData.TestCheckersLevel1(newTex.GetPixelColors(0, 0));
@@ -90,13 +90,13 @@ namespace FrameworkTests.Model.Shader
         public void Alignment()
         {
             var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "unaligned.png"));
-            Assert.AreEqual(3, tex.Width % 4);
-            Assert.AreEqual(1, tex.Height % 4);
+            Assert.AreEqual(3, tex.Size.Width % 4);
+            Assert.AreEqual(1, tex.Size.Height % 4);
             
             // convert with 4 texel alignment
             var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, 0, 1.0f, false, 0, 0, 0, 0, 4, 4);
-            Assert.AreEqual(0, newTex.Width % 4);
-            Assert.AreEqual(0, newTex.Height % 4);
+            Assert.AreEqual(0, newTex.Size.Width % 4);
+            Assert.AreEqual(0, newTex.Size.Height % 4);
         }
     }
 }

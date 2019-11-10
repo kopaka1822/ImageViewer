@@ -24,8 +24,8 @@ namespace ImageConsole.Commands.Export
 
             using (var tex = model.CreateThumbnail(size, model.Pipelines[0].Image))
             {
-                var width = tex.Width;
-                var heigth = tex.Height;
+                var width = tex.Size.Width;
+                var heigth = tex.Size.Height;
                 var bytes = tex.GetBytes(0, 0, (uint)(width * heigth * 4));
 
                 Console.Out.WriteLine(width);

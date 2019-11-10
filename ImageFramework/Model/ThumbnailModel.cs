@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Shader;
+using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
@@ -60,20 +61,20 @@ namespace ImageFramework.Model
             // determine dimensions of output texture
             var width = 0;
             var height = 0;
-            if (texture.Width > texture.Height)
+            if (texture.Size.Width > texture.Size.Height)
             {
                 width = size;
-                height = (texture.Height * size) / texture.Width;
+                height = (texture.Size.Height * size) / texture.Size.Width;
             }
             else
             {
                 height = size;
-                width = (texture.Width * size) / texture.Height;
+                width = (texture.Size.Width * size) / texture.Size.Height;
             }
             Debug.Assert(width <= size);
             Debug.Assert(height <= size);
 
-            var res = new TextureArray2D(1, 1, width, height, dstFormat, false);
+            var res = new TextureArray2D(1, 1, new Size3(width, height), dstFormat, false);
 
             var dev = Device.Get();
             dev.Vertex.Set(quad.Vertex);
@@ -81,7 +82,7 @@ namespace ImageFramework.Model
             
             // compute which mipmap has the closest fit
             var mipmap = 0;
-            var curWidth = texture.Width;
+            var curWidth = texture.Size.Width;
             while (curWidth >= width)
             {
                 ++mipmap;
