@@ -15,7 +15,7 @@ namespace FrameworkTests.DirectX
     public class Texture3DTests
     {
 
-        private static Color[] GetSlice(Color[] data, int startIdx, int count)
+        public static Color[] GetSlice(Color[] data, int startIdx, int count)
         {
             Color[] res = new Color[count];
             for (int i = 0; i < count; ++i)

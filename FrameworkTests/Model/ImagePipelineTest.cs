@@ -1,4 +1,5 @@
-﻿using ImageFramework.DirectX;
+﻿using FrameworkTests.DirectX;
+using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
 using ImageFramework.Utility;
@@ -112,6 +113,27 @@ namespace FrameworkTests.Model
             model.Pipelines[0].Alpha.Formula = "I1";
             model.Apply();
             Assert.IsTrue(ReferenceEquals(model.Pipelines[0].Image, model.Images.Images[1].Image));
+        }
+
+        [TestMethod]
+        public void Checkers3DInvert()
+        {
+            var model = new Models(1);
+            model.AddImageFromFile(TestData.Directory + "checkers3d.dds");
+            model.Apply();
+
+            Assert.IsTrue(ReferenceEquals(model.Pipelines[0].Image, model.Images.Images[0].Image));
+
+            model.Pipelines[0].Color.Formula = "1 - I0";
+            model.Apply();
+            Assert.IsNotNull(model.Pipelines[0].Image);
+
+            var tex = model.Pipelines[0].Image;
+            // compare with checkers texture
+            TestData.TestCheckersLevel0(Texture3DTests.GetSlice(tex.GetPixelColors(0, 0), 2 * 4 * 4, 4 * 4));
+            TestData.TestCheckersLevel0(Texture3DTests.GetSlice(tex.GetPixelColors(0, 0), 3 * 4 * 4, 4 * 4));
+            
+            TestData.TestCheckersLevel1(Texture3DTests.GetSlice(tex.GetPixelColors(0, 1), 2 * 2, 2 * 2));
         }
 
         [TestMethod]
