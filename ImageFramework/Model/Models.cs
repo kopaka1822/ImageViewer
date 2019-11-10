@@ -116,7 +116,7 @@ namespace ImageFramework.Model
         /// Image format will be BGRA8 because this is the format expected for windows bitmaps
         public TextureArray2D CreateThumbnail(int size, ITexture texture, int layer = 0)
         {
-            return thumbnail.CreateThumbnail(size, (TextureArray2D)texture, Format.B8G8R8A8_UNorm_SRgb, layer);
+            return thumbnail.CreateThumbnail(size, texture, Format.B8G8R8A8_UNorm_SRgb, layer);
         }
 
         /// <summary>

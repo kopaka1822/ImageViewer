@@ -16,7 +16,7 @@ namespace ImageFramework.DirectX
     {
         public Size3 Size { get; protected set; }
         public int NumMipmaps { get; protected set; }
-        public bool HasMipmaps { get; protected set; }
+        public bool HasMipmaps => NumMipmaps > 1;
         public int NumLayers { get; protected set; }
         public Format Format { get; protected set; }
 
