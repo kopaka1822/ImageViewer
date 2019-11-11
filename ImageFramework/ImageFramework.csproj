@@ -70,6 +70,7 @@
     <Compile Include="Controller\PipelineController.cs" />
     <Compile Include="DirectX\Device.cs" />
     <Compile Include="DirectX\DownloadBuffer.cs" />
+    <Compile Include="DirectX\GpuBuffer.cs" />
     <Compile Include="DirectX\ITexture.cs" />
     <Compile Include="DirectX\Structs\DirSizeData.cs" />
     <Compile Include="DirectX\Structs\PixelValueData.cs" />
@@ -142,6 +143,7 @@
     <Compile Include="Model\Shader\PixelValueShader.cs" />
     <Compile Include="Model\Shader\QuadShader.cs" />
     <Compile Include="Model\Shader\ConvertFormatShader.cs" />
+    <Compile Include="Model\Shader\ScanShader.cs" />
     <Compile Include="Model\Shader\ShaderBuilder2D.cs" />
     <Compile Include="Model\Shader\ShaderBuilder3D.cs" />
     <Compile Include="Model\Shader\StatisticsShader.cs" />
