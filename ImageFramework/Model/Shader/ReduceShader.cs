@@ -13,7 +13,7 @@ namespace ImageFramework.Model.Shader
     {
         private static readonly int LocalSize = 1024;
         private static readonly int ElementsPerThread = 8;
-        private static readonly int ElementsPerGroup = ElementsPerThread * LocalSize;
+        public static readonly int ElementsPerGroup = ElementsPerThread * LocalSize;
         private readonly string type;
         private readonly string reduceOp;
         private readonly string defaultValue;
@@ -35,7 +35,7 @@ namespace ImageFramework.Model.Shader
         /// performs a reduce on the buffer. The final value will be at buffer[0]
         /// </summary>
         /// <param name="numElements">number of elements for the reduce</param>
-        void Run(GpuBuffer buffer, int numElements)
+        public void Run(GpuBuffer buffer, int numElements)
         {
             Device.Get().Compute.Set(shader.Compute);
             Device.Get().Compute.SetUnorderedAccessView(0, buffer.View);
@@ -44,6 +44,8 @@ namespace ImageFramework.Model.Shader
             {
                 int numGroups = Utility.Utility.DivideRoundUp(numElements, ElementsPerGroup);
                 numBuffer.SetData(numElements);
+                Device.Get().Compute.SetConstantBuffer(0, numBuffer.Handle);
+
                 Device.Get().Dispatch(numGroups, 1);
                 numElements = numGroups;
             }
@@ -54,7 +56,7 @@ namespace ImageFramework.Model.Shader
         private string GetSource()
         {
             return $@"
-RWStructureBuffer<{type}> buffer : register(u0);
+RWStructuredBuffer<{type}> buffer : register(u0);
 
 groupshared {type} cache[{LocalSize}];
 
@@ -88,24 +90,23 @@ void main(uint3 localInvocationID : SV_GroupThreadID, uint3 workGroupID : SV_Gro
     
     {type} res = local[0];
     // perform local reduce
-    [unroll] for(uint i = 1; i < {ElementsPerThread}; ++i)
+    [unroll] for(i = 1; i < {ElementsPerThread}; ++i)
     {{
         res = reduce(res, local[i]);
     }}
 
     // write to shared memory
     cache[localIndex] = res;
-    GroupMemoryBarrierWithGroupSync();
 
     // reduce to cache[0]
     uint stride = {LocalSize} / 2;
-    [unroll] while(stride > 1)
+    [unroll] while(stride >= 1)
     {{
+        GroupMemoryBarrierWithGroupSync();
+        
         if(localIndex < stride)
             cache[localIndex] = reduce(cache[localIndex], cache[localIndex + stride]);
         stride /= 2;
-        [branch] if(stride >= 32) // only one warp left => no memory barriers are required for this
-            GroupMemoryBarrierWithGroupSync();
     }}
 
     // write back result

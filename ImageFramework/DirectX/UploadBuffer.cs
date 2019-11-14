@@ -16,19 +16,22 @@ namespace ImageFramework.DirectX
     public class UploadBuffer<T> : IDisposable where T : struct
     {
         public readonly Buffer Handle;
-        private readonly int elementCount;
+
+        public int ElementCount { get; }
+        public int ByteSize { get; }
 
         public UploadBuffer(int numElements = 1)
         {
             var elementSize = Marshal.SizeOf(typeof(T));
-            elementCount = numElements;
+            ElementCount = numElements;
+            ByteSize = elementSize * ElementCount;
 
             var bufferDesc = new BufferDescription
             {
                 BindFlags = BindFlags.ConstantBuffer,
                 CpuAccessFlags = CpuAccessFlags.None,
                 OptionFlags = ResourceOptionFlags.None,
-                SizeInBytes = Utility.Utility.AlignTo(elementSize * elementCount, 16),
+                SizeInBytes = Utility.Utility.AlignTo(ByteSize, 16),
                 StructureByteStride = elementSize,
                 Usage = ResourceUsage.Default
             };
@@ -38,13 +41,13 @@ namespace ImageFramework.DirectX
 
         public void SetData(T data)
         {
-            Debug.Assert(elementCount == 1);
+            Debug.Assert(ElementCount == 1);
             Device.Get().UpdateBufferData(Handle, data);
         }
 
         public void SetData(T[] data)
         {
-            Debug.Assert(data.Length == elementCount);
+            Debug.Assert(data.Length == ElementCount);
             Device.Get().UpdateBufferData(Handle, data);
         }
 

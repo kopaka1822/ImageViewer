@@ -13,22 +13,25 @@ namespace ImageFramework.DirectX
     /// <summary>
     /// buffer to read back data from the gpu to cpu
     /// </summary>
-    internal class DownloadBuffer<T> : IDisposable where T : struct
+    public class DownloadBuffer<T> : IDisposable where T : struct
     {
         private readonly Buffer gpuBuffer;
         private readonly Buffer stageBuffer;
         public UnorderedAccessView Handle;
 
+        public int ByteSize { get; }
+
         public DownloadBuffer()
         {
             var elementSize = Marshal.SizeOf(typeof(T));
+            ByteSize = elementSize;
 
             var bufferDesc = new BufferDescription
             {
                 BindFlags = BindFlags.UnorderedAccess,
                 CpuAccessFlags = CpuAccessFlags.None,
                 OptionFlags = ResourceOptionFlags.BufferStructured,
-                SizeInBytes = Utility.Utility.AlignTo(elementSize, 16),
+                SizeInBytes = Utility.Utility.AlignTo(ByteSize, 16),
                 StructureByteStride = elementSize,
                 Usage = ResourceUsage.Default
             };
@@ -54,12 +57,17 @@ namespace ImageFramework.DirectX
                 BindFlags = BindFlags.None,
                 CpuAccessFlags = CpuAccessFlags.Read,
                 OptionFlags = ResourceOptionFlags.None,
-                SizeInBytes = Utility.Utility.AlignTo(elementSize, 16),
+                SizeInBytes = Utility.Utility.AlignTo(ByteSize, 16),
                 StructureByteStride = elementSize,
                 Usage = ResourceUsage.Staging
             };
 
             stageBuffer = new Buffer(Device.Get().Handle, stageDesc);
+        }
+
+        public void CopyFrom(GpuBuffer buffer)
+        {
+            Device.Get().CopyBufferData(buffer.Handle, gpuBuffer, ByteSize);
         }
 
         public T GetData()

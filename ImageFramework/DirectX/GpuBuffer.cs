@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -39,6 +40,12 @@ namespace ImageFramework.DirectX
 
             Handle = new Buffer(Device.Get().Handle, bufferDesc);
             View = new UnorderedAccessView(Device.Get().Handle, Handle);
+        }
+
+        public void CopyFrom<T>(UploadBuffer<T> buffer) where T : struct
+        {
+            Debug.Assert(buffer.ByteSize <= ByteSize);
+            Device.Get().CopyBufferData(buffer.Handle, Handle, ByteSize);
         }
 
         public void Dispose()
