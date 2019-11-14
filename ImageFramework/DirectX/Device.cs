@@ -278,5 +278,11 @@ namespace ImageFramework.DirectX
         {
             return context.GetData<int>(query) != 0;
         }
+
+        public void CopyBufferData(Buffer src, Buffer dst, int size, int srcOffset = 0, int dstOffstet = 0)
+        {
+            context.CopySubresourceRegion(src, 0, new ResourceRegion(srcOffset, 0, 0, srcOffset + size, 1, 1), 
+                dst, 0, dstOffstet, 0, 0);
+        }
     }
 }

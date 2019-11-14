@@ -143,7 +143,7 @@
     <Compile Include="Model\Shader\PixelValueShader.cs" />
     <Compile Include="Model\Shader\QuadShader.cs" />
     <Compile Include="Model\Shader\ConvertFormatShader.cs" />
-    <Compile Include="Model\Shader\ScanShader.cs" />
+    <Compile Include="Model\Shader\ReduceShader.cs" />
     <Compile Include="Model\Shader\ShaderBuilder2D.cs" />
     <Compile Include="Model\Shader\ShaderBuilder3D.cs" />
     <Compile Include="Model\Shader\StatisticsShader.cs" />
