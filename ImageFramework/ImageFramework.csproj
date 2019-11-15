@@ -71,6 +71,7 @@
     <Compile Include="DirectX\Device.cs" />
     <Compile Include="DirectX\DownloadBuffer.cs" />
     <Compile Include="DirectX\GpuBuffer.cs" />
+    <Compile Include="DirectX\GpuTimer.cs" />
     <Compile Include="DirectX\ITexture.cs" />
     <Compile Include="DirectX\Structs\DirSizeData.cs" />
     <Compile Include="DirectX\Structs\PixelValueData.cs" />

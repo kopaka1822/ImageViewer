@@ -53,8 +53,8 @@ namespace FrameworkTests.Model.Shader
         [TestMethod]
         public void VeryLarge()
         {
-            // 800 mb of data
-            var upload = new UploadBuffer<float>(1024 * 1024 * 400);
+            // 40 mb of data
+            var upload = new UploadBuffer<float>(1024 * 1024 * 100);
             var data = new float[upload.ElementCount];
             for (int i = 0; i < upload.ElementCount; ++i)
                 data[i] = (float)(i + 1);
@@ -62,7 +62,7 @@ namespace FrameworkTests.Model.Shader
 
             float expected = (float) upload.ElementCount;
 
-            Reduce(upload, new ReduceShader("max(a,b)"));
+            Assert.AreEqual(expected, Reduce(upload, new ReduceShader("max(a,b)")));
         }
 
 
@@ -74,7 +74,14 @@ namespace FrameworkTests.Model.Shader
             {
                 buf.CopyFrom(data);
 
-                shader.Run(buf, data.ElementCount);
+                using (var timer = new GpuTimer())
+                {
+                    timer.Start();
+                    for(int i = 0; i < 100; ++i)
+                        shader.Run(buf, data.ElementCount);
+                    timer.Stop();
+                    Console.WriteLine(timer.GetDelta());
+                }
 
                 using (var res = new DownloadBuffer<T>())
                 {

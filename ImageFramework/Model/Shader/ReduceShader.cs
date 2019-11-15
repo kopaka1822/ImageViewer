@@ -11,7 +11,7 @@ namespace ImageFramework.Model.Shader
 {
     public class ReduceShader : IDisposable
     {
-        private static readonly int LocalSize = 1024;
+        private static readonly int LocalSize = 64;
         private static readonly int ElementsPerThread = 8;
         public static readonly int ElementsPerGroup = ElementsPerThread * LocalSize;
         private readonly string type;

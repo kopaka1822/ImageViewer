@@ -284,5 +284,15 @@ namespace ImageFramework.DirectX
             context.CopySubresourceRegion(src, 0, new ResourceRegion(srcOffset, 0, 0, srcOffset + size, 1, 1), 
                 dst, 0, dstOffstet, 0, 0);
         }
+
+        public void Begin(Asynchronous ass)
+        {
+            context.Begin(ass);
+        }
+
+        public void End(Asynchronous ass)
+        {
+            context.End(ass);
+        }
     }
 }
