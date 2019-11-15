@@ -76,23 +76,19 @@ void main(uint3 localInvocationID : SV_GroupThreadID, uint3 workGroupID : SV_Gro
     uint localIndex = localInvocationID.x;
     uint globalIndex = workGroupID.x * {LocalSize} + localIndex;
 
-    {type} local[{ElementsPerThread}];
+    {type} res = {defaultValue};
     uint offset = workGroupID.x * {ElementsPerGroup} + localIndex;
+
     // read in local data
     [unroll] for(uint i = 0; i < {ElementsPerThread}; ++i)
     {{
+        {type} tmp;
         [flatten] if(offset < u_bufferSize)
-            local[i] = buffer[offset];
+            tmp = buffer[offset];
         else
-            local[i] = {defaultValue};
+            tmp = {defaultValue};
+        res = reduce(res, tmp);
         offset += {LocalSize};
-    }}
-    
-    {type} res = local[0];
-    // perform local reduce
-    [unroll] for(i = 1; i < {ElementsPerThread}; ++i)
-    {{
-        res = reduce(res, local[i]);
     }}
 
     // write to shared memory

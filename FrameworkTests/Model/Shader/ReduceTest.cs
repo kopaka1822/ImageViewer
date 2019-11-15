@@ -53,7 +53,7 @@ namespace FrameworkTests.Model.Shader
         [TestMethod]
         public void VeryLarge()
         {
-            // 40 mb of data
+            // 400 mb of data
             var upload = new UploadBuffer<float>(1024 * 1024 * 100);
             var data = new float[upload.ElementCount];
             for (int i = 0; i < upload.ElementCount; ++i)
@@ -77,7 +77,7 @@ namespace FrameworkTests.Model.Shader
                 using (var timer = new GpuTimer())
                 {
                     timer.Start();
-                    for(int i = 0; i < 100; ++i)
+                    //for(int i = 0; i < 100; ++i)
                         shader.Run(buf, data.ElementCount);
                     timer.Stop();
                     Console.WriteLine(timer.GetDelta());
