@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageFramework.Utility;
 using ImageViewer.Models;
@@ -30,7 +31,7 @@ namespace ImageViewer.Commands
 
         public override bool CanExecute()
         {
-            return models.Images.NumImages > 0;
+            return models.Images.NumImages > 0 && models.Images.ImageType == typeof(TextureArray2D);
         }
 
         public override void Execute()

@@ -61,12 +61,12 @@ namespace ImageFramework.Model
                 Image.Dispose();
             }
 
-            /*public void Scale(int width, int height, MitchellNetravaliScaleShader scale)
+            public void Scale(Size3 size, MitchellNetravaliScaleShader shader)
             {
-                var tmp = scale.Run(Image, width, height);
+                var tmp = shader.Run((TextureArray2D) Image, size);
                 Image.Dispose();
                 Image = tmp;
-            }*/
+            }
         }
 
         private readonly List<ImageData> images = new List<ImageData>();
@@ -294,21 +294,21 @@ namespace ImageFramework.Model
         {
             if (NumImages == 0) return;
             if (Size == size) return;
-            /*var prevMipmaps = NumMipmaps;
+            if (ImageType != typeof(TextureArray2D))
+                throw new Exception("scaling is only supported for 2D images");
+            
+            var prevMipmaps = NumMipmaps;
 
             foreach (var imageData in Images)
             {
-                imageData.Scale(width, height, scaleShader);
+                imageData.Scale(size, scaleShader);
             }
 
             InitDimensions(images[0].Image);
 
-            OnPropertyChanged(nameof(Width));
-            OnPropertyChanged(nameof(Height));
+            OnPropertyChanged(nameof(Size));
             if(prevMipmaps != NumMipmaps)
-                OnPropertyChanged(nameof(NumMipmaps));*/
-
-            throw new NotImplementedException();
+                OnPropertyChanged(nameof(NumMipmaps));
         }
 
         /// <summary>
