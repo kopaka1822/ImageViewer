@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using ImageFramework.Annotations;
 using ImageFramework.Model;
+using ImageFramework.Model.Statistics;
 using ImageViewer.Models;
 
 namespace ImageViewer.ViewModels
@@ -82,25 +83,25 @@ namespace ImageViewer.ViewModels
 
         public string Average
         {
-            get => model.Stats.Avg.Get(viewModel.SelectedChannel.Cargo).ToString(ImageFramework.Model.Models.Culture);
+            get => model.Stats.Get(viewModel.SelectedChannel.Cargo, DefaultStatistics.Metrics.Avg).ToString(ImageFramework.Model.Models.Culture);
             set { }
         }
 
         public string RootAverage
         {
-            get => Math.Sqrt(model.Stats.Avg.Get(viewModel.SelectedChannel.Cargo)).ToString(ImageFramework.Model.Models.Culture);
+            get => Math.Sqrt(model.Stats.Get(viewModel.SelectedChannel.Cargo, DefaultStatistics.Metrics.Avg)).ToString(ImageFramework.Model.Models.Culture);
             set { }
         }
 
         public string Min
         {
-            get => model.Stats.Min.Get(viewModel.SelectedChannel.Cargo).ToString(ImageFramework.Model.Models.Culture);
+            get => model.Stats.Get(viewModel.SelectedChannel.Cargo, DefaultStatistics.Metrics.Min).ToString(ImageFramework.Model.Models.Culture);
             set { }
         }
 
         public string Max
         {
-            get => model.Stats.Max.Get(viewModel.SelectedChannel.Cargo).ToString(ImageFramework.Model.Models.Culture);
+            get => model.Stats.Get(viewModel.SelectedChannel.Cargo, DefaultStatistics.Metrics.Max).ToString(ImageFramework.Model.Models.Culture);
             set { }
         }
 

@@ -22,6 +22,8 @@ namespace ImageFramework.DirectX
         public int ElementCount { get; }
         public int ByteSize { get; }
 
+        private Dictionary<int, UnorderedAccessView> views;
+
         public GpuBuffer(int elementSize, int elementCount)
         {
             ElementSize = elementSize;
@@ -42,6 +44,32 @@ namespace ImageFramework.DirectX
             View = new UnorderedAccessView(Device.Get().Handle, Handle);
         }
 
+        /// <summary>
+        /// returns a uav views with the specified offset
+        /// </summary>
+        UnorderedAccessView GetView(int offset)
+        {
+            Debug.Assert(offset < ElementCount);
+            if(views == null) views = new Dictionary<int, UnorderedAccessView>();
+
+            if (views.TryGetValue(offset, out var hashedView)) return hashedView;
+
+            var newView = new UnorderedAccessView(Device.Get().Handle, Handle, new UnorderedAccessViewDescription
+            {
+                Dimension = UnorderedAccessViewDimension.Buffer,
+                Format = Format.Unknown,
+                Buffer = new UnorderedAccessViewDescription.BufferResource
+                {
+                    FirstElement = offset,
+                    ElementCount = ElementCount - offset,
+                    Flags = UnorderedAccessViewBufferFlags.None
+                }
+            });
+
+            views[offset] = newView;
+            return newView;
+        }
+
         public void CopyFrom<T>(UploadBuffer<T> buffer) where T : struct
         {
             Debug.Assert(buffer.ByteSize <= ByteSize);
@@ -50,6 +78,13 @@ namespace ImageFramework.DirectX
 
         public void Dispose()
         {
+            if (views != null)
+            {
+                foreach (var uav in views)
+                {
+                    uav.Value.Dispose();
+                }
+            }
             View?.Dispose();
             Handle?.Dispose();
         }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageFramework.Model.Shader;
+using ImageFramework.Model.Statistics;
 
 namespace ImageViewer.Models
 {
@@ -62,13 +63,7 @@ namespace ImageViewer.Models
                     display.ActiveView == DisplayModel.ViewMode.CubeMap)
                 {
                     // compute for all layers
-                    Stats = StatisticsModel.Init;
-                    for (int i = 0; i < models.Images.NumLayers; ++i)
-                    {
-                        Stats.Plus(models.GetStatistics(pipe.Image, i, display.ActiveMipmap));
-                    }
-
-                    Stats.Divide((float) models.Images.NumLayers);
+                    Stats = models.GetStatistics(pipe.Image, -1, display.ActiveMipmap);
                 }
                 else // compute for single layer
                 {
@@ -79,13 +74,13 @@ namespace ImageViewer.Models
             }
             else
             {
-                Stats = StatisticsModel.Zero;
+                Stats = DefaultStatistics.Zero;
                 OnPropertyChanged(nameof(Stats));
             }
             
         }
 
-        public StatisticsModel Stats { get; private set; } = StatisticsModel.Zero;
+        public DefaultStatistics Stats { get; private set; } = DefaultStatistics.Zero;
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

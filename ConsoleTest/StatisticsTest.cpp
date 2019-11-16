@@ -24,6 +24,11 @@ public:
 		Assert::AreEqual(1.0f, stats.max.luma, 0.01f);
 		Assert::AreEqual(0.5f, stats.avg.luma, 0.01f);
 
+		// average
+		Assert::AreEqual(0.0f, stats.min.avg);
+		Assert::AreEqual(1.0f, stats.max.avg, 0.01f);
+		Assert::AreEqual(0.5f, stats.avg.avg, 0.01f);
+
 		// lightness
 		Assert::AreEqual(0.0f, stats.min.lightness);
 		Assert::AreEqual(100.0f, stats.max.lightness, 0.5f);

@@ -134,7 +134,6 @@
     <Compile Include="Model\ImagePipeline.cs" />
     <Compile Include="Model\ImagesModel.cs" />
     <Compile Include="Model\Models.cs" />
-    <Compile Include="Model\PreprocessModel.cs" />
     <Compile Include="Model\ProgressModel.cs" />
     <Compile Include="Model\Shader\FilterShader.cs" />
     <Compile Include="Model\Shader\GifShader.cs" />
@@ -148,9 +147,9 @@
     <Compile Include="Model\Shader\ShaderBuilder2D.cs" />
     <Compile Include="Model\Shader\ShaderBuilder3D.cs" />
     <Compile Include="Model\Shader\StatisticsShader.cs" />
-    <Compile Include="Model\Shader\DefaultStatisticsShader.cs" />
     <Compile Include="Model\SharedModel.cs" />
-    <Compile Include="Model\StatisticsModel.cs" />
+    <Compile Include="Model\Statistics\DefaultStatistics.cs" />
+    <Compile Include="Model\Statistics\StatisticsModel.cs" />
     <Compile Include="Model\ThumbnailModel.cs" />
     <Compile Include="Utility\TextureCache.cs" />
     <Compile Include="Properties\Annotations.cs" />

@@ -14,6 +14,7 @@ using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
 using ImageFramework.Model.Filter;
 using ImageFramework.Model.Shader;
+using ImageFramework.Model.Statistics;
 using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
@@ -50,7 +51,7 @@ namespace ImageFramework.Model
 
         private readonly PixelValueShader pixelValueShader;
 
-        private readonly PreprocessModel preprocess;
+        private readonly StatisticsModel stats;
 
         private readonly PipelineController pipelineController;
 
@@ -76,7 +77,7 @@ namespace ImageFramework.Model
             }
             Pipelines = pipelines;
 
-            preprocess = new PreprocessModel();
+            stats = new StatisticsModel();
             thumbnail = new ThumbnailModel(sharedModel.QuadShader);
 
             // pipeline controller
@@ -122,10 +123,11 @@ namespace ImageFramework.Model
         /// <summary>
         /// gets statistics about from the image
         /// </summary>
+        /// <param name="layer">layer to get statistics from or -1 for all layers</param>
         /// <returns></returns>
-        public StatisticsModel GetStatistics(ITexture image, int layer = 0, int mipmap = 0)
+        public DefaultStatistics GetStatistics(ITexture image, int layer = -1, int mipmap = 0)
         {
-            return preprocess.GetStatistics((TextureArray2D)image, layer, mipmap, pixelValueShader, TextureCache);
+            return stats.GetStatisticsFor(image, layer, mipmap);
         }
 
         /// <summary>
@@ -249,7 +251,7 @@ namespace ImageFramework.Model
             //Gif?.Dispose();       
             Images?.Dispose();
             Filter?.Dispose();
-            preprocess?.Dispose();
+            stats?.Dispose();
             TextureCache?.Dispose();
             pipelineController?.Dispose();
             foreach (var imagePipeline in Pipelines)

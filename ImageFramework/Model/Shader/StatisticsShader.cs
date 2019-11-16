@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,154 +10,97 @@ using ImageFramework.Utility;
 
 namespace ImageFramework.Model.Shader
 {
-    public abstract class StatisticsShader<ResultT> : IDisposable
+    public class StatisticsShader : IDisposable
     {
-        private DirectX.Shader shader;
-        private readonly int LocalSize = 128;
+        private readonly DirectX.Shader shader;
+        private readonly DirectX.Shader shader3d;
+        private readonly int LocalSizeX = 128;
+        private readonly int LocalSizeY = 4;
         private readonly UploadBuffer<StatisticsData> cbuffer;
+        private readonly string returnValue;
 
-        protected StatisticsShader()
+        // predefined return values
+        public static readonly string LuminanceValue = "return dot(value.rgb, float3(0.2125, 0.7154, 0.0721))";
+        public static readonly string UniformWeightValue = "return dot(value.rgb, 1.0/3.0)";
+        public static readonly string LightnessValue = @"
+float lum = dot(value.rgb, float3(0.2125, 0.7154, 0.0721));
+return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
+        public static readonly string LumaValue = "return dot(toSrgb(value).rgb, float3(0.299, 0.587, 0.114))";
+        public static readonly string AlphaValue = "return value.a";
+
+        /// <summary>
+        /// shader used for statistics calculation
+        /// </summary>
+        /// <param name="returnValue">one of the values declared above this function (*Value)</param>
+        public StatisticsShader(string returnValue)
         {
+            this.returnValue = returnValue;
             cbuffer = new UploadBuffer<StatisticsData>();
+
+            shader = new DirectX.Shader(DirectX.Shader.Type.Compute, GetSource(ShaderBuilder.Builder2D), "StatisticsShader");
+            shader3d = new DirectX.Shader(DirectX.Shader.Type.Compute, GetSource(ShaderBuilder.Builder3D), "StatisticsShader");
         }
 
-        /// <param name="type">type of statistic for the debug name</param>
-        protected void Init(string type)
+        /// <summary>
+        /// puts statistic data of all pixels into the buffer
+        /// </summary>
+        internal void CopyToBuffer(ITexture source, GpuBuffer buffer, int layer = -1, int mipmap = 0)
         {
-            shader = new DirectX.Shader(DirectX.Shader.Type.Compute, GetSource(), type + "StatisticsShader");
-        }
-
-        internal ResultT Run(PixelValueShader pixelValueShader, TextureArray2D source, TextureCache cache, int layer = 0, int mipmap = 0)
-        {
-            var texDst = (TextureArray2D)cache.GetTexture();
-            
             // copy pixels from the source image into a texture from the texture cache
             var dev = Device.Get();
-            dev.Compute.Set(shader.Compute);
+            if(source.Is3D) dev.Compute.Set(shader3d.Compute);
+            else dev.Compute.Set(shader.Compute);
 
             var dim = source.Size.GetMip(mipmap);
+            var numLayers = source.NumLayers;
             var curData = new StatisticsData
             {
-                DirectionX = 1,
-                DirectionY = 0,
-                Width = dim.Width,
-                Height = dim.Height,
-                Stride = 2,
-                Layer = layer,
-                FirstTime = true,
+                Level = mipmap,
                 TrueBool = true
             };
-            var curWidth = curData.Width;
+
+            if (layer == -1)
+            {
+                dev.Compute.SetShaderResource(0, source.View);
+            }
+            else
+            {
+                // single layer
+                dev.Compute.SetShaderResource(0, source.GetSrView(layer, mipmap));
+                curData.Level = 0; // view with single level
+                numLayers = 1;
+            }
             cbuffer.SetData(curData);
 
-            dev.Compute.SetShaderResource(0, source.GetSrView(layer, mipmap));
-            dev.Compute.SetUnorderedAccessView(0, texDst.GetUaView(mipmap));
+            // buffer big enough?
+            Debug.Assert(buffer.ElementCount >= dim.Product * numLayers);
+
+            dev.Compute.SetUnorderedAccessView(0, buffer.View);
             dev.Compute.SetConstantBuffer(0, cbuffer.Handle);
 
-            dev.Dispatch(Utility.Utility.DivideRoundUp(curWidth, LocalSize * 2), curData.Height);
+            dev.Dispatch(Utility.Utility.DivideRoundUp(dim.Width, LocalSizeX), 
+                Utility.Utility.DivideRoundUp(dim.Height, LocalSizeY),
+                    Math.Max(dim.Depth, numLayers));
 
-            // swap textures
-            curData.FirstTime = false;
-            var texSrc = (TextureArray2D)cache.GetTexture();
-
-            // do scan in x direction from right to left
-            while (curWidth > 2)
-            {
-                curWidth = Utility.Utility.DivideRoundUp(curWidth, 2);
-                curData.Stride *= 2;
-                cbuffer.SetData(curData);
-
-                // swap textures and rebind
-                Swap(ref texSrc, ref texDst);
-                UnbindResources();
-                dev.Compute.SetUnorderedAccessView(0, texDst.GetUaView(mipmap));
-                dev.Compute.SetShaderResource(0, texSrc.GetSrView(layer, mipmap));
-                dev.Compute.SetConstantBuffer(0, cbuffer.Handle);
-
-                dev.Dispatch(Utility.Utility.DivideRoundUp(curWidth, LocalSize * 2), curData.Height);
-            }
-
-            // do final scan in y direction
-            curData.DirectionX = 0;
-            curData.DirectionY = 1;
-            curData.Stride = 2;
-
-            var curHeight = curData.Height;
-            while (curHeight > 1)
-            {
-                cbuffer.SetData(curData);
-
-                // swap textures and rebind
-                Swap(ref texSrc, ref texDst);
-                UnbindResources();
-                dev.Compute.SetUnorderedAccessView(0, texDst.GetUaView(mipmap));
-                dev.Compute.SetShaderResource(0, texSrc.GetSrView(layer, mipmap));
-                dev.Compute.SetConstantBuffer(0, cbuffer.Handle);
-
-                dev.Dispatch(1, Utility.Utility.DivideRoundUp(curHeight, LocalSize * 2));
-
-                curHeight = Utility.Utility.DivideRoundUp(curHeight, 2);
-                curData.Stride *= 2;
-            }
-
-            UnbindResources();
-
-            // the result is in pixel 0 0 
-            var res = pixelValueShader.Run(texDst, new Size3(0), layer, mipmap);
-
-            // cleanup
-            cache.StoreTexture(texSrc);
-            cache.StoreTexture(texDst);
-
-            return GetResult(res, curData.Width * curData.Height);
-        }
-
-        private void UnbindResources()
-        {
-            var dev = Device.Get();
             dev.Compute.SetUnorderedAccessView(0, null);
             dev.Compute.SetShaderResource(0, null);
         }
 
-        private void Swap(ref TextureArray2D t1, ref TextureArray2D t2)
-        {
-            var tmp = t1;
-            t1 = t2;
-            t2 = tmp;
-        }
-
-        private string GetSource()
+        private string GetSource(IShaderBuilder builder)
         {
             return $@"
-Texture2D<float4> src_image : register(t0);
-RWTexture2DArray<float4> dst_image : register(u0);
+{builder.SrvType} src_image : register(t0);
+RWStructuredBuffer<float> dst_buffer : register(u0);
 
 cbuffer InputBuffer : register(b0) {{
-    uint2 direction;
-    uint2 size;
-    uint stride;
-    uint layer;
-    bool firstTime;
+    uint level;
     bool trueBool;
 }};
 
-{GetFunctions()}
-
-float4 combine(float4 a, float4 b) {{
-    {GetCombineFunction()}
-}}
-
-float4 combineSingle(float4 a) {{
-    {GetSingleCombine()}
-}}
-
-float4 oneTimeModify(float4 a) {{
-    {GetOneTimeModifyFunction()}
-}}
+{Utility.Utility.ToSrgbFunction()}
 
 struct ComputeIn {{
-    uint3 local : SV_GROUPTHREADID;
-    uint3 group : SV_GROUPID;
+    uint3 global : SV_DispatchThreadID;
 }};
 
 bool isNan(float v) {{
@@ -177,90 +121,31 @@ float4 zeroNans(float4 v) {{
     return res;
 }}
 
-float4 getPixel(int2 pos) {{
-    float4 value = src_image[pos];
-    if(firstTime) {{
-        // ignore nans
-        value = zeroNans(value);
-        value = oneTimeModify(value);
-    }}
-    return value;
+float getPixel(int3 pos) {{
+    float4 value = src_image.mips[level][pos];
+    value = zeroNans(value);
+    {returnValue};
 }}
 
-[numthreads({LocalSize}, 1, 1)]
+[numthreads({LocalSizeX}, {LocalSizeY}, 1)]
 void main(ComputeIn i){{
-    const uint2 invDir = int2(1, 1) - direction;
-    
-    const uint2 pixelX = (dot(i.group.xy, direction) * {LocalSize} + i.local.x) * direction;
-    const uint2 pixelY = dot(i.group.xy, invDir) * invDir;
-    const uint2 pixel = pixelX + pixelY;
+    uint3 pos = i.global.xyz;
+    uint width, height, depth, numLevels;
+    src_image.GetDimensions(level, width, height, depth, numLevels);
 
-    const uint2 y = dot(pixel, invDir) * invDir;
-    const uint2 x = dot(pixel, direction) * stride * direction;
-    const uint2 x2 = x + direction * (stride / 2);
-
-    const uint2 pos1 = x + y;
-    const uint2 pos2 = x2 + y;
-
-    if(pos1.x >= size.x || pos1.y >= size.y) return;
+    if(pos.x >= width || pos.y >= height) return;
     
-    float4 color;
-    if(pos2.x >= size.x || pos2.y >= size.y) {{
-        // only write the value as is
-        color = combineSingle(getPixel(pos1));
-    }} else {{
-        color = combine(getPixel(pos1), getPixel(pos2));
-    }}
+    float value = getPixel(pos);
     
-    dst_image[uint3(pos1, layer)] = color;
+    dst_buffer[pos.z * width * height  + pos.y * width + pos.x] = value;
 }}
 ";
         }
 
-        /// <summary>
-        /// global functions
-        /// </summary>
-        protected virtual string GetFunctions()
-        {
-            return "";
-        }
-
-        /// <summary>
-        /// this function will be called only once per pixel in the first iteration.
-        /// default is: return a;
-        /// </summary>
-        protected virtual string GetOneTimeModifyFunction()
-        {
-            return "return a;";
-        }
-
-        /// <summary>
-        /// this will be called to combine two pixel values into one.
-        /// default: return a + b;
-        /// </summary>
-        protected virtual string GetCombineFunction()
-        {
-            return "return a + b;";
-        }
-
-        /// <summary>
-        /// this will be called if there is no second pixel to use the combine function.
-        /// default: return a;
-        /// </summary>
-        /// <returns></returns>
-        protected virtual string GetSingleCombine()
-        {
-            return "return a;";
-        }
-
-        /// <summary>
-        /// this function can modify the final result
-        /// </summary>
-        protected abstract ResultT GetResult(Color color, int numPixels);
-
         public void Dispose()
         {
             shader?.Dispose();
+            shader3d?.Dispose();
             cbuffer?.Dispose();
         }
     }

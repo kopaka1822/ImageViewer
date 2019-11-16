@@ -35,24 +35,65 @@ namespace FrameworkTests.Model
             //var cpuStats = CalcCpuStats(models.Pipelines[0].Image.GetPixelColors(0, 0));
 
             // alpha
-            Assert.AreEqual(1.0f, stats.Min.Alpha);
-            Assert.AreEqual(1.0f, stats.Max.Alpha);
-            Assert.AreEqual(1.0f, stats.Avg.Alpha, 0.01f);
+            Assert.AreEqual(1.0f, stats.Alpha.Min);
+            Assert.AreEqual(1.0f, stats.Alpha.Max);
+            Assert.AreEqual(1.0f, stats.Alpha.Avg, 0.01f);
 
             // luminance
-            Assert.AreEqual(0.0f, stats.Min.Luminance);
-            Assert.AreEqual(1.0f, stats.Max.Luminance, 0.01f);
-            Assert.AreEqual(0.5f, stats.Avg.Luminance, 0.01f);
+            Assert.AreEqual(0.0f, stats.Luminance.Min);
+            Assert.AreEqual(1.0f, stats.Luminance.Max, 0.01f);
+            Assert.AreEqual(0.5f, stats.Luminance.Avg, 0.01f);
 
             // luma
-            Assert.AreEqual(0.0f, stats.Min.Average);
-            Assert.AreEqual(1.0f, stats.Max.Average, 0.01f);
-            Assert.AreEqual(0.5f, stats.Avg.Average, 0.01f);
+            Assert.AreEqual(0.0f, stats.Luma.Min);
+            Assert.AreEqual(1.0f, stats.Luma.Max, 0.01f);
+            Assert.AreEqual(0.5f, stats.Luma.Avg, 0.01f);
+
+            // average
+            Assert.AreEqual(0.0f, stats.Average.Min);
+            Assert.AreEqual(1.0f, stats.Average.Max, 0.01f);
+            Assert.AreEqual(0.5f, stats.Average.Avg, 0.01f);
 
             // lightness
-            Assert.AreEqual(0.0f, stats.Min.Lightness);
-            Assert.AreEqual(100.0f, stats.Max.Lightness, 0.5f);
-            Assert.AreEqual(50.0f, stats.Avg.Lightness, 0.5f);
+            Assert.AreEqual(0.0f, stats.Lightness.Min);
+            Assert.AreEqual(100.0f, stats.Lightness.Max, 0.5f);
+            Assert.AreEqual(50.0f, stats.Lightness.Avg, 0.5f);
+        }
+
+        [TestMethod]
+        public void Checkers3D()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "checkers3d.dds");
+            models.Apply();
+
+            // get statistics
+            var stats = models.GetStatistics(models.Pipelines[0].Image);
+
+            // alpha
+            Assert.AreEqual(1.0f, stats.Alpha.Min);
+            Assert.AreEqual(1.0f, stats.Alpha.Max);
+            Assert.AreEqual(1.0f, stats.Alpha.Avg, 0.01f);     
+
+            // luminance
+            Assert.AreEqual(0.0f, stats.Luminance.Min);
+            Assert.AreEqual(1.0f, stats.Luminance.Max, 0.01f);     
+            Assert.AreEqual(0.5f, stats.Luminance.Avg, 0.01f);     
+
+            // luma
+            Assert.AreEqual(0.0f, stats.Luma.Min);
+            Assert.AreEqual(1.0f, stats.Luma.Max, 0.01f);
+            Assert.AreEqual(0.5f, stats.Luma.Avg, 0.01f);
+
+            // average
+            Assert.AreEqual(0.0f, stats.Average.Min);
+            Assert.AreEqual(1.0f, stats.Average.Max, 0.01f);
+            Assert.AreEqual(0.5f, stats.Average.Avg, 0.01f);
+
+            // lightness
+            Assert.AreEqual(0.0f, stats.Lightness.Min);
+            Assert.AreEqual(100.0f, stats.Lightness.Max, 0.5f);
+            Assert.AreEqual(50.0f, stats.Lightness.Avg, 0.5f);
         }
 
         [TestMethod]
@@ -68,9 +109,9 @@ namespace FrameworkTests.Model
             // calculate (alpha) statistics by hand
             var cpuStats = CalcCpuStats(models.Pipelines[0].Image.GetPixelColors(0, 0));
             
-            Assert.AreEqual(cpuStats.Min, stats.Min.Alpha);
-            Assert.AreEqual(cpuStats.Max, stats.Max.Alpha);
-            Assert.AreEqual(cpuStats.Avg, stats.Avg.Alpha, 0.01f);
+            Assert.AreEqual(cpuStats.Min, stats.Alpha.Min);
+            Assert.AreEqual(cpuStats.Max, stats.Alpha.Max);
+            Assert.AreEqual(cpuStats.Avg, stats.Alpha.Avg, 0.01f);
         }
 
         private AlphaStats CalcCpuStats(Color[] colors)

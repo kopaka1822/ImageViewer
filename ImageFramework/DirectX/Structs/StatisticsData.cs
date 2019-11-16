@@ -9,13 +9,7 @@ namespace ImageFramework.DirectX.Structs
 {
     internal struct StatisticsData
     {
-        public int DirectionX;
-        public int DirectionY;
-        public int Width;
-        public int Height;
-        public int Stride;
-        public int Layer;
-        public RawBool FirstTime;
+        public int Level;
         public RawBool TrueBool;
     }
 }

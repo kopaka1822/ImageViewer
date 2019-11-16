@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageFramework.Model.Shader;
+using ImageFramework.Model.Statistics;
 using ImageFramework.Utility;
 using ImageViewer.Properties;
 using ImageViewer.ViewModels;
@@ -101,9 +102,9 @@ namespace ImageViewer.Models
             get => Settings.Default.FilterPath ?? "";
             set => Settings.Default.FilterPath = value;
         }
-        public DefaultStatistics.Values StatisticsChannel
+        public DefaultStatistics.Types StatisticsChannel
         {
-            get => (DefaultStatistics.Values) Settings.Default.StatisticsChannel;
+            get => (DefaultStatistics.Types) Settings.Default.StatisticsChannel;
             set => Settings.Default.StatisticsChannel = (int) value;
         }
 

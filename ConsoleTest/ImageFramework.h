@@ -24,6 +24,7 @@ namespace ImageFramework
 			float luminance;
 			float lightness;
 			float luma;
+			float avg;
 		};
 
 		struct StatisticModel
@@ -127,19 +128,23 @@ namespace ImageFramework
 
 		Statistic GetStatistic(std::string_view name) const
 		{
+			Statistic stat;
+			stat.luminance = GetSingleStatistic(name, "luminance");
+			stat.lightness = GetSingleStatistic(name, "lightness");
+			stat.luma = GetSingleStatistic(name, "luma");
+			stat.avg = GetSingleStatistic(name, "avg");
+			return stat;
+		}
+
+		float GetSingleStatistic(std::string_view metric, std::string_view name) const
+		{
 			m_in.Write("-stats ");
+			m_in.Write(metric);
+			m_in.Write(" ");
 			m_in.Write(name);
 			m_in.Write("\n");
 
-			const auto luminance = ReadLine();
-			const auto lightness = ReadLine();
-			const auto luma = ReadLine();
-
-			Statistic stat;
-			stat.luminance = GetLastFloat(luminance);
-			stat.lightness = GetLastFloat(lightness);
-			stat.luma = GetLastFloat(luma);
-			return stat;
+			return std::stof(ReadLine());
 		}
 
 		static float GetLastFloat(const std::string& text)
