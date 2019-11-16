@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -109,8 +110,29 @@ namespace ImageFramework.DirectX
             }
             catch (Exception e)
             {
-                throw new Exception($"{debugName} compilation failed: {e.Message}\nsource:\n{source}");
+                throw new Exception($"{debugName} compilation failed: {e.Message}\nsource:\n{AddLineNumbers(source)}");
             }
+        }
+
+        private string AddLineNumbers(string source)
+        {
+            int curLine = 1;
+            var r = new StringReader(source);
+            string line;
+            var res = "";
+
+            while ((line = r.ReadLine()) != null)
+            {
+                if (line.StartsWith("#line 1"))
+                    curLine = 0;
+
+                if(!String.IsNullOrWhiteSpace(line))
+                    res += $"{curLine}: {line}\n";
+
+                ++curLine;
+            }
+
+            return res;
         }
 
         private static string GetProfile(Type t)

@@ -135,15 +135,23 @@
     <CopyFileToFolders Include="..\Docs\requirements.md">
       <Filter>Docs</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\Docs\about.md" />
-    <CopyFileToFolders Include="..\Docs\equation.md" />
-    <CopyFileToFolders Include="..\Docs\filter_manual.md" />
-    <CopyFileToFolders Include="..\Docs\README.md" />
     <CopyFileToFolders Include="..\dependencies\lib\glew32.dll">
       <Filter>dll</Filter>
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\dependencies\lib\libktx.gl.dll">
       <Filter>dll</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\about.md">
+      <Filter>Docs</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\equation.md">
+      <Filter>Docs</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\filter_manual.md">
+      <Filter>Docs</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\README.md">
+      <Filter>Docs</Filter>
     </CopyFileToFolders>
   </ItemGroup>
 </Project>

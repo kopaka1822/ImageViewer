@@ -37,6 +37,8 @@ namespace ImageViewer.ViewModels
             this.models.Display.PropertyChanged += DisplayOnPropertyChanged;
             this.models.Settings.PropertyChanged += SettingsOnPropertyChanged;
             this.statistics.PropertyChanged += StatisticsOnPropertyChanged;
+
+            
         }
 
         private void StatisticsOnPropertyChanged(object sender, PropertyChangedEventArgs e)

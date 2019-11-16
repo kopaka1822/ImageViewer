@@ -53,6 +53,8 @@ namespace ImageFramework.Model.Shader
             if(paramBuffer != null)
                 dev.Compute.SetConstantBuffer(1, paramBuffer.Handle);
 
+            dev.Compute.SetShaderResource(1, src.View);
+
             for (int curMipmap = 0; curMipmap < image.NumMipmaps; ++curMipmap)
             {
                 // dst texture
@@ -82,6 +84,7 @@ namespace ImageFramework.Model.Shader
             // remove texture bindings
             dev.Compute.SetUnorderedAccessView(0, null);
             dev.Compute.SetShaderResource(0, null);
+            dev.Compute.SetShaderResource(1, null);
         }
 
         /// <summary>
@@ -116,6 +119,7 @@ namespace ImageFramework.Model.Shader
             return $@"
 RWTexture2DArray<float4> dst_image : register(u0);
 Texture2D<float4> src_image : register(t0);
+Texture2DArray<float4> src_image_ex : register(t1);
 
 cbuffer LayerLevelBuffer : register(b0) {{
     uint layer;

@@ -3,7 +3,7 @@
 	url = https://github.com/nothings/stb.git
 [submodule "dependencies/gli"]
 	path = dependencies/gli
-	url = https://github.com/g-truc/gli.git
+	url = https://github.com/kopaka1822/gli.git
 [submodule "dependencies/tinyexr"]
 	path = dependencies/tinyexr
 	url = https://github.com/syoyo/tinyexr.git

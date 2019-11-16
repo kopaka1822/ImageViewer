@@ -26,6 +26,8 @@ namespace ImageViewer.Controller
         private readonly ModelsEx models;
         private bool mouseDown = false;
         private Point mousePosition = new Point(0);
+        // mouse position for displaying multiple views can be fixed
+        private Point? fixedMousePosition = null;
         private readonly Border dxHost;
         private ITextureView currentView = new EmptyView();
         private TextureViewData viewData;
@@ -70,6 +72,13 @@ namespace ImageViewer.Controller
             var dev = Device.Get();
 
             var visible = models.GetEnabledPipelines();
+
+            var scissorsPos = new Point(mousePosition.X, mousePosition.Y);
+
+            if (visible.Count < 2) fixedMousePosition = null;
+            if(fixedMousePosition != null)
+                scissorsPos = new Point(fixedMousePosition.Value.X, fixedMousePosition.Value.Y);
+
             if (visible.Count == 1)
             {
                 // draw single image
@@ -78,7 +87,7 @@ namespace ImageViewer.Controller
             else if (visible.Count == 2)
             {
                 // draw two images in split view
-                var scissorsPos = new Point(mousePosition.X, mousePosition.Y);
+               
                 scissorsPos.X = Math.Min(size.Width - 1, Math.Max(0, scissorsPos.X));
                 scissorsPos.Y = Math.Min(size.Height - 1, Math.Max(0, scissorsPos.Y));
 
@@ -100,7 +109,6 @@ namespace ImageViewer.Controller
             }
             else if (visible.Count == 3 || visible.Count == 4)
             {
-                var scissorsPos = new Point(mousePosition.X, mousePosition.Y);
                 scissorsPos.X = Math.Min(size.Width - 1, Math.Max(0, scissorsPos.X));
                 scissorsPos.Y = Math.Min(size.Height - 1, Math.Max(0, scissorsPos.Y));
 
@@ -176,6 +184,13 @@ namespace ImageViewer.Controller
                 
 
             mousePosition = new Point((int)e.GetPosition(dxHost).X, (int)e.GetPosition(dxHost).Y);
+
+            // toggle fixed mouse position
+            if (e.ChangedButton == MouseButton.Left && e.ClickCount > 1)
+            {
+                if (fixedMousePosition == null) fixedMousePosition = mousePosition;
+                else fixedMousePosition = null;
+            }
         }
 
         private void DxHostOnMouseWheel(object sender, MouseWheelEventArgs e)

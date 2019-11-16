@@ -32,6 +32,47 @@ namespace ImageFramework.Model.Shader
         }
 
         /// <summary>
+        /// copies a single mip from one layer of a texture to another layer of a texture. The formats don't have to match
+        /// </summary>
+        /// <param name="src">source texture</param>
+        /// <param name="srcLayer"></param>
+        /// <param name="srcMip"></param>
+        /// <param name="dst">destination texture</param>
+        /// <param name="dstLayer"></param>
+        /// <param name="dstMip"></param>
+        public void CopyLayer(TextureArray2D src, int srcLayer, int srcMip, TextureArray2D dst, int dstLayer,
+            int dstMip)
+        {
+            Debug.Assert(src.Size == dst.Size);
+
+            var dev = DirectX.Device.Get();
+            quad.Bind(false);
+            dev.Pixel.Set(convert2D.Pixel);
+
+            dev.Pixel.SetShaderResource(0, src.View);
+
+ 
+            cbuffer.SetData(new LayerLevelOffsetData
+            {
+                Layer = srcLayer,
+                Level = srcMip,
+                Xoffset = 0,
+                Yoffset = 0,
+                Multiplier = 1.0f
+            });
+
+            var dim = dst.Size.GetMip(dstMip);
+            dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
+            dev.OutputMerger.SetRenderTargets(dst.GetRtView(dstLayer, dstMip));
+            dev.SetViewScissors(dim.Width, dim.Height);
+            dev.DrawQuad();
+
+            // remove bindings
+            dev.Pixel.SetShaderResource(0, null);
+            dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+        }
+
+        /// <summary>
         /// converts the texture into another format and performs cropping if requested
         /// </summary>
         /// <param name="texture">source texture</param>

@@ -39,6 +39,9 @@ namespace ImageFramework.Model
 
         public ExportModel Export { get; }
 
+        // soft reset that clears images, filters and resets formulas
+        public event EventHandler SoftReset;
+
         //public GifModel Gif { get; }
 
         public ProgressModel Progress { get; }
@@ -55,7 +58,10 @@ namespace ImageFramework.Model
 
         private readonly PipelineController pipelineController;
 
-        public Models(int numPipelines)
+
+        private readonly ConvertPolarShader polarConvertShader;
+
+        public Models(int numPipelines = 1)
         {
             NumPipelines = numPipelines;
             CheckDeviceCapabilities();
@@ -64,6 +70,7 @@ namespace ImageFramework.Model
             Images = new ImagesModel(sharedModel.ScaleShader);
             TextureCache = new TextureCache(Images);
             pixelValueShader = new PixelValueShader();
+            polarConvertShader = new ConvertPolarShader(sharedModel.QuadShader);
 
             Export = new ExportModel(sharedModel);
             Filter = new FiltersModel();
@@ -82,6 +89,21 @@ namespace ImageFramework.Model
 
             // pipeline controller
             pipelineController = new PipelineController(this);
+        }
+
+        // removes all images, filters and resets equations
+        public void Reset()
+        {
+            Images.Clear();
+            Filter.Clear();
+            int id = 0;
+            foreach (var pipe in Pipelines)
+            {
+                pipe.Color.Formula = "I" + id;
+                pipe.Alpha.Formula = "I" + id;
+                ++id;
+            }
+            OnSoftReset();
         }
 
         private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -147,6 +169,39 @@ namespace ImageFramework.Model
                 tex.Dispose();
                 throw;
             }
+        }
+
+        /// <summary>
+        /// takes a list of textures and combines them into an array.
+        /// </summary>
+        /// <param name="textures">list of images with same dimensions and no layers</param>
+        /// <returns>combined image</returns>
+        public TextureArray2D CombineToArray(List<TextureArray2D> textures)
+        {
+            if (textures.Count == 0) return null;
+            var first = textures[0];
+            var tex = new TextureArray2D(textures.Count, first.NumMipmaps, first.Size, Format.R32G32B32A32_Float, false);
+            for(int i = 0; i < textures.Count; ++i)
+            {
+                for (int curMip = 0; curMip < first.NumMipmaps; ++curMip)
+                {
+                    sharedModel.Convert.CopyLayer(textures[i], 0, curMip, tex, i, curMip);
+                }
+            }
+
+            return tex;
+        }
+
+        /// converts lat long to cubemap
+        public TextureArray2D ConvertToCubemap(TextureArray2D latLong, int resolution)
+        {
+            return polarConvertShader.ConvertToCube(latLong, resolution);
+        }
+
+        /// converts cubemap to lat long
+        public TextureArray2D ConvertToLatLong(TextureArray2D cube, int resolution)
+        {
+            return polarConvertShader.ConvertToLatLong(cube, resolution);
         }
 
         /// <summary>
@@ -247,14 +302,11 @@ namespace ImageFramework.Model
 
         public virtual void Dispose()
         {
-            Export?.Dispose();
             //Gif?.Dispose();       
             Images?.Dispose();
             Filter?.Dispose();
-            stats?.Dispose();
-            TextureCache?.Dispose();
-            pipelineController?.Dispose();
-            foreach (var imagePipeline in Pipelines)
+            polarConvertShader?.Dispose();
+            foreach (var imagePipeline in pipelines)
             {
                 imagePipeline.Dispose();
             }
@@ -268,6 +320,11 @@ namespace ImageFramework.Model
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected virtual void OnSoftReset()
+        {
+            SoftReset?.Invoke(this, EventArgs.Empty);
         }
     }
 }

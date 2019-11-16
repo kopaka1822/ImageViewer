@@ -31,6 +31,7 @@
             </MenuItem>
             <MenuItem
                     Header="Import Equation Image"
+                    ToolTip="Adds one of the visible equations to the imported images list"
                     IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
                     <Image Source="../Icons/import.png"/>
@@ -63,6 +64,15 @@
                         <system:Int32>3</system:Int32>
                     </MenuItem.CommandParameter>
                 </MenuItem>
+            </MenuItem>
+            <MenuItem
+                Header="Import as Array"
+                ToolTip="Combines multiple images into a single texture array on import"
+                IsEnabled="{Binding Progress.NotProcessing}"
+                Command="{Binding ImportArrayCommand}">
+                <MenuItem.Icon>
+                    <Image Source="../Icons/image_layer.png"/>
+                </MenuItem.Icon>
             </MenuItem>
             <Separator/>
             <MenuItem 
@@ -144,6 +154,7 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <Separator/>
             <MenuItem 
                     Header="Generate Mipmaps"
                     Command="{Binding GenerateMipmapsCommand}"
@@ -164,6 +175,30 @@
                             Source="../Icons/cancel.png"
                             Width="16" 
                             Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
+
+            <Separator/>
+            <MenuItem
+                Header="LatLong to Cubemap"
+                Command="{Binding LatLongToCubemapCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/cube.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem
+                Header="Cubemap to LatLong"
+                Command="{Binding CubemapToLatLongCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/image_long.png"
+                        Width="16"
+                        Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
             <!--<MenuItem 

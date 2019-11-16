@@ -74,6 +74,7 @@ namespace ImageViewer.ViewModels
         {
             if (args.PropertyName != nameof(FormulaModel.Formula)) return;
             // this property probably changed
+            Formula = model.Formula;
             OnPropertyChanged(nameof(HasChanges));
         }
 

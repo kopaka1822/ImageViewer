@@ -135,6 +135,7 @@
     <Compile Include="Model\ImagesModel.cs" />
     <Compile Include="Model\Models.cs" />
     <Compile Include="Model\ProgressModel.cs" />
+    <Compile Include="Model\Shader\ConvertPolarShader.cs" />
     <Compile Include="Model\Shader\FilterShader.cs" />
     <Compile Include="Model\Shader\GifShader.cs" />
     <Compile Include="Model\Shader\ImageCombineShader.cs" />
@@ -212,6 +213,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Filter\heightToNormal.hlsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Filter\flip_cubemap.hlsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
