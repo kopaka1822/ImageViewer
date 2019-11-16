@@ -123,6 +123,9 @@ namespace FrameworkTests.Model
             model.Apply();
 
             Assert.IsTrue(ReferenceEquals(model.Pipelines[0].Image, model.Images.Images[0].Image));
+            TestData.TestCheckers3DLevel0(model.Pipelines[0].Image.GetPixelColors(0, 0));
+            TestData.TestCheckers3DLevel1(model.Pipelines[0].Image.GetPixelColors(0, 1));
+            TestData.TestCheckersLevel2(model.Pipelines[0].Image.GetPixelColors(0, 2));
 
             model.Pipelines[0].Color.Formula = "1 - I0";
             model.Apply();
@@ -130,10 +133,13 @@ namespace FrameworkTests.Model
 
             var tex = model.Pipelines[0].Image;
             // compare with checkers texture
-            TestData.TestCheckersLevel0(Texture3DTests.GetSlice(tex.GetPixelColors(0, 0), 2 * 4 * 4, 4 * 4));
-            TestData.TestCheckersLevel0(Texture3DTests.GetSlice(tex.GetPixelColors(0, 0), 3 * 4 * 4, 4 * 4));
+            TestData.TestCheckersLevel0Inverted(TestData.GetSlice(tex.GetPixelColors(0, 0), 0 * 4 * 4, 4 * 4));
+            TestData.TestCheckersLevel0Inverted(TestData.GetSlice(tex.GetPixelColors(0, 0), 1 * 4 * 4, 4 * 4));
+            TestData.TestCheckersLevel0(TestData.GetSlice(tex.GetPixelColors(0, 0), 2 * 4 * 4, 4 * 4));
+            TestData.TestCheckersLevel0(TestData.GetSlice(tex.GetPixelColors(0, 0), 3 * 4 * 4, 4 * 4));
             
-            TestData.TestCheckersLevel1(Texture3DTests.GetSlice(tex.GetPixelColors(0, 1), 2 * 2, 2 * 2));
+            TestData.TestCheckersLevel1Inverted(TestData.GetSlice(tex.GetPixelColors(0, 1), 0, 2 * 2));
+            TestData.TestCheckersLevel1(TestData.GetSlice(tex.GetPixelColors(0, 1), 2 * 2, 2 * 2));
         }
 
         [TestMethod]

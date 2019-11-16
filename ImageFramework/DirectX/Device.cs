@@ -81,9 +81,11 @@ namespace ImageFramework.DirectX
             int srcOffset = 0;
             int dstOffset = 0;
             int rowSize = size.Width * pixelByteSize;
+            int sliceOffset = data.SlicePitch - data.RowPitch * size.Height;
             Debug.Assert(rowSize <= data.RowPitch);
 
-            for(int curZ = 0; curZ < size.Depth; ++curZ)
+            for (int curZ = 0; curZ < size.Depth; ++curZ)
+            {
                 for (int curY = 0; curY < size.Height; ++curY)
                 {
                     Marshal.Copy(data.DataPointer + srcOffset, result, dstOffset, rowSize);
@@ -91,6 +93,8 @@ namespace ImageFramework.DirectX
                     srcOffset += data.RowPitch;
                     dstOffset += rowSize;
                 }
+                srcOffset += sliceOffset;
+            }
 
             context.UnmapSubresource(res, subresource);
 
@@ -109,6 +113,7 @@ namespace ImageFramework.DirectX
 
             var data = context.MapSubresource(res, subresource, MapMode.Read, MapFlags.None);
             int rowSize = dim.Width * pixelSize;
+            int sliceOffset = data.SlicePitch - data.RowPitch * dim.Height;
 
             for (int curZ = 0; curZ < dim.Depth; ++curZ)
             {
@@ -118,6 +123,7 @@ namespace ImageFramework.DirectX
                     dst += rowSize;
                     data.DataPointer += data.RowPitch;
                 }
+                data.DataPointer += sliceOffset;
             }
 
             context.UnmapSubresource(res, subresource);

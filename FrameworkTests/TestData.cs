@@ -40,6 +40,14 @@ namespace FrameworkTests
             }
         }
 
+        public static Color[] GetSlice(Color[] data, int startIdx, int count)
+        {
+            Color[] res = new Color[count];
+            for (int i = 0; i < count; ++i)
+                res[i] = data[startIdx + i];
+            return res;
+        }
+
         public static void TestCheckersLevel0(Color[] colors)
         {
             Assert.AreEqual(4 * 4, colors.Length);
@@ -64,6 +72,39 @@ namespace FrameworkTests
             Assert.IsTrue(colors[15].Equals(Color.Black, Color.Channel.Rgb));
         }
 
+        public static void TestCheckersLevel0Inverted(Color[] colors)
+        {
+            Assert.AreEqual(4 * 4, colors.Length);
+            Assert.IsTrue(colors[0].Equals(Color.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[1].Equals(Color.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[2].Equals(Color.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[3].Equals(Color.Black, Color.Channel.Rgb));
+
+            Assert.IsTrue(colors[4].Equals(Color.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[5].Equals(Color.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[6].Equals(Color.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[7].Equals(Color.Black, Color.Channel.Rgb));
+
+            Assert.IsTrue(colors[8].Equals(Color.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[9].Equals(Color.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[10].Equals(Color.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[11].Equals(Color.White, Color.Channel.Rgb));
+
+            Assert.IsTrue(colors[12].Equals(Color.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[13].Equals(Color.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[14].Equals(Color.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[15].Equals(Color.White, Color.Channel.Rgb));
+        }
+
+        public static void TestCheckers3DLevel0(Color[] colors)
+        {
+            Assert.AreEqual(4 * 4 * 4, colors.Length);
+            TestCheckersLevel0(GetSlice(colors, 0, 4 * 4));
+            TestCheckersLevel0(GetSlice(colors, 4 * 4, 4 * 4));
+            TestCheckersLevel0Inverted(GetSlice(colors, 2 * 4 * 4, 4 * 4));
+            TestCheckersLevel0Inverted(GetSlice(colors, 3 * 4 * 4, 4 * 4));
+        }
+
         public static void TestCheckersLevel1(Color[] colors)
         {
             Assert.AreEqual(2 * 2, colors.Length);
@@ -71,6 +112,22 @@ namespace FrameworkTests
             Assert.IsTrue(colors[1].Equals(Color.White, Color.Channel.Rgb));
             Assert.IsTrue(colors[2].Equals(Color.White, Color.Channel.Rgb));
             Assert.IsTrue(colors[3].Equals(Color.Black, Color.Channel.Rgb));
+        }
+
+        public static void TestCheckersLevel1Inverted(Color[] colors)
+        {
+            Assert.AreEqual(2 * 2, colors.Length);
+            Assert.IsTrue(colors[0].Equals(Color.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[1].Equals(Color.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[2].Equals(Color.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[3].Equals(Color.White, Color.Channel.Rgb));
+        }
+
+        public static void TestCheckers3DLevel1(Color[] colors)
+        {
+            Assert.AreEqual(2 * 2 * 2, colors.Length);
+            TestCheckersLevel1(GetSlice(colors, 0, 2 * 2));
+            TestCheckersLevel1Inverted(GetSlice(colors, 2 * 2, 2 * 2));
         }
 
         public static void TestCheckersLevel2(Color[] colors)
