@@ -120,6 +120,7 @@
     <Compile Include="Controller\TextureViews\Shader\PolarViewShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\SingleViewShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\ViewShader.cs" />
+    <Compile Include="Controller\TextureViews\Single3DView.cs" />
     <Compile Include="Controller\TextureViews\SingleTextureView.cs" />
     <Compile Include="Controller\TextureViews\TextureViewData.cs" />
     <Compile Include="Controller\TextureViews\ViewBufferData.cs" />

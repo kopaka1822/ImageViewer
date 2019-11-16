@@ -36,6 +36,7 @@ namespace ImageFramework.DirectX
         public TextureArray2D(ImageLoader.Image image)
         {
             Size = image.GetSize(0);
+            Debug.Assert(Size.Depth == 1);
             NumMipmaps = image.NumMipmaps;
             NumLayers = image.NumLayers;
             Format = image.Format.DxgiFormat;

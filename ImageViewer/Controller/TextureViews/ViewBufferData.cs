@@ -14,5 +14,8 @@ namespace ImageViewer.Controller.TextureViews
         public float Multiplier;
         public float Farplane;
         public int UseAbs;
+        public int XAxis;
+        public int YAxis;
+        public int ZValue;
     }
 }

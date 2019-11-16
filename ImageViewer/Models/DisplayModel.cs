@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using ImageFramework.Annotations;
+using ImageFramework.DirectX;
 using ImageFramework.Model;
 using SharpDX;
 using Point = System.Drawing.Point;
@@ -295,7 +296,7 @@ namespace ImageViewer.Models
                             modes.Insert(0, ViewMode.CubeMap);
                             modes.Insert(1, ViewMode.CubeCrossView);
                         }
-                        else if (models.Images.NumLayers == 1)
+                        else if (models.Images.NumLayers == 1 && models.Images.ImageType == typeof(TextureArray2D))
                         {
                             modes.Add(ViewMode.Polar);
                         }

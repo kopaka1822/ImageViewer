@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using SharpDX;
 using SharpDX.Direct3D11;
@@ -14,20 +15,24 @@ namespace ImageViewer.Controller.TextureViews.Shader
     public class SingleViewShader : ViewShader
     {
 
-        public SingleViewShader()
-        : base(GetVertexSource(), GetPixelSource(), "Single")
+        public SingleViewShader(IShaderBuilder builder)
+        : base(GetVertexSource(), GetPixelSource(builder), "Single")
         {
             
         }
 
-        public void Run(UploadBuffer<ViewBufferData> buffer, Matrix transform, Vector4 crop, float multiplier, bool useAbs, ShaderResourceView texture, SamplerState sampler)
+        public void Run(UploadBuffer<ViewBufferData> buffer, Matrix transform, Vector4 crop, float multiplier, bool useAbs, 
+            ShaderResourceView texture, SamplerState sampler, int xaxis = 0, int yaxis = 1, int zvalue = 0)
         {
             buffer.SetData(new ViewBufferData
             {
                 Transform = transform,
                 Crop = crop,
                 Multiplier = multiplier,
-                UseAbs = useAbs?1:0
+                UseAbs = useAbs?1:0,
+                XAxis = xaxis,
+                YAxis = yaxis,
+                ZValue = zvalue
             });
 
             var dev = Device.Get();
@@ -69,10 +74,10 @@ VertexOut main(uint id: SV_VertexID) {{
 ";
         }
 
-        public static string GetPixelSource()
+        public static string GetPixelSource(IShaderBuilder builder)
         {
             return $@"
-Texture2D<float4> tex : register(t0);
+{builder.SrvSingleType} tex : register(t0);
 
 SamplerState texSampler : register(s0);
 
@@ -82,6 +87,9 @@ cbuffer InfoBuffer : register(b0) {{
     float multiplier;
     float farplane;
     bool useAbs;
+    int xaxis;
+    int yaxis;
+    int zvalue;
 }};
 
 {Utility.ToSrgbFunction()}
@@ -91,10 +99,24 @@ struct PixelIn {{
     float2 texcoord : TEXCOORD;  
 }};
 
+#if {builder.Is3DInt}
+float3 getCoord(float2 coord){{
+    float res[3];
+    res[xaxis] = coord.x;
+    res[yaxis] = coord.y;
+    res[3 - xaxis - yaxis] = zvalue;
+    return float3(res[0], res[1], res[2]);
+}}
+#else
+float2 getCoord(float2 coord) {{ return coord; }}
+#endif
+
 float4 main(PixelIn i) : SV_TARGET {{
-    float4 color = tex.Sample(texSampler, i.texcoord);
+    float4 color = tex.Sample(texSampler, getCoord(i.texcoord));
     color.rgb *= multiplier;
+#if {1-builder.Is3DInt}
     {ApplyColorCrop("i.texcoord")}
+#endif    
     {ApplyColorTransform()}
     return color;
 }}

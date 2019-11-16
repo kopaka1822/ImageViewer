@@ -12,10 +12,10 @@ using Point = System.Drawing.Point;
 
 namespace ImageViewer.Controller.TextureViews
 {
-    public class SingleTextureView : PlainTextureView
+    public class Single3DView : PlainTextureView
     {
-        public SingleTextureView(ModelsEx models, TextureViewData data)
-        : base(models, data, ShaderBuilder.Builder2D)
+        public Single3DView(ModelsEx models, TextureViewData data) : 
+            base(models, data, ShaderBuilder.Builder3D)
         {
         }
 
@@ -26,7 +26,7 @@ namespace ImageViewer.Controller.TextureViews
             DrawLayer(Matrix.Identity, models.Display.ActiveLayer, texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap));
         }
 
-        public override Point GetTexelPosition(Vector2 mouse)
+        public override System.Drawing.Point GetTexelPosition(Vector2 mouse)
         {
             var transMouse = GetDirectXMouseCoordinates(mouse);
 

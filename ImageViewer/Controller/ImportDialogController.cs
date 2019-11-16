@@ -44,13 +44,9 @@ namespace ImageViewer.Controller
         {
             try
             {
-                using (var img = IO.LoadImage(file))
-                {
-                    // create texture
-                    var tex = new TextureArray2D(img);
-
-                    ImportTexture(tex, file, img.OriginalFormat);
-                }
+                var img = IO.LoadImageTexture(file, out var originalFormat);
+                
+                ImportTexture(img, file, originalFormat);
             }
             catch (Exception e)
             {
@@ -58,7 +54,7 @@ namespace ImageViewer.Controller
             }
         }
 
-        private void ImportTexture(TextureArray2D tex, string file, GliFormat imgOriginalFormat)
+        private void ImportTexture(ITexture tex, string file, GliFormat imgOriginalFormat)
         {
             try
             {
@@ -70,7 +66,7 @@ namespace ImageViewer.Controller
                 // silently generate mipmaps and import
                 if (models.Images.NumMipmaps > 1 && tex.NumMipmaps == 1)
                 {
-                    var tmp = tex.GenerateMipmapLevelsT(models.Images.NumMipmaps);
+                    var tmp = tex.GenerateMipmapLevels(models.Images.NumMipmaps);
                     ImportTexture(tmp, file, imgOriginalFormat);
                 }
                 else

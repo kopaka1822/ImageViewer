@@ -11,7 +11,7 @@ namespace ImageViewer.Controller.TextureViews
 {
     interface ITextureView : IDisposable
     {
-        void Draw(TextureArray2D texture);
+        void Draw(ITexture texture);
         void OnScroll(float amount, Vector2 mouse);
         void OnDrag(Vector2 diff);
         Point GetTexelPosition(Vector2 mouse);

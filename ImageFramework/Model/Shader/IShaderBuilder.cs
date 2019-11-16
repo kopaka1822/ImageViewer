@@ -22,6 +22,7 @@ namespace ImageFramework.Model.Shader
 
         string Is3DString { get; }
 
+        int Is3DInt { get; }
     }
 
     public static class ShaderBuilder

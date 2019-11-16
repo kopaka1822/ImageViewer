@@ -28,7 +28,7 @@ namespace ImageViewer.Controller.TextureViews
             base.Dispose();
         }
 
-        public override void Draw(TextureArray2D texture)
+        public override void Draw(ITexture texture)
         {
             if (texture == null) return;
 

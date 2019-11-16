@@ -25,7 +25,7 @@ namespace ImageViewer.Controller.TextureViews
         public virtual void Dispose()
         {}
 
-        public virtual void Draw(TextureArray2D texture)
+        public virtual void Draw(ITexture texture)
         {
             data.Checkers.Run(data.Buffer, Matrix.Identity);
         }

@@ -19,5 +19,6 @@ namespace ImageFramework.Model.Shader
         public bool Is3D => true;
 
         public string Is3DString => "true";
+        public int Is3DInt => 1;
     }
 }

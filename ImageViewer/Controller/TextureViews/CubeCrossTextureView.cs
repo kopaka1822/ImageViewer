@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using ImageViewer.Models;
 using SharpDX;
@@ -14,10 +15,10 @@ namespace ImageViewer.Controller.TextureViews
     class CubeCrossTextureView : PlainTextureView
     {
         public CubeCrossTextureView(ModelsEx models, TextureViewData data)
-        : base(models, data)
+        : base(models, data, ShaderBuilder.Builder2D)
         {}
 
-        public override void Draw(TextureArray2D texture)
+        public override void Draw(ITexture texture)
         {
             if (texture == null) return;
 

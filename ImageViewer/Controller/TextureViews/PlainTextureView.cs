@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.Model.Shader;
 using ImageViewer.Controller.TextureViews.Shader;
 using ImageViewer.Models;
 using SharpDX;
@@ -12,18 +13,18 @@ using Point = System.Drawing.Point;
 
 namespace ImageViewer.Controller.TextureViews
 {
-    public class PlainTextureView : ITextureView
+    public abstract class PlainTextureView : ITextureView
     {
         protected readonly ModelsEx models;
         private readonly TextureViewData data;
         private Vector3 translation = Vector3.Zero;
         private readonly SingleViewShader shader;
 
-        public PlainTextureView(ModelsEx models, TextureViewData data)
+        public PlainTextureView(ModelsEx models, TextureViewData data, IShaderBuilder builder)
         {
             this.models = models;
             this.data = data;
-            shader = new SingleViewShader();
+            shader = new SingleViewShader(builder);
         }
 
         public void Dispose()
@@ -31,10 +32,7 @@ namespace ImageViewer.Controller.TextureViews
             shader.Dispose();
         }
 
-        public virtual void Draw(TextureArray2D texture)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract void Draw(ITexture texture);
 
         public void OnScroll(float amount, Vector2 mouse)
         {
