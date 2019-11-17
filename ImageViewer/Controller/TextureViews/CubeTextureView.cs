@@ -42,7 +42,7 @@ namespace ImageViewer.Controller.TextureViews
             dev.OutputMerger.BlendState = data.DefaultBlendState;
         }
 
-        public override Point GetTexelPosition(Vector2 mouse)
+        public override Size3 GetTexelPosition(Vector2 mouse)
         {
             // left handed coordinate system
             var transform = GetTransform();
@@ -126,7 +126,7 @@ namespace ImageViewer.Controller.TextureViews
                 models.Images.GetWidth(models.Display.ActiveMipmap),
                 models.Images.GetHeight(models.Display.ActiveMipmap));
 
-            return new Point(pt.X, pt.Y);
+            return new Size3(pt.X, pt.Y, 0);
         }
 
         protected override Matrix GetOrientation()

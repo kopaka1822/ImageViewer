@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Model.Shader;
+using ImageFramework.Utility;
 using ImageViewer.Controller.TextureViews.Shader;
 using ImageViewer.Models;
 using SharpDX;
@@ -59,10 +60,7 @@ namespace ImageViewer.Controller.TextureViews
             translation.Y -= diff.Y * 2.0f / models.Images.GetHeight(0);
         }
 
-        public virtual Point GetTexelPosition(Vector2 mouse)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Size3 GetTexelPosition(Vector2 mouse);
 
         private Matrix GetTransform()
         {

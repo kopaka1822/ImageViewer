@@ -32,15 +32,21 @@ namespace ImageViewer.Controller.TextureViews
                 displayEx.FreeAxis1, displayEx.FreeAxis2, displayEx.FixedAxisSlice);
         }
 
-        public override System.Drawing.Point GetTexelPosition(Vector2 mouse)
+        public override Size3 GetTexelPosition(Vector2 mouse)
         {
             var transMouse = GetDirectXMouseCoordinates(mouse);
 
+            var dim = models.Images.Size.GetMip(models.Display.ActiveMipmap);
             var pt = Utility.CanonicalToTexelCoordinates(transMouse.X, transMouse.Y,
-                models.Images.GetWidth(models.Display.ActiveMipmap),
-                models.Images.GetHeight(models.Display.ActiveMipmap));
+                dim[displayEx.FreeAxis1],
+                dim[displayEx.FreeAxis2]);
 
-            return new Point(pt.X, pt.Y);
+            Size3 res = Size3.Zero;
+            res[displayEx.FreeAxis1] = pt.X;
+            res[displayEx.FreeAxis2] = pt.Y;
+            res[displayEx.FixedAxis] = displayEx.FixedAxisSlice;
+
+            return res;
         }
     }
 }

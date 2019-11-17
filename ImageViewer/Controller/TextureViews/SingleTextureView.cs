@@ -26,7 +26,7 @@ namespace ImageViewer.Controller.TextureViews
             DrawLayer(Matrix.Identity, models.Display.ActiveLayer, texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap));
         }
 
-        public override Point GetTexelPosition(Vector2 mouse)
+        public override Size3 GetTexelPosition(Vector2 mouse)
         {
             var transMouse = GetDirectXMouseCoordinates(mouse);
 
@@ -34,7 +34,7 @@ namespace ImageViewer.Controller.TextureViews
                 models.Images.GetWidth(models.Display.ActiveMipmap),
                 models.Images.GetHeight(models.Display.ActiveMipmap));
 
-            return new Point(pt.X, pt.Y);
+            return new Size3(pt.X, pt.Y, 0);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.Utility;
 using ImageViewer.Models;
 using SharpDX;
 using Point = System.Drawing.Point;
@@ -45,10 +46,7 @@ namespace ImageViewer.Controller.TextureViews
             roll += (float)diff.Y * 0.01f * models.Display.Aperture;
         }
 
-        public virtual Point GetTexelPosition(Vector2 mouse)
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Size3 GetTexelPosition(Vector2 mouse);
 
         protected Matrix GetTransform()
         {

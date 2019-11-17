@@ -11,6 +11,7 @@ using System.Windows;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
+using ImageFramework.Utility;
 using SharpDX;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
@@ -252,14 +253,14 @@ namespace ImageViewer.Models.Display
             }
         }
 
-        private Point texelPosition = new Point(0, 0);
+        private Size3 texelPosition = Size3.Zero;
         // the mouse position on the texture
-        public Point TexelPosition
+        public Size3 TexelPosition
         {
             get => texelPosition;
             set
             {
-                if (value == null || value.Equals(texelPosition)) return;
+                if (value.Equals(texelPosition)) return;
                 texelPosition = value;
                 OnPropertyChanged(nameof(TexelPosition));
             }

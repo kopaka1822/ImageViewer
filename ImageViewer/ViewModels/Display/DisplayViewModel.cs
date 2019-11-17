@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using ImageFramework.Annotations;
+using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageFramework.Utility;
 using ImageViewer.Controller.TextureViews;
@@ -397,7 +398,17 @@ namespace ImageViewer.ViewModels.Display
                 OnPropertyChanged(nameof(EnableViewModes));
         }
 
-        public string TexelPosition => models.Display.TexelPosition.X + ", " + GetTexelPositionY();
+        public string TexelPosition
+        {
+            get
+            {
+                var res = models.Display.TexelPosition.X + ", " + GetTexelPositionY();
+                if (models.Images.ImageType == typeof(Texture3D))
+                    res += ", " + models.Display.TexelPosition.Z;
+                return res;
+            }
+        }
+           
 
         public Visibility DxSystemVisibility =>
             models.Settings.FlipYAxis ? Visibility.Collapsed : Visibility.Visible;
