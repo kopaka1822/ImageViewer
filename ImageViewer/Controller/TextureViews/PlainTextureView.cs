@@ -92,7 +92,8 @@ namespace ImageViewer.Controller.TextureViews
             return Matrix.Scaling(1.0f, -1.0f, 1.0f);
         }
 
-        protected void DrawLayer(Matrix offset, int layer, ShaderResourceView texture)
+        protected void DrawLayer(Matrix offset, int layer, ShaderResourceView texture,
+            int xaxis = 0, int yaxis = 1, int zvalue = 1)
         {
             var dev = ImageFramework.DirectX.Device.Get();
             var finalTransform = offset * GetTransform();
@@ -103,7 +104,10 @@ namespace ImageViewer.Controller.TextureViews
             // blend over the final image
             dev.OutputMerger.BlendState = data.AlphaBlendState;
 
-            shader.Run(data.Buffer, finalTransform, data.GetCrop(models, layer), models.Display.Multiplier, models.Display.DisplayNegative, texture, data.GetSampler(models.Display.LinearInterpolation));
+            shader.Run(data.Buffer, finalTransform, data.GetCrop(models, layer), 
+                models.Display.Multiplier, models.Display.DisplayNegative, 
+                texture, data.GetSampler(models.Display.LinearInterpolation),
+                xaxis, yaxis, zvalue);
 
             dev.OutputMerger.BlendState = data.DefaultBlendState;
         }

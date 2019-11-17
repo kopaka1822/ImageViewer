@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using ImageViewer.Commands;
 using ImageViewer.Models;
+using ImageViewer.ViewModels.Display;
 
 namespace ImageViewer.ViewModels
 {

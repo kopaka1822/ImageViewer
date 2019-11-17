@@ -102,9 +102,12 @@ struct PixelIn {{
 #if {builder.Is3DInt}
 float3 getCoord(float2 coord){{
     float res[3];
+    uint size[3];
+    tex.GetDimensions(size[0], size[1], size[2]);
     res[xaxis] = coord.x;
     res[yaxis] = coord.y;
-    res[3 - xaxis - yaxis] = zvalue;
+    // convert zvalue to float
+    res[3 - xaxis - yaxis] = (zvalue + 0.5f) / size[3 - xaxis - yaxis];
     return float3(res[0], res[1], res[2]);
 }}
 #else

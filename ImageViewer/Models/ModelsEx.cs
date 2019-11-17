@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageViewer.Controller;
+using ImageViewer.Models.Display;
 
 namespace ImageViewer.Models
 {

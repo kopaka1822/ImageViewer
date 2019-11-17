@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageViewer.Models;
+using ImageViewer.Models.Display;
 using ImageViewer.Views;
 
 namespace ImageViewer.ViewModels.Dialog

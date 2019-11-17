@@ -12,6 +12,7 @@ using System.Windows.Threading;
 using ImageFramework.DirectX;
 using ImageViewer.Controller.TextureViews;
 using ImageViewer.Models;
+using ImageViewer.Models.Display;
 using SharpDX;
 using SharpDX.Direct3D11;
 using Device = ImageFramework.DirectX.Device;

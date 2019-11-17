@@ -13,6 +13,7 @@ using ImageFramework.Model;
 using ImageFramework.Model.Export;
 using ImageViewer.DirectX;
 using ImageViewer.Models;
+using ImageViewer.Models.Display;
 using SharpDX.Mathematics.Interop;
 using Color = ImageFramework.Utility.Color;
 using Size = System.Drawing.Size;
@@ -162,6 +163,12 @@ namespace ImageViewer.Controller
                 case nameof(DisplayModel.Multiplier):
                 case nameof(DisplayModel.DisplayNegative):
                     ScheduleRedraw();
+                    break;
+                case nameof(DisplayModel.ExtendedViewData):
+                    if (models.Display.ExtendedViewData != null)
+                    {
+                        models.Display.ExtendedViewData.PropertyChanged += (s, ev) => ScheduleRedraw();
+                    }
                     break;
             }
         }

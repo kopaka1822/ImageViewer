@@ -1,7 +1,9 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -12,10 +14,13 @@ using System.Windows.Input;
 using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageFramework.Utility;
+using ImageViewer.Controller.TextureViews;
 using ImageViewer.Models;
+using ImageViewer.Models.Display;
 using ImageViewer.Views;
+using Single3DView = ImageViewer.Views.Display.Single3DView;
 
-namespace ImageViewer.ViewModels
+namespace ImageViewer.ViewModels.Display
 {
     public class DisplayViewModel : INotifyPropertyChanged
     {
@@ -27,7 +32,7 @@ namespace ImageViewer.ViewModels
         public DisplayViewModel(ModelsEx models)
         {
             this.models = models;
-            this.selectedSplitMode = AvailableSplitModes[models.Display.Split == DisplayModel.SplitMode.Vertical ? 0 : 1];
+            selectedSplitMode = AvailableSplitModes[models.Display.Split == DisplayModel.SplitMode.Vertical ? 0 : 1];
             models.PropertyChanged += ModelsOnPropertyChanged;
             models.Display.PropertyChanged += DisplayOnPropertyChanged;
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
@@ -155,6 +160,23 @@ namespace ImageViewer.ViewModels
                 case nameof(DisplayModel.Multiplier):
                     OnPropertyChanged(nameof(Multiplier));
                     break;
+
+                case nameof(DisplayModel.ExtendedViewData):
+                    ExtendedView?.Dispose();
+                    ExtendedView = null;
+
+                    if (models.Display.ExtendedViewData != null)
+                    {
+                        if (models.Display.ExtendedViewData is Single3DDisplayModel)
+                        {
+                            ExtendedView = new Single3DView(models);
+                        }
+                        else Debug.Assert(false);
+                    }
+
+                    OnPropertyChanged(nameof(ExtendedView));
+                    OnPropertyChanged(nameof(ExtendedViewVisibility));
+                    break;
             }
         }
 
@@ -191,6 +213,10 @@ namespace ImageViewer.ViewModels
             get => models.Settings.FlipYAxis;
             set => models.Settings.FlipYAxis = value;
         }
+
+        public IDisposable ExtendedView { get; private set; } = null;
+
+        public Visibility ExtendedViewVisibility => ExtendedView == null ? Visibility.Collapsed : Visibility.Visible;
 
         public ObservableCollection<ComboBoxItem<int>> AvailableMipMaps { get; } = new ObservableCollection<ComboBoxItem<int>>();
         public ObservableCollection<ComboBoxItem<int>> AvailableLayers { get; } = new ObservableCollection<ComboBoxItem<int>>();
@@ -275,8 +301,8 @@ namespace ImageViewer.ViewModels
         public string Zoom
         {
             get => models.Display.ActiveView.IsDegree() ?
-                        Math.Round((Decimal)(models.Display.Aperture * 180.0 / Math.PI), 2).ToString(ImageFramework.Model.Models.Culture) + "°" :
-                        Math.Round((Decimal)(models.Display.Zoom * 100.0f), 2).ToString(ImageFramework.Model.Models.Culture) + "%";
+                        Math.Round((decimal)(models.Display.Aperture * 180.0 / Math.PI), 2).ToString(ImageFramework.Model.Models.Culture) + "°" :
+                        Math.Round((decimal)(models.Display.Zoom * 100.0f), 2).ToString(ImageFramework.Model.Models.Culture) + "%";
 
             set
             {

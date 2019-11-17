@@ -10,6 +10,7 @@ using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageFramework.Utility;
 using ImageViewer.Models;
+using ImageViewer.Models.Display;
 
 namespace ImageViewer.ViewModels
 {

@@ -73,10 +73,14 @@
                     Grid.Column="2"
                     DockPanel.Dock="Left"
                     HorizontalAlignment="Stretch"
-                    
+                    SelectedIndex="1"
                     BorderThickness="0 0 0 0"
                     x:Name="TabControl"   
                 >
+                    <TabItem
+                        Header="View"
+                        Visibility="{Binding Display.ExtendedViewVisibility}"
+                        Content="{Binding Display.ExtendedView}"/>
                     <TabItem 
                         Header="Images"
                         Foreground="{Binding Equations.TabItemColor}"

@@ -9,6 +9,7 @@ using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageFramework.Model.Shader;
 using ImageFramework.Model.Statistics;
+using ImageViewer.Models.Display;
 
 namespace ImageViewer.Models
 {

@@ -15,8 +15,10 @@ using SharpDX;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
-namespace ImageViewer.Models
+namespace ImageViewer.Models.Display
 {
+    public interface IExtendedDisplayModel : IDisposable, INotifyPropertyChanged { }
+
     public class DisplayModel : INotifyPropertyChanged
     {
         public enum ViewMode
@@ -43,12 +45,11 @@ namespace ImageViewer.Models
             private set
             {
                 availableViews = value;
+                OnPropertyChanged(nameof(AvailableViews));
+
                 // active view must be within available views
                 Debug.Assert(availableViews.Count != 0);
-                activeView = availableViews[0];
-
-                OnPropertyChanged(nameof(AvailableViews));
-                OnPropertyChanged(nameof(ActiveView));
+                ActiveView = availableViews[0];
             }
         }
 
@@ -62,9 +63,22 @@ namespace ImageViewer.Models
                 // active view must be in available views
                 Debug.Assert(availableViews.Contains(value));
                 activeView = value;
+                extendedView?.Dispose();
+                if (activeView == ViewMode.Single && models.Images.ImageType == typeof(Texture3D))
+                {
+                    extendedView = new Single3DDisplayModel(models, this);
+                }
+                else
+                {
+                    extendedView = null;
+                }
                 OnPropertyChanged(nameof(ActiveView));
+                OnPropertyChanged(nameof(ExtendedViewData));
             }
         }
+
+        private IExtendedDisplayModel extendedView = null;
+        public IExtendedDisplayModel ExtendedViewData => extendedView;
 
         private float zoom = 1.0f;
         public float Zoom
@@ -169,7 +183,7 @@ namespace ImageViewer.Models
             get => activeLayer;
             set
             {
-                Debug.Assert(value == 0 || (value >= 0 && value < models.Images.NumLayers));
+                Debug.Assert(value == 0 || value >= 0 && value < models.Images.NumLayers);
                 if (value == activeLayer) return;
                 activeLayer = value;
                 OnPropertyChanged(nameof(ActiveLayer));
@@ -182,7 +196,7 @@ namespace ImageViewer.Models
             get => activeMipmap;
             set
             {
-                Debug.Assert(value == 0 || (value >= 0 && value < models.Images.NumMipmaps));
+                Debug.Assert(value == 0 || value >= 0 && value < models.Images.NumMipmaps);
                 if (value == activeMipmap) return;
                 activeMipmap = value;
                 OnPropertyChanged(nameof(ActiveMipmap));
@@ -318,16 +332,16 @@ namespace ImageViewer.Models
         {
             lastClientSize = clientSize;
 
-            if (models.Images.NumImages > 0) 
+            if (models.Images.NumImages > 0)
             {
                 ImageAspectRatio = Matrix.Scaling(
-                    (float)models.Images.GetWidth(0) / (float)clientSize.Width,
-                    (float)models.Images.GetHeight(0) / (float)clientSize.Height,
+                    models.Images.GetWidth(0) / (float)clientSize.Width,
+                    models.Images.GetHeight(0) / (float)clientSize.Height,
                     1.0f);
             }
 
             ClientAspectRatio = Matrix.Scaling(
-                (float)clientSize.Width / (float)clientSize.Height, 1.0f, 1.0f
+                clientSize.Width / (float)clientSize.Height, 1.0f, 1.0f
             );
         }
 

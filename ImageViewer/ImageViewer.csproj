@@ -128,6 +128,7 @@
     <Compile Include="Controller\TextureViews\TextureViewData.cs" />
     <Compile Include="Controller\TextureViews\ViewBufferData.cs" />
     <Compile Include="Controller\ViewModeController.cs" />
+    <Compile Include="Models\Display\Single3DDisplayModel.cs" />
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Models\StatisticModel.cs" />
     <Compile Include="ViewModels\Dialog\ExportViewModel.cs" />
@@ -137,7 +138,8 @@
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ResolutionViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ScaleViewModel.cs" />
-    <Compile Include="ViewModels\DisplayViewModel.cs" />
+    <Compile Include="ViewModels\Display\DisplayViewModel.cs" />
+    <Compile Include="ViewModels\Display\Single3DDisplayViewModel.cs" />
     <Compile Include="ViewModels\EquationsViewModel.cs" />
     <Compile Include="ViewModels\EquationViewModel.cs" />
     <Compile Include="ViewModels\FiltersViewModel.cs" />
@@ -179,6 +181,9 @@
     </Compile>
     <Compile Include="Views\Dialog\ScaleDialog.xaml.cs">
       <DependentUpon>ScaleDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Display\Single3DView.xaml.cs">
+      <DependentUpon>Single3DView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\FilterTab.xaml.cs">
       <DependentUpon>FilterTab.xaml</DependentUpon>
@@ -250,6 +255,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Display\Single3DView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\FilterTab.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -312,7 +321,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Models\DisplayModel.cs" />
+    <Compile Include="Models\Display\DisplayModel.cs" />
     <Compile Include="Models\ModelsEx.cs" />
     <Compile Include="Models\WindowModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
