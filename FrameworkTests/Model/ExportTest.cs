@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using FrameworkTests.DirectX;
 using ImageFramework.DirectX;
@@ -499,32 +500,46 @@ namespace FrameworkTests.Model
 
             var lastTexel = tex.Size.Product - 1;
             Color[] colors = null;
+            var i = 0;
             foreach (var format in eFmt.Formats)
             {
                 try
                 {
-                    var desc = new ExportDescription(ExportDir + "gray", outputExtension, model.Export);
-                    desc.FileFormat = format;
-                    model.Export.Export(tex, desc);
-                    // load and compare gray tone
-                    using (var newTex = new TextureArray2D(IO.LoadImage(ExportDir + "gray." + outputExtension)))
+                    int numTries = 0;
+                    while(true)
+                    try
                     {
-                        Assert.AreEqual(8, newTex.Size.Width);
-                        Assert.AreEqual(4, newTex.Size.Height);
-                        colors = newTex.GetPixelColors(0, 0);
-                        // compare last texel
-                        var grayColor = colors[lastTexel];
+                        var desc = new ExportDescription(ExportDir + "gray" + ++i, outputExtension, model.Export);
+                        desc.FileFormat = format;
+                        model.Export.Export(tex, desc);
+                        Thread.Sleep(1);
+                        // load and compare gray tone
+                        using (var newTex = new TextureArray2D(IO.LoadImage($"{ExportDir}gray{i}.{outputExtension}")))
+                        {
+                            Assert.AreEqual(8, newTex.Size.Width);
+                            Assert.AreEqual(4, newTex.Size.Height);
+                            colors = newTex.GetPixelColors(0, 0);
+                            // compare last texel
+                            var grayColor = colors[lastTexel];
 
-                        float tolerance = 0.01f;
-                        if (format.IsLessThan8Bit())
-                            tolerance = 0.1f;
+                            float tolerance = 0.01f;
+                            if (format.IsLessThan8Bit())
+                                tolerance = 0.1f;
 
-                        // some formats don't write to red
-                        // ReSharper disable once CompareOfFloatsByEqualityOperator
-                        //if(grayColor.Red != 0.0f) Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
-                        Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
-                        //else Assert.AreEqual(TestData.Gray, grayColor.Green, tolerance);
+                            // some formats don't write to red
+                            // ReSharper disable once CompareOfFloatsByEqualityOperator
+                            //if(grayColor.Red != 0.0f) Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
+                            Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
+                            //else Assert.AreEqual(TestData.Gray, grayColor.Green, tolerance);
+                            break;
+                        }
                     }
+                    catch (Exception)
+                    {
+                        ++numTries;
+                        if (numTries > 3) throw;
+                    }
+                    
                 }
                 catch (Exception e)
                 {
