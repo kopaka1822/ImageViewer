@@ -19,7 +19,6 @@ using Size = System.Drawing.Size;
 namespace ImageViewer.Models.Display
 {
     public interface IExtendedDisplayModel : IDisposable, INotifyPropertyChanged { }
-
     public class DisplayModel : INotifyPropertyChanged
     {
         public enum ViewMode

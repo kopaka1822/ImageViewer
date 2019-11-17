@@ -48,5 +48,15 @@ namespace ImageViewer.Controller.TextureViews
 
             return res;
         }
+
+        protected override Matrix GetImageAspectRatio()
+        {
+            var dim = models.Images.Size;
+            return Matrix.Scaling(
+                    dim[displayEx.FreeAxis1] / (float)models.Window.ClientSize.Width,
+                    dim[displayEx.FreeAxis2] / (float)models.Window.ClientSize.Height,
+                    1.0f);
+
+        }
     }
 }

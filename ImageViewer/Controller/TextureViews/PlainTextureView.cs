@@ -65,7 +65,12 @@ namespace ImageViewer.Controller.TextureViews
         private Matrix GetTransform()
         {
             return Matrix.Scaling(models.Display.Zoom, models.Display.Zoom, 1.0f) *
-                   Matrix.Translation(translation) * models.Display.ImageAspectRatio;
+                   Matrix.Translation(translation) * GetImageAspectRatio();
+        }
+
+        protected virtual Matrix GetImageAspectRatio()
+        {
+            return models.Display.ImageAspectRatio;
         }
 
         /// <summary>

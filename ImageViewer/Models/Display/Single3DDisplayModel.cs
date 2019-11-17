@@ -47,6 +47,7 @@ namespace ImageViewer.Models.Display
                 if (value == fixedAxis) return;
                 fixedAxis = Utility.Clamp(value, 0, 2);
                 OnPropertyChanged(nameof(FixedAxis));
+                FixedAxisSlice = FixedAxisSlice; // refresh slice
             }
         }
 
