@@ -70,7 +70,7 @@ namespace ImageFramework.DirectX
             return newView;
         }
 
-        public void CopyFrom<T>(UploadBuffer<T> buffer) where T : struct
+        public void CopyFrom(UploadBuffer buffer)
         {
             Debug.Assert(buffer.ByteSize <= ByteSize);
             Device.Get().CopyBufferData(buffer.Handle, Handle, ByteSize);

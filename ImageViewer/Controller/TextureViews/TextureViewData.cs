@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using ImageFramework.DirectX;
+using ImageFramework.Model;
 using ImageFramework.Model.Export;
 using ImageViewer.Controller.TextureViews.Shader;
 using ImageViewer.Models;
@@ -23,10 +24,10 @@ namespace ImageViewer.Controller.TextureViews
 
         public SamplerState PointSampler { get; }
 
-        public UploadBuffer<ViewBufferData> Buffer { get; }
+        public UploadBuffer Buffer { get; }
 
         public CheckersShader Checkers { get; }
-        public TextureViewData()
+        public TextureViewData(SharedModel shared)
         {
             var dev = ImageFramework.DirectX.Device.Get();
 
@@ -36,7 +37,7 @@ namespace ImageViewer.Controller.TextureViews
             LinearSampler = CreateSamplerState(true);
             PointSampler = CreateSamplerState(false);
 
-            Buffer = new UploadBuffer<ViewBufferData>(1);
+            Buffer = shared.Upload;
 
             Checkers = new CheckersShader();
         }
@@ -89,7 +90,6 @@ namespace ImageViewer.Controller.TextureViews
             AlphaBlendState?.Dispose();
             LinearSampler?.Dispose();
             PointSampler?.Dispose();
-            Buffer?.Dispose();
             Checkers?.Dispose();
         }
 

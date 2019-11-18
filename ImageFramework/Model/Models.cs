@@ -46,7 +46,7 @@ namespace ImageFramework.Model
 
         public ProgressModel Progress { get; }
 
-        internal readonly SharedModel sharedModel;
+        public SharedModel SharedModel { get; }
         
         internal TextureCache TextureCache { get; }
 
@@ -66,13 +66,13 @@ namespace ImageFramework.Model
             NumPipelines = numPipelines;
             CheckDeviceCapabilities();
 
-            sharedModel = new SharedModel();
-            Images = new ImagesModel(sharedModel.ScaleShader);
+            SharedModel = new SharedModel();
+            Images = new ImagesModel(SharedModel.ScaleShader);
             TextureCache = new TextureCache(Images);
-            pixelValueShader = new PixelValueShader();
-            polarConvertShader = new ConvertPolarShader(sharedModel.QuadShader);
+            pixelValueShader = new PixelValueShader(SharedModel);
+            polarConvertShader = new ConvertPolarShader(SharedModel.QuadShader);
 
-            Export = new ExportModel(sharedModel);
+            Export = new ExportModel(SharedModel);
             Filter = new FiltersModel();
             //Gif = new GifModel(sharedModel.QuadShader);
             Progress = new ProgressModel();
@@ -84,8 +84,8 @@ namespace ImageFramework.Model
             }
             Pipelines = pipelines;
 
-            stats = new StatisticsModel();
-            thumbnail = new ThumbnailModel(sharedModel.QuadShader);
+            stats = new StatisticsModel(SharedModel);
+            thumbnail = new ThumbnailModel(SharedModel.QuadShader);
 
             // pipeline controller
             pipelineController = new PipelineController(this);
@@ -185,7 +185,7 @@ namespace ImageFramework.Model
             {
                 for (int curMip = 0; curMip < first.NumMipmaps; ++curMip)
                 {
-                    sharedModel.Convert.CopyLayer(textures[i], 0, curMip, tex, i, curMip);
+                    SharedModel.Convert.CopyLayer(textures[i], 0, curMip, tex, i, curMip);
                 }
             }
 
@@ -311,7 +311,7 @@ namespace ImageFramework.Model
                 imagePipeline.Dispose();
             }
             pixelValueShader?.Dispose();
-            sharedModel?.Dispose();
+            SharedModel?.Dispose();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

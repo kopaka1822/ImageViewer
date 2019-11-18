@@ -28,9 +28,9 @@ namespace ImageFramework.Model
             public string Filename;
         }
 
-        internal GifModel(QuadShader quad)
+        internal GifModel(QuadShader quad, UploadBuffer upload)
         {
-            shader = new GifShader(quad);
+            shader = new GifShader(quad, upload);
         }
 
         public void CreateGif(TextureArray2D left, TextureArray2D right, Config cfg, int layer = 0, int mipmap = 0)

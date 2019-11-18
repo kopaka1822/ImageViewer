@@ -22,7 +22,7 @@ namespace ImageFramework.Controller
     internal class PipelineController : IDisposable
     {
         private readonly Models models;
-        private readonly UploadBuffer<LayerLevelFilter> layerLevelBuffer;
+        private readonly UploadBuffer layerLevelBuffer;
         private readonly SyncQuery syncQuery;
         public PipelineController(Models models)
         {
@@ -36,7 +36,7 @@ namespace ImageFramework.Controller
                 pipe.Alpha.PropertyChanged += (sender, e) => PipelineFormulaOnPropertyChanged(pipe, pipe.Alpha, e);
             }
 
-            layerLevelBuffer = new UploadBuffer<LayerLevelFilter>(1);
+            layerLevelBuffer = models.SharedModel.Upload;
             syncQuery = new SyncQuery();
 
             this.models.Filter.PropertyChanged += FilterOnPropertyChanged;
@@ -177,7 +177,6 @@ namespace ImageFramework.Controller
 
         public void Dispose()
         {
-            layerLevelBuffer?.Dispose();
             syncQuery?.Dispose();
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -13,30 +14,15 @@ namespace ImageFramework.DirectX
     /// <summary>
     /// buffer to read back data from the gpu to cpu
     /// </summary>
-    public class DownloadBuffer<T> : IDisposable where T : struct
+    public class DownloadBuffer : IDisposable
     {
-        private readonly Buffer gpuBuffer;
         private readonly Buffer stageBuffer;
-        public UnorderedAccessView Handle;
 
         public int ByteSize { get; }
 
-        public DownloadBuffer()
+        public DownloadBuffer(int byteSize)
         {
-            var elementSize = Marshal.SizeOf(typeof(T));
-            ByteSize = elementSize;
-
-            var bufferDesc = new BufferDescription
-            {
-                BindFlags = BindFlags.UnorderedAccess,
-                CpuAccessFlags = CpuAccessFlags.None,
-                OptionFlags = ResourceOptionFlags.BufferStructured,
-                SizeInBytes = Utility.Utility.AlignTo(ByteSize, 16),
-                StructureByteStride = elementSize,
-                Usage = ResourceUsage.Default
-            };
-
-            gpuBuffer = new Buffer(Device.Get().Handle, bufferDesc);
+            ByteSize = Utility.Utility.AlignTo(byteSize, 16);
 
             var viewDesc = new UnorderedAccessViewDescription
             {
@@ -50,15 +36,13 @@ namespace ImageFramework.DirectX
                 }
             };
 
-            Handle = new UnorderedAccessView(Device.Get().Handle, gpuBuffer, viewDesc);
-
             var stageDesc = new BufferDescription
             {
                 BindFlags = BindFlags.None,
                 CpuAccessFlags = CpuAccessFlags.Read,
                 OptionFlags = ResourceOptionFlags.None,
-                SizeInBytes = Utility.Utility.AlignTo(ByteSize, 16),
-                StructureByteStride = elementSize,
+                SizeInBytes = ByteSize,
+                StructureByteStride = 0,
                 Usage = ResourceUsage.Staging
             };
 
@@ -67,25 +51,29 @@ namespace ImageFramework.DirectX
 
         public void CopyFrom(GpuBuffer buffer)
         {
-            Device.Get().CopyBufferData(buffer.Handle, gpuBuffer, ByteSize);
+            Device.Get().CopyBufferData(buffer.Handle, stageBuffer, ByteSize);
         }
 
-        public T GetData()
+        public T GetData<T>() where T : struct
         {
-            // transfer data to the staging buffer
-            Device.Get().CopyResource(gpuBuffer, stageBuffer);
+            var res = new T[1];
 
-            T[] res = new T[1];
-
-            var elementSize = Marshal.SizeOf(typeof(T));
+            Debug.Assert(Marshal.SizeOf(typeof(T)) <= ByteSize);
             Device.Get().GetData(stageBuffer, ref res);
             return res[0];
         }
 
+        public T[] GetData<T>(int count) where T : struct
+        {
+            var res = new T[count];
+
+            Debug.Assert(Marshal.SizeOf(typeof(T)) * count <= ByteSize);
+            Device.Get().GetData(stageBuffer, ref res);
+            return res;
+        }
+
         public void Dispose()
         {
-            Handle?.Dispose();
-            gpuBuffer?.Dispose();
             stageBuffer?.Dispose();
         }
     }

@@ -16,7 +16,7 @@ namespace ImageFramework.Model.Shader
         private readonly DirectX.Shader shader3d;
         private readonly int LocalSizeX = 128;
         private readonly int LocalSizeY = 4;
-        private readonly UploadBuffer<StatisticsData> cbuffer;
+        private readonly UploadBuffer cbuffer;
         private readonly string returnValue;
 
         // predefined return values
@@ -32,10 +32,10 @@ return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
         /// shader used for statistics calculation
         /// </summary>
         /// <param name="returnValue">one of the values declared above this function (*Value)</param>
-        public StatisticsShader(string returnValue)
+        public StatisticsShader(UploadBuffer upload, string returnValue)
         {
             this.returnValue = returnValue;
-            cbuffer = new UploadBuffer<StatisticsData>();
+            cbuffer = upload;
 
             shader = new DirectX.Shader(DirectX.Shader.Type.Compute, GetSource(ShaderBuilder.Builder2D), "StatisticsShader");
             shader3d = new DirectX.Shader(DirectX.Shader.Type.Compute, GetSource(ShaderBuilder.Builder3D), "StatisticsShader");
@@ -146,7 +146,6 @@ void main(ComputeIn i){{
         {
             shader?.Dispose();
             shader3d?.Dispose();
-            cbuffer?.Dispose();
         }
     }
 }

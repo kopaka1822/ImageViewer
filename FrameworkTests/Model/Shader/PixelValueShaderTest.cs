@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
+using ImageFramework.Model;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -21,7 +22,7 @@ namespace FrameworkTests.Model.Shader
             var refColors = tex.GetPixelColors(0, 0);
 
             // recreate colors by picking them with the shader
-            var shader = new PixelValueShader();
+            var shader = new PixelValueShader(new SharedModel());
             var colors = new Color[refColors.Length];
             for(int y = 0; y < tex.Size.Height; ++y)
                 for (int x = 0; x < tex.Size.Width; ++x)
@@ -36,7 +37,7 @@ namespace FrameworkTests.Model.Shader
         public void Radius()
         {
             var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "checkers.dds"));
-            var shader = new PixelValueShader();
+            var shader = new PixelValueShader(new SharedModel());
 
             var color = shader.Run(tex, new Size3(1, 1, 0), 0, 0, 1);
             // should be 5 times black field + 4 times white field
@@ -55,7 +56,7 @@ namespace FrameworkTests.Model.Shader
         public void Image3D()
         {
             var tex = new Texture3D(IO.LoadImage(TestData.Directory + "checkers3d.dds"));
-            var shader = new PixelValueShader();
+            var shader = new PixelValueShader(new SharedModel());
             var refColors = tex.GetPixelColors(0);
 
             var colors = new Color[refColors.Length];

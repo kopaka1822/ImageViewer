@@ -19,7 +19,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
         }
 
-        public void Run(UploadBuffer<ViewBufferData> buffer, Matrix transform, Vector4 crop, float multiplier, float farplane, bool useAbs, ShaderResourceView texture, SamplerState sampler)
+        public void Run(UploadBuffer buffer, Matrix transform, Vector4 crop, float multiplier, float farplane, bool useAbs, ShaderResourceView texture, SamplerState sampler)
         {
             buffer.SetData(new ViewBufferData
             {

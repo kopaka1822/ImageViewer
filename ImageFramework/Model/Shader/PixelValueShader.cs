@@ -13,15 +13,17 @@ namespace ImageFramework.Model.Shader
     {
         private readonly DirectX.Shader shader2D;
         private readonly DirectX.Shader shader3D;
-        private readonly DownloadBuffer<Color> readBuffer;
-        private readonly UploadBuffer<PixelValueData> cbuffer;
+        private readonly DownloadBuffer readBuffer;
+        private readonly UploadBuffer cbuffer;
+        private readonly GpuBuffer dstBuffer;
 
-        public PixelValueShader()
+        public PixelValueShader(SharedModel shared)
         {
             shader2D = new DirectX.Shader(DirectX.Shader.Type.Compute, GetSource(ShaderBuilder.Builder2D), "PixelValueShader");
             shader3D = new DirectX.Shader(DirectX.Shader.Type.Compute, GetSource(ShaderBuilder.Builder3D), "PixelValueShader");
-            readBuffer = new DownloadBuffer<Color>();
-            cbuffer = new UploadBuffer<PixelValueData>(1);
+            readBuffer = shared.Download;
+            cbuffer = shared.Upload;
+            dstBuffer = new GpuBuffer(4 * 4, 1);
         }
 
         /// <summary>
@@ -53,7 +55,7 @@ namespace ImageFramework.Model.Shader
             else dev.Compute.Set(shader2D.Compute);
             dev.Compute.SetConstantBuffer(0, cbuffer.Handle);
             dev.Compute.SetShaderResource(0, image.GetSrView(layer, mipmap));
-            dev.Compute.SetUnorderedAccessView(0, readBuffer.Handle);
+            dev.Compute.SetUnorderedAccessView(0, dstBuffer.View);
 
             dev.Dispatch(1, 1);
 
@@ -62,7 +64,8 @@ namespace ImageFramework.Model.Shader
             dev.Compute.SetUnorderedAccessView(0, null);
 
             // obtain data
-            return readBuffer.GetData();
+            readBuffer.CopyFrom(dstBuffer);
+            return readBuffer.GetData<Color>();
         }
 
         private static string GetSource(IShaderBuilder builder)
@@ -103,8 +106,7 @@ void main(){{
         {
             shader2D?.Dispose();
             shader3D?.Dispose();
-            readBuffer?.Dispose();
-            cbuffer?.Dispose();
+            dstBuffer?.Dispose();
         }
     }
 }

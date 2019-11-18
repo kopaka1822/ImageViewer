@@ -19,7 +19,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
             pixel = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Pixel, GetPixelSource(), "CheckersPixelShader");
         }
 
-        public void Run(UploadBuffer<ViewBufferData> buffer, Matrix transform)
+        public void Run(UploadBuffer buffer, Matrix transform)
         {
             buffer.SetData(new ViewBufferData
             {

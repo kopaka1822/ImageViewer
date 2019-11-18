@@ -16,13 +16,13 @@ namespace ImageFramework.Model.Shader
     {
         private readonly DirectX.Shader shader;
         private readonly QuadShader quad;
-        private readonly UploadBuffer<DirSizeData> cbuffer;
+        private readonly UploadBuffer cbuffer;
 
-        public MitchellNetravaliScaleShader(QuadShader quad)
+        public MitchellNetravaliScaleShader(QuadShader quad, UploadBuffer upload)
         {
             this.quad = quad;
             shader = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(), "MitchellNetravaliScale");
-            cbuffer = new UploadBuffer<DirSizeData>(1);
+            cbuffer = upload;
         }
 
         public TextureArray2D Run(TextureArray2D src, Size3 dstSize)
@@ -156,7 +156,6 @@ float4 main(PixelIn i) : SV_TARGET
         public void Dispose()
         {
             shader?.Dispose();
-            cbuffer?.Dispose();
         }
     }
 }

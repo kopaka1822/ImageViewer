@@ -19,18 +19,23 @@ namespace ImageFramework.Model.Statistics
         private ReduceShader minReduce;
         private ReduceShader maxReduce;
         private ReduceShader avgReduce;
-        // TODO replace with a shared model download buffer
-        private DownloadBuffer<float> downloadBuffer = null;
 
-        internal StatisticsShader LuminanceShader => luminanceShader ?? (luminanceShader = new StatisticsShader(StatisticsShader.LuminanceValue));
-        internal StatisticsShader UniformShader => uniformShader ?? (uniformShader = new StatisticsShader(StatisticsShader.UniformWeightValue));
-        internal StatisticsShader LumaShader => lumaShader ?? (lumaShader = new StatisticsShader(StatisticsShader.LumaValue));
-        internal StatisticsShader LightnessShader => lightnessShader ?? (lightnessShader = new StatisticsShader(StatisticsShader.LightnessValue));
-        internal StatisticsShader AlphaShader => alphaShader ?? (alphaShader = new StatisticsShader(StatisticsShader.AlphaValue));
+        private SharedModel shared;
 
-        internal ReduceShader MinReduce => minReduce ?? (minReduce = new ReduceShader("min(a,b)", float.MaxValue.ToString(CultureInfo.InvariantCulture)));
-        internal ReduceShader MaxReduce => maxReduce ?? (maxReduce = new ReduceShader("max(a,b)", float.MinValue.ToString(CultureInfo.InvariantCulture)));
-        internal ReduceShader AvgReduce => avgReduce ?? (avgReduce = new ReduceShader("a+b", "0.0"));
+        public StatisticsModel(SharedModel shared)
+        {
+            this.shared = shared;
+        }
+
+        internal StatisticsShader LuminanceShader => luminanceShader ?? (luminanceShader = new StatisticsShader(shared.Upload, StatisticsShader.LuminanceValue));
+        internal StatisticsShader UniformShader => uniformShader ?? (uniformShader = new StatisticsShader(shared.Upload, StatisticsShader.UniformWeightValue));
+        internal StatisticsShader LumaShader => lumaShader ?? (lumaShader = new StatisticsShader(shared.Upload, StatisticsShader.LumaValue));
+        internal StatisticsShader LightnessShader => lightnessShader ?? (lightnessShader = new StatisticsShader(shared.Upload, StatisticsShader.LightnessValue));
+        internal StatisticsShader AlphaShader => alphaShader ?? (alphaShader = new StatisticsShader(shared.Upload, StatisticsShader.AlphaValue));
+
+        internal ReduceShader MinReduce => minReduce ?? (minReduce = new ReduceShader(shared.Upload, "min(a,b)", float.MaxValue.ToString(CultureInfo.InvariantCulture)));
+        internal ReduceShader MaxReduce => maxReduce ?? (maxReduce = new ReduceShader(shared.Upload, "max(a,b)", float.MinValue.ToString(CultureInfo.InvariantCulture)));
+        internal ReduceShader AvgReduce => avgReduce ?? (avgReduce = new ReduceShader(shared.Upload, "a+b", "0.0"));
         //public bool HasAlpha => !(Min.Alpha == 1.0f && Max.Alpha == 1.0f);
 
         internal float GetStats(ITexture texture, int layer, int mipmap, StatisticsShader statShader, ReduceShader redShader, bool normalize)
@@ -51,15 +56,9 @@ namespace ImageFramework.Model.Statistics
             // execute reduce
             redShader.Run(buffer, numElements);
 
-            // extract from buffer[0]
-            if (downloadBuffer == null)
-            {
-                downloadBuffer = new DownloadBuffer<float>();
-            }
+            shared.Download.CopyFrom(buffer);
 
-            downloadBuffer.CopyFrom(buffer);
-
-            var res = downloadBuffer.GetData();
+            var res = shared.Download.GetData<float>();
             if (normalize) res /= numElements;
             return res;
         }
@@ -72,7 +71,6 @@ namespace ImageFramework.Model.Statistics
         public void Dispose()
         {
             buffer?.Dispose();
-            downloadBuffer?.Dispose();
             luminanceShader?.Dispose();
             uniformShader?.Dispose();
             lumaShader?.Dispose();

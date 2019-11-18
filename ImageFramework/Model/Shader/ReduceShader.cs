@@ -19,16 +19,16 @@ namespace ImageFramework.Model.Shader
         private readonly string defaultValue;
 
         private readonly DirectX.Shader shader;
-        private readonly UploadBuffer<int> numBuffer;
+        private readonly UploadBuffer numBuffer;
 
-        public ReduceShader(string reduceOp = "a+b", string defaultValue = "0.0", string type = "float")
+        public ReduceShader(UploadBuffer upload, string reduceOp = "a+b", string defaultValue = "0.0", string type = "float")
         {
             this.type = type;
             this.reduceOp = reduceOp;
             this.defaultValue = defaultValue;
 
             shader = new DirectX.Shader(DirectX.Shader.Type.Compute, GetSource(), "ReduceShader");
-            numBuffer = new UploadBuffer<int>(1);
+            numBuffer = upload;
         }
 
         /// <summary>

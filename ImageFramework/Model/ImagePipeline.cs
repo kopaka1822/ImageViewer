@@ -104,7 +104,7 @@ namespace ImageFramework.Model
             public ImagesModel Images;
             public ProgressModel Progress;
             public TextureCache TextureCache;
-            public UploadBuffer<LayerLevelFilter> LayerLevelBuffer;
+            public UploadBuffer LayerLevelBuffer;
             public List<FilterModel> Filters;
             public SyncQuery Sync;
         }

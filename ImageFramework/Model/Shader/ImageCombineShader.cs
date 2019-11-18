@@ -17,7 +17,7 @@ namespace ImageFramework.Model.Shader
                 GetShaderSource(colorFormula, alphaFormula, Math.Max(numImages, 1), builder), "ImageCombineShader");
         }
 
-        public void Run(ImagesModel images, UploadBuffer<LayerLevelFilter> constantBuffer, ITexture target)
+        public void Run(ImagesModel images, UploadBuffer constantBuffer, ITexture target)
         {
             var dev = Device.Get();
             dev.Compute.Set(shader.Compute);

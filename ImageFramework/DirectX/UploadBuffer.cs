@@ -13,41 +13,38 @@ namespace ImageFramework.DirectX
     /// <summary>
     /// this should be used to upload data to the gpu or for constant buffers that update frequently
     /// </summary>
-    public class UploadBuffer<T> : IDisposable where T : struct
+    public class UploadBuffer : IDisposable
     {
         public readonly Buffer Handle;
-
-        public int ElementCount { get; }
         public int ByteSize { get; }
 
-        public UploadBuffer(int numElements = 1)
+        public UploadBuffer(int byteSize)
         {
-            var elementSize = Marshal.SizeOf(typeof(T));
-            ElementCount = numElements;
-            ByteSize = elementSize * ElementCount;
+            ByteSize = Utility.Utility.AlignTo(byteSize, 16);
 
             var bufferDesc = new BufferDescription
             {
                 BindFlags = BindFlags.ConstantBuffer,
                 CpuAccessFlags = CpuAccessFlags.None,
                 OptionFlags = ResourceOptionFlags.None,
-                SizeInBytes = Utility.Utility.AlignTo(ByteSize, 16),
-                StructureByteStride = elementSize,
+                SizeInBytes = ByteSize,
+                StructureByteStride = 0,
                 Usage = ResourceUsage.Default
             };
 
             Handle = new Buffer(Device.Get().Handle, bufferDesc);
         }
 
-        public void SetData(T data)
+        public void SetData<T>(T data) where T : struct
         {
-            Debug.Assert(ElementCount == 1);
+            Debug.Assert(Marshal.SizeOf(typeof(T)) <= ByteSize);
+
             Device.Get().UpdateBufferData(Handle, data);
         }
 
-        public void SetData(T[] data)
+        public void SetData<T>(T[] data) where T : struct
         {
-            Debug.Assert(data.Length == ElementCount);
+            Debug.Assert(Marshal.SizeOf(typeof(T)) * data.Length <= ByteSize);
             Device.Get().UpdateBufferData(Handle, data);
         }
 

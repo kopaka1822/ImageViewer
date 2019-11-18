@@ -21,7 +21,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
             
         }
 
-        public void Run(UploadBuffer<ViewBufferData> buffer, Matrix transform, Vector4 crop, float multiplier, bool useAbs, 
+        public void Run(UploadBuffer buffer, Matrix transform, Vector4 crop, float multiplier, bool useAbs, 
             ShaderResourceView texture, SamplerState sampler, int xaxis = 0, int yaxis = 1, int zvalue = 0)
         {
             buffer.SetData(new ViewBufferData

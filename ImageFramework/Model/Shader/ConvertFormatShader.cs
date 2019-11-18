@@ -20,15 +20,15 @@ namespace ImageFramework.Model.Shader
         private readonly DirectX.Shader convert2D;
         private readonly DirectX.Shader convert3D;
         private readonly QuadShader quad;
-        private readonly UploadBuffer<LayerLevelOffsetData> cbuffer;
+        private readonly UploadBuffer cbuffer;
 
-        public ConvertFormatShader(QuadShader quad)
+        public ConvertFormatShader(QuadShader quad, UploadBuffer upload)
         {
             var dev = DirectX.Device.Get();
             convert2D = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(ShaderBuilder.Builder2D), "ConvertFormatShader2D");
             convert3D = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(ShaderBuilder.Builder3D), "ConvertFormatShader3D");
             this.quad = quad;
-            cbuffer = new UploadBuffer<LayerLevelOffsetData>(1);
+            cbuffer = upload;
         }
 
         /// <summary>
@@ -256,7 +256,6 @@ float4 main(PixelIn i) : SV_TARGET
         {
             convert2D?.Dispose();
             convert3D?.Dispose();
-            cbuffer?.Dispose();
         }
     }
 }

@@ -16,7 +16,7 @@ namespace ImageFramework.Model.Shader
     {
         private readonly FilterModel parent;
         private readonly DirectX.Shader shader;
-        private readonly UploadBuffer<int> paramBuffer;
+        private readonly UploadBuffer paramBuffer;
 
         public readonly int localSize;
 
@@ -27,7 +27,7 @@ namespace ImageFramework.Model.Shader
             shader = new DirectX.Shader(DirectX.Shader.Type.Compute, GetShaderHeader() + "\n#line 1\n" + source, parent.Filename);
             if (parent.Parameters.Count != 0)
             {
-                paramBuffer = new UploadBuffer<int>(parent.Parameters.Count);
+                paramBuffer = new UploadBuffer(4 * parent.Parameters.Count);
                 UpdateParamBuffer();
             }
         }
@@ -41,7 +41,7 @@ namespace ImageFramework.Model.Shader
         /// <param name="cbuffer">buffer that stores some runtime information</param>
         /// <param name="iteration">current filter iteration. Should be 0 if not separable. Should be 0 or 1 if separable (x- and y-direction pass)</param>
         /// <remarks>make sure to call UpdateParamBuffer() if parameters have changed after the last invocation</remarks>
-        internal void Run(ImagesModel image, TextureArray2D src, TextureArray2D dst, UploadBuffer<LayerLevelFilter> cbuffer, int iteration)
+        internal void Run(ImagesModel image, TextureArray2D src, TextureArray2D dst, UploadBuffer cbuffer, int iteration)
         {
             if (parent.IsSepa) Debug.Assert(iteration == 0 || iteration == 1);
             else Debug.Assert(iteration == 0);

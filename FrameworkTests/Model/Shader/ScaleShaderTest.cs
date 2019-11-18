@@ -18,7 +18,7 @@ namespace FrameworkTests.Model.Shader
         [TestMethod]
         public void MitchelUpscale()
         {
-            var shader = new MitchellNetravaliScaleShader(new QuadShader());
+            var shader = new MitchellNetravaliScaleShader(new QuadShader(), new UploadBuffer(256));
             var checkers = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere.png"));
 
             var res = shader.Run(checkers, new Size3(62, 31));
@@ -32,7 +32,7 @@ namespace FrameworkTests.Model.Shader
         [TestMethod]
         public void MitchelXYScale()
         {
-            var shader = new MitchellNetravaliScaleShader(new QuadShader());
+            var shader = new MitchellNetravaliScaleShader(new QuadShader(), new UploadBuffer(256));
             var checkers = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere.png"));
 
             var res = shader.Run(checkers, new Size3(20, 40));

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.DirectX;
 using ImageFramework.Model.Shader;
 
 namespace ImageFramework.Model
@@ -10,15 +11,20 @@ namespace ImageFramework.Model
     /// <summary>
     /// data that is usually used by multiple models
     /// </summary>
-    internal class SharedModel : IDisposable
+    public class SharedModel : IDisposable
     {
         public MitchellNetravaliScaleShader ScaleShader { get; }
         public QuadShader QuadShader { get; } = new QuadShader();
         public ConvertFormatShader Convert { get; }
+        public UploadBuffer Upload { get; }
+        public DownloadBuffer Download { get; }
+
         public SharedModel()
         {
-            ScaleShader = new MitchellNetravaliScaleShader(QuadShader);
-            Convert = new ConvertFormatShader(QuadShader);
+            Upload = new UploadBuffer(256); // big enough for 4 matrix4
+            Download = new DownloadBuffer(256);
+            ScaleShader = new MitchellNetravaliScaleShader(QuadShader, Upload);
+            Convert = new ConvertFormatShader(QuadShader, Upload);
         }
 
         public void Dispose()
@@ -26,6 +32,7 @@ namespace ImageFramework.Model
             Convert?.Dispose();
             ScaleShader?.Dispose();
             QuadShader?.Dispose();
+            Upload?.Dispose();
         }
     }
 }
