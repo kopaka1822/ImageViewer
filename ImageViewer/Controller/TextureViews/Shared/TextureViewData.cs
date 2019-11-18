@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
-using ImageFramework.Model.Export;
 using ImageViewer.Controller.TextureViews.Shader;
 using ImageViewer.Models;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.Mathematics.Interop;
 
-namespace ImageViewer.Controller.TextureViews
+namespace ImageViewer.Controller.TextureViews.Shared
 {
     public class TextureViewData : IDisposable
     {

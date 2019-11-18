@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Utility;
 using ImageViewer.Controller.TextureViews.Shader;
+using ImageViewer.Controller.TextureViews.Shared;
 using ImageViewer.Models;
 using SharpDX;
-using Point = System.Drawing.Point;
 
-namespace ImageViewer.Controller.TextureViews
+namespace ImageViewer.Controller.TextureViews.Texture2D
 {
     public class PolarTextureView : ProjectionTextureView
     {

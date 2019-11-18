@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageViewer.Controller.TextureViews.Shared;
 using SharpDX;
 
 namespace ImageViewer.Controller.TextureViews.Shader
