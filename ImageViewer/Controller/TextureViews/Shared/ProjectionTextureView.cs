@@ -1,11 +1,10 @@
 ﻿using System;
 using ImageFramework.DirectX;
 using ImageFramework.Utility;
-using ImageViewer.Controller.TextureViews.Shared;
 using ImageViewer.Models;
 using SharpDX;
 
-namespace ImageViewer.Controller.TextureViews.Texture2D
+namespace ImageViewer.Controller.TextureViews.Shared
 {
     public abstract class ProjectionTextureView : ITextureView
     {

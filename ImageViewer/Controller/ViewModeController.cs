@@ -247,6 +247,9 @@ namespace ImageViewer.Controller
                             case DisplayModel.ViewMode.CubeCrossView:
                                 currentView = new CubeCrossTextureView(models, viewData);
                                 break;
+                            case DisplayModel.ViewMode.RayCasting:
+                                currentView = new RayCastingView(models, viewData);
+                                break;
                             default:
                                 currentView = new EmptyView();
                                 break;
