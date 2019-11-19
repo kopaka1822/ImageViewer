@@ -49,6 +49,12 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             models.Display.Zoom = models.Display.Zoom * value;
         }
 
+        public override void OnDrag2(Vector2 diff)
+        {
+            cubeOffsetX += 8.0f * diff.X / models.Display.Zoom / models.Window.ClientSize.Width;
+            cubeOffsetY -= 8.0f * diff.Y / models.Display.Zoom / models.Window.ClientSize.Height;
+        }
+
         protected override Matrix GetOrientation()
         {
             return Matrix.Identity;

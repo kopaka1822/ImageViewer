@@ -15,6 +15,8 @@ namespace ImageViewer.Controller.TextureViews
         void Draw(ITexture texture);
         void OnScroll(float amount, Vector2 mouse);
         void OnDrag(Vector2 diff);
+
+        void OnDrag2(Vector2 diff);
         Size3 GetTexelPosition(Vector2 mouse);
     }
 }

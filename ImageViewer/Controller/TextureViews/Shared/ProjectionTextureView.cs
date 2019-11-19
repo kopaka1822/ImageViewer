@@ -41,6 +41,11 @@ namespace ImageViewer.Controller.TextureViews.Shared
             roll += (float)diff.Y * 0.01f * models.Display.Aperture;
         }
 
+        public virtual void OnDrag2(Vector2 diff)
+        {
+            
+        }
+
         public abstract Size3 GetTexelPosition(Vector2 mouse);
 
         protected Matrix GetTransform()

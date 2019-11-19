@@ -29,6 +29,7 @@ namespace ImageViewer.Controller
     {
         private readonly ModelsEx models;
         private bool mouseDown = false;
+        private bool mouse2Down = false; // middle mouse button
         private Point mousePosition = new Point(0);
         // mouse position for displaying multiple views can be fixed
         private Point? fixedMousePosition = null;
@@ -143,14 +144,16 @@ namespace ImageViewer.Controller
             // don't interrupt when processing
             if (models.Progress.IsProcessing) return;
 
-            if (mouseDown)
+            if (mouseDown || mouse2Down)
             {
-                // drag event
                 // drag event
                 var diff = new Point(newPosition.X - mousePosition.X, newPosition.Y - mousePosition.Y);
                 if (Math.Abs(diff.X) > 0.01 || Math.Abs(diff.Y) > 0.01)
                 {
-                    currentView.OnDrag(new Vector2(diff.X, diff.Y));
+                    if(mouseDown)
+                        currentView.OnDrag(new Vector2(diff.X, diff.Y));
+                    if(mouse2Down)
+                        currentView.OnDrag2(new Vector2(diff.X, diff.Y));
                 }
             }
 
@@ -164,6 +167,7 @@ namespace ImageViewer.Controller
         private void DxHostOnMouseLeave(object sender, MouseEventArgs e)
         {
             mouseDown = false;
+            mouse2Down = false;
         }
 
         private void DxHostOnMouseUp(object sender, MouseButtonEventArgs e)
@@ -171,6 +175,10 @@ namespace ImageViewer.Controller
             if (e.ChangedButton == MouseButton.Left)
             {
                 mouseDown = false;
+                e.Handled = true;
+            } else if (e.ChangedButton == MouseButton.Middle)
+            {
+                mouse2Down = false;
                 e.Handled = true;
             }
                 
@@ -182,6 +190,11 @@ namespace ImageViewer.Controller
             if (e.ChangedButton == MouseButton.Left)
             {
                 mouseDown = true;
+                e.Handled = true;
+                dxHost.Focus();
+            } else if (e.ChangedButton == MouseButton.Middle)
+            {
+                mouse2Down = true;
                 e.Handled = true;
                 dxHost.Focus();
             }

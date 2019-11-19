@@ -23,6 +23,7 @@ namespace ImageViewer.Controller.TextureViews
         public void OnScroll(float amount, Vector2 mouse) {}
 
         public void OnDrag(Vector2 diff) {}
+        public void OnDrag2(Vector2 diff) {}
 
         public Size3 GetTexelPosition(Vector2 mouse)
         {

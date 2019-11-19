@@ -55,6 +55,11 @@ namespace ImageViewer.Controller.TextureViews.Shared
             translation.Y -= diff.Y * 2.0f / models.Images.GetHeight(0);
         }
 
+        public void OnDrag2(Vector2 diff)
+        {
+            
+        }
+
         public abstract Size3 GetTexelPosition(Vector2 mouse);
 
         private Matrix GetTransform()
