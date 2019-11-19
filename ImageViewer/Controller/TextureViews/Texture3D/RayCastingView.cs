@@ -51,8 +51,9 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
 
         public override void OnDrag2(Vector2 diff)
         {
-            cubeOffsetX += 8.0f * diff.X / models.Display.Zoom / models.Window.ClientSize.Width;
-            cubeOffsetY -= 8.0f * diff.Y / models.Display.Zoom / models.Window.ClientSize.Height;
+            float aspectX = models.Window.ClientSize.Width / (float)models.Window.ClientSize.Height;
+            cubeOffsetX += 4.0f * diff.X / models.Display.Zoom / models.Window.ClientSize.Width * aspectX;
+            cubeOffsetY -= 4.0f * diff.Y / models.Display.Zoom / models.Window.ClientSize.Height;
         }
 
         protected override Matrix GetOrientation()
