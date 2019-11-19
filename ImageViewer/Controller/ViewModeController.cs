@@ -258,6 +258,7 @@ namespace ImageViewer.Controller
                     catch (Exception err)
                     {
                         models.Window.ShowErrorDialog(err.Message);
+                        currentView = new EmptyView();
                     }
                     break;
             }

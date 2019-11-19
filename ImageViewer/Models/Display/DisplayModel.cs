@@ -370,6 +370,7 @@ namespace ImageViewer.Models.Display
             switch (vm)
             {
                 case DisplayModel.ViewMode.CubeCrossView:
+                case DisplayModel.ViewMode.RayCasting:
                 case DisplayModel.ViewMode.Single:
                 case DisplayModel.ViewMode.Empty:
                     return false;

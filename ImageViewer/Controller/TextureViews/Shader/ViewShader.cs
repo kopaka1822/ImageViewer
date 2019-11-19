@@ -48,7 +48,7 @@ color = toSrgb(color);
             dev.Pixel.Set(null);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             vertex?.Dispose();
             pixel?.Dispose();

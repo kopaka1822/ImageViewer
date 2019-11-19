@@ -26,7 +26,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
             data.Checkers.Run(data.Buffer, Matrix.Identity);
         }
 
-        public void OnScroll(float amount, Vector2 mouse)
+        public virtual void OnScroll(float amount, Vector2 mouse)
         {
             // modify zoom
             var step = amount > 0.0f ? 1.0f / 1.001f : 1.001f;
@@ -50,7 +50,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
 
         protected abstract Matrix GetOrientation();
 
-        private Matrix GetRotation()
+        protected Matrix GetRotation()
         {
             return
                 Matrix.RotationX(roll) *
