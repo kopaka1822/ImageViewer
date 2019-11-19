@@ -23,7 +23,7 @@ namespace ImageFramework.Model.Equation.Markov
             };
         }
 
-        public override List<Token.Token> Apply(List<Token.Token> match)
+        protected override List<Token.Token> Apply(List<Token.Token> match)
         {
             var function = (FunctionToken)match[0];
             var v1 = (ValueToken)match[1];

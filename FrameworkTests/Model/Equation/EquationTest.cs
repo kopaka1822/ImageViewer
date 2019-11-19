@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Model.Equation.Token;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FrameworkTests.Model.Equation
@@ -33,6 +34,46 @@ namespace FrameworkTests.Model.Equation
             Assert.AreEqual(2, GetMaxImage("I1 + I2"));
             Assert.AreEqual(3, GetMaxImage("I3 + I2"));
             Assert.AreEqual(0, GetMaxImage("1"));
+        }
+
+        [TestMethod]
+        public void OperatorPrecedence()
+        {
+            var eq = new ImageFramework.Model.Equation.Equation("(3-1)*0.4+1");
+            var hlsl = eq.GetHlslExpression();
+            var expected =
+                $"((({NumberToken.ToHlsl(3.0f)}-{NumberToken.ToHlsl(1.0f)})*{NumberToken.ToHlsl(0.4f)})+{NumberToken.ToHlsl(1.0f)})";
+
+            Assert.AreEqual(expected, hlsl.Replace(" ", ""));
+
+            eq = new ImageFramework.Model.Equation.Equation("1+0.4*(3-1)");
+            hlsl = eq.GetHlslExpression();
+
+            expected =
+                $"({NumberToken.ToHlsl(1.0f)}+({NumberToken.ToHlsl(0.4f)}*({NumberToken.ToHlsl(3.0f)}-{NumberToken.ToHlsl(1.0f)})))";
+
+            Assert.AreEqual(expected, hlsl.Replace(" ", ""));
+        }
+
+        [TestMethod]
+        public void SignOperatorAndBrackets()
+        {
+            var eq = new ImageFramework.Model.Equation.Equation("1+0.4*-2");
+            var hlsl = eq.GetHlslExpression();
+            var expected =
+                $"({NumberToken.ToHlsl(1.0f)}+({NumberToken.ToHlsl(0.4f)}*({NumberToken.ToHlsl(-1.0f)}*{NumberToken.ToHlsl(2.0f)})))";
+
+            Assert.AreEqual(expected, hlsl.Replace(" ", ""));
+        }
+
+        [TestMethod]
+        public void SignPrecedence()
+        {
+            var eq = new ImageFramework.Model.Equation.Equation( "-1+2");
+            var hlsl = eq.GetHlslExpression();
+            var expected = $"(({NumberToken.ToHlsl(-1.0f)}*{NumberToken.ToHlsl(1.0f)})+{NumberToken.ToHlsl(2.0f)})";
+
+            Assert.AreEqual(expected, hlsl.Replace(" ", ""));
         }
 
         // equation should fail
