@@ -260,7 +260,9 @@ struct PixelIn
 float4 main(PixelIn i) : SV_TARGET
 {
     float4 coord = i.projPos;
-    return multiplier * in_tex.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), layer)];
+    float4 color = in_tex.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), layer)];
+    color.rgb *= multiplier;
+    return color;
 }
 ";
         }
