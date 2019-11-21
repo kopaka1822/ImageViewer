@@ -26,7 +26,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
         public UploadBuffer Buffer { get; }
 
         public CheckersShader Checkers { get; }
-        public TextureViewData(SharedModel shared)
+        public TextureViewData(ModelsEx models)
         {
             var dev = ImageFramework.DirectX.Device.Get();
 
@@ -37,9 +37,9 @@ namespace ImageViewer.Controller.TextureViews.Shared
             LinearSampler = CreateSamplerState(true);
             PointSampler = CreateSamplerState(false);
 
-            Buffer = shared.Upload;
+            Buffer = models.SharedModel.Upload;
 
-            Checkers = new CheckersShader();
+            Checkers = new CheckersShader(models);
         }
 
         private static BlendState CreateBlendState(bool enable, BlendOption src, BlendOption dst)

@@ -50,12 +50,10 @@ namespace ImageViewer.Controller
             models.Window.Window.Loaded += WindowOnLoaded;
 
             // clear color
-            var bgBrush = (SolidColorBrush)models.Window.Window.FindResource("BackgroundBrush");
-            var tmpColor = new Color(bgBrush.Color.ScR, bgBrush.Color.ScG, bgBrush.Color.ScB, 1.0f);
-            tmpColor = tmpColor.ToSrgb();
-            clearColor.R = tmpColor.Red;
-            clearColor.G = tmpColor.Green;
-            clearColor.B = tmpColor.Blue;
+            var col = models.Window.ThemeColor;
+            clearColor.R = col.Red;
+            clearColor.G = col.Green;
+            clearColor.B = col.Blue;
             clearColor.A = 1.0f;
         }
 

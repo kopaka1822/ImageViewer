@@ -51,6 +51,9 @@ namespace ImageViewer.Models
                 case nameof(Settings.Default.FlipYAxis):
                     OnPropertyChanged(nameof(FlipYAxis));
                     break;
+                case nameof(Settings.Default.AlphaBackground):
+                    OnPropertyChanged(nameof(AlphaBackground));
+                    break;
             }
         }
 
@@ -134,6 +137,20 @@ namespace ImageViewer.Models
                 var clamp = Utility.Clamp(value, MinTexelDecimalPlaces, MaxTexelDecimalPlaces);
                 Settings.Default.TexelDecimalCount = clamp;
             }
+        }
+
+        public enum AlphaType
+        {
+            Black,
+            White,
+            Checkers,
+            Theme
+        }
+
+        public AlphaType AlphaBackground
+        {
+            get => (AlphaType) Settings.Default.AlphaBackground;
+            set => Settings.Default.AlphaBackground = (int)value;
         }
 
         public bool FlipYAxis

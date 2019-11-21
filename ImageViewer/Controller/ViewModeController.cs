@@ -49,7 +49,7 @@ namespace ImageViewer.Controller
             dxHost.MouseLeave += DxHostOnMouseLeave;
             dxHost.MouseMove += DxHostOnMouseMove;
 
-            viewData = new TextureViewData(models.SharedModel);
+            viewData = new TextureViewData(models);
         }
 
         private void DispatchRecomputeTexelColor()

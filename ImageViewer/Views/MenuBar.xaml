@@ -96,15 +96,16 @@
                 IsCheckable="True"
                 IsChecked="{Binding Display.DisplayNegative}"/>
             <MenuItem
-                Header="Flip Y Axis"
-                IsCheckable="True"
-                IsChecked="{Binding Display.FlipYAxis}"/>
-            <MenuItem
                     Header="Show Crop Box"
                     IsCheckable="True"
                     IsChecked="{Binding Display.ShowCropRectangle}"
                     ToolTip="Shows the crop box if cropping is enabled for export"
                     />
+            <Separator/>
+            <MenuItem
+                Header="Flip Y Axis"
+                IsCheckable="True"
+                IsChecked="{Binding Display.FlipYAxis}"/>
             <MenuItem 
                     Header="_Pixel Display"
                     Command="{Binding ShowPixelDisplayCommand}">
@@ -112,7 +113,7 @@
                     <Image Source="../Icons/displayconfig.png"/>
                 </MenuItem.Icon>
             </MenuItem>
-
+            <Separator/>
             <MenuItem
                 Header="_Theme">
                 <MenuItem
@@ -139,6 +140,26 @@
                         <system:Int32>2</system:Int32>
                     </MenuItem.CommandParameter>
                 </MenuItem>
+            </MenuItem>
+            <MenuItem 
+                Header="Alpha Background"
+                ToolTip="Background color when using transparent images">
+                <MenuItem 
+                    Header="White"
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.IsAlphaWhite}"/>
+                <MenuItem 
+                    Header="Black"
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.IsAlphaBlack}"/>
+                <MenuItem 
+                    Header="Checkers"
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.IsAlphaCheckers}"/>
+                <MenuItem 
+                    Header="Theme"
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.IsAlphaTheme}"/>
             </MenuItem>
         </MenuItem>
         <!--END VIEW-->

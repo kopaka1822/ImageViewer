@@ -23,7 +23,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
 
         public virtual void Draw(ITexture texture)
         {
-            data.Checkers.Run(data.Buffer, Matrix.Identity);
+            data.Checkers.Run(data.Buffer, Matrix.Identity, models.Settings.AlphaBackground);
         }
 
         public virtual void OnScroll(float amount, Vector2 mouse)

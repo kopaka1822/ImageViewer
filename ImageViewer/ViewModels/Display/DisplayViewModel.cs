@@ -52,6 +52,12 @@ namespace ImageViewer.ViewModels.Display
                     OnPropertyChanged(nameof(DxSystemVisibility));
                     OnPropertyChanged(nameof(GlSystemVisibility));
                     break;
+                case nameof(SettingsModel.AlphaBackground):
+                    OnPropertyChanged(nameof(IsAlphaBlack));
+                    OnPropertyChanged(nameof(IsAlphaWhite));
+                    OnPropertyChanged(nameof(IsAlphaCheckers));
+                    OnPropertyChanged(nameof(IsAlphaTheme));
+                    break;
             }
         }
 
@@ -415,6 +421,39 @@ namespace ImageViewer.ViewModels.Display
 
         public Visibility GlSystemVisibility =>
             models.Settings.FlipYAxis ? Visibility.Visible : Visibility.Collapsed;
+
+        public bool IsAlphaWhite
+        {
+            get => models.Settings.AlphaBackground == SettingsModel.AlphaType.White;
+            set
+            {
+                if(value) models.Settings.AlphaBackground = SettingsModel.AlphaType.White;
+            } 
+        }
+        public bool IsAlphaBlack
+        {
+            get => models.Settings.AlphaBackground == SettingsModel.AlphaType.Black;
+            set
+            {
+                if (value) models.Settings.AlphaBackground = SettingsModel.AlphaType.Black;
+            }
+        }
+        public bool IsAlphaCheckers
+        {
+            get => models.Settings.AlphaBackground == SettingsModel.AlphaType.Checkers;
+            set
+            {
+                if (value) models.Settings.AlphaBackground = SettingsModel.AlphaType.Checkers;
+            }
+        }
+        public bool IsAlphaTheme
+        {
+            get => models.Settings.AlphaBackground == SettingsModel.AlphaType.Theme;
+            set
+            {
+                if (value) models.Settings.AlphaBackground = SettingsModel.AlphaType.Theme;
+            }
+        }
 
         /// <summary>
         /// respects flipping of texel coordinate

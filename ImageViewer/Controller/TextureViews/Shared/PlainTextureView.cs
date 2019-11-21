@@ -102,7 +102,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
             var finalTransform = offset * GetTransform();
             
             // draw the checkers background
-            data.Checkers.Run(data.Buffer, finalTransform);
+            data.Checkers.Run(data.Buffer, finalTransform, models.Settings.AlphaBackground);
             
             // blend over the final image
             dev.OutputMerger.BlendState = data.AlphaBlendState;
