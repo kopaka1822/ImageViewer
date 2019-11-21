@@ -32,12 +32,15 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         {
             if (texture == null) return;
 
-            var src = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
-            var mat = GetWorldToImage();
-            Vector4.Transform(ref src, ref mat, out var res);
+            base.Draw(texture);
+
+            var dev = Device.Get();
+            dev.OutputMerger.BlendState = data.AlphaDarkenState;
 
             shader.Run(data.Buffer, models.Display.ClientAspectRatio * GetOrientation(), GetWorldToImage(), models.Display.Multiplier, CalcFarplane(), models.Display.DisplayNegative, 
                 texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap));
+
+            dev.OutputMerger.BlendState = data.DefaultBlendState;
         }
 
         public override void OnScroll(float amount, Vector2 mouse)

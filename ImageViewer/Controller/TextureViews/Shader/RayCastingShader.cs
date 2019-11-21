@@ -186,28 +186,30 @@ bool getIntersection(float3 origin, float3 dir, out float3 intersect) {{
 
 float4 main(PixelIn i) : SV_TARGET {{
     float4 color = 0.0;
+    color.a = 1.0; // transmittance
+
     uint width, height, depth;
     tex.GetDimensions(width, height, depth);
 
     // the height of the cube is 2.0 in world space. Width and Depth depend on aspect of height
-    float stepsize = 4.0;
+    const float stepsize = 4.0;
     float3 ray = normalize(i.rayDir) * 2.0f / float(height) / stepsize;
 
     // transform ray to image space
     ray = mul(toImage, float4(ray, 0.0)).xyz;
     float3 pos;    
 
-    if(!getIntersection(i.origin, ray, pos)) return 0.0;
+    if(!getIntersection(i.origin, ray, pos)) return color;
     
-    float transmittance = 1.0;
     [loop] do{{
         float4 s = tex.SampleLevel(texSampler, pos, 0);
-        float alpha = s.a / stepsize;
-        color.rgb += transmittance * alpha * s.rgb;
-        transmittance *= (1.0 - alpha);
+        float invAlpha = pow(max(1.0 - s.a, 0.0), 1.0 / stepsize);
+        float alpha = 1.0 - invAlpha;
+        color.rgb += color.a * alpha * s.rgb;
+        color.a *= invAlpha;
         
         pos += ray;
-    }} while(isInside(pos) && transmittance > 0.0);
+    }} while(isInside(pos) && color.a > 0.0);
    
     color.rgb *= multiplier;
     {ApplyColorTransform()}

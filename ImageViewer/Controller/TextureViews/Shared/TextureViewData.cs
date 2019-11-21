@@ -12,7 +12,12 @@ namespace ImageViewer.Controller.TextureViews.Shared
     public class TextureViewData : IDisposable
     {
         public BlendState DefaultBlendState { get; }
+
+        // src = alpha, dst = 1 - alpha
         public BlendState AlphaBlendState { get; }
+
+        // src = 1, dst = alpha
+        public BlendState AlphaDarkenState { get; }
 
         public SamplerState LinearSampler { get; }
 
@@ -27,6 +32,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
 
             DefaultBlendState = CreateBlendState(false, BlendOption.One, BlendOption.Zero);
             AlphaBlendState = CreateBlendState(true, BlendOption.SourceAlpha, BlendOption.InverseSourceAlpha);
+            AlphaDarkenState = CreateBlendState(true, BlendOption.One, BlendOption.SourceAlpha);
 
             LinearSampler = CreateSamplerState(true);
             PointSampler = CreateSamplerState(false);
@@ -82,6 +88,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
         {
             DefaultBlendState?.Dispose();
             AlphaBlendState?.Dispose();
+            AlphaDarkenState?.Dispose();
             LinearSampler?.Dispose();
             PointSampler?.Dispose();
             Checkers?.Dispose();
