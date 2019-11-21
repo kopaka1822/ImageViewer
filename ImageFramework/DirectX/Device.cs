@@ -247,10 +247,10 @@ namespace ImageFramework.DirectX
             return Handle.CheckFormatSupport(f);
         }
 
-        public void DrawQuad()
+        public void DrawQuad(int count = 1)
         {
             context.InputAssembler.InputLayout = null;
-            context.Draw(4, 0);
+            context.Draw(4 * count, 0);
         }
 
         public void DrawFullscreenTriangle(int count = 1)

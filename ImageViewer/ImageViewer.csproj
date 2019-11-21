@@ -112,6 +112,7 @@
     <Compile Include="Controller\ImportDialogController.cs" />
     <Compile Include="Controller\PaintController.cs" />
     <Compile Include="Controller\TextureViews\Shader\RayCastingShader.cs" />
+    <Compile Include="Controller\TextureViews\Shader\ShearWarpShader.cs" />
     <Compile Include="Controller\TextureViews\Texture2D\CubeCrossTextureView.cs" />
     <Compile Include="Controller\TextureViews\Texture2D\CubeTextureView.cs" />
     <Compile Include="Controller\TextureViews\EmptyView.cs" />
@@ -125,10 +126,12 @@
     <Compile Include="Controller\TextureViews\Shader\SingleViewShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\ViewShader.cs" />
     <Compile Include="Controller\TextureViews\Texture3D\RayCastingView.cs" />
+    <Compile Include="Controller\TextureViews\Texture3D\ShearWarpView.cs" />
     <Compile Include="Controller\TextureViews\Texture3D\Single3DView.cs" />
     <Compile Include="Controller\TextureViews\Shared\SingleTextureView.cs" />
     <Compile Include="Controller\TextureViews\Shared\TextureViewData.cs" />
     <Compile Include="Controller\TextureViews\Shared\ViewBufferData.cs" />
+    <Compile Include="Controller\TextureViews\Texture3D\Texture3DBaseView.cs" />
     <Compile Include="Controller\ViewModeController.cs" />
     <Compile Include="Models\Display\Single3DDisplayModel.cs" />
     <Compile Include="Models\SettingsModel.cs" />

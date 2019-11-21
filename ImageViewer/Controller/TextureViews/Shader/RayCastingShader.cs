@@ -95,7 +95,6 @@ VertexOut main(uint id : SV_VertexID) {{
     o.projPos = float4(canonical, 0, 1);
 
     o.rayDir = normalize(mul(transform, float4(canonical.xy, farplane, 0.0)).xyz);    
-    //o.rayDir.y *= -1.0;
     
     float4 origin = mul(toImage, float4(0, 0, 0, 1));
     o.origin = origin.xyz / origin.w;    

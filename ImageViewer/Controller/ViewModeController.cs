@@ -263,6 +263,9 @@ namespace ImageViewer.Controller
                             case DisplayModel.ViewMode.RayCasting:
                                 currentView = new RayCastingView(models, viewData);
                                 break;
+                            case DisplayModel.ViewMode.ShearWarp:
+                                currentView = new ShearWarpView(models, viewData);
+                                break;
                             default:
                                 currentView = new EmptyView();
                                 break;

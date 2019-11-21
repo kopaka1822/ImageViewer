@@ -28,7 +28,8 @@ namespace ImageViewer.Models.Display
             CubeMap,
             Polar,
             CubeCrossView,
-            RayCasting
+            RayCasting,
+            ShearWarp
         }
 
         public enum SplitMode
@@ -317,7 +318,8 @@ namespace ImageViewer.Models.Display
                         }
                         else if(models.Images.ImageType == typeof(Texture3D))
                         {
-                            modes.Insert(0, ViewMode.RayCasting);
+                            modes.Insert(0, ViewMode.ShearWarp);
+                            modes.Insert(1, ViewMode.RayCasting);
                         }
 
                         AvailableViews = modes;
@@ -371,6 +373,7 @@ namespace ImageViewer.Models.Display
             {
                 case DisplayModel.ViewMode.CubeCrossView:
                 case DisplayModel.ViewMode.RayCasting:
+                case DisplayModel.ViewMode.ShearWarp:
                 case DisplayModel.ViewMode.Single:
                 case DisplayModel.ViewMode.Empty:
                     return false;
