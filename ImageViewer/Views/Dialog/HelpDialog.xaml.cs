@@ -109,9 +109,13 @@ namespace ImageViewer.Views.Dialog
         {
             if (args.Uri == null) return;
 
-            // dont open web page in the embedded browser
-            if (args.Uri.ToString().StartsWith("http") || args.Uri.ToString().StartsWith("www"))
+            if (args.Uri.ToString().StartsWith("about:blank"))
             {
+                // markdown header redirection
+            }
+            else if (args.Uri.ToString().StartsWith("http") || args.Uri.ToString().StartsWith("www"))
+            {
+                // dont open web page in the embedded browser
                 args.Cancel = true;
                 System.Diagnostics.Process.Start(args.Uri.ToString());
             }

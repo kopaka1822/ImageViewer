@@ -7,14 +7,55 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Annotations;
+using ImageFramework.DirectX;
 
 namespace ImageFramework.Model.Filter
 {
     public class FiltersModel : IDisposable, INotifyPropertyChanged
     {
         private List<FilterModel> filter = new List<FilterModel>();
+        private readonly ImagesModel images;
+
+        public class RetargetErrorEventArgs : EventArgs
+        {
+            public RetargetErrorEventArgs(string error)
+            {
+                Error = error;
+            }
+
+            public string Error { get; private set; }
+        }
+
+        public delegate void RetargetErrorHandler(object sender, RetargetErrorEventArgs e);
+
+        public event RetargetErrorHandler RetargetError;
+
+        public FiltersModel(ImagesModel images)
+        {
+            this.images = images;
+            this.images.PropertyChanged += ImagesOnPropertyChanged;
+        }
+
+        private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ImagesModel.ImageType):
+                    if (images.ImageType == typeof(TextureArray2D))
+                    {
+                        RetargetFilter(FilterLoader.TargetType.Tex2D);
+                    }
+                    else if (images.ImageType == typeof(Texture3D))
+                    {
+                        RetargetFilter(FilterLoader.TargetType.Tex3D);
+                    }
+                    break;
+            }
+        }
 
         public IReadOnlyList<FilterModel> Filter => filter;
+
+        public FilterLoader.TargetType CurrentTarget { get; private set; } = FilterLoader.TargetType.Tex2D; // assume filter target 2d texture in the beginning        
 
         public class ParameterChangeEventArgs : EventArgs
         {
@@ -49,6 +90,8 @@ namespace ImageFramework.Model.Filter
             DisposeUnusedFilter(newFilter, filter);
             foreach (var filterModel in newFilter)
             {
+                Debug.Assert(filterModel.Target == CurrentTarget);
+
                 // only set the callback if it is a new filter
                 if(filter.All(f => !ReferenceEquals(f, filterModel)))
                     SetParameterChangeCallback(filterModel);
@@ -62,6 +105,12 @@ namespace ImageFramework.Model.Filter
         /// </summary>
         public void AddFilter(FilterModel model)
         {
+            if (filter.Count == 0 && images.NumImages == 0)
+            {
+                CurrentTarget = model.Target; // set target based on filter
+            }
+            Debug.Assert(model.Target == CurrentTarget);
+
             filter.Add(model);
             SetParameterChangeCallback(model);
             OnPropertyChanged(nameof(Filter));
@@ -77,6 +126,34 @@ namespace ImageFramework.Model.Filter
             filter[index].Dispose();
             filter.RemoveAt(index);
             OnPropertyChanged(nameof(Filter));
+        }
+
+        private void RetargetFilter(FilterLoader.TargetType target)
+        {
+            if (target == CurrentTarget) return;
+            CurrentTarget = target;
+            if (Filter.Count == 0) return;
+
+            string errors = "";
+            var newFilter = new List<FilterModel>();
+            foreach (var f in Filter)
+            {
+                try
+                {
+                    newFilter.Add(f.Retarget(CurrentTarget));
+                }
+                catch (Exception)
+                {
+                    errors += $"filter {f.Name} was removed during retargeting\n";
+                }
+            }
+
+            Dispose();
+            filter = newFilter;
+            OnPropertyChanged(nameof(Filter));
+
+            if (errors.Length != 0)
+                OnRetargetError(errors);
         }
 
         public void Clear()
@@ -131,6 +208,11 @@ namespace ImageFramework.Model.Filter
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected virtual void OnRetargetError(string error)
+        {
+            RetargetError?.Invoke(this, new RetargetErrorEventArgs(error));
         }
     }
 }

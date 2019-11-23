@@ -68,6 +68,13 @@ namespace ImageViewer.ViewModels
 
             changesBrush = new SolidColorBrush(Color.FromRgb(237, 28, 36));
             noChangesBrush = (SolidColorBrush)models.Window.Window.FindResource("FontBrush");
+
+            this.models.Filter.RetargetError += FilterOnRetargetError;
+        }
+
+        private void FilterOnRetargetError(object sender, FiltersModel.RetargetErrorEventArgs e)
+        {
+            models.Window.ShowInfoDialog(e.Error, "Error during filter retargeting");
         }
 
         private void ModelsOnSoftReset(object sender, EventArgs e)

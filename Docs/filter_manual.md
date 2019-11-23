@@ -1,10 +1,10 @@
 # Filter Manual
 
-Filters are simple HLSL compute shader with a custom entry point: `float4 filter(int2 pixel, int2 size)`. This function will be called once for each pixel on each layer in each mipmap. 
+Filters are simple HLSL compute shader with a custom entry point. Filters can be written for 2D and 3D images. All filters have the entry point `float4 filter(...)` that will be invoked for each pixel in each layer in each mipmap.
 
 ### Source Image:
 
-The source image can be accesed via `Texture2D src_image`. This is a texture view of the currently processed layer and mipmap. Additionally, you can use the global variables `uint layer` and `uint level` to get information about the currently processed layer or mipmap level. If you need to acces a custom layer/mipmap you can use `Texture2DArray src_image_ex` to get the view of the entire resource.
+The source image can be accesed via `Texture2D src_image` or `Texture3D src_image`. This is a texture view of the currently processed layer and mipmap. Additionally, you can use the global variables `uint layer` and `uint level` to get information about the currently processed layer or mipmap level. If you need to acces a custom layer/mipmap you can use `Texture2DArray src_image_ex` or `Texture3D src_image_ex` to get the view of the entire resource.
 
 ## Additional Preprocessor directives:
 ### Settings:
@@ -19,7 +19,24 @@ Sets the description of the shader that will be displayed in the filter tab
 
 **#setting** sepa, *true/false*
 
-Specifies if the shader is a seperatable shader. If sepa is set to true, the shader will be executed twice. In the first run, the variable "int2 filterDirection" will be set to int2(1,0). In the second run, the variable will be set to int2(0,1). The default value is false.
+Specifies if the shader is a seperatable shader. If sepa is set to true, the shader will be executed one time for each dimension (2 or 3 times). In the first run, the variable `int3 filterDirection` will be set to `int3(1,0, 0)`. In the second run, the variable will be set to `int3(0,1,0)`. If we are processing a 3D image, the variable will be set to `int3(0,0,1)` in the third run. The default value is false.
+
+**#setting** type, *filter type*
+
+Specifies what kind of filter function is provided. List of types and resulting filter functions:
+
+| *filter type* | entry point | supports
+|-|-|-|
+|TEX2D      | `float4 filter(int2 pixel, int2 size)`| 2D
+|TEX3D      | `float4 filter(int3 pixel, int3 size)`| 3D
+|COLOR          | `float4 filter(float4 pixelColor)` | 2D,3D
+|DYNAMIC        | `float4 filter(int3 pixel, int3 size)`| 2D,3D
+
+refer to [*Writing DYNAMIC filter*](#Writing-DYNAMIC-filter) for a detailed explanation on DYNAMIC
+
+**#setting** groupsize, size
+
+Sets the compute shaders `numthreads(size)`. The default value for 2D and 3D are (2x) **32** and (3x) **8**. It is recommended to set this to a lower number for compute heavy shaders
 
 ---
 
@@ -73,7 +90,7 @@ The original (imported) images can be accessed by using the **#texture** directi
 
 *Displayed Name*: Will be displayed in the filter tab as texture name.
 
-*Shader Name*: Name of the `Texture2D` variable that will be provided to access the texture data.  
+*Shader Name*: Name of the `Texture2D` or `Texture3D` variable that will be provided to access the texture data.  
 
 The desired (imported) texture can be selected in the filter menu.
  
@@ -116,3 +133,16 @@ More examples:
 * See gamma.hlsl for a simple example.
 * See blur.hlsl for a simple seperatable shader example (Gaussian Blur) 
 * See silhouette.hlsl for an example with texture bindings.
+
+## Writing DYNAMIC filter
+
+Dynamic filter work with both, 2D and 3D textures. In order accesss the textures correctly the following helper functions are defined:
+
+|function| 2D return value | 3D ret. value |
+|-|-|-|
+|`texel(int3 coord)`| `coord.xy` | `coord.xyz`|
+|`texel(int3 coord, int layer)`|`coord.xy,layer`|`coord.xyz`|
+
+Additionally you can use `#if2D` and `#if3D` in combination with `#else` and `#endif` for preprocessing.
+
+* See mirror.hlsl for a simple example

@@ -1,8 +1,14 @@
 #setting title, Median Filter
 #setting description, Chooses the pixel with the average luminance within the filter radius.
-#setting groupsize, 5
+#setting type, DYNAMIC
 
+#if2D
+#setting groupsize, 5
 #param Radius, RADIUS, Int, 1, 1, 6
+#else
+#setting groupsize, 3
+#param Radius, RADIUS, Int, 1, 1, 2
+#endif
 
 // sum of temp registers and indexable temp registers times 64 threads exceeds the recommended total 16384.  Performance may be reduced
 #pragma warning( disable : 4717 )
@@ -28,17 +34,19 @@ void bubbleSort(int numLength, inout float4 buf[169])
 	}
 }
 			
-float4 filter(int2 pixelCoord, int2 size)
+float4 filter(int3 pixelCoord, int3 size)
 {
 	float4 buf[169];
 
-	float alpha = src_image[pixelCoord].a;
+	float alpha = src_image[texel(pixelCoord)].a;
 	// fill buffer
 	uint count = 0;
+
+	for(int z = max(0, pixelCoord.z - RADIUS); z <= min(pixelCoord.z + RADIUS, size.z-1); ++z)
 	for(int y = max(0, pixelCoord.y - RADIUS); y <= min(pixelCoord.y + RADIUS, size.y-1); ++y)
 	for(int x = max(0, pixelCoord.x - RADIUS); x <= min(pixelCoord.x + RADIUS, size.x-1); ++x)
 	{
-		buf[count].rgb = src_image[int2(x,y)].rgb;
+		buf[count].rgb = src_image[texel(int3(x,y,z))].rgb;
 		buf[count].w = dot(float3(0.299, 0.587, 0.114), buf[count].rgb);
 		++count;
 	}

@@ -19,6 +19,7 @@ using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Device = ImageFramework.DirectX.Device;
+using Texture3D = ImageFramework.DirectX.Texture3D;
 
 namespace ImageFramework.Model
 {
@@ -73,7 +74,7 @@ namespace ImageFramework.Model
             polarConvertShader = new ConvertPolarShader(SharedModel.QuadShader);
 
             Export = new ExportModel(SharedModel);
-            Filter = new FiltersModel();
+            Filter = new FiltersModel(Images);
             //Gif = new GifModel(sharedModel.QuadShader);
             Progress = new ProgressModel();
 
@@ -124,8 +125,8 @@ namespace ImageFramework.Model
         /// <returns></returns>
         public FilterModel CreateFilter(string filename)
         {
-            var loader = new FilterLoader(filename);
-
+            var loader = new FilterLoader(filename, Filter.CurrentTarget);
+            
             return new FilterModel(loader, NumPipelines);
         }
        

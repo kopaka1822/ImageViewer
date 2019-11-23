@@ -204,9 +204,6 @@
     <None Include="Filter\quantile.hlsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Filter\set_color.hlsl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Filter\silhouette.hlsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

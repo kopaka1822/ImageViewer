@@ -26,6 +26,16 @@ namespace ImageFramework.Model.Filter
         /// </summary>
         public bool IsSepa { get; }
 
+        public int NumIterations
+        {
+            get
+            {
+                if (!IsSepa) return 1;
+                if (Target == FilterLoader.TargetType.Tex2D) return 2;
+                return 3; // target 3d
+            }
+        }
+        public FilterLoader.TargetType Target { get; }
         public string Name { get; }
 
         public string Description { get; }
@@ -56,6 +66,7 @@ namespace ImageFramework.Model.Filter
         {
             Parameters = loader.Parameters;
             TextureParameters = loader.TextureParameters;
+            Target = loader.Target;
             IsSepa = loader.IsSepa;
             Name = loader.Name;
             Description = loader.Description;
@@ -64,7 +75,49 @@ namespace ImageFramework.Model.Filter
             for (var i = 0; i < numPipelines; ++i)
                 isPipelineEnabled[i] = true;
 
-            Shader = new FilterShader(this, loader.ShaderSource, loader.GroupSize);
+            Shader = new FilterShader(this, loader.ShaderSource, loader.GroupSize, loader.KernelType, 
+                loader.Target==FilterLoader.TargetType.Tex2D?ShaderBuilder.Builder2D:ShaderBuilder.Builder3D);
+        }
+
+        // tries to create the same filter with a different target
+        internal FilterModel Retarget(FilterLoader.TargetType currentTarget)
+        {
+            var loader = new FilterLoader(Filename, currentTarget);
+
+            var res = new FilterModel(loader, NumPipelines);
+
+            // try to match parameters
+            res.IsEnabled = IsEnabled;
+            res.isPipelineEnabled = isPipelineEnabled;
+
+            // int, float, bool parameters
+            var numParams = Math.Min(res.Parameters.Count, Parameters.Count);
+            for (int i = 0; i < numParams; ++i)
+            {
+                var psrc = Parameters[i];
+                var pdst = res.Parameters[i];
+
+                if (psrc.GetBase().Name == pdst.GetBase().Name &&
+                    psrc.GetParamterType() == pdst.GetParamterType()) // probably the same parameter
+                {
+                    switch (psrc.GetParamterType())
+                    {
+                        case ParameterType.Float:
+                            pdst.GetFloatModel().Value = psrc.GetFloatModel().Value;
+                            break;
+                        case ParameterType.Int:
+                            pdst.GetIntModel().Value = psrc.GetIntModel().Value;
+                            break;
+                        case ParameterType.Bool:
+                            pdst.GetBoolModel().Value = psrc.GetBoolModel().Value;
+                            break;
+                    }
+                }
+            }
+
+            // no need to match texture parameters since the target type has changed
+
+            return res;
         }
 
         public void SetIsPipelineEnabled(int index, bool value)

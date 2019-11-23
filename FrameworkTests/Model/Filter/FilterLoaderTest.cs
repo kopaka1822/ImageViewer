@@ -32,13 +32,13 @@ namespace FrameworkTests.Model.Filter
         [TestMethod]
         public void Denoise()
         {
-            TestFilter("denoise.hlsl");
+            TestFilter("denoise.hlsl", FilterLoader.TargetType.Tex2D);
         }
 
         [TestMethod]
         public void Enhance()
         {
-            TestFilter("enhance.hlsl");
+            TestFilter("enhance.hlsl", FilterLoader.TargetType.Tex2D);
         }
 
         [TestMethod]
@@ -80,31 +80,30 @@ namespace FrameworkTests.Model.Filter
         [TestMethod]
         public void Quantile()
         {
-            TestFilter("quantile.hlsl");
-        }
-
-        [TestMethod]
-        public void SetColor()
-        {
-            TestFilter("set_color.hlsl");
+            TestFilter("quantile.hlsl", FilterLoader.TargetType.Tex2D);
         }
 
         [TestMethod]
         public void Silhouette()
         {
-            TestFilter("silhouette.hlsl");
+            TestFilter("silhouette.hlsl", FilterLoader.TargetType.Tex2D);
         }
 
         [TestMethod]
         public void HeightToNormal()
         {
-            TestFilter("heightToNormal.hlsl");
+            TestFilter("heightToNormal.hlsl", FilterLoader.TargetType.Tex2D);
         }
-
 
         private void TestFilter(string name)
         {
-            var loader = new FilterLoader("filter/" + name);
+            TestFilter(name, FilterLoader.TargetType.Tex2D);
+            TestFilter(name, FilterLoader.TargetType.Tex3D);
+        }
+
+        private void TestFilter(string name, FilterLoader.TargetType target)
+        {
+            var loader = new FilterLoader("filter/" + name, target);
 
             var test = new FilterModel(loader, 1);
         }

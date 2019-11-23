@@ -167,12 +167,11 @@ namespace ImageFramework.Model
                             // TODO update parameters only on change
                             filter.Shader.UpdateParamBuffer();
 
-                            await DoFilterIterationAsync(args, index, tex[srcIdx], tex[1 - srcIdx], 0, ct);
-
-                            if (filter.IsSepa)
-                                await DoFilterIterationAsync(args, index, tex[1 - srcIdx], tex[srcIdx], 1, ct);
-                            else
+                            for (int iteration = 0; iteration < filter.NumIterations; ++iteration)
+                            {
+                                await DoFilterIterationAsync(args, index, tex[srcIdx], tex[1 - srcIdx], iteration, ct);
                                 srcIdx = 1 - srcIdx;
+                            }
                         }
                     }
                     catch (Exception)
@@ -210,7 +209,7 @@ namespace ImageFramework.Model
         {
             ct.ThrowIfCancellationRequested();
             var filter = args.Filters[index];
-            filter.Shader.Run(args.Images, (TextureArray2D)src, (TextureArray2D)dst, args.LayerLevelBuffer, iteration);
+            filter.Shader.Run(args.Images, src, dst, args.LayerLevelBuffer, iteration);
             args.Sync.Set();
 
             var step = 1.0f / args.Filters.Count;
