@@ -144,7 +144,7 @@ namespace ImageFramework.Model.Filter
                 }
                 catch (Exception)
                 {
-                    errors += $"filter {f.Name} was removed during retargeting\n";
+                    errors += $"Filter \"{f.Name}\" was removed during retargeting\n";
                 }
             }
 

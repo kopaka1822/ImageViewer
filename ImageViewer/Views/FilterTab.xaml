@@ -60,14 +60,16 @@
                         Width="80"
                         HorizontalAlignment="Right"
                         Margin="0 0 5 5"
-                        Command="{Binding Filter.ApplyCommand}"/>
+                        Command="{Binding Filter.ApplyCommand}"
+                        IsEnabled="{Binding Filter.HasChanges}"/>
 
                     <Button
                         Content="Cancel"
                         Width="80"
                         HorizontalAlignment="Right"
                         Margin="0 0 0 5"
-                        Command="{Binding Filter.CancelCommand}"/>
+                        Command="{Binding Filter.CancelCommand}"
+                        IsEnabled="{Binding Filter.HasChanges}"/>
                 </StackPanel>
 
 

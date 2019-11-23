@@ -85,9 +85,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Commands\AddFilterCommand.cs" />
-    <Compile Include="Commands\ApplyFiltersCommand.cs" />
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
-    <Compile Include="Commands\CancelFiltersCommand.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\CubemapToLatLongCommand.cs" />
     <Compile Include="Commands\DeleteMipmapsCommand.cs" />

@@ -27,6 +27,7 @@ namespace ImageViewer.ViewModels
         private readonly ModelsEx models;
         private readonly SolidColorBrush changesBrush;
         private readonly SolidColorBrush noChangesBrush;
+        private bool isApplying = false;
         private class FilterItem : IDisposable
         {
             public FilterModel Model { get; }
@@ -62,14 +63,32 @@ namespace ImageViewer.ViewModels
         public FiltersViewModel(ModelsEx models)
         {
             this.models = models;
-            this.ApplyCommand = new ApplyFiltersCommand(this);
-            this.CancelCommand = new CancelFiltersCommand(this);
+            this.ApplyCommand = new ActionCommand(Apply);
+            this.CancelCommand = new ActionCommand(Cancel);
             this.models.SoftReset += ModelsOnSoftReset;
 
             changesBrush = new SolidColorBrush(Color.FromRgb(237, 28, 36));
             noChangesBrush = (SolidColorBrush)models.Window.Window.FindResource("FontBrush");
 
             this.models.Filter.RetargetError += FilterOnRetargetError;
+            models.Filter.PropertyChanged += FilterOnPropertyChanged;
+        }
+
+        private void FilterOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(FiltersModel.Filter):
+                    if (isApplying) return;
+                    // reload data
+                    items.Clear();
+                    foreach (var filterModel in models.Filter.Filter)
+                    {
+                        AddFilter(filterModel);
+                    }
+                    UpdateAvailableFilter();
+                    break;
+            }
         }
 
         private void FilterOnRetargetError(object sender, FiltersModel.RetargetErrorEventArgs e)
@@ -165,6 +184,8 @@ namespace ImageViewer.ViewModels
             item.Parameters.Changed += (sender, args) => UpdateHasChanges();
         }
 
+        
+
         public void RemoveFilter(FilterModel filter)
         {
             var index = items.FindIndex(item => item.Model.Equals(filter));
@@ -183,28 +204,37 @@ namespace ImageViewer.ViewModels
         /// </summary>
         public void Apply()
         {
-            // fill the has changed array
-            //bool[] changed = new bool[4];
-            //for (var i = 0; i < models.NumPipelines; ++i)
-            //    changed[i] = HasEquationChanged(i);
-
-            // apply the current parameters
-            foreach (var filterItem in items)
+            try
             {
-                filterItem.Parameters.Apply();
-            }
+                isApplying = true;
 
-            // exchange model lists
-            var newModels = new List<FilterModel>();
-            foreach (var filterItem in items)
+                // fill the has changed array
+                //bool[] changed = new bool[4];
+                //for (var i = 0; i < models.NumPipelines; ++i)
+                //    changed[i] = HasEquationChanged(i);
+
+                // apply the current parameters
+                foreach (var filterItem in items)
+                {
+                    filterItem.Parameters.Apply();
+                }
+
+                // exchange model lists
+                var newModels = new List<FilterModel>();
+                foreach (var filterItem in items)
+                {
+                    newModels.Add(filterItem.Model);
+                }
+
+                //models.Filter.Apply(newModels, statisticsPoint, models.GlContext, changed);
+                models.Filter.SetFilter(newModels);
+
+                UpdateHasChanges();
+            }
+            finally
             {
-                newModels.Add(filterItem.Model);
+                isApplying = false;
             }
-
-            //models.Filter.Apply(newModels, statisticsPoint, models.GlContext, changed);
-            models.Filter.SetFilter(newModels);
-
-            UpdateHasChanges();
         }
 
         private bool HasEquationChanged(int id)
