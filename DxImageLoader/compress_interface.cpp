@@ -265,12 +265,29 @@ void compressonator_convert_image(image::IImage& src, image::IImage& dst, int qu
 		// copy mipmap levels
 		for(uint32_t mipmap = 0; mipmap < src.getNumMipmaps(); ++mipmap)
 		{
+			const auto depth = src.getDepth(mipmap);
+
 			uint32_t srcSize;
 			auto srcDat = src.getData(layer, mipmap, srcSize);
 			uint32_t dstSize;
 			auto dstDat = dst.getData(layer, mipmap, dstSize);
-			copy_level(srcDat, dstDat, src.getWidth(mipmap), src.getHeight(mipmap), 
-				srcSize, dstSize, srcFormat, dstFormat, srcFormatInfo, dstFormatInfo, fquality);
+
+			auto srcPlaneSize = srcSize / depth;
+			auto dstPlaneSize = dstSize / depth;
+
+			for(uint32_t z = 0; z < depth; ++z)
+			{
+				copy_level(
+					srcDat + srcPlaneSize * z, 
+					dstDat + dstPlaneSize * z, 
+					src.getWidth(mipmap), 
+					src.getHeight(mipmap),
+					srcPlaneSize, dstPlaneSize,
+					srcFormat, dstFormat, 
+					srcFormatInfo, dstFormatInfo, 
+					fquality
+				);
+			}
 		}
 	}
 }

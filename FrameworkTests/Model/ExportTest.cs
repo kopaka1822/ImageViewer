@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Device = ImageFramework.DirectX.Device;
+using Texture3D = ImageFramework.DirectX.Texture3D;
 
 namespace FrameworkTests.Model
 {
@@ -152,6 +153,8 @@ namespace FrameworkTests.Model
 
             TestData.CompareColors(orig.GetPixelColors(0, 0), newTex.GetPixelColors(0, 0));
         }
+
+        
 
         [TestMethod]
         public void ExportAllJpg()
@@ -386,6 +389,62 @@ namespace FrameworkTests.Model
 
             if (errors.Length > 0)
                 throw new Exception($"directX compability failed for {numErrors}/{eFmt.Formats.Count} formats:\n" + errors);
+        }
+
+        /// <summary>
+        /// tests if all dds formats actually run on gpu
+        /// </summary>
+        [TestMethod]
+        public void Dds3DDirectXCompability()
+        {
+            var model = new Models(1);
+            model.AddImageFromFile(TestData.Directory + "checkers3d.dds");
+            model.Apply();
+            model.Export.Quality = 100;
+            var origTex = (Texture3D)model.Pipelines[0].Image;
+            var origColors = origTex.GetPixelColors(0, 0);
+            Color[] newColors = null;
+
+            var eFmt = model.Export.Formats.First(fmt => fmt.Extension == "dds");
+            string errors = "";
+            int numErrors = 0;
+            int nFormats = 0;
+
+            foreach (var format in eFmt.Formats)
+            {
+                if (format.IsExcludedFrom3DExport()) continue;
+                nFormats++;
+                try
+                {
+                    // export to dds
+                    var desc = new ExportDescription(ExportDir + "tmp", "dds", model.Export);
+                    desc.FileFormat = format;
+                    model.Export.Export(origTex, desc);
+
+                    // load with directx dds loader
+                    DDSTextureLoader.CreateDDSTextureFromFile(Device.Get().Handle, Device.Get().ContextHandle, ExportDir + "tmp.dds",
+                        out var resource, out var resourceView, 0, out var alphaMode);
+
+                    // convert to obtain color data
+                    using (var newTex = model.Export.convert.ConvertFromRaw3D(resourceView, origTex.Size, Format.R32G32B32A32_Float))
+                    {
+                        resourceView.Dispose();
+                        resource.Dispose();
+
+                        newColors = newTex.GetPixelColors(0, 0);
+                        // only compare with red channel since some formats only store red
+                        TestData.CompareColors(origColors, newColors, Color.Channel.R, 0.1f);
+                    }
+                }
+                catch (Exception e)
+                {
+                    errors += $"{format}: {e.Message}\n";
+                    ++numErrors;
+                }
+            }
+
+            if (errors.Length > 0)
+                throw new Exception($"directX compability failed for {numErrors}/{nFormats} formats:\n" + errors);
         }
 
 

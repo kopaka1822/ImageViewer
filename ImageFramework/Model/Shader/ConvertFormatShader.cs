@@ -12,6 +12,7 @@ using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Device = SharpDX.Direct3D11.Device;
 using Resource = ImageFramework.ImageLoader.Resource;
+using Texture3D = ImageFramework.DirectX.Texture3D;
 
 namespace ImageFramework.Model.Shader
 {
@@ -214,6 +215,41 @@ namespace ImageFramework.Model.Shader
             dev.OutputMerger.SetRenderTargets(res.GetRtView(0, 0));
             dev.SetViewScissors(size.Width, size.Height);
             dev.DrawQuad();
+
+            // remove bindings
+            dev.Pixel.SetShaderResource(0, null);
+            dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            quad.Unbind();
+
+            return res;
+        }
+
+        /// <summary>
+        /// for unit testing purposes. Converts naked srv to TextureArray2D
+        /// </summary>
+        internal Texture3D ConvertFromRaw3D(SharpDX.Direct3D11.ShaderResourceView srv, Size3 size, SharpDX.DXGI.Format dstFormat)
+        {
+            var res = new Texture3D(1, size, dstFormat, false);
+
+            var dev = DirectX.Device.Get();
+            quad.Bind(true);
+            dev.Pixel.Set(convert3D.Pixel);
+
+            dev.Pixel.SetShaderResource(0, srv);
+
+            cbuffer.SetData(new LayerLevelOffsetData
+            {
+                Layer = 0,
+                Level = 0,
+                Xoffset = 0,
+                Yoffset = 0,
+                Multiplier = 1.0f
+            });
+
+            dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
+            dev.OutputMerger.SetRenderTargets(res.GetRtView(0, 0));
+            dev.SetViewScissors(size.Width, size.Height);
+            dev.DrawFullscreenTriangle(size.Depth);
 
             // remove bindings
             dev.Pixel.SetShaderResource(0, null);

@@ -603,6 +603,21 @@ namespace ImageFramework.ImageLoader
             return false;
         }
 
+        // some formats don't work for texture3D targets
+        public static bool IsExcludedFrom3DExport(this GliFormat format)
+        {
+            switch (format)
+            {
+                case GliFormat.RG16_UNORM:
+                case GliFormat.R_ATI1N_SNORM:
+                case GliFormat.RG_ATI2N_SNORM:
+                case GliFormat.RGB_BP_UFLOAT:
+                    return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// helpful texture description (mostly for compressed formats)
         /// </summary>
