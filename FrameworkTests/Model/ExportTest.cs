@@ -89,6 +89,41 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void ExportCroppedImage3D()
+        {
+            var model = new Models(1);
+            model.AddImageFromFile(TestData.Directory + "checkers3d.dds");
+            model.Export.Mipmap = 0;
+            model.Export.UseCropping = true;
+
+            model.Export.CropStartX = 1;
+            model.Export.CropEndX = 2;
+
+            model.Export.CropStartY = 0;
+            model.Export.CropEndY = 1;
+
+            model.Export.CropStartZ = 2;
+            model.Export.CropEndZ = 3;
+            model.Apply();
+            
+            model.ExportPipelineImage(ExportDir + "cropped", "dds", GliFormat.RGBA8_SRGB);
+            var newTex = new Texture3D(IO.LoadImage(ExportDir + "cropped.dds"));
+
+            var colors = newTex.GetPixelColors(0);
+
+            Assert.AreEqual(2 * 2 * 2, colors.Length);
+            Assert.IsTrue(Color.White.Equals(colors[0], Color.Channel.Rgb));
+            Assert.IsTrue(Color.Black.Equals(colors[1], Color.Channel.Rgb));
+            Assert.IsTrue(Color.White.Equals(colors[2], Color.Channel.Rgb));
+            Assert.IsTrue(Color.Black.Equals(colors[3], Color.Channel.Rgb));
+
+            Assert.IsTrue(Color.White.Equals(colors[4], Color.Channel.Rgb));
+            Assert.IsTrue(Color.Black.Equals(colors[5], Color.Channel.Rgb));
+            Assert.IsTrue(Color.White.Equals(colors[6], Color.Channel.Rgb));
+            Assert.IsTrue(Color.Black.Equals(colors[7], Color.Channel.Rgb));
+        }
+
+        [TestMethod]
         public void ExportCroppedWithMipmaps()
         {
             var model = new Models(1);
