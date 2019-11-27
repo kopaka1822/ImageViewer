@@ -110,7 +110,7 @@ namespace ImageViewer.Commands
 
             var sfd = new SaveFileDialog
             {
-                Filter = GetFilter(exportExtension),
+                Filter = GetFilter(exportExtension, tex.Is3D),
                 InitialDirectory = exportDirectory,
                 FileName = proposedFilename
             };
@@ -124,7 +124,7 @@ namespace ImageViewer.Commands
 
             models.Export.Mipmap = models.Display.ActiveMipmap;
             models.Export.Layer = models.Display.ActiveLayer;
-            var viewModel = new ExportViewModel(models, exportExtension, exportFormat.Value, sfd.FileName);
+            var viewModel = new ExportViewModel(models, exportExtension, exportFormat.Value, sfd.FileName, tex.Is3D);
             var dia = new ExportDialog(viewModel);
 
             if (models.Window.ShowDialog(dia) != true) return;
@@ -156,9 +156,16 @@ namespace ImageViewer.Commands
             {"dds", "DirectDraw Surface (*.dds)|*.dds" },
         };
 
-        private static string GetFilter(string preferred)
+        private static bool Is3DFilter(string key)
         {
-            filter.TryGetValue(preferred, out var pref);
+            return key == "dds" || key == "ktx";
+        }
+
+        private static string GetFilter(string preferred, bool is3D)
+        {
+            string pref = null;
+            if(!is3D || Is3DFilter(preferred))
+                filter.TryGetValue(preferred, out pref);
 
             var res = "";
             if (pref != null)
@@ -166,7 +173,7 @@ namespace ImageViewer.Commands
 
             foreach (var f in filter)
             {
-                if (f.Value != pref)
+                if (f.Value != pref && (!is3D || Is3DFilter(f.Key)))
                     res += f.Value + "|";
             }
 

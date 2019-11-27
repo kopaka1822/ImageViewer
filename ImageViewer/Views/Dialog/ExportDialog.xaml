@@ -133,6 +133,23 @@
                                 Margin="0 0 5 0"
                                 Value="{Binding CropEndY}"/>
                         </StackPanel>
+                        <StackPanel
+                            Margin="0 5 0 0"
+                            Visibility="{Binding ZCropVisibility}"
+                            Orientation="Horizontal">
+                            <TextBlock Text="Z from: " Width="45"/>
+                            <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="0 0 5 0"
+                                Value="{Binding CropStartZ}"/>
+                            <TextBlock Text="to:" Margin="0 0 5 0"/>
+                            <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="0 0 5 0"
+                                Value="{Binding CropEndZ}"/>
+                        </StackPanel>
                     </StackPanel>
 
                 </GroupBox>
