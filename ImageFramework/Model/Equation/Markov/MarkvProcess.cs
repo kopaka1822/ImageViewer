@@ -10,6 +10,45 @@ namespace ImageFramework.Model.Equation.Markov
     {
         public static List<Token.Token> Run(List<MarkovRule> rules, List<Token.Token> tokens)
         {
+            VerifyBrackets(tokens);
+
+            while (tokens.Count > 1)
+            {
+                // find a range of tokens to verify first (tokens inside brackets)
+                int startId = 0;
+                int endId = tokens.Count;
+                for (var i = 0; i < tokens.Count; i++)
+                {
+                    if (tokens[i].TokenType == Token.Token.Type.BracketOpen || tokens[i].TokenType == Token.Token.Type.Function)
+                    {
+                        startId = endId = i;
+                    }
+
+                    if (tokens[i].TokenType == Token.Token.Type.BracketClose && startId == endId)
+                        endId = i + 1;
+                }
+
+                // replace start id/ end id range
+                var range = Resolve(rules, tokens.GetRange(startId, endId - startId));
+                tokens = Replace(tokens, startId, endId - startId, range);
+            } 
+
+            return tokens;
+        }
+
+        public static List<Token.Token> Replace(List<Token.Token> list, int startIdx, int count, List<Token.Token> replacement)
+        {
+            var firstPart = list.GetRange(0, startIdx);
+            var lastPart = list.GetRange(startIdx + count, list.Count - startIdx - count);
+
+            firstPart.AddRange(replacement);
+            firstPart.AddRange(lastPart);
+
+            return firstPart;
+        }
+
+        public static List<Token.Token> Resolve(List<MarkovRule> rules, List<Token.Token> tokens)
+        {
             var foundRules = true;
             markovloop:
             while (foundRules)
@@ -22,17 +61,15 @@ namespace ImageFramework.Model.Equation.Markov
                         if (TokensMatch(markovRule, tokens, i))
                         {
                             // apply the rule
-                            var firstPart = tokens.GetRange(0, i);
                             var middle = tokens.GetRange(i, markovRule.Tokens.Count);
-                            var lastPart = tokens.GetRange(i + markovRule.Tokens.Count,
-                                tokens.Count - i - markovRule.Tokens.Count);
+                            Token.Token left = null;
+                            if (i > 0) left = tokens[i - 1];
 
-                            middle = markovRule.Apply(middle);
-                            tokens.Clear();
-                            tokens.AddRange(firstPart);
-                            tokens.AddRange(middle);
-                            tokens.AddRange(lastPart);
+                            middle = markovRule.ApplyEx(middle, left);
+                            if(middle == null) continue; // no match
 
+                            tokens = Replace(tokens, i, markovRule.Tokens.Count, middle);
+                            
                             // and again
                             goto markovloop;
                         }
@@ -41,6 +78,10 @@ namespace ImageFramework.Model.Equation.Markov
 
                 foundRules = false;
             }
+
+            if(tokens.Count > 1)
+                throw new Exception("Could not resolve all tokens to an expression");
+
             return tokens;
         }
 
@@ -54,6 +95,25 @@ namespace ImageFramework.Model.Equation.Markov
                 }
             }
             return true;
+        }
+
+        private static void VerifyBrackets(IReadOnlyList<Token.Token> tokens)
+        {
+            int openBrackets = 0;
+            foreach (var token in tokens)
+            {
+                if (token.TokenType == Token.Token.Type.BracketOpen || token.TokenType == Token.Token.Type.Function)
+                    ++openBrackets;
+                if (token.TokenType == Token.Token.Type.BracketClose)
+                {
+                    --openBrackets;
+                    if (openBrackets < 0)
+                        throw new Exception("too many closing brackets");
+                }
+            }
+
+            if(openBrackets != 0)
+                throw new Exception("not all brackets were closed");
         }
     }
 }

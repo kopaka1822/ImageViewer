@@ -96,6 +96,8 @@
     <Compile Include="ImageLoader\Resource.cs" />
     <Compile Include="Model\Equation\Equation.cs" />
     <Compile Include="Model\Equation\FormulaModel.cs" />
+    <Compile Include="Model\Equation\Markov\RuleDoubleSign.cs" />
+    <Compile Include="Model\Equation\Markov\RuleSign.cs" />
     <Compile Include="Model\Export\ExportDescription.cs" />
     <Compile Include="Model\Export\ExportFormatModel.cs" />
     <Compile Include="Model\Export\ExportModel.cs" />
@@ -117,7 +119,6 @@
     <Compile Include="Model\Equation\Markov\BracketRule.cs" />
     <Compile Include="Model\Equation\Markov\MarkovRule.cs" />
     <Compile Include="Model\Equation\Markov\MarkvProcess.cs" />
-    <Compile Include="Model\Equation\Markov\RuleSign.cs" />
     <Compile Include="Model\Equation\Markov\RuleValueOperationValue.cs" />
     <Compile Include="Model\Equation\Markov\TertiaryFunctionRule.cs" />
     <Compile Include="Model\Equation\Markov\UnaryFunctionRule.cs" />

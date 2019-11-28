@@ -162,14 +162,15 @@ namespace ImageFramework.Model.Equation
         {
             List<MarkovRule> rules = new List<MarkovRule>();
 
-            rules.Add(new RuleValueOperationValue(Token.Token.Type.Operation1));
-            rules.Add(new RuleValueOperationValue(Token.Token.Type.Operation2));
-            rules.Add(new RuleValueOperationValue(Token.Token.Type.Operation3));
-            rules.Add(new BracketRule());
             rules.Add(new UnaryFunctionRule());
             rules.Add(new BinaryFunctionRule());
             rules.Add(new TertiaryFunctionRule());
+            rules.Add(new BracketRule());
+            rules.Add(new RuleValueOperationValue(Token.Token.Type.Operation1));
+            rules.Add(new RuleDoubleSign());
             rules.Add(new RuleSign());
+            rules.Add(new RuleValueOperationValue(Token.Token.Type.Operation2));
+            rules.Add(new RuleValueOperationValue(Token.Token.Type.Operation3));
 
             return rules;
         }

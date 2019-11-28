@@ -11,6 +11,14 @@ namespace ImageFramework.Model.Equation.Markov
         /// </summary>
         /// <param name="match">Tokens with the same signature as Tokens</param>
         /// <returns></returns>
-        public abstract List<Token.Token> Apply(List<Token.Token> match);
+        protected virtual List<Token.Token> Apply(List<Token.Token> match)
+        {
+            return null;
+        }
+
+        public virtual List<Token.Token> ApplyEx(List<Token.Token> match, Token.Token left)
+        {
+            return Apply(match);
+        }
     }
 }

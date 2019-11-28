@@ -16,7 +16,7 @@ namespace ImageFramework.Model.Equation.Markov
             };
         }
 
-        public override List<Token.Token> Apply(List<Token.Token> match)
+        protected override List<Token.Token> Apply(List<Token.Token> match)
         {
             Debug.Assert(match.Count == 3);
             return new List<Token.Token> { new CombinedValueToken(match[0], match[1], match[2]) };
