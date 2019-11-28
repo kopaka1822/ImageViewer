@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
+using ImageFramework.DirectX.Query;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.Model.Equation;
 using ImageFramework.Model.Filter;

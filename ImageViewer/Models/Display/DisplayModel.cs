@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
+using ImageFramework.DirectX.Query;
 using ImageFramework.Model;
 using ImageFramework.Utility;
 using SharpDX;
@@ -96,6 +97,17 @@ namespace ImageViewer.Models.Display
             }
         }
 
+        private AdvancedGpuTimer.Stats frameTime = AdvancedGpuTimer.Stats.Zero;
+
+        public AdvancedGpuTimer.Stats FrameTime
+        {
+            get => frameTime;
+            set
+            {
+                frameTime = value;
+                OnPropertyChanged(nameof(FrameTime));
+            }
+        }
 
         // for values >= 0 => multiplier = pow(2, multiplierExponent)
         // for values < 0 => multiplier = pow(2, 1 / abs(multiplierExponent))

@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SharpDX.Direct3D11;
 
-namespace ImageFramework.DirectX
+namespace ImageFramework.DirectX.Query
 {
     internal class SyncQuery : IDisposable
     {

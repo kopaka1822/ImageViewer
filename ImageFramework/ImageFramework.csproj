@@ -71,12 +71,13 @@
     <Compile Include="DirectX\Device.cs" />
     <Compile Include="DirectX\DownloadBuffer.cs" />
     <Compile Include="DirectX\GpuBuffer.cs" />
-    <Compile Include="DirectX\GpuTimer.cs" />
+    <Compile Include="DirectX\Query\AdvancedGpuTimer.cs" />
+    <Compile Include="DirectX\Query\GpuTimer.cs" />
     <Compile Include="DirectX\ITexture.cs" />
     <Compile Include="DirectX\Structs\DirSizeData.cs" />
     <Compile Include="DirectX\Structs\PixelValueData.cs" />
     <Compile Include="DirectX\Structs\StatisticsData.cs" />
-    <Compile Include="DirectX\SyncQuery.cs" />
+    <Compile Include="DirectX\Query\SyncQuery.cs" />
     <Compile Include="DirectX\Shader.cs" />
     <Compile Include="DirectX\Structs\LayerLevelFilter.cs" />
     <Compile Include="DirectX\Structs\LayerLevelOffsetData.cs" />

@@ -189,6 +189,10 @@ namespace ImageViewer.ViewModels.Display
 
                     OnPropertyChanged(nameof(ExtendedViewVisibility));
                     break;
+
+                case nameof(DisplayModel.FrameTime):
+                    OnPropertyChanged(nameof(FrameTime));
+                    break;
             }
         }
 
@@ -201,6 +205,8 @@ namespace ImageViewer.ViewModels.Display
                     break;
             }
         }
+
+        public string FrameTime => models.Display.FrameTime.Last.ToString("f2", ImageFramework.Model.Models.Culture) + " ms";
 
         public bool LinearInterpolation
         {

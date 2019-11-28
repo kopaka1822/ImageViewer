@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 using ImageFramework.DirectX;
+using ImageFramework.DirectX.Query;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.Model;
 using ImageFramework.Model.Equation;

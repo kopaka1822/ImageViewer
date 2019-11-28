@@ -271,7 +271,7 @@ namespace ImageFramework.DirectX
             context.UpdateSubresource(data, buffer);
         }
 
-        public void EndQuery(Query query)
+        public void EndQuery(SharpDX.Direct3D11.Query query)
         {
             context.End(query);
         }
@@ -280,7 +280,7 @@ namespace ImageFramework.DirectX
         /// true if the event is completed
         /// </summary>
         /// <param name="query"></param>
-        public bool GetQueryEventData(Query query)
+        public bool GetQueryEventData(SharpDX.Direct3D11.Query query)
         {
             return context.GetData<int>(query) != 0;
         }

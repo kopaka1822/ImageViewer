@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImageViewer.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="25" d:DesignWidth="1000">
+             d:DesignHeight="25"
+             d:DesignWidth="1500">
     <StatusBar 
                 Grid.Row="1" 
                 BorderThickness="0 1 0 0">
@@ -249,6 +250,13 @@
                         Value="{Binding Progress.ProgressValue}">
 
             </ProgressBar>
+        </StatusBarItem>
+
+        <!-- FRAME TIME -->
+        <StatusBarItem
+            HorizontalAlignment="Right"
+            Width="Auto">
+            <TextBlock Text="{Binding Display.FrameTime}"/>
         </StatusBarItem>
     </StatusBar>
 </UserControl>

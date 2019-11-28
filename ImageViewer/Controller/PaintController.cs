@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 using ImageFramework.DirectX;
+using ImageFramework.DirectX.Query;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
 using ImageViewer.DirectX;
@@ -28,9 +29,11 @@ namespace ImageViewer.Controller
         private SwapChain swapChain = null;
         private bool scheduledRedraw = false;
         private RawColor4 clearColor;
+        private readonly AdvancedGpuTimer gpuTimer;
         public PaintController(ModelsEx models)
         {
             this.models = models;
+            this.gpuTimer = new AdvancedGpuTimer();
             viewMode = new ViewModeController(models);
 
             // model events
@@ -124,6 +127,7 @@ namespace ImageViewer.Controller
             scheduledRedraw = false;
             if (swapChain == null) return;
 
+            var timerStarted = false;
             swapChain.BeginFrame();
             try
             {
@@ -135,7 +139,11 @@ namespace ImageViewer.Controller
                 dev.Rasterizer.SetScissorRectangle(0, 0, size.Width, size.Height);
                 dev.OutputMerger.SetRenderTargets(swapChain.Rtv);
 
+                gpuTimer.Start();
+                timerStarted = true;
+
                 viewMode.Repaint(size);
+
             }
             catch (Exception e)
             {
@@ -143,8 +151,15 @@ namespace ImageViewer.Controller
             }
             finally
             {
+                if (timerStarted)
+                {
+                    gpuTimer.Stop();
+                }
+
                 swapChain.EndFrame();
             }
+
+            models.Display.FrameTime = gpuTimer.Get();
         }
 
         private void DisplayOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -176,6 +191,7 @@ namespace ImageViewer.Controller
         {
             viewMode?.Dispose();
             swapChain?.Dispose();
+            gpuTimer?.Dispose();
         }
     }
 }

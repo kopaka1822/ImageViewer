@@ -1,42 +1,41 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using SharpDX.Direct3D11;
 
-namespace ImageFramework.DirectX
+namespace ImageFramework.DirectX.Query
 {
     public class GpuTimer : IDisposable
     {
-        private Query disjointHandle;
-        private Query startHandle;
-        private Query endHandle;
+        private SharpDX.Direct3D11.Query disjointHandle;
+        private SharpDX.Direct3D11.Query startHandle;
+        private SharpDX.Direct3D11.Query endHandle;
         private bool isRunning = false;
 
         public GpuTimer()
         {
-            startHandle = new Query(Device.Get().Handle, new QueryDescription
+            startHandle = new SharpDX.Direct3D11.Query(Device.Get().Handle, new QueryDescription
             {
                 Flags = QueryFlags.None,
                 Type = QueryType.Timestamp
             });
 
-            endHandle = new Query(Device.Get().Handle, new QueryDescription
+            endHandle = new SharpDX.Direct3D11.Query(Device.Get().Handle, new QueryDescription
             {
                 Flags = QueryFlags.None,
                 Type = QueryType.Timestamp
             });
 
-            disjointHandle = new Query(Device.Get().Handle, new QueryDescription
+            disjointHandle = new SharpDX.Direct3D11.Query(Device.Get().Handle, new QueryDescription
             {
                 Flags = QueryFlags.None,
                 Type = QueryType.TimestampDisjoint
             });
         }
 
+        /// <summary>
+        /// inserts timestamp on gpu
+        /// </summary>
         public void Start()
         {
             Debug.Assert(!isRunning);
@@ -45,6 +44,9 @@ namespace ImageFramework.DirectX
             isRunning = true;
         }
 
+        /// <summary>
+        /// inserts end timestamp on gpu
+        /// </summary>
         public void Stop()
         {
             Debug.Assert(isRunning);
@@ -53,6 +55,16 @@ namespace ImageFramework.DirectX
             isRunning = false;
         }
 
+        /// <returns>true if data is available</returns>
+        public bool HasData()
+        {
+            Debug.Assert(!isRunning);
+            return Device.Get().ContextHandle.GetData<UInt64>(endHandle, out var tmp);
+        }
+
+        /// <summary>
+        /// time delta in milliseconds
+        /// </summary>
         public float GetDelta()
         {
             Debug.Assert(!isRunning);
