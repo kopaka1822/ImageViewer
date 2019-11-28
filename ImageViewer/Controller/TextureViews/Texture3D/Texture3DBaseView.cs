@@ -70,6 +70,10 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         }
 
         public abstract Size3 GetTexelPosition(Vector2 mouse);
+        public virtual void UpdateImage(int id, ITexture texture)
+        {
+            int a = 3;
+        }
 
         protected float GetCubeCenter()
         {

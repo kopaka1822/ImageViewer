@@ -18,5 +18,11 @@ namespace ImageViewer.Controller.TextureViews
 
         void OnDrag2(Vector2 diff);
         Size3 GetTexelPosition(Vector2 mouse);
+
+        /// indicates that a pipeline image was changed.
+        /// assume that initially all textures are null.
+        /// <param name="id">id of the images [0, models.NumPipelines-1]</param>
+        /// <param name="texture">new texture or null if removed</param>
+        void UpdateImage(int id, ITexture texture);
     }
 }

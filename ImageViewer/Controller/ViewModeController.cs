@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
 using ImageFramework.DirectX;
+using ImageFramework.Model;
 using ImageViewer.Controller.TextureViews;
 using ImageViewer.Controller.TextureViews.Shared;
 using ImageViewer.Controller.TextureViews.Texture2D;
@@ -50,6 +51,22 @@ namespace ImageViewer.Controller
             dxHost.MouseMove += DxHostOnMouseMove;
 
             viewData = new TextureViewData(models);
+
+            for(int i = 0; i < models.NumPipelines; ++i)
+            {
+                var i1 = i;
+                models.Pipelines[i].PropertyChanged += (o, e) => OnPipelineChanged(models.Pipelines[i1], e, i1);
+            }
+        }
+
+        private void OnPipelineChanged(ImagePipeline pipe, PropertyChangedEventArgs e, int id)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ImagePipeline.Image):
+                    currentView?.UpdateImage(id, pipe.Image);
+                    break;
+            }
         }
 
         private void DispatchRecomputeTexelColor()
@@ -269,6 +286,12 @@ namespace ImageViewer.Controller
                             default:
                                 currentView = new EmptyView();
                                 break;
+                        }
+
+                        for(int i = 0; i < models.NumPipelines; ++i)
+                        {
+                            if(models.Pipelines[i].Image != null)
+                                currentView.UpdateImage(i, models.Pipelines[i].Image);
                         }
                     }
                     catch (Exception err)

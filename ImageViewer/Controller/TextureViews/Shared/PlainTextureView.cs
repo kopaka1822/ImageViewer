@@ -61,6 +61,10 @@ namespace ImageViewer.Controller.TextureViews.Shared
         }
 
         public abstract Size3 GetTexelPosition(Vector2 mouse);
+        public void UpdateImage(int id, ITexture texture)
+        {
+            
+        }
 
         private Matrix GetTransform()
         {

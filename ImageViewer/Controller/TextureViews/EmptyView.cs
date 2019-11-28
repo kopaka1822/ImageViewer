@@ -29,5 +29,7 @@ namespace ImageViewer.Controller.TextureViews
         {
             return Size3.Zero;
         }
+
+        public void UpdateImage(int id, ITexture texture) { }
     }
 }
