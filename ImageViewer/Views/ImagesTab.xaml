@@ -61,6 +61,13 @@
 
                 <Separator Height="2"/>
 
+                <Border
+                    x:Name="ExtendedViewHost"
+                    Visibility="{Binding Display.ExtendedViewVisibility}">
+                </Border>
+
+                <Separator Height="2"  Visibility="{Binding Display.ExtendedViewVisibility}"/>
+
                 <!--Split Mode-->
                 <TextBlock 
                     Text="Split Mode:" 

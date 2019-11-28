@@ -169,19 +169,24 @@ namespace ImageViewer.ViewModels.Display
                     break;
 
                 case nameof(DisplayModel.ExtendedViewData):
-                    ExtendedView?.Dispose();
-                    ExtendedView = null;
+                    extendedView?.Dispose();
+                    extendedView = null;
 
                     if (models.Display.ExtendedViewData != null)
                     {
                         if (models.Display.ExtendedViewData is Single3DDisplayModel)
                         {
-                            ExtendedView = new Single3DView(models);
+                            var view = new Single3DView(models);
+                            extendedView = view; 
+                            models.Window.Window.ImagesTab.ExtendedViewHost.Child = view;
                         }
                         else Debug.Assert(false);
                     }
+                    else
+                    {
+                        models.Window.Window.ImagesTab.ExtendedViewHost.Child = null;
+                    }
 
-                    OnPropertyChanged(nameof(ExtendedView));
                     OnPropertyChanged(nameof(ExtendedViewVisibility));
                     break;
             }
@@ -221,9 +226,9 @@ namespace ImageViewer.ViewModels.Display
             set => models.Settings.FlipYAxis = value;
         }
 
-        public IDisposable ExtendedView { get; private set; } = null;
+        private IDisposable extendedView = null;
 
-        public Visibility ExtendedViewVisibility => ExtendedView == null ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility ExtendedViewVisibility => extendedView == null ? Visibility.Collapsed : Visibility.Visible;
 
         public ObservableCollection<ComboBoxItem<int>> AvailableMipMaps { get; } = new ObservableCollection<ComboBoxItem<int>>();
         public ObservableCollection<ComboBoxItem<int>> AvailableLayers { get; } = new ObservableCollection<ComboBoxItem<int>>();
