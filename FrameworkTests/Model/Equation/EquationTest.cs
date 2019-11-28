@@ -76,6 +76,18 @@ namespace FrameworkTests.Model.Equation
             Assert.AreEqual(expected, hlsl.Replace(" ", ""));
         }
 
+        [TestMethod]
+        public void PowTranslation()
+        {
+            // this should translate to the same expression
+            var eq = new ImageFramework.Model.Equation.Equation("red(I0)^2*0.1");
+            var eq2 = new ImageFramework.Model.Equation.Equation("pow(red(I0),2)*0.1");
+            var hlsl = eq.GetHlslExpression();
+            var hlsl2 = eq2.GetHlslExpression();
+
+            Assert.AreEqual(hlsl2, hlsl);
+        }
+
         // equation should fail
         private void AssertThrow(string formula)
         {
