@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.Utility;
 using ImageViewer.Controller.TextureViews.Shader;
 using ImageViewer.Controller.TextureViews.Shared;
 using ImageViewer.Models;
@@ -21,10 +22,14 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             
         }
 
+        public override Size3 GetTexelPosition(Vector2 mouse)
+        {
+            return new Size3(0, 0, 0);
+        }
+
         public override void Dispose()
         {
             shader.Dispose();
-            base.Dispose();
         }
 
         public override void Draw(ITexture texture)
@@ -53,7 +58,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
                 Matrix.Translation(cubeOffsetX, cubeOffsetY, GetCubeCenter()); // move to correct position
         }
 
-        protected override Matrix GetOrientation()
+        private Matrix GetOrientation()
         {
             return Matrix.Scaling(-1.0f, -1.0f, 1.0f);
         }

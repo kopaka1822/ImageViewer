@@ -48,10 +48,14 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
                 Matrix.Translation(0.5f, 0.5f, 0.5f); // move to [0, 1]
         }
 
+        public override Size3 GetTexelPosition(Vector2 mouse)
+        {
+            return new Size3(0, 0, 0);
+        }
+
         public override void Dispose()
         {
             shader?.Dispose();
-            base.Dispose();
         }
     }
 }
