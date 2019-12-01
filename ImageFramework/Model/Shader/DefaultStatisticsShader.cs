@@ -9,7 +9,7 @@ namespace ImageFramework.Model.Shader
         public enum Values
         {
             Luminance,
-            Luma,
+            Average,
             Lightness,
             Alpha
         }
@@ -17,11 +17,13 @@ namespace ImageFramework.Model.Shader
         // luminance: http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/POYNTON1/ColorFAQ.html#RTFToC3
         public float Luminance;
         // luma: http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/POYNTON1/ColorFAQ.html#RTFToC11
-        public float Luma;
+        public float Average;
         // CIELAB lightness (0-100): http://homepages.inf.ed.ac.uk/rbf/CVonline/LOCAL_COPIES/POYNTON1/ColorFAQ.html#RTFToC4
         public float Lightness;
         public float Alpha;
-        public static readonly DefaultStatistics Zero = new DefaultStatistics{Alpha = 0.0f, Luminance = 0.0f, Lightness = 0.0f, Luma = 0.0f};
+        public static readonly DefaultStatistics Zero = new DefaultStatistics{Alpha = 0.0f, Luminance = 0.0f, Lightness = 0.0f, Average = 0.0f};
+        public static readonly DefaultStatistics MinStats = new DefaultStatistics{Alpha = float.MinValue, Luminance = float.MinValue, Lightness = float.MinValue, Average = float.MinValue};
+        public static readonly DefaultStatistics MaxStats = new DefaultStatistics{ Alpha = float.MaxValue, Luminance = float.MaxValue, Lightness = float.MaxValue, Average = float.MaxValue };
 
         public float Get(Values value)
         {
@@ -29,8 +31,8 @@ namespace ImageFramework.Model.Shader
             {
                 case Values.Luminance:
                     return Luminance;
-                case Values.Luma:
-                    return Luma;
+                case Values.Average:
+                    return Average;
                 case Values.Lightness:
                     return Lightness;
                 case Values.Alpha:
@@ -43,15 +45,31 @@ namespace ImageFramework.Model.Shader
         public void Plus(DefaultStatistics other)
         {
             Luminance += other.Luminance;
-            Luma += other.Luma;
+            Average += other.Average;
             Lightness += other.Lightness;
             Alpha += other.Alpha;
+        }
+
+        public void Min(DefaultStatistics other)
+        {
+            Luminance = Math.Min(Luminance, other.Luminance);
+            Average = Math.Min(Average, other.Average);
+            Lightness = Math.Min(Lightness, other.Lightness);
+            Luminance = Math.Min(Luminance, other.Luminance);
+        }
+
+        public void Max(DefaultStatistics other)
+        {
+            Luminance = Math.Max(Luminance, other.Luminance);
+            Average = Math.Max(Average, other.Average);
+            Lightness = Math.Max(Lightness, other.Lightness);
+            Luminance = Math.Max(Luminance, other.Luminance);
         }
 
         public void Divide(float value)
         {
             Luminance /= value;
-            Luma /= value;
+            Average /= value;
             Lightness /= value;
             Alpha /= value;
         }
@@ -71,8 +89,8 @@ namespace ImageFramework.Model.Shader
 float4 res;
 // linear luminance
 res.r = dot(a.rgb, float3(0.2125, 0.7154, 0.0721));
-// (video) luma (sRGB). Uses NTSC luminance vector
-res.g = dot(toSrgb(a).rgb, float3(0.299, 0.587, 0.114));
+// uniform weight
+res.g = dot(a.rgb, float3(1.0/3.0,1.0/3.0,1.0/3.0));
 // lightness
 res.b = max(116.0 * pow(max(res.r, 0.0), 1.0 / 3.0) - 16.0, 0.0);
 // keep alpha
@@ -86,7 +104,7 @@ return res;
             return new DefaultStatistics
             {
                 Luminance = color.Red,
-                Luma = color.Green,
+                Average = color.Green,
                 Lightness = color.Blue,
                 Alpha = color.Alpha
             };

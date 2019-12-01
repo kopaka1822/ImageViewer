@@ -79,6 +79,12 @@ namespace ImageFramework.Model.Filter
             OnPropertyChanged(nameof(Filter));
         }
 
+        public void Clear()
+        {
+            Dispose();
+            OnPropertyChanged(nameof(Filter));
+        }
+
         public void Dispose()
         {
             foreach (var filterModel in filter)

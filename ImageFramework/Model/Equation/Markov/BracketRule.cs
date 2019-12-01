@@ -14,7 +14,7 @@ namespace ImageFramework.Model.Equation.Markov
             };
         }
 
-        public override List<Token.Token> Apply(List<Token.Token> match)
+        protected override List<Token.Token> Apply(List<Token.Token> match)
         {
             // brackets will be implicitly given through the token structure
             return new List<Token.Token> { match[1] };

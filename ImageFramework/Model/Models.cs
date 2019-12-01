@@ -34,17 +34,26 @@ namespace ImageFramework.Model
 
         public ExportModel Export { get; }
 
+        // soft reset that clears images, filters and resets formulas
+        public event EventHandler SoftReset;
+
+        //public GifModel Gif { get; }
+
         public ProgressModel Progress { get; }
 
         private ThumbnailModel thumbnail;
 
         internal TextureCache TextureCache { get; }
 
+        private readonly SharedModel sharedModel;
+
         private readonly List<ImagePipeline> pipelines = new List<ImagePipeline>();
 
         private readonly PipelineController pipelineController;
 
-        private readonly PixelValueShader pixelValueShader = new PixelValueShader();
+        private readonly PixelValueShader pixelValueShader;
+
+        private readonly ConvertPolarShader polarConvertShader;
 
         private readonly PreprocessModel preprocess;
 
@@ -53,15 +62,19 @@ namespace ImageFramework.Model
             NumPipelines = numPipelines;
 
             CheckDeviceCapabilities();
+            pixelValueShader = new PixelValueShader();
+            sharedModel = new SharedModel();
+            polarConvertShader = new ConvertPolarShader(sharedModel.QuadShader);
 
             // models
-            Images = new ImagesModel();
-            Export = new ExportModel();
+            Images = new ImagesModel(sharedModel.ScaleShader);
+            Export = new ExportModel(sharedModel);
+            //Gif = new GifModel(sharedModel.QuadShader);
             Progress = new ProgressModel();
             Filter = new FiltersModel();
             preprocess = new PreprocessModel();
             TextureCache = new TextureCache(Images);
-            thumbnail = new ThumbnailModel();
+            thumbnail = new ThumbnailModel(sharedModel.QuadShader);
 
             for (int i = 0; i < numPipelines; ++i)
             {
@@ -72,6 +85,21 @@ namespace ImageFramework.Model
 
             // pipeline controller
             pipelineController = new PipelineController(this);
+        }
+
+        // removes all images, filters and resets equations
+        public void Reset()
+        {
+            Images.Clear();
+            Filter.Clear();
+            int id = 0;
+            foreach (var pipe in Pipelines)
+            {
+                pipe.Color.Formula = "I" + id;
+                pipe.Alpha.Formula = "I" + id;
+                ++id;
+            }
+            OnSoftReset();
         }
 
         private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -140,6 +168,39 @@ namespace ImageFramework.Model
                     throw;
                 }
             }
+        }
+
+        /// <summary>
+        /// takes a list of textures and combines them into an array.
+        /// </summary>
+        /// <param name="textures">list of images with same dimensions and no layers</param>
+        /// <returns>combined image</returns>
+        public TextureArray2D CombineToArray(List<TextureArray2D> textures)
+        {
+            if (textures.Count == 0) return null;
+            var first = textures[0];
+            var tex = new TextureArray2D(textures.Count, first.NumMipmaps, first.Width, first.Height, Format.R32G32B32A32_Float, false);
+            for(int i = 0; i < textures.Count; ++i)
+            {
+                for (int curMip = 0; curMip < first.NumMipmaps; ++curMip)
+                {
+                    sharedModel.Convert.CopyLayer(textures[i], 0, curMip, tex, i, curMip);
+                }
+            }
+
+            return tex;
+        }
+
+        /// converts lat long to cubemap
+        public TextureArray2D ConvertToCubemap(TextureArray2D latLong, int resolution)
+        {
+            return polarConvertShader.ConvertToCube(latLong, resolution);
+        }
+
+        /// converts cubemap to lat long
+        public TextureArray2D ConvertToLatLong(TextureArray2D cube, int resolution)
+        {
+            return polarConvertShader.ConvertToLatLong(cube, resolution);
         }
 
         /// <summary>
@@ -237,17 +298,19 @@ namespace ImageFramework.Model
 
         public virtual void Dispose()
         {
-            Export?.Dispose();
+            //Gif?.Dispose();
             TextureCache?.Dispose();
             Images?.Dispose();
             Filter?.Dispose();
             preprocess?.Dispose();
+            polarConvertShader?.Dispose();
             foreach (var imagePipeline in pipelines)
             {
                 imagePipeline.Dispose();
             }
             pipelineController?.Dispose();
             pixelValueShader?.Dispose();
+            sharedModel?.Dispose();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -256,6 +319,11 @@ namespace ImageFramework.Model
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected virtual void OnSoftReset()
+        {
+            SoftReset?.Invoke(this, EventArgs.Empty);
         }
     }
 }

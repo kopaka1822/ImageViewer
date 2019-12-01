@@ -1,20 +1,15 @@
 # Image Viewer and Tonemapper
 
-An image viewer for anyone related to computer graphics.
+An image viewer for anyone related to computer graphics. It supports quick side-by-side comparison, arithmetic image manipulation, customisable filter effects (HLSL) and 360° views.
 
 ## File Formats
 
-Currently the following image formats can be imported:
+Currently the following image formats can be used:
 * PNG, JPG, BMP
 * HDR, PFM
 * uncompressed DDS, KTX
 * block compression (BC1-BC7) for DDS, KTX
-* EXR
-
-Exporting is supported for:
-* PNG, JPG, BMP
-* HDR, PFM
-* KTX, DDS (uncompressed and block compression)
+* EXR (only import)
 
 [Used Libraries](about.md)
 
@@ -84,4 +79,4 @@ float4 filter(int2 pixelCoord, int2 size)
 }
 ```
 
-The detailed filter guide can be found [here](https://github.com/kopaka1822/ImageViewer/blob/master/TextureViewer/Help/filter_manual.md).
+The detailed filter guide can be found [here](filter_manual.md).

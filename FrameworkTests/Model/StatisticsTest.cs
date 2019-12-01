@@ -45,9 +45,9 @@ namespace FrameworkTests.Model
             Assert.AreEqual(0.5f, stats.Avg.Luminance, 0.01f);
 
             // luma
-            Assert.AreEqual(0.0f, stats.Min.Luma);
-            Assert.AreEqual(1.0f, stats.Max.Luma, 0.01f);
-            Assert.AreEqual(0.5f, stats.Avg.Luma, 0.01f);
+            Assert.AreEqual(0.0f, stats.Min.Average);
+            Assert.AreEqual(1.0f, stats.Max.Average, 0.01f);
+            Assert.AreEqual(0.5f, stats.Avg.Average, 0.01f);
 
             // lightness
             Assert.AreEqual(0.0f, stats.Min.Lightness);

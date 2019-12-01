@@ -12,7 +12,7 @@ using ImageFramework.Model.Shader;
 
 namespace ImageFramework.Model.Export
 {
-    public class ExportModel : INotifyPropertyChanged, IDisposable
+    public class ExportModel : INotifyPropertyChanged
     {
         public enum LdrMode
         {
@@ -24,10 +24,12 @@ namespace ImageFramework.Model.Export
 
         public IReadOnlyList<ExportFormatModel> Formats { get; }
 
-        internal readonly ConvertFormatShader convert = new ConvertFormatShader();
+        internal readonly ConvertFormatShader convert;
 
-        public ExportModel()
+        internal ExportModel(SharedModel shared)
         {
+            convert = shared.Convert;
+
             var formats = new List<ExportFormatModel>();
             formats.Add(new ExportFormatModel("png"));
             formats.Add(new ExportFormatModel("jpg"));
@@ -295,11 +297,6 @@ namespace ImageFramework.Model.Export
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public void Dispose()
-        {
-            convert?.Dispose();
         }
     }
 }

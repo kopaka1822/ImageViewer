@@ -16,8 +16,13 @@ namespace ImageFramework.Model.Equation.Markov
             };
         }
 
-        public override List<Token.Token> Apply(List<Token.Token> match)
+        public override List<Token.Token> ApplyEx(List<Token.Token> match, Token.Token left)
         {
+            if (left != null)
+            {
+                if (left.TokenType == Token.Token.Type.Value) return null; // don't apply here
+            }
+
             Debug.Assert(match.Count == 2);
             if (match[0] is SingleCharToken signToken)
             {

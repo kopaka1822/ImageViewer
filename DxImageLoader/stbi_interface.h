@@ -2,7 +2,7 @@
 #include <memory>
 #include "Image.h"
 
-std::unique_ptr<image::Image> stb_image_load(const char* filename);
+std::unique_ptr<image::IImage> stb_image_load(const char* filename);
 
 std::vector<uint32_t> stb_image_get_export_formats(const char* extension);
 

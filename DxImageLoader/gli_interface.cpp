@@ -3,116 +3,17 @@
 #include <gli/gli.hpp>
 #include <gli/gl.hpp>
 #include "compress_interface.h"
+#include "ktx_interface.h"
+#include "GliImage.h"
 
-// mofified copy of gli convert
-template <typename texture_type>
-inline texture_type convert_mod(texture_type const& Texture, gli::format Format)
+
+std::unique_ptr<image::IImage> gli_load(const char* filename)
 {
-	typedef float T;
-	typedef typename gli::texture::extent_type extent_type;
-	typedef typename texture_type::size_type size_type;
-	typedef typename extent_type::value_type component_type;
-	typedef typename gli::detail::convert<texture_type, T, gli::defaultp>::fetchFunc fetch_type;
-	typedef typename gli::detail::convert<texture_type, T, gli::defaultp>::writeFunc write_type;
+	auto res = std::make_unique<GliImage>(gli::load(filename));
 
-	GLI_ASSERT(!Texture.empty());
-	GLI_ASSERT(!is_compressed(Format));
+	if (image::isSupported(res->getFormat())) return res;
 
-	const auto isSrgb = gli::is_srgb(Texture.format());
-	const auto isCompressed = gli::is_compressed(Texture.format());
-
-	// for some reason the gli loader doesn't revert srgb compression in this case
-	const auto convertFromSrgb = isSrgb && isCompressed;
-
-	fetch_type Fetch = gli::detail::convert<texture_type, T, gli::defaultp>::call(Texture.format()).Fetch;
-	write_type Write = gli::detail::convert<texture_type, T, gli::defaultp>::call(Format).Write;
-
-	gli::texture Storage(Texture.target(), Format, Texture.texture::extent(), Texture.layers(), Texture.faces(), Texture.levels(), Texture.swizzles());
-	texture_type Copy(Storage);
-
-	for (size_type Layer = 0; Layer < Texture.layers(); ++Layer)
-		for (size_type Face = 0; Face < Texture.faces(); ++Face)
-			for (size_type Level = 0; Level < Texture.levels(); ++Level)
-			{
-				extent_type const& Dimensions = Texture.texture::extent(Level);
-
-				for (component_type k = 0; k < Dimensions.z; ++k)
-					for (component_type j = 0; j < Dimensions.y; ++j)
-						for (component_type i = 0; i < Dimensions.x; ++i)
-						{
-							typename texture_type::extent_type const Texelcoord(extent_type(i, j, k));
-							auto texel = Fetch(Texture, Texelcoord, Layer, Face, Level);
-							if (convertFromSrgb)
-								texel = gli::convertSRGBToLinear(texel);
-
-							Write(
-								Copy, Texelcoord, Layer, Face, Level,
-								texel);
-						}
-			}
-
-	return texture_type(Copy);
-}
-
-std::unique_ptr<image::Image> gli_load(const char* filename)
-{
-	gli::texture tex(gli::load(filename));
-	if (tex.empty())
-		throw std::exception("error opening file");
-	auto originalFormat = tex.format();
-
-	bool useCompressonator = is_compressonator_format(tex.format());
-
-	// convert image format if not compatible
-	if(!image::isSupported(tex.format()) && !useCompressonator)
-	{
-		const auto newFormat = image::getSupportedFormat(tex.format());
-		if(tex.faces() == 1)
-		{
-			tex = convert_mod(gli::texture2d_array(tex), newFormat);
-		}
-		else
-		{
-			tex = convert_mod(gli::texture_cube_array(tex), newFormat);
-		}
-	}
-
-	std::unique_ptr<image::Image> res = std::make_unique<image::Image>();
-
-	// determine image format
-	res->format = tex.format();
-	res->original = originalFormat;
-
-	// put layers and faces together (only case that has layers and faces would be of type CUBE_ARRAY)
-	res->layer.assign(tex.layers() * tex.faces(), image::Layer());
-	size_t outputLayer = 0;
-	for (size_t layer = 0; layer < tex.layers(); ++layer)
-	{
-		for (size_t face = 0; face < tex.faces(); ++face)
-		{
-			res->layer.at(outputLayer).mipmaps.assign(tex.levels(), image::Mipmap());
-			for (size_t mip = 0; mip < tex.levels(); ++mip)
-			{
-				// fill mipmap
-				image::Mipmap& mipmap = res->layer.at(outputLayer).mipmaps.at(mip);
-				mipmap.width = tex.extent(mip).x;
-				mipmap.height = tex.extent(mip).y;
-				mipmap.depth = 1;
-
-				auto data = tex.data(layer, face, mip);
-				auto size = tex.size(mip);
-				mipmap.bytes.reserve(size);
-				mipmap.bytes.assign(reinterpret_cast<char*>(data), reinterpret_cast<char*>(data) + size);
-			}
-			outputLayer++;
-		}
-	}
-
-	if (!useCompressonator) return res;
-
-	// decompress image data
-	const auto newFormat = image::getSupportedFormat(tex.format());
-	return compressonator_convert_image(*res, newFormat, 100);
+	return res->convert(image::getSupportedFormat(res->getFormat()), 100);
 }
 
 std::vector<uint32_t> dds_get_export_formats()
@@ -375,70 +276,16 @@ std::vector<uint32_t> ktx_get_export_formats()
 	};
 }
 
-void gli_save_image(const char* filename, image::Image& image, gli::format format, bool ktx, int quality)
+void gli_save_image(const char* filename, GliImage& image, gli::format format, bool ktx, int quality)
 {
-	gli::texture* tex = nullptr;
-	gli::texture2d_array tex2d;
-	gli::texture_cube texCube;
-
-	if(format != image.format && is_compressonator_format(format))
+	if(image.getFormat() == format)
 	{
-		// use compressonator for texture compression
-		auto cimg = compressonator_convert_image(image, format, quality);
-		gli_save_image(filename, *cimg, format, ktx, quality);
+		if (ktx) image.saveKtx(filename);
+		else image.saveDds(filename);
 		return;
 	}
 
-	bool isCube = image.layer.size() == 6;
-	// create texture storage
-	if(isCube)
-	{
-		texCube = gli::texture_cube(image.format,
-			gli::extent2d(image.layer[0].mipmaps[0].width, image.layer[0].mipmaps[0].height),
-			image.layer[0].mipmaps.size()
-		);
-		tex = &texCube;
-	}
-	else
-	{
-		tex2d = gli::texture2d_array(image.format,
-			gli::extent2d(image.layer[0].mipmaps[0].width, image.layer[0].mipmaps[0].height),
-			image.layer.size(),
-			image.layer[0].mipmaps.size());
-		tex = &tex2d;
-	}
-
-	// transfer texture data
-	for(size_t curLayer = 0; curLayer < image.layer.size(); ++curLayer)
-	{
-		for(size_t curMip = 0; curMip < image.layer[curLayer].mipmaps.size(); ++curMip)
-		{
-			auto* dst = tex->data(
-				isCube ? 0 : curLayer,
-				isCube ? curLayer : 0,
-				curMip
-			);
-			const auto& mip = image.layer[curLayer].mipmaps[curMip];
-			if (mip.bytes.size() != tex->size(curMip))
-				throw std::runtime_error("mipmap size mipmatch. Expected "
-					+ std::to_string(tex->size(curMip)) + " but got " + std::to_string(mip.bytes.size()));
-
-			memcpy(dst, mip.bytes.data(), mip.bytes.size());
-		}
-	}
-
-	// convert texture if necessary
-	if(tex->format() != format)
-	{
-		if (isCube)
-			texCube = convert_mod(texCube, format);
-		else
-			tex2d = convert_mod(tex2d, format);
-	}
-
-	// save
-	if (ktx)
-		gli::save_ktx(*tex, filename);
-	else
-		gli::save_dds(*tex, filename);
+	auto res = image.convert(format, quality);
+	if (ktx) res->saveKtx(filename);
+	else res->saveDds(filename);
 }

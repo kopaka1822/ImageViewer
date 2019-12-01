@@ -36,6 +36,19 @@ namespace ImageViewer.ViewModels
             this.model.PropertyChanged += ModelOnPropertyChanged;
             this.models.Display.PropertyChanged += DisplayOnPropertyChanged;
             this.models.Settings.PropertyChanged += SettingsOnPropertyChanged;
+            this.statistics.PropertyChanged += StatisticsOnPropertyChanged;
+
+            
+        }
+
+        private void StatisticsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(StatisticModel.Stats):
+                    OnPropertyChanged(nameof(TexelColor));
+                    break;
+            }
         }
 
         private void SettingsOnPropertyChanged(object sender, PropertyChangedEventArgs e)

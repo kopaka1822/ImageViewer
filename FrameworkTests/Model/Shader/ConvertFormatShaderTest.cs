@@ -22,7 +22,7 @@ namespace FrameworkTests.Model.Shader
         [TestInitialize]
         public void Init()
         {
-            shader = new ConvertFormatShader();
+            shader = new ConvertFormatShader(new QuadShader());
         }
 
         [TestCleanup]
@@ -97,6 +97,28 @@ namespace FrameworkTests.Model.Shader
             var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, 0, 1.0f, false, 0, 0, 0, 0, 4, 4);
             Assert.AreEqual(0, newTex.Width % 4);
             Assert.AreEqual(0, newTex.Height % 4);
+        }
+
+        [TestMethod]
+        public void Multiplier()
+        {
+            var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "checkers.dds"));
+
+            // multiply with 0.5f
+            var newTex = shader.Convert(tex, Format.B8G8R8A8_UNorm_SRgb, 1, 0, 0.5f);
+            var colors = newTex.GetPixelColors(0, 0);
+
+            Assert.AreEqual(2, newTex.Width);
+            Assert.AreEqual(2, newTex.Height);
+
+            // black remains the same
+            Assert.IsTrue(Color.Black.Equals(colors[0], Color.Channel.Rgba));
+            Assert.IsTrue(Color.Black.Equals(colors[3], Color.Channel.Rgba));
+
+            // white changes to gray
+            var gray = new Color(0.5f, 0.5f, 0.5f, 1.0f).ToSrgb();
+            Assert.IsTrue(gray.Equals(colors[1], Color.Channel.Rgba));
+            Assert.IsTrue(gray.Equals(colors[2], Color.Channel.Rgba));
         }
     }
 }

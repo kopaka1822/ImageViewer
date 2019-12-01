@@ -8,6 +8,9 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <!-- include this to supress warnings -->
+                <ResourceDictionary Source="Views/Theme/DefaultTheme.xaml"/>
+                <!-- the actual resource dictionary -->
                 <theme:ThemeDictionary
                     DefaultSource="Views/Theme/DefaultTheme.xaml"
                     WhiteSource="Views/Theme/WhiteTheme.xaml"

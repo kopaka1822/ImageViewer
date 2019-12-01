@@ -1,0 +1,62 @@
+﻿<Window x:Class="ImageViewer.Views.Dialog.ScaleDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImageViewer.Views.Dialog"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="Scale" 
+        Width="200"
+        SizeToContent="Height"
+        ResizeMode="NoResize"
+        Icon="../../Icons/scale.png"
+        Style="{StaticResource WindowStyle}"
+        WindowStartupLocation="CenterOwner">
+    <Border Padding="5">
+        <StackPanel>
+            <!--Width-->
+            <Grid Margin="0 0 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Width:"/>
+                <xctk:IntegerUpDown Grid.Column="1"  
+                                    Minimum="1"
+                                    Maximum="16384"
+                                    Value="{Binding Width}"/>
+            </Grid>
+
+            <!--Height-->
+            <Grid Margin="0 0 0 5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Height:"/>
+                <xctk:IntegerUpDown Grid.Column="1"  
+                                    Minimum="1"
+                                    Maximum="16384"
+                                    Value="{Binding Height}"/>
+            </Grid>
+
+            <!-- Buttons -->
+            <StackPanel 
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                Margin="0 10 0 0">
+                <Button 
+                    Content="_Apply" 
+                    Margin="0 0 10 0" 
+                    Width="60"
+                    Click="Apply_OnClick"
+                />
+                <Button 
+                    Content="_Cancel"
+                    Width="60"
+                    Click="Cancel_OnClick"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

@@ -31,6 +31,7 @@
             </MenuItem>
             <MenuItem
                     Header="Import Equation Image"
+                    ToolTip="Adds one of the visible equations to the imported images list"
                     IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
                     <Image Source="../Icons/import.png"/>
@@ -64,6 +65,15 @@
                     </MenuItem.CommandParameter>
                 </MenuItem>
             </MenuItem>
+            <MenuItem
+                Header="Import as Array"
+                ToolTip="Combines multiple images into a single texture array on import"
+                IsEnabled="{Binding Progress.NotProcessing}"
+                Command="{Binding ImportArrayCommand}">
+                <MenuItem.Icon>
+                    <Image Source="../Icons/image_layer.png"/>
+                </MenuItem.Icon>
+            </MenuItem>
             <Separator/>
             <MenuItem 
                     Header="_Export"
@@ -81,6 +91,10 @@
                     Header="Linear Interpolation" 
                     IsCheckable="True"
                     IsChecked="{Binding Display.LinearInterpolation}"/>
+            <MenuItem 
+                Header="Display Absolute Values" 
+                IsCheckable="True"
+                IsChecked="{Binding Display.DisplayNegative}"/>
             <MenuItem
                 Header="Flip Y Axis"
                 IsCheckable="True"
@@ -130,6 +144,17 @@
         <!--END VIEW-->
 
         <MenuItem Header="Tools">
+            <MenuItem Header="Scale"
+                      Command="{Binding ShowScaleCommand}"
+                      IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/scale.png"
+                        Width="16" 
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <Separator/>
             <MenuItem 
                     Header="Generate Mipmaps"
                     Command="{Binding GenerateMipmapsCommand}"
@@ -152,6 +177,38 @@
                             Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+
+            <Separator/>
+            <MenuItem
+                Header="LatLong to Cubemap"
+                Command="{Binding LatLongToCubemapCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/cube.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem
+                Header="Cubemap to LatLong"
+                Command="{Binding CubemapToLatLongCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/image_long.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <!--<MenuItem 
+                Header="Animated Gif Export"
+                Command="{Binding GifExportCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image Source="../Icons/save.png"/>
+                </MenuItem.Icon>
+            </MenuItem>-->
         </MenuItem>
         <!--END TOOLS-->
 

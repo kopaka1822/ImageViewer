@@ -26,8 +26,10 @@ The magnitude of luminance is proportional to physical power.
 But the spectral composition of luminance is related to the brightness sensitivity of human vision.
 Luminance is computed in linear color space with: dot(RGB, (0.2125, 0.7154, 0.0721)).",
             // luma
-            @"Luma is brightness computed in sRGB color space which is often used by video codecs.
-The ""NTSC"" luma formula is: dot(sRGB, (0.299, 0.587, 0.114)).",
+            /*@"Luma is brightness computed in sRGB color space which is often used by video codecs.
+The ""NTSC"" luma formula is: dot(sRGB, (0.299, 0.587, 0.114)).",*/
+            // average
+            @"The average weight computed in linear space: dot(RGB, (1/3, 1/3, 1/3)).",
             // lightness
             @"Human vision has a nonlinear perceptual response to brightness: a source having a luminance only 18% of a reference luminance appears about half as bright. 
 The perceptual response to luminance Y is called lightness L.
@@ -76,7 +78,7 @@ It is computed from the luminance: L = 116 * Y ^ (1/3) - 16."
         public List<ComboBoxItem<DefaultStatistics.Values>> AvailableChannels { get; } = new List<ComboBoxItem<DefaultStatistics.Values>>
         {
             new ComboBoxItem<DefaultStatistics.Values>("Luminance", DefaultStatistics.Values.Luminance),
-            new ComboBoxItem<DefaultStatistics.Values>("Luma", DefaultStatistics.Values.Luma),
+            new ComboBoxItem<DefaultStatistics.Values>("Average", DefaultStatistics.Values.Average),
             new ComboBoxItem<DefaultStatistics.Values>("Lightness", DefaultStatistics.Values.Lightness),
         };
 

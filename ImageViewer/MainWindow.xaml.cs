@@ -42,7 +42,9 @@ namespace ImageViewer
             catch (Exception exception)
             {
                 Console.WriteLine(exception);
-                throw;
+                MessageBox.Show(exception.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Close();
+                return;
             }
 
             DataContext = ViewModel;
@@ -63,7 +65,7 @@ namespace ImageViewer
 
         protected override void OnClosed(EventArgs e)
         {
-            ViewModel.Dispose();
+            ViewModel?.Dispose();
             base.OnClosed(e);
         }
     }

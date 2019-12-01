@@ -20,12 +20,53 @@ namespace ImageFramework.Model.Shader
         private readonly QuadShader quad;
         private readonly UploadBuffer<LayerLevelOffsetData> cbuffer;
 
-        public ConvertFormatShader()
+        public ConvertFormatShader(QuadShader quad)
         {
             var dev = DirectX.Device.Get();
             convert = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(), "ConvertFormatShader");
-            quad = new QuadShader();
+            this.quad = quad;
             cbuffer = new UploadBuffer<LayerLevelOffsetData>(1);
+        }
+
+        /// <summary>
+        /// copies a single mip from one layer of a texture to another layer of a texture. The formats don't have to match
+        /// </summary>
+        /// <param name="src">source texture</param>
+        /// <param name="srcLayer"></param>
+        /// <param name="srcMip"></param>
+        /// <param name="dst">destination texture</param>
+        /// <param name="dstLayer"></param>
+        /// <param name="dstMip"></param>
+        public void CopyLayer(TextureArray2D src, int srcLayer, int srcMip, TextureArray2D dst, int dstLayer,
+            int dstMip)
+        {
+            Debug.Assert(src.GetWidth(srcMip) == dst.GetWidth(dstMip));
+            Debug.Assert(src.GetHeight(srcMip) == dst.GetHeight(dstMip));
+
+            var dev = DirectX.Device.Get();
+            dev.Vertex.Set(quad.Vertex);
+            dev.Pixel.Set(convert.Pixel);
+
+            dev.Pixel.SetShaderResource(0, src.View);
+
+ 
+            cbuffer.SetData(new LayerLevelOffsetData
+            {
+                Layer = srcLayer,
+                Level = srcMip,
+                Xoffset = 0,
+                Yoffset = 0,
+                Multiplier = 1.0f
+            });
+
+            dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
+            dev.OutputMerger.SetRenderTargets(dst.GetRtView(dstLayer, dstMip));
+            dev.SetViewScissors(dst.GetWidth(dstMip), dst.GetHeight(dstMip));
+            dev.DrawQuad();
+
+            // remove bindings
+            dev.Pixel.SetShaderResource(0, null);
+            dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
         }
 
         /// <summary>
@@ -219,7 +260,9 @@ struct PixelIn
 float4 main(PixelIn i) : SV_TARGET
 {
     float4 coord = i.projPos;
-    return multiplier * in_tex.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), layer)];
+    float4 color = in_tex.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), layer)];
+    color.rgb *= multiplier;
+    return color;
 }
 ";
         }
@@ -227,7 +270,6 @@ float4 main(PixelIn i) : SV_TARGET
         public void Dispose()
         {
             convert?.Dispose();
-            quad?.Dispose();
             cbuffer?.Dispose();
         }
     }

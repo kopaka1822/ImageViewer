@@ -160,6 +160,7 @@ namespace ImageViewer.Controller
                 case nameof(DisplayModel.LinearInterpolation):
                 case nameof(DisplayModel.ShowCropRectangle):
                 case nameof(DisplayModel.Multiplier):
+                case nameof(DisplayModel.DisplayNegative):
                     ScheduleRedraw();
                     break;
             }

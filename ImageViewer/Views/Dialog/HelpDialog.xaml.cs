@@ -49,6 +49,12 @@ namespace ImageViewer.Views.Dialog
             string text = "";
             try
             {
+                // adjust path if not rooted (working directory is different when a file was opened with double click)
+                if (!Path.IsPathRooted(filename))
+                {
+                    var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    filename = dir + "\\" + filename;
+                }
                 // load text from file
                 text = File.ReadAllText(filename);
             }

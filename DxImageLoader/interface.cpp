@@ -11,9 +11,10 @@
 #include "exr_interface.h"
 #include <map>
 #include "convert.h"
+#include "ktx_interface.h"
 
 static int s_currentID = 1;
-static std::unordered_map<int, std::unique_ptr<image::Image>> s_resources;
+static std::unordered_map<int, std::unique_ptr<image::IImage>> s_resources;
 std::string s_error;
 
 // key = extension (e.g. png), value = DXGI formats
@@ -31,11 +32,11 @@ inline bool file_exists(const std::string& name) {
 	return f.good();
 }
 
-inline void assertSingleLayerMip(const image::Image& image)
+inline void assertSingleLayerMip(const image::IImage& image)
 {
-	if (image.layer.size() != 1)
+	if (image.getNumLayers() != 1)
 		throw std::runtime_error("expected single layer image");
-	if (image.layer[0].mipmaps.size() != 1)
+	if (image.getNumMipmaps() != 1)
 		throw std::runtime_error("expected single mipmap image");
 }
 
@@ -46,7 +47,7 @@ int image_open(const char* filename)
 	std::string fname = filename;
 	std::transform(fname.begin(), fname.end(), fname.begin(), ::tolower);
 
-	std::unique_ptr<image::Image> res;
+	std::unique_ptr<image::IImage> res;
 
 	try
 	{
@@ -56,6 +57,10 @@ int image_open(const char* filename)
 		if (hasEnding(fname, ".pfm"))
 		{
 			res = pfm_load(filename);
+		}
+		else if(hasEnding(fname, ".ktx2"))
+		{
+			res = ktx_load(filename);
 		}
 		else if (hasEnding(fname, ".dds") || hasEnding(fname, ".ktx"))
 		{
@@ -84,32 +89,11 @@ int image_open(const char* filename)
 
 int image_allocate(uint32_t format, int width, int height, int layer, int mipmaps)
 {
-	auto res = std::make_unique<image::Image>();
-	res->format = gli::format(format);
-	res->original = res->format;
-	if(!image::isSupported(res->format))
+	auto res = std::make_unique<GliImage>(gli::format(format), layer, mipmaps, width, height);
+	if(!image::isSupported(res->getFormat()))
 	{
 		set_error("image format is not supported for allocate");
 		return 0;
-	}
-
-	const auto pixelSize = image::pixelSize(res->format);
-	res->layer.resize(layer);
-	for(auto& l : res->layer)
-	{
-		l.mipmaps.resize(mipmaps);
-		int curWidth = width;
-		int curHeight = height;
-		for(auto& m : l.mipmaps)
-		{
-			m.bytes.resize(curWidth * curHeight * pixelSize);
-			m.width = curWidth;
-			m.height = curHeight;
-			m.depth = 1;
-
-			curWidth = std::max(curWidth / 2, 1);
-			curHeight = std::max(curHeight / 2, 1);
-		}
 	}
 
 	int id = s_currentID++;
@@ -131,14 +115,14 @@ void image_info(int id, uint32_t& format, uint32_t& originalFormat, int& nLayer,
 	if (it == s_resources.end())
 		return;
 
-	format = uint32_t(it->second->format);
-	originalFormat = uint32_t(it->second->original);
-	nLayer = int(it->second->layer.size());
+	format = uint32_t(it->second->getFormat());
+	originalFormat = uint32_t(it->second->getOriginalFormat());
+	nLayer = int(it->second->getNumLayers());
 
 	nMipmaps = 0;
 	if (nLayer > 0)
 	{
-		nMipmaps = static_cast<int>(it->second->layer.at(0).mipmaps.size());
+		nMipmaps = static_cast<int>(it->second->getNumMipmaps());
 	}
 }
 
@@ -148,14 +132,14 @@ void image_info_mipmap(int id, int mipmap, int& width, int& height)
 	if (it == s_resources.end())
 		return;
 
-	if (it->second->layer.empty())
+	if (it->second->getNumLayers() == 0)
 		return;
 
-	if (unsigned(mipmap) >= it->second->layer[0].mipmaps.size())
+	if (unsigned(mipmap) >= it->second->getNumMipmaps())
 		return;
 
-	width = it->second->layer[0].mipmaps[mipmap].width;
-	height = it->second->layer[0].mipmaps[mipmap].height;
+	width = it->second->getWidth(mipmap);
+	height = it->second->getHeight(mipmap);
 }
 
 unsigned char* image_get_mipmap(int id, int layer, int mipmap, uint32_t& size)
@@ -164,14 +148,13 @@ unsigned char* image_get_mipmap(int id, int layer, int mipmap, uint32_t& size)
 	if (it == s_resources.end())
 		return nullptr;
 
-	if (unsigned(layer) >= it->second->layer.size())
+	if (unsigned(layer) >= it->second->getNumLayers())
 		return nullptr;
 
-	if (unsigned(mipmap) >= it->second->layer.at(layer).mipmaps.size())
+	if (unsigned(mipmap) >= it->second->getNumMipmaps())
 		return nullptr;
 
-	size = static_cast<int>(it->second->layer.at(layer).mipmaps[mipmap].bytes.size());
-	return it->second->layer.at(layer).mipmaps[mipmap].bytes.data();
+	return it->second->getData(layer, mipmap, size);
 }
 
 bool image_save(int id, const char* filename, const char* extension, uint32_t format, int quality)
@@ -188,47 +171,54 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 	try
 	{
 		if (ext == "dds")
-			gli_save_image(fullName.c_str(), *it->second, gli::format(format), false, quality);
+			gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*it->second), gli::format(format), false, quality);
 		else if (ext == "ktx")
-			gli_save_image(fullName.c_str(), *it->second, gli::format(format), true, quality);
+			gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*it->second), gli::format(format), true, quality);
 		else if (ext == "pfm" || ext == "hdr")
 		{
 			assertSingleLayerMip(*it->second);
-			if (it->second->format != gli::FORMAT_RGBA32_SFLOAT_PACK32)
+			if (it->second->getFormat() != gli::FORMAT_RGBA32_SFLOAT_PACK32)
 				throw std::runtime_error ("expected RGBA32F image format for pfm, hdr export");
 
-			auto& mip = it->second->layer[0].mipmaps[0];
+			uint32_t mipSize;
+			auto mip = it->second->getData(0, 0, mipSize);
+			auto width = it->second->getWidth(0);
+			auto height = it->second->getHeight(0);
 			int nComponents = 0;
 
 			// only 2 possible formats
 			if (format == gli::FORMAT_RGB32_SFLOAT_PACK32)
 			{
-				image::changeStride(mip.bytes, 16, 12);
+				image::changeStride(mip, mipSize, 16, 12);
 				nComponents = 3;
 			}
 			else if (format == gli::FORMAT_R32_SFLOAT_PACK32)
 			{
-				image::changeStride(mip.bytes, 16, 4);
+				image::changeStride(mip, mipSize, 16, 4);
 				nComponents = 1;
 			}
 			else throw std::runtime_error("export format not supported for pfm, hdr");
 
 			if (ext == "hdr")
-				stb_save_hdr(fullName.c_str(), mip.width, mip.height, nComponents, mip.bytes.data());
+				stb_save_hdr(fullName.c_str(), width, height, nComponents, mip);
 			else if (ext == "pfm")
-				pfm_save(fullName.c_str(), mip.width, mip.height, nComponents, mip.bytes.data());
+				pfm_save(fullName.c_str(), width, height, nComponents, mip);
 			else assert(false);
 		}
 		else if (ext == "png" || ext == "jpg" || ext == "bmp")
 		{
 			assertSingleLayerMip(*it->second);
-			if (it->second->format != gli::FORMAT_RGBA8_SRGB_PACK8 &&
-				it->second->format != gli::FORMAT_RGBA8_UNORM_PACK8 &&
-				it->second->format != gli::FORMAT_RGBA8_SNORM_PACK8)
+			if (it->second->getFormat() != gli::FORMAT_RGBA8_SRGB_PACK8 &&
+				it->second->getFormat() != gli::FORMAT_RGBA8_UNORM_PACK8 &&
+				it->second->getFormat() != gli::FORMAT_RGBA8_SNORM_PACK8)
 				throw std::runtime_error("unexpected image format. Expected one of FORMAT_RGBA8_SRGB_PACK8, FORMAT_RGBA8_UNORM_PACK8, FORMAT_RGBA8_SNORM_PACK8");
 
-			auto& mip = it->second->layer[0].mipmaps[0];
+			uint32_t mipSize;
+			auto mip = it->second->getData(0, 0, mipSize);
+			auto width = it->second->getWidth(0);
+			auto height = it->second->getHeight(0);
 			int nComponents = 0;
+
 			if (format == gli::FORMAT_RGBA8_SRGB_PACK8)
 			{
 				nComponents = 4;
@@ -236,21 +226,21 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 			else if (format == gli::FORMAT_RGB8_SRGB_PACK8)
 			{
 				nComponents = 3;
-				image::changeStride(mip.bytes, 4, 3);
+				image::changeStride(mip, mipSize, 4, 3);
 			}
 			else if (format == gli::FORMAT_R8_SRGB_PACK8)
 			{
 				nComponents = 1;
-				image::changeStride(mip.bytes, 4, 1);
+				image::changeStride(mip, mipSize, 4, 1);
 			}
 			else throw std::runtime_error("export format not supported for png, jpg, bmp");
 
 			if (ext == "png")
-				stb_save_png(fullName.c_str(), mip.width, mip.height, nComponents, mip.bytes.data());
+				stb_save_png(fullName.c_str(), width, height, nComponents, mip);
 			else if (ext == "bmp")
-				stb_save_bmp(fullName.c_str(), mip.width, mip.height, nComponents, mip.bytes.data());
+				stb_save_bmp(fullName.c_str(), width, height, nComponents, mip);
 			else if (ext == "jpg")
-				stb_save_jpg(fullName.c_str(), mip.width, mip.height, nComponents, mip.bytes.data(), quality);
+				stb_save_jpg(fullName.c_str(), width, height, nComponents, mip, quality);
 			else assert(false);
 		}
 		else throw std::runtime_error("file extension not supported");

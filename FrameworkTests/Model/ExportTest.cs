@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -345,6 +346,35 @@ namespace FrameworkTests.Model
                 throw new Exception($"directX compability failed for {numErrors}/{eFmt.Formats.Count} formats:\n" + errors);
         }
 
+
+        /// <summary>
+        /// tests if the dds loader recognizes cubemaps
+        /// </summary>
+        [TestMethod]
+        public void DdsDirectXCubemapCompability()
+        {
+            // load cubemap
+            var model = new Models(1);
+            model.AddImageFromFile(TestData.Directory + "cubemap.dds");
+            model.Apply();
+
+            // export
+            var desc = new ExportDescription(ExportDir + "tmp", "dds", model.Export);
+            desc.FileFormat = GliFormat.RGBA8_SRGB;
+            model.Export.Export(model.Pipelines[0].Image, desc);
+
+            // try loading with dds loader
+            DDSTextureLoader.CreateDDSTextureFromFile(Device.Get().Handle, Device.Get().ContextHandle, ExportDir + "tmp.dds",
+                out var resource, out var resourceView, 0, out var alphaMode);
+
+            Assert.AreEqual(ResourceDimension.Texture2D, resource.Dimension);
+            Assert.IsTrue(resource is Texture2D);
+            var tex2D = resource as Texture2D;
+            Assert.AreEqual(model.Images.Width, tex2D.Description.Width);
+            Assert.AreEqual(model.Images.Height, tex2D.Description.Height);
+            Assert.AreEqual(model.Images.NumLayers, tex2D.Description.ArraySize);
+            Assert.AreEqual(model.Images.NumMipmaps, tex2D.Description.MipLevels);
+        }
 
         private void CompareAfterExport(string inputImage, string outputImage, string outputExtension, GliFormat format, Color.Channel channels = Color.Channel.Rgb, float tolerance = 0.01f)
         {

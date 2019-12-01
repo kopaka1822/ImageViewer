@@ -140,6 +140,9 @@ namespace ImageFramework.Controller
                     break;
                 case nameof(ImagesModel.ImageOrder):
                 case nameof(ImagesModel.NumMipmaps):
+                case nameof(ImagesModel.NumLayers):
+                case nameof(ImagesModel.Width):
+                case nameof(ImagesModel.Height):
                     // all images must be recomputed
                     foreach (var pipe in models.Pipelines)
                     {

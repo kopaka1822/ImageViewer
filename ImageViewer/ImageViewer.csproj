@@ -89,17 +89,22 @@
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
     <Compile Include="Commands\CancelFiltersCommand.cs" />
     <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\CubemapToLatLongCommand.cs" />
     <Compile Include="Commands\DeleteMipmapsCommand.cs" />
     <Compile Include="Commands\ExportCommand.cs" />
     <Compile Include="Commands\GenerateMipmapsCommand.cs" />
+    <Compile Include="Commands\GifExportCommand.cs" />
     <Compile Include="Commands\HelpDialogCommand.cs" />
+    <Compile Include="Commands\ImportArrayCommand.cs" />
     <Compile Include="Commands\ImportCommand.cs" />
     <Compile Include="Commands\ImportEquationImageCommand.cs" />
+    <Compile Include="Commands\LatLongToCubemapCommand.cs" />
     <Compile Include="Commands\OpenCommand.cs" />
     <Compile Include="Commands\ResizeWindowCommand.cs" />
     <Compile Include="Commands\SetThemeCommand.cs" />
     <Compile Include="Commands\ShowPixelColorCommand.cs" />
     <Compile Include="Commands\ShowPixelDisplayCommand.cs" />
+    <Compile Include="Commands\ShowScaleCommand.cs" />
     <Compile Include="Commands\SimpleCommand.cs" />
     <Compile Include="Controller\ClientDropController.cs" />
     <Compile Include="Controller\ComputeImageController.cs" />
@@ -125,8 +130,12 @@
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Models\StatisticModel.cs" />
     <Compile Include="ViewModels\Dialog\ExportViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\GifExportViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\ImportArrayViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelColorViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\ResolutionViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\ScaleViewModel.cs" />
     <Compile Include="ViewModels\DisplayViewModel.cs" />
     <Compile Include="ViewModels\EquationsViewModel.cs" />
     <Compile Include="ViewModels\EquationViewModel.cs" />
@@ -146,8 +155,14 @@
     <Compile Include="ViewModels\ViewModels.cs" />
     <Compile Include="Views\ComboBoxItem.cs" />
     <Compile Include="Views\CustomTextBox.cs" />
+    <Compile Include="Views\Dialog\ArrayImportDialog.xaml.cs">
+      <DependentUpon>ArrayImportDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Dialog\ExportDialog.xaml.cs">
       <DependentUpon>ExportDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\GifExportDialog.xaml.cs">
+      <DependentUpon>GifExportDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\HelpDialog.xaml.cs">
       <DependentUpon>HelpDialog.xaml</DependentUpon>
@@ -157,6 +172,12 @@
     </Compile>
     <Compile Include="Views\Dialog\PixelDisplayDialog.xaml.cs">
       <DependentUpon>PixelDisplayDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\ResolutionDialog.xaml.cs">
+      <DependentUpon>ResolutionDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\ScaleDialog.xaml.cs">
+      <DependentUpon>ScaleDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\FilterTab.xaml.cs">
       <DependentUpon>FilterTab.xaml</DependentUpon>
@@ -196,7 +217,15 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\Dialog\ArrayImportDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Dialog\ExportDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\GifExportDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -209,6 +238,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialog\PixelDisplayDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\ResolutionDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\ScaleDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -356,6 +393,15 @@
   <ItemGroup>
     <Resource Include="Icons\dx_system.png" />
     <Resource Include="Icons\gl_system.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\scale.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\image_long.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\cube.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

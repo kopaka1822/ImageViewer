@@ -11,8 +11,13 @@
 
         public override string ToHlsl()
         {
-            var num = $"float({value.ToString(Models.Culture)})";
-            return $"float4({num}, {num}, {num}, {num})";
+            return ToHlsl(value);
+        }
+
+        // for unit testing purposes
+        internal static string ToHlsl(float value)
+        {
+            return $"f4({value.ToString(Models.Culture)})";
         }
     }
 }

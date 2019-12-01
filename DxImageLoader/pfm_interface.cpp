@@ -38,7 +38,7 @@ struct Pixel
 	float r, g, b;
 };
 
-std::unique_ptr<image::Image> pfm_load(const char* filename)
+std::unique_ptr<image::IImage> pfm_load(const char* filename)
 {
 	// create fstream object to read in pfm file 
 	// open the file in binary
@@ -80,17 +80,13 @@ std::unique_ptr<image::Image> pfm_load(const char* filename)
 
 	bool grayscale = (bands == "Pf");
 
-	auto res = std::make_unique<image::Image>();
-	res->original = grayscale ? gli::FORMAT_R32_SFLOAT_PACK32 : gli::FORMAT_RGB32_SFLOAT_PACK32;
-	res->format = gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
-	res->layer.emplace_back();
-	res->layer.at(0).mipmaps.emplace_back();
-	auto& mipmap = res->layer.at(0).mipmaps.at(0);
+	auto res = std::make_unique<image::SimpleImage>(
+		grayscale ? gli::FORMAT_R32_SFLOAT_PACK32 : gli::FORMAT_RGB32_SFLOAT_PACK32,
+		gli::format::FORMAT_RGBA32_SFLOAT_PACK32,
+		width, height, 4 * 4);
 
-	mipmap.width = width;
-	mipmap.height = height;
-	mipmap.bytes.resize(width * height * 4 * 4);
-	auto data = reinterpret_cast<float*>(mipmap.bytes.data());
+	uint32_t size;
+	auto data = reinterpret_cast<float*>(res->getData(0, 0, size));
 
 	if (bands == "Pf") {          // handle 1-band image 
 
