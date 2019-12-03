@@ -41,11 +41,25 @@ public:
 		{
 			// load hdr file
 			int nComponents = 0;
-			m_data = reinterpret_cast<stbi_uc*>(stbi_loadf(filename, &m_width, &m_height, &nComponents, 4));
-			if (!m_data)
+			auto tmp = reinterpret_cast<stbi_uc*>(stbi_loadf(filename, &m_width, &m_height, &nComponents, 3));
+			if (!tmp)
 				throw std::exception("error during reading file");
 
-			m_original = getFloatFormat(nComponents);
+			// copy data with additional alpha channel
+			const size_t size = size_t(m_width) * size_t(m_height) * 4 * 4;
+			m_data = reinterpret_cast<stbi_uc*>(stbi__malloc(size));
+			for (auto* src = reinterpret_cast<float*>(tmp), *dst = reinterpret_cast<float*>(m_data), *end = reinterpret_cast<float*>(m_data + size);
+				dst != end; src += 3, dst += 4)
+			{
+				dst[0] = src[0];
+				dst[1] = src[1];
+				dst[2] = src[2];
+				dst[3] = 1.0f;
+			}
+			
+			stbi_image_free(tmp);
+
+			m_original = gli::format::FORMAT_RGB9E5_UFLOAT_PACK32;
 			m_format = gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
 			m_size = m_width * m_height * 4 * 4;
 		}
