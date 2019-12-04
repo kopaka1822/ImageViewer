@@ -144,6 +144,7 @@
     <Compile Include="ViewModels\Dialog\ResolutionViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ScaleViewModel.cs" />
     <Compile Include="ViewModels\Display\DisplayViewModel.cs" />
+    <Compile Include="ViewModels\Display\RayCastingDisplayViewModel.cs" />
     <Compile Include="ViewModels\Display\Single3DDisplayViewModel.cs" />
     <Compile Include="ViewModels\EquationsViewModel.cs" />
     <Compile Include="ViewModels\EquationViewModel.cs" />
@@ -186,6 +187,9 @@
     </Compile>
     <Compile Include="Views\Dialog\ScaleDialog.xaml.cs">
       <DependentUpon>ScaleDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Display\RayCastingView.xaml.cs">
+      <DependentUpon>RayCastingView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Display\Single3DView.xaml.cs">
       <DependentUpon>Single3DView.xaml</DependentUpon>
@@ -257,6 +261,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialog\ScaleDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Display\RayCastingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

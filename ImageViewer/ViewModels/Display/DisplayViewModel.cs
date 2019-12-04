@@ -16,9 +16,11 @@ using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageFramework.Utility;
 using ImageViewer.Controller.TextureViews;
+using ImageViewer.Controller.TextureViews.Texture3D;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
 using ImageViewer.Views;
+using RayCastingView = ImageViewer.Views.Display.RayCastingView;
 using Single3DView = ImageViewer.Views.Display.Single3DView;
 
 namespace ImageViewer.ViewModels.Display
@@ -178,6 +180,12 @@ namespace ImageViewer.ViewModels.Display
                         {
                             var view = new Single3DView(models);
                             extendedView = view; 
+                            models.Window.Window.ImagesTab.ExtendedViewHost.Child = view;
+                        }
+                        else if (models.Display.ExtendedViewData is RayCastingDisplayModel)
+                        {
+                            var view = new RayCastingView(models);
+                            extendedView = view;
                             models.Window.Window.ImagesTab.ExtendedViewHost.Child = view;
                         }
                         else Debug.Assert(false);

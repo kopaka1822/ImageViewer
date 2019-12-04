@@ -19,7 +19,7 @@ namespace ImageViewer.Models.Display
         {
             this.models = models;
             this.display = display;
-          
+            
         }
 
         public void Dispose()

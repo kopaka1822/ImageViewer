@@ -67,7 +67,6 @@ namespace ImageFramework.DirectX.Query
             Debug.Assert(current == null);
 
             // get next free timer
-            GpuTimer t;
             if (cache.Count > 0)
                 current = cache.Pop();
             else current = new GpuTimer();
