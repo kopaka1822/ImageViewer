@@ -17,9 +17,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         protected readonly TextureViewData data;
         protected float cubeOffsetX = 0.0f;
         protected float cubeOffsetY = 0.0f;
-        private float pitch = 0.0f;
-        private float roll = 0.0f;
-
+        private Matrix rotation = Matrix.Identity;
 
         public Texture3DBaseView(ModelsEx models, TextureViewData data)
         {
@@ -45,15 +43,15 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
 
         public void OnDrag(Vector2 diff)
         {
-            pitch += (float)diff.X * 0.01f * models.Display.Aperture;
-            roll += (float)diff.Y * 0.01f * models.Display.Aperture;
+            float pitch = (float)diff.X * 0.01f * models.Display.Aperture;
+            float roll = (float)diff.Y * 0.01f * models.Display.Aperture;
+            var r = Matrix.RotationX(roll) * Matrix.RotationY(pitch);
+            rotation = r * rotation;
         }
 
         protected Matrix GetRotation()
         {
-            return
-                Matrix.RotationX(roll) *
-                Matrix.RotationY(pitch);
+            return rotation;
         }
 
         protected float CalcFarplane()
