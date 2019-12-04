@@ -23,6 +23,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
             public float Multiplier;
             public float Farplane;
             public int UseAbs;
+            public int UseFlatShading;
             
         }
 
@@ -49,7 +50,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
 
         public void Run(UploadBuffer buffer, Matrix rayTransform, Matrix worldToImage, float multiplier, float farplane,
-            bool useAbs, ShaderResourceView texture)
+            bool useAbs, bool useFlatShading,ShaderResourceView texture)
         {
             buffer.SetData(new ViewBufferData
             {
@@ -57,7 +58,8 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 WorldToImage = worldToImage,
                 Multiplier = multiplier,
                 Farplane = farplane,
-                UseAbs = useAbs ? 1 : 0
+                UseAbs = useAbs ? 1 : 0,
+                UseFlatShading = useFlatShading ? 1 : 0
             });
 
             var dev = Device.Get();
@@ -223,37 +225,60 @@ float4 main(PixelIn i) : SV_TARGET {{
     if(dirSign.z == 1) distance.z = 1-distance.z;
     distance *= projLength;
 
+    
+    float first_diffuse = 1;
+    if(useFlatShading){{
+        if(pos.x == 1 || pos.x == 0){{
+         first_diffuse = absDir.x;
+        }}
+        if(pos.y == 1 || pos.y == 0){{
+         first_diffuse = absDir.y;
+        }}
+        if(pos.z == 1 || pos.z == 0){{
+         first_diffuse = absDir.z;
+        }}
+    }}
+
     float4 first = tex[rayPos];
-    color.rgb += color.a * first.a * first.rgb;
+    color.rgb += color.a * first.a * first.rgb * first_diffuse;
     color.a *= 1 - first.a;
      
+    
 
     [loop] do{{
+        float diffuse = 0;
         if(distance.x < distance.y || distance.z < distance.y) {{
             if(distance.x < distance.z){{
                 rayPos.x += dirSign.x;
                 distance.yz -= distance.x;
                 distance.x = projLength.x;
+                diffuse = absDir.x;
             }}    
             else{{
                 rayPos.z += dirSign.z;
                 distance.xy -= distance.z;
                 distance.z = projLength.z;
+                diffuse = absDir.z;
             }}    
         }}
         else{{
             rayPos.y += dirSign.y;
             distance.xz -= distance.y;
             distance.y = projLength.y;
+            diffuse = absDir.y;
         }}    
     
-
+        
         float4 s = tex[rayPos];
-        color.rgb += color.a * s.a * s.rgb;
+        if(!useFlatShading){{
+           diffuse = 1;
+        }}
+        color.rgb += color.a * s.a * s.rgb * diffuse;
         color.a *= 1 - s.a;
         
     }} while(isInside(rayPos,textureDimension) && color.a > 0.0);
-   
+
+
     color.rgb *= multiplier;
     {ApplyColorTransform()}
     return color;
@@ -271,6 +296,7 @@ cbuffer InfoBuffer : register(b0) {
     float multiplier;
     float farplane;
     bool useAbs;
+    bool useFlatShading;
 };
 ";
         }

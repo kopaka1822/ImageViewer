@@ -8,6 +8,7 @@ using ImageFramework.Utility;
 using ImageViewer.Controller.TextureViews.Shader;
 using ImageViewer.Controller.TextureViews.Shared;
 using ImageViewer.Models;
+using ImageViewer.Models.Display;
 using SharpDX;
 
 namespace ImageViewer.Controller.TextureViews.Texture3D
@@ -16,11 +17,13 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
     {
         private readonly RayCastingShader shader;
         private readonly RayMarchingShader marchingShader;
+        private RayCastingDisplayModel displayEx;
 
         public RayCastingView(ModelsEx models, TextureViewData data) : base(models, data)
         {
             shader = new RayCastingShader();
             marchingShader = new RayMarchingShader();
+            displayEx = (RayCastingDisplayModel)models.Display.ExtendedViewData;
         } 
 
         public override void Draw(ITexture texture)
@@ -40,7 +43,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             else
             {
                 marchingShader.Run(data.Buffer, models.Display.ClientAspectRatio, GetWorldToImage(), models.Display.Multiplier, CalcFarplane(), models.Display.DisplayNegative,
-                texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap));
+                displayEx.FlatShading,texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap));
             }
 
             dev.OutputMerger.BlendState = data.DefaultBlendState;

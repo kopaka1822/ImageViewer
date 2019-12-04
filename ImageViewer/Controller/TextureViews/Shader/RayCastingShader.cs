@@ -24,6 +24,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
             public float Farplane;
             public int UseAbs;
             
+            
         }
 
         private readonly SamplerState sampler;
@@ -58,6 +59,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 Multiplier = multiplier,
                 Farplane = farplane,
                 UseAbs = useAbs ? 1 : 0
+                
             });
 
             var dev = Device.Get();
@@ -227,6 +229,7 @@ cbuffer InfoBuffer : register(b0) {
     float multiplier;
     float farplane;
     bool useAbs;
+
 };
 ";
         }
