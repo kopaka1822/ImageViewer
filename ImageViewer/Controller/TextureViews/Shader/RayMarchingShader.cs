@@ -223,6 +223,11 @@ float4 main(PixelIn i) : SV_TARGET {{
     if(dirSign.z == 1) distance.z = 1-distance.z;
     distance *= projLength;
 
+    float4 first = tex[rayPos];
+    color.rgb += color.a * first.a * first.rgb;
+    color.a *= 1 - first.a;
+     
+
     [loop] do{{
         if(distance.x < distance.y || distance.z < distance.y) {{
             if(distance.x < distance.z){{

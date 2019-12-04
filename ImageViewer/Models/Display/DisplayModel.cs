@@ -71,6 +71,10 @@ namespace ImageViewer.Models.Display
                 {
                     extendedView = new Single3DDisplayModel(models, this);
                 }
+                else if (ActiveView == ViewMode.RayCasting)
+                {
+                    extendedView = new RayCastingDisplayModel(models, this);
+                }
                 else
                 {
                     extendedView = null;
