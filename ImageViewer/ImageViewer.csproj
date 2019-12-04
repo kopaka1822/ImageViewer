@@ -109,6 +109,7 @@
     <Compile Include="Controller\CropController.cs" />
     <Compile Include="Controller\ImportDialogController.cs" />
     <Compile Include="Controller\PaintController.cs" />
+    <Compile Include="Controller\TextureViews\Shader\RayMarchingShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\RayCastingShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\ShearWarpShader.cs" />
     <Compile Include="Controller\TextureViews\Texture2D\CubeCrossTextureView.cs" />

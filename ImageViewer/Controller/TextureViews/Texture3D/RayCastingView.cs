@@ -15,10 +15,12 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
     public class RayCastingView : Texture3DBaseView
     {
         private readonly RayCastingShader shader;
+        private readonly RayMarchingShader marchingShader;
 
         public RayCastingView(ModelsEx models, TextureViewData data) : base(models, data)
         {
             shader = new RayCastingShader();
+            marchingShader = new RayMarchingShader();
         } 
 
         public override void Draw(ITexture texture)
@@ -30,8 +32,16 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             var dev = Device.Get();
             dev.OutputMerger.BlendState = data.AlphaDarkenState;
 
-            shader.Run(data.Buffer, models.Display.ClientAspectRatio, GetWorldToImage(), models.Display.Multiplier, CalcFarplane(), models.Display.DisplayNegative, 
+            if (models.Display.LinearInterpolation)
+            {
+                shader.Run(data.Buffer, models.Display.ClientAspectRatio, GetWorldToImage(), models.Display.Multiplier, CalcFarplane(), models.Display.DisplayNegative,
                 texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap));
+            }
+            else
+            {
+                marchingShader.Run(data.Buffer, models.Display.ClientAspectRatio, GetWorldToImage(), models.Display.Multiplier, CalcFarplane(), models.Display.DisplayNegative,
+                texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap));
+            }
 
             dev.OutputMerger.BlendState = data.DefaultBlendState;
         }
@@ -56,6 +66,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         public override void Dispose()
         {
             shader?.Dispose();
+            marchingShader?.Dispose();
         }
     }
 }
