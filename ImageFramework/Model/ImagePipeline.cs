@@ -210,6 +210,7 @@ namespace ImageFramework.Model
         {
             ct.ThrowIfCancellationRequested();
             var filter = args.Filters[index];
+
             filter.Shader.Run(args.Images, src, dst, args.LayerLevelBuffer, iteration);
             args.Sync.Set();
 

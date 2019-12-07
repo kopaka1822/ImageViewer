@@ -26,12 +26,12 @@ namespace ImageFramework.DirectX.Query
         /// </summary>
         public void Set()
         {
-            /*if (isActive)
+            if (isActive)
             {
                 // wait for previous query to be finished
                 var cts = new CancellationTokenSource();
                 WaitForGpuAsync(cts.Token).Wait();
-            }*/
+            }
             
             Device.Get().EndQuery(query);
             isActive = true;
@@ -43,11 +43,18 @@ namespace ImageFramework.DirectX.Query
         public async Task WaitForGpuAsync(CancellationToken ct)
         {
             Debug.Assert(isActive);
+            // flush before wait to ensure that commands were submitted
+            Device.Get().Flush();
 
-            while (!Device.Get().GetQueryEventData(query))
+            int timeout = 1; // start with waiting 1 ms
+            do
             {
-                await Task.Delay(10, ct);
-            }
+                ct.ThrowIfCancellationRequested();
+                await Task.Delay(timeout);
+                timeout = Math.Min(timeout * 2, 1000);
+            } while (!Device.Get().GetQueryEventData(query));
+
+            isActive = false;
         }
 
         public void Dispose()
