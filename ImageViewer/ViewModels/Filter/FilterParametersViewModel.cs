@@ -305,11 +305,13 @@ namespace ImageViewer.ViewModels.Filter
 
         public bool HasKeyToInvoke(Key key)
         {
-            return ViewModels.Any(p => p.HasKeyToInvoke(key));
+            return IsVisible && ViewModels.Any(p => p.HasKeyToInvoke(key));
         }
 
         public void InvokeKey(Key key)
         {
+            if (!IsVisible) return;
+
             foreach (var p in ViewModels)
             {
                 p.InvokeKey(key);
