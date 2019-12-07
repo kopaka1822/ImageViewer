@@ -34,7 +34,8 @@ namespace ImageFramework.DirectX
 #if DEBUG
             flags |= DeviceCreationFlags.Debug;
 #endif
-            Handle = new SharpDX.Direct3D11.Device(DriverType.Hardware, flags, new FeatureLevel[]{FeatureLevel.Level_11_0});
+            // create 11.1 if possible (disable gpu timeout) but 11.0 is also fine
+            Handle = new SharpDX.Direct3D11.Device(DriverType.Hardware, flags, new FeatureLevel[]{ FeatureLevel.Level_11_1, FeatureLevel.Level_11_0});
 
             // obtain the factory that created the device
             var obj = Handle.QueryInterface<SharpDX.DXGI.Device>();
@@ -263,7 +264,12 @@ namespace ImageFramework.DirectX
         /// <param name="query"></param>
         public bool GetQueryEventData(Query query)
         {
-            return context.GetData<int>(query) != 0;
+            return context.GetData<int>(query, AsynchronousFlags.DoNotFlush) != 0;
+        }
+
+        public void Flush()
+        {
+            context.Flush();
         }
     }
 }
