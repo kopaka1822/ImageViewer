@@ -12,6 +12,7 @@ using System.Windows.Documents;
 using ImageFramework.Annotations;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
+using ImageFramework.Model.Statistics;
 using ImageFramework.Utility;
 using ImageViewer.Models;
 using ImageViewer.Views;
@@ -21,16 +22,20 @@ namespace ImageViewer.ViewModels.Dialog
     public class ExportViewModel : INotifyPropertyChanged, IDisposable
     {
         private readonly ModelsEx models;
+        private readonly ExportFormatModel usedFormat;
         private readonly string filename;
         private readonly string extension;
         private readonly bool is3D;
+        private readonly List<ComboBoxItem<GliFormat>> allFormats = new List<ComboBoxItem<GliFormat>>();
+        private readonly List<int> formatRatings = new List<int>();
 
-        public ExportViewModel(ModelsEx models, string extension, GliFormat preferredFormat, string filename, bool is3D)
+        public ExportViewModel(ModelsEx models, string extension, GliFormat preferredFormat, string filename, bool is3D, DefaultStatistics stats)
         {
             this.models = models;
             this.extension = extension;
             this.filename = filename;
             this.is3D = is3D;
+            this.usedFormat = models.Export.Formats.First(fmt => fmt.Extension == extension);
             models.Export.IsExporting = true;
             Quality = models.Settings.LastQuality;
 
@@ -50,9 +55,6 @@ namespace ImageViewer.ViewModels.Dialog
             selectedMipmap = AvailableMipmaps[models.Export.Mipmap];
             Debug.Assert(selectedMipmap.Cargo == models.Export.Mipmap);
 
-            // set crop borders
-
-
             // all layer option for ktx and dds
             if (models.Images.NumLayers > 1 && (extension == "ktx" || extension == "dds"))
             {
@@ -69,21 +71,34 @@ namespace ImageViewer.ViewModels.Dialog
                 models.Export.Mipmap = selectedMipmap.Cargo;
             }
 
-            // init formats
-            var usedFormat = models.Export.Formats.First(fmt => fmt.Extension == extension);
-
+            // init available pixel data types
+            var usedPixelTypes = new SortedSet<PixelDataType>();
             foreach (var format in usedFormat.Formats)
             {
                 // exclude some formats for 3d export
                 if(is3D && format.IsExcludedFrom3DExport()) continue;
 
-                AvailableFormat.Add(new ComboBoxItem<GliFormat>(format.ToString(), format, format.GetDescription()));
-                if (format == preferredFormat)
-                    SelectedFormat = AvailableFormat.Last();
+                allFormats.Add(new ComboBoxItem<GliFormat>(format.ToString(), format, format.GetDescription()));
+                formatRatings.Add(stats.GetFormatRating(format, preferredFormat));
+                usedPixelTypes.Add(format.GetDataType());
             }
 
-            if (SelectedFormat == null)
-                SelectedFormat = AvailableFormat[0];
+            if(usedPixelTypes.Count > 1)
+                AvailableDataTypes.Add(new ComboBoxItem<PixelDataType>("All", PixelDataType.Undefined));
+            var preferredPixelType = preferredFormat.GetDataType();
+            foreach (var usedPixelType in usedPixelTypes)
+            {
+                AvailableDataTypes.Add(new ComboBoxItem<PixelDataType>(usedPixelType.ToString(), usedPixelType, usedPixelType.GetDescription()));
+                if (usedPixelType == preferredPixelType)
+                    SelectedDataType = AvailableDataTypes.Last();
+            }
+
+            if (SelectedDataType == null)
+                SelectedDataType = AvailableDataTypes[0];
+
+            // assert that those were were set by SelectedDataType
+            Debug.Assert(AvailableFormats != null);
+            Debug.Assert(SelectedFormat != null);
 
             // enable quality
             if (extension == "jpg")
@@ -208,11 +223,13 @@ namespace ImageViewer.ViewModels.Dialog
 
         public ObservableCollection<ComboBoxItem<int>> AvailableLayers { get; } = new ObservableCollection<ComboBoxItem<int>>();
         public ObservableCollection<ComboBoxItem<int>> AvailableMipmaps { get; } = new ObservableCollection<ComboBoxItem<int>>();
-        public ObservableCollection<ComboBoxItem<GliFormat>> AvailableFormat { get; } = new ObservableCollection<ComboBoxItem<GliFormat>>();
+        public ObservableCollection<ComboBoxItem<PixelDataType>> AvailableDataTypes { get; } = new ObservableCollection<ComboBoxItem<PixelDataType>>();
+        public ObservableCollection<ComboBoxItem<GliFormat>> AvailableFormats { get; } = new ObservableCollection<ComboBoxItem<GliFormat>>();
 
         public bool EnableLayers => AvailableLayers.Count > 1;
         public bool EnableMipmaps => AvailableMipmaps.Count > 1;
-        public bool EnableFormat => AvailableFormat.Count > 1;
+        public bool EnableDataType => AvailableDataTypes.Count > 1;
+        public bool EnableFormat => AvailableFormats.Count > 1;
 
         public Visibility ZCropVisibility => is3D ? Visibility.Visible : Visibility.Collapsed;
 
@@ -248,6 +265,42 @@ namespace ImageViewer.ViewModels.Dialog
                 OnPropertyChanged(nameof(CropMaxZ));
                 // preview mipmap
                 models.Display.ActiveMipmap = Math.Max(value.Cargo, 0);
+            }
+        }
+
+        private ComboBoxItem<PixelDataType> selectedDataType;
+
+        public ComboBoxItem<PixelDataType> SelectedDataType
+        {
+            get => selectedDataType;
+            set
+            {
+                if (value == null || value == selectedDataType) return;
+                selectedDataType = value;
+
+                AvailableFormats.Clear();
+                selectedFormat = null;
+                bool allowAll = selectedDataType.Cargo == PixelDataType.Undefined;
+                int bestFit = 0;
+                int bestFitValue = Int32.MinValue;
+                for (var index = 0; index < allFormats.Count; index++)
+                {
+                    var formatBox = allFormats[index];
+                    if (!allowAll && formatBox.Cargo.GetDataType() != selectedDataType.Cargo)
+                        continue;
+
+                    AvailableFormats.Add(formatBox);
+                    // determine most appropriate format
+                    if (formatRatings[index] > bestFitValue)
+                    {
+                        bestFitValue = formatRatings[index];
+                        bestFit = index;
+                    }
+                }
+
+                SelectedFormat = allFormats[bestFit];
+                
+                OnPropertyChanged(nameof(SelectedDataType));
             }
         }
 

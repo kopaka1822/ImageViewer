@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.ImageLoader;
 using ImageFramework.Model.Shader;
 using SharpDX.DXGI;
 
@@ -133,5 +135,78 @@ namespace ImageFramework.Model.Statistics
         }
 
         public static readonly DefaultStatistics Zero = new DefaultStatistics();
+
+        // gets a suitability rating for the format based on the statistic values
+        public int GetFormatRating(GliFormat format)
+        {
+            const int alphaMissWeight = 1000; // penalty if alpha channel is required but missing
+            const int alphaMatchWeight = 5; // bonus for same alpha state
+            const int signWeight = 10;
+            const int unormWeight = 300;
+
+            // determine basic properties of image
+            bool hasAlpha = HasAlpha;
+            bool isUnormed = Average.Min >= 0.0f && Average.Max <= 1.0f
+                && Alpha.Min >= 0.0f && Alpha.Max <= 1.0f;
+            bool isSigned = Average.Min < 0.0f;
+
+            int rating = 0;
+            // is alpha required?
+            if (hasAlpha && !format.HasAlpha())
+                rating -= alphaMissWeight; // alpha should be present if image needs alpha
+            else if (hasAlpha == format.HasAlpha())
+                rating += alphaMatchWeight; // alpha state matching
+
+            // is a signed format required?
+            var pixelType = format.GetDataType();
+            if (isSigned && !pixelType.IsSigned())
+                rating -= signWeight; // signed format is required
+            else if (isSigned == pixelType.IsSigned())
+                rating += signWeight;
+
+            // range 0 1?
+            if (!isUnormed && pixelType.IsUnormed())
+                rating -= unormWeight; // unorm is not sufficient
+            //else if (isUnormed == pixelType.IsUnormed())
+            //    rating += unormWeight;
+
+            return rating;
+        }
+
+        /// gets suitability rating for format and takes preferred format into account
+        public int GetFormatRating(GliFormat format, GliFormat preferredFormat)
+        {
+            var rating = GetFormatRating(format);
+            var preferredPixelType = preferredFormat.GetDataType();
+            var pixelType = format.GetDataType();
+            bool isSrgb = preferredPixelType == PixelDataType.Srgb;
+            bool hasRgb = preferredFormat.HasRgb();
+
+            if (format == preferredFormat)
+                rating += 150;
+
+            // keep srgb specifier
+            if (isSrgb == (format.GetDataType() == PixelDataType.Srgb))
+                rating += 200;
+            else rating -= 200;
+
+            // small bonus for same datatype
+            if (preferredPixelType == pixelType)
+                rating += 5;
+
+            // small bonus for rgb match
+            if (hasRgb == format.HasRgb())
+                rating += 15;
+
+            // small bonus for high precision
+            if (!preferredFormat.IsLessThan8Bit() && !format.IsLessThan8Bit())
+                rating += 20;
+
+            // small bonus for kept compression
+            if (preferredFormat.IsCompressed() && format.IsCompressed())
+                rating += 10;
+
+            return rating;
+        }
     }
 }

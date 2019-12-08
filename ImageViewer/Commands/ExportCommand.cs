@@ -124,7 +124,7 @@ namespace ImageViewer.Commands
 
             models.Export.Mipmap = models.Display.ActiveMipmap;
             models.Export.Layer = models.Display.ActiveLayer;
-            var viewModel = new ExportViewModel(models, exportExtension, exportFormat.Value, sfd.FileName, tex.Is3D);
+            var viewModel = new ExportViewModel(models, exportExtension, exportFormat.Value, sfd.FileName, tex.Is3D, models.Statistics[id].Stats);
             var dia = new ExportDialog(viewModel);
 
             if (models.Window.ShowDialog(dia) != true) return;

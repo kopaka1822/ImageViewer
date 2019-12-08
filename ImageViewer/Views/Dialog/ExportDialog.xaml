@@ -30,27 +30,7 @@
                         IsEnabled="False"
                         Text="{Binding Filename}"/>
                 </Grid>
-                <!-- QUALITY -->
-                <Grid 
-                  Margin="0 0 0 5"
-                  Visibility="{Binding HasQuality}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="60"/>
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock 
-                        Grid.Column="0" 
-                        Text="Quality: "/>
-                    <xctk:IntegerUpDown
-                        Grid.Column="1"
-                        Width="80"
-                        Margin="0 0 5 0"
-                        Value="{Binding Quality}"
-                        Minimum="{Binding MinQuality}"
-                        Maximum="{Binding MaxQuality}"
-                        HorizontalAlignment="Left"/>
-                </Grid>
+                
                 <!-- LAYER -->
                 <Grid Margin="0 0 0 5">
                     <Grid.ColumnDefinitions>
@@ -77,6 +57,22 @@
                         ItemsSource="{Binding AvailableMipmaps}"
                         SelectedItem="{Binding SelectedMipmap}"/>
                 </Grid>
+
+                <!-- Pixel Type -->
+                <Grid 
+                    Margin="0 0 0 5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Data Type:"/>
+                    <ComboBox 
+                        Grid.Column="1"
+                        IsEnabled="{Binding EnableDataType}"
+                        ItemsSource="{Binding AvailableDataTypes}"
+                        SelectedItem="{Binding SelectedDataType}"/>
+                </Grid>
+
                 <!-- Format -->
                 <Grid Margin="0 0 0 5">
                     <Grid.ColumnDefinitions>
@@ -87,8 +83,30 @@
                     <ComboBox 
                         Grid.Column="1"
                         IsEnabled="{Binding EnableFormat}"
-                        ItemsSource="{Binding AvailableFormat}"
+                        ItemsSource="{Binding AvailableFormats}"
                         SelectedItem="{Binding SelectedFormat}"/>
+                </Grid>
+
+                <!-- QUALITY -->
+                <Grid 
+                    Margin="0 0 0 5"
+                    Visibility="{Binding HasQuality}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock 
+                        Grid.Column="0" 
+                        Text="Quality: "/>
+                    <xctk:IntegerUpDown
+                        Grid.Column="1"
+                        Width="80"
+                        Margin="0 0 5 0"
+                        Value="{Binding Quality}"
+                        Minimum="{Binding MinQuality}"
+                        Maximum="{Binding MaxQuality}"
+                        HorizontalAlignment="Left"/>
                 </Grid>
 
                 <!-- Crop -->
