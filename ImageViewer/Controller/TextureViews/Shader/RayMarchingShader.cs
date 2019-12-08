@@ -194,9 +194,7 @@ bool getIntersection(float3 origin, float3 dir, out float3 intersect) {{
 }}
 
 float4 main(PixelIn i) : SV_TARGET {{
-    float4 color = 0.0;
-    color.a = 1.0; // transmittance
-
+    
     uint width, height, depth;
     tex.GetDimensions(width, height, depth);
     uint3 textureDimension = uint3(width,height, depth);
@@ -207,7 +205,7 @@ float4 main(PixelIn i) : SV_TARGET {{
     ray = normalize(ray);
     float3 pos;    
 
-    if(!getIntersection(i.origin, ray, pos)) return color;
+    if(!getIntersection(i.origin, ray, pos)) return float4(0.0,0.0,0.0,1.0);
     
     int3 dirSign; 
     dirSign.x = ray.x < 0.0f ? -1 : 1;
@@ -225,28 +223,33 @@ float4 main(PixelIn i) : SV_TARGET {{
     if(dirSign.z == 1) distance.z = 1-distance.z;
     distance *= projLength;
 
-    
-    float first_diffuse = 1;
+     
+    float4 color = 0.0;
+    color.a = 1.0; //transmittance
+
+    //dot(normal,absDir) for first intersection with bounding box
+    float diffuse = 1;
     if(useFlatShading){{
         if(pos.x == 1 || pos.x == 0){{
-         first_diffuse = absDir.x;
+         diffuse = absDir.x;
         }}
         if(pos.y == 1 || pos.y == 0){{
-         first_diffuse = absDir.y;
+         diffuse = absDir.y;
         }}
         if(pos.z == 1 || pos.z == 0){{
-         first_diffuse = absDir.z;
+         diffuse = absDir.z;
         }}
     }}
 
-    float4 first = tex[rayPos];
-    color.rgb += color.a * first.a * first.rgb * first_diffuse;
-    color.a *= 1 - first.a;
-     
-    
-
     [loop] do{{
-        float diffuse = 0;
+        
+        float4 s = tex[rayPos];
+        if(!useFlatShading){{
+           diffuse = 1;
+        }}
+        color.rgb += color.a * s.a * s.rgb * diffuse;
+        color.a *= 1 - s.a;
+
         if(distance.x < distance.y || distance.z < distance.y) {{
             if(distance.x < distance.z){{
                 rayPos.x += dirSign.x;
@@ -268,14 +271,6 @@ float4 main(PixelIn i) : SV_TARGET {{
             diffuse = absDir.y;
         }}    
     
-        
-        float4 s = tex[rayPos];
-        if(!useFlatShading){{
-           diffuse = 1;
-        }}
-        color.rgb += color.a * s.a * s.rgb * diffuse;
-        color.a *= 1 - s.a;
-        
     }} while(isInside(rayPos,textureDimension) && color.a > 0.0);
 
 
