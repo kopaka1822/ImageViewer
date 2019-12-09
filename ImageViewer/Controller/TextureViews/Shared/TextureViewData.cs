@@ -99,13 +99,13 @@ namespace ImageViewer.Controller.TextureViews.Shared
             if (models.Export.Layer != -1) // only single layer
             {
                 // darken due to layer mismatch?
-                if (models.Export.IsExporting && models.Export.Layer != layer)
+                if (models.Display.IsExporting && models.Export.Layer != layer)
                 {
                     // everything is gray
                     return Vector4.Zero;
                 }
 
-                if (models.Export.UseCropping && (models.Export.IsExporting || models.Display.ShowCropRectangle))
+                if (models.Export.UseCropping && (models.Display.IsExporting || models.Display.ShowCropRectangle))
                 {
                     int mipmap = Math.Max(models.Export.Mipmap, 0);
                     float cropMaxX = models.Images.GetWidth(mipmap);

@@ -92,7 +92,6 @@ namespace ImageViewer.Controller
                 case nameof(ExportModel.UseCropping):
                 case nameof(ExportModel.Mipmap):
                 case nameof(ExportModel.Layer):
-                case nameof(ExportModel.IsExporting):
                     ScheduleRedraw();
                     break;
             }
@@ -175,6 +174,7 @@ namespace ImageViewer.Controller
                 case nameof(DisplayModel.ShowCropRectangle):
                 case nameof(DisplayModel.Multiplier):
                 case nameof(DisplayModel.DisplayNegative):
+                case nameof(DisplayModel.IsExporting):
                     ScheduleRedraw();
                     break;
                 case nameof(DisplayModel.ExtendedViewData):

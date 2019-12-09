@@ -73,10 +73,10 @@ namespace ImageFramework.Model
             pixelValueShader = new PixelValueShader(SharedModel);
             polarConvertShader = new ConvertPolarShader(SharedModel.QuadShader);
 
-            Export = new ExportModel(SharedModel);
             Filter = new FiltersModel(Images);
             //Gif = new GifModel(sharedModel.QuadShader);
             Progress = new ProgressModel();
+            Export = new ExportModel(SharedModel, Progress);
 
             for (int i = 0; i < numPipelines; ++i)
             {
@@ -226,11 +226,6 @@ namespace ImageFramework.Model
             Export.Export(Pipelines[pipelineId].Image, desc);
         }
 
-        public async Task ApplyAsync(CancellationToken ct)
-        {
-            await pipelineController.UpdateImagesAsync(ct);
-        }
-
         /// <summary>
         /// returns ids of all enabled pipeline
         /// </summary>
@@ -261,10 +256,14 @@ namespace ImageFramework.Model
         /// </summary>
         public void Apply()
         {
-            using (var cts = new CancellationTokenSource())
-            {
-                ApplyAsync(cts.Token).Wait();
-            }
+            ApplyAsync();
+            Progress.WaitForTask();
+        }
+
+        public void ApplyAsync()
+        {
+            var cts = new CancellationTokenSource();
+            Progress.AddTask(pipelineController.UpdateImagesAsync(cts.Token), cts);
         }
 
         /// <summary>
@@ -303,7 +302,9 @@ namespace ImageFramework.Model
 
         public virtual void Dispose()
         {
-            //Gif?.Dispose();       
+            Progress?.Dispose();
+            //Gif?.Dispose();   
+
             Images?.Dispose();
             Filter?.Dispose();
             polarConvertShader?.Dispose();

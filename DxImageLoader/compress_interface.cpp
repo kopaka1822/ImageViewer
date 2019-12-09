@@ -4,6 +4,7 @@
 #include "../dependencies/compressonator/Compressonator/Header/Compressonator.h"
 #include <thread>
 #include <stdexcept>
+#include "interface.h"
 
 struct ExFormatInfo
 {
@@ -15,6 +16,12 @@ struct ExFormatInfo
 	CMP_BYTE bz = 1;
 	CMP_DWORD widthMultiplier = 0; // 0 for compressed formats. width multiplier to get pitch
 };
+
+bool cmp_feedback_proc(float fProgress, CMP_DWORD_PTR pUser1, CMP_DWORD_PTR pUser2)
+{
+	set_progress(std::lroundf(fProgress), "compressing");
+	return false; // don't abort compression
+}
 
 CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSource)
 { 
@@ -237,9 +244,8 @@ void copy_level(uint8_t* srcDat, uint8_t* dstDat, uint32_t width, uint32_t heigh
 	options.nComputeWith = CMP_Compute_type::Compute_OPENCL;
 	options.nGPUDecode = CMP_GPUDecode::GPUDecode_DIRECTX;
 
-
 	// compress texture
-	auto status = CMP_ConvertTexture(&srcTex, &dstTex, &options, nullptr, 0, 0);
+	auto status = CMP_ConvertTexture(&srcTex, &dstTex, &options, cmp_feedback_proc, 0, 0);
 	if (status != CMP_OK)
 		throw std::runtime_error("texture compression failed");
 

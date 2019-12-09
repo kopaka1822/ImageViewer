@@ -36,7 +36,7 @@ namespace ImageViewer.ViewModels.Dialog
             this.filename = filename;
             this.is3D = is3D;
             this.usedFormat = models.Export.Formats.First(fmt => fmt.Extension == extension);
-            models.Export.IsExporting = true;
+            models.Display.IsExporting = true;
             Quality = models.Settings.LastQuality;
 
             // init layers
@@ -138,7 +138,7 @@ namespace ImageViewer.ViewModels.Dialog
         {
             models.Export.PropertyChanged -= ExportOnPropertyChanged;
             models.Settings.LastQuality = Quality;
-            models.Export.IsExporting = false;
+            models.Display.IsExporting = false;
         }
 
         private void ExportOnPropertyChanged(object sender, PropertyChangedEventArgs args)

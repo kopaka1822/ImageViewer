@@ -117,7 +117,6 @@ namespace ImageFramework.Model
             Debug.Assert(Color.MaxImageId < args.Images.NumImages);
             Debug.Assert(Alpha.MaxImageId < args.Images.NumImages);
 
-            args.Progress.IsProcessing = true;
             args.Progress.Progress = 0.0f;
             args.Progress.What = "resolving equation";
 
@@ -130,7 +129,6 @@ namespace ImageFramework.Model
                     Image = args.Images.Images[imgId].Image;
                     cachedTexture = false; // image was not taken from the image cache
                     HasChanges = false;
-                    args.Progress.IsProcessing = false;
                     OnPropertyChanged(nameof(Image));
                     return;
                 }
@@ -199,10 +197,6 @@ namespace ImageFramework.Model
             {
                 IsValid = false;
                 throw;
-            }
-            finally
-            {
-                args.Progress.IsProcessing = false;
             }
         }
 

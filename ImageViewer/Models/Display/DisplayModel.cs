@@ -183,6 +183,22 @@ namespace ImageViewer.Models.Display
             }
         }
 
+        private bool isExporting = false;
+
+        /// <summary>
+        /// indicates if the exporting dialog is open
+        /// </summary>
+        public bool IsExporting
+        {
+            get => isExporting;
+            set
+            {
+                if (value == isExporting) return;
+                isExporting = value;
+                OnPropertyChanged(nameof(IsExporting));
+            }
+        }
+
         private float aperture = (float)Math.PI / 2.0f;
         public float Aperture
         {

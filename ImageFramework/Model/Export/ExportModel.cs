@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
+using System.Threading;
+using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
@@ -26,9 +28,11 @@ namespace ImageFramework.Model.Export
         public IReadOnlyList<ExportFormatModel> Formats { get; }
 
         internal readonly ConvertFormatShader convert;
+        private readonly ProgressModel progress;
 
-        internal ExportModel(SharedModel shared)
+        internal ExportModel(SharedModel shared, ProgressModel progress)
         {
+            this.progress = progress;
             convert = shared.Convert;
 
             var formats = new List<ExportFormatModel>();
@@ -113,22 +117,6 @@ namespace ImageFramework.Model.Export
 
         public static int QualityMin = 1;
         public static int QualityMax = 100;
-
-        private bool isExporting = false;
-
-        /// <summary>
-        /// indicates if the exporting dialog is open
-        /// </summary>
-        public bool IsExporting
-        {
-            get => isExporting;
-            set
-            {
-                if(value == isExporting) return;
-                isExporting = value;
-                OnPropertyChanged(nameof(IsExporting));
-            }
-        }
 
         private bool useCropping = false;
 
@@ -226,10 +214,23 @@ namespace ImageFramework.Model.Export
 
         public void Export(ITexture image, ExportDescription desc)
         {
+            ExportAsync(image, desc);
+            progress.WaitForTask();
+        }
+
+        // does export asynchronously => the task will be passed to the ProgressModel
+        public void ExportAsync(ITexture image, ExportDescription desc)
+        {
+            var cts = new CancellationTokenSource();
+            progress.AddTask(ExportAsync(image, desc, cts.Token), cts);
+        }
+
+        private Task ExportAsync(ITexture image, ExportDescription desc, CancellationToken ct)
+        {
             Debug.Assert(image != null);
 
             // verify mipmaps etc.
-            if(Mipmap >= image.NumMipmaps)
+            if (Mipmap >= image.NumMipmaps)
                 throw new Exception("export mipmap out of range");
             if(Layer >= image.NumLayers)
                 throw new Exception("export layer out of range");
@@ -284,25 +285,24 @@ namespace ImageFramework.Model.Export
 
             // image is ready for export!
             var stagingFormat = desc.StagingFormat;
+            
             // ReSharper disable once CompareOfFloatsByEqualityOperator
-            if (image.Format != stagingFormat.DxgiFormat || croppingActive || desc.Multiplier != 1.0f || alignmentActive)
+            if (image.Format == stagingFormat.DxgiFormat && !croppingActive && desc.Multiplier == 1.0f &&
+                !alignmentActive)
+                return ExportTexture(image, desc, Mipmap, Layer, ct);
+            
+            // do some conversion before exporting
+            using (var tmpTex = convert.Convert(image, stagingFormat.DxgiFormat, Mipmap, Layer,
+                desc.Multiplier, UseCropping, new Size3(CropStartX, CropStartY, CropStartZ),
+                new Size3(CropEndX - CropStartX + 1, CropEndY - CropStartY + 1, CropEndZ - CropStartZ + 1),
+                new Size3(desc.FileFormat.GetAlignmentX(), desc.FileFormat.GetAlignmentY(), 0)))
             {
-                using (var tmpTex = convert.Convert(image, stagingFormat.DxgiFormat, Mipmap, Layer,
-                    desc.Multiplier, UseCropping, new Size3(CropStartX, CropStartY, CropStartZ),
-                    new Size3(CropEndX - CropStartX + 1, CropEndY - CropStartY + 1, CropEndZ - CropStartZ + 1),
-                    new Size3(desc.FileFormat.GetAlignmentX(), desc.FileFormat.GetAlignmentY(), 0)))
-                {
-                    // the final texture only has the relevant layers and mipmaps
-                    ExportTexture(tmpTex, desc, -1, -1);
-                }
-            }
-            else
-            {
-                ExportTexture(image, desc, Mipmap, Layer);
+                // the final texture only has the relevant layers and mipmaps
+                return ExportTexture(tmpTex, desc, -1, -1, ct);
             }
         }
 
-        private void ExportTexture(ITexture texture, ExportDescription desc, int mipmap, int layer)
+        private Task ExportTexture(ITexture texture, ExportDescription desc, int mipmap, int layer, CancellationToken ct)
         {
             Debug.Assert(desc.StagingFormat.DxgiFormat == texture.Format);
 
@@ -311,21 +311,27 @@ namespace ImageFramework.Model.Export
             int firstLayer = Math.Max(layer, 0);
             int nLayer = layer == -1 ? texture.NumLayers : 1;
 
-            using (var img = IO.CreateImage(desc.StagingFormat, texture.Size.GetMip(firstMipmap), nLayer, nMipmaps))
+            var img = IO.CreateImage(desc.StagingFormat, texture.Size.GetMip(firstMipmap), nLayer, nMipmaps);
+            
+            // fill with data
+            for (int curLayer = 0; curLayer < nLayer; ++curLayer)
             {
-                // fill with data
-                for (int curLayer = 0; curLayer < nLayer; ++curLayer)
+                for (int curMipmap = 0; curMipmap < nMipmaps; ++curMipmap)
                 {
-                    for (int curMipmap = 0; curMipmap < nMipmaps; ++curMipmap)
-                    {
-                        var mip = img.Layers[curLayer].Mipmaps[curMipmap];
-                        // transfer image data
-                        texture.CopyPixels(firstLayer + curLayer, firstMipmap + curMipmap, mip.Bytes, mip.Size);
-                    }
+                    var mip = img.Layers[curLayer].Mipmaps[curMipmap];
+                    // transfer image data
+                    texture.CopyPixels(firstLayer + curLayer, firstMipmap + curMipmap, mip.Bytes, mip.Size);
                 }
-
-                IO.SaveImage(img, desc.Filename, desc.Extension, desc.FileFormat, quality);
             }
+
+            return Task.Run(() =>
+            {
+                using (img)
+                {
+                    // TODO use cancellation token
+                    IO.SaveImage(img, desc.Filename, desc.Extension, desc.FileFormat, quality);
+                }
+            }, ct);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -62,17 +62,11 @@ namespace ImageViewer.Controller
 #pragma warning restore 4014
         }
 
-        private async Task ExecuteAsync()
+        private async void ExecuteAsync()
         {
-            try
-            {
-                var cts = new CancellationTokenSource();
-                await models.ApplyAsync(cts.Token);
-            }
-            finally
-            {
-                scheduled = false;
-            }
+            models.ApplyAsync();
+            await models.Progress.WaitForTaskAsync();
+            scheduled = false;
         }
     }
 }

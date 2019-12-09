@@ -134,15 +134,7 @@ namespace ImageViewer.Commands
             desc.Multiplier = multiplier;
             exportFormat = desc.FileFormat;
 
-            try
-            {
-                models.Export.Export(tex, desc);
-            }
-            catch (Exception e)
-            {
-                models.Window.ShowErrorDialog(e.Message, "during export");
-            }
-
+            models.Export.ExportAsync(tex, desc);
         }
 
         private static Dictionary<string, string> filter = new Dictionary<string, string>

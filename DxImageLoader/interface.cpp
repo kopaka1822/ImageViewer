@@ -16,6 +16,8 @@
 static int s_currentID = 1;
 static std::unordered_map<int, std::unique_ptr<image::IImage>> s_resources;
 std::string s_error;
+static ProgressCallback s_progress_callback = nullptr;
+static uint32_t s_last_progress = -1;
 
 // key = extension (e.g. png), value = DXGI formats
 static std::map<std::string, std::vector<uint32_t>> s_exportFormats;
@@ -46,6 +48,7 @@ int image_open(const char* filename)
 {
 	// try loading the resource
 	// transform filename to lowercase for file extension check
+	s_last_progress = -1;
 	std::string fname = filename;
 	std::transform(fname.begin(), fname.end(), fname.begin(), ::tolower);
 
@@ -162,6 +165,7 @@ unsigned char* image_get_mipmap(int id, int layer, int mipmap, uint32_t& size)
 
 bool image_save(int id, const char* filename, const char* extension, uint32_t format, int quality)
 {
+	s_last_progress = -1;
 	auto it = s_resources.find(id);
 	if (it == s_resources.end())
 	{
@@ -280,6 +284,11 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 	return it->second.data();
 }
 
+void set_progress_callback(ProgressCallback cb)
+{
+	s_progress_callback = cb;
+}
+
 const char* get_error(int& length)
 {
 	length = static_cast<int>(s_error.length());
@@ -289,4 +298,16 @@ const char* get_error(int& length)
 void set_error(const std::string& str)
 {
 	s_error = str;
+}
+
+void set_progress(uint32_t progress, const char* description)
+{
+	if (!s_progress_callback) return;
+	progress = std::min(uint32_t(100), progress);
+
+	if (progress == s_last_progress) return;
+	s_last_progress = progress;
+	if (description == nullptr) description = "";
+
+	s_progress_callback(progress / 100.0f, description);
 }
