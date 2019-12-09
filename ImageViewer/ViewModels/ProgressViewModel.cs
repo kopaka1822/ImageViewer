@@ -44,6 +44,9 @@ namespace ImageViewer.ViewModels
                 case nameof(ProgressModel.Progress):
                     OnPropertyChanged(nameof(ProgressValue));
                     break;
+                case nameof(ProgressModel.What):
+                    OnPropertyChanged(nameof(ProgressDescription));
+                    break;
             }
         }
 
@@ -56,6 +59,8 @@ namespace ImageViewer.ViewModels
             // dont allow changes from the ui
             set => OnPropertyChanged(nameof(ProgressValue));
         }
+
+        public string ProgressDescription => models.Progress.What;
 
         public event PropertyChangedEventHandler PropertyChanged;
 

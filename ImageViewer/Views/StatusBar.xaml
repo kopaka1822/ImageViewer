@@ -239,24 +239,25 @@
             </Grid>
         </StatusBarItem>
 
-        <!--PROGRESS BAR-->
-        <StatusBarItem 
-                    Width="Auto"
-                    HorizontalContentAlignment="Stretch"
-                    VerticalContentAlignment="Stretch"
-                    Visibility="{Binding Progress.EnableProgress}">
-
-            <ProgressBar
-                        Value="{Binding Progress.ProgressValue}">
-
-            </ProgressBar>
-        </StatusBarItem>
-
         <!-- FRAME TIME -->
         <StatusBarItem
-            HorizontalAlignment="Right"
-            Width="Auto">
-            <TextBlock Text="{Binding Display.FrameTime}"/>
+            DockPanel.Dock="Right">
+            <TextBlock Text="{Binding Display.FrameTime, FallbackValue=0.02 ms}"/>
+        </StatusBarItem>
+
+        <!--PROGRESS BAR-->
+        <StatusBarItem 
+            HorizontalContentAlignment="Stretch"
+            VerticalContentAlignment="Stretch"
+            Visibility="{Binding Progress.EnableProgress}">
+
+            <Grid>
+                <ProgressBar Value="{Binding Progress.ProgressValue}"/>
+                <TextBlock Text="{Binding Progress.ProgressDescription, FallbackValue=Current Task}"
+                           Foreground="Black"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+            </Grid>
         </StatusBarItem>
     </StatusBar>
 </UserControl>
