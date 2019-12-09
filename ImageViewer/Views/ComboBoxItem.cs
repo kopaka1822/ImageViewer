@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace ImageViewer.Views
 {
-    public class ComboBoxItem<T> : ComboBoxItem
+    public class ComboBoxItem<T> : TextBlock
     {
         private readonly string name;
         public T Cargo { get; }
@@ -17,9 +18,11 @@ namespace ImageViewer.Views
             this.name = name;
             Cargo = cargo;
 
-            Content = this.name;
+            Text = this.name;
             if (!string.IsNullOrEmpty(tooltip))
                 ToolTip = tooltip;
         }
+
+
     }
 }

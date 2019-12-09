@@ -221,10 +221,10 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
-        public ObservableCollection<ComboBoxItem<int>> AvailableLayers { get; } = new ObservableCollection<ComboBoxItem<int>>();
-        public ObservableCollection<ComboBoxItem<int>> AvailableMipmaps { get; } = new ObservableCollection<ComboBoxItem<int>>();
-        public ObservableCollection<ComboBoxItem<PixelDataType>> AvailableDataTypes { get; } = new ObservableCollection<ComboBoxItem<PixelDataType>>();
-        public ObservableCollection<ComboBoxItem<GliFormat>> AvailableFormats { get; } = new ObservableCollection<ComboBoxItem<GliFormat>>();
+        public List<ComboBoxItem<int>> AvailableLayers { get; } = new List<ComboBoxItem<int>>();
+        public List<ComboBoxItem<int>> AvailableMipmaps { get; } = new List<ComboBoxItem<int>>();
+        public List<ComboBoxItem<PixelDataType>> AvailableDataTypes { get; } = new List<ComboBoxItem<PixelDataType>>();
+        public List<ComboBoxItem<GliFormat>> AvailableFormats { get; } = new List<ComboBoxItem<GliFormat>>();
 
         public bool EnableLayers => AvailableLayers.Count > 1;
         public bool EnableMipmaps => AvailableMipmaps.Count > 1;
@@ -298,9 +298,11 @@ namespace ImageViewer.ViewModels.Dialog
                     }
                 }
 
+                OnPropertyChanged(nameof(AvailableFormats));
                 SelectedFormat = allFormats[bestFit];
                 
                 OnPropertyChanged(nameof(SelectedDataType));
+                
             }
         }
 
