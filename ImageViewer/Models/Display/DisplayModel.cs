@@ -87,17 +87,44 @@ namespace ImageViewer.Models.Display
         private IExtendedDisplayModel extendedView = null;
         public IExtendedDisplayModel ExtendedViewData => extendedView;
 
+        private static readonly float[] ZOOM_POINTS = { 0.01f, 0.02f, 0.05f, 0.1f, 0.25f, 0.33f, 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f };
         private float zoom = 1.0f;
         public float Zoom
         {
             get => zoom;
             set
             {
-                var clamped = Math.Min(Math.Max(value, 0.01f), 100.0f);
+                var clamped = Math.Min(Math.Max(value, 0.01f), 128.0f);
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (clamped == zoom) return;
                 zoom = clamped;
                 OnPropertyChanged(nameof(Zoom));
+            }
+        }
+        public void IncreaseZoom()
+        {
+            // Get the first number larger than zoom
+            foreach (float zoomPoint in ZOOM_POINTS)
+            {
+                if (zoomPoint > zoom)
+                {
+                    zoom = zoomPoint;
+                    OnPropertyChanged(nameof(Zoom));
+                    break;
+                }
+            }
+        }
+        public void DecreaseZoom()
+        {
+            // Get the first number smaller than zoom
+            foreach (float zoomPoint in ZOOM_POINTS.Reverse())
+            {
+                if (zoomPoint < zoom)
+                {
+                    zoom = zoomPoint;
+                    OnPropertyChanged(nameof(Zoom));
+                    break;
+                }
             }
         }
 

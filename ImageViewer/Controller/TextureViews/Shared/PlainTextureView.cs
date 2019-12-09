@@ -33,16 +33,15 @@ namespace ImageViewer.Controller.TextureViews.Shared
         public void OnScroll(float amount, Vector2 mouse)
         {
             // modify zoom
-            var step = amount < 0.0f ? 1.0f / 1.001f : 1.001f;
-            var value = (float)Math.Pow(step, Math.Abs(amount));
-
             var oldZoom = models.Display.Zoom;
 
-
-            models.Display.Zoom = models.Display.Zoom * value;
+            if (amount < 0.0f)
+                models.Display.DecreaseZoom();
+            else
+                models.Display.IncreaseZoom();
 
             // do this because zoom is clamped and may not have changed at all
-            value = models.Display.Zoom / oldZoom;
+            var value = models.Display.Zoom / oldZoom;
             // modify translation as well
             translation.X *= value;
             translation.Y *= value;
