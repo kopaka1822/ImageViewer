@@ -27,7 +27,7 @@ namespace ImageViewer.Controller
             import = new ImportDialogController(models);
         }
 
-        private void DxHostOnDrop(object sender, DragEventArgs e)
+        private async void DxHostOnDrop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
@@ -35,7 +35,7 @@ namespace ImageViewer.Controller
 
                 if (files != null)
                     foreach (var file in files)
-                        import.ImportImage(file);
+                        await import.ImportImageAsync(file);
             }
         }
     }

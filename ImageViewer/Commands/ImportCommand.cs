@@ -19,14 +19,14 @@ namespace ImageViewer.Commands
             importDialog = new ImportDialogController(models);
         }
 
-        public override void Execute()
+        public override async void Execute()
         {
             var files = importDialog.ShowImportImageDialog();
             if (files == null) return;
 
             foreach (var file in files)
             {
-                importDialog.ImportImage(file);
+                await importDialog.ImportImageAsync(file);
             }
         }
     }

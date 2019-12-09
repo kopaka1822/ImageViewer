@@ -32,7 +32,7 @@ namespace ImageFramework.Model
 
         private void OnDllProgress(float prog, string description)
         {
-            if (!IsProcessing) return; // ignore for now => progress when opening files
+            if (!IsProcessing) return; // ignore for now => progress when opening files without task
 
             Progress = prog;
             if (What != description)

@@ -19,7 +19,7 @@ namespace ImageViewer.Commands
             this.import = new ImportDialogController(models);
         }
 
-        public override void Execute()
+        public override async void Execute()
         {
             var files = import.ShowImportImageDialog();
             if (files == null) return;
@@ -29,7 +29,7 @@ namespace ImageViewer.Commands
             {
                 foreach (var file in files)
                 {
-                    import.ImportImage(file);
+                    await import.ImportImageAsync(file);
                 }
                 return;
             }

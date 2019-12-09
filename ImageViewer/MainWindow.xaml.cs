@@ -56,10 +56,15 @@ namespace ImageViewer
             // handle startup arguments
             if (App.StartupArgs.Length == 0) return;
 
+            LoadStartupArgsAsync();
+        }
+
+        private async void LoadStartupArgsAsync()
+        {
             var import = new ImportDialogController(models);
             foreach (var arg in App.StartupArgs)
             {
-                import.ImportImage(arg);
+                await import.ImportImageAsync(arg);
             }
         }
 

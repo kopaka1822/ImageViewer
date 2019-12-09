@@ -105,7 +105,7 @@ namespace ImageViewer.ViewModels
             }
         }
 
-        public void Drop(IDropInfo dropInfo)
+        public async void Drop(IDropInfo dropInfo)
         {
             if (dropInfo.Data is ImageListBoxItem)
             {
@@ -132,7 +132,7 @@ namespace ImageViewer.ViewModels
 
                 foreach (var file in items)
                 {
-                    import.ImportImage(file);
+                    await import.ImportImageAsync(file);
                     
                     // put inserted image into correct position
                     models.Images.MoveImage(models.Images.NumImages - 1, desiredPosition++);

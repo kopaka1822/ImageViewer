@@ -40,13 +40,14 @@ namespace ImageViewer.Controller
             return ofd.FileNames;
         }
 
-        public void ImportImage(string file)
+        public async Task ImportImageAsync(string file)
         {
             try
             {
-                var img = IO.LoadImageTexture(file, out var originalFormat);
+
+                var img = await IO.LoadImageTextureAsync(file, models.Progress);
                 
-                ImportTexture(img, file, originalFormat);
+                ImportTexture(img.Texture, file, img.OriginalFormat);
             }
             catch (Exception e)
             {
