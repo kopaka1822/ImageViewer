@@ -80,13 +80,30 @@
                 <Setter Property="Background" Value="{StaticResource BorderBrush}"/>
             </Style>
 
-            <Style TargetType="ListBox" BasedOn="{StaticResource BaseStyle}">
+            <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource BaseStyle}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListBox}">
+                            <Grid Width="Auto" Height="Auto">
+                                <Border x:Name="Border" 
+                                        BorderBrush="{StaticResource BorderBrush}" 
+                                        BorderThickness="1"/>
+                                <ScrollViewer Focusable="false" IsTabStop="False" HorizontalScrollBarVisibility="Disabled">
+                                    <StackPanel IsItemsHost="true"/>
+                                </ScrollViewer>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter TargetName="Border" Property="Border.Background" Value="{StaticResource DisabledBackgroundBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsGrouping" Value="true">
+                                    <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
                 <Setter Property="Background" Value="{StaticResource ListingBackgroundBrush}"/>
-                <Style.Triggers>
-                    <Trigger Property="IsEnabled" Value="False">
-                        <Setter Property="Background" Value="{StaticResource DisabledBackgroundBrush}"/>
-                    </Trigger>
-                </Style.Triggers>
             </Style>
 
             <Style TargetType="ToolTip" BasedOn="{StaticResource BaseStyle}"/>
