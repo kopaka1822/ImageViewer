@@ -98,13 +98,13 @@ namespace ImageFramework.Model
             if(currentTask != null)
                 WaitForTask();
 
-            // automatically unregister task when finished or failed
-            t.ContinueWith(OnTaskFinished);
             currentTask = t;
             currentTaskCancellation = cts;
             LastError = "";
             Progress = 0.0f;
             What = "";
+            // automatically unregister task when finished or failed
+            t.ContinueWith(OnTaskFinished);
             OnPropertyChanged(nameof(IsProcessing));
         }
 

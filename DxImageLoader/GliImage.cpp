@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GliImage.h"
 #include "compress_interface.h"
+#include "interface.h"
 
 // mofified copy of gli convert
 template <typename texture_type>
@@ -18,15 +19,21 @@ inline texture_type convert_mod(texture_type const& Texture, gli::format Format)
 
 	const auto isSrgb = gli::is_srgb(Texture.format());
 	const auto isCompressed = gli::is_compressed(Texture.format());
+	assert(!isCompressed); // this should be done by compressonator
 
 	// for some reason the gli loader doesn't revert srgb compression in this case
-	const auto convertFromSrgb = isSrgb && isCompressed;
+	//const auto convertFromSrgb = isSrgb && isCompressed;
 
 	fetch_type Fetch = gli::detail::convert<texture_type, T, gli::defaultp>::call(Texture.format()).Fetch;
 	write_type Write = gli::detail::convert<texture_type, T, gli::defaultp>::call(Format).Write;
 
 	gli::texture Storage(Texture.target(), Format, Texture.texture::extent(), Texture.layers(), Texture.faces(), Texture.levels(), Texture.swizzles());
 	texture_type Copy(Storage);
+
+	extent_type const& baseDim = Texture.texture::extent(0);
+	// divide by 100 for range [0, 100]
+	const size_t numSteps = image::IImage::calcNumPixels(uint32_t(Texture.layers() * Texture.faces()), uint32_t(Texture.levels()), baseDim.x, baseDim.y, baseDim.z) / 100;
+	size_t curSteps = 0;
 
 	for (size_type Layer = 0; Layer < Texture.layers(); ++Layer)
 		for (size_type Face = 0; Face < Texture.faces(); ++Face)
@@ -36,17 +43,23 @@ inline texture_type convert_mod(texture_type const& Texture, gli::format Format)
 
 				for (component_type k = 0; k < Dimensions.z; ++k)
 					for (component_type j = 0; j < Dimensions.y; ++j)
+					{
+						set_progress(uint32_t(curSteps / numSteps));
+
 						for (component_type i = 0; i < Dimensions.x; ++i)
 						{
 							typename texture_type::extent_type const Texelcoord(extent_type(i, j, k));
 							auto texel = Fetch(Texture, Texelcoord, Layer, Face, Level);
-							if (convertFromSrgb)
-								texel = gli::convertSRGBToLinear(texel);
+							//if (convertFromSrgb)
+							//	texel = gli::convertSRGBToLinear(texel);
 
 							Write(
 								Copy, Texelcoord, Layer, Face, Level,
 								texel);
 						}
+						curSteps += Dimensions.x;
+					}
+						
 			}
 
 	return texture_type(Copy);

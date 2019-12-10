@@ -6,6 +6,7 @@
 #include "../dependencies/stb_image.h"
 #include "../dependencies/stb_image_write.h"
 #include <fstream>
+#include "interface.h"
 
 gli::format getFloatFormat(int numComponents)
 {
@@ -29,6 +30,12 @@ gli::format getSrgbFormat(int numComponents)
 	case 4: return gli::FORMAT_RGBA8_SRGB_PACK8;
 	}
 	return gli::FORMAT_UNDEFINED;
+}
+
+// custom function
+void stbi_progress_callback(int height, int y)
+{
+	set_progress(y * 100 / height);
 }
 
 class StbImage final : public image::IImage

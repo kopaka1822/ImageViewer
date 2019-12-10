@@ -17,9 +17,22 @@ struct ExFormatInfo
 	CMP_DWORD widthMultiplier = 0; // 0 for compressed formats. width multiplier to get pitch
 };
 
+struct CompressInfo
+{
+	bool isCompress;
+	// progress tracking
+	size_t curSteps; // number of steps before this compression
+	size_t curStepWeight; // weight of this compression
+	size_t numSteps; // total number of steps
+};
+
 bool cmp_feedback_proc(float fProgress, CMP_DWORD_PTR pUser1, CMP_DWORD_PTR pUser2)
 {
-	set_progress(std::lroundf(fProgress), "compressing");
+	const CompressInfo* info = reinterpret_cast<CompressInfo*>(pUser1);
+	const char* desc = "compressing";
+	if (!info->isCompress) desc = "decompressing";
+
+	set_progress(uint32_t((info->curSteps + size_t(fProgress * 0.01f * float(info->curStepWeight))) / info->numSteps), desc);
 	return false; // don't abort compression
 }
 
@@ -198,7 +211,7 @@ void swizzleMipmap(uint8_t* data, uint32_t size, CMP_FORMAT format)
 
 void copy_level(uint8_t* srcDat, uint8_t* dstDat, uint32_t width, uint32_t height, uint32_t srcSize, uint32_t dstSize,
 	CMP_FORMAT srcFormat, CMP_FORMAT dstFormat, 
-	const ExFormatInfo& srcInfo, const ExFormatInfo& dstInfo, float quality)
+	const ExFormatInfo& srcInfo, const ExFormatInfo& dstInfo, float quality, CompressInfo& curCompressInfo)
 {
 	// fill out src texture
 	CMP_Texture srcTex;
@@ -245,7 +258,7 @@ void copy_level(uint8_t* srcDat, uint8_t* dstDat, uint32_t width, uint32_t heigh
 	options.nGPUDecode = CMP_GPUDecode::GPUDecode_DIRECTX;
 
 	// compress texture
-	auto status = CMP_ConvertTexture(&srcTex, &dstTex, &options, cmp_feedback_proc, 0, 0);
+	auto status = CMP_ConvertTexture(&srcTex, &dstTex, &options, cmp_feedback_proc, reinterpret_cast<size_t>(&curCompressInfo), 0);
 	if (status != CMP_OK)
 		throw std::runtime_error("texture compression failed");
 
@@ -266,12 +279,19 @@ void compressonator_convert_image(image::IImage& src, image::IImage& dst, int qu
 	const auto dstFormat = get_cmp_format(dst.getFormat(), dstFormatInfo, false);
 	const float fquality = quality / 100.0f;
 
+	CompressInfo info;
+	info.isCompress = dstFormatInfo.isCompressed;
+	info.numSteps = src.getNumPixels() / 100; // progress range [0, 100]
+	info.curSteps = 0;
 	for(uint32_t layer = 0; layer < src.getNumLayers(); ++layer)
 	{
 		// copy mipmap levels
 		for(uint32_t mipmap = 0; mipmap < src.getNumMipmaps(); ++mipmap)
 		{
 			const auto depth = src.getDepth(mipmap);
+			const auto width = src.getWidth(mipmap);
+			const auto height = src.getHeight(mipmap);
+			info.curStepWeight = width * height;
 
 			uint32_t srcSize;
 			auto srcDat = src.getData(layer, mipmap, srcSize);
@@ -281,18 +301,21 @@ void compressonator_convert_image(image::IImage& src, image::IImage& dst, int qu
 			auto srcPlaneSize = srcSize / depth;
 			auto dstPlaneSize = dstSize / depth;
 
-			for(uint32_t z = 0; z < depth; ++z)
+			for (uint32_t z = 0; z < depth; ++z)
 			{
 				copy_level(
-					srcDat + srcPlaneSize * z, 
-					dstDat + dstPlaneSize * z, 
-					src.getWidth(mipmap), 
-					src.getHeight(mipmap),
+					srcDat + srcPlaneSize * z,
+					dstDat + dstPlaneSize * z,
+					width,
+					height,
 					srcPlaneSize, dstPlaneSize,
-					srcFormat, dstFormat, 
-					srcFormatInfo, dstFormatInfo, 
-					fquality
+					srcFormat, dstFormat,
+					srcFormatInfo, dstFormatInfo,
+					fquality,
+					info
 				);
+
+				info.curSteps += info.curStepWeight;;
 			}
 		}
 	}

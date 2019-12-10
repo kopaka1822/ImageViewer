@@ -1,5 +1,27 @@
 #include "pch.h"
 #include "Image.h"
+#include <algorithm>
+
+size_t image::IImage::calcNumPixels(uint32_t numLayer, uint32_t numLevels, uint32_t width, uint32_t height,
+	uint32_t depth)
+{
+	size_t num = 0;
+
+	for(uint32_t lvl = 0; lvl < numLevels; ++lvl)
+	{
+		num += size_t(width * height * depth);
+		width = std::max(width / 2, 1u);
+		height = std::max(height / 2, 1u);
+		depth = std::max(depth / 2, 1u);
+	}
+
+	return num * numLayer;
+}
+
+size_t image::IImage::getNumPixels() const
+{
+	return calcNumPixels(getNumLayers(), getNumMipmaps(), getWidth(0), getHeight(0), getDepth(0));
+}
 
 image::SimpleImage::SimpleImage(gli::format originalFormat, gli::format internalFormat, int width, int height,
 	int pixelByteSize)
