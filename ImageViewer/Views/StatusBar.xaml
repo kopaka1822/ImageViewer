@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImageViewer.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="25"
+             Height="28"
              d:DesignWidth="1500">
     <StatusBar 
                 Grid.Row="1" 
@@ -252,11 +252,23 @@
             Visibility="{Binding Progress.EnableProgress}">
 
             <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
                 <ProgressBar Value="{Binding Progress.ProgressValue}"/>
                 <TextBlock Text="{Binding Progress.ProgressDescription, FallbackValue=Current Task}"
                            Foreground="Black"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"/>
+
+                <Button
+                    Grid.Column="1" Content="Abort"
+                    VerticalAlignment="Center"
+                    Command="{Binding Progress.CancelCommand}"
+                    Padding="2 0 2 0"
+                    Margin="5 0 0 0"
+                    Height="20"/>
             </Grid>
         </StatusBarItem>
     </StatusBar>

@@ -41,7 +41,7 @@ namespace ImageFramework.ImageLoader
         public static extern IntPtr get_error(out int length);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        public delegate void ProgressDelegate([MarshalAs(UnmanagedType.R4)] float progress, [MarshalAs(UnmanagedType.LPStr)] string description);
+        public delegate uint ProgressDelegate([MarshalAs(UnmanagedType.R4)] float progress, [MarshalAs(UnmanagedType.LPStr)] string description);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         public static extern void set_progress_callback([MarshalAs(UnmanagedType.FunctionPtr)] ProgressDelegate pDelegate);

@@ -47,7 +47,7 @@ EXPORT(bool) image_save(int id, const char* filename, const char* extension, uin
 /// \brief retrieves an array with all supported dxgi formats that are available for export with the extension
 EXPORT(const uint32_t*) get_export_formats(const char* extension, int& numFormats);
 
-typedef void(__stdcall* ProgressCallback)(float, const char*);
+typedef uint32_t(__stdcall* ProgressCallback)(float, const char*);
 
 /// \brief sets the progress report callback
 EXPORT(void) set_progress_callback(ProgressCallback cb);
@@ -59,4 +59,5 @@ EXPORT(const char*) get_error(int& length);
 void set_error(const std::string& str);
 
 /// \brief set current progress (for internal use only)
+/// throws an error if the action should be aborted
 void set_progress(uint32_t progress, const char* description = nullptr);

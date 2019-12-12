@@ -309,5 +309,6 @@ void set_progress(uint32_t progress, const char* description)
 	s_last_progress = progress;
 	if (description == nullptr) description = "";
 
-	s_progress_callback(progress / 100.0f, description);
+	if (s_progress_callback(progress / 100.0f, description))
+		throw std::runtime_error("aborted by user");
 }

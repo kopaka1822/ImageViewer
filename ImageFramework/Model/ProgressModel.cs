@@ -30,13 +30,18 @@ namespace ImageFramework.Model
             Dll.set_progress_callback(onDllProgress);
         }
 
-        private void OnDllProgress(float prog, string description)
+        private uint OnDllProgress(float prog, string description)
         {
-            if (!IsProcessing) return; // ignore for now => progress when opening files without task
+            if (!IsProcessing) return 0; // ignore for now => progress when opening files without task
 
             Progress = prog;
             if (What != description)
                 What = description;
+
+            if (currentTaskCancellation.IsCancellationRequested)
+                return 1;
+
+            return 0;
         }
 
         /// <summary>

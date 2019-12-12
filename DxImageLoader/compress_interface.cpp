@@ -32,7 +32,15 @@ bool cmp_feedback_proc(float fProgress, CMP_DWORD_PTR pUser1, CMP_DWORD_PTR pUse
 	const char* desc = "compressing";
 	if (!info->isCompress) desc = "decompressing";
 
-	set_progress(uint32_t((info->curSteps + size_t(fProgress * 0.01f * float(info->curStepWeight))) / info->numSteps), desc);
+	try
+	{
+		set_progress(uint32_t((info->curSteps + size_t(fProgress * 0.01f * float(info->curStepWeight))) / info->numSteps), desc);
+	}
+	catch (const std::exception& e)
+	{
+		return true;
+	}
+	
 	return false; // don't abort compression
 }
 
