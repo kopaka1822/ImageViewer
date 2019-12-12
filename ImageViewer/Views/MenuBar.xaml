@@ -16,6 +16,7 @@
             <MenuItem 
                     Header="_Open"
                     Command="{Binding OpenCommand}"
+                    InputGestureText="Ctrl+O"
                   IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
                     <Image Source="../Icons/open.png"/>
@@ -24,6 +25,7 @@
             <MenuItem 
                     Header="_Import"
                     Command="{Binding ImportCommand}"
+                    InputGestureText="Ctrl+I"
                     IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
                     <Image Source="../Icons/import.png"/>
@@ -77,6 +79,7 @@
             <Separator/>
             <MenuItem 
                     Header="_Export"
+                    InputGestureText="Ctrl+S"
                     Command="{Binding ExportCommand}"
                     IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
