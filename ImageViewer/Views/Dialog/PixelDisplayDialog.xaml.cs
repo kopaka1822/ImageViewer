@@ -26,8 +26,8 @@ namespace ImageViewer.Views.Dialog
         public PixelDisplayDialog(ModelsEx models)
         {
             viewModel = new PixelDisplayViewModel(models);
-            DataContext = viewModel;
             InitializeComponent();
+            DataContext = viewModel;
         }
 
         protected override void OnClosed(EventArgs e)
