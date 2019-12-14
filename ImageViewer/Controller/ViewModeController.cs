@@ -158,9 +158,6 @@ namespace ImageViewer.Controller
         {
             var newPosition = new Point((int)e.GetPosition(dxHost).X, (int)e.GetPosition(dxHost).Y);
 
-            // don't interrupt when processing
-            if (models.Progress.IsProcessing) return;
-
             if (mouseDown || mouse2Down)
             {
                 // drag event
@@ -229,9 +226,6 @@ namespace ImageViewer.Controller
 
         private void DxHostOnMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            // don't interrupt when processing
-            if (models.Progress.IsProcessing) return;
-
             var canMouse = ConvertToCanonical(new Vector2(mousePosition.X, mousePosition.Y));
 
             // convert to canonical coordinates

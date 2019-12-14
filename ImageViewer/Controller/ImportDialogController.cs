@@ -51,7 +51,8 @@ namespace ImageViewer.Controller
             }
             catch (Exception e)
             {
-                models.Window.ShowErrorDialog(e.Message);
+                if(!models.Progress.LastTaskCancelledByUser)
+                    models.Window.ShowErrorDialog(e.Message);
             }
         }
 

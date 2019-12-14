@@ -92,6 +92,9 @@ namespace ImageFramework.Model
             }
         }
 
+        // indicates if the last task that completed was cancelled by the user
+        public bool LastTaskCancelledByUser { get; private set; } = false;
+
         /// <summary>
         /// indicates if anything is being processed
         /// </summary>
@@ -145,11 +148,13 @@ namespace ImageFramework.Model
         private void OnTaskFinished(Task prevTask)
         {
             currentTask = null;
+            LastTaskCancelledByUser = currentTaskCancellation.IsCancellationRequested;
             currentTaskCancellation.Dispose();
             currentTaskCancellation = null;
             OnPropertyChanged(nameof(IsProcessing));
 
-            if (prevTask.Exception == null) return;
+            // don't set error if cancellation was requested by the user
+            if (prevTask.Exception == null || LastTaskCancelledByUser) return;
             LastError = prevTask.Exception.Message;
         }
 

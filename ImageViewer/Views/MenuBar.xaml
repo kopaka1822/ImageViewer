@@ -118,7 +118,8 @@
             </MenuItem>
             <Separator/>
             <MenuItem
-                Header="_Theme">
+                Header="_Theme"
+                IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem
                     Header="Default"
                     Command="{Binding SetThemeCommand}"
