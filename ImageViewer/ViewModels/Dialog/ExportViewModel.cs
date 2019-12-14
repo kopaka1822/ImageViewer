@@ -224,7 +224,7 @@ namespace ImageViewer.ViewModels.Dialog
         public List<ComboBoxItem<int>> AvailableLayers { get; } = new List<ComboBoxItem<int>>();
         public List<ComboBoxItem<int>> AvailableMipmaps { get; } = new List<ComboBoxItem<int>>();
         public List<ComboBoxItem<PixelDataType>> AvailableDataTypes { get; } = new List<ComboBoxItem<PixelDataType>>();
-        public List<ComboBoxItem<GliFormat>> AvailableFormats { get; } = new List<ComboBoxItem<GliFormat>>();
+        public List<ComboBoxItem<GliFormat>> AvailableFormats { get; private set; }
 
         public bool EnableLayers => AvailableLayers.Count > 1;
         public bool EnableMipmaps => AvailableMipmaps.Count > 1;
@@ -278,7 +278,7 @@ namespace ImageViewer.ViewModels.Dialog
                 if (value == null || value == selectedDataType) return;
                 selectedDataType = value;
 
-                AvailableFormats.Clear();
+                AvailableFormats = new List<ComboBoxItem<GliFormat>>();
                 selectedFormat = null;
                 bool allowAll = selectedDataType.Cargo == PixelDataType.Undefined;
                 int bestFit = 0;
