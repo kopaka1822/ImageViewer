@@ -137,7 +137,8 @@ namespace ImageFramework.Model
             try
             {
                 // first, use the combine shader
-                using (var shader = new ImageCombineShader(Color.Converted, Alpha.Converted, args.Images.NumImages, ShaderBuilder.Get(args.Images.ImageType)))
+                using (var shader = new ImageCombineShader(Color.Converted, Alpha.Converted, args.Images.NumImages,
+                    ShaderBuilder.Get(args.Images.ImageType)))
                 {
                     var texSrc = args.TextureCache.GetTexture();
 
@@ -192,9 +193,6 @@ namespace ImageFramework.Model
             catch (OperationCanceledException)
             {
                 // changes remain true
-            }
-            catch (Exception)
-            {
                 IsValid = false;
                 throw;
             }

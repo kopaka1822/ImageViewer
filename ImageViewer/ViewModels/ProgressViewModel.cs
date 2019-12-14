@@ -22,7 +22,7 @@ namespace ImageViewer.ViewModels
         {
             this.models = models;
             this.models.Progress.PropertyChanged += ProgressOnPropertyChanged;
-            CancelCommand = new ActionCommand(() => models.Progress.Cancel());
+            CancelCommand = new ActionCommand(() => models.Progress.CancelAsync());
         }
 
         private void ProgressOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -40,8 +40,9 @@ namespace ImageViewer.ViewModels
                     OnPropertyChanged(nameof(ProgressDescription));
                     break;
                 case nameof(ProgressModel.LastError):
-                    if(!String.IsNullOrEmpty(models.Progress.LastError))
-                        models.Window.ShowErrorDialog(models.Progress.LastError, "Task failed");
+                    // TODO log
+                    //if(!String.IsNullOrEmpty(models.Progress.LastError))
+                    //    models.Window.ShowErrorDialog(models.Progress.LastError, "Task failed");
                     break;
             }
         }

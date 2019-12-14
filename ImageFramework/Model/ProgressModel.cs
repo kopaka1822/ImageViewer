@@ -13,6 +13,19 @@ using ImageFramework.ImageLoader;
 
 namespace ImageFramework.Model
 {
+    public class TaskCompletedEventArgs : EventArgs
+    {
+        public TaskCompletedEventArgs(bool success)
+        {
+            Success = success;
+        }
+
+        // task completed succesfully
+        public bool Success { get; }
+    }
+
+    public delegate void TaskCompletedEventHandler(object sender, TaskCompletedEventArgs args);
+
     /// <summary>
     /// gives information about image pipelines in progress
     /// </summary>
@@ -95,6 +108,9 @@ namespace ImageFramework.Model
         // indicates if the last task that completed was cancelled by the user
         public bool LastTaskCancelledByUser { get; private set; } = false;
 
+        // will be invoked if the last task failed
+        public event TaskCompletedEventHandler TaskCompleted;
+
         /// <summary>
         /// indicates if anything is being processed
         /// </summary>
@@ -154,8 +170,12 @@ namespace ImageFramework.Model
             OnPropertyChanged(nameof(IsProcessing));
 
             // don't set error if cancellation was requested by the user
-            if (prevTask.Exception == null || LastTaskCancelledByUser) return;
-            LastError = prevTask.Exception.Message;
+            if (prevTask.Exception != null && !LastTaskCancelledByUser)
+            {
+                LastError = prevTask.Exception.Message;
+            }
+
+            OnTaskCompleted(new TaskCompletedEventArgs(prevTask.IsCompleted));
         }
 
         // cancels the current task
@@ -163,6 +183,12 @@ namespace ImageFramework.Model
         {
             currentTaskCancellation?.Cancel();
             WaitForTask();
+        }
+
+        public async void CancelAsync()
+        {
+            currentTaskCancellation?.Cancel();
+            await WaitForTaskAsync();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -178,6 +204,11 @@ namespace ImageFramework.Model
             Cancel();
             Debug.Assert(currentTask == null);
             Debug.Assert(currentTaskCancellation == null);
+        }
+
+        protected virtual void OnTaskCompleted(TaskCompletedEventArgs args)
+        {
+            TaskCompleted?.Invoke(this, args);
         }
     }
 }
