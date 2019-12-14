@@ -20,6 +20,8 @@ namespace ImageFramework.Model.Shader
     {
         private readonly DirectX.Shader convert2D;
         private readonly DirectX.Shader convert3D;
+        private DirectX.Shader convert2DInt;
+        private DirectX.Shader convert3DInt;
         private readonly QuadShader quad;
         private readonly UploadBuffer cbuffer;
 
@@ -192,13 +194,18 @@ namespace ImageFramework.Model.Shader
         /// <summary>
         /// for unit testing purposes. Converts naked srv to TextureArray2D
         /// </summary>
-        internal TextureArray2D ConvertFromRaw(SharpDX.Direct3D11.ShaderResourceView srv, Size3 size, SharpDX.DXGI.Format dstFormat)
+        internal TextureArray2D ConvertFromRaw(SharpDX.Direct3D11.ShaderResourceView srv, Size3 size, SharpDX.DXGI.Format dstFormat, bool isInteger)
         {
             var res = new TextureArray2D(1, 1, size, dstFormat, false);
 
             var dev = DirectX.Device.Get();
             quad.Bind(false);
-            dev.Pixel.Set(convert2D.Pixel);
+            if (isInteger)
+            {
+                if(convert2DInt == null) convert2DInt = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(new ShaderBuilder2D("int4")), "ConvertInt");
+                dev.Pixel.Set(convert2DInt.Pixel);
+            }
+            else dev.Pixel.Set(convert2D.Pixel);
 
             dev.Pixel.SetShaderResource(0, srv);
 
@@ -227,13 +234,18 @@ namespace ImageFramework.Model.Shader
         /// <summary>
         /// for unit testing purposes. Converts naked srv to TextureArray2D
         /// </summary>
-        internal Texture3D ConvertFromRaw3D(SharpDX.Direct3D11.ShaderResourceView srv, Size3 size, SharpDX.DXGI.Format dstFormat)
+        internal Texture3D ConvertFromRaw3D(SharpDX.Direct3D11.ShaderResourceView srv, Size3 size, SharpDX.DXGI.Format dstFormat, bool isInteger)
         {
             var res = new Texture3D(1, size, dstFormat, false);
 
             var dev = DirectX.Device.Get();
             quad.Bind(true);
-            dev.Pixel.Set(convert3D.Pixel);
+            if (isInteger)
+            {
+                if(convert3DInt == null) convert3DInt = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(new ShaderBuilder3D("int4")), "ConvertInt");
+                dev.Pixel.Set(convert3DInt.Pixel);
+            }
+            else dev.Pixel.Set(convert3D.Pixel);
 
             dev.Pixel.SetShaderResource(0, srv);
 
@@ -294,6 +306,8 @@ float4 main(PixelIn i) : SV_TARGET
         {
             convert2D?.Dispose();
             convert3D?.Dispose();
+            convert2DInt?.Dispose();
+            convert3DInt?.Dispose();
         }
     }
 }
