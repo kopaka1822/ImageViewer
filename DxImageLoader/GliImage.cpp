@@ -32,7 +32,7 @@ inline texture_type convert_mod(texture_type const& Texture, gli::format Format)
 
 	extent_type const& baseDim = Texture.texture::extent(0);
 	// divide by 100 for range [0, 100]
-	const size_t numSteps = image::IImage::calcNumPixels(uint32_t(Texture.layers() * Texture.faces()), uint32_t(Texture.levels()), baseDim.x, baseDim.y, baseDim.z) / 100;
+	const size_t numSteps = std::max<size_t>(image::IImage::calcNumPixels(uint32_t(Texture.layers() * Texture.faces()), uint32_t(Texture.levels()), baseDim.x, baseDim.y, baseDim.z) / 100, 1);
 	size_t curSteps = 0;
 
 	for (size_type Layer = 0; Layer < Texture.layers(); ++Layer)

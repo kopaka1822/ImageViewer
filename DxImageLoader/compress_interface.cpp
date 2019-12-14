@@ -5,6 +5,7 @@
 #include <thread>
 #include <stdexcept>
 #include "interface.h"
+#include <algorithm>
 
 struct ExFormatInfo
 {
@@ -289,7 +290,7 @@ void compressonator_convert_image(image::IImage& src, image::IImage& dst, int qu
 
 	CompressInfo info;
 	info.isCompress = dstFormatInfo.isCompressed;
-	info.numSteps = src.getNumPixels() / 100; // progress range [0, 100]
+	info.numSteps = std::max<size_t>(src.getNumPixels() / 100, 1); // progress range [0, 100]
 	info.curSteps = 0;
 	for(uint32_t layer = 0; layer < src.getNumLayers(); ++layer)
 	{
