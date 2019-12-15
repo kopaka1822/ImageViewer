@@ -121,8 +121,11 @@ namespace ImageViewer.ViewModels
             set
             {
                 model.IsEnabled = value;
-                if (value) return;
+                //if (value) return;
                 UseFilter = model.UseFilter;
+                // this might have changed while invisible
+                if(value)
+                    OnPropertyChanged(nameof(HasChanges));
             }
         }
 

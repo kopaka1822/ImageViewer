@@ -61,10 +61,9 @@ namespace FrameworkTests.Model
             model.AddImageFromFile(TestData.Directory + "small.bmp");
             // set formula to srgb but export with ldr mode unorm
             model.Pipelines[0].Color.Formula = "tosrgb(I0)";
-            model.Export.LdrExportMode = ExportModel.LdrMode.UNorm;
             model.Apply();
 
-            model.ExportPipelineImage(ExportDir + "unorm", "bmp", GliFormat.RGB8_SRGB);
+            model.ExportPipelineImage(ExportDir + "unorm", "bmp", GliFormat.RGB8_UNORM);
 
             TestData.CompareWithSmall(IO.LoadImage(ExportDir + "unorm.bmp"), Color.Channel.Rgb);
         }

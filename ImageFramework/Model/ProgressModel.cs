@@ -172,7 +172,7 @@ namespace ImageFramework.Model
             // don't set error if cancellation was requested by the user
             if (prevTask.Exception != null && !LastTaskCancelledByUser)
             {
-                LastError = prevTask.Exception.Message;
+                if (prevTask.Exception.InnerException != null) LastError = prevTask.Exception.InnerException.Message;
             }
 
             OnTaskCompleted(new TaskCompletedEventArgs(prevTask.IsCompleted));

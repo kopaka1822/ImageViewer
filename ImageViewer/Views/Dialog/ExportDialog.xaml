@@ -16,6 +16,7 @@
     <Grid>
         <Border Padding="5">
             <StackPanel>
+                
                 <Grid Margin="0 0 0 5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="60"/>
@@ -176,6 +177,13 @@
                     Margin="0 15 0 15"
                     Text="{Binding Description}"
                     TextWrapping="Wrap"/>
+
+                <TextBlock 
+                    Margin="0 0 0 5"
+                    Text="{Binding Warning, FallbackValue=!!Warning Text!!}"
+                    TextWrapping="Wrap"
+                    Foreground="Red"
+                    Visibility="{Binding WarningVisibility}"/>
 
                 <Grid HorizontalAlignment="Right">
                     <Grid.ColumnDefinitions>

@@ -224,23 +224,16 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 			auto mip = it->second->getData(0, 0, mipSize);
 			auto width = it->second->getWidth(0);
 			auto height = it->second->getHeight(0);
-			int nComponents = 0;
+			int nComponents = stb_ldr_get_num_components(gli::format(format));
 
-			if (format == gli::FORMAT_RGBA8_SRGB_PACK8)
+			if (nComponents == 3)
 			{
-				nComponents = 4;
-			}
-			else if (format == gli::FORMAT_RGB8_SRGB_PACK8)
-			{
-				nComponents = 3;
 				image::changeStride(mip, mipSize, 4, 3);
 			}
-			else if (format == gli::FORMAT_R8_SRGB_PACK8)
+			else if (nComponents == 1)
 			{
-				nComponents = 1;
 				image::changeStride(mip, mipSize, 4, 1);
 			}
-			else throw std::runtime_error("export format not supported for png, jpg, bmp");
 
 			if (ext == "png")
 				stb_save_png(fullName.c_str(), width, height, nComponents, mip);

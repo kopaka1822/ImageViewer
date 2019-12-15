@@ -124,24 +124,58 @@ std::unique_ptr<image::IImage> stb_image_load(const char* filename)
 
 std::vector<uint32_t> stb_image_get_export_formats(const char* extension)
 {
-	auto ext = std::string(extension);
-	if (ext == "bmp" || ext == "jpg")
-		return std::vector<uint32_t>{
-			gli::format::FORMAT_RGB8_SRGB_PACK8,
-			gli::format::FORMAT_R8_SRGB_PACK8
-		};
-	if (ext == "png")
-		return std::vector<uint32_t>{
-			gli::format::FORMAT_RGBA8_SRGB_PACK8,
-			gli::format::FORMAT_RGB8_SRGB_PACK8,
-			gli::format::FORMAT_R8_SRGB_PACK8
-		};
+	const auto ext = std::string(extension);
 	if (ext == "hdr")
+	{
 		return std::vector<uint32_t>{
 			gli::format::FORMAT_RGB32_SFLOAT_PACK32,
-			gli::format::FORMAT_R32_SFLOAT_PACK32
+				gli::format::FORMAT_R32_SFLOAT_PACK32
 		};
-	return {};
+	}
+
+	std::vector<uint32_t> formats;
+	// R8 formats
+	formats.push_back(gli::format::FORMAT_R8_SRGB_PACK8);
+	formats.push_back(gli::format::FORMAT_R8_UNORM_PACK8);
+	formats.push_back(gli::format::FORMAT_R8_SNORM_PACK8);
+
+	// RGB8
+	formats.push_back(gli::format::FORMAT_RGB8_SRGB_PACK8);
+	formats.push_back(gli::format::FORMAT_RGB8_UNORM_PACK8);
+	formats.push_back(gli::format::FORMAT_RGB8_SNORM_PACK8);
+
+	// RGBA8
+	if(ext == "png")
+	{
+		formats.push_back(gli::format::FORMAT_RGBA8_SRGB_PACK8);
+		formats.push_back(gli::format::FORMAT_RGBA8_UNORM_PACK8);
+		formats.push_back(gli::format::FORMAT_RGBA8_SNORM_PACK8);
+	}
+
+	return formats;
+}
+
+int stb_ldr_get_num_components(gli::format format)
+{
+	switch (format)
+	{
+	case gli::FORMAT_R8_SRGB_PACK8:
+	case gli::FORMAT_R8_UNORM_PACK8:
+	case gli::FORMAT_R8_SNORM_PACK8:
+		return 1;
+
+	case gli::FORMAT_RGB8_SRGB_PACK8:
+	case gli::FORMAT_RGB8_UNORM_PACK8:
+	case gli::FORMAT_RGB8_SNORM_PACK8:
+		return 3;
+
+	case gli::FORMAT_RGBA8_SRGB_PACK8:
+	case gli::FORMAT_RGBA8_UNORM_PACK8:
+	case gli::FORMAT_RGBA8_SNORM_PACK8:
+		return 4;
+	}
+
+	throw std::runtime_error("format not supported for png, jpg, bmp");
 }
 
 void stb_save_png(const char* filename, int width, int height, int components, const void* data)

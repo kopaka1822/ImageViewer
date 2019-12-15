@@ -17,14 +17,6 @@ namespace ImageFramework.Model.Export
 {
     public class ExportModel : INotifyPropertyChanged
     {
-        public enum LdrMode
-        {
-            Undefined,
-            Srgb,
-            UNorm,
-            SNorm
-        }
-
         public IReadOnlyList<ExportFormatModel> Formats { get; }
 
         internal readonly ConvertFormatShader convert;
@@ -44,22 +36,6 @@ namespace ImageFramework.Model.Export
             formats.Add(new ExportFormatModel("dds"));
             formats.Add(new ExportFormatModel("ktx"));
             Formats = formats;
-        }
-
-        private LdrMode ldrExportMode = LdrMode.Srgb;
-
-        /// <summary>
-        /// format of the pixel data for ldr (png, jpg, bmp) exports
-        /// </summary>
-        public LdrMode LdrExportMode
-        {
-            get => ldrExportMode;
-            set
-            {
-                if(value == ldrExportMode) return;
-                ldrExportMode = value;
-                OnPropertyChanged(nameof(LdrExportMode));
-            }
         }
 
         private int mipmap = -1;
@@ -216,6 +192,8 @@ namespace ImageFramework.Model.Export
         {
             ExportAsync(image, desc);
             progress.WaitForTask();
+            if(!String.IsNullOrEmpty(progress.LastError))
+                throw new Exception(progress.LastError);
         }
 
         // does export asynchronously => the task will be passed to the ProgressModel
@@ -328,7 +306,6 @@ namespace ImageFramework.Model.Export
             {
                 using (img)
                 {
-                    // TODO use cancellation token
                     IO.SaveImage(img, desc.Filename, desc.Extension, desc.FileFormat, quality);
                 }
             }, ct);

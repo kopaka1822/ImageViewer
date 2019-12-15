@@ -39,30 +39,23 @@ namespace ImageFramework.Model.Export
         {
             get
             {
-                var ldrMode = exportModel.LdrExportMode;
-
-                if (Extension == "ktx" || Extension == "dds")
-                {
-                    ldrMode = GetLdrMode(FileFormat); // overwrite ldr mode
-                }
-
-                if (!FileFormat.IsAtMost8bit() || ldrMode == ExportModel.LdrMode.Undefined)
+                // type bigger than 8 bit => use float staging
+                if(!FileFormat.IsAtMost8bit())
                     return new ImageFormat(GliFormat.RGBA32_SFLOAT);
 
+                // determine staging format based on pixel data type
+                var ldrMode = FileFormat.GetDataType();
                 switch (ldrMode)
                 {
-                    case ExportModel.LdrMode.Srgb:
+                    case PixelDataType.Srgb:
                         return new ImageFormat(GliFormat.RGBA8_SRGB);
-                    case ExportModel.LdrMode.UNorm:
+                    case PixelDataType.UNorm:
                         return new ImageFormat(GliFormat.RGBA8_UNORM);
-                    case ExportModel.LdrMode.SNorm:
+                    case PixelDataType.SNorm:
                         return new ImageFormat(GliFormat.RGBA8_SNORM);
-                    default:
-                        Debug.Assert(false);
-                        break;
+                    default: // all other formats (float, scaled, int) use float staging
+                        return new ImageFormat(GliFormat.RGBA32_SFLOAT);
                 }
-
-                return null;
             }
         }
         
@@ -92,22 +85,6 @@ namespace ImageFramework.Model.Export
             if (!ExportFormat.Formats.Contains(format)) return false;
             FileFormat = format;
             return true;
-        }
-
-        private ExportModel.LdrMode GetLdrMode(GliFormat format)
-        {
-            switch (format.GetDataType())
-            {
-                case PixelDataType.UNorm:
-                    return ExportModel.LdrMode.UNorm;
-                case PixelDataType.SNorm:
-                    return ExportModel.LdrMode.SNorm;
-                case PixelDataType.Srgb:
-                    return ExportModel.LdrMode.Srgb;
-            }
-           
-            // no ldr mode possible => use hdr staging format
-            return ExportModel.LdrMode.Undefined;
         }
     }
 }

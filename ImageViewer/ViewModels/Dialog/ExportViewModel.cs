@@ -28,6 +28,8 @@ namespace ImageViewer.ViewModels.Dialog
         private readonly bool is3D;
         private readonly List<ComboBoxItem<GliFormat>> allFormats = new List<ComboBoxItem<GliFormat>>();
         private readonly List<int> formatRatings = new List<int>();
+        // warning if exporting into non srgb formats (ldr file formats)
+        private readonly bool nonSrgbExportWarnings = false;
 
         public ExportViewModel(ModelsEx models, string extension, GliFormat preferredFormat, string filename, bool is3D, DefaultStatistics stats)
         {
@@ -104,6 +106,11 @@ namespace ImageViewer.ViewModels.Dialog
             if (extension == "jpg")
             {
                 hasQualityValue = true;
+                nonSrgbExportWarnings = true;
+            }
+            else if (extension == "png" || extension == "bmp")
+            {
+                nonSrgbExportWarnings = true;
             }
             else SetKtxDdsQuality();
 
@@ -316,6 +323,7 @@ namespace ImageViewer.ViewModels.Dialog
                 selectedFormat = value;
                 OnPropertyChanged(nameof(SelectedFormat));
                 OnPropertyChanged(nameof(Description));
+                OnPropertyChanged(nameof(Warning));
                 SetKtxDdsQuality();
             }
         }
@@ -324,6 +332,40 @@ namespace ImageViewer.ViewModels.Dialog
 
         public string Description => selectedFormat.Cargo.GetDescription();
 
+        public string Warning
+        {
+            get
+            {
+                var dataType = selectedFormat.Cargo.GetDataType();
+                if (nonSrgbExportWarnings && dataType != PixelDataType.Srgb)
+                {
+                    var war = "Warning: This file format only supports sRGB formats. ";
+                    if (dataType == PixelDataType.UNorm)
+                        war += "Use SrgbAsUnorm(I0) inside image equation after importing.";
+                    else if (dataType == PixelDataType.SNorm)
+                        war += "Use SrgbAsSnorm(I0) inside image equation after importing.";
+
+                    WarningVisibility = Visibility.Visible;
+                    return war;
+                }
+
+                WarningVisibility = Visibility.Collapsed;
+                return "";
+            }
+        }
+
+        private Visibility warningVisibility = Visibility.Collapsed;
+
+        public Visibility WarningVisibility
+        {
+            get => warningVisibility;
+            set
+            {
+                if(value == warningVisibility) return;
+                warningVisibility = value;
+                OnPropertyChanged(nameof(WarningVisibility));
+            }
+        }
         public bool UseCropping
         {
             get => models.Export.UseCropping;
