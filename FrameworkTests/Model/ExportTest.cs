@@ -7,10 +7,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FrameworkTests.DirectX;
+using FrameworkTests.Model.Equation;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
+using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDX.Direct3D11;
@@ -199,7 +201,7 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void GrayTestAllJpg()
         {
-            TryExportAllFormatsAndCompareGray("jpg");
+            TryExportAllFormatsAndCompareGray("jpg", true);
         }
 
         [TestMethod]
@@ -211,7 +213,7 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void GrayTestAllPng()
         {
-            TryExportAllFormatsAndCompareGray("png");
+            TryExportAllFormatsAndCompareGray("png", true);
         }
 
         [TestMethod]
@@ -223,7 +225,7 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void GrayTestAllBmp()
         {
-            TryExportAllFormatsAndCompareGray("bmp");
+            TryExportAllFormatsAndCompareGray("bmp", true);
         }
 
         [TestMethod]
@@ -624,9 +626,9 @@ namespace FrameworkTests.Model
             return false;
         }
 
-        private void TryExportAllFormatsAndCompareGray(string outputExtension)
+        private void TryExportAllFormatsAndCompareGray(string outputExtension, bool onlySrgb = false)
         {
-            var model = new Models(1);
+            var model = new Models(2);
             model.AddImageFromFile(TestData.Directory + "gray.png");
             model.Apply();
             var tex = (TextureArray2D)model.Pipelines[0].Image;
@@ -642,6 +644,7 @@ namespace FrameworkTests.Model
             var i = 0;
             foreach (var format in eFmt.Formats)
             {
+                if(onlySrgb && format.GetDataType() != PixelDataType.Srgb) continue;
                 try
                 {
                     int numTries = 0;
@@ -656,6 +659,7 @@ namespace FrameworkTests.Model
 
                         model.Export.Export(tex, desc);
                         Thread.Sleep(1);
+
                         // load and compare gray tone
                         using (var newTex = new TextureArray2D(IO.LoadImage($"{ExportDir}gray{i}.{outputExtension}")))
                         {
