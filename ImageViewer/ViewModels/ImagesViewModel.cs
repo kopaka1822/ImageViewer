@@ -45,8 +45,8 @@ namespace ImageViewer.ViewModels
             }
         }
 
-        public ObservableCollection<ImageListBoxItem> ImageListItems { get; } = new ObservableCollection<ImageListBoxItem>();
-        public ImageListBoxItem SelectedImageListItem { get; set; }
+        public ObservableCollection<ImageItemView> ImageListItems { get; } = new ObservableCollection<ImageItemView>();
+        public ImageItemView SelectedImageListItem { get; set; }
 
         public string WindowTitle
         {
@@ -71,7 +71,7 @@ namespace ImageViewer.ViewModels
             ImageListItems.Clear();
             for (var i = 0; i < models.Images.NumImages; ++i)
             {
-                var item = new ImageListBoxItem(models.Images.Images[i].Filename, models.Images.Images[i].OriginalFormat.ToString(), i, models.Images);
+                var item = new ImageItemView(models.Images.Images[i], i, models.Images);
                 ImageListItems.Add(item);
             }
 
@@ -92,7 +92,7 @@ namespace ImageViewer.ViewModels
         {
 
             // enable if both items are image list box items
-            if (dropInfo.Data is ImageListBoxItem && dropInfo.TargetItem is ImageListBoxItem)
+            if (dropInfo.Data is ImageItemView && dropInfo.TargetItem is ImageItemView)
             {
                 dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
                 dropInfo.Effects = DragDropEffects.Move;
@@ -107,10 +107,10 @@ namespace ImageViewer.ViewModels
 
         public async void Drop(IDropInfo dropInfo)
         {
-            if (dropInfo.Data is ImageListBoxItem)
+            if (dropInfo.Data is ImageItemView)
             {
                 // move images 
-                var idx1 = ImageListItems.IndexOf(dropInfo.Data as ImageListBoxItem);
+                var idx1 = ImageListItems.IndexOf(dropInfo.Data as ImageItemView);
                 var idx2 = dropInfo.InsertIndex;
                 if (idx1 < 0 || idx2 < 0) return;
                 // did the order change?

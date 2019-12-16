@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:ImageViewer"
              xmlns:views="clr-namespace:ImageViewer.Views" 
              xmlns:theme="clr-namespace:ImageViewer.Views.Theme"
+             xmlns:converter="clr-namespace:ImageViewer.Views.Converter"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -107,6 +108,11 @@
             </Style>
 
             <Style TargetType="ToolTip" BasedOn="{StaticResource BaseStyle}"/>
+
+            <converter:CollapsedVisibleConverter x:Key="CollapsedVisibleConverter"/>
+            <converter:VisibleCollapsedConverter x:Key="VisibleCollapsedConverter"/>
+            <converter:HiddenVisibleConverter x:Key="HiddenVisibleConverter"/>
+            <converter:VisibleHiddenConverter x:Key="VisibleHiddenConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
