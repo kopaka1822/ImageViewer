@@ -12,6 +12,7 @@
 #include <map>
 #include "convert.h"
 #include "ktx_interface.h"
+#include "png_interface.h"
 
 static int s_currentID = 1;
 static std::unordered_map<int, std::unique_ptr<image::IImage>> s_resources;
@@ -74,6 +75,10 @@ int image_open(const char* filename)
 		else if (hasEnding(fname, ".exr"))
 		{
 			res = openexr_load(filename);
+		}
+		else if(hasEnding(fname, ".png"))
+		{
+			res = png_load(filename);
 		}
 		else
 		{

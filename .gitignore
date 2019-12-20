@@ -36,3 +36,5 @@ Release/
 
 # unit testing tmp
 FrameworkTests/TestData/export/
+
+*.bsc

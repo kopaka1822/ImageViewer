@@ -250,7 +250,14 @@ namespace ImageFramework.ImageLoader
         BGR8_UNORM_PACK32,
         BGR8_SRGB_PACK32,
 
-        RG3B2_UNORM, LAST = RG3B2_UNORM
+        RG3B2_UNORM, LAST = RG3B2_UNORM,
+
+        // extensions from libpng
+        RA8_SRGB,
+        AR8_SRGB,
+        ARGB8_SRGB,
+        ABGR8_SRGB,
+        RA16_UNORM
     };
 
     public enum PixelDataType
@@ -437,6 +444,10 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.BGR8_UNORM_PACK32:
                 case GliFormat.BGR8_SRGB_PACK32:
                 case GliFormat.RG3B2_UNORM:
+                case GliFormat.RA8_SRGB:
+                case GliFormat.AR8_SRGB:
+                case GliFormat.ARGB8_SRGB:
+                case GliFormat.ABGR8_SRGB:
                     return true;
 
                 /*case GliFormat.RGB10A2_UNORM:
@@ -741,6 +752,11 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.LA8_UNORM:
                 case GliFormat.A16_UNORM:
                 case GliFormat.LA16_UNORM:
+                case GliFormat.RA8_SRGB:
+                case GliFormat.AR8_SRGB:
+                case GliFormat.ABGR8_SRGB:
+                case GliFormat.ARGB8_SRGB:
+                case GliFormat.RA16_UNORM:
                     return true;
             }
 
@@ -898,6 +914,8 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.BGR8_UNORM_PACK32:
                 case GliFormat.BGR8_SRGB_PACK32:
                 case GliFormat.RG3B2_UNORM:
+                case GliFormat.ARGB8_SRGB:
+                case GliFormat.ABGR8_SRGB:
                     return true;
             }
 
@@ -1080,6 +1098,7 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.RGB_ATC_UNORM_BLOCK8:
                 case GliFormat.RGBA_ATCA_UNORM_BLOCK16:
                 case GliFormat.RGBA_ATCI_UNORM_BLOCK16:
+                case GliFormat.RA16_UNORM:
                     return PixelDataType.UNorm;
 
                 case GliFormat.R8_SNORM:
@@ -1137,6 +1156,10 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.RGBA_PVRTC1_16X8_SRGB_BLOCK32:
                 case GliFormat.RGBA_PVRTC2_4X4_SRGB_BLOCK8:
                 case GliFormat.RGBA_PVRTC2_8X4_SRGB_BLOCK8:
+                case GliFormat.RA8_SRGB:
+                case GliFormat.AR8_SRGB:
+                case GliFormat.ARGB8_SRGB:
+                case GliFormat.ABGR8_SRGB:
                     return PixelDataType.Srgb;
 
                 case GliFormat.R8_USCALED:
