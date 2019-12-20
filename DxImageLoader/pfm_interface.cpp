@@ -3,6 +3,7 @@
 #include <fstream>
 #include <memory>
 #include <iostream>
+#include "convert.h"
 
 using uchar = unsigned char;
 
@@ -15,14 +16,6 @@ void skip_space(std::fstream& fileStream)
 		c = fileStream.get();
 	} while (c == '\n' || c == ' ' || c == '\t' || c == '\r');
 	fileStream.unget();
-}
-
-// check whether machine is little endian
-int littleendian()
-{
-	int intval = 1;
-	uchar* uval = reinterpret_cast<uchar*>(&intval);
-	return uval[0] == 1;
 }
 
 void swapBytes(float* fptr)
@@ -65,7 +58,7 @@ std::unique_ptr<image::IImage> pfm_load(const char* filename)
 
 	// determine endianness 
 	int littleEndianFile = (scalef < 0);
-	int littleEndianMachine = littleendian();
+	int littleEndianMachine = image::littleendian();
 	int needSwap = (littleEndianFile != littleEndianMachine);
 
 	// skip SINGLE newline character after reading third arg

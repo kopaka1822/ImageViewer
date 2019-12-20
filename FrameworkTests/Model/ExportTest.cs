@@ -213,7 +213,7 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void GrayTestAllPng()
         {
-            TryExportAllFormatsAndCompareGray("png", true);
+            TryExportAllFormatsAndCompareGray("png");
         }
 
         [TestMethod]

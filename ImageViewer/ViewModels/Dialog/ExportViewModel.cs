@@ -108,7 +108,7 @@ namespace ImageViewer.ViewModels.Dialog
                 hasQualityValue = true;
                 nonSrgbExportWarnings = true;
             }
-            else if (extension == "png" || extension == "bmp")
+            else if (extension == "bmp")
             {
                 nonSrgbExportWarnings = true;
             }

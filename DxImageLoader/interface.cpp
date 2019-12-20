@@ -217,7 +217,12 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 				pfm_save(fullName.c_str(), width, height, nComponents, mip);
 			else assert(false);
 		}
-		else if (ext == "png" || ext == "jpg" || ext == "bmp")
+		else if(ext == "png")
+		{
+			assertSingleLayerMip(*it->second);
+			png_write(*it->second, fullName.c_str(), gli::format(format), quality);
+		}
+		else if (ext == "jpg" || ext == "bmp")
 		{
 			assertSingleLayerMip(*it->second);
 			if (it->second->getFormat() != gli::FORMAT_RGBA8_SRGB_PACK8 &&
@@ -240,9 +245,7 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 				image::changeStride(mip, mipSize, 4, 1);
 			}
 
-			if (ext == "png")
-				stb_save_png(fullName.c_str(), width, height, nComponents, mip);
-			else if (ext == "bmp")
+			if (ext == "bmp")
 				stb_save_bmp(fullName.c_str(), width, height, nComponents, mip);
 			else if (ext == "jpg")
 				stb_save_jpg(fullName.c_str(), width, height, nComponents, mip, quality);
@@ -268,7 +271,7 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 		s_exportFormats["pfm"] = pfm_get_export_formats();
 		s_exportFormats["hdr"] = stb_image_get_export_formats("hdr");
 		s_exportFormats["jpg"] = stb_image_get_export_formats("jpg");
-		s_exportFormats["png"] = stb_image_get_export_formats("png");
+		s_exportFormats["png"] = png_get_export_formats();
 		s_exportFormats["bmp"] = stb_image_get_export_formats("bmp");
 	}
 	auto it = s_exportFormats.find(extension);
