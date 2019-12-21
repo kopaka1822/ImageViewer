@@ -140,6 +140,15 @@ static ExportFormatInfo get_export_info(gli::format format)
 		i.bitmask = 0b1;
 		i.gamma = noGamma;
 		return i;
+	case gli::format::FORMAT_RA8_UNORM_PACK8:
+		i.format = PNG_FORMAT_GA;
+		i.colorType = PNG_COLOR_TYPE_GA;
+		i.bitDepth = 8;
+		i.pixelSize = 2;
+		i.bitmask = 0b1001;
+		i.gamma = noGamma;
+		return i;
+		break;
 	case gli::format::FORMAT_RGB8_UNORM_PACK8:
 		i.format = PNG_FORMAT_RGB;
 		i.colorType = PNG_COLOR_TYPE_RGB;
