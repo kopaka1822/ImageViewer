@@ -6,48 +6,80 @@
 #include <string>
 #include "convert.h"
 #include <algorithm>
+#include "interface.h"
 
-static const std::unordered_map<uint32_t, gli::format>& get_png_import_lookup()
+struct ImportFormatInfo
 {
-	static std::unordered_map<uint32_t, gli::format> s_map =
+	uint32_t width;
+	uint32_t height;
+	int bitDepth;
+	int colorType;
+	bool isSrgb = false;
+	gli::format original = gli::format::FORMAT_UNDEFINED;
+	gli::format staging = gli::format::FORMAT_UNDEFINED;
+	uint32_t pixelSize = 0; // in bytes
+};
+
+void complete_import_info(ImportFormatInfo& info)
+{
+	const uint32_t nonPalettedType = info.colorType & ~PNG_COLOR_MASK_PALETTE;
+	if(info.bitDepth <= 8)
 	{
-		// single byte sRGB formats TODO add more gli formats
-		{PNG_FORMAT_GRAY, gli::format::FORMAT_R8_SRGB_PACK8},
-		{PNG_FORMAT_GA, gli::format::FORMAT_RA8_SRGB_PACK8},
-		{PNG_FORMAT_AG, gli::format::FORMAT_AR8_SRGB_PACK8},
-		{PNG_FORMAT_RGB, gli::format::FORMAT_RGB8_SRGB_PACK8},
-		{PNG_FORMAT_BGR, gli::format::FORMAT_BGR8_SRGB_PACK8},
-		{PNG_FORMAT_RGBA, gli::format::FORMAT_RGBA8_SRGB_PACK8},
-		{PNG_FORMAT_ARGB, gli::format::FORMAT_ARGB8_SRGB_PACK8},
-		{PNG_FORMAT_BGRA, gli::format::FORMAT_BGRA8_SRGB_PACK8},
-		{PNG_FORMAT_ABGR, gli::format::FORMAT_ABGR8_SRGB_PACK8},
+		if (info.isSrgb) info.staging = gli::format::FORMAT_RGBA8_SRGB_PACK8;
+		else info.staging = gli::format::FORMAT_RGBA8_UNORM_PACK8;
 
-		// linear 2 byte formats
-		{PNG_FORMAT_LINEAR_Y, gli::format::FORMAT_R16_UNORM_PACK16},
-		{PNG_FORMAT_LINEAR_Y_ALPHA, gli::format::FORMAT_RA16_UNORM_PACK16},
-		{PNG_FORMAT_LINEAR_RGB, gli::format::FORMAT_RGB16_UNORM_PACK16},
-		{PNG_FORMAT_LINEAR_RGB_ALPHA, gli::format::FORMAT_RGBA16_UNORM_PACK16},
-
-		// colormapped formats
-		{PNG_FORMAT_RGB_COLORMAP, gli::format::FORMAT_RGB8_SRGB_PACK8},
-		{PNG_FORMAT_BGR_COLORMAP, gli::format::FORMAT_BGR8_SRGB_PACK8},
-		{PNG_FORMAT_RGBA_COLORMAP, gli::format::FORMAT_RGBA8_SRGB_PACK8},
-		{PNG_FORMAT_ARGB_COLORMAP, gli::format::FORMAT_ARGB8_SRGB_PACK8},
-		{PNG_FORMAT_BGRA_COLORMAP, gli::format::FORMAT_BGRA8_SRGB_PACK8},
-		{PNG_FORMAT_ABGR_COLORMAP, gli::format::FORMAT_ABGR8_SRGB_PACK8},
-	};
-
-	return s_map;
-}
-
-static gli::format get_gli_format(uint32_t format)
-{
-	const auto& m = get_png_import_lookup();
-	auto it = m.find(format);
-	if (it == m.end())
-		throw std::runtime_error("could not convert png format " + std::to_string(format));
-
-	return it->second;
+		switch (nonPalettedType)
+		{
+		case PNG_COLOR_TYPE_GRAY:
+			if (info.isSrgb) info.original = gli::format::FORMAT_R8_SRGB_PACK8;
+			else info.original = gli::format::FORMAT_R8_UNORM_PACK8;
+			info.pixelSize = 1;
+			break;
+		case PNG_COLOR_TYPE_GRAY_ALPHA:
+			if (info.isSrgb) info.original = gli::format::FORMAT_RA8_SRGB_PACK8;
+			else info.original = gli::format::FORMAT_RA8_UNORM_PACK8;
+			info.pixelSize = 2;
+			break;
+		case PNG_COLOR_TYPE_RGB:
+			if (info.isSrgb) info.original = gli::format::FORMAT_RGB8_SRGB_PACK8;
+			else info.original = gli::format::FORMAT_RGB8_UNORM_PACK8;
+			info.pixelSize = 3;
+			break;
+		case PNG_COLOR_TYPE_RGBA:
+			if (info.isSrgb) info.original = gli::format::FORMAT_RGBA8_SRGB_PACK8;
+			else info.original = gli::format::FORMAT_RGBA8_UNORM_PACK8;
+			info.pixelSize = 4;
+			break;
+		default: throw std::runtime_error("unknown color type");
+		}
+		return;
+	}
+	else if(info.bitDepth == 16)
+	{
+		info.staging = gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
+		switch(nonPalettedType)
+		{
+		case PNG_COLOR_TYPE_GRAY:
+			info.original = gli::format::FORMAT_R16_UNORM_PACK16;
+			info.pixelSize = 2;
+			break;
+		case PNG_COLOR_TYPE_GRAY_ALPHA:
+			info.original = gli::format::FORMAT_RG16_UNORM_PACK16;
+			info.pixelSize = 4;
+			break;
+		case PNG_COLOR_TYPE_RGB:
+			info.original = gli::format::FORMAT_RGB16_UNORM_PACK16;
+			info.pixelSize = 6;
+			break;
+		case PNG_COLOR_TYPE_RGBA:
+			info.original = gli::format::FORMAT_RGBA16_UNORM_PACK16;
+			info.pixelSize = 8;
+			break;
+		default: throw std::runtime_error("unknown color type");
+		}
+		return;
+	}
+	throw std::runtime_error("invalid bit depth");
 }
 
 struct ExportFormatInfo
@@ -60,7 +92,7 @@ struct ExportFormatInfo
 	png_fixed_point gamma;
 };
 
-static ExportFormatInfo get_png_format(gli::format format)
+static ExportFormatInfo get_export_info(gli::format format)
 {
 	ExportFormatInfo i = {};
 	const png_fixed_point noGamma = 100000;
@@ -162,57 +194,9 @@ static ExportFormatInfo get_png_format(gli::format format)
 	throw std::runtime_error("gli export format not supported");
 }
 
-std::unique_ptr<image::IImage> png_load(const char* filename)
+void png_error(png_structp pPng, png_const_charp message)
 {
-	png_image img = {};
-	img.version = PNG_IMAGE_VERSION;
-
-	if (!png_image_begin_read_from_file(&img, filename))
-		throw std::runtime_error(img.message);
-
-	gli::format original = get_gli_format(img.format);
-	gli::format gliStageFormat = gli::format::FORMAT_RGBA8_SRGB_PACK8;
-	uint32_t stageFormat = PNG_FORMAT_RGBA;
-	uint32_t pixelSize = 4;
-	const auto isLinear = img.format & PNG_FORMAT_FLAG_LINEAR;
-	if(isLinear)
-	{
-		// take bigger stage target
-		gliStageFormat = gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
-		stageFormat = PNG_FORMAT_LINEAR_RGB_ALPHA;
-		pixelSize = 4 * 4;
-	}
-
-	auto res = std::make_unique<image::SimpleImage>(
-		original,
-		gliStageFormat,
-		img.width, img.height, pixelSize);
-
-	img.format = stageFormat;
-	auto bufSize = PNG_IMAGE_SIZE(img);
-	uint32_t actualBufSize;
-	auto buffer = res->getData(0, 0, actualBufSize);
-	if (bufSize > actualBufSize)
-		throw std::runtime_error("buffer to small");
-
-	if (!png_image_finish_read(&img, nullptr, buffer, 0, nullptr))
-		throw std::runtime_error(img.message);
-
-	if(isLinear) // unorm16 => float32
-	{
-		// do conversion to 32 bit (from back to front to do this inplace)
-		const uint16_t* src = reinterpret_cast<uint16_t*>(buffer) + img.width * img.height * 4 - 1;
-		const uint16_t* end = reinterpret_cast<uint16_t*>(buffer) - 1;
-		float* dst = reinterpret_cast<float*>(buffer) + img.width * img.height * 4 - 1;
-		float invMax = 1.0f / float(std::numeric_limits<uint16_t>::max());
-
-		for(;src != end; --src, --dst)
-		{
-			*dst = float(*src) * invMax;
-		}
-	}
-
-	return res;
+	throw std::runtime_error(message);
 }
 
 std::vector<uint32_t> png_get_export_formats()
@@ -226,7 +210,7 @@ std::vector<uint32_t> png_get_export_formats()
 
 		// 8 bit unorm formats (no gamma)
 		gli::format::FORMAT_R8_UNORM_PACK8,
-		//gli::format::FORMAT_RA8_UNORM_PACK8,
+		gli::format::FORMAT_RA8_UNORM_PACK8,
 		gli::format::FORMAT_RGB8_UNORM_PACK8,
 		gli::format::FORMAT_RGBA8_UNORM_PACK8,
 
@@ -238,15 +222,162 @@ std::vector<uint32_t> png_get_export_formats()
 	};
 }
 
-void png_error(png_structp pPng, png_const_charp message)
+std::unique_ptr<image::IImage> png_load(const char* filename)
 {
-	throw std::runtime_error(message);
+	FILE* fp = fopen(filename, "rb");
+	if (!fp)
+		throw std::runtime_error("could not open file");
+
+	png_structp pPng = nullptr;
+	png_infop pInfo = nullptr;
+	std::unique_ptr<image::IImage> res;
+
+	try
+	{
+		pPng = png_create_read_struct(PNG_LIBPNG_VER_STRING,
+			nullptr, png_error, nullptr);
+		if (!pPng)
+			throw std::runtime_error("could not create read struct");
+
+		pInfo = png_create_info_struct(pPng);
+		if (!pInfo)
+			throw std::runtime_error("could not create info struct");
+
+		png_init_io(pPng, fp);
+
+		png_read_info(pPng, pInfo);
+
+		ImportFormatInfo info;
+		int interlace, compression, filterMethod;
+		png_get_IHDR(pPng, pInfo, &info.width, &info.height, &info.bitDepth, &info.colorType, &interlace, &compression, &filterMethod);
+
+		// set bit depth to at least 8 bit
+		png_set_packing(pPng);
+
+		// convert palette to rgb
+		if (info.colorType == PNG_COLOR_TYPE_PALETTE)
+			png_set_palette_to_rgb(pPng);
+		// Expand grayscale images to the full 8 bits from 1, 2 or 4 bits/pixel.
+		if (info.colorType == PNG_COLOR_TYPE_GRAY && info.bitDepth < 8)
+			png_set_expand_gray_1_2_4_to_8(pPng);
+		// Expand paletted or RGB images with transparency to full alpha channels
+		// so the data will be available as RGBA quartets.
+		if (png_get_valid(pPng, pInfo, PNG_INFO_tRNS) != 0)
+			png_set_tRNS_to_alpha(pPng);
+		
+		// gamma handling
+		int srgbIntent;
+		double gamma;
+		if(png_get_sRGB(pPng, pInfo, &srgbIntent))
+		{
+			// srgb available
+			if (info.bitDepth <= 8)
+				info.isSrgb = true; // use srgb as is
+			else // convert to linear
+				png_set_gamma(pPng, 1.0, PNG_DEFAULT_sRGB);
+		}
+		else if(png_get_gAMA(pPng, pInfo, &gamma))
+		{
+			// gamma available
+			if (std::abs(gamma - 1.0) < 0.01) {} // keep it linear
+			else if (std::abs(gamma - 0.45455) < 0.1 && info.bitDepth <= 8) // keep srgb as is
+				info.isSrgb = true;
+			else
+			{
+				// do color conversion
+				if(info.bitDepth > 8 || gamma > 0.727275)
+				{
+					// convert to linear
+					png_set_gamma(pPng, 1.0, gamma);
+				}
+				else // convert to srgb (closer)
+				{
+					info.isSrgb = true;
+					png_set_gamma(pPng, 0.45455, gamma);
+				}
+			}
+		}
+		else if(info.bitDepth < 16)
+		{
+			// assume srgb
+			info.isSrgb = true;
+		}
+
+		if(info.bitDepth == 16 && image::littleendian())
+			png_set_swap(pPng);
+
+		// convert gray to rgb
+		if (info.colorType == PNG_COLOR_TYPE_GRAY || info.colorType == PNG_COLOR_TYPE_GRAY_ALPHA)
+			png_set_gray_to_rgb(pPng);
+
+		// fill with alpha
+		if((info.colorType & PNG_COLOR_MASK_ALPHA) == 0)
+			png_set_filler(pPng, 0xFFFF, PNG_FILLER_AFTER);
+
+		png_read_update_info(pPng, pInfo);
+		complete_import_info(info);
+
+		// allocate storage
+		res.reset(new image::SimpleImage(
+			info.original, info.staging,
+			info.width, info.height,
+			info.bitDepth <= 8 ? 4 : 4 * 4
+		));
+
+		std::vector<png_bytep> rows;
+		rows.resize(info.height);
+		uint32_t dataSize;
+		auto data = res->getData(0, 0, dataSize);
+		auto rowStride = info.width * (info.bitDepth <= 8 ? 4 : 2 * 4);
+		for(auto& r:  rows)
+		{
+			r = data;
+			data += rowStride;
+			set_progress();
+		}
+
+		png_read_image(pPng, rows.data());
+		png_read_end(pPng, pInfo);
+
+		// fix image stride
+		if(info.bitDepth == 16)
+		{
+			// do conversion to 32 bit (from back to front to do this inplace)
+			auto buffer = res->getData(0, 0, dataSize);
+			const uint16_t* src = reinterpret_cast<uint16_t*>(buffer) + info.width * info.height * 4 - 1;
+			const uint16_t* end = reinterpret_cast<uint16_t*>(buffer) - 1;
+			float* dst = reinterpret_cast<float*>(buffer) + info.width * info.height * 4 - 1;
+			float invMax = 1.0f / float(std::numeric_limits<uint16_t>::max());
+
+			for (; src != end; --src, --dst)
+			{
+				*dst = float(*src) * invMax;
+			}
+		}
+	}
+	catch (...)
+	{
+		fclose(fp);
+		if(pPng)
+		{
+			if (pInfo)
+				png_destroy_read_struct(&pPng, &pInfo, nullptr);
+			else
+				png_destroy_read_struct(&pPng, nullptr, nullptr);
+		}
+		throw;
+	}
+
+	png_destroy_read_struct(&pPng, &pInfo, nullptr);
+	fclose(fp);
+
+	return res;
 }
 
 void png_write(image::IImage& image, const char* filename, gli::format format, int quality)
 {
 	// bit depth info etc.
-	auto info = get_png_format(format);
+	const auto info = get_export_info(format);
 
 	if (image.getHeight(0) > PNG_SIZE_MAX / (image.getWidth(0) * info.pixelSize))
 		throw std::runtime_error("image too large");

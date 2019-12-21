@@ -254,6 +254,7 @@ namespace ImageFramework.ImageLoader
 
         // extensions from libpng
         RA8_SRGB,
+        RA8_UNORM,
         AR8_SRGB,
         ARGB8_SRGB,
         ABGR8_SRGB,
@@ -445,6 +446,7 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.BGR8_SRGB_PACK32:
                 case GliFormat.RG3B2_UNORM:
                 case GliFormat.RA8_SRGB:
+                case GliFormat.RA8_UNORM:
                 case GliFormat.AR8_SRGB:
                 case GliFormat.ARGB8_SRGB:
                 case GliFormat.ABGR8_SRGB:
@@ -753,6 +755,7 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.A16_UNORM:
                 case GliFormat.LA16_UNORM:
                 case GliFormat.RA8_SRGB:
+                case GliFormat.RA8_UNORM:
                 case GliFormat.AR8_SRGB:
                 case GliFormat.ABGR8_SRGB:
                 case GliFormat.ARGB8_SRGB:
@@ -1098,6 +1101,7 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.RGB_ATC_UNORM_BLOCK8:
                 case GliFormat.RGBA_ATCA_UNORM_BLOCK16:
                 case GliFormat.RGBA_ATCI_UNORM_BLOCK16:
+                case GliFormat.RA8_UNORM:
                 case GliFormat.RA16_UNORM:
                     return PixelDataType.UNorm;
 
