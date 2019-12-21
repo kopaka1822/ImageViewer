@@ -243,7 +243,8 @@ Global
 		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Release Library|x86.ActiveCfg = Release Library|Win32
 		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Release Library|x86.Build.0 = Release Library|Win32
 		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Release|Any CPU.ActiveCfg = Release|Win32
-		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Release|x64.ActiveCfg = Release|Win32
+		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Release|x64.ActiveCfg = Release Library|x64
+		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Release|x64.Build.0 = Release Library|x64
 		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Release|x86.ActiveCfg = Release|Win32
 		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Release|x86.Build.0 = Release|Win32
 		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Debug Library|Any CPU.ActiveCfg = Debug Library|Win32
@@ -261,7 +262,8 @@ Global
 		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release Library|x86.ActiveCfg = Release Library|Win32
 		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release Library|x86.Build.0 = Release Library|Win32
 		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release|Any CPU.ActiveCfg = Release|Win32
-		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release|x64.ActiveCfg = Release|Win32
+		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release|x64.ActiveCfg = Release Library|x64
+		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release|x64.Build.0 = Release Library|x64
 		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release|x86.ActiveCfg = Release|Win32
 		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection

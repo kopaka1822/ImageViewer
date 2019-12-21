@@ -222,6 +222,12 @@ std::vector<uint32_t> png_get_export_formats()
 	};
 }
 
+static uint32_t s_num_rows = 0;
+void png_progress(png_structp pPng, png_uint_32 row, int pass)
+{
+	set_progress(row * 100 / s_num_rows);
+}
+
 std::unique_ptr<image::IImage> png_load(const char* filename)
 {
 	FILE* fp = fopen(filename, "rb");
@@ -244,6 +250,8 @@ std::unique_ptr<image::IImage> png_load(const char* filename)
 			throw std::runtime_error("could not create info struct");
 
 		png_init_io(pPng, fp);
+
+		png_set_read_status_fn(pPng, png_progress);
 
 		png_read_info(pPng, pInfo);
 
@@ -326,6 +334,7 @@ std::unique_ptr<image::IImage> png_load(const char* filename)
 
 		std::vector<png_bytep> rows;
 		rows.resize(info.height);
+		s_num_rows = info.height;
 		uint32_t dataSize;
 		auto data = res->getData(0, 0, dataSize);
 		auto rowStride = info.width * (info.bitDepth <= 8 ? 4 : 2 * 4);
@@ -333,7 +342,6 @@ std::unique_ptr<image::IImage> png_load(const char* filename)
 		{
 			r = data;
 			data += rowStride;
-			set_progress();
 		}
 
 		png_read_image(pPng, rows.data());
@@ -399,6 +407,9 @@ void png_write(image::IImage& image, const char* filename, gli::format format, i
 		if (!pInfo)
 			throw std::runtime_error("could not create info struct");
 
+		s_num_rows = image.getHeight(0);
+		png_set_write_status_fn(pPng, png_progress);
+
 		png_init_io(pPng, fp);
 
 		png_set_IHDR(pPng, pInfo, 
@@ -433,9 +444,14 @@ void png_write(image::IImage& image, const char* filename, gli::format format, i
 			const float* end = reinterpret_cast<float*>(data + dataSize);
 			uint16_t* dst = reinterpret_cast<uint16_t*>(data);
 
+			uint32_t progress = 0;
+			uint32_t divisor = std::max<uint32_t>(4 * image.getWidth(0) * image.getHeight(0) / 100, 1);
 			for (; src != end; ++src, ++dst)
 			{
 				*dst = uint16_t(glm::round(glm::clamp(*src, 0.0f, 1.0f) * 65535.0f));
+				++progress;
+
+				if (progress % 256 == 0) set_progress(progress / divisor, "converting float to unorm");
 			}
 				
 			// change stride if required
