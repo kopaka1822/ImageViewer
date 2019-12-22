@@ -7,9 +7,7 @@
              mc:Ignorable="d" 
              Height="28"
              d:DesignWidth="1500">
-    <StatusBar 
-                Grid.Row="1" 
-                BorderThickness="0 1 0 0">
+    <StatusBar BorderThickness="0 1 0 0">
         <!-- MOUSE POSITION -->
         <StatusBarItem 
                     Width="100" 
@@ -24,14 +22,14 @@
                     Source="../Icons/dx_system.png" 
                     Width="16" 
                     Height="16" 
-                    Margin="0 0 5 0"
+                    Margin="{StaticResource DefaultBorderRight}"
                     Visibility="{Binding Display.DxSystemVisibility, FallbackValue=Visible}"/>
 
                 <Image 
                     Source="../Icons/gl_system.png" 
                     Width="16" 
                     Height="16" 
-                    Margin="0 0 5 0"
+                    Margin="{StaticResource DefaultBorderRight}"
                     Visibility="{Binding Display.GlSystemVisibility, FallbackValue=Collapsed}"/>
                 <TextBlock 
                             Text="{Binding Display.TexelPosition}" 
@@ -64,12 +62,12 @@
                             Source="../Icons/eyedropper.png" 
                             Width="16" 
                             Height="16" 
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
                 <TextBlock  
                             Text="{Binding Equations.Equation1.TexelColor}" 
                             Grid.Column="1"
                             FontFamily="Consolas"
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
             </Grid>
         </StatusBarItem>
 
@@ -87,12 +85,12 @@
                             Source="../Icons/eyedropper.png" 
                             Width="16" 
                             Height="16" 
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
                 <TextBlock  
                             Text="{Binding Equations.Equation2.TexelColor}" 
                             Grid.Column="1"
                             FontFamily="Consolas"
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
             </Grid>
         </StatusBarItem>
 
@@ -110,12 +108,12 @@
                             Source="../Icons/eyedropper.png" 
                             Width="16" 
                             Height="16" 
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
                 <TextBlock  
                             Text="{Binding Equations.Equation3.TexelColor}" 
                             Grid.Column="1"
                             FontFamily="Consolas"
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
             </Grid>
         </StatusBarItem>
 
@@ -133,12 +131,12 @@
                             Source="../Icons/eyedropper.png" 
                             Width="16" 
                             Height="16" 
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
                 <TextBlock  
                             Text="{Binding Equations.Equation4.TexelColor}" 
                             Grid.Column="1"
                             FontFamily="Consolas"
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
             </Grid>
         </StatusBarItem>
 
@@ -156,7 +154,7 @@
                             Source="../Icons/zoom.png" 
                             Width="16" 
                             Height="16" 
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
                 <local:CustomTextBox 
                             Grid.Column="1" 
                             Width="70"
@@ -180,7 +178,7 @@
                             Source="../Icons/eye.png" 
                             Width="16" 
                             Height="16" 
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
                 <ComboBox 
                             Grid.Column="1" 
                             Width="120"
@@ -204,7 +202,7 @@
                             Source="../Icons/image_layer.png" 
                             Width="16" 
                             Height="16" 
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
                 <ComboBox 
                             Grid.Column="1" 
                             Width="120"
@@ -229,7 +227,7 @@
                             Source="../Icons/image.png"
                             Width="16" 
                             Height="16" 
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
                 <ComboBox 
                             Grid.Column="1" 
                             Width="120"
@@ -267,7 +265,7 @@
                     VerticalAlignment="Center"
                     Command="{Binding Progress.CancelCommand}"
                     Padding="2 0 2 0"
-                    Margin="5 0 0 0"
+                    Margin="{StaticResource DefaultBorderLeft}"
                     Height="20"/>
             </Grid>
         </StatusBarItem>

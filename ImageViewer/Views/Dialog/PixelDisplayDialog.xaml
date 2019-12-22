@@ -13,10 +13,10 @@
         Icon="../../Icons/displayconfig.png"
         Style="{StaticResource WindowStyle}"
         WindowStartupLocation="CenterOwner">
-    <Border Padding="5">
+    <Border Padding="{StaticResource DefaultBorder}">
         <StackPanel>
             <!-- FORMAT -->
-            <Grid Margin="0 0 0 5">
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="90"/>
                     <ColumnDefinition />
@@ -29,7 +29,7 @@
             </Grid>
 
             <!-- Decimal Places -->
-            <Grid Margin="0 0 0 5">
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="90"/>
                     <ColumnDefinition />
@@ -42,7 +42,7 @@
             </Grid>
 
             <!-- Radius -->
-            <Grid Margin="0 0 0 5">
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="90"/>
                     <ColumnDefinition />
@@ -58,10 +58,10 @@
             <StackPanel 
                 Orientation="Horizontal"
                 HorizontalAlignment="Right"
-                Margin="0 10 0 0">
+                Margin="{StaticResource DefaultBorderTop}">
                 <Button 
                     Content="_Apply" 
-                    Margin="0 0 10 0" 
+                    Margin="{StaticResource DefaultBorderRight}" 
                     Width="60"
                     Click="Apply_OnClick"
                     />

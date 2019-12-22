@@ -16,13 +16,15 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Text="Flat Shading: "/>
+            <TextBlock 
+                Text="Flat Shading: "
+                Margin="{StaticResource DefaultBorderBotRight}"/>
             <CheckBox
                 Grid.Column="1"
-                Margin="5 0 0 0"
                 VerticalAlignment="Center"
                 IsChecked="{Binding FlatShading}"
-                IsEnabled="{Binding FlatIsEnabled}"/>
+                IsEnabled="{Binding FlatIsEnabled}"
+                Margin="{StaticResource DefaultBorderBottom}"/>
         </Grid>
     </Border>
 </UserControl>

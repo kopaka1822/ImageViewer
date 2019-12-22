@@ -20,22 +20,27 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             
-            <TextBlock Text="Visible Plane: "/>
+            <TextBlock Text="Visible Plane: "
+                       Margin="{StaticResource DefaultBorderBotRight}"/>
             <ComboBox
-                Margin="0 0 0 5"
+                Margin="{StaticResource DefaultBorderBottom}"
+                Grid.Row="0"
                 Grid.Column="1"
                 SelectedItem="{Binding SelectedAxis}"
                 ItemsSource="{Binding AxisList}"/>
 
             <TextBlock
+                Grid.Column="0"
                 Grid.Row="1"
-                Text="Slice Index: "/>
+                Text="Slice Index: "
+                Margin="{StaticResource DefaultBorderBotRight}"/>
             <xctk:IntegerUpDown 
                 Grid.Column="1"
                 Grid.Row="1"
                 Minimum="0"
                 Maximum="{Binding FixedAxisSliceMax}"
-                Value="{Binding FixedAxisSlice}"/>
+                Value="{Binding FixedAxisSlice}"
+                Margin="{StaticResource DefaultBorderBottom}"/>
         </Grid>
     </Border>
 </UserControl>

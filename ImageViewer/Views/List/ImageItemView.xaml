@@ -27,7 +27,7 @@
         <Button 
             Width="16" 
             Height="16"
-            Margin="0 0 5 0"
+            Margin="{StaticResource DefaultBorderRight}"
             Command="{Binding DeleteCommand}">
             <Image Source="../../Icons/cancel.png"/>
         </Button>

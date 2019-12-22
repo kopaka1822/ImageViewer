@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:ImageViewer.Views" 
              xmlns:dd="urn:gong-wpf-dragdrop"
              mc:Ignorable="d" 
+             Background="{StaticResource BackgroundBrush}"
              d:DesignHeight="450" d:DesignWidth="250">
     <ScrollViewer 
         VerticalScrollBarVisibility="Auto">
@@ -32,7 +33,7 @@
                             </Grid.ColumnDefinitions>
                             <Image 
                                 Source="../Icons/tonemap.png"
-                                Margin="0 0 5 0"/>
+                                Margin="{StaticResource DefaultBorderRight}"/>
                             <TextBlock 
                                 Grid.Column="1" 
                                 Text="Add Filter"/>
@@ -43,7 +44,7 @@
                 <ListBox 
                     Height="180"
                     ScrollViewer.VerticalScrollBarVisibility="Visible"
-                    Margin="0 0 0 5"
+                    Margin="{StaticResource DefaultBorderBottom}"
                     ItemsSource="{Binding Filter.AvailableFilter}"
                     SelectedItem="{Binding Filter.SelectedFilter}"
                     dd:DragDrop.IsDragSource="True"
@@ -53,13 +54,14 @@
 
                 <StackPanel 
                     Orientation="Horizontal"
-                    HorizontalAlignment="Right">
+                    HorizontalAlignment="Right"
+                    Margin="{StaticResource DefaultBorderBottom}">
 
                     <Button
                         Content="Apply"
                         Width="80"
                         HorizontalAlignment="Right"
-                        Margin="0 0 5 5"
+                        Margin="{StaticResource DefaultBorderRight}"
                         Command="{Binding Filter.ApplyCommand}"
                         IsEnabled="{Binding Filter.HasChanges}"/>
 
@@ -67,13 +69,11 @@
                         Content="Cancel"
                         Width="80"
                         HorizontalAlignment="Right"
-                        Margin="0 0 0 5"
                         Command="{Binding Filter.CancelCommand}"
                         IsEnabled="{Binding Filter.HasChanges}"/>
                 </StackPanel>
 
-
-                <Separator Height="2"/>
+                <Separator Height="{StaticResource SeparatorHeight}"/>
 
                 <ItemsControl ItemsSource="{Binding Filter.SelectedFilterProperties}"/>
             </StackPanel>

@@ -6,11 +6,12 @@
              xmlns:local="clr-namespace:ImageViewer.Views" 
              xmlns:dd="urn:gong-wpf-dragdrop"
              mc:Ignorable="d" 
-             d:DesignHeight="450" 
+             Background="{StaticResource BackgroundBrush}"
+             d:DesignHeight="800" 
              d:DesignWidth="300"
              >
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Border Padding="5">
+        <Border Padding="{StaticResource DefaultBorder}">
             <StackPanel IsEnabled="{Binding Progress.NotProcessing}">
                 <!--Image Label + Import Button-->
                 <Grid  Margin="0 0 0 2">
@@ -33,7 +34,7 @@
                             </Grid.ColumnDefinitions>
                             <Image 
                                 Source="../Icons/import.png"
-                                Margin="0 0 5 0"/>
+                                Margin="{StaticResource DefaultBorderRight}"/>
                             <TextBlock 
                                 Grid.Column="1" 
                                 Text="Import Image"/>
@@ -45,7 +46,7 @@
                     SelectedIndex="0" 
                     ScrollViewer.VerticalScrollBarVisibility="Visible"                       
                     Height="180"
-                    Margin="0 0 0 5"
+                    Margin="{StaticResource DefaultBorderBottom}"
                     ItemsSource="{Binding Images.ImageListItems}"
                     SelectedItem="{Binding Images.SelectedImageListItem}"
                     dd:DragDrop.IsDragSource="True"
@@ -57,9 +58,9 @@
                     Content="Apply"
                     Width="80"
                     HorizontalAlignment="Right"
-                    Margin="0 0 0 5"/>
+                    Margin="{StaticResource DefaultBorderBottom}"/>
 
-                <Separator Height="2"/>
+                <Separator Height="{StaticResource SeparatorHeight}"/>
 
                 <Border
                     x:Name="ExtendedViewHost"
@@ -71,9 +72,9 @@
                 <!--Split Mode-->
                 <TextBlock 
                     Text="Split Mode:" 
-                    Margin="0 0 0 5"/>
+                    Margin="{StaticResource DefaultBorderBottom}"/>
                 <ComboBox 
-                    Margin="0 0 0 5"
+                    Margin="{StaticResource DefaultBorderBottom}"
                     IsEnabled="{Binding Display.EnableSplitMode}"
                     SelectedItem="{Binding Display.SelectedSplitMode}"
                     ItemsSource="{Binding Display.AvailableSplitModes}"/>
@@ -81,9 +82,10 @@
                 <!--Equation 1-->
                 <GroupBox 
                     Header="Equation 1" 
-                    Margin="0 0 0 5">
+                    Margin="{StaticResource DefaultBorderBottom}"
+                    Padding="{StaticResource DefaultBorderTop}">
                     <StackPanel>
-                        <Grid Margin="0 5 0 5">
+                        <Grid Margin="{StaticResource DefaultBorderBottom}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="70"/>
                                 <ColumnDefinition/>
@@ -93,7 +95,7 @@
                                 Grid.Column="1"
                                 IsChecked="{Binding Equations.Equation1.IsVisible}"/>
                         </Grid>
-                        <Grid Margin="0 0 0 5">
+                        <Grid Margin="{StaticResource DefaultBorderBottom}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="70"/>
                                 <ColumnDefinition/>
@@ -104,7 +106,7 @@
                                 IsChecked="{Binding Equations.Equation1.UseFilter}"
                                 IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
                         </Grid>
-                        <Grid Margin="0 0 0 5">
+                        <Grid Margin="{StaticResource DefaultBorderBottom}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="40"/>
                                 <ColumnDefinition/>
@@ -113,10 +115,9 @@
                             <local:CustomTextBox 
                                 Grid.Column="1"
                                 Text="{Binding Equations.Equation1.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                Margin="0 0 0 5"
                                 IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
                         </Grid>
-                        <Grid Margin="0 0 0 5">
+                        <Grid Margin="{StaticResource DefaultBorderBottom}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="40"/>
                                 <ColumnDefinition/>
@@ -125,7 +126,6 @@
                             <local:CustomTextBox 
                                 Grid.Column="1"
                                 Text="{Binding Equations.Equation1.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                Margin="0 0 0 5"
                                 IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
                         </Grid>
                     </StackPanel>

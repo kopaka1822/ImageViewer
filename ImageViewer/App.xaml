@@ -5,6 +5,7 @@
              xmlns:views="clr-namespace:ImageViewer.Views" 
              xmlns:theme="clr-namespace:ImageViewer.Views.Theme"
              xmlns:converter="clr-namespace:ImageViewer.Views.Converter"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -109,10 +110,39 @@
 
             <Style TargetType="ToolTip" BasedOn="{StaticResource BaseStyle}"/>
 
+            <!-- Converters -->
+
             <converter:CollapsedVisibleConverter x:Key="CollapsedVisibleConverter"/>
             <converter:VisibleCollapsedConverter x:Key="VisibleCollapsedConverter"/>
             <converter:HiddenVisibleConverter x:Key="HiddenVisibleConverter"/>
             <converter:VisibleHiddenConverter x:Key="VisibleHiddenConverter"/>
+
+            <!-- Borders etc. -->
+
+            <system:Double x:Key="DefaultBorderValue">5</system:Double>
+            <system:Double x:Key="SmallBorderValue">2</system:Double>
+            <system:Double x:Key="SeparatorHeight">2</system:Double>
+
+            <Thickness x:Key="DefaultBorder" Bottom="{StaticResource DefaultBorderValue}" Left="{StaticResource DefaultBorderValue}"
+                       Right="{StaticResource DefaultBorderValue}" Top="{StaticResource DefaultBorderValue}" />
+
+            <Thickness x:Key="DefaultBorderRight" Bottom="0" Left="0"
+                       Right="{StaticResource DefaultBorderValue}" Top="0" />
+
+            <Thickness x:Key="DefaultBorderLeft" Bottom="0" Left="{StaticResource DefaultBorderValue}"
+                       Right="0" Top="0" />
+
+            <Thickness x:Key="DefaultBorderBottom" Bottom="{StaticResource DefaultBorderValue}" Left="0"
+                       Right="0" Top="0" />
+
+            <Thickness x:Key="DefaultBorderBotRight" Bottom="{StaticResource DefaultBorderValue}" Left="0"
+                       Right="{StaticResource DefaultBorderValue}" Top="0" />
+
+            <Thickness x:Key="DefaultBorderTop" Bottom="0" Left="0"
+                       Right="0" Top="{StaticResource DefaultBorderValue}"/>
+
+            <Thickness x:Key="SmallBorderBottom" Bottom="{StaticResource SmallBorderValue}" Left="0"
+                       Right="0" Top="0" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>
