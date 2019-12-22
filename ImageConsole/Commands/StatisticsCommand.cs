@@ -42,7 +42,7 @@ namespace ImageConsole.Commands
             reader.ExpectNoMoreArgs();
 
             model.Apply();
-            var stats = model.GetStatistics(model.Pipelines[0].Image);
+            var stats = model.Stats.GetStatisticsFor(model.Pipelines[0].Image);
             switch (type)
             {
                 case StatType.luminance:

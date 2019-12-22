@@ -29,6 +29,9 @@ namespace ImageFramework.Model
 
         public readonly int NumPipelines;
 
+        #region Required Components
+
+
         public ImagesModel Images { get; }
 
         public FiltersModel Filter { get; }
@@ -38,7 +41,8 @@ namespace ImageFramework.Model
 
         public int NumEnabled => Pipelines.Count(pipe => pipe.IsEnabled);
 
-        public ExportModel Export { get; }
+        private ExportModel export = null;
+        public ExportModel Export => export ?? (export = new ExportModel(SharedModel, Progress));
 
         // soft reset that clears images, filters and resets formulas
         public event EventHandler SoftReset;
@@ -51,16 +55,29 @@ namespace ImageFramework.Model
         
         internal TextureCache TextureCache { get; }
 
-        private ThumbnailModel thumbnail;
-
-        private readonly PixelValueShader pixelValueShader;
-
-        private readonly StatisticsModel stats;
-
         private readonly PipelineController pipelineController;
 
+        #endregion
 
-        private readonly ConvertPolarShader polarConvertShader;
+        #region On Demand Properties
+
+        private ThumbnailModel thumbnail = null;
+        private ThumbnailModel Thumbnail => thumbnail ?? (thumbnail = new ThumbnailModel(SharedModel.QuadShader));
+
+        private PixelValueShader pixelValueShader = null;
+
+        private PixelValueShader PixelValueShader =>
+            pixelValueShader ?? (pixelValueShader = new PixelValueShader(SharedModel));
+
+        private StatisticsModel stats = null;
+        public StatisticsModel Stats => stats ?? (stats = new StatisticsModel(SharedModel));
+
+        private ConvertPolarShader polarConvertShader = null;
+
+        private ConvertPolarShader PolarConvertShader =>
+            polarConvertShader ?? (polarConvertShader = new ConvertPolarShader(SharedModel.QuadShader));
+
+        #endregion
 
         public Models(int numPipelines = 1)
         {
@@ -70,13 +87,10 @@ namespace ImageFramework.Model
             SharedModel = new SharedModel();
             Images = new ImagesModel(SharedModel.ScaleShader);
             TextureCache = new TextureCache(Images);
-            pixelValueShader = new PixelValueShader(SharedModel);
-            polarConvertShader = new ConvertPolarShader(SharedModel.QuadShader);
 
             Filter = new FiltersModel(Images);
             //Gif = new GifModel(sharedModel.QuadShader);
             Progress = new ProgressModel();
-            Export = new ExportModel(SharedModel, Progress);
 
             for (int i = 0; i < numPipelines; ++i)
             {
@@ -84,9 +98,6 @@ namespace ImageFramework.Model
                 pipelines.Last().PropertyChanged += PipeOnPropertyChanged;
             }
             Pipelines = pipelines;
-
-            stats = new StatisticsModel(SharedModel);
-            thumbnail = new ThumbnailModel(SharedModel.QuadShader);
 
             // pipeline controller
             pipelineController = new PipelineController(this);
@@ -133,24 +144,14 @@ namespace ImageFramework.Model
         /// <inheritdoc cref="PixelValueShader.Run"/>
         public Color GetPixelValue(ITexture image, Size3 coord, int layer = 0, int mipmap = 0, int radius = 0)
         {
-            return pixelValueShader.Run(image, coord, layer, mipmap, radius);
+            return PixelValueShader.Run(image, coord, layer, mipmap, radius);
         }
 
         /// <inheritdoc cref="ThumbnailModel.CreateThumbnail"/>
         /// Image format will be BGRA8 because this is the format expected for windows bitmaps
         public TextureArray2D CreateThumbnail(int size, ITexture texture, int layer = 0)
         {
-            return thumbnail.CreateThumbnail(size, texture, Format.B8G8R8A8_UNorm_SRgb, layer);
-        }
-
-        /// <summary>
-        /// gets statistics about from the image
-        /// </summary>
-        /// <param name="layer">layer to get statistics from or -1 for all layers</param>
-        /// <returns></returns>
-        public DefaultStatistics GetStatistics(ITexture image, int layer = -1, int mipmap = 0)
-        {
-            return stats.GetStatisticsFor(image, layer, mipmap);
+            return Thumbnail.CreateThumbnail(size, texture, Format.B8G8R8A8_UNorm_SRgb, layer);
         }
 
         /// <summary>
@@ -196,13 +197,13 @@ namespace ImageFramework.Model
         /// converts lat long to cubemap
         public TextureArray2D ConvertToCubemap(TextureArray2D latLong, int resolution)
         {
-            return polarConvertShader.ConvertToCube(latLong, resolution);
+            return PolarConvertShader.ConvertToCube(latLong, resolution);
         }
 
         /// converts cubemap to lat long
         public TextureArray2D ConvertToLatLong(TextureArray2D cube, int resolution)
         {
-            return polarConvertShader.ConvertToLatLong(cube, resolution);
+            return PolarConvertShader.ConvertToLatLong(cube, resolution);
         }
 
         /// <summary>
@@ -303,7 +304,8 @@ namespace ImageFramework.Model
         public virtual void Dispose()
         {
             Progress?.Dispose();
-            //Gif?.Dispose();   
+            thumbnail?.Dispose();
+            stats?.Dispose();
 
             Images?.Dispose();
             Filter?.Dispose();

@@ -64,11 +64,11 @@ namespace ImageViewer.Models
                     display.ActiveView == DisplayModel.ViewMode.CubeMap)
                 {
                     // compute for all layers
-                    Stats = models.GetStatistics(pipe.Image, -1, display.ActiveMipmap);
+                    Stats = models.Stats.GetStatisticsFor(pipe.Image, -1, display.ActiveMipmap);
                 }
                 else // compute for single layer
                 {
-                    Stats = models.GetStatistics(pipe.Image, display.ActiveLayer, display.ActiveMipmap);
+                    Stats = models.Stats.GetStatisticsFor(pipe.Image, display.ActiveLayer, display.ActiveMipmap);
                 }
                 
                 OnPropertyChanged(nameof(Stats));
