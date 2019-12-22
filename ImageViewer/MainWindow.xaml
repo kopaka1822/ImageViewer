@@ -85,21 +85,23 @@
                     DockPanel.Dock="Left"
                     HorizontalAlignment="Stretch"
                     SelectedIndex="0"
-                    BorderThickness="0 0 0 0"
+                    BorderThickness="0"
                     x:Name="TabControl"   
                 >
               
-                    <TabItem 
-                        Header="Images"
-                        Foreground="{Binding Equations.TabItemColor}"
-                    >
+                    <TabItem>
+                        <TabItem.Header>
+                            <TextBlock Text="Images"
+                                       Foreground="{Binding Equations.TabItemColor}"/>
+                        </TabItem.Header>
                         <views:ImagesTab
                             x:Name="ImagesTab"/>
                     </TabItem>
-                    <TabItem 
-                        Header="Filter"
-                        Foreground="{Binding Filter.TabItemColor}"
-                    >
+                    <TabItem>
+                        <TabItem.Header>
+                            <TextBlock Text="Filter"
+                                       Foreground="{Binding Filter.TabItemColor}"/>
+                        </TabItem.Header>
                         <views:FilterTab/>
                     </TabItem>
                     <TabItem Header="Statistics"
