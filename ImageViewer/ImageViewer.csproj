@@ -206,6 +206,9 @@
     <Compile Include="Views\ImagesTab.xaml.cs">
       <DependentUpon>ImagesTab.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\List\ImageEquationView.xaml.cs">
+      <DependentUpon>ImageEquationView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\List\ImageItemView.xaml.cs">
       <DependentUpon>ImageItemView.xaml</DependentUpon>
     </Compile>
@@ -280,6 +283,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ImagesTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\List\ImageEquationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

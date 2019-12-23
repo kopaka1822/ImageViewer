@@ -1,0 +1,67 @@
+﻿<UserControl x:Class="ImageViewer.Views.List.ImageEquationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ImageViewer.Views.List" 
+             xmlns:views="clr-namespace:ImageViewer.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" 
+             d:DesignWidth="200">
+    <UserControl.Resources>
+        <GridLength x:Key="TopGridLength">70</GridLength>
+        <GridLength x:Key="BotGridLength">40</GridLength>
+    </UserControl.Resources>
+    <GroupBox 
+        Margin="{StaticResource DefaultBorderBottom}"
+        Padding="{StaticResource DefaultBorderTop}">
+        <GroupBox.Header>
+            <TextBlock Text="{Binding Title, FallbackValue=Title}"/>
+        </GroupBox.Header>
+        <StackPanel>
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource TopGridLength}"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Visible: "/>
+                <CheckBox 
+                    Grid.Column="1"
+                    IsChecked="{Binding IsVisible}"/>
+            </Grid>
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource TopGridLength}"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Use Filter: "/>
+                <CheckBox 
+                    Grid.Column="1"
+                    IsChecked="{Binding UseFilter}"
+                    IsEnabled="{Binding IsVisible}"/>
+            </Grid>
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource BotGridLength}"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="RGB:"/>
+                <views:CustomTextBox 
+                    Grid.Column="1"
+                    Text="{Binding Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                    IsEnabled="{Binding IsVisible}"/>
+            </Grid>
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource BotGridLength}"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Alpha:"/>
+                <views:CustomTextBox 
+                    Grid.Column="1"
+                    Text="{Binding Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                    IsEnabled="{Binding IsVisible}"/>
+            </Grid>
+        </StackPanel>
+    </GroupBox>
+</UserControl>

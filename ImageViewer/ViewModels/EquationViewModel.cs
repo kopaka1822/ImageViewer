@@ -115,6 +115,7 @@ namespace ImageViewer.ViewModels
             }
         }
 
+        public string Title => $"Equation {imageId + 1}";
         public bool IsVisible
         {
             get => model.IsEnabled;

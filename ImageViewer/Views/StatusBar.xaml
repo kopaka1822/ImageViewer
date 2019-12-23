@@ -52,7 +52,7 @@
         <StatusBarItem  
                     HorizontalAlignment="Left" 
                     BorderThickness="0 0 1 0"
-                    Visibility="{Binding Equations.Equation1.Visibility}">
+                    Visibility="{Binding Equations.Equations[0].Visibility}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -64,7 +64,7 @@
                             Height="16" 
                             Margin="{StaticResource DefaultBorderRight}"/>
                 <TextBlock  
-                            Text="{Binding Equations.Equation1.TexelColor}" 
+                            Text="{Binding Equations.Equations[0].TexelColor}" 
                             Grid.Column="1"
                             FontFamily="Consolas"
                             Margin="{StaticResource DefaultBorderRight}"/>
@@ -75,7 +75,7 @@
         <StatusBarItem 
                     HorizontalAlignment="Left" 
                     BorderThickness="0 0 1 0"
-                    Visibility="{Binding Equations.Equation2.Visibility}">
+                    Visibility="{Binding Equations.Equations[1].Visibility}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -87,7 +87,7 @@
                             Height="16" 
                             Margin="{StaticResource DefaultBorderRight}"/>
                 <TextBlock  
-                            Text="{Binding Equations.Equation2.TexelColor}" 
+                            Text="{Binding Equations.Equations[1].TexelColor}" 
                             Grid.Column="1"
                             FontFamily="Consolas"
                             Margin="{StaticResource DefaultBorderRight}"/>
@@ -98,7 +98,7 @@
         <StatusBarItem 
                     HorizontalAlignment="Left" 
                     BorderThickness="0 0 1 0"
-                    Visibility="{Binding Equations.Equation3.Visibility}">
+                    Visibility="{Binding Equations.Equations[2].Visibility}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -110,7 +110,7 @@
                             Height="16" 
                             Margin="{StaticResource DefaultBorderRight}"/>
                 <TextBlock  
-                            Text="{Binding Equations.Equation3.TexelColor}" 
+                            Text="{Binding Equations.Equations[2].TexelColor}" 
                             Grid.Column="1"
                             FontFamily="Consolas"
                             Margin="{StaticResource DefaultBorderRight}"/>
@@ -121,7 +121,7 @@
         <StatusBarItem 
                     HorizontalAlignment="Left" 
                     BorderThickness="0 0 1 0"
-                    Visibility="{Binding Equations.Equation4.Visibility}">
+                    Visibility="{Binding Equations.Equations[3].Visibility}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -133,7 +133,7 @@
                             Height="16" 
                             Margin="{StaticResource DefaultBorderRight}"/>
                 <TextBlock  
-                            Text="{Binding Equations.Equation4.TexelColor}" 
+                            Text="{Binding Equations.Equations[3].TexelColor}" 
                             Grid.Column="1"
                             FontFamily="Consolas"
                             Margin="{StaticResource DefaultBorderRight}"/>

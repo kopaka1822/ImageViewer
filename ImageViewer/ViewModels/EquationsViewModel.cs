@@ -10,12 +10,12 @@ using System.Windows.Media;
 using ImageFramework.Annotations;
 using ImageViewer.Commands;
 using ImageViewer.Models;
+using ImageViewer.Views.List;
 
 namespace ImageViewer.ViewModels
 {
     public class EquationsViewModel : INotifyPropertyChanged
     {
-        private readonly EquationViewModel[] viewModels;
         private readonly ModelsEx models;
         private readonly SolidColorBrush changesBrush;
         private readonly SolidColorBrush noChangesBrush;
@@ -23,20 +23,16 @@ namespace ImageViewer.ViewModels
         {
             this.models = models;
             this.Apply = new ApplyImageFormulasCommand(this);
-            viewModels = new EquationViewModel[models.NumPipelines];
-            for (var i = 0; i < viewModels.Length; ++i)
-            {
-                viewModels[i] = new EquationViewModel(models, i);
-                viewModels[i].PropertyChanged += OnPropertyChanged;
-            }
 
             changesBrush = new SolidColorBrush(Color.FromRgb(237, 28, 36));
             noChangesBrush = (SolidColorBrush) models.Window.Window.FindResource("FontBrush");
+
+            RefreshEquations();
         }
 
         private void UpdateHasChanges()
         {
-            HasChanges = viewModels.Any(eq => eq.HasChanges && eq.IsVisible);
+            HasChanges = Equations.Any(eq => eq.HasChanges && eq.IsVisible);
         }
 
         private void OnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -45,16 +41,11 @@ namespace ImageViewer.ViewModels
             UpdateHasChanges();
         }
 
-        public EquationViewModel Equation1 => viewModels[0];
-        public EquationViewModel Equation2 => viewModels[1];
-        public EquationViewModel Equation3 => viewModels[2];
-        public EquationViewModel Equation4 => viewModels[3];
-
         public ICommand Apply { get; }
 
         public void ApplyFormulas()
         {
-            foreach (var eq in viewModels)
+            foreach (var eq in Equations)
             {
                 try
                 {
@@ -83,6 +74,30 @@ namespace ImageViewer.ViewModels
         }
 
         public Brush TabItemColor => HasChanges ? changesBrush : noChangesBrush;
+
+        public List<EquationViewModel> Equations { get; private set; }
+
+        private void RefreshEquations()
+        {
+            if (Equations != null)
+            {
+                foreach (var eq in Equations)
+                {
+                    eq.PropertyChanged -= OnPropertyChanged;
+                }
+            }
+
+            var res = new List<EquationViewModel>();
+            for (var i = 0; i < models.NumPipelines; ++i)
+            {
+                var vm = new EquationViewModel(models, i);
+                vm.PropertyChanged += OnPropertyChanged;
+                res.Add(vm);
+            }
+
+            Equations = res;
+            OnPropertyChanged(nameof(Equations));
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
