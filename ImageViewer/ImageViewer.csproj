@@ -440,6 +440,9 @@
   <ItemGroup>
     <Resource Include="Icons\cube.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Icons\chained.png" />
+    <Resource Include="Icons\unchained.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

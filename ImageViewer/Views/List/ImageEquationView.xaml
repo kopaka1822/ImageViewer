@@ -10,7 +10,7 @@
              d:DesignWidth="200">
     <UserControl.Resources>
         <GridLength x:Key="TopGridLength">70</GridLength>
-        <GridLength x:Key="BotGridLength">40</GridLength>
+        <GridLength x:Key="BotGridLength">34</GridLength>
     </UserControl.Resources>
     <GroupBox 
         Margin="{StaticResource DefaultBorderBottom}"
@@ -56,11 +56,31 @@
                     <ColumnDefinition Width="{StaticResource BotGridLength}"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Alpha:"/>
+                <StackPanel Orientation="Horizontal" Height="18">
+                    <TextBlock Text="A:" Margin="{StaticResource DefaultBorderRight}"/>
+                    <Button 
+                        Padding="0" 
+                        Height="18" 
+                        Margin="{StaticResource DefaultBorderRight}"
+                        Command="{Binding ToggleAlphaCommand}"
+                        ToolTip="Toggle Auto Alpha">
+                        <Grid>
+                            <Image 
+                                Width="16" Height="16" 
+                                Source="../../Icons/chained.png"
+                                Visibility="{Binding AutoAlpha, Converter={StaticResource VisibleCollapsedConverter}}"/>
+                            <Image 
+                                Width="16" Height="16" 
+                                Source="../../Icons/unchained.png"
+                                Visibility="{Binding AutoAlpha, Converter={StaticResource CollapsedVisibleConverter}, FallbackValue=Collapsed}"/>
+                        </Grid>
+                    </Button>
+                </StackPanel>
+                
                 <views:CustomTextBox 
                     Grid.Column="1"
                     Text="{Binding Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                    IsEnabled="{Binding IsVisible}"/>
+                    IsEnabled="{Binding UseAlphaEquation}"/>
             </Grid>
         </StackPanel>
     </GroupBox>

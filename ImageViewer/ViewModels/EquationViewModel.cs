@@ -6,9 +6,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageFramework.Utility;
+using ImageViewer.Commands;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
 
@@ -39,7 +41,7 @@ namespace ImageViewer.ViewModels
             this.models.Settings.PropertyChanged += SettingsOnPropertyChanged;
             this.statistics.PropertyChanged += StatisticsOnPropertyChanged;
 
-            
+            ToggleAlphaCommand = new ActionCommand(() => AutoAlpha = !AutoAlpha);
         }
 
         private void StatisticsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -105,6 +107,7 @@ namespace ImageViewer.ViewModels
                     break;
                 case nameof(ImagePipeline.IsEnabled):
                     OnPropertyChanged(nameof(IsVisible));
+                    OnPropertyChanged(nameof(UseAlphaEquation));
                     if (model.IsEnabled)
                         RecomputeTexelColor();
                     return;
@@ -139,6 +142,23 @@ namespace ImageViewer.ViewModels
                 useFilter = value;
                 OnPropertyChanged(nameof(UseFilter));
                 if (HasChangedChanged()) OnPropertyChanged(nameof(HasChanges));
+            }
+        }
+
+        public bool UseAlphaEquation => IsVisible && !AutoAlpha;
+
+        public ICommand ToggleAlphaCommand { get; }
+
+        private bool autoAlpha = true;
+        public bool AutoAlpha
+        {
+            get => autoAlpha;
+            set
+            {
+                if (value == autoAlpha) return;
+                autoAlpha = value;
+                OnPropertyChanged(nameof(AutoAlpha));
+                OnPropertyChanged(nameof(UseAlphaEquation));
             }
         }
 
