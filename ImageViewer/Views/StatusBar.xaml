@@ -19,6 +19,8 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Image 
+                    Grid.Column="0"
+                    Grid.Row="0"
                     Source="../Icons/dx_system.png" 
                     Width="16" 
                     Height="16" 
@@ -26,6 +28,8 @@
                     Visibility="{Binding Display.DxSystemVisibility, FallbackValue=Visible}"/>
 
                 <Image 
+                    Grid.Column="0"
+                    Grid.Row="0"
                     Source="../Icons/gl_system.png" 
                     Width="16" 
                     Height="16" 
@@ -37,6 +41,7 @@
             </Grid>
         </StatusBarItem>
 
+        <!-- Multiplier -->
         <StatusBarItem
             HorizontalAlignment="Left"
             BorderThickness="0 0 1 0"
@@ -44,101 +49,44 @@
             ToolTip="Colors will be multiplied by this value before displaying">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="x "/>
-                <TextBlock Text="{Binding Display.Multiplier}"/>
+                <TextBlock Text="{Binding Display.Multiplier, FallbackValue=16}"/>
             </StackPanel>
         </StatusBarItem>
 
-        <!-- MOUSE POSITION COLOR 1 -->
-        <StatusBarItem  
-                    HorizontalAlignment="Left" 
-                    BorderThickness="0 0 1 0"
-                    Visibility="{Binding Equations.Equations[0].Visibility}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Image 
-                            Source="../Icons/eyedropper.png" 
-                            Width="16" 
-                            Height="16" 
-                            Margin="{StaticResource DefaultBorderRight}"/>
-                <TextBlock  
-                            Text="{Binding Equations.Equations[0].TexelColor}" 
-                            Grid.Column="1"
-                            FontFamily="Consolas"
-                            Margin="{StaticResource DefaultBorderRight}"/>
-            </Grid>
-        </StatusBarItem>
-
-        <!-- MOUSE POSITION COLOR 2 -->
-        <StatusBarItem 
-                    HorizontalAlignment="Left" 
-                    BorderThickness="0 0 1 0"
-                    Visibility="{Binding Equations.Equations[1].Visibility}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Image 
-                            Source="../Icons/eyedropper.png" 
-                            Width="16" 
-                            Height="16" 
-                            Margin="{StaticResource DefaultBorderRight}"/>
-                <TextBlock  
-                            Text="{Binding Equations.Equations[1].TexelColor}" 
-                            Grid.Column="1"
-                            FontFamily="Consolas"
-                            Margin="{StaticResource DefaultBorderRight}"/>
-            </Grid>
-        </StatusBarItem>
-
-        <!-- MOUSE POSITION COLOR 3 -->
-        <StatusBarItem 
-                    HorizontalAlignment="Left" 
-                    BorderThickness="0 0 1 0"
-                    Visibility="{Binding Equations.Equations[2].Visibility}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Image 
-                            Source="../Icons/eyedropper.png" 
-                            Width="16" 
-                            Height="16" 
-                            Margin="{StaticResource DefaultBorderRight}"/>
-                <TextBlock  
-                            Text="{Binding Equations.Equations[2].TexelColor}" 
-                            Grid.Column="1"
-                            FontFamily="Consolas"
-                            Margin="{StaticResource DefaultBorderRight}"/>
-            </Grid>
-        </StatusBarItem>
-
-        <!-- MOUSE POSITION COLOR 4 -->
-        <StatusBarItem 
-                    HorizontalAlignment="Left" 
-                    BorderThickness="0 0 1 0"
-                    Visibility="{Binding Equations.Equations[3].Visibility}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Image 
-                            Source="../Icons/eyedropper.png" 
-                            Width="16" 
-                            Height="16" 
-                            Margin="{StaticResource DefaultBorderRight}"/>
-                <TextBlock  
-                            Text="{Binding Equations.Equations[3].TexelColor}" 
-                            Grid.Column="1"
-                            FontFamily="Consolas"
-                            Margin="{StaticResource DefaultBorderRight}"/>
-            </Grid>
-        </StatusBarItem>
+        <!-- Equation Colors -->
+        <ItemsControl
+            ItemsSource="{Binding Equations.Equations}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <!-- Orientation for StatusBar -->
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StatusBarItem HorizontalAlignment="Left" 
+                                   BorderThickness="0 0 1 0"
+                                   Visibility="{Binding IsVisible, Converter={StaticResource VisibleCollapsedConverter}}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Image 
+                                Source="../Icons/eyedropper.png" 
+                                Width="16" 
+                                Height="16" 
+                                Margin="{StaticResource DefaultBorderRight}"/>
+                            <TextBlock  
+                                Text="{Binding TexelColor, FallbackValue=0}" 
+                                Grid.Column="1"
+                                FontFamily="Consolas"
+                                Margin="{StaticResource DefaultBorderRight}"/>
+                        </Grid>
+                    </StatusBarItem>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
         <!-- ZOOM -->
         <StatusBarItem 
@@ -254,11 +202,15 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <ProgressBar Value="{Binding Progress.ProgressValue}"/>
-                <TextBlock Text="{Binding Progress.ProgressDescription, FallbackValue=Current Task}"
-                           Foreground="Black"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"/>
+                <ProgressBar 
+                    Grid.Column="0"
+                    Value="{Binding Progress.ProgressValue}"/>
+                <TextBlock 
+                    Grid.Column="0"
+                    Text="{Binding Progress.ProgressDescription, FallbackValue=Current Task}"
+                    Foreground="Black"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"/>
 
                 <Button
                     Grid.Column="1" Content="Abort"

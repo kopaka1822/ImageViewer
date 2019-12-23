@@ -105,7 +105,6 @@ namespace ImageViewer.ViewModels
                     break;
                 case nameof(ImagePipeline.IsEnabled):
                     OnPropertyChanged(nameof(IsVisible));
-                    OnPropertyChanged(nameof(Visibility));
                     if (model.IsEnabled)
                         RecomputeTexelColor();
                     return;
@@ -129,8 +128,6 @@ namespace ImageViewer.ViewModels
                     OnPropertyChanged(nameof(HasChanges));
             }
         }
-
-        public Visibility Visibility => model.IsEnabled ? Visibility.Visible : Visibility.Collapsed;
 
         private bool useFilter;
         public bool UseFilter
