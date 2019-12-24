@@ -42,6 +42,8 @@ namespace ImageViewer.ViewModels
             this.statistics.PropertyChanged += StatisticsOnPropertyChanged;
 
             ToggleAlphaCommand = new ActionCommand(() => AutoAlpha = !AutoAlpha);
+
+            AdjustAlphaFormula();
         }
 
         private void StatisticsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -71,6 +73,9 @@ namespace ImageViewer.ViewModels
             {
                 case nameof(FormulaViewModel.HasChanges):
                     if (HasChangedChanged()) OnPropertyChanged(nameof(HasChanges));
+                    break;
+                case nameof(FormulaViewModel.FirstImageId):
+                    AdjustAlphaFormula();
                     break;
             }
         }
@@ -159,7 +164,19 @@ namespace ImageViewer.ViewModels
                 autoAlpha = value;
                 OnPropertyChanged(nameof(AutoAlpha));
                 OnPropertyChanged(nameof(UseAlphaEquation));
+
+                if (AutoAlpha)
+                {
+                    AdjustAlphaFormula();
+                }
             }
+        }
+
+        public void AdjustAlphaFormula()
+        {
+            if (!AutoAlpha) return;
+            // change in view model
+            Alpha.Formula = $"I{Color.FirstImageId}";
         }
 
         public FormulaViewModel Color { get; }

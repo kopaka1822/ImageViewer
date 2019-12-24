@@ -64,6 +64,8 @@ namespace ImageFramework.Model.Equation
             public string Error;
             /// max image id
             public int MaxId;
+            // id of the first used image
+            public int FirstId;
         }
 
         /// <summary>
@@ -80,7 +82,8 @@ namespace ImageFramework.Model.Equation
 
                 return new TestResults
                 {
-                    MaxId = eq.MaxImageId
+                    MaxId = eq.MaxImageId,
+                    FirstId = eq.FirstImageId
                 };
             }
             catch (Exception e)
