@@ -16,19 +16,28 @@
         Margin="{StaticResource DefaultBorderBottom}"
         Padding="{StaticResource DefaultBorderTop}">
         <GroupBox.Header>
-            <TextBlock Text="{Binding Title, FallbackValue=Title}"/>
+            <StackPanel Orientation="Horizontal">
+                <Button 
+                    Padding="0" 
+                    Height="18" 
+                    Margin="{StaticResource DefaultBorderRight}"
+                    Command="{Binding ToggleVisibilityCommand}"
+                    ToolTip="Toggle Visibility">
+                    <Grid Width="16" Height="16">
+                        <Image 
+                            Width="14" Height="14" 
+                            Source="../../Icons/eye.png"
+                            Visibility="{Binding IsVisible, Converter={StaticResource VisibleCollapsedConverter}}"/>
+                        <Image 
+                            Width="14" Height="14" 
+                            Source="../../Icons/eye_closed.png"
+                            Visibility="{Binding IsVisible, Converter={StaticResource CollapsedVisibleConverter}, FallbackValue=Collapsed}"/>
+                    </Grid>
+                </Button>
+                <TextBlock Text="{Binding Title, FallbackValue=Equation X}"/>
+            </StackPanel>
         </GroupBox.Header>
-        <StackPanel>
-            <Grid Margin="{StaticResource DefaultBorderBottom}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{StaticResource TopGridLength}"/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="Visible: "/>
-                <CheckBox 
-                    Grid.Column="1"
-                    IsChecked="{Binding IsVisible}"/>
-            </Grid>
+        <StackPanel Visibility="{Binding IsVisible, Converter={StaticResource VisibleCollapsedConverter}}">
             <Grid Margin="{StaticResource DefaultBorderBottom}"
                   Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Filter.HasFilter, Converter={StaticResource VisibleCollapsedConverter}}">
                 <Grid.ColumnDefinitions>
@@ -39,7 +48,8 @@
                 <CheckBox 
                     Grid.Column="1"
                     IsChecked="{Binding UseFilter}"
-                    IsEnabled="{Binding IsVisible}"/>
+                    IsEnabled="{Binding IsVisible}"
+                    VerticalAlignment="Center"/>
             </Grid>
             <Grid Margin="{StaticResource DefaultBorderBottom}">
                 <Grid.ColumnDefinitions>

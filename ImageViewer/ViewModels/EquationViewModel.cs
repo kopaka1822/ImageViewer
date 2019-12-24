@@ -42,6 +42,7 @@ namespace ImageViewer.ViewModels
             this.statistics.PropertyChanged += StatisticsOnPropertyChanged;
 
             ToggleAlphaCommand = new ActionCommand(() => AutoAlpha = !AutoAlpha);
+            ToggleVisibilityCommand = new ActionCommand(() => IsVisible = !IsVisible);
 
             AdjustAlphaFormula();
         }
@@ -153,6 +154,7 @@ namespace ImageViewer.ViewModels
         public bool UseAlphaEquation => IsVisible && !AutoAlpha;
 
         public ICommand ToggleAlphaCommand { get; }
+        public ICommand ToggleVisibilityCommand { get; }
 
         private bool autoAlpha = true;
         public bool AutoAlpha
