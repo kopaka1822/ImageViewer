@@ -29,7 +29,8 @@
                     Grid.Column="1"
                     IsChecked="{Binding IsVisible}"/>
             </Grid>
-            <Grid Margin="{StaticResource DefaultBorderBottom}">
+            <Grid Margin="{StaticResource DefaultBorderBottom}"
+                  Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Filter.HasFilter, Converter={StaticResource VisibleCollapsedConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{StaticResource TopGridLength}"/>
                     <ColumnDefinition/>

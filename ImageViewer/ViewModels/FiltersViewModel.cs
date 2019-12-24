@@ -110,8 +110,11 @@ namespace ImageViewer.ViewModels
             {
                 availableFilter = value;
                 OnPropertyChanged(nameof(AvailableFilter));
+                OnPropertyChanged(nameof(HasFilter));
             }
         }
+
+        public bool HasFilter => AvailableFilter.Count > 0;
 
         private void UpdateAvailableFilter()
         {
