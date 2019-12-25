@@ -20,7 +20,7 @@ namespace ImageFramework.Model.Export
             return File.Exists(Path);
         }
 
-        public static async Task ConvertAsync(GifModel.Config config, CancellationToken ct)
+        public static async Task ConvertAsync(GifModel.Config config, ProgressModel progress, CancellationToken ct)
         {
             Debug.Assert(IsAvailable());
 
@@ -31,35 +31,38 @@ namespace ImageFramework.Model.Export
                     UseShellExecute = false,
                     WindowStyle = ProcessWindowStyle.Hidden,
                     CreateNoWindow = true,
-                    RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     FileName = Path,
                     Arguments = $"-framerate {config.FramesPerSecond} -i \"{config.TmpFilename}%4d.png\" -c:v libx264 -preset veryslow -crf 1 -pix_fmt yuv420p -frames:v {config.FramesPerSecond * config.NumSeconds} -r {config.FramesPerSecond} \"{config.Filename}\""
                 }
             };
+            var numFrames = config.NumSeconds * config.FramesPerSecond;
+            progress.What = "converting";
 
-            p.OutputDataReceived += (sender, args) =>
-            {
-                if (args.Data == null) return;
-                Console.Out.WriteLine("Outpur: " + args.Data);
-            };
+            // progress reports
             p.ErrorDataReceived += (sender, args) =>
             {
-                if (args.Data == null) return;
-                Console.Out.WriteLine("Error: " + args.Data);
+                if(args.Data == null) return;
+
+                if (args.Data.StartsWith("frame="))
+                {
+                    if (int.TryParse(args.Data.Substring("frame=".Length), out var frame))
+                    {
+                        progress.Progress = frame / (float) numFrames;
+                    }
+                }
             };
 
             if (!p.Start())
                 throw new Exception("could not start ffmpeg.exe");
 
-            p.BeginOutputReadLine();
             p.BeginErrorReadLine();
 
             while (!p.HasExited)
             {
                 await Task.Run(() => p.WaitForExit(100));
 
-                if (ct.IsCancellationRequested)
+                if (ct.IsCancellationRequested && !p.HasExited)
                 {
                     p.Kill();
                     ct.ThrowIfCancellationRequested();

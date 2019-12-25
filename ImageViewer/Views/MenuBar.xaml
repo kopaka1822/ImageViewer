@@ -86,6 +86,15 @@
                     <Image Source="../Icons/save.png"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <MenuItem 
+                Header="Animated Diff (.mp4)"
+                ToolTip="Export video with a side-by-side comparision of two images"
+                Command="{Binding GifExportCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image Source="../Icons/save.png"/>
+                </MenuItem.Icon>
+            </MenuItem>
         </MenuItem>
         <!--END FILE-->
 
@@ -226,16 +235,7 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
-            <Separator/>
-            <MenuItem 
-                Header="Animated Image Diff"
-                ToolTip="Export video with a side-by-side comparision of two images"
-                Command="{Binding GifExportCommand}"
-                IsEnabled="{Binding Progress.NotProcessing}">
-                <MenuItem.Icon>
-                    <Image Source="../Icons/save.png"/>
-                </MenuItem.Icon>
-            </MenuItem>
+
         </MenuItem>
         <!--END TOOLS-->
 

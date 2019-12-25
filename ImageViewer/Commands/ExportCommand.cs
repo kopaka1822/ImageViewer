@@ -18,7 +18,7 @@ namespace ImageViewer.Commands
     public class ExportCommand : Command
     {
         private readonly ModelsEx models;
-        private string exportDirectory = null;
+        private static string s_exportDirectory = null;
         private string exportExtension = null;
         private GliFormat? exportFormat = null;
 
@@ -28,6 +28,24 @@ namespace ImageViewer.Commands
             this.models.PropertyChanged += ModelsOnPropertyChanged;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
+
+        public static string GetExportDirectory(string fallbackFilename)
+        {
+            // set or keep export directory
+            if (s_exportDirectory == null)
+            {
+                s_exportDirectory = System.IO.Path.GetDirectoryName(fallbackFilename);
+            }
+
+            return s_exportDirectory;
+        }
+
+        public static void SetExportDirectory(string directory)
+        {
+            if (directory != null)
+                s_exportDirectory = directory;
+        }
+
 
         private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -87,10 +105,7 @@ namespace ImageViewer.Commands
             var proposedFilename = System.IO.Path.GetFileNameWithoutExtension(firstImage);
             
             // set or keep export directory
-            if (exportDirectory == null)
-            {
-                exportDirectory = System.IO.Path.GetDirectoryName(firstImage);
-            }
+            var exportDirectory = GetExportDirectory(firstImage);
 
             if (exportExtension == null)
             {
@@ -121,6 +136,7 @@ namespace ImageViewer.Commands
             exportExtension = System.IO.Path.GetExtension(sfd.FileName).Substring(1);
             var exportFilename = System.IO.Path.GetFileNameWithoutExtension(sfd.FileName);
             exportDirectory = System.IO.Path.GetDirectoryName(sfd.FileName);
+            SetExportDirectory(exportDirectory);
 
             models.Export.Mipmap = models.Display.ActiveMipmap;
             models.Export.Layer = models.Display.ActiveLayer;

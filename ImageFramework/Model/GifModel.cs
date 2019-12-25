@@ -17,8 +17,9 @@ using Format = SharpDX.DXGI.Format;
 namespace ImageFramework.Model
 {
     /// <summary>
-    /// temporarily removed due to bad results
+    /// Used to create an animated diff video of two images
     /// </summary>
+    /// <remarks>Exports .mp4 but is called GifModel because it was originally supposed to export gif instead of mp4</remarks>
     public class GifModel : IDisposable
     {
         private readonly GifShader shader;
@@ -54,7 +55,7 @@ namespace ImageFramework.Model
         private async Task CreateGifAsync(TextureArray2D left, TextureArray2D right, Config cfg, CancellationToken ct)
         {
             // delay in milliseconds
-            var numImages = cfg.FramesPerSecond * cfg.NumSeconds;
+            var numFrames = cfg.FramesPerSecond * cfg.NumSeconds;
 
             try
             {
@@ -68,14 +69,15 @@ namespace ImageFramework.Model
                     var dstPtr = dst.Layers[0].Mipmaps[0].Bytes;
                     var dstSize = dst.Layers[0].Mipmaps[0].Size;
 
+                    // render frames into texture
                     using (var frame = new TextureArray2D(1, 1, left.Size,
                         Format.R8G8B8A8_UNorm_SRgb, false))
                     {
                         var frameView = frame.GetRtView(0, 0);
 
-                        for (int i = 0; i < numImages; ++i)
+                        for (int i = 0; i < numFrames; ++i)
                         {
-                            float t = (float)i / (numImages);
+                            float t = (float)i / (numFrames);
                             int borderPos = (int)(t * frame.Size.Width);
 
                             // render frame
@@ -86,14 +88,14 @@ namespace ImageFramework.Model
                             frame.CopyPixels(0, 0, dstPtr, dstSize);
                             var filename = $"{cfg.TmpFilename}{i:D4}";
                             await Task.Run(() =>IO.SaveImage(dst, filename, "png", GliFormat.RGBA8_SRGB), ct);
-                            progress.Progress = i / (float)numImages;
+                            progress.Progress = i / (float)numFrames;
                             progress.What = "creating frames";
                         }
                     }
                 }
 
                 // convert video
-                await FFMpeg.ConvertAsync(cfg, ct);
+                await FFMpeg.ConvertAsync(cfg, progress, ct);
             }
             finally
             {

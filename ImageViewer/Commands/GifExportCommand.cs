@@ -45,19 +45,19 @@ namespace ImageViewer.Commands
         {
             if (models.NumEnabled != 2)
             {
-                models.Window.ShowErrorDialog("Exactly two image equations should be visible for exporting.");
+                models.Window.ShowErrorDialog("Exactly two image equations should be visible for exporting");
                 return;
             }
 
             if (models.Images.ImageType != typeof(TextureArray2D))
             {
-                models.Window.ShowErrorDialog("Only 2D textures are supported.");
+                models.Window.ShowErrorDialog("Only 2D textures are supported");
                 return;
             }
 
             if (!FFMpeg.IsAvailable())
             {
-                models.Window.ShowErrorDialog("ffmpeg is required for this feature. Please download the ffmpeg binaries and place them in the ImageViewer root directory.");
+                models.Window.ShowErrorDialog("ffmpeg is required for this feature. Please download the ffmpeg binaries and place them in the ImageViewer root directory");
                 return;
             }
 
@@ -71,19 +71,24 @@ namespace ImageViewer.Commands
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (models.Display.Multiplier != 1.0f)
             {
-                models.Window.ShowErrorDialog("This mode only works with multiplier = 1.0 at the moment...");
-                return;
+                models.Window.ShowInfoDialog("Export will ignore image multiplier");
             }
+
+            // export directory fallback
+            var firstImageId = models.Pipelines[ids[0]].Color.FirstImageId;
+            var firstImage = models.Images.Images[firstImageId].Filename;
 
             var sfd = new SaveFileDialog
             {
                 Filter = "MPEG-4 (*.mp4)|*.mp4",
-                // TODO set export directory
-                // TODO set filename
+                InitialDirectory = ExportCommand.GetExportDirectory(firstImage),
+                FileName = System.IO.Path.GetFileNameWithoutExtension(firstImage)
             };
 
             if (sfd.ShowDialog(models.Window.TopmostWindow) != true)
                 return;
+
+            ExportCommand.SetExportDirectory(System.IO.Path.GetDirectoryName(sfd.FileName));
 
             var dia = new GifExportDialog(viewModel);
             if (models.Window.ShowDialog(dia) != true) return;
@@ -92,6 +97,9 @@ namespace ImageViewer.Commands
             var tmpDir = Path.Combine(Path.GetTempPath(), "ImageViewer");
             System.IO.Directory.CreateDirectory(tmpDir);
             var tmpName = tmpDir + "\\frame";
+
+            // delete old file if it existed (otherwise ffmpeg will hang)
+            System.IO.File.Delete(sfd.FileName);
 
             models.Gif.CreateGif((TextureArray2D)img1, (TextureArray2D)img2, new GifModel.Config
             {
