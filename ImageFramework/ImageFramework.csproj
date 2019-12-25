@@ -102,6 +102,7 @@
     <Compile Include="Model\Export\ExportDescription.cs" />
     <Compile Include="Model\Export\ExportFormatModel.cs" />
     <Compile Include="Model\Export\ExportModel.cs" />
+    <Compile Include="Model\Export\FFMpeg.cs" />
     <Compile Include="Model\Filter\FilterLoader.cs" />
     <Compile Include="Model\Filter\FilterModel.cs" />
     <Compile Include="Model\Filter\FiltersModel.cs" />

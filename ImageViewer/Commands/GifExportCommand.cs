@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.DirectX;
 using ImageFramework.Model;
+using ImageFramework.Model.Export;
 using ImageViewer.Models;
 using ImageViewer.ViewModels.Dialog;
 using ImageViewer.Views.Dialog;
@@ -42,7 +45,19 @@ namespace ImageViewer.Commands
         {
             if (models.NumEnabled != 2)
             {
-                models.Window.ShowErrorDialog("Exactly two image equations should be visible for gif exporting.");
+                models.Window.ShowErrorDialog("Exactly two image equations should be visible for exporting.");
+                return;
+            }
+
+            if (models.Images.ImageType != typeof(TextureArray2D))
+            {
+                models.Window.ShowErrorDialog("Only 2D textures are supported.");
+                return;
+            }
+
+            if (!FFMpeg.IsAvailable())
+            {
+                models.Window.ShowErrorDialog("ffmpeg is required for this feature. Please download the ffmpeg binaries and place them in the ImageViewer root directory.");
                 return;
             }
 
@@ -62,7 +77,7 @@ namespace ImageViewer.Commands
 
             var sfd = new SaveFileDialog
             {
-                Filter = "Graphics Interchange Format (*.gif)|*.gif",
+                Filter = "MPEG-4 (*.mp4)|*.mp4",
                 // TODO set export directory
                 // TODO set filename
             };
@@ -73,14 +88,19 @@ namespace ImageViewer.Commands
             var dia = new GifExportDialog(viewModel);
             if (models.Window.ShowDialog(dia) != true) return;
             
-            throw new NotImplementedException();
-            /*models.Gif.CreateGif(img1, img2, new GifModel.Config
+            // get tmp directory
+            var tmpDir = Path.Combine(Path.GetTempPath(), "ImageViewer");
+            System.IO.Directory.CreateDirectory(tmpDir);
+            var tmpName = tmpDir + "\\frame";
+
+            models.Gif.CreateGif((TextureArray2D)img1, (TextureArray2D)img2, new GifModel.Config
             {
                 Filename = sfd.FileName,
+                TmpFilename = tmpName,
                 FramesPerSecond = viewModel.FramesPerSecond,
                 SliderWidth = viewModel.SliderSize,
                 NumSeconds = viewModel.TotalSeconds
-            });*/
+            });
         }
     }
 }

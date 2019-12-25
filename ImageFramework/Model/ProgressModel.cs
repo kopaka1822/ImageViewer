@@ -47,9 +47,12 @@ namespace ImageFramework.Model
         {
             if (!IsProcessing) return 0; // ignore for now => progress when opening files without task
 
-            Progress = prog;
-            if (What != description)
-                What = description;
+            if (EnableDllProgress)
+            {
+                Progress = prog;
+                if (What != description)
+                    What = description;
+            }
 
             if (currentTaskCancellation.IsCancellationRequested)
                 return 1;
@@ -73,7 +76,10 @@ namespace ImageFramework.Model
             }
         }
 
-
+        /// <summary>
+        /// progress reports from the ImageLoader dll will be used to set progress and what
+        /// </summary>
+        public bool EnableDllProgress = true;
 
         private string what = "";
 

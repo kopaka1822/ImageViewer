@@ -47,7 +47,8 @@ namespace ImageFramework.Model
         // soft reset that clears images, filters and resets formulas
         public event EventHandler SoftReset;
 
-        //public GifModel Gif { get; }
+        private GifModel gif = null;
+        public GifModel Gif => gif ?? (gif = new GifModel(SharedModel.QuadShader, SharedModel.Upload, Progress));
 
         public ProgressModel Progress { get; }
 
@@ -89,7 +90,6 @@ namespace ImageFramework.Model
             TextureCache = new TextureCache(Images);
 
             Filter = new FiltersModel(Images);
-            //Gif = new GifModel(sharedModel.QuadShader);
             Progress = new ProgressModel();
 
             for (int i = 0; i < numPipelines; ++i)
@@ -306,6 +306,7 @@ namespace ImageFramework.Model
             Progress?.Dispose();
             thumbnail?.Dispose();
             stats?.Dispose();
+            gif?.Dispose();
 
             Images?.Dispose();
             Filter?.Dispose();
