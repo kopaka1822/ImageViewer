@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageFramework.Utility;
+using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 using ImageViewer.ViewModels.Dialog;
 using ImageViewer.Views.Dialog;

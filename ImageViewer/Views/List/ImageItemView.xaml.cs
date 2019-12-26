@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageViewer.Commands;
+using ImageViewer.Commands.Helper;
 
 namespace ImageViewer.Views.List
 {

@@ -86,13 +86,14 @@
     </ApplicationDefinition>
     <Compile Include="Commands\AddFilterCommand.cs" />
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
-    <Compile Include="Commands\Command.cs" />
+    <Compile Include="Commands\Helper\Command.cs" />
     <Compile Include="Commands\CubemapToLatLongCommand.cs" />
     <Compile Include="Commands\DeleteMipmapsCommand.cs" />
     <Compile Include="Commands\ExportCommand.cs" />
     <Compile Include="Commands\GenerateMipmapsCommand.cs" />
     <Compile Include="Commands\GifExportCommand.cs" />
     <Compile Include="Commands\HelpDialogCommand.cs" />
+    <Compile Include="Commands\Helper\ParameterCommandAdapter.cs" />
     <Compile Include="Commands\ImportArrayCommand.cs" />
     <Compile Include="Commands\ImportCommand.cs" />
     <Compile Include="Commands\ImportEquationImageCommand.cs" />
@@ -103,7 +104,7 @@
     <Compile Include="Commands\ShowPixelColorCommand.cs" />
     <Compile Include="Commands\ShowPixelDisplayCommand.cs" />
     <Compile Include="Commands\ShowScaleCommand.cs" />
-    <Compile Include="Commands\SimpleCommand.cs" />
+    <Compile Include="Commands\Helper\SimpleCommand.cs" />
     <Compile Include="Controller\ClientDropController.cs" />
     <Compile Include="Controller\ComputeImageController.cs" />
     <Compile Include="Controller\CropController.cs" />
@@ -231,7 +232,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Commands\ActionCommand.cs" />
+    <Compile Include="Commands\Helper\ActionCommand.cs" />
     <Compile Include="Controller\ResizeController.cs" />
     <Compile Include="DirectX\SwapChainAdapter.cs" />
     <Compile Include="MainWindow.xaml.cs">

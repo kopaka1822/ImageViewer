@@ -10,6 +10,7 @@ using System.Windows.Input;
 using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageViewer.Commands;
+using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 
 namespace ImageViewer.ViewModels

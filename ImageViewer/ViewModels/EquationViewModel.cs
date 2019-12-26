@@ -11,6 +11,7 @@ using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageFramework.Utility;
 using ImageViewer.Commands;
+using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
 
@@ -124,6 +125,8 @@ namespace ImageViewer.ViewModels
         }
 
         public string Title => $"Equation {imageId + 1}";
+
+        public int Id => imageId;
         public bool IsVisible
         {
             get => model.IsEnabled;

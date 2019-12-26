@@ -32,42 +32,6 @@
                 </MenuItem.Icon>
             </MenuItem>
             <MenuItem
-                    Header="Import Equation Image"
-                    ToolTip="Adds one of the visible equations to the imported images list"
-                    IsEnabled="{Binding Progress.NotProcessing}">
-                <MenuItem.Icon>
-                    <Image Source="../Icons/import.png"/>
-                </MenuItem.Icon>
-                <MenuItem 
-                        Header="Equation 1"
-                        Command="{Binding ImportEquationImageCommand}">
-                    <MenuItem.CommandParameter>
-                        <system:Int32>0</system:Int32>
-                    </MenuItem.CommandParameter>
-                </MenuItem>
-                <MenuItem 
-                        Header="Equation 2"
-                        Command="{Binding ImportEquationImageCommand}">
-                    <MenuItem.CommandParameter>
-                        <system:Int32>1</system:Int32>
-                    </MenuItem.CommandParameter>
-                </MenuItem>
-                <MenuItem 
-                        Header="Equation 3"
-                        Command="{Binding ImportEquationImageCommand}">
-                    <MenuItem.CommandParameter>
-                        <system:Int32>2</system:Int32>
-                    </MenuItem.CommandParameter>
-                </MenuItem>
-                <MenuItem 
-                        Header="Equation 4"
-                        Command="{Binding ImportEquationImageCommand}">
-                    <MenuItem.CommandParameter>
-                        <system:Int32>3</system:Int32>
-                    </MenuItem.CommandParameter>
-                </MenuItem>
-            </MenuItem>
-            <MenuItem
                 Header="Import as Array"
                 ToolTip="Combines multiple images into a single texture array on import"
                 IsEnabled="{Binding Progress.NotProcessing}"

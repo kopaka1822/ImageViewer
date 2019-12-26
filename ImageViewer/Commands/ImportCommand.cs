@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageViewer.Commands.Helper;
 using ImageViewer.Controller;
 using ImageViewer.Models;
 

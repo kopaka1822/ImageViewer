@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
+using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 using ImageViewer.ViewModels.Dialog;
 using ImageViewer.Views.Dialog;
@@ -94,7 +95,7 @@ namespace ImageViewer.Commands
             if (models.Window.ShowDialog(dia) != true) return;
             
             // get tmp directory
-            var tmpDir = Path.Combine(Path.GetTempPath(), "ImageViewer");
+            var tmpDir = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(Path.GetTempFileName()));
             System.IO.Directory.CreateDirectory(tmpDir);
             var tmpName = tmpDir + "\\frame";
 

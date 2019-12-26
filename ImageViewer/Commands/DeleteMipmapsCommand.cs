@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Model;
+using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 
 namespace ImageViewer.Commands

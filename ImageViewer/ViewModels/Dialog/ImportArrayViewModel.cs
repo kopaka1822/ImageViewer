@@ -15,6 +15,7 @@ using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageViewer.Commands;
+using ImageViewer.Commands.Helper;
 using ImageViewer.Controller;
 using ImageViewer.Models;
 

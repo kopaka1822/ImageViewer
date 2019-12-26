@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Model;
 using ImageFramework.Utility;
+using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 using ImageViewer.Views.Dialog;
 
