@@ -158,7 +158,8 @@
     <Compile Include="ViewModels\Filter\IntFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\TextureFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\FormulaViewModel.cs" />
-    <Compile Include="ViewModels\ImagesViewModel.cs" />
+    <Compile Include="ViewModels\Image\ImageItemViewModel.cs" />
+    <Compile Include="ViewModels\Image\ImagesViewModel.cs" />
     <Compile Include="ViewModels\ProgressViewModel.cs" />
     <Compile Include="ViewModels\StatisticsViewModel.cs" />
     <Compile Include="ViewModels\StatisticViewModel.cs" />

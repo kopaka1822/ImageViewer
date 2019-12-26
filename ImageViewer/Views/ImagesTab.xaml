@@ -44,16 +44,20 @@
                 </Grid>
 
                 <ListBox 
-                    SelectedIndex="0" 
                     ScrollViewer.VerticalScrollBarVisibility="Visible"                       
                     Height="180"
                     Margin="{StaticResource DefaultBorderBottom}"
                     ItemsSource="{Binding Images.ImageListItems}"
-                    SelectedItem="{Binding Images.SelectedImageListItem}"
+                    HorizontalContentAlignment="Stretch"
                     dd:DragDrop.IsDragSource="True"
                     dd:DragDrop.IsDropTarget="True"
-                    dd:DragDrop.DropHandler="{Binding Images}"/>
-
+                    dd:DragDrop.DropHandler="{Binding Images}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <list:ImageItemView/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
                 <Button
                     Command="{Binding Equations.Apply}"
                     Content="Apply"

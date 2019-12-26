@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using GongSolutions.Wpf.DragDrop;
 using ImageFramework.Annotations;
@@ -15,7 +9,7 @@ using ImageViewer.Controller;
 using ImageViewer.Models;
 using ImageViewer.Views.List;
 
-namespace ImageViewer.ViewModels
+namespace ImageViewer.ViewModels.Image
 {
     public class ImagesViewModel : INotifyPropertyChanged, IDropTarget
     {
@@ -45,8 +39,7 @@ namespace ImageViewer.ViewModels
             }
         }
 
-        public ObservableCollection<ImageItemView> ImageListItems { get; } = new ObservableCollection<ImageItemView>();
-        public ImageItemView SelectedImageListItem { get; set; }
+        public ObservableCollection<ImageItemViewModel> ImageListItems { get; } = new ObservableCollection<ImageItemViewModel>();
 
         public string WindowTitle
         {
@@ -66,17 +59,14 @@ namespace ImageViewer.ViewModels
 
         private void RefreshImageList()
         {
-            SelectedImageListItem = null;
-
             ImageListItems.Clear();
             for (var i = 0; i < models.Images.NumImages; ++i)
             {
-                var item = new ImageItemView(models.Images.Images[i], i, models.Images);
+                var item = new ImageItemViewModel(models.Images, i);
                 ImageListItems.Add(item);
             }
 
             OnPropertyChanged(nameof(ImageListItems));
-            OnPropertyChanged(nameof(SelectedImageListItem));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -92,7 +82,7 @@ namespace ImageViewer.ViewModels
         {
 
             // enable if both items are image list box items
-            if (dropInfo.Data is ImageItemView && dropInfo.TargetItem is ImageItemView)
+            if (dropInfo.Data is ImageItemViewModel && dropInfo.TargetItem is ImageItemViewModel)
             {
                 dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
                 dropInfo.Effects = DragDropEffects.Move;
@@ -107,10 +97,10 @@ namespace ImageViewer.ViewModels
 
         public async void Drop(IDropInfo dropInfo)
         {
-            if (dropInfo.Data is ImageItemView)
+            if (dropInfo.Data is ImageItemViewModel vm)
             {
                 // move images 
-                var idx1 = ImageListItems.IndexOf(dropInfo.Data as ImageItemView);
+                var idx1 = ImageListItems.IndexOf(vm);
                 var idx2 = dropInfo.InsertIndex;
                 if (idx1 < 0 || idx2 < 0) return;
                 // did the order change?
@@ -122,11 +112,9 @@ namespace ImageViewer.ViewModels
                 // put item from idx1 into the position it was dragged to
                 models.Images.MoveImage(idx1, idx2);
             }
-            else if (dropInfo.Data is DataObject)
+            else if (dropInfo.Data is DataObject obj)
             {
-                var obj = dropInfo.Data as System.Windows.DataObject;
                 var items = obj.GetFileDropList();
-                if (items == null) return;
 
                 int desiredPosition = dropInfo.InsertIndex;
 

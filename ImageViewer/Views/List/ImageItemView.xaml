@@ -1,4 +1,4 @@
-﻿<ListBoxItem x:Class="ImageViewer.Views.List.ImageItemView"
+﻿<UserControl x:Class="ImageViewer.Views.List.ImageItemView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,14 +8,15 @@
              mc:Ignorable="d" 
              d:DesignHeight="20" 
              d:DesignWidth="150"
-             HorizontalContentAlignment="Stretch">
-    <ListBoxItem.ContextMenu>
+             HorizontalContentAlignment="Stretch"
+             DataContextChanged="OnDataContextChanged">
+    <UserControl.ContextMenu>
         <ContextMenu>
             <MenuItem Header="Rename"
                       Command="{Binding RenameCommand}"
                       InputGestureText="Double Click"/>
         </ContextMenu>
-    </ListBoxItem.ContextMenu>
+    </UserControl.ContextMenu>
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -50,4 +51,4 @@
             </views:CustomTextBox>
         </Grid>
     </Grid>
-</ListBoxItem>
+</UserControl>

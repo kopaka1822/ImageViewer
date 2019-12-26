@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -18,77 +19,26 @@ using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageViewer.Commands;
 using ImageViewer.Commands.Helper;
+using ImageViewer.ViewModels.Image;
 
 namespace ImageViewer.Views.List
 {
     /// <summary>
     /// Interaction logic for ImageItemView.xaml
     /// </summary>
-    public partial class ImageItemView : ListBoxItem, INotifyPropertyChanged
+    public partial class ImageItemView : UserControl
     {
-        private readonly ImagesModel.ImageData imgData;
+        public ImageItemViewModel ViewModel { get; private set; }
 
-        public ImageItemView(ImagesModel.ImageData imgData, int id, ImagesModel images)
+        public ImageItemView()
         {
             InitializeComponent();
 
-            this.imgData = imgData;
-            Id = id;
-            Prefix = $"I{id} - ";
-            ToolTip = imgData.Filename + "\n" + imgData.OriginalFormat;
-            if (imgData.Alias.StartsWith("__imported"))
-            {
-                imageName = "";
-                imgData.Alias = "";
-                System.Windows.Threading.Dispatcher.CurrentDispatcher.BeginInvoke((Action)OnRename);
-            }
-            else imageName = imgData.Alias;
-
-            DeleteCommand = new ActionCommand(() => images.DeleteImage(id));
-            RenameCommand = new ActionCommand(OnRename);
             TextInputBox.LostFocus += TextInputBoxOnLostFocus;
-
-            DataContext = this;
         }
-
-        public int Id { get; }
-
-        public string Prefix { get; }
-
-        private string imageName;
-
-        public string ImageName
-        {
-            get => imageName;
-            set
-            {
-                if (value == null || value == imageName) return;
-                imageName = value;
-                OnPropertyChanged(nameof(ImageName));
-                IsRenaming = false;
-                imgData.Alias = imageName;
-            }
-        }
-
-        private bool isRenaming = false;
-
-        public bool IsRenaming
-        {
-            get => isRenaming;
-            set
-            {
-                if(value == isRenaming) return;
-                isRenaming = value;
-                OnPropertyChanged(nameof(IsRenaming));
-            }
-        }
-
-        public ICommand DeleteCommand { get; }
-        public ICommand RenameCommand { get; }
 
         private async void OnRename()
         {
-            IsRenaming = true;
             TextInputBox.SelectAll();
 
             int count = 0;
@@ -101,24 +51,49 @@ namespace ImageViewer.Views.List
 
         private void TextInputBoxOnLostFocus(object sender, RoutedEventArgs e)
         {
-            IsRenaming = false;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            ViewModel.IsRenaming = false;
         }
 
         private void NameMouseDown(object sender, MouseButtonEventArgs e)
         {
             if(e.ChangedButton == MouseButton.Left && e.ClickCount == 2)
             {
-                //OnRename();
-                //e.Handled = false;
-                System.Windows.Threading.Dispatcher.CurrentDispatcher.BeginInvoke((Action) OnRename);
+                System.Windows.Threading.Dispatcher.CurrentDispatcher.BeginInvoke((Action)(() =>
+                {
+                    if (ViewModel != null)
+                        ViewModel.IsRenaming = true;
+                }));
+            }
+        }
+
+        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            // unsubscribe old
+            if (ViewModel != null)
+            {
+                ViewModel.PropertyChanged -= DataContextOnPropertyChanged;
+            }
+
+            if (DataContext == null)
+            {
+                ViewModel = null;
+                return;
+            }
+
+            // subscribe new
+            Debug.Assert(DataContext is ImageItemViewModel);
+            ViewModel = (ImageItemViewModel) DataContext;
+            ViewModel.PropertyChanged += DataContextOnPropertyChanged;
+        }
+
+        private void DataContextOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ImageItemViewModel.IsRenaming):
+                    if(ViewModel.IsRenaming)
+                        OnRename();
+                    break;
             }
         }
     }
