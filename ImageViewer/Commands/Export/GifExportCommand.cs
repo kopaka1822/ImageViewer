@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
@@ -14,7 +9,7 @@ using ImageViewer.ViewModels.Dialog;
 using ImageViewer.Views.Dialog;
 using Microsoft.Win32;
 
-namespace ImageViewer.Commands
+namespace ImageViewer.Commands.Export
 {
     public class GifExportCommand : Command
     {

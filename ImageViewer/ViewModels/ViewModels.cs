@@ -5,6 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ImageViewer.Commands;
+using ImageViewer.Commands.Export;
+using ImageViewer.Commands.Import;
+using ImageViewer.Commands.Tools;
+using ImageViewer.Commands.View;
 using ImageViewer.Models;
 using ImageViewer.ViewModels.Display;
 

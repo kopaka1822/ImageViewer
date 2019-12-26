@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ImageViewer.Commands.Helper;
+﻿using ImageViewer.Commands.Helper;
 using ImageViewer.Controller;
 using ImageViewer.Models;
 
-namespace ImageViewer.Commands
+namespace ImageViewer.Commands.Import
 {
     public class ImportCommand : SimpleCommand
     {

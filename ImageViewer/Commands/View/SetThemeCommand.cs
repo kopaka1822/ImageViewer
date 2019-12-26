@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using ImageViewer.Commands.Helper;
+﻿using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 using ImageViewer.Views.Theme;
 
-namespace ImageViewer.Commands
+namespace ImageViewer.Commands.View
 {
     public class SetThemeCommand : SimpleCommand<int>
     {

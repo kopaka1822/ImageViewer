@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageViewer.Commands.Helper;
@@ -11,13 +6,13 @@ using ImageViewer.Models;
 using ImageViewer.ViewModels.Dialog;
 using ImageViewer.Views.Dialog;
 
-namespace ImageViewer.Commands
+namespace ImageViewer.Commands.Tools
 {
-    public class CubemapToLatLongCommand : Command
+    public class LatLongToCubemapCommand : Command
     {
         private readonly ModelsEx models;
 
-        public CubemapToLatLongCommand(ModelsEx models)
+        public LatLongToCubemapCommand(ModelsEx models)
         {
             this.models = models;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
@@ -36,7 +31,7 @@ namespace ImageViewer.Commands
 
         public override bool CanExecute()
         {
-            return models.Images.NumLayers == 6 && models.Images.ImageType == typeof(TextureArray2D);
+            return models.Images.NumLayers == 1 && models.Images.ImageType == typeof(TextureArray2D);
         }
 
         public override void Execute()
@@ -56,14 +51,14 @@ namespace ImageViewer.Commands
             var texName = firstImage.Filename;
             var origFormat = firstImage.OriginalFormat;
 
-            var vm = new ResolutionViewModel(2);
+            var vm = new ResolutionViewModel(1);
             var dia = new ResolutionDialog
             {
                 DataContext = vm
             };
             if (models.Window.ShowDialog(dia) != true) return;
 
-            var tex = models.ConvertToLatLong((TextureArray2D)srcTex, vm.Width);
+            var tex = models.ConvertToCubemap((TextureArray2D)srcTex, vm.Width);
 
             // clear all images
             models.Reset();

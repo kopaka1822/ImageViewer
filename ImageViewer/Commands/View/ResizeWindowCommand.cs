@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 
-namespace ImageViewer.Commands
+namespace ImageViewer.Commands.View
 {
     public class ResizeWindowCommand : SimpleCommand
     {

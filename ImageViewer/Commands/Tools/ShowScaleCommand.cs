@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageFramework.Utility;
@@ -12,7 +7,7 @@ using ImageViewer.Models;
 using ImageViewer.ViewModels.Dialog;
 using ImageViewer.Views.Dialog;
 
-namespace ImageViewer.Commands
+namespace ImageViewer.Commands.Tools
 {
     public class ShowScaleCommand : Command
     {

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using ImageFramework.Model;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 
-namespace ImageViewer.Commands
+namespace ImageViewer.Commands.Tools
 {
     public class DeleteMipmapsCommand : Command
     {

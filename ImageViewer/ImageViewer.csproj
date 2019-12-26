@@ -87,23 +87,23 @@
     <Compile Include="Commands\AddFilterCommand.cs" />
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
     <Compile Include="Commands\Helper\Command.cs" />
-    <Compile Include="Commands\CubemapToLatLongCommand.cs" />
-    <Compile Include="Commands\DeleteMipmapsCommand.cs" />
-    <Compile Include="Commands\ExportCommand.cs" />
-    <Compile Include="Commands\GenerateMipmapsCommand.cs" />
-    <Compile Include="Commands\GifExportCommand.cs" />
+    <Compile Include="Commands\Tools\CubemapToLatLongCommand.cs" />
+    <Compile Include="Commands\Tools\DeleteMipmapsCommand.cs" />
+    <Compile Include="Commands\Export\ExportCommand.cs" />
+    <Compile Include="Commands\Tools\GenerateMipmapsCommand.cs" />
+    <Compile Include="Commands\Export\GifExportCommand.cs" />
     <Compile Include="Commands\HelpDialogCommand.cs" />
     <Compile Include="Commands\Helper\ParameterCommandAdapter.cs" />
-    <Compile Include="Commands\ImportArrayCommand.cs" />
-    <Compile Include="Commands\ImportCommand.cs" />
-    <Compile Include="Commands\ImportEquationImageCommand.cs" />
-    <Compile Include="Commands\LatLongToCubemapCommand.cs" />
-    <Compile Include="Commands\OpenCommand.cs" />
-    <Compile Include="Commands\ResizeWindowCommand.cs" />
-    <Compile Include="Commands\SetThemeCommand.cs" />
-    <Compile Include="Commands\ShowPixelColorCommand.cs" />
-    <Compile Include="Commands\ShowPixelDisplayCommand.cs" />
-    <Compile Include="Commands\ShowScaleCommand.cs" />
+    <Compile Include="Commands\Import\ImportArrayCommand.cs" />
+    <Compile Include="Commands\Import\ImportCommand.cs" />
+    <Compile Include="Commands\Import\ImportEquationImageCommand.cs" />
+    <Compile Include="Commands\Tools\LatLongToCubemapCommand.cs" />
+    <Compile Include="Commands\Import\OpenCommand.cs" />
+    <Compile Include="Commands\View\ResizeWindowCommand.cs" />
+    <Compile Include="Commands\View\SetThemeCommand.cs" />
+    <Compile Include="Commands\View\ShowPixelColorCommand.cs" />
+    <Compile Include="Commands\View\ShowPixelDisplayCommand.cs" />
+    <Compile Include="Commands\Tools\ShowScaleCommand.cs" />
     <Compile Include="Commands\Helper\SimpleCommand.cs" />
     <Compile Include="Controller\ClientDropController.cs" />
     <Compile Include="Controller\ComputeImageController.cs" />
@@ -445,5 +445,6 @@
     <Resource Include="Icons\chained.png" />
     <Resource Include="Icons\unchained.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

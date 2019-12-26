@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ImageFramework.Model;
 using ImageFramework.Utility;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 using ImageViewer.Views.Dialog;
 
-namespace ImageViewer.Commands
+namespace ImageViewer.Commands.View
 {
     public class ShowPixelColorCommand : Command
     {

@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Security.RightsManagement;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using ImageFramework.DirectX;
-using ImageFramework.ImageLoader;
 using ImageFramework.Model;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 using ImageViewer.ViewModels.Dialog;
 using ImageViewer.Views.Dialog;
 
-namespace ImageViewer.Commands
+namespace ImageViewer.Commands.Import
 {
     public class ImportArrayCommand : Command
     {
