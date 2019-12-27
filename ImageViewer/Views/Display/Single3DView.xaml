@@ -27,7 +27,8 @@
                 Grid.Row="0"
                 Grid.Column="1"
                 SelectedItem="{Binding SelectedAxis}"
-                ItemsSource="{Binding AxisList}"/>
+                ItemsSource="{Binding AxisList}"
+                ItemTemplate="{StaticResource ListItemView}"/>
 
             <TextBlock
                 Grid.Column="0"

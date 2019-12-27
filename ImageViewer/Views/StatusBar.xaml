@@ -131,7 +131,8 @@
                             Grid.Column="1" 
                             Width="120"
                             SelectedItem="{Binding Display.SelectedViewMode}"
-                            ItemsSource="{Binding Display.AvailableViewModes}"/>
+                            ItemsSource="{Binding Display.AvailableViewModes}"
+                            ItemTemplate="{StaticResource ListItemView}"/>
             </Grid>
         </StatusBarItem>
 
@@ -156,7 +157,8 @@
                             Width="120"
                             IsEnabled="{Binding Display.ChooseLayers}"
                             SelectedItem="{Binding Display.SelectedLayer}"
-                            ItemsSource="{Binding Display.AvailableLayers}"/>
+                            ItemsSource="{Binding Display.AvailableLayers}"
+                            ItemTemplate="{StaticResource ListItemView}"/>
             </Grid>
         </StatusBarItem>
 
@@ -181,7 +183,8 @@
                             Width="120"
                             SelectedItem="{Binding Display.SelectedMipMap}"
                             ItemsSource="{Binding Display.AvailableMipMaps}"
-                            IsSynchronizedWithCurrentItem="True"/>
+                            IsSynchronizedWithCurrentItem="True"
+                            ItemTemplate="{StaticResource ListItemView}"/>
             </Grid>
         </StatusBarItem>
 

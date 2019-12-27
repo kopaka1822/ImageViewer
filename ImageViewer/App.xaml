@@ -143,6 +143,13 @@
 
             <Thickness x:Key="SmallBorderBottom" Bottom="{StaticResource SmallBorderValue}" Left="0"
                        Right="0" Top="0" />
+
+            <!-- UI Element templates -->
+            <DataTemplate x:Key="ListItemView">
+                <TextBlock Text="{Binding Name}"
+                           ToolTip="{Binding ToolTip}"/>
+            </DataTemplate>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

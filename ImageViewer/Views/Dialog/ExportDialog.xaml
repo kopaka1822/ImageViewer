@@ -48,7 +48,8 @@
                         Grid.Column="1"
                         IsEnabled="{Binding EnableLayers}"
                         ItemsSource="{Binding AvailableLayers}"
-                        SelectedItem="{Binding SelectedLayer}"/>
+                        SelectedItem="{Binding SelectedLayer}"
+                        ItemTemplate="{StaticResource ListItemView}"/>
                 </Grid>
                 <!-- MIPMAPS -->
                 <Grid Margin="{StaticResource DefaultBorderBottom}">
@@ -61,7 +62,8 @@
                         Grid.Column="1"
                         IsEnabled="{Binding EnableMipmaps}"
                         ItemsSource="{Binding AvailableMipmaps}"
-                        SelectedItem="{Binding SelectedMipmap}"/>
+                        SelectedItem="{Binding SelectedMipmap}"
+                        ItemTemplate="{StaticResource ListItemView}"/>
                 </Grid>
 
                 <!-- Pixel Type -->
@@ -76,7 +78,8 @@
                         Grid.Column="1"
                         IsEnabled="{Binding EnableDataType}"
                         ItemsSource="{Binding AvailableDataTypes}"
-                        SelectedItem="{Binding SelectedDataType}"/>
+                        SelectedItem="{Binding SelectedDataType}"
+                        ItemTemplate="{StaticResource ListItemView}"/>
                 </Grid>
 
                 <!-- Format -->
@@ -90,7 +93,8 @@
                         Grid.Column="1"
                         IsEnabled="{Binding EnableFormat}"
                         ItemsSource="{Binding AvailableFormats}"
-                        SelectedItem="{Binding SelectedFormat}"/>
+                        SelectedItem="{Binding SelectedFormat}"
+                        ItemTemplate="{StaticResource ListItemView}"/>
                 </Grid>
 
                 <!-- QUALITY -->

@@ -76,16 +76,32 @@ It is computed from the luminance: L = 116 * Y ^ (1/3) - 16."
 
         public string ChannelDescription { get; private set; } = "";
 
-        public List<ComboBoxItem<DefaultStatistics.Types>> AvailableChannels { get; } = new List<ComboBoxItem<DefaultStatistics.Types>>
+        public List<ListItemViewModel<DefaultStatistics.Types>> AvailableChannels { get; } = new List<ListItemViewModel<DefaultStatistics.Types>>
         {
-            new ComboBoxItem<DefaultStatistics.Types>("Luminance", DefaultStatistics.Types.Luminance),
-            new ComboBoxItem<DefaultStatistics.Types>("Average", DefaultStatistics.Types.Average),
-            new ComboBoxItem<DefaultStatistics.Types>("Luma", DefaultStatistics.Types.Luma),
-            new ComboBoxItem<DefaultStatistics.Types>("Lightness", DefaultStatistics.Types.Lightness),
+            new ListItemViewModel<DefaultStatistics.Types>
+            {
+                Name = "Luminance",
+                Cargo = DefaultStatistics.Types.Luminance
+            },
+            new ListItemViewModel<DefaultStatistics.Types>
+            {
+                Name = "Average",
+                Cargo = DefaultStatistics.Types.Average
+            },
+            new ListItemViewModel<DefaultStatistics.Types>
+            {
+                Name = "Luma",
+                Cargo = DefaultStatistics.Types.Luma
+            },
+            new ListItemViewModel<DefaultStatistics.Types>
+            {
+                Name = "Lightness",
+                Cargo = DefaultStatistics.Types.Lightness
+            }
         };
 
-        private ComboBoxItem<DefaultStatistics.Types> selectedChannel;
-        public ComboBoxItem<DefaultStatistics.Types> SelectedChannel
+        private ListItemViewModel<DefaultStatistics.Types> selectedChannel;
+        public ListItemViewModel<DefaultStatistics.Types> SelectedChannel
         {
             get => selectedChannel;
             set

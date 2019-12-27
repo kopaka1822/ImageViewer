@@ -82,7 +82,8 @@
                     Margin="{StaticResource DefaultBorderBottom}"
                     IsEnabled="{Binding Display.EnableSplitMode}"
                     SelectedItem="{Binding Display.SelectedSplitMode}"
-                    ItemsSource="{Binding Display.AvailableSplitModes}"/>
+                    ItemsSource="{Binding Display.AvailableSplitModes}"
+                    ItemTemplate="{StaticResource ListItemView}"/>
 
                 <ItemsControl 
                     ItemsSource="{Binding Equations.Equations}">

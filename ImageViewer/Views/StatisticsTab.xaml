@@ -16,7 +16,8 @@
                 <ComboBox
                     Margin="{StaticResource DefaultBorderBottom}"
                     ItemsSource="{Binding Statistics.AvailableChannels}"
-                    SelectedItem="{Binding Statistics.SelectedChannel}"/>
+                    SelectedItem="{Binding Statistics.SelectedChannel}"
+                    ItemTemplate="{StaticResource ListItemView}"/>
                 <TextBlock 
                     Text="Double click box to copy content to clipboard"
                     Margin="{StaticResource DefaultBorderBottom}"

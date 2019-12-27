@@ -24,10 +24,26 @@ namespace ImageViewer.ViewModels.Dialog
             this.decimalPlaces = models.Settings.TexelDecimalPlaces;
             this.radius = models.Display.TexelRadius;
 
-            AvailableFormats.Add(new ComboBoxItem<SettingsModel.TexelDisplayMode>("decimal (linear)", SettingsModel.TexelDisplayMode.LinearDecimal));
-            AvailableFormats.Add(new ComboBoxItem<SettingsModel.TexelDisplayMode>("float (linear)", SettingsModel.TexelDisplayMode.LinearFloat));
-            AvailableFormats.Add(new ComboBoxItem<SettingsModel.TexelDisplayMode>("decimal (sRGB)", SettingsModel.TexelDisplayMode.SrgbDecimal));
-            AvailableFormats.Add(new ComboBoxItem<SettingsModel.TexelDisplayMode>("byte (sRGB)", SettingsModel.TexelDisplayMode.SrgbByte));
+            AvailableFormats.Add(new ListItemViewModel<SettingsModel.TexelDisplayMode>
+            {
+                Cargo = SettingsModel.TexelDisplayMode.LinearDecimal,
+                Name = "decimal (linear)"
+            });
+            AvailableFormats.Add(new ListItemViewModel<SettingsModel.TexelDisplayMode>
+            {
+                Cargo = SettingsModel.TexelDisplayMode.LinearFloat,
+                Name = "float (linear)"
+            });
+            AvailableFormats.Add(new ListItemViewModel<SettingsModel.TexelDisplayMode>
+            {
+                Cargo = SettingsModel.TexelDisplayMode.SrgbDecimal,
+                Name = "decimal (sRGB)"
+            });
+            AvailableFormats.Add(new ListItemViewModel<SettingsModel.TexelDisplayMode>
+            {
+                Cargo = SettingsModel.TexelDisplayMode.SrgbByte,
+                Name = "byte (sRGB)"
+            });
 
             selectedFormat = AvailableFormats.Find(box => box.Cargo == models.Settings.TexelDisplay);
         }
@@ -84,10 +100,10 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
-        public List<ComboBoxItem<SettingsModel.TexelDisplayMode>> AvailableFormats { get; } = new List<ComboBoxItem<SettingsModel.TexelDisplayMode>>();
+        public List<ListItemViewModel<SettingsModel.TexelDisplayMode>> AvailableFormats { get; } = new List<ListItemViewModel<SettingsModel.TexelDisplayMode>>();
 
-        private ComboBoxItem<SettingsModel.TexelDisplayMode> selectedFormat;
-        public ComboBoxItem<SettingsModel.TexelDisplayMode> SelectedFormat
+        private ListItemViewModel<SettingsModel.TexelDisplayMode> selectedFormat;
+        public ListItemViewModel<SettingsModel.TexelDisplayMode> SelectedFormat
         {
             get => selectedFormat;
             set

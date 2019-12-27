@@ -25,7 +25,8 @@
                 <ComboBox 
                     Grid.Column="1"
                     ItemsSource="{Binding AvailableFormats}"
-                    SelectedItem="{Binding SelectedFormat}"/>
+                    SelectedItem="{Binding SelectedFormat}"
+                    ItemTemplate="{StaticResource ListItemView}"/>
             </Grid>
 
             <!-- Decimal Places -->

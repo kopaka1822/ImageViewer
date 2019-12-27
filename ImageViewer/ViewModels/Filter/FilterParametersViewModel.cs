@@ -105,7 +105,10 @@ namespace ImageViewer.ViewModels.Filter
 
                 var vm = new TextureFilterParameterViewModel(tex, images);
                 ViewModels.Add(vm);
-                View.Add(new TextureFilterParameterView(vm, enabledBinding));
+                View.Add(new TextureFilterParameterView(enabledBinding)
+                {
+                    DataContext = vm
+                });
 
                 // register on changed callback                
                 vm.Changed += (sender, args) => HasChanged = HasChanges();

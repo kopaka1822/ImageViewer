@@ -26,7 +26,7 @@ namespace ImageViewer.ViewModels.Dialog
         private readonly string filename;
         private readonly string extension;
         private readonly bool is3D;
-        private readonly List<ComboBoxItem<GliFormat>> allFormats = new List<ComboBoxItem<GliFormat>>();
+        private readonly List<ListItemViewModel<GliFormat>> allFormats = new List<ListItemViewModel<GliFormat>>();
         private readonly List<int> formatRatings = new List<int>();
         // warning if exporting into non srgb formats (ldr file formats)
         private readonly bool nonSrgbExportWarnings = false;
@@ -44,7 +44,11 @@ namespace ImageViewer.ViewModels.Dialog
             // init layers
             for (var i = 0; i < models.Images.NumLayers; ++i)
             {
-                AvailableLayers.Add(new ComboBoxItem<int>("Layer " + i, i));
+                AvailableLayers.Add(new ListItemViewModel<int>
+                {
+                    Cargo = i,
+                    Name = "Layer " + i
+                });
             }
             selectedLayer = AvailableLayers[models.Export.Layer];
             Debug.Assert(selectedLayer.Cargo == models.Export.Layer);
@@ -52,7 +56,11 @@ namespace ImageViewer.ViewModels.Dialog
             // init mipmaps
             for (var i = 0; i < models.Images.NumMipmaps; ++i)
             {
-                AvailableMipmaps.Add(new ComboBoxItem<int>("Mipmap " + i, i));
+                AvailableMipmaps.Add(new ListItemViewModel<int>
+                {
+                    Cargo = i,
+                    Name = "Mipmap " + i
+                });
             }
             selectedMipmap = AvailableMipmaps[models.Export.Mipmap];
             Debug.Assert(selectedMipmap.Cargo == models.Export.Mipmap);
@@ -60,7 +68,11 @@ namespace ImageViewer.ViewModels.Dialog
             // all layer option for ktx and dds
             if (models.Images.NumLayers > 1 && (extension == "ktx" || extension == "dds"))
             {
-                AvailableLayers.Add(new ComboBoxItem<int>("All Layer", -1));
+                AvailableLayers.Add(new ListItemViewModel<int>
+                {
+                    Cargo = -1,
+                    Name = "All Layer"
+                });
                 selectedLayer = AvailableLayers.Last();
                 models.Export.Layer = selectedLayer.Cargo;
             }
@@ -68,7 +80,11 @@ namespace ImageViewer.ViewModels.Dialog
             // all mipmaps option for ktx and dds
             if (models.Images.NumMipmaps > 1 && (extension == "ktx" || extension == "dds"))
             {
-                AvailableMipmaps.Add(new ComboBoxItem<int>("All Mipmaps", -1));
+                AvailableMipmaps.Add(new ListItemViewModel<int>
+                {
+                    Cargo = -1,
+                    Name = "All Mipmaps"
+                });
                 selectedMipmap = AvailableMipmaps.Last();
                 models.Export.Mipmap = selectedMipmap.Cargo;
             }
@@ -80,17 +96,31 @@ namespace ImageViewer.ViewModels.Dialog
                 // exclude some formats for 3d export
                 if(is3D && format.IsExcludedFrom3DExport()) continue;
 
-                allFormats.Add(new ComboBoxItem<GliFormat>(format.ToString(), format, format.GetDescription()));
+                allFormats.Add(new ListItemViewModel<GliFormat>
+                {
+                    Cargo = format,
+                    Name = format.ToString(),
+                    ToolTip = format.GetDescription()
+                });
                 formatRatings.Add(stats.GetFormatRating(format, preferredFormat));
                 usedPixelTypes.Add(format.GetDataType());
             }
 
             if(usedPixelTypes.Count > 1)
-                AvailableDataTypes.Add(new ComboBoxItem<PixelDataType>("All", PixelDataType.Undefined));
+                AvailableDataTypes.Add(new ListItemViewModel<PixelDataType>
+                {
+                    Cargo = PixelDataType.Undefined,
+                    Name = "All"
+                });
             var preferredPixelType = preferredFormat.GetDataType();
             foreach (var usedPixelType in usedPixelTypes)
             {
-                AvailableDataTypes.Add(new ComboBoxItem<PixelDataType>(usedPixelType.ToString(), usedPixelType, usedPixelType.GetDescription()));
+                AvailableDataTypes.Add(new ListItemViewModel<PixelDataType>
+                {
+                    Cargo = usedPixelType,
+                    Name = usedPixelType.ToString(),
+                    ToolTip = usedPixelType.GetDescription()
+                });
                 if (usedPixelType == preferredPixelType)
                     SelectedDataType = AvailableDataTypes.Last();
             }
@@ -228,10 +258,10 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
-        public List<ComboBoxItem<int>> AvailableLayers { get; } = new List<ComboBoxItem<int>>();
-        public List<ComboBoxItem<int>> AvailableMipmaps { get; } = new List<ComboBoxItem<int>>();
-        public List<ComboBoxItem<PixelDataType>> AvailableDataTypes { get; } = new List<ComboBoxItem<PixelDataType>>();
-        public List<ComboBoxItem<GliFormat>> AvailableFormats { get; private set; }
+        public List<ListItemViewModel<int>> AvailableLayers { get; } = new List<ListItemViewModel<int>>();
+        public List<ListItemViewModel<int>> AvailableMipmaps { get; } = new List<ListItemViewModel<int>>();
+        public List<ListItemViewModel<PixelDataType>> AvailableDataTypes { get; } = new List<ListItemViewModel<PixelDataType>>();
+        public List<ListItemViewModel<GliFormat>> AvailableFormats { get; private set; }
 
         public bool EnableLayers => AvailableLayers.Count > 1;
         public bool EnableMipmaps => AvailableMipmaps.Count > 1;
@@ -240,8 +270,8 @@ namespace ImageViewer.ViewModels.Dialog
 
         public Visibility ZCropVisibility => is3D ? Visibility.Visible : Visibility.Collapsed;
 
-        private ComboBoxItem<int> selectedLayer;
-        public ComboBoxItem<int> SelectedLayer
+        private ListItemViewModel<int> selectedLayer;
+        public ListItemViewModel<int> SelectedLayer
         {
             get => selectedLayer;
             set
@@ -257,8 +287,8 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
-        private ComboBoxItem<int> selectedMipmap;
-        public ComboBoxItem<int> SelectedMipmap
+        private ListItemViewModel<int> selectedMipmap;
+        public ListItemViewModel<int> SelectedMipmap
         {
             get => selectedMipmap;
             set
@@ -275,9 +305,9 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
-        private ComboBoxItem<PixelDataType> selectedDataType;
+        private ListItemViewModel<PixelDataType> selectedDataType;
 
-        public ComboBoxItem<PixelDataType> SelectedDataType
+        public ListItemViewModel<PixelDataType> SelectedDataType
         {
             get => selectedDataType;
             set
@@ -285,7 +315,7 @@ namespace ImageViewer.ViewModels.Dialog
                 if (value == null || value == selectedDataType) return;
                 selectedDataType = value;
 
-                AvailableFormats = new List<ComboBoxItem<GliFormat>>();
+                AvailableFormats = new List<ListItemViewModel<GliFormat>>();
                 selectedFormat = null;
                 bool allowAll = selectedDataType.Cargo == PixelDataType.Undefined;
                 int bestFit = 0;
@@ -313,8 +343,8 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
-        private ComboBoxItem<GliFormat> selectedFormat;
-        public ComboBoxItem<GliFormat> SelectedFormat
+        private ListItemViewModel<GliFormat> selectedFormat;
+        public ListItemViewModel<GliFormat> SelectedFormat
         {
             get => selectedFormat;
             set
