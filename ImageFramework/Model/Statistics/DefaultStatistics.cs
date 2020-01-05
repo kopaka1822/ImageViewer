@@ -65,6 +65,7 @@ namespace ImageFramework.Model.Statistics
             Average,
             Luma,
             Lightness,
+            Alpha
         }
 
         public enum Metrics
@@ -95,6 +96,8 @@ namespace ImageFramework.Model.Statistics
                     return Get(Luma, metric);
                 case Types.Lightness:
                     return Get(Lightness, metric);
+                case Types.Alpha:
+                    return Get(Alpha, metric);
             }
 
             return 0.0f;

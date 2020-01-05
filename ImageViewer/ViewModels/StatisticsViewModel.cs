@@ -34,7 +34,9 @@ The ""NTSC"" luma formula is: dot(sRGB, (0.299, 0.587, 0.114)).",
             // lightness
             @"Human vision has a nonlinear perceptual response to brightness: a source having a luminance only 18% of a reference luminance appears about half as bright. 
 The perceptual response to luminance Y is called lightness L.
-It is computed from the luminance: L = 116 * Y ^ (1/3) - 16."
+It is computed from the luminance: L = 116 * Y ^ (1/3) - 16.",
+            // alpha
+            @"Alpha channel."
         };
 
         public StatisticsViewModel(ModelsEx models)
@@ -97,7 +99,12 @@ It is computed from the luminance: L = 116 * Y ^ (1/3) - 16."
             {
                 Name = "Lightness",
                 Cargo = DefaultStatistics.Types.Lightness
-            }
+            },
+            new ListItemViewModel<DefaultStatistics.Types>
+            {
+                Name = "Alpha",
+                Cargo = DefaultStatistics.Types.Alpha
+            },
         };
 
         private ListItemViewModel<DefaultStatistics.Types> selectedChannel;

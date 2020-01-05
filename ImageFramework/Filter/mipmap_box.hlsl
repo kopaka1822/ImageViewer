@@ -29,6 +29,8 @@ float4 filter(int3 pixelCoord, int3 size)
 	if(level == 0){
 		color = src_image[texel(pixelCoord)];
 	} else {
+		double4 dcolor = 0.0; // high preision color because large sums can screw with float precision
+
 		// calculate filter dimension based on level 0 size
 		uint3 baseSize = getLevel0Size();	
 #if2D
@@ -42,28 +44,46 @@ float4 filter(int3 pixelCoord, int3 size)
 		float3 end = float3(pixelCoord + 1) * filterSize;
 
 		int3 pos;
-		int3 endi;
+		int3 starti = floor(start);
+		int3 endi = ceil(end);
+		endi.xy = min(endi.xy, baseSize.xy);
 		float3 vis = 0; // visibility for each axis
+		bool hasAlpha = false; // indicates if at least one pixel had alpha != 1
 
-		for(pos.z = floor(start.z), endi.z = ceil(end.z); pos.z < endi.z; ++pos.z)
+		for(pos.z = starti.z; pos.z < endi.z; ++pos.z)
 		{
-			vis[2] =  getVisibility(pos.z, start.z, end.z);
-			for(pos.y = floor(start.y), endi.y = ceil(end.y); pos.y < endi.y; ++pos.y)
+			vis[2] = getVisibility(pos.z, start.z, end.z);
+			for(pos.y = starti.y; pos.y < endi.y; ++pos.y)
 			{
-				vis[1] =  getVisibility(pos.y, start.y, end.y);
-				for(pos.x = floor(start.x), endi.x = ceil(end.x); pos.x < endi.x; ++pos.x)
+				vis[1] = getVisibility(pos.y, start.y, end.y);
+				for(pos.x = starti.x; pos.x < endi.x; ++pos.x)
 				{
-					vis[0] =  getVisibility(pos.x, start.x, end.x);
+					vis[0] = getVisibility(pos.x, start.x, end.x);
 					float visibility = vis.x * vis.y * vis.z;
 
 					// sum up pixels
-					color += src_image_ex.mips[0][pos] * visibility;
+					float4 c = src_image_ex.mips[0][pos];
+					if(c.a != 1.0) hasAlpha = true;
+					dcolor.a += (double)(c.a * visibility); // sum up all alpha
+					// scale color with alpha (higher alpha values have more impact on the actual color)
+					dcolor.rgb += double3(c.a * c.rgb * visibility);
 				}
 			}
 		}
 		
 		// divide sum by filter size
-		color /= filterSize.x * filterSize.y * filterSize.z;
+		dcolor /= (double)(filterSize.x * filterSize.y * filterSize.z);
+		if(hasAlpha)
+		{
+			// scale color according to alpha
+			if(dcolor.a != 0.0) dcolor.rgb /= dcolor.a;
+		}
+		else
+		{
+			dcolor.a = 1.0; // not always true due to precision errors
+		}
+		
+		color = (float4)(dcolor);
 	}
 
 	return color;
