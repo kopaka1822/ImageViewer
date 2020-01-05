@@ -20,12 +20,12 @@ namespace ImageFramework.Model.Shader
         private readonly string returnValue;
 
         // predefined return values
-        public static readonly string LuminanceValue = "return dot(value.rgb, float3(0.2125, 0.7154, 0.0721))";
-        public static readonly string UniformWeightValue = "return dot(value.rgb, 1.0/3.0)";
+        public static readonly string LuminanceValue = "return dot(value.a * value.rgb, float3(0.2125, 0.7154, 0.0721))";
+        public static readonly string UniformWeightValue = "return dot(value.a * value.rgb, 1.0/3.0)";
         public static readonly string LightnessValue = @"
-float lum = dot(value.rgb, float3(0.2125, 0.7154, 0.0721));
+float lum = dot(value.a * value.rgb, float3(0.2125, 0.7154, 0.0721));
 return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
-        public static readonly string LumaValue = "return dot(toSrgb(value).rgb, float3(0.299, 0.587, 0.114))";
+        public static readonly string LumaValue = "return dot(value.a * toSrgb(value).rgb, float3(0.299, 0.587, 0.114))";
         public static readonly string AlphaValue = "return value.a";
 
         /// <summary>
