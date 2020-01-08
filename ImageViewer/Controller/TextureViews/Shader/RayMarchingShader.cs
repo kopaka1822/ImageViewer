@@ -24,12 +24,12 @@ namespace ImageViewer.Controller.TextureViews.Shader
             public float Farplane;
             public int UseAbs;
             public int UseFlatShading;
-            
+
         }
 
         private readonly SamplerState sampler;
 
-        public RayMarchingShader() 
+        public RayMarchingShader()
             : base(GetVertexSource(), GetPixelSource(), "RayMarchingShader")
         {
             sampler = new SamplerState(Device.Get().Handle, new SamplerStateDescription
@@ -50,7 +50,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
 
         public void Run(UploadBuffer buffer, Matrix rayTransform, Matrix worldToImage, float multiplier, float farplane,
-            bool useAbs, bool useFlatShading,ShaderResourceView texture)
+            bool useAbs, bool useFlatShading, ShaderResourceView texture, ShaderResourceView emptySpaceTex)
         {
             buffer.SetData(new ViewBufferData
             {
@@ -69,12 +69,14 @@ namespace ImageViewer.Controller.TextureViews.Shader
             dev.Pixel.SetConstantBuffer(0, buffer.Handle);
 
             dev.Pixel.SetShaderResource(0, texture);
+            dev.Pixel.SetShaderResource(1, emptySpaceTex);
             dev.Pixel.SetSampler(0, sampler);
 
             dev.DrawQuad();
 
             // unbind
             dev.Pixel.SetShaderResource(0, null);
+            dev.Pixel.SetShaderResource(1, null);
             UnbindShader(dev);
         }
 
@@ -110,6 +112,7 @@ VertexOut main(uint id : SV_VertexID) {{
         {
             return $@"
 Texture3D<float4> tex : register(t0);
+Texture3D<uint> emptySpaceTex : register(t1);
 SamplerState texSampler : register(s0);
 
 {ConstantBuffer()}
@@ -270,7 +273,9 @@ float4 main(PixelIn i) : SV_TARGET {{
             distance.y = projLength.y;
             diffuse = absDir.y;
         }}    
-    
+        //skip empty space
+        //rayPos += emptySpaceTex[rayPos] * ray;    
+
     }} while(isInside(rayPos,textureDimension) && color.a > 0.0);
 
 
