@@ -21,7 +21,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
         public virtual void Dispose()
         {}
 
-        public virtual void Draw(ITexture texture)
+        public virtual void Draw(int id, ITexture texture)
         {
             data.Checkers.Run(data.Buffer, Matrix.Identity, models.Settings.AlphaBackground);
         }

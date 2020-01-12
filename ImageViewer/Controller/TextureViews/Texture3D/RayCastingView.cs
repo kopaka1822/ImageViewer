@@ -36,11 +36,11 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             helpTextures = new SpaceSkippingTexture3D[4];
         }
 
-        public override void Draw(ITexture texture)
+        public override void Draw(int id, ITexture texture)
         {
             if (texture == null) return;
 
-            base.Draw(texture);
+            base.Draw(id, texture);
 
             var dev = Device.Get();
             dev.OutputMerger.BlendState = data.AlphaDarkenState;
@@ -86,11 +86,13 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         public override void UpdateImage(int id, ITexture texture)
         {
             base.UpdateImage(id, texture);
-            SpaceSkippingTexture3D tex = new SpaceSkippingTexture3D(id, texture);
-            helpTextures[id] = tex;
 
-            emptySpaceSkippingShader.Execute(texture.GetSrView(0, 0), helpTextures[id].GetUaView(0),texture.Size);
-            
+            if (!(texture is null))
+            {
+                SpaceSkippingTexture3D tex = new SpaceSkippingTexture3D(id, texture);
+                helpTextures[id] = tex;
+                emptySpaceSkippingShader.Execute(texture.GetSrView(0, 0), helpTextures[id].GetUaView(0), texture.Size);
+            }
         }
 
         private class SpaceSkippingTexture3D
@@ -116,7 +118,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
                     Usage = ResourceUsage.Default
                 };
                 texHandle = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, desc);
-                
+
                 srViews = new ShaderResourceView[NumMipmaps];
                 uaViews = new UnorderedAccessView[NumMipmaps];
 

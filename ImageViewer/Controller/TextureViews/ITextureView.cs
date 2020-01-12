@@ -12,7 +12,7 @@ namespace ImageViewer.Controller.TextureViews
 {
     interface ITextureView : IDisposable
     {
-        void Draw(ITexture texture);
+        void Draw(int id, ITexture texture);
         void OnScroll(float amount, Vector2 mouse);
         void OnDrag(Vector2 diff);
 

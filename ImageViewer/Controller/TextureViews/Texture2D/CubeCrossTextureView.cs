@@ -13,7 +13,7 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
         : base(models, data, ShaderBuilder.Builder2D)
         {}
 
-        public override void Draw(ITexture texture)
+        public override void Draw(int id, ITexture texture)
         {
             if (texture == null) return;
 

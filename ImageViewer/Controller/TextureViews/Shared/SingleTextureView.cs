@@ -13,7 +13,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
         {
         }
 
-        public override void Draw(ITexture texture)
+        public override void Draw(int id, ITexture texture)
         {
             if (texture == null) return;
 
