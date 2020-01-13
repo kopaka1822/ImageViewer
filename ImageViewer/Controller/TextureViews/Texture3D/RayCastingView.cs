@@ -53,7 +53,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             else
             {
                 marchingShader.Run(data.Buffer, models.Display.ClientAspectRatio, GetWorldToImage(), models.Display.Multiplier, CalcFarplane(), models.Display.DisplayNegative,
-                displayEx.FlatShading, texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap), helpTextures[0].GetSrView(0));
+                displayEx.FlatShading, texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap), helpTextures[id].GetSrView(0));
             }
 
             dev.OutputMerger.BlendState = data.DefaultBlendState;
