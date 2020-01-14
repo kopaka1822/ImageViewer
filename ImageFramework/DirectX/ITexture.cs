@@ -31,7 +31,7 @@ namespace ImageFramework.DirectX
         unsafe byte[] GetBytes(int layer, int mipmap, uint size);
         void CopyPixels(int layer, int mipmap, IntPtr destination, uint size);
 
-        ITexture GenerateMipmapLevels(int levels);
+        ITexture GenerateMipmapLevels(int levels, bool generate = true);
         ITexture CloneWithoutMipmaps(int mipmap = 0);
 
         /// <summary>
@@ -41,5 +41,8 @@ namespace ImageFramework.DirectX
         ITexture Create(int numLayer, int numMipmaps, Size3 size, Format format, bool createUav);
 
         ITexture Clone();
+
+        // indicates if both textures have the same dimension, layer, etc. (format excluded)
+        bool HasSameDimensions(ITexture other);
     }
 }

@@ -265,7 +265,7 @@ namespace ImageFramework.Model
             Debug.Assert(NumMipmaps == 1);
 
             // compute new mipmap levels
-            var levels = ComputeMaxMipLevels();
+            var levels = Size.MaxMipLevels;
             if (levels == NumMipmaps) return;
 
             foreach (var image in Images)
@@ -292,18 +292,6 @@ namespace ImageFramework.Model
             OnPropertyChanged(nameof(NumMipmaps));
         }
 
-        public static int ComputeMaxMipLevels(Size3 size)
-        {
-            return ComputeMaxMipLevels(size.Max);
-        }
-
-        public static int ComputeMaxMipLevels(int width)
-        {
-            var maxMip = 1;
-            while ((width /= 2) > 0) ++maxMip;
-            return maxMip;
-        }
-
         /// <summary>
         /// scales all images to the given dimensions
         /// </summary>
@@ -326,15 +314,6 @@ namespace ImageFramework.Model
             OnPropertyChanged(nameof(Size));
             if(prevMipmaps != NumMipmaps)
                 OnPropertyChanged(nameof(NumMipmaps));
-        }
-
-        /// <summary>
-        /// computes the maximum amount of mipmap levels for the current width and height
-        /// </summary>
-        /// <returns></returns>
-        private int ComputeMaxMipLevels()
-        {
-            return ComputeMaxMipLevels(Size.Max);
         }
 
         protected void InitDimensions(ITexture image)

@@ -1,0 +1,84 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using ImageFramework.ImageLoader;
+using ImageFramework.Model;
+using ImageFramework.Utility;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace FrameworkTests.Model.Scaling
+{
+    [TestClass]
+    public class DownscalingTest
+    {
+        [TestMethod]
+        public void FastScalingWithCopy()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "checkers_wide.png");
+            models.Pipelines[0].Color.Formula = "I0 + 0"; // trick pipeline to create a rgba32 target for us
+            models.Apply();
+
+            var src = models.Pipelines[0].Image;
+            Assert.IsNotNull(src);
+            Assert.AreEqual(SharpDX.DXGI.Format.R32G32B32A32_Float ,src.Format);
+            var mipped = src.GenerateMipmapLevels(src.Size.MaxMipLevels, false);
+            // mip levels:
+            // 0: 8 x 4
+            // 1: 4 x 2
+            // 2: 2 x 1
+            // 3: 1 x 1 => y was copied
+
+            models.Scaling.WriteMipmaps(mipped);
+
+            // test mipmaps
+            var mip1 = mipped.GetPixelColors(0, 1);
+            var refMip1 = IO.LoadImageTexture(TestData.Directory + "checkers_wide_mip1.png").GetPixelColors(0, 0);
+
+            Console.Out.WriteLine("Testing fast results");
+
+            TestData.CompareColors(refMip1, mip1);
+
+            var mip2 = mipped.GetPixelColors(0, 2);
+            Assert.AreEqual(2, mip2.Length);
+            Assert.IsTrue(new Color(0.5f).Equals(mip2[0], Color.Channel.Rgb));
+
+            Console.Out.WriteLine("Testing copy results");
+
+            var mip3 = mipped.GetPixelColors(0, 3);
+            Assert.AreEqual(1, mip3.Length);
+            Assert.IsTrue(new Color(0.5f).Equals(mip3[0], Color.Channel.Rgb));
+        }
+
+        [TestMethod]
+        public void FastSlowCopyScaling()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "checkers3x7.png");
+            models.Pipelines[0].Color.Formula = "I0 + 0"; // trick pipeline to create a rgba32 target for us
+            models.Apply();
+
+            var src = models.Pipelines[0].Image;
+            Assert.IsNotNull(src);
+            Assert.AreEqual(SharpDX.DXGI.Format.R32G32B32A32_Float, src.Format);
+            var mipped = src.GenerateMipmapLevels(src.Size.MaxMipLevels, false);
+            // mip levels:
+            // 0: 3 x 7
+            // 1: 1 x 3 fast + slow
+            // 2: 1 x 1 copy + slow
+
+            models.Scaling.WriteMipmaps(mipped);
+
+            // test mipmaps
+            var mip1 = mipped.GetPixelColors(0, 1);
+            var refMip1 = IO.LoadImageTexture(TestData.Directory + "checkers3x7_mip1.png").GetPixelColors(0, 0);
+            TestData.CompareColors(refMip1, mip1);
+
+            var mip2 = mipped.GetPixelColors(0, 2);
+            Assert.AreEqual(1, mip2.Length);
+            Assert.IsTrue(new Color(0.476f).Equals(mip2[0], Color.Channel.Rgb));
+        }
+    }
+}

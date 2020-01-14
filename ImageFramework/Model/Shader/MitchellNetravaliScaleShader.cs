@@ -31,7 +31,7 @@ namespace ImageFramework.Model.Shader
             var genMipmaps = src.HasMipmaps;
             var numMipmaps = 1;
             if (genMipmaps)
-                numMipmaps = ImagesModel.ComputeMaxMipLevels(dstSize);
+                numMipmaps = dstSize.MaxMipLevels;
 
             bool changeWidth = dstSize.Width != src.Size.Width;
             bool changeHeight = dstSize.Height != src.Size.Height;

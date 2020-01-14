@@ -104,7 +104,7 @@ namespace ImageFramework.Model
         {
             public ImagesModel Images;
             public ProgressModel Progress;
-            public TextureCache TextureCache;
+            public ITextureCache TextureCache;
             public UploadBuffer LayerLevelBuffer;
             public List<FilterModel> Filters;
             public SyncQuery Sync;
@@ -213,7 +213,7 @@ namespace ImageFramework.Model
             return args.Sync.WaitForGpuAsync(ct);
         }
 
-        internal void ResetImage(TextureCache cache)
+        internal void ResetImage(ITextureCache cache)
         {
             if (Image != null)
             {

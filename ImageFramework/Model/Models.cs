@@ -13,6 +13,7 @@ using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
 using ImageFramework.Model.Filter;
+using ImageFramework.Model.Scaling;
 using ImageFramework.Model.Shader;
 using ImageFramework.Model.Statistics;
 using ImageFramework.Utility;
@@ -54,7 +55,7 @@ namespace ImageFramework.Model
 
         public SharedModel SharedModel { get; }
         
-        internal TextureCache TextureCache { get; }
+        internal ITextureCache TextureCache { get; }
 
         private readonly PipelineController pipelineController;
 
@@ -78,6 +79,9 @@ namespace ImageFramework.Model
         private ConvertPolarShader PolarConvertShader =>
             polarConvertShader ?? (polarConvertShader = new ConvertPolarShader(SharedModel.QuadShader));
 
+        private ScalingModel scaling = null;
+        public ScalingModel Scaling => scaling ?? (scaling = new ScalingModel(this));
+
         #endregion
 
         public Models(int numPipelines = 1)
@@ -87,7 +91,7 @@ namespace ImageFramework.Model
 
             SharedModel = new SharedModel();
             Images = new ImagesModel(SharedModel.ScaleShader);
-            TextureCache = new TextureCache(Images);
+            TextureCache = new ImageModelTextureCache(Images);
 
             Filter = new FiltersModel(Images);
             Progress = new ProgressModel();
@@ -117,6 +121,8 @@ namespace ImageFramework.Model
             }
             OnSoftReset();
         }
+
+        
 
         private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -307,6 +313,7 @@ namespace ImageFramework.Model
             thumbnail?.Dispose();
             stats?.Dispose();
             gif?.Dispose();
+            scaling?.Dispose();
 
             Images?.Dispose();
             Filter?.Dispose();

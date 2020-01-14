@@ -89,12 +89,12 @@ namespace ImageFramework.DirectX
             }
         }
 
-        public ITexture GenerateMipmapLevels(int levels)
+        public ITexture GenerateMipmapLevels(int levels, bool generate)
         {
-            return GenerateMipmapLevelsT(levels);
+            return GenerateMipmapLevelsT(levels, generate);
         }
 
-        public T GenerateMipmapLevelsT(int levels)
+        public T GenerateMipmapLevelsT(int levels, bool generate = true)
         {
             Debug.Assert(!HasMipmaps);
             var newTex = CreateT(NumLayers, levels, Size, Format, uaViews != null);
@@ -106,7 +106,8 @@ namespace ImageFramework.DirectX
                 Device.Get().CopySubresource(GetHandle(), newTex.GetHandle(), GetSubresourceIndex(curLayer, 0), newTex.GetSubresourceIndex(curLayer, 0), Size);
             }
 
-            Device.Get().GenerateMips(newTex.View);
+            if(generate)
+                Device.Get().GenerateMips(newTex.View);
 
             return newTex;
         }
@@ -145,6 +146,15 @@ namespace ImageFramework.DirectX
         public ITexture Clone()
         {
             return CloneT();
+        }
+
+        public bool HasSameDimensions(ITexture other)
+        {
+            if (NumLayers != other.NumLayers) return false;
+            if (NumMipmaps != other.NumMipmaps) return false;
+            if (Size != other.Size) return false;
+            if (GetType() != other.GetType()) return false;
+            return true;
         }
 
         public T CloneT()

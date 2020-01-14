@@ -142,7 +142,7 @@ namespace ImageFramework.Model.Shader
             if (recomputeMips)
             {
                 // number of mipmaps might have changed
-                nMipmaps = ImagesModel.ComputeMaxMipLevels(size);
+                nMipmaps = size.MaxMipLevels;
                 recomputeMips = nMipmaps > 1;
             }
 
