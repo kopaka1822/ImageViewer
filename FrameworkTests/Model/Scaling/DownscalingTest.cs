@@ -80,5 +80,26 @@ namespace FrameworkTests.Model.Scaling
             Assert.AreEqual(1, mip2.Length);
             Assert.IsTrue(new Color(0.476f).Equals(mip2[0], Color.Channel.Rgb));
         }
+
+        [TestMethod]
+        public void Scaling3D()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "checkers3d.dds");
+            models.Pipelines[0].Color.Formula = "I0 + 0"; // trick pipeline to create a rgba32 target for us
+            models.Apply();
+
+            var original = models.Images.Images[0].Image;
+            var dst = models.Pipelines[0].Image;
+            Assert.IsNotNull(dst);
+            Assert.AreEqual(SharpDX.DXGI.Format.R32G32B32A32_Float, dst.Format);
+            Assert.IsTrue(dst != models.Images.Images[0].Image);
+
+            // overwrite mipmaps
+            models.Scaling.WriteMipmaps(dst);
+
+            TestData.CompareColors(original.GetPixelColors(0, 1), dst.GetPixelColors(0, 1));
+            TestData.CompareColors(original.GetPixelColors(0, 2), dst.GetPixelColors(0, 2));
+        }
     }
 }
