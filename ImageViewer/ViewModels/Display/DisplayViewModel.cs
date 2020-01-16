@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
@@ -20,6 +21,7 @@ using ImageViewer.Controller.TextureViews.Texture3D;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
 using ImageViewer.Views;
+using Color = System.Windows.Media.Color;
 using RayCastingView = ImageViewer.Views.Display.RayCastingView;
 using Single3DView = ImageViewer.Views.Display.Single3DView;
 
@@ -72,6 +74,18 @@ namespace ImageViewer.ViewModels.Display
                     OnPropertyChanged(nameof(IsAlphaCheckers));
                     OnPropertyChanged(nameof(IsAlphaTheme));
                     break;
+                case nameof(SettingsModel.NaNColor):
+                    OnPropertyChanged(nameof(NaNColor));
+                    break;
+            }
+        }
+
+        public SolidColorBrush NaNColor
+        {
+            get
+            {
+                var c = models.Settings.NaNColor;
+                return new SolidColorBrush(Color.FromScRgb(1.0f, c.Red, c.Green, c.Blue));
             }
         }
 

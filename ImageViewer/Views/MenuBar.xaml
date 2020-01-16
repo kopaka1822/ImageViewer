@@ -72,6 +72,16 @@
                 IsCheckable="True"
                 IsChecked="{Binding Display.DisplayNegative}"/>
             <MenuItem
+                Header="NaN Color"
+                Command="{Binding SelectNaNColorCommand}">
+                <MenuItem.Icon>
+                    <Border 
+                        Width="16" 
+                        Height="16"
+                        Background="{Binding Display.NaNColor, FallbackValue=Red}"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem
                     Header="Show Crop Box"
                     IsCheckable="True"
                     IsChecked="{Binding Display.ShowCropRectangle}"
