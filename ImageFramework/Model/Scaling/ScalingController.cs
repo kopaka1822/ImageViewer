@@ -13,6 +13,9 @@ namespace ImageFramework.Model.Scaling
         private readonly Models models;
         private ITextureCache customTexCache = null;
         private DownscalingShaderBase boxMinify = null;
+        private DownscalingShaderBase triangleMinify = null;
+        private DownscalingShaderBase lanzosMinify = null;
+        private DownscalingShaderBase detailPreservingMinify = null;
 
         internal ScalingModel(Models models)
         {
@@ -88,6 +91,8 @@ namespace ImageFramework.Model.Scaling
             {
                 case MinifyFilters.Box:
                     return boxMinify ?? (boxMinify = new BoxScalingShader());
+                case MinifyFilters.Triangle:
+                    return triangleMinify ?? (triangleMinify = new TriangleScalingShader());
             }
 
             throw new Exception($"invalid minify filter specified: {minify}");
@@ -113,6 +118,10 @@ namespace ImageFramework.Model.Scaling
         public void Dispose()
         {
             customTexCache?.Dispose();
+            boxMinify?.Dispose();
+            triangleMinify?.Dispose();
+            lanzosMinify?.Dispose();
+            detailPreservingMinify?.Dispose();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

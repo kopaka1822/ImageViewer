@@ -140,6 +140,7 @@
     <Compile Include="Model\ProgressModel.cs" />
     <Compile Include="Model\Scaling\DownscalingShaderBase.cs" />
     <Compile Include="Model\Scaling\Down\BoxScalingShader.cs" />
+    <Compile Include="Model\Scaling\Down\TriangleScalingShader.cs" />
     <Compile Include="Model\Scaling\ScalingController.cs" />
     <Compile Include="Model\Shader\ConvertPolarShader.cs" />
     <Compile Include="Model\Shader\FilterShader.cs" />

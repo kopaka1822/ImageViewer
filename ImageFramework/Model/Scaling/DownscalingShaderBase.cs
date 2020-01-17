@@ -61,6 +61,18 @@ namespace ImageFramework.Model.Scaling
             this.weightFunc = weightFunc;
         }
 
+        // for testing purposes
+        internal void CompileShaders()
+        {
+            DirectX.Shader instance;
+            instance = CopyShader;
+            instance = CopyShader3D;
+            instance = FastShader;
+            instance = FastShader3D;
+            instance = SlowShader;
+            instance = SlowShader3D;
+        }
+
         internal void Run(ITexture src, ITexture dst, int dstMipmap, bool hasAlpha, UploadBuffer upload, ITextureCache cache)
         {
             Debug.Assert(cache.IsCompatibleWith(src));
@@ -170,7 +182,7 @@ namespace ImageFramework.Model.Scaling
 {HeaderAndMain(builder)}  {{
     {ReturnIfOutside()}
     
-    dst_image[texel(id)] = src_image[texel(id)];
+    dst_image[texel(id, layer)] = src_image[texel(id)];
 }}
 ";
         }

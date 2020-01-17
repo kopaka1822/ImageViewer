@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
+using ImageFramework.Model.Scaling;
+using ImageFramework.Model.Scaling.Down;
 using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -14,7 +16,7 @@ namespace FrameworkTests.Model.Scaling
     public class DownscalingTest
     {
         [TestMethod]
-        public void FastScalingWithCopy()
+        public void FastScaling()
         {
             var models = new Models(1);
             models.AddImageFromFile(TestData.Directory + "checkers_wide.png");
@@ -29,7 +31,7 @@ namespace FrameworkTests.Model.Scaling
             // 0: 8 x 4
             // 1: 4 x 2
             // 2: 2 x 1
-            // 3: 1 x 1 => y was copied
+            // 3: 1 x 1
 
             models.Scaling.WriteMipmaps(mipped);
 
@@ -53,7 +55,7 @@ namespace FrameworkTests.Model.Scaling
         }
 
         [TestMethod]
-        public void FastSlowCopyScaling()
+        public void FastSlowScaling()
         {
             var models = new Models(1);
             models.AddImageFromFile(TestData.Directory + "checkers3x7.png");
@@ -67,7 +69,7 @@ namespace FrameworkTests.Model.Scaling
             // mip levels:
             // 0: 3 x 7
             // 1: 1 x 3 fast + slow
-            // 2: 1 x 1 copy + slow
+            // 2: 1 x 1 fast + fast
 
             models.Scaling.WriteMipmaps(mipped);
 
@@ -100,6 +102,49 @@ namespace FrameworkTests.Model.Scaling
 
             TestData.CompareColors(original.GetPixelColors(0, 1), dst.GetPixelColors(0, 1));
             TestData.CompareColors(original.GetPixelColors(0, 2), dst.GetPixelColors(0, 2));
+        }
+
+        [TestMethod]
+        public void BoxCompile()
+        {
+            var s = new BoxScalingShader();
+            s.CompileShaders();
+        }
+
+        [TestMethod]
+        public void TriangleCompile()
+        {
+            var s = new TriangleScalingShader();
+            s.CompileShaders();
+        }
+
+        [TestMethod]
+        public void TriangleCheckersTest()
+        {
+            // the results should be identical with the box filter in this case
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "checkers.dds");
+            models.Pipelines[0].Color.Formula = "I0 + 0"; // trick pipeline to create a rgba32 target for us
+            models.Apply();
+
+            var src = models.Pipelines[0].Image;
+            Assert.IsNotNull(src);
+            Assert.AreEqual(SharpDX.DXGI.Format.R32G32B32A32_Float, src.Format);
+            var mipped = src.CloneWithoutMipmaps().GenerateMipmapLevels(src.Size.MaxMipLevels, false);
+            // mip levels:
+            // 0: 4 x 4
+            // 1: 2 x 2
+            // 2: 1 x 1
+
+            models.Scaling.Minify = ScalingModel.MinifyFilters.Triangle;
+            models.Scaling.WriteMipmaps(mipped);
+
+            // test mipmaps
+            var mip1 = mipped.GetPixelColors(0, 1);
+            TestData.TestCheckersLevel1(mip1);
+
+            var mip2 = mipped.GetPixelColors(0, 2);
+            TestData.TestCheckersLevel2(mip2);
         }
     }
 }
