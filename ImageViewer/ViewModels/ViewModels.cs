@@ -28,6 +28,8 @@ namespace ImageViewer.ViewModels
         public EquationsViewModel Equations { get; }
 
         public StatisticsViewModel Statistics { get; }
+
+        public ScalingViewModel Scale { get; }
         public ViewModels(ModelsEx models)
         {
             this.models = models;
@@ -39,6 +41,7 @@ namespace ImageViewer.ViewModels
             Equations = new EquationsViewModel(models);
             Filter = new FiltersViewModel(models);
             Statistics = new StatisticsViewModel(models);
+            Scale = new ScalingViewModel(models);
 
             // commands
             OpenCommand = new OpenCommand(models);

@@ -34,6 +34,7 @@ namespace ImageFramework.Model.Scaling
             Triangle,
             Lanzos,
             DetailPreserving, // Rapid, Detail-Preserving Image Downscaling 2016
+            Normals, // TODO
         }
 
         private MagnifyFilters magnify = MagnifyFilters.MitchellNetravali;
