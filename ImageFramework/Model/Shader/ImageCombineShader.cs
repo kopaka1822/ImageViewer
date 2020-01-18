@@ -29,7 +29,10 @@ namespace ImageFramework.Model.Shader
                 dev.Compute.SetShaderResource(i, images.Images[i].Image.View);
             }
 
-            for (int curMipmap = 0; curMipmap < images.NumMipmaps; ++curMipmap)
+
+            //for (int curMipmap = 0; curMipmap < images.NumMipmaps; ++curMipmap)
+            // only for upper mipmap (mipmaps might be invalid if non linear operations were performed => they will be recomputed in the last pipeline step)
+            var curMipmap = 0;
             {
                 var size = images.GetSize(curMipmap);
 

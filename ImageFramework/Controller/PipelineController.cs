@@ -20,11 +20,9 @@ namespace ImageFramework.Controller
     /// <summary>
     /// controller that assures that the pipeline images are up to date
     /// </summary>
-    internal class PipelineController : IDisposable
+    internal class PipelineController
     {
         private readonly Models models;
-        private readonly UploadBuffer layerLevelBuffer;
-        private readonly SyncQuery syncQuery;
         public PipelineController(Models models)
         {
             this.models = models;
@@ -36,9 +34,6 @@ namespace ImageFramework.Controller
                 pipe.Color.PropertyChanged += (sender, e) => PipelineFormulaOnPropertyChanged(pipe, pipe.Color, e);
                 pipe.Alpha.PropertyChanged += (sender, e) => PipelineFormulaOnPropertyChanged(pipe, pipe.Alpha, e);
             }
-
-            layerLevelBuffer = models.SharedModel.Upload;
-            syncQuery = new SyncQuery();
 
             this.models.Filter.PropertyChanged += FilterOnPropertyChanged;
             this.models.Filter.ParameterChanged += FilterOnParameterChanged;
@@ -87,12 +82,8 @@ namespace ImageFramework.Controller
         {
             var args = new ImagePipeline.UpdateImageArgs
             {
-                Images = models.Images,
-                LayerLevelBuffer = layerLevelBuffer,
-                Progress = models.Progress,
-                TextureCache = models.TextureCache,
+                Models = models,
                 Filters = null,
-                Sync = syncQuery
             };
 
             for (var i = 0; i < models.Pipelines.Count; i++)
@@ -100,10 +91,7 @@ namespace ImageFramework.Controller
                 var pipe = models.Pipelines[i];
                 if (pipe.HasChanges && pipe.IsValid && pipe.IsEnabled)
                 {
-                    if (pipe.UseFilter)
-                    {
-                        args.Filters = GetPipeFilters(i);
-                    }
+                    args.Filters = pipe.UseFilter ? GetPipeFilters(i) : null;
 
                     await pipe.UpdateImageAsync(args, ct);
                 }
@@ -174,11 +162,6 @@ namespace ImageFramework.Controller
         private void UpdateFormulaValidity(ImagePipeline pipe, int numImages)
         {
             pipe.IsValid = pipe.Color.MaxImageId < numImages && pipe.Alpha.MaxImageId < numImages;
-        }
-
-        public void Dispose()
-        {
-            syncQuery?.Dispose();
         }
     }
 }

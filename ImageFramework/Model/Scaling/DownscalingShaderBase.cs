@@ -268,8 +268,8 @@ dst_image[texel(id, layer)] = float4(dstColor);
 float w = rightWeight - leftWeight;
 
 float4 v = src_image[texel(srcPos)];
-dstColor.a += (double)(v.a * w);
-dstColor.rgb += (double)(v.a * v.rgb * w);
+dstColor.a += double(v.a * w);
+dstColor.rgb += double3(v.a * v.rgb * w);
 
 srcPos += dir;
 leftWeight = rightWeight;

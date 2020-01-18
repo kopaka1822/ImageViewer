@@ -64,7 +64,9 @@ namespace ImageFramework.Model.Shader
 
             dev.Compute.SetShaderResource(1, src.View);
 
-            for (int curMipmap = 0; curMipmap < image.NumMipmaps; ++curMipmap)
+            //for (int curMipmap = 0; curMipmap < image.NumMipmaps; ++curMipmap)
+            // only execute for upper mipmap => filters are unpredictable and likely to destroy the correct mipmap. Mipmaps will be computed in the last pipeline step
+            var curMipmap = 0;
             {
                 // dst texture
                 dev.Compute.SetUnorderedAccessView(0, dst.GetUaView(curMipmap));
