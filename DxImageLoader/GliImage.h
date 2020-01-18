@@ -40,8 +40,8 @@ class GliImage final : public GliImageBase
 {
 public:
 	GliImage(const gli::texture& tex);
-	GliImage(gli::format format, gli::format original, size_t nLayer, size_t nFaces, size_t nLevel, size_t width, size_t height, size_t depth);
 	GliImage(gli::format format, size_t nLayer, size_t nLevel, size_t width, size_t height, size_t depth);
+	GliImage(gli::format format, gli::format original, size_t nLayer, size_t nFaces, size_t nLevel, size_t width, size_t height, size_t depth);
 	GliImage(const gli::texture& tex, gli::format original);
 
 	std::unique_ptr<GliImage> convert(gli::format format, int quality);
@@ -50,7 +50,7 @@ public:
 	void flip();
 private:
 	// helper to choose the correct internal format. This is later required for format conversions
-	gli::texture& initTex(size_t nFaces, size_t depth);
+	gli::texture& initTex(size_t nFaces, gli::extent3d size);
 
 	enum Type
 	{

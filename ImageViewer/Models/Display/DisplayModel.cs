@@ -365,7 +365,7 @@ namespace ImageViewer.Models.Display
                     {
                         // first image was added
                         var modes = new List<ViewMode> { ViewMode.Single };
-                        if (models.Images.NumLayers == 6)
+                        if (models.Images.Images[0].Image.HasCubemap)
                         {
                             // cube map should be the default view
                             modes.Insert(0, ViewMode.CubeMap);

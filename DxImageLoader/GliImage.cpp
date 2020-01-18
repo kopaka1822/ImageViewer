@@ -109,7 +109,7 @@ void GliImage::flip()
 
 GliImage::GliImage(gli::format format, gli::format original, size_t nLayer, size_t nFaces, size_t nLevel, size_t width,
 	size_t height, size_t depth) :
-GliImageBase(initTex(nFaces, depth), original)
+GliImageBase(initTex(nFaces, gli::extent3d(width, height, depth)), original)
 {
 	if (m_type == Cubes) m_cube = gli::texture_cube_array(format, gli::extent2d{ width, height }, nLayer, nLevel);
 	else if (m_type == Volume)
@@ -123,11 +123,11 @@ GliImageBase(initTex(nFaces, depth), original)
 GliImage::GliImage(gli::format format, size_t nLayer, size_t nLevel, size_t width, size_t height, size_t depth)
 	:
 // create cube map array if nLayer == 6, otherwise 2d array
-GliImage(format, format, nLayer == 6? 1 : nLayer, nLayer == 6 ? 6 : 1, nLevel, width, height, depth)
+GliImage(format, format, (nLayer == 6 && width == height) ? 1 : nLayer, (nLayer == 6 && width == height) ? 6 : 1, nLevel, width, height, depth)
 {}
 
 GliImage::GliImage(const gli::texture& tex, gli::format original) :
-	GliImageBase(initTex(tex.faces(), tex.extent().z), original)
+	GliImageBase(initTex(tex.faces(), tex.extent()), original)
 {
 	if (tex.empty())
 		throw std::runtime_error("could not load image");
@@ -137,15 +137,15 @@ GliImage::GliImage(const gli::texture& tex, gli::format original) :
 	else m_array = gli::texture2d_array(tex);
 } 
 
-gli::texture& GliImage::initTex(size_t nFaces, size_t depth)
+gli::texture& GliImage::initTex(size_t nFaces, gli::extent3d size)
 {
-	if(depth > 1)
+	if(size.z > 1)
 	{
 		m_type = Volume;
 		return m_volume;
 	}
 
-	if(nFaces == 6)
+	if(nFaces == 6 && size.x == size.y)
 	{
 		m_type = Cubes;
 		return m_cube;

@@ -17,6 +17,7 @@ namespace ImageFramework.DirectX
         public Size3 Size { get; protected set; }
         public int NumMipmaps { get; protected set; }
         public bool HasMipmaps => NumMipmaps > 1;
+        public bool HasCubemap => NumLayers == 6 && Size.Width == Size.Height;
         public int NumLayers { get; protected set; }
         public Format Format { get; protected set; }
 

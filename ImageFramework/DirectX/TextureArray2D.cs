@@ -148,7 +148,7 @@ namespace ImageFramework.DirectX
             };
             View = new ShaderResourceView(Device.Get().Handle, handle, defaultDesc);
 
-            if (NumLayers == 6)
+            if (HasCubemap)
             {
                 cubeViews = new ShaderResourceView[NumMipmaps];
                 for (int curMipmap = 0; curMipmap < NumMipmaps; ++curMipmap)
@@ -241,7 +241,7 @@ namespace ImageFramework.DirectX
                 flags |= BindFlags.UnorderedAccess;
 
             var optionFlags = ResourceOptionFlags.GenerateMipMaps;
-            if (NumLayers == 6)
+            if (HasCubemap)
                 optionFlags |= ResourceOptionFlags.TextureCube;
 
             return new Texture2DDescription
