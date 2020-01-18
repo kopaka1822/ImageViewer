@@ -9,21 +9,19 @@ namespace ImageViewer.Controller.TextureViews.Shared
     public abstract class ProjectionTextureView : ITextureView
     {
         protected readonly ModelsEx models;
-        protected readonly TextureViewData data;
         private float pitch = 0.0f;
         private float roll = 0.0f;
 
-        public ProjectionTextureView(ModelsEx models, TextureViewData data)
+        public ProjectionTextureView(ModelsEx models)
         {
             this.models = models;
-            this.data = data;
         }
         public virtual void Dispose()
         {}
 
         public virtual void Draw(ITexture texture)
         {
-            data.Checkers.Run(data.Buffer, Matrix.Identity, models.Settings.AlphaBackground);
+            models.ViewData.Checkers.Run(Matrix.Identity);
         }
 
         public virtual void OnScroll(float amount, Vector2 mouse)

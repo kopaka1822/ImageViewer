@@ -16,9 +16,9 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
     {
         private readonly ShearWarpShader shader;
 
-        public ShearWarpView(ModelsEx models, TextureViewData data) : base(models, data)
+        public ShearWarpView(ModelsEx models) : base(models)
         {
-            shader = new ShearWarpShader();
+            shader = new ShearWarpShader(models);
             
         }
 
@@ -39,15 +39,15 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             base.Draw(texture);
 
             var dev = Device.Get();
-            dev.OutputMerger.BlendState = data.AlphaBlendState;
+            dev.OutputMerger.BlendState = models.ViewData.AlphaBlendState;
 
             var projection = Matrix.PerspectiveFovLH(1.57f, models.Window.ClientSize.Width / (float)models.Window.ClientSize.Height, 0.01f, 10000.0f);
 
-            shader.Run(data.Buffer, projection, GetModel(), models.Display.Multiplier, models.Display.DisplayNegative,
-                texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap), 
-                data.GetSampler(models.Display.LinearInterpolation), models.Images.Size.GetMip(models.Display.ActiveMipmap));
+            shader.Run(models.ViewData.Buffer, projection, GetModel(), models.Display.Multiplier, models.Display.DisplayNegative,
+                texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap),
+                models.ViewData.GetSampler(models.Display.LinearInterpolation), models.Images.Size.GetMip(models.Display.ActiveMipmap));
 
-            dev.OutputMerger.BlendState = data.DefaultBlendState;
+            dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
         }
 
         private Matrix GetModel()

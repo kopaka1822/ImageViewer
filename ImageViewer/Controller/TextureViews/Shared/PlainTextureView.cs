@@ -12,15 +12,13 @@ namespace ImageViewer.Controller.TextureViews.Shared
     public abstract class PlainTextureView : ITextureView
     {
         protected readonly ModelsEx models;
-        private readonly TextureViewData data;
         private Vector3 translation = Vector3.Zero;
         private readonly SingleViewShader shader;
 
-        public PlainTextureView(ModelsEx models, TextureViewData data, IShaderBuilder builder)
+        public PlainTextureView(ModelsEx models, IShaderBuilder builder)
         {
             this.models = models;
-            this.data = data;
-            shader = new SingleViewShader(builder);
+            shader = new SingleViewShader(models, builder);
         }
 
         public void Dispose()
@@ -105,17 +103,14 @@ namespace ImageViewer.Controller.TextureViews.Shared
             var finalTransform = offset * GetTransform();
             
             // draw the checkers background
-            data.Checkers.Run(data.Buffer, finalTransform, models.Settings.AlphaBackground);
+            models.ViewData.Checkers.Run(finalTransform);
             
             // blend over the final image
-            dev.OutputMerger.BlendState = data.AlphaBlendState;
+            dev.OutputMerger.BlendState = models.ViewData.AlphaBlendState;
 
-            shader.Run(data.Buffer, finalTransform, data.GetCrop(models, layer), 
-                models.Display.Multiplier, models.Display.DisplayNegative, 
-                texture, data.GetSampler(models.Display.LinearInterpolation),
-                xaxis, yaxis, zvalue);
+            shader.Run(finalTransform, texture, layer, xaxis, yaxis, zvalue);
 
-            dev.OutputMerger.BlendState = data.DefaultBlendState;
+            dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
         }
     }
 }

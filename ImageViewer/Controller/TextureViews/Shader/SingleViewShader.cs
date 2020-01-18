@@ -7,6 +7,7 @@ using ImageFramework.DirectX;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using ImageViewer.Controller.TextureViews.Shared;
+using ImageViewer.Models;
 using SharpDX;
 using SharpDX.Direct3D11;
 using Device = ImageFramework.DirectX.Device;
@@ -16,40 +17,63 @@ namespace ImageViewer.Controller.TextureViews.Shader
     public class SingleViewShader : ViewShader
     {
 
-        public SingleViewShader(IShaderBuilder builder)
-        : base(GetVertexSource(), GetPixelSource(builder), "Single")
+        public SingleViewShader(ModelsEx models, IShaderBuilder builder)
+        : base(models, GetVertexSource(), GetPixelSource(builder), "Single")
         {
             
         }
 
-        public void Run(UploadBuffer buffer, Matrix transform, Vector4 crop, float multiplier, bool useAbs, 
-            ShaderResourceView texture, SamplerState sampler, int xaxis = 0, int yaxis = 1, int zvalue = 0)
+        struct BufferData
         {
-            buffer.SetData(new ViewBufferData
+            public CommonBufferData Common;
+            public Matrix Transform;
+            public int XAxis;
+            public int YAxis;
+            public int ZValue;
+            public int Layer;
+        }
+
+        public void Run(Matrix transform, ShaderResourceView texture, int layer, int xaxis, int yaxis, int zvalue)
+        {
+            var v = models.ViewData;
+            v.Buffer.SetData(new BufferData
             {
+                Common = GetCommonData(),
                 Transform = transform,
-                Crop = crop,
-                Multiplier = multiplier,
-                UseAbs = useAbs?1:0,
                 XAxis = xaxis,
                 YAxis = yaxis,
-                ZValue = zvalue
+                ZValue = zvalue,
+                Layer = layer
             });
 
             var dev = Device.Get();
             BindShader(dev);
 
-            dev.Vertex.SetConstantBuffer(0, buffer.Handle);
-            dev.Pixel.SetConstantBuffer(0 , buffer.Handle);
+            dev.Vertex.SetConstantBuffer(0, v.Buffer.Handle);
+            dev.Pixel.SetConstantBuffer(0 , v.Buffer.Handle);
 
             dev.Pixel.SetShaderResource(0, texture);
-            dev.Pixel.SetSampler(0, sampler);
+            dev.Pixel.SetSampler(0, v.GetSampler());
 
             dev.DrawQuad();
 
             // unbind
             dev.Pixel.SetShaderResource(0, null);
             UnbindShader(dev);
+        }
+
+        private static string ConstantBuffer()
+        {
+            return $@"
+cbuffer InfoBuffer : register(b0) {{
+    {CommonShaderBufferData()}
+    matrix transform;
+    int xaxis;
+    int yaxis;
+    int zvalue;
+    int layer;
+}};
+";
         }
 
         public static string GetVertexSource()
@@ -61,9 +85,7 @@ struct VertexOut {{
     float2 texcoord : TEXCOORD;  
 }};
 
-cbuffer InfoBuffer : register(b0) {{
-    matrix transform;
-}};
+{ConstantBuffer()}
 
 VertexOut main(uint id: SV_VertexID) {{
     VertexOut o;
@@ -82,16 +104,7 @@ VertexOut main(uint id: SV_VertexID) {{
 
 SamplerState texSampler : register(s0);
 
-cbuffer InfoBuffer : register(b0) {{
-    matrix transform;
-    float4 crop;
-    float multiplier;
-    float farplane;
-    bool useAbs;
-    int xaxis;
-    int yaxis;
-    int zvalue;
-}};
+{ConstantBuffer()}
 
 {Utility.ToSrgbFunction()}
 
@@ -111,16 +124,17 @@ float3 getCoord(float2 coord){{
     res[3 - xaxis - yaxis] = (zvalue + 0.5f) / size[3 - xaxis - yaxis];
     return float3(res[0], res[1], res[2]);
 }}
+#define TexcoordT float3
 #else
 float2 getCoord(float2 coord) {{ return coord; }}
+#define TexcoordT float2
 #endif
 
 float4 main(PixelIn i) : SV_TARGET {{
-    float4 color = tex.Sample(texSampler, getCoord(i.texcoord));
+    TexcoordT texcoord = getCoord(i.texcoord);
+    float4 color = tex.Sample(texSampler, texcoord);
     color.rgb *= multiplier;
-#if {1-builder.Is3DInt}
-    {ApplyColorCrop("i.texcoord")}
-#endif    
+    {ApplyColorCrop("texcoord", "layer", builder.Is3D)}
     {ApplyColorTransform()}
     return color;
 }}

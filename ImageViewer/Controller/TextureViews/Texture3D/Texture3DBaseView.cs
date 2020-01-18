@@ -14,22 +14,20 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
     public abstract class Texture3DBaseView : ITextureView
     {
         protected readonly ModelsEx models;
-        protected readonly TextureViewData data;
         protected float cubeOffsetX = 0.0f;
         protected float cubeOffsetY = 0.0f;
         private Matrix rotation = Matrix.Identity;
 
-        public Texture3DBaseView(ModelsEx models, TextureViewData data)
+        public Texture3DBaseView(ModelsEx models)
         {
             this.models = models;
-            this.data = data;
         }
 
 
         public virtual void Draw(ITexture texture)
         {
             // draw transparent background
-            data.Checkers.Run(data.Buffer, Matrix.Identity, models.Settings.AlphaBackground);
+            models.ViewData.Checkers.Run(Matrix.Identity);
         }
 
         public void OnScroll(float amount, Vector2 mouse)
@@ -68,10 +66,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         }
 
         public abstract Size3 GetTexelPosition(Vector2 mouse);
-        public virtual void UpdateImage(int id, ITexture texture)
-        {
-            int a = 3;
-        }
+        public virtual void UpdateImage(int id, ITexture texture) {}
 
         protected float GetCubeCenter()
         {

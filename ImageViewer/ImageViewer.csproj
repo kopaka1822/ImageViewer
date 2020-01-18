@@ -131,7 +131,6 @@
     <Compile Include="Controller\TextureViews\Texture3D\Single3DView.cs" />
     <Compile Include="Controller\TextureViews\Shared\SingleTextureView.cs" />
     <Compile Include="Controller\TextureViews\Shared\TextureViewData.cs" />
-    <Compile Include="Controller\TextureViews\Shared\ViewBufferData.cs" />
     <Compile Include="Controller\TextureViews\Texture3D\Texture3DBaseView.cs" />
     <Compile Include="Controller\ViewModeController.cs" />
     <Compile Include="Models\Display\RayCastingDisplayModel.cs" />

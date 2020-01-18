@@ -8,8 +8,8 @@ namespace ImageViewer.Controller.TextureViews.Shared
 {
     public class SingleTextureView : PlainTextureView
     {
-        public SingleTextureView(ModelsEx models, TextureViewData data)
-        : base(models, data, ShaderBuilder.Builder2D)
+        public SingleTextureView(ModelsEx models)
+        : base(models, ShaderBuilder.Builder2D)
         {
         }
 

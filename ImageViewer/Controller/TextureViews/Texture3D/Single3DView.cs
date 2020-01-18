@@ -12,8 +12,8 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
     {
         private Single3DDisplayModel displayEx;
 
-        public Single3DView(ModelsEx models, TextureViewData data) : 
-            base(models, data, ShaderBuilder.Builder3D)
+        public Single3DView(ModelsEx models) : 
+            base(models, ShaderBuilder.Builder3D)
         {
             displayEx = (Single3DDisplayModel)models.Display.ExtendedViewData;
         }

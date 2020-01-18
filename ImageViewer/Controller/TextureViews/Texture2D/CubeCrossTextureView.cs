@@ -9,8 +9,8 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
 {
     class CubeCrossTextureView : PlainTextureView
     {
-        public CubeCrossTextureView(ModelsEx models, TextureViewData data)
-        : base(models, data, ShaderBuilder.Builder2D)
+        public CubeCrossTextureView(ModelsEx models)
+        : base(models, ShaderBuilder.Builder2D)
         {}
 
         public override void Draw(ITexture texture)

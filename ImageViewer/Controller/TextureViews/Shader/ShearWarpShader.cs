@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Utility;
+using ImageViewer.Models;
 using SharpDX;
 using SharpDX.Direct3D11;
 using Device = ImageFramework.DirectX.Device;
@@ -27,12 +28,13 @@ namespace ImageViewer.Controller.TextureViews.Shader
             public Vector2 Aspects;
         }
 
-        public ShearWarpShader() :
-            base(GetVertexSource(), GetPixelSource(), "ShearWarpShader")
+        public ShearWarpShader(ModelsEx models) :
+            base(models, GetVertexSource(), GetPixelSource(), "ShearWarpShader")
         {
 
         }
 
+        // TODO refactor this
         public void Run(UploadBuffer buffer, Matrix projection, Matrix model, float multiplier,
             bool useAbs, ShaderResourceView texture, SamplerState sampler, Size3 imgSize)
         {

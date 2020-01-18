@@ -11,10 +11,10 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
     {
         private readonly CubeViewShader shader;
 
-        public CubeTextureView(ModelsEx models, TextureViewData data)
-            : base(models, data)
+        public CubeTextureView(ModelsEx models)
+            : base(models)
         {
-            shader = new CubeViewShader();
+            shader = new CubeViewShader(models);
         }
 
         public override void Dispose()
@@ -30,11 +30,11 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
             base.Draw(texture);
 
             var dev = Device.Get();
-            dev.OutputMerger.BlendState = data.AlphaBlendState;
+            dev.OutputMerger.BlendState = models.ViewData.AlphaBlendState;
 
-            shader.Run(data.Buffer, GetTransform(), models.Display.Multiplier, CalcFarplane(), models.Display.DisplayNegative, ((TextureArray2D)texture).GetCubeView(models.Display.ActiveMipmap), data.GetSampler(models.Display.LinearInterpolation));
+            shader.Run(GetTransform(), CalcFarplane(), ((TextureArray2D)texture).GetCubeView(models.Display.ActiveMipmap));
 
-            dev.OutputMerger.BlendState = data.DefaultBlendState;
+            dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
         }
 
         public override Size3 GetTexelPosition(Vector2 mouse)

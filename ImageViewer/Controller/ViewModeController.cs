@@ -36,7 +36,6 @@ namespace ImageViewer.Controller
         private Point? fixedMousePosition = null;
         private readonly Border dxHost;
         private ITextureView currentView = new EmptyView();
-        private TextureViewData viewData;
         private bool recomputeScheduled = false;
 
         public ViewModeController(ModelsEx models)
@@ -49,8 +48,6 @@ namespace ImageViewer.Controller
             dxHost.MouseUp += DxHostOnMouseUp;
             dxHost.MouseLeave += DxHostOnMouseLeave;
             dxHost.MouseMove += DxHostOnMouseMove;
-
-            viewData = new TextureViewData(models);
 
             for(int i = 0; i < models.NumPipelines; ++i)
             {
@@ -258,24 +255,24 @@ namespace ImageViewer.Controller
                         {
                             case DisplayModel.ViewMode.Single:
                                 if(models.Images.ImageType == typeof(Texture3D))
-                                    currentView = new Single3DView(models, viewData);
+                                    currentView = new Single3DView(models);
                                 else
-                                    currentView = new SingleTextureView(models, viewData);
+                                    currentView = new SingleTextureView(models);
                                 break;
                             case DisplayModel.ViewMode.Polar:
-                                currentView = new PolarTextureView(models, viewData);
+                                currentView = new PolarTextureView(models);
                                 break;
                             case DisplayModel.ViewMode.CubeMap:
-                                currentView = new CubeTextureView(models, viewData);
+                                currentView = new CubeTextureView(models);
                                 break;
                             case DisplayModel.ViewMode.CubeCrossView:
-                                currentView = new CubeCrossTextureView(models, viewData);
+                                currentView = new CubeCrossTextureView(models);
                                 break;
                             case DisplayModel.ViewMode.RayCasting:
-                                currentView = new RayCastingView(models, viewData);
+                                currentView = new RayCastingView(models);
                                 break;
                             case DisplayModel.ViewMode.ShearWarp:
-                                currentView = new ShearWarpView(models, viewData);
+                                currentView = new ShearWarpView(models);
                                 break;
                             default:
                                 currentView = new EmptyView();
@@ -300,7 +297,6 @@ namespace ImageViewer.Controller
         public void Dispose()
         {
             currentView?.Dispose();
-            viewData?.Dispose();
         }
     }
 }
