@@ -129,12 +129,16 @@ static float4 guideValue; // in sRGB space (perceived difference)
 // color: color in sRGB space
 float weight(float4 color) {{
     // according to paper:
-    // length(guide - color) ^ y with y == 0.5, or y == 1.0 for very detailed
-    // y = 0.5: lengthSq(guide-color)
-    // y = 1.0: length(guide-color)
+    // (length(guide - color) / Vmax) ^ y with y == 0.5, or y == 1.0 for very detailed
+    // Vmax = maximal color difference
 
+    // sRGB difference
     float3 diff = (color.rgb - guideValue.rgb); // TODO multiply with alpha?
-    return {(veryDetailed ? "length(diff)" : "dot(diff,diff)")};
+    diff *= diff;
+    // give luma weights to each color => assuming max difference of (1, 1, 1) leads to weightedDiff [0, 1] => Vmax = 1
+    float weightedDiff = dot(diff, float3(0.299, 0.587, 0.114));
+    // weightedDiff ~ length(diff) ^ 2
+    return {(veryDetailed ? "sqrt(weightedDiff)" : "pow(weightedDiff, 0.25)")};
 }}
 
 // indicates how much of the box is covered
@@ -213,7 +217,8 @@ void main(uint3 id : SV_DispatchThreadID){{
         private static string NormalizeAndWriteBackColor()
         {
             return @" 
-if(hasAlpha) dcolor.a = 1.0;
+dcolor /= weightSum;
+if(!hasAlpha) dcolor.a = 1.0;
 if(dcolor.a != 0.0) dcolor.rgb /= dcolor.a;
 
 if(weightSum <= 0.0) // there was not difference in color => take guide value (all pixels were equal to the guide)

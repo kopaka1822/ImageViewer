@@ -33,7 +33,7 @@ namespace ImageFramework.Model.Scaling.Down
 
             // run fast 3x3 gaussian shader
             var guidanceTex = cache.GetTexture();
-            gaussShader.Run(src, guidanceTex, dstMipmap, hasAlpha, upload);
+            gaussShader.Run(dst, guidanceTex, dstMipmap, hasAlpha, upload);
 
             // perform filter with guidance texture
             coreShader.Run(src, guidanceTex, dst, dstMipmap, hasAlpha, upload);
