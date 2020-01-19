@@ -9,6 +9,7 @@ using ImageFramework.Model.Scaling;
 using ImageFramework.Model.Scaling.Down;
 using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SharpDX.DXGI;
 
 namespace FrameworkTests.Model.Scaling
 {
@@ -115,6 +116,13 @@ namespace FrameworkTests.Model.Scaling
         public void TriangleCompile()
         {
             var s = new TriangleScalingShader();
+            s.CompileShaders();
+        }
+
+        [TestMethod]
+        public void DetailPreservingCompile()
+        {
+            var s = new DetailPreservingDownscalingShader(null);
             s.CompileShaders();
         }
 

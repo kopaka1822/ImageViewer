@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ImageFramework.Model.Scaling.Down
 {
-    public class BoxScalingShader : DownscalingShaderBase
+    internal class BoxScalingShader : DownscalingShaderBase
     {
         // base function: 1
         // integral: x * 0.5 + 0.5 (area = 1)

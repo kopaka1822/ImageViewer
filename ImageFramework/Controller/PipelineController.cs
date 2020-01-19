@@ -12,6 +12,7 @@ using ImageFramework.DirectX.Structs;
 using ImageFramework.Model;
 using ImageFramework.Model.Equation;
 using ImageFramework.Model.Filter;
+using ImageFramework.Model.Scaling;
 using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 
@@ -37,6 +38,24 @@ namespace ImageFramework.Controller
 
             this.models.Filter.PropertyChanged += FilterOnPropertyChanged;
             this.models.Filter.ParameterChanged += FilterOnParameterChanged;
+            this.models.Scaling.PropertyChanged += ScalingOnPropertyChanged;
+        }
+
+        private void ScalingOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ScalingModel.Minify): 
+                    // mipmap technique has changed => mipmaps need to be recomputed
+                    if (models.Images.NumMipmaps > 1)
+                    {
+                        foreach (var pipeline in models.Pipelines)
+                        {
+                            pipeline.HasChanges = true;
+                        }
+                    }
+                    break;
+            }
         }
 
         private void FilterOnParameterChanged(object sender, FiltersModel.ParameterChangeEventArgs args)

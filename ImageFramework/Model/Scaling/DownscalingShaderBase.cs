@@ -12,7 +12,7 @@ using Device = ImageFramework.DirectX.Device;
 
 namespace ImageFramework.Model.Scaling
 {
-    public class DownscalingShaderBase : IDisposable
+    internal class DownscalingShaderBase : IDownscalingShader
     {
         private DirectX.Shader copyShader;
         private DirectX.Shader copyShader3D;
@@ -73,7 +73,7 @@ namespace ImageFramework.Model.Scaling
             instance = SlowShader3D;
         }
 
-        internal void Run(ITexture src, ITexture dst, int dstMipmap, bool hasAlpha, UploadBuffer upload, ITextureCache cache)
+        public void Run(ITexture src, ITexture dst, int dstMipmap, bool hasAlpha, UploadBuffer upload, ITextureCache cache)
         {
             Debug.Assert(cache.IsCompatibleWith(src));
             Debug.Assert(src.NumLayers == dst.NumLayers);
