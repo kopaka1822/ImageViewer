@@ -29,5 +29,10 @@ namespace ImageFramework.Model.Shader
 
         public string Is3DString => "false";
         public int Is3DInt => 0;
+
+        public string TexelHelperFunctions => @"
+int2 texel(int3 coord) {{ return coord.xy; }}
+int3 texel(int3 coord, int layer) {{ return uint3(coord.xy, layer); }}
+";
     }
 }

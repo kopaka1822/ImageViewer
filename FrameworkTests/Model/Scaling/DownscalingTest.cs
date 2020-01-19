@@ -123,7 +123,16 @@ namespace FrameworkTests.Model.Scaling
         [TestMethod]
         public void DetailPreservingCompile()
         {
-            var s = new DetailPreservingDownscalingShader(null);
+            var s = new DetailPreservingDownscalingShader(null, true);
+            s.CompileShaders();
+        }
+
+        [TestMethod]
+        public void CompileDetailPreservingCore()
+        {
+            var s = new DetailPreservingShaderCore(true);
+            s.CompileShaders();
+            s = new DetailPreservingShaderCore(false);
             s.CompileShaders();
         }
 

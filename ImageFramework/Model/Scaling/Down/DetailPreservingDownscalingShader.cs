@@ -12,16 +12,18 @@ namespace ImageFramework.Model.Scaling.Down
     {
         private readonly IDownscalingShader boxScalingShader;
         private readonly FastGaussShader gaussShader;
-
-        public DetailPreservingDownscalingShader(IDownscalingShader boxScalingShader)
+        private readonly DetailPreservingShaderCore coreShader;
+        public DetailPreservingDownscalingShader(IDownscalingShader boxScalingShader, bool veryDetailed)
         {
             this.boxScalingShader = boxScalingShader;
             gaussShader = new FastGaussShader();
+            coreShader = new DetailPreservingShaderCore(veryDetailed);
         }
 
         public void Dispose()
         {
             gaussShader?.Dispose();
+            coreShader?.Dispose();
         }
 
         public void Run(ITexture src, ITexture dst, int dstMipmap, bool hasAlpha, UploadBuffer upload, ITextureCache cache)
@@ -34,6 +36,7 @@ namespace ImageFramework.Model.Scaling.Down
             gaussShader.Run(src, guidanceTex, dstMipmap, hasAlpha, upload);
 
             // perform filter with guidance texture
+            coreShader.Run(src, guidanceTex, dst, dstMipmap, hasAlpha, upload);
 
             cache.StoreTexture(guidanceTex);
         }

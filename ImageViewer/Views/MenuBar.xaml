@@ -189,6 +189,11 @@
                     IsCheckable="True"
                     IsChecked="{Binding Scale.UseDetailPreserving}"
                     ToolTip="Details are preserved when downscaling. Based on 'Rapid, Detail-Preserving Image Downscaling'"/>
+                <MenuItem 
+                    Header="Detail Preserving (Stronger)"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseVeryDetailPreserving}"
+                    ToolTip="Details are preserved when downscaling. Based on 'Rapid, Detail-Preserving Image Downscaling'"/>
                 <Separator/>
                 <MenuItem 
                     Header="Normals"

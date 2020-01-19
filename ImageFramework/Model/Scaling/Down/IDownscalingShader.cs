@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Utility;
 
-namespace ImageFramework.Model.Scaling
+namespace ImageFramework.Model.Scaling.Down
 {
     internal interface IDownscalingShader : IDisposable
     {

@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using ImageFramework.DirectX;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using Device = ImageFramework.DirectX.Device;
 
-namespace ImageFramework.Model.Scaling
+namespace ImageFramework.Model.Scaling.Down
 {
     internal class DownscalingShaderBase : IDownscalingShader
     {
@@ -230,7 +225,7 @@ namespace ImageFramework.Model.Scaling
     float endf = (dot(id, dir) + 1) * filterSize;
     
     uint starti = floor(startf);
-    uint endi = max(ceil(endf), numSrcPixelsTotal);
+    uint endi = min(ceil(endf), numSrcPixelsTotal);
     uint3 srcPos = dir * starti + (1 - dir) * id;
 
     float factorScale = 2.0 / filterSize;

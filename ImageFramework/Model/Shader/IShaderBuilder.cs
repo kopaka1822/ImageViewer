@@ -23,6 +23,8 @@ namespace ImageFramework.Model.Shader
         string Is3DString { get; }
 
         int Is3DInt { get; }
+
+        string TexelHelperFunctions { get; }
     }
 
     public static class ShaderBuilder

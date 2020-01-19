@@ -16,6 +16,7 @@ namespace ImageFramework.Model.Scaling
         private IDownscalingShader triangleMinify = null;
         private IDownscalingShader lanzosMinify = null;
         private IDownscalingShader detailPreservingMinify = null;
+        private IDownscalingShader veryDetailPreservingMinify = null;
 
         internal ScalingModel(Models models)
         {
@@ -33,7 +34,8 @@ namespace ImageFramework.Model.Scaling
             Box,
             Triangle,
             Lanzos,
-            DetailPreserving, // Rapid, Detail-Preserving Image Downscaling 2016
+            DetailPreserving, // Rapid, Detail-Preserving Image Downscaling 2016 with y = 0.5
+            VeryDetailPreserving, // Rapid, Detail-Preserving Image Downscaling 2016 with y = 1.0
             Normals, // TODO
         }
 
@@ -96,7 +98,10 @@ namespace ImageFramework.Model.Scaling
                     return triangleMinify ?? (triangleMinify = new TriangleScalingShader());
                 case MinifyFilters.DetailPreserving:
                     if(boxMinify == null) boxMinify = new BoxScalingShader();
-                    return detailPreservingMinify ?? (detailPreservingMinify = new DetailPreservingDownscalingShader(boxMinify));
+                    return detailPreservingMinify ?? (detailPreservingMinify = new DetailPreservingDownscalingShader(boxMinify, false));
+                case MinifyFilters.VeryDetailPreserving:
+                    if (boxMinify == null) boxMinify = new BoxScalingShader();
+                    return veryDetailPreservingMinify ?? (veryDetailPreservingMinify = new DetailPreservingDownscalingShader(boxMinify, true));
             }
 
             throw new Exception($"invalid minify filter specified: {minify}");
