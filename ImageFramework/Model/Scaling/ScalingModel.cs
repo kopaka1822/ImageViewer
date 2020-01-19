@@ -96,6 +96,8 @@ namespace ImageFramework.Model.Scaling
                     return boxMinify ?? (boxMinify = new BoxScalingShader());
                 case MinifyFilters.Triangle:
                     return triangleMinify ?? (triangleMinify = new TriangleScalingShader());
+                case MinifyFilters.Lanzos:
+                    return lanzosMinify ?? (lanzosMinify = new LanzosScalingShader());
                 case MinifyFilters.DetailPreserving:
                     if(boxMinify == null) boxMinify = new BoxScalingShader();
                     return detailPreservingMinify ?? (detailPreservingMinify = new DetailPreservingDownscalingShader(boxMinify, false));

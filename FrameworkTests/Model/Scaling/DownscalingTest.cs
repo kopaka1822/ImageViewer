@@ -121,6 +121,13 @@ namespace FrameworkTests.Model.Scaling
         }
 
         [TestMethod]
+        public void LanzosCompile()
+        {
+            var s = new LanzosScalingShader();
+            s.CompileShaders();
+        }
+
+        [TestMethod]
         public void DetailPreservingCompile()
         {
             var s = new DetailPreservingDownscalingShader(null, true);

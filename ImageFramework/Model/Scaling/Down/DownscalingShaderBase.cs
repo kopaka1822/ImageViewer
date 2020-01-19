@@ -50,6 +50,9 @@ namespace ImageFramework.Model.Scaling.Down
         private readonly float weightSum;
         private readonly string weightFunc;
 
+        /// <param name="weightSum">weightFunc(1) => integral of the kernel function</param>
+        /// <param name="weightFunc">the weight func is actually the integral of the kernel function and will be evaluated between -1 and 1.
+        /// This allows well defined handling of partially covered pixels. As opposed to sampling theory, a pixel is regarded as a square of constant value</param>
         protected DownscalingShaderBase(float weightSum, string weightFunc)
         {
             this.weightSum = weightSum;

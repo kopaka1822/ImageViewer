@@ -143,6 +143,7 @@
     <Compile Include="Model\Scaling\Down\BoxScalingShader.cs" />
     <Compile Include="Model\Scaling\Down\DetailPreservingDownscalingShader.cs" />
     <Compile Include="Model\Scaling\Down\FastGaussShader.cs" />
+    <Compile Include="Model\Scaling\Down\LanzosScalingShader.cs" />
     <Compile Include="Model\Scaling\Down\TriangleScalingShader.cs" />
     <Compile Include="Model\Scaling\Down\IDownscalingShader.cs" />
     <Compile Include="Model\Scaling\ScalingModel.cs" />
