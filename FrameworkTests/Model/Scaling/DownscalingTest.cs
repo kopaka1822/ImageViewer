@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
 using ImageFramework.Model.Scaling;
@@ -153,6 +154,41 @@ namespace FrameworkTests.Model.Scaling
 
             var mip2 = mipped.GetPixelColors(0, 2);
             TestData.TestCheckersLevel2(mip2);
+        }
+
+        [TestMethod]
+        public void FastGaussTest()
+        {
+            // filter kernel:
+            // 1 2 1
+            // 2 4 2
+            // 1 2 1
+
+            var s = new FastGaussShader();
+            var img = IO.LoadImageTexture(TestData.Directory + "small.pfm");
+            var dst = new TextureArray2D(1, 1, img.Size, Format.R32G32B32A32_Float, true);
+
+            s.Run(img, dst, 0, false, new UploadBuffer(256));
+
+            var src = img.GetPixelColors(0, 0);
+            var res = dst.GetPixelColors(0, 0);
+            Assert.AreEqual(3 * 3, res.Length);
+
+            // expected values calculated by hand
+            float midR = (src[0].Red + src[1].Red * 2.0f + src[2].Red
+                           + src[3].Red * 2.0f + src[4].Red * 4.0f + src[5].Red * 2.0f
+                           + src[6].Red + src[7].Red * 2.0f + src[8].Red) / 16.0f;
+            float midG = (src[0].Green + src[1].Green * 2.0f + src[2].Green
+                          + src[3].Green * 2.0f + src[4].Green * 4.0f + src[5].Green * 2.0f
+                          + src[6].Green + src[7].Green * 2.0f + src[8].Green) / 16.0f;
+            var midColor = new Color(midR, midG, 1.0f);
+
+            float firstR = (src[0].Red * 4.0f + src[1].Red * 2.0f
+                            + src[3].Red * 2.0f + src[4].Red) / 9.0f;
+            var firstColor = new Color(firstR);
+
+            Assert.IsTrue(res[4].Equals(midColor, Color.Channel.R | Color.Channel.G));
+            Assert.IsTrue(res[0].Equals(firstColor, Color.Channel.R));
         }
     }
 }

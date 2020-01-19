@@ -99,24 +99,25 @@ void main(int3 id : SV_DispatchThreadID) {{
     int3 coord = 0;
     
     float4 dstColor = 0.0;
-    float weightSum = 0.0;
+    int weightSum = 0.0;
 
     // apply filter
-    for(coord.z = max(id.z - 1, 0); coord.z <= max(id.z + 1, size.z - 1); ++coord.z)
-    for(coord.y = max(id.y - 1, 0); coord.y <= max(id.y + 1, size.y - 1); ++coord.y)
-    for(coord.x = max(id.z - 1, 0); coord.x <= max(id.x + 1, size.x - 1); ++coord.x) {{
+    for(coord.z = max(id.z - 1, 0); coord.z <= min(id.z + 1, size.z - 1); ++coord.z)
+    for(coord.y = max(id.y - 1, 0); coord.y <= min(id.y + 1, size.y - 1); ++coord.y)
+    for(coord.x = max(id.x - 1, 0); coord.x <= min(id.x + 1, size.x - 1); ++coord.x) {{
         float4 v = src_image[texel(coord)];
-        float w = float(4 >> dot(abs(id - coord), 1)); // 4 >> 0 for center, 4 >> 1 == 2 for one difference, 4 >> 2 == 1 for two difference
-        weightSum += w;
+        int iw = 4 >> dot(abs(id - coord), 1);  // 4 >> 0 for center, 4 >> 1 == 2 for one difference, 4 >> 2 == 1 for two difference
+        weightSum += iw;
+        float w = float(iw);
         dstColor.a += v.a * w;
         dstColor.rgb += v.a * v.rgb * w;
     }}
 
-    dstColor /= weightSum;
+    dstColor /= float(weightSum);
     if(!hasAlpha) dstColor.a = 1.0;
     if(dstColor.a != 0.0) dstColor.rgb /= dstColor.a;
 
-    dst_image[texel(coord, layer)] = dstColor;
+    dst_image[texel(id, layer)] = dstColor;
 }}
 ";
         }
