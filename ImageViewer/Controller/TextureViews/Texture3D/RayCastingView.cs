@@ -48,7 +48,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             if (models.Display.LinearInterpolation)
             {
                 shader.Run(data.Buffer, models.Display.ClientAspectRatio, GetWorldToImage(), models.Display.Multiplier, CalcFarplane(), models.Display.DisplayNegative,
-                texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap));
+                texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap),helpTextures[id].GetSrView(0));
             }
             else
             {
@@ -89,21 +89,23 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
 
             if (!(texture is null))
             {
-                SpaceSkippingTexture3D tex = new SpaceSkippingTexture3D(id, texture);
+                SpaceSkippingTexture3D tex = new SpaceSkippingTexture3D(texture.Size, texture.NumMipmaps);
                 helpTextures[id] = tex;
-                emptySpaceSkippingShader.Execute(texture.GetSrView(0, 0), helpTextures[id].GetUaView(0), texture.Size);
+                emptySpaceSkippingShader.Execute(texture.GetSrView(0, 0), helpTextures[id], texture.Size);
             }
         }
 
-        private class SpaceSkippingTexture3D
+        public class SpaceSkippingTexture3D
         {
             private UnorderedAccessView[] uaViews;
             private ShaderResourceView[] srViews;
-            private Texture3D texHandle;
-            public SpaceSkippingTexture3D(int id, ITexture orgTex)
+            public Texture3D texHandle;
+            public Size3 texSize;
+            public int numMipMaps;
+            public SpaceSkippingTexture3D(Size3 orgSize, int numMipMaps)
             {
-                Size3 texSize = orgTex.Size;
-                int NumMipmaps = orgTex.NumMipmaps;
+                this.texSize = orgSize;
+                this.numMipMaps = numMipMaps;
 
                 var desc = new Texture3DDescription
                 {
@@ -111,7 +113,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
                     Height = texSize.Height,
                     Depth = texSize.Depth,
                     Format = SharpDX.DXGI.Format.R8_UInt,
-                    MipLevels = orgTex.NumMipmaps,
+                    MipLevels = numMipMaps,
                     BindFlags = BindFlags.UnorderedAccess | BindFlags.ShaderResource,
                     CpuAccessFlags = CpuAccessFlags.None,
                     OptionFlags = ResourceOptionFlags.None,
@@ -119,11 +121,11 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
                 };
                 texHandle = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, desc);
 
-                srViews = new ShaderResourceView[NumMipmaps];
-                uaViews = new UnorderedAccessView[NumMipmaps];
+                srViews = new ShaderResourceView[numMipMaps];
+                uaViews = new UnorderedAccessView[numMipMaps];
 
                 //Create Views
-                for (int curMip = 0; curMip < NumMipmaps; ++curMip)
+                for (int curMip = 0; curMip < numMipMaps; ++curMip)
                 {
                     srViews[curMip] = new ShaderResourceView(Device.Get().Handle, texHandle, new ShaderResourceViewDescription
                     {

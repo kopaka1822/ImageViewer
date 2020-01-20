@@ -50,7 +50,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
 
         public void Run(UploadBuffer buffer, Matrix rayTransform, Matrix worldToImage, float multiplier, float farplane,
-            bool useAbs, ShaderResourceView texture)
+            bool useAbs, ShaderResourceView texture, ShaderResourceView emptySpaceTex)
         {
             buffer.SetData(new ViewBufferData
             {
@@ -70,11 +70,13 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
             dev.Pixel.SetShaderResource(0, texture);
             dev.Pixel.SetSampler(0, sampler);
+            dev.Pixel.SetShaderResource(1, emptySpaceTex);
 
             dev.DrawQuad();
 
             // unbind
             dev.Pixel.SetShaderResource(0, null);
+            dev.Pixel.SetShaderResource(1, null);
             UnbindShader(dev);
         }
 
@@ -110,6 +112,7 @@ VertexOut main(uint id : SV_VertexID) {{
         {
             return $@"
 Texture3D<float4> tex : register(t0);
+Texture3D<uint> emptySpaceTex : register(t1);
 SamplerState texSampler : register(s0);
 
 {ConstantBuffer()}
@@ -210,6 +213,10 @@ float4 main(PixelIn i) : SV_TARGET {{
         color.a *= invAlpha;
         
         pos += ray;
+
+        //skip empty space
+        pos += emptySpaceTex[pos] * ray;
+
     }} while(isInside(pos) && color.a > 0.0);
    
     color.rgb *= multiplier;
