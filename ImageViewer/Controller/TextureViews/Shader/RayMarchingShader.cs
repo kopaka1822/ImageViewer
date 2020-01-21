@@ -247,7 +247,7 @@ float4 main(PixelIn i) : SV_TARGET {{
     [loop] do{{
         
         //skip empty space
-        rayPos += emptySpaceTex[rayPos] * ray;        
+        rayPos += emptySpaceTex[rayPos] * absDir;        
 
         float4 s = tex[rayPos];
         if(!useFlatShading){{
