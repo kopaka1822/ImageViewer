@@ -12,14 +12,12 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
     public class EmptySpaceSkippingShader : IDisposable
     {
-        private ImageFramework.DirectX.Shader computeMin;
-        private ImageFramework.DirectX.Shader computePlusOne;
+        private ImageFramework.DirectX.Shader compute;
         private static readonly Size3 workgroupSize = new Size3(8, 8, 8);
 
         public EmptySpaceSkippingShader()
         {
-            this.computeMin = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Compute, GetMinComputeSource(), "Min Filter");
-            this.computePlusOne = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Compute, GetPlusOneComputeSource(), "Plus one");
+            this.compute = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Compute, GetMinComputeSource(), "Min Filter");
         }
         private struct DirBufferData
         {
@@ -28,8 +26,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
         public void Dispose()
         {
-            computeMin?.Dispose();
-            computePlusOne?.Dispose();
+            compute?.Dispose();
         }
 
 
@@ -37,11 +34,12 @@ namespace ImageViewer.Controller.TextureViews.Shader
         {
 
             var dev = Device.Get();
+            dev.Compute.Set(compute.Compute);
             dev.Compute.SetShaderResource(0, orgTex);
 
             UploadBuffer directionBuffer = new UploadBuffer(Int3.SizeInBytes);
 
-            SpaceSkippingTexture3D pong = new RayCastingView.SpaceSkippingTexture3D(helpTex.texSize, helpTex.numMipMaps);
+            SpaceSkippingTexture3D pong = new RayCastingView.SpaceSkippingTexture3D(helpTex.Size, helpTex.NumMipmaps);
 
 
             bool readHelpTex = true;
@@ -51,7 +49,6 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
             for (int i = 0; i < 255; i++)
             {
-                dev.Compute.Set(computeMin.Compute);
                 //x-direction
                 directionBuffer.SetData(new DirBufferData
                 {
@@ -60,7 +57,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 dev.Compute.SetConstantBuffer(0, directionBuffer.Handle);
                 dev.Dispatch(Utility.DivideRoundUp(size.X, workgroupSize.X), Utility.DivideRoundUp(size.Y, workgroupSize.Y), Utility.DivideRoundUp(size.Z, workgroupSize.Z));
 
-                swapTextures(readHelpTex, helpTex, pong);
+                swapTextures(ref readHelpTex, helpTex, pong);
 
 
                 //y-direction
@@ -71,11 +68,9 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 dev.Compute.SetConstantBuffer(0, directionBuffer.Handle);
                 dev.Dispatch(Utility.DivideRoundUp(size.X, workgroupSize.X), Utility.DivideRoundUp(size.Y, workgroupSize.Y), Utility.DivideRoundUp(size.Z, workgroupSize.Z));
 
-                swapTextures(readHelpTex, helpTex, pong);
+                swapTextures(ref readHelpTex, helpTex, pong);
 
-                //z-direction 
-                //and +1 on at the end
-                dev.Compute.Set(computePlusOne.Compute);
+
                 directionBuffer.SetData(new DirBufferData
                 {
                     dir = new Int3(0, 0, 1)
@@ -83,26 +78,26 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 dev.Compute.SetConstantBuffer(0, directionBuffer.Handle);
                 dev.Dispatch(Utility.DivideRoundUp(size.X, workgroupSize.X), Utility.DivideRoundUp(size.Y, workgroupSize.Y), Utility.DivideRoundUp(size.Z, workgroupSize.Z));
 
-
-                swapTextures(readHelpTex, helpTex, pong);
+                swapTextures(ref readHelpTex, helpTex, pong);
 
                 if (readHelpTex)
                 {
-                    //DebugTex(helpTex);
+                    DebugTex(helpTex);
                 }
                 else
                 {
-                    //DebugTex(pong);
+                    DebugTex(pong);
+                    DebugTex(helpTex);
                 }
             }
 
-            DebugTex(helpTex);
+            //DebugTex(helpTex);
 
 
 
         }
 
-        private void swapTextures(bool readHelpTex, SpaceSkippingTexture3D helpTex, SpaceSkippingTexture3D pong)
+        private void swapTextures(ref bool readHelpTex, SpaceSkippingTexture3D helpTex, SpaceSkippingTexture3D pong)
         {
             var dev = Device.Get();
             if (readHelpTex)
@@ -137,7 +132,7 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
 {{
     uint width, height, depth;
     OrgInput.GetDimensions(width, height, depth);
-    uint3 dim = uint3(width,height, depth);
+    uint3 dim = uint3(width,height,depth);
 
     float4 src = OrgInput[dispatchThreadID];
     if(src.a > 0){{
@@ -149,72 +144,28 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
         uint3 sample2Point = dispatchThreadID - dir;
 
         if( all(sample1Point < dim) && all(sample1Point  > 0) ){{
-            sample1 = CurrentRead[dispatchThreadID + dir];    
+            sample1 = CurrentRead[sample1Point];    
         }}
         else{{
             sample1 = 255;
         }}
         if( all(sample2Point < dim) && all(sample2Point > 0 ) ){{
-            sample2 = CurrentRead[dispatchThreadID - dir];
+            sample2 = CurrentRead[sample2Point];
         }}
         else{{
             sample2 = 255;
         }}
-        CurrentWrite[dispatchThreadID] = min(CurrentRead[dispatchThreadID], min(sample1,sample2));
+        if(dir.z != 1){{
+            CurrentWrite[dispatchThreadID] = min(CurrentRead[dispatchThreadID], min(sample1,sample2));
+        }}
+        else{{
+            CurrentWrite[dispatchThreadID] = min(CurrentRead[dispatchThreadID], min(sample1,sample2)) + 1;
+        }}
     }}
 }}
 
 ";
         }
-
-        private static string GetPlusOneComputeSource()
-        {
-            return $@"
-
-cbuffer DirBuffer : register(b0){{
-    int3 dir;
-}};
-
-Texture3D<float4> OrgInput: register(t0);
-Texture3D<uint> CurrentRead: register(t1);
-RWTexture3D<uint> CurrentWrite: register(u0);
-
-
-{NumThreads()}
-void main(uint3 dispatchThreadID : SV_DispatchThreadID)
-{{
-    uint width, height, depth;
-    OrgInput.GetDimensions(width, height, depth);
-    uint3 dim = uint3(width,height, depth);
-
-    float4 src = OrgInput[dispatchThreadID];
-    if(src.a > 0){{
-        CurrentWrite[dispatchThreadID] = 0;    
-    }}    
-    else{{
-        uint sample1, sample2;
-        uint3 sample1Point = dispatchThreadID + dir;
-        uint3 sample2Point = dispatchThreadID - dir;
-
-        if( all(sample1Point < dim) && all(sample1Point  > 0) ){{
-            sample1 = CurrentRead[dispatchThreadID + dir];    
-        }}
-        else{{
-            sample1 = 255;
-        }}
-        if( all(sample2Point < dim) && all(sample2Point > 0 ) ){{
-            sample2 = CurrentRead[dispatchThreadID - dir];
-        }}
-        else{{
-            sample2 = 255;
-        }}
-        CurrentWrite[dispatchThreadID] = min(CurrentRead[dispatchThreadID], min(sample1,sample2)) + 1;
-    }}
-}}
-
-";
-        }
-
 
 
         private static string NumThreads()
@@ -228,9 +179,9 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
         {
             var desc = new Texture3DDescription
             {
-                Width = tex.texSize.Width,
-                Height = tex.texSize.Height,
-                Depth = tex.texSize.Depth,
+                Width = tex.Size.Width,
+                Height = tex.Size.Height,
+                Depth = tex.Size.Depth,
                 Format = SharpDX.DXGI.Format.R8_UInt,
                 MipLevels = 1,
                 BindFlags = BindFlags.None,
@@ -240,9 +191,7 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
             };
 
             var tmp = tex.GetPixelColors(0, 0);
-
-
+            int a = 0;
         }
-
     }
 }

@@ -101,104 +101,11 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             }
         }
 
-        public class SpaceSkippingTexture3D : TextureBase<SpaceSkippingTexture3D>
+        public class SpaceSkippingTexture3D : ImageFramework.DirectX.Texture3D
         {
-            public Size3 texSize;
-            public int numMipMaps;
-            private readonly SharpDX.Direct3D11.Texture3D handle;
-
-            public override bool Is3D => true;
-
-            public SpaceSkippingTexture3D(Size3 orgSize, int numMipMaps)
+            public SpaceSkippingTexture3D(Size3 orgSize, int numMipMaps) : base(numMipMaps, orgSize, Format.R8_UInt, true, false)
             {
-                this.texSize = orgSize;
-                this.numMipMaps = numMipMaps;
 
-                var desc = new Texture3DDescription
-                {
-                    Width = texSize.Width,
-                    Height = texSize.Height,
-                    Depth = texSize.Depth,
-                    Format = SharpDX.DXGI.Format.R8_UInt,
-                    MipLevels = numMipMaps,
-                    BindFlags = BindFlags.UnorderedAccess | BindFlags.ShaderResource,
-                    CpuAccessFlags = CpuAccessFlags.None,
-                    OptionFlags = ResourceOptionFlags.None,
-                    Usage = ResourceUsage.Default
-                };
-                handle = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, desc);
-
-                views = new ShaderResourceView[numMipMaps];
-                uaViews = new UnorderedAccessView[numMipMaps];
-
-                //Create Views
-                for (int curMip = 0; curMip < numMipMaps; ++curMip)
-                {
-                    views[curMip] = new ShaderResourceView(Device.Get().Handle, GetHandle(), new ShaderResourceViewDescription
-                    {
-                        Dimension = SharpDX.Direct3D.ShaderResourceViewDimension.Texture3D,
-                        Format = SharpDX.DXGI.Format.R8_UInt,
-                        Texture3D = new ShaderResourceViewDescription.Texture3DResource
-                        {
-                            MipLevels = 1,
-                            MostDetailedMip = curMip
-                        }
-                    });
-                    uaViews[curMip] = new UnorderedAccessView(Device.Get().Handle, GetHandle(), new UnorderedAccessViewDescription
-                    {
-                        Dimension = UnorderedAccessViewDimension.Texture3D,
-                        Format = SharpDX.DXGI.Format.R8_UInt,
-                        Texture3D = new UnorderedAccessViewDescription.Texture3DResource
-                        {
-                            FirstWSlice = 0,
-                            MipSlice = curMip,
-                            WSize = -1 // all slices
-                        }
-                    });
-                }
-
-            }
-
-            public ShaderResourceView GetSrView(int mipmap)
-            {
-                Debug.Assert(mipmap >= 0);
-                Debug.Assert(mipmap < NumMipmaps);
-                return views[mipmap];
-            }
-
-            protected override SharpDX.Direct3D11.Resource GetStagingTexture(int layer, int mipmap)
-            {
-                var mipDim = Size.GetMip(mipmap);
-                var desc = new Texture3DDescription
-                {
-                    Width = mipDim.Width,
-                    Height = mipDim.Height,
-                    Depth = mipDim.Depth,
-                    Format = Format,
-                    MipLevels = 1,
-                    BindFlags = BindFlags.None,
-                    CpuAccessFlags = CpuAccessFlags.Read,
-                    OptionFlags = ResourceOptionFlags.None,
-                    Usage = ResourceUsage.Staging
-                };
-
-                // create staging texture
-                var staging = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, desc);
-
-                // copy data to staging texture
-                Device.Get().CopySubresource(handle, staging, GetSubresourceIndex(layer, mipmap), 0, mipDim);
-
-                return staging;
-            }
-
-            public override SpaceSkippingTexture3D CreateT(int numLayer, int numMipmaps, Size3 size, Format format, bool createUav)
-            {
-                return new SpaceSkippingTexture3D(size, numMipMaps);
-            }
-
-            protected override SharpDX.Direct3D11.Resource GetHandle()
-            {
-                return handle;
             }
         }
 
