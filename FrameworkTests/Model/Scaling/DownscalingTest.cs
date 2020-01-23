@@ -206,5 +206,72 @@ namespace FrameworkTests.Model.Scaling
             Assert.IsTrue(res[4].Equals(midColor, Color.Channel.R | Color.Channel.G));
             Assert.IsTrue(res[0].Equals(firstColor, Color.Channel.R));
         }
+
+        /// <summary>
+        /// tests if the box filter does not lose energy when building mipmaps
+        /// </summary>
+        [TestMethod]
+        public void BoxFilterEnergyConserve()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "sphere.png");
+            models.Pipelines[0].Color.Formula = "I0 * RGB(1, 1, 0)";
+            models.Images.GenerateMipmaps();
+            models.Scaling.Minify = ScalingModel.MinifyFilters.Box;
+            models.Apply();
+
+            var img = models.Pipelines[0].Image;
+            Assert.IsNotNull(img);
+            Assert.IsTrue(img.NumMipmaps > 1);
+            var refStats = models.Stats.GetStatisticsFor(img, 0, 0);
+            for (int i = 1; i < img.NumMipmaps; ++i)
+            {
+                var s = models.Stats.GetStatisticsFor(img, 0, i);
+
+                Assert.AreEqual(refStats.Average.Avg, s.Average.Avg, 0.01f);
+            }
+        }
+
+        [TestMethod]
+        public void TriangleFastFilterEnergyConserve()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "checkers.dds");
+            models.Pipelines[0].Color.Formula = "I0 * RGB(1, 1, 0)";
+            models.Images.DeleteMipmaps();
+            models.Images.GenerateMipmaps();
+            models.Scaling.Minify = ScalingModel.MinifyFilters.Triangle;
+            models.Apply();
+
+            TestEnergyConserve(models);
+        }
+
+        [TestMethod]
+        public void TriangleSlowFilterEnergyConserve()
+        {
+            var models = new Models(1);
+            // this filter is actually not 100% energy conservant (i.e. if going from 3x3 to 1x1)
+            models.AddImageFromFile(TestData.Directory + "checkers3x7.png");
+            models.Pipelines[0].Color.Formula = "I0 * RGB(1, 1, 0)";
+            models.Scaling.Minify = ScalingModel.MinifyFilters.Triangle;
+            models.Images.GenerateMipmaps();
+            models.Apply();
+
+            TestEnergyConserve(models);
+        }
+
+        private void TestEnergyConserve(Models models)
+        {
+            var img = models.Pipelines[0].Image;
+            Assert.IsNotNull(img);
+            Assert.IsTrue(img.NumMipmaps > 1);
+            var refStats = models.Stats.GetStatisticsFor(img, 0, 0);
+            for (int i = 1; i < img.NumMipmaps; ++i)
+            {
+                var s = models.Stats.GetStatisticsFor(img, 0, i);
+
+                Assert.AreEqual(refStats.Average.Avg, s.Average.Avg, 0.01f);
+            }
+        }
     }
 }

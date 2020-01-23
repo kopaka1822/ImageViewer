@@ -31,7 +31,6 @@ namespace ImageViewer.ViewModels
                     OnPropertyChanged(nameof(UseLanzosFilter));
                     OnPropertyChanged(nameof(UseDetailPreserving));
                     OnPropertyChanged(nameof(UseVeryDetailPreserving));
-                    OnPropertyChanged(nameof(UseNormals));
                     break;
             }
         }
@@ -64,12 +63,6 @@ namespace ImageViewer.ViewModels
         {
             get => models.Scaling.Minify == ScalingModel.MinifyFilters.VeryDetailPreserving;
             set => SetMinify(value, ScalingModel.MinifyFilters.VeryDetailPreserving);
-        }
-
-        public bool UseNormals
-        {
-            get => models.Scaling.Minify == ScalingModel.MinifyFilters.Normals;
-            set => SetMinify(value, ScalingModel.MinifyFilters.Normals);
         }
 
         private void SetMinify(bool value, ScalingModel.MinifyFilters filter)
