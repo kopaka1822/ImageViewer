@@ -41,7 +41,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
             UploadBuffer directionBuffer = new UploadBuffer(Int3.SizeInBytes);
 
-            SpaceSkippingTexture3D pong = new RayCastingView.SpaceSkippingTexture3D(helpTex.texSize,helpTex.numMipMaps);
+            SpaceSkippingTexture3D pong = new RayCastingView.SpaceSkippingTexture3D(helpTex.texSize, helpTex.numMipMaps);
 
 
             bool readHelpTex = true;
@@ -58,10 +58,10 @@ namespace ImageViewer.Controller.TextureViews.Shader
                     dir = new Int3(1, 0, 0)
                 });
                 dev.Compute.SetConstantBuffer(0, directionBuffer.Handle);
-                dev.Dispatch(Utility.DivideRoundUp(size.X,workgroupSize.X) , Utility.DivideRoundUp(size.Y, workgroupSize.Y), Utility.DivideRoundUp(size.Z, workgroupSize.Z));
+                dev.Dispatch(Utility.DivideRoundUp(size.X, workgroupSize.X), Utility.DivideRoundUp(size.Y, workgroupSize.Y), Utility.DivideRoundUp(size.Z, workgroupSize.Z));
 
                 swapTextures(readHelpTex, helpTex, pong);
-                
+
 
                 //y-direction
                 directionBuffer.SetData(new DirBufferData
@@ -90,7 +90,8 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 {
                     //DebugTex(helpTex);
                 }
-                else {
+                else
+                {
                     //DebugTex(pong);
                 }
             }
@@ -238,13 +239,7 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
                 Usage = ResourceUsage.Staging
             };
 
-            // create staging texture
-            var staging = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, desc);
-
-            // copy data to staging texture
-            Device.Get().CopySubresource(tex.texHandle, staging, 0, 0, tex.texSize);
-            
-            var tmp = Device.Get().GetData(staging, 0, tex.texSize, 1);
+            var tmp = tex.GetPixelColors(0, 0);
 
 
         }

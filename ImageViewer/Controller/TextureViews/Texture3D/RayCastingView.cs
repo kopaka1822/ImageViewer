@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using ImageViewer.Models;
 using ImageViewer.Models.Display;
 using SharpDX;
 using SharpDX.Direct3D11;
+using SharpDX.DXGI;
 using Device = ImageFramework.DirectX.Device;
 
 namespace ImageViewer.Controller.TextureViews.Texture3D
@@ -48,7 +50,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             if (models.Display.LinearInterpolation)
             {
                 shader.Run(data.Buffer, models.Display.ClientAspectRatio, GetWorldToImage(), models.Display.Multiplier, CalcFarplane(), models.Display.DisplayNegative,
-                texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap),helpTextures[id].GetSrView(0));
+                texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap), helpTextures[id].GetSrView(0));
             }
             else
             {
@@ -93,15 +95,20 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
                 helpTextures[id] = tex;
                 emptySpaceSkippingShader.Execute(texture.GetSrView(0, 0), helpTextures[id], texture.Size);
             }
+            else
+            {
+                helpTextures[id].Dispose();
+            }
         }
 
-        public class SpaceSkippingTexture3D
+        public class SpaceSkippingTexture3D : TextureBase<SpaceSkippingTexture3D>
         {
-            private UnorderedAccessView[] uaViews;
-            private ShaderResourceView[] srViews;
-            public Texture3D texHandle;
             public Size3 texSize;
             public int numMipMaps;
+            private readonly SharpDX.Direct3D11.Texture3D handle;
+
+            public override bool Is3D => true;
+
             public SpaceSkippingTexture3D(Size3 orgSize, int numMipMaps)
             {
                 this.texSize = orgSize;
@@ -119,15 +126,15 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
                     OptionFlags = ResourceOptionFlags.None,
                     Usage = ResourceUsage.Default
                 };
-                texHandle = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, desc);
+                handle = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, desc);
 
-                srViews = new ShaderResourceView[numMipMaps];
+                views = new ShaderResourceView[numMipMaps];
                 uaViews = new UnorderedAccessView[numMipMaps];
 
                 //Create Views
                 for (int curMip = 0; curMip < numMipMaps; ++curMip)
                 {
-                    srViews[curMip] = new ShaderResourceView(Device.Get().Handle, texHandle, new ShaderResourceViewDescription
+                    views[curMip] = new ShaderResourceView(Device.Get().Handle, GetHandle(), new ShaderResourceViewDescription
                     {
                         Dimension = SharpDX.Direct3D.ShaderResourceViewDimension.Texture3D,
                         Format = SharpDX.DXGI.Format.R8_UInt,
@@ -137,7 +144,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
                             MostDetailedMip = curMip
                         }
                     });
-                    uaViews[curMip] = new UnorderedAccessView(Device.Get().Handle, texHandle, new UnorderedAccessViewDescription
+                    uaViews[curMip] = new UnorderedAccessView(Device.Get().Handle, GetHandle(), new UnorderedAccessViewDescription
                     {
                         Dimension = UnorderedAccessViewDimension.Texture3D,
                         Format = SharpDX.DXGI.Format.R8_UInt,
@@ -151,15 +158,48 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
                 }
 
             }
+
             public ShaderResourceView GetSrView(int mipmap)
             {
-                return srViews[mipmap];
-            }
-            public UnorderedAccessView GetUaView(int mipmap)
-            {
-                return uaViews[mipmap];
+                Debug.Assert(mipmap >= 0);
+                Debug.Assert(mipmap < NumMipmaps);
+                return views[mipmap];
             }
 
+            protected override SharpDX.Direct3D11.Resource GetStagingTexture(int layer, int mipmap)
+            {
+                var mipDim = Size.GetMip(mipmap);
+                var desc = new Texture3DDescription
+                {
+                    Width = mipDim.Width,
+                    Height = mipDim.Height,
+                    Depth = mipDim.Depth,
+                    Format = Format,
+                    MipLevels = 1,
+                    BindFlags = BindFlags.None,
+                    CpuAccessFlags = CpuAccessFlags.Read,
+                    OptionFlags = ResourceOptionFlags.None,
+                    Usage = ResourceUsage.Staging
+                };
+
+                // create staging texture
+                var staging = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, desc);
+
+                // copy data to staging texture
+                Device.Get().CopySubresource(handle, staging, GetSubresourceIndex(layer, mipmap), 0, mipDim);
+
+                return staging;
+            }
+
+            public override SpaceSkippingTexture3D CreateT(int numLayer, int numMipmaps, Size3 size, Format format, bool createUav)
+            {
+                return new SpaceSkippingTexture3D(size, numMipMaps);
+            }
+
+            protected override SharpDX.Direct3D11.Resource GetHandle()
+            {
+                return handle;
+            }
         }
 
     }
