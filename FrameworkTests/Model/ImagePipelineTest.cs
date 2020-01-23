@@ -167,6 +167,7 @@ namespace FrameworkTests.Model
             var model = new Models(1);
             model.AddImageFromFile(TestData.Directory + "checkers.dds");
             model.Pipelines[0].Color.Formula = "(I0+1)^2"; // nonlinear transformation on image
+            model.Pipelines[0].RecomputeMipmaps = true;
             model.Apply();
 
             Assert.IsFalse(model.Pipelines[0].HasChanges);

@@ -144,35 +144,6 @@ namespace FrameworkTests.Model.Scaling
         }
 
         [TestMethod]
-        public void TriangleCheckersTest()
-        {
-            // the results should be identical with the box filter in this case
-            var models = new Models(1);
-            models.AddImageFromFile(TestData.Directory + "checkers.dds");
-            models.Pipelines[0].Color.Formula = "I0 + 0"; // trick pipeline to create a rgba32 target for us
-            models.Apply();
-
-            var src = models.Pipelines[0].Image;
-            Assert.IsNotNull(src);
-            Assert.AreEqual(SharpDX.DXGI.Format.R32G32B32A32_Float, src.Format);
-            var mipped = src.CloneWithoutMipmaps().GenerateMipmapLevels(src.Size.MaxMipLevels, false);
-            // mip levels:
-            // 0: 4 x 4
-            // 1: 2 x 2
-            // 2: 1 x 1
-
-            models.Scaling.Minify = ScalingModel.MinifyFilters.Triangle;
-            models.Scaling.WriteMipmaps(mipped);
-
-            // test mipmaps
-            var mip1 = mipped.GetPixelColors(0, 1);
-            TestData.TestCheckersLevel1(mip1);
-
-            var mip2 = mipped.GetPixelColors(0, 2);
-            TestData.TestCheckersLevel2(mip2);
-        }
-
-        [TestMethod]
         public void FastGaussTest()
         {
             // filter kernel:
@@ -216,6 +187,7 @@ namespace FrameworkTests.Model.Scaling
             var models = new Models(1);
             models.AddImageFromFile(TestData.Directory + "sphere.png");
             models.Pipelines[0].Color.Formula = "I0 * RGB(1, 1, 0)";
+            models.Pipelines[0].RecomputeMipmaps = true;
             models.Images.GenerateMipmaps();
             models.Scaling.Minify = ScalingModel.MinifyFilters.Box;
             models.Apply();
@@ -241,6 +213,7 @@ namespace FrameworkTests.Model.Scaling
             models.Images.DeleteMipmaps();
             models.Images.GenerateMipmaps();
             models.Scaling.Minify = ScalingModel.MinifyFilters.Triangle;
+            models.Pipelines[0].RecomputeMipmaps = true;
             models.Apply();
 
             TestEnergyConserve(models);
@@ -253,6 +226,7 @@ namespace FrameworkTests.Model.Scaling
             // this filter is actually not 100% energy conservant (i.e. if going from 3x3 to 1x1)
             models.AddImageFromFile(TestData.Directory + "checkers3x7.png");
             models.Pipelines[0].Color.Formula = "I0 * RGB(1, 1, 0)";
+            models.Pipelines[0].RecomputeMipmaps = true;
             models.Scaling.Minify = ScalingModel.MinifyFilters.Triangle;
             models.Images.GenerateMipmaps();
             models.Apply();
