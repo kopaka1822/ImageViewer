@@ -36,6 +36,7 @@ namespace ImageViewer.ViewModels
             Alpha.PropertyChanged += FormulaOnPropertyChanged;
 
             this.useFilter = model.UseFilter;
+            this.recomputeMipmaps = model.RecomputeMipmaps;
 
             this.model.PropertyChanged += ModelOnPropertyChanged;
             this.models.Display.PropertyChanged += DisplayOnPropertyChanged;
@@ -102,6 +103,7 @@ namespace ImageViewer.ViewModels
             Color.Apply();
             Alpha.Apply();
             model.UseFilter = useFilter;
+            model.RecomputeMipmaps = recomputeMipmaps;
             prevHasChanged = false;
         }
 
@@ -121,6 +123,9 @@ namespace ImageViewer.ViewModels
                 case nameof(ImagePipeline.UseFilter):
                     UseFilter = model.UseFilter;
                     return;
+                case nameof(ImagePipeline.RecomputeMipmaps):
+                    RecomputeMipmaps = model.RecomputeMipmaps;
+                    break;
             }
         }
 
@@ -135,6 +140,7 @@ namespace ImageViewer.ViewModels
                 model.IsEnabled = value;
                 //if (value) return;
                 UseFilter = model.UseFilter;
+                RecomputeMipmaps = model.RecomputeMipmaps;
                 // this might have changed while invisible
                 if(value)
                     OnPropertyChanged(nameof(HasChanges));
@@ -151,6 +157,20 @@ namespace ImageViewer.ViewModels
                 useFilter = value;
                 OnPropertyChanged(nameof(UseFilter));
                 if (HasChangedChanged()) OnPropertyChanged(nameof(HasChanges));
+            }
+        }
+
+        private bool recomputeMipmaps;
+
+        public bool RecomputeMipmaps
+        {
+            get => recomputeMipmaps;
+            set
+            {
+                if (value == recomputeMipmaps) return;
+                recomputeMipmaps = value;
+                OnPropertyChanged(nameof(RecomputeMipmaps));
+                if(HasChangedChanged()) OnPropertyChanged(nameof(HasChanges));
             }
         }
 
@@ -238,7 +258,8 @@ namespace ImageViewer.ViewModels
         private bool prevHasChanged = false;
         public bool HasChanges => Color.HasChanges ||
                                   Alpha.HasChanges ||
-                                  useFilter != model.UseFilter;
+                                  useFilter != model.UseFilter ||
+                                  recomputeMipmaps != model.RecomputeMipmaps;
 
         /// <summary>
         /// indicates if the has changed property changed since the last query

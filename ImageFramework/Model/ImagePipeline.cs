@@ -42,6 +42,25 @@ namespace ImageFramework.Model
             }
         }
 
+        private bool recomputeMipmaps = false;
+        /// <summary>
+        /// indicates if mipmaps will be recomputed in the end.
+        /// if enabled: image combination and filters will only be executed on the upper layer => then mipmaps will be generated
+        /// if disabled: image combination and filters will be executed on all layers => no mipmap recalculation
+        /// </summary>
+        public bool RecomputeMipmaps
+        {
+            get => recomputeMipmaps;
+            set
+            {
+                if(value == recomputeMipmaps) return;
+                recomputeMipmaps = value;
+                OnPropertyChanged(nameof(RecomputeMipmaps));
+                HasChanges = true;
+            }
+        }
+        
+
         private bool isEnabled = true;
 
         /// <summary>
@@ -131,7 +150,7 @@ namespace ImageFramework.Model
 
                 // compute mipmaps
                 args.Models.Progress.Progress = 1.0f;
-                if (args.Models.Images.NumMipmaps > 1)
+                if (RecomputeMipmaps && args.Models.Images.NumMipmaps > 1)
                 {
                     args.Models.Progress.What = "Generating Mipmaps";
                     args.Models.Scaling.WriteMipmaps(Image);
@@ -152,7 +171,9 @@ namespace ImageFramework.Model
         private bool TryMatchingInputImage(UpdateImageArgs args)
         {
             // early out if color and alpha are from an input image
-            if (Color.Formula.Length == 2 && Color.Formula.StartsWith("I") && Alpha.Formula == Color.Formula && (!UseFilter || args.Filters.Count == 0))
+            if (Color.Formula.Length == 2 && Color.Formula.StartsWith("I") && Alpha.Formula == Color.Formula // one of the input images
+                && (!UseFilter || args.Filters.Count == 0) // no filters used
+                && (!RecomputeMipmaps || args.Models.Images.NumMipmaps <= 1)) // no mipmap re computation
             {
                 // just reference the input image
                 if (int.TryParse(Color.Formula.Substring(1), out var imgId))
@@ -176,7 +197,9 @@ namespace ImageFramework.Model
             {
                 var texSrc = args.Models.TextureCache.GetTexture();
 
-                shader.Run(args.Models.Images, args.Models.SharedModel.Upload, texSrc);
+                // do for all mipmaps if no mipmap re computation is enabled
+                var nMipmaps = RecomputeMipmaps ? 1 : args.Models.Images.NumMipmaps;
+                shader.Run(args.Models.Images, args.Models.SharedModel.Upload, texSrc, nMipmaps);
 
                 Image = texSrc;
             }
@@ -226,7 +249,9 @@ namespace ImageFramework.Model
             ct.ThrowIfCancellationRequested();
             var filter = args.Filters[index];
 
-            filter.Shader.Run(args.Models.Images, src, dst, args.Models.SharedModel.Upload, iteration);
+            // do for all mipmaps if no mipmap re computation is enabled
+            var nMipmaps = RecomputeMipmaps ? 1 : args.Models.Images.NumMipmaps;
+            filter.Shader.Run(args.Models.Images, src, dst, args.Models.SharedModel.Upload, iteration, nMipmaps);
             args.Models.SharedModel.Sync.Set();
 
             var step = 1.0f / args.Filters.Count;

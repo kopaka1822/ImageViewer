@@ -51,7 +51,8 @@ namespace ImageFramework.Controller
                     {
                         foreach (var pipeline in models.Pipelines)
                         {
-                            pipeline.HasChanges = true;
+                            if(pipeline.RecomputeMipmaps)
+                                pipeline.HasChanges = true;
                         }
                     }
                     break;

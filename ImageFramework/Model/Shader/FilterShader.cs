@@ -45,8 +45,9 @@ namespace ImageFramework.Model.Shader
         /// <param name="dst">destination texture</param>
         /// <param name="cbuffer">buffer that stores some runtime information</param>
         /// <param name="iteration">current filter iteration. Should be 0 if not separable. Should be 0 or 1 if separable (x- and y-direction pass) or 2 for z-direction pass</param>
+        /// <param name="numMipmaps">number of mipmaps to apply the filter on (starting with most detailed mip)</param>
         /// <remarks>make sure to call UpdateParamBuffer() if parameters have changed after the last invocation</remarks>
-        internal void Run(ImagesModel image, ITexture src, ITexture dst, UploadBuffer cbuffer, int iteration)
+        internal void Run(ImagesModel image, ITexture src, ITexture dst, UploadBuffer cbuffer, int iteration, int numMipmaps)
         {
             if (parent.IsSepa) Debug.Assert(iteration == 0 || iteration == 1 || iteration == 2);
             else Debug.Assert(iteration == 0);
@@ -64,9 +65,7 @@ namespace ImageFramework.Model.Shader
 
             dev.Compute.SetShaderResource(1, src.View);
 
-            //for (int curMipmap = 0; curMipmap < image.NumMipmaps; ++curMipmap)
-            // only execute for upper mipmap => filters are unpredictable and likely to destroy the correct mipmap. Mipmaps will be computed in the last pipeline step
-            var curMipmap = 0;
+            for (int curMipmap = 0; curMipmap < numMipmaps; ++curMipmap)
             {
                 // dst texture
                 dev.Compute.SetUnorderedAccessView(0, dst.GetUaView(curMipmap));

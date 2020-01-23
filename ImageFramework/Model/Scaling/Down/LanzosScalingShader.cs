@@ -18,12 +18,12 @@ namespace ImageFramework.Model.Scaling.Down
         // approximation of the integral from -1 to x: 0.89734 + x - x^3 / 9 
         // integral is very similar to a linear function (box scaling shader)
 
-        // for stretch = 3: sin(pi * x * 3) * sin(pi * x)
-        // aprox. integral: 0.166176 + x - 5.48311355 * x^3 + 18.1830303 * x^5
+        // for stretch = 3 (x will still be in [-1, 1]): sinc(pi * x * 3) * sinc(pi * x)
+        // aprox. integral: x - 5.48311355 * x^3 + 18.1830303 * x^5
         public LanzosScalingShader() : base(@"
 float xsq = x * x;
 float xtri = xsq * x;
-return 0.166176 + x - 5.48311355 * xtri + 18.1830303 * xtri * xsq;", 3)
+return x - 5.48311355 * xtri + 18.1830303 * xtri * xsq;", 3)
         {
         }
     }
