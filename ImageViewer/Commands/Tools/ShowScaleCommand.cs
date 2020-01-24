@@ -37,7 +37,7 @@ namespace ImageViewer.Commands.Tools
 
             if (models.Window.ShowDialog(dia) != true) return;
 
-            models.Images.ScaleImages(new Size3(vm.Width, vm.Height));
+            models.Images.ScaleImages(new Size3(vm.Width, vm.Height), models.Scaling);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace FrameworkTests.Model.Scaling
             var src = models.Pipelines[0].Image;
             Assert.IsNotNull(src);
             Assert.AreEqual(SharpDX.DXGI.Format.R32G32B32A32_Float ,src.Format);
-            var mipped = src.GenerateMipmapLevels(src.Size.MaxMipLevels, false);
+            var mipped = src.CloneWithMipmaps(src.Size.MaxMipLevels);
             // mip levels:
             // 0: 8 x 4
             // 1: 4 x 2
@@ -67,13 +67,35 @@ namespace FrameworkTests.Model.Scaling
             var src = models.Pipelines[0].Image;
             Assert.IsNotNull(src);
             Assert.AreEqual(SharpDX.DXGI.Format.R32G32B32A32_Float, src.Format);
-            var mipped = src.GenerateMipmapLevels(src.Size.MaxMipLevels, false);
+            var mipped = src.CloneWithMipmaps(src.Size.MaxMipLevels);
             // mip levels:
             // 0: 3 x 7
             // 1: 1 x 3 fast + slow
             // 2: 1 x 1 fast + fast
 
             models.Scaling.WriteMipmaps(mipped);
+
+            // test mipmaps
+            var mip1 = mipped.GetPixelColors(0, 1);
+            var refMip1 = IO.LoadImageTexture(TestData.Directory + "checkers3x7_mip1.png").GetPixelColors(0, 0);
+            TestData.CompareColors(refMip1, mip1);
+
+            var mip2 = mipped.GetPixelColors(0, 2);
+            Assert.AreEqual(1, mip2.Length);
+            Assert.IsTrue(new Color(0.476f).Equals(mip2[0], Color.Channel.Rgb));
+        }
+
+        [TestMethod]
+        public void OverwriteMipmapsLdr()
+        {
+            var models = new Models(1);
+            // load ldr file (png)
+            models.AddImageFromFile(TestData.Directory + "checkers3x7.png");
+            models.Images.GenerateMipmaps(models.Scaling);
+            models.Apply();
+
+            var mipped = models.Pipelines[0].Image;
+            Assert.AreEqual(Format.R8G8B8A8_UNorm_SRgb, mipped.Format);
 
             // test mipmaps
             var mip1 = mipped.GetPixelColors(0, 1);
@@ -188,7 +210,7 @@ namespace FrameworkTests.Model.Scaling
             models.AddImageFromFile(TestData.Directory + "sphere.png");
             models.Pipelines[0].Color.Formula = "I0 * RGB(1, 1, 0)";
             models.Pipelines[0].RecomputeMipmaps = true;
-            models.Images.GenerateMipmaps();
+            models.Images.GenerateMipmaps(models.Scaling);
             models.Scaling.Minify = ScalingModel.MinifyFilters.Box;
             models.Apply();
 
@@ -211,7 +233,7 @@ namespace FrameworkTests.Model.Scaling
             models.AddImageFromFile(TestData.Directory + "checkers.dds");
             models.Pipelines[0].Color.Formula = "I0 * RGB(1, 1, 0)";
             models.Images.DeleteMipmaps();
-            models.Images.GenerateMipmaps();
+            models.Images.GenerateMipmaps(models.Scaling);
             models.Scaling.Minify = ScalingModel.MinifyFilters.Triangle;
             models.Pipelines[0].RecomputeMipmaps = true;
             models.Apply();
@@ -228,7 +250,7 @@ namespace FrameworkTests.Model.Scaling
             models.Pipelines[0].Color.Formula = "I0 * RGB(1, 1, 0)";
             models.Pipelines[0].RecomputeMipmaps = true;
             models.Scaling.Minify = ScalingModel.MinifyFilters.Triangle;
-            models.Images.GenerateMipmaps();
+            models.Images.GenerateMipmaps(models.Scaling);
             models.Apply();
 
             TestEnergyConserve(models);

@@ -68,7 +68,8 @@ namespace ImageViewer.Controller
                 // silently generate mipmaps and import
                 if (models.Images.NumMipmaps > 1 && tex.NumMipmaps == 1)
                 {
-                    var tmp = tex.GenerateMipmapLevels(models.Images.NumMipmaps);
+                    var tmp = tex.CloneWithMipmaps(models.Images.NumMipmaps);
+                    models.Scaling.WriteMipmaps(tmp);
                     ImportTexture(tmp, file, imgOriginalFormat);
                 }
                 else

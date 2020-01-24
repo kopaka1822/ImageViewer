@@ -240,7 +240,7 @@ namespace ImageFramework.DirectX
             if (createUav)
                 flags |= BindFlags.UnorderedAccess;
 
-            var optionFlags = ResourceOptionFlags.GenerateMipMaps;
+            var optionFlags = ResourceOptionFlags.None;
             if (NumLayers == 6)
                 optionFlags |= ResourceOptionFlags.TextureCube;
 

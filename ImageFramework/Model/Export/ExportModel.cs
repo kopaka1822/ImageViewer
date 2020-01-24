@@ -19,13 +19,11 @@ namespace ImageFramework.Model.Export
     {
         public IReadOnlyList<ExportFormatModel> Formats { get; }
 
-        internal readonly ConvertFormatShader convert;
-        private readonly ProgressModel progress;
+        private readonly Models models;
 
-        internal ExportModel(SharedModel shared, ProgressModel progress)
+        internal ExportModel(Models models)
         {
-            this.progress = progress;
-            convert = shared.Convert;
+            this.models = models;
 
             var formats = new List<ExportFormatModel>();
             formats.Add(new ExportFormatModel("png"));
@@ -191,16 +189,16 @@ namespace ImageFramework.Model.Export
         public void Export(ITexture image, ExportDescription desc)
         {
             ExportAsync(image, desc);
-            progress.WaitForTask();
-            if(!String.IsNullOrEmpty(progress.LastError))
-                throw new Exception(progress.LastError);
+            models.Progress.WaitForTask();
+            if(!String.IsNullOrEmpty(models.Progress.LastError))
+                throw new Exception(models.Progress.LastError);
         }
 
         // does export asynchronously => the task will be passed to the ProgressModel
         public void ExportAsync(ITexture image, ExportDescription desc)
         {
             var cts = new CancellationTokenSource();
-            progress.AddTask(ExportAsync(image, desc, cts.Token), cts);
+            models.Progress.AddTask(ExportAsync(image, desc, cts.Token), cts);
         }
 
         private Task ExportAsync(ITexture image, ExportDescription desc, CancellationToken ct)
@@ -270,10 +268,10 @@ namespace ImageFramework.Model.Export
                 return ExportTexture(image, desc, Mipmap, Layer, ct);
             
             // do some conversion before exporting
-            using (var tmpTex = convert.Convert(image, stagingFormat.DxgiFormat, Mipmap, Layer,
+            using (var tmpTex = models.SharedModel.Convert.Convert(image, stagingFormat.DxgiFormat, Mipmap, Layer,
                 desc.Multiplier, UseCropping, new Size3(CropStartX, CropStartY, CropStartZ),
                 new Size3(CropEndX - CropStartX + 1, CropEndY - CropStartY + 1, CropEndZ - CropStartZ + 1),
-                new Size3(desc.FileFormat.GetAlignmentX(), desc.FileFormat.GetAlignmentY(), 0)))
+                new Size3(desc.FileFormat.GetAlignmentX(), desc.FileFormat.GetAlignmentY(), 0), models.Scaling))
             {
                 // the final texture only has the relevant layers and mipmaps
                 return ExportTexture(tmpTex, desc, -1, -1, ct);

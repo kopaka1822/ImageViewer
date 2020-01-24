@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
@@ -77,13 +78,31 @@ namespace ImageFramework.Model.Scaling
 
         public void WriteMipmaps(ITexture tex)
         {
+            Debug.Assert(tex.HasUaViews || tex.HasRtViews);
+
             var shader = GetMinify();
             var cache = GetMinifyTextureCache(tex);
             var hasAlpha = models.Stats.GetStatisticsFor(tex).HasAlpha;
 
+            ITexture dstTex = tex;
+            if (!tex.HasUaViews) // cannot write directly into texture
+                dstTex = cache.GetTexture(); // get texture from cache with unordered access view
+
             for (int curMip = 1; curMip < tex.NumMipmaps; ++curMip)
             {
-                shader.Run(tex, tex, curMip, hasAlpha, models.SharedModel.Upload, cache);
+                shader.Run(tex, dstTex, curMip, hasAlpha, models.SharedModel.Upload, cache);
+            }
+
+            if (!tex.HasUaViews) // write back from dstTex to tex
+            {
+                for (int curLayer = 0; curLayer < tex.NumLayers; ++curLayer)
+                {
+                    for(int curMip = 1; curMip < tex.NumMipmaps; ++curMip)
+                    {
+                        models.SharedModel.Convert.CopyLayer(dstTex, curLayer, curMip, tex, curLayer, curMip);
+                    }
+                }
+                cache.StoreTexture(dstTex);
             }
         }
 

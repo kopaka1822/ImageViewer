@@ -122,7 +122,7 @@ namespace ImageFramework.DirectX
                 BindFlags = flags,
                 CpuAccessFlags = CpuAccessFlags.None,
                 MipLevels = NumMipmaps,
-                OptionFlags = ResourceOptionFlags.GenerateMipMaps,
+                OptionFlags = ResourceOptionFlags.None,
                 Usage = ResourceUsage.Default
             };
         }

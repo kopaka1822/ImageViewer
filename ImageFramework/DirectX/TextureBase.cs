@@ -27,6 +27,9 @@ namespace ImageFramework.DirectX
         protected ShaderResourceView[] views;
 
         public ShaderResourceView View { get; protected set; }
+        public bool HasUaViews => uaViews != null;
+        public bool HasSrViews => views != null;
+        public bool HasRtViews => rtViews != null;
 
         public ShaderResourceView GetSrView(int layer, int mipmap)
         {
@@ -89,15 +92,9 @@ namespace ImageFramework.DirectX
             }
         }
 
-        public ITexture GenerateMipmapLevels(int levels, bool generate)
+        public ITexture CloneWithMipmaps(int nLevels)
         {
-            return GenerateMipmapLevelsT(levels, generate);
-        }
-
-        public T GenerateMipmapLevelsT(int levels, bool generate = true)
-        {
-            Debug.Assert(!HasMipmaps);
-            var newTex = CreateT(NumLayers, levels, Size, Format, uaViews != null);
+            var newTex = CreateT(NumLayers, nLevels, Size, Format, uaViews != null);
 
             // copy all layers
             for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
@@ -106,18 +103,7 @@ namespace ImageFramework.DirectX
                 Device.Get().CopySubresource(GetHandle(), newTex.GetHandle(), GetSubresourceIndex(curLayer, 0), newTex.GetSubresourceIndex(curLayer, 0), Size);
             }
 
-            if(generate)
-                Device.Get().GenerateMips(newTex.View);
-
             return newTex;
-        }
-
-        /// <summary>
-        /// inplace mipmap regeneration based on the number of internal levels
-        /// </summary>
-        public void RegenerateMipmapLevels()
-        {
-            Device.Get().GenerateMips(View);
         }
 
         public ITexture CloneWithoutMipmaps(int mipmap = 0)

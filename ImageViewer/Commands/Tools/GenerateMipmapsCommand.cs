@@ -32,7 +32,7 @@ namespace ImageViewer.Commands.Tools
 
         public override void Execute()
         {
-            models.Images.GenerateMipmaps();
+            models.Images.GenerateMipmaps(models.Scaling);
         }
     }
 }

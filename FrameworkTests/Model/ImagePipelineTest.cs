@@ -151,7 +151,7 @@ namespace FrameworkTests.Model
 
             Assert.IsFalse(model.Pipelines[0].HasChanges);
 
-            model.Images.ScaleImages( new Size3(5, 6));
+            model.Images.ScaleImages( new Size3(5, 6), model.Scaling);
             Assert.IsTrue(model.Pipelines[0].HasChanges);
 
             model.Apply();

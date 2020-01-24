@@ -24,7 +24,7 @@ namespace ImageConsole.Commands.Image
                 model.Images.DeleteMipmaps();
             }
 
-            model.Images.GenerateMipmaps();
+            model.Images.GenerateMipmaps(model.Scaling);
         }
     }
 }

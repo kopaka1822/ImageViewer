@@ -43,7 +43,7 @@ namespace ImageFramework.Model
         public int NumEnabled => Pipelines.Count(pipe => pipe.IsEnabled);
 
         private ExportModel export = null;
-        public ExportModel Export => export ?? (export = new ExportModel(SharedModel, Progress));
+        public ExportModel Export => export ?? (export = new ExportModel(this));
 
         // soft reset that clears images, filters and resets formulas
         public event EventHandler SoftReset;
@@ -157,7 +157,7 @@ namespace ImageFramework.Model
         /// Image format will be BGRA8 because this is the format expected for windows bitmaps
         public TextureArray2D CreateThumbnail(int size, ITexture texture, int layer = 0)
         {
-            return Thumbnail.CreateThumbnail(size, texture, Format.B8G8R8A8_UNorm_SRgb, layer);
+            return Thumbnail.CreateThumbnail(size, texture, Format.B8G8R8A8_UNorm_SRgb, layer, Scaling);
         }
 
         /// <summary>

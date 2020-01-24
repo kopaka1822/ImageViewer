@@ -69,12 +69,6 @@ namespace ImageFramework.DirectX
             context.CopySubresourceRegion(src, srcSubresource, new ResourceRegion(0, 0, 0, size.Width, size.Height, size.Depth), 
                 dst, dstSubresource);
         }
-
-        public void GenerateMips(ShaderResourceView res)
-        {
-            context.GenerateMips(res);
-        }
-
         public byte[] GetData(Resource res, int subresource, Size3 size, int pixelByteSize)
         {
             var result = new byte[size.Product * pixelByteSize];

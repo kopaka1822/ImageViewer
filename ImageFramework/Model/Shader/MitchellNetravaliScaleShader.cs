@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
+using ImageFramework.Model.Scaling;
 using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using Device = ImageFramework.DirectX.Device;
@@ -25,7 +26,7 @@ namespace ImageFramework.Model.Shader
             cbuffer = upload;
         }
 
-        public TextureArray2D Run(TextureArray2D src, Size3 dstSize)
+        public TextureArray2D Run(TextureArray2D src, Size3 dstSize, ScalingModel scaling)
         {
             Debug.Assert(src.Size != dstSize);
             var genMipmaps = src.HasMipmaps;
@@ -60,7 +61,7 @@ namespace ImageFramework.Model.Shader
                 src = tmp;
             }
 
-            if(genMipmaps) src.RegenerateMipmapLevels();
+            if(genMipmaps) scaling.WriteMipmaps(src);
 
             return src;
         }
