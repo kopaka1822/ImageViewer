@@ -23,7 +23,7 @@ namespace FrameworkTests.Model.Shader
             var upload = new UploadBuffer(  4*4);
             upload.SetData(new int[]{1, 2, 3, 4});
 
-            Assert.AreEqual(10, Reduce<int>(upload, new ReduceShader(upload, "a+b", "0", "int")));
+            Assert.AreEqual(10, Reduce<int>(upload, new ReduceShader(new UploadBuffer(256), "a+b", "0", "int")));
         }
 
         [TestMethod]
@@ -32,10 +32,10 @@ namespace FrameworkTests.Model.Shader
             var upload = new UploadBuffer(4 * 13);
 
             upload.SetData(new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 });
-            Assert.AreEqual(13, Reduce<int>(upload, new ReduceShader(upload, "a+b", "0", "int")));
+            Assert.AreEqual(13, Reduce<int>(upload, new ReduceShader(new UploadBuffer(256), "a+b", "0", "int")));
 
             upload.SetData(new int[]{1,2,3,4,5,6,7,8,9,10,11,12,13});
-            Assert.AreEqual(91, Reduce<int>(upload, new ReduceShader(upload, "a+b", "0", "int")));
+            Assert.AreEqual(91, Reduce<int>(upload, new ReduceShader(new UploadBuffer(256), "a+b", "0", "int")));
         }
 
         [TestMethod]
@@ -49,7 +49,7 @@ namespace FrameworkTests.Model.Shader
             upload.SetData(data);
 
             int expected = (count * (count + 1)) / 2;
-            Assert.AreEqual(expected, Reduce<int>(upload, new ReduceShader(upload, "a+b", "0", "int")));
+            Assert.AreEqual(expected, Reduce<int>(upload, new ReduceShader(new UploadBuffer(256), "a+b", "0", "int")));
         }
 
         [TestMethod]
@@ -65,7 +65,7 @@ namespace FrameworkTests.Model.Shader
 
             float expected = (float)count;
 
-            Assert.AreEqual(expected, Reduce<float>(upload, new ReduceShader(upload, "max(a,b)")));
+            Assert.AreEqual(expected, Reduce<float>(upload, new ReduceShader(new UploadBuffer(256), "max(a,b)")));
         }
 
 
