@@ -64,6 +64,7 @@ namespace ImageFramework.Model.Shader
             dev.Pixel.SetShaderResource(0, null);
             dev.Pixel.SetSampler(0, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            quad.Unbind();
 
             return dst;
         }
@@ -89,6 +90,7 @@ namespace ImageFramework.Model.Shader
             dev.Pixel.SetShaderResource(0, null);
             dev.Pixel.SetSampler(0, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            quad.Unbind();
 
             return dst;
         }

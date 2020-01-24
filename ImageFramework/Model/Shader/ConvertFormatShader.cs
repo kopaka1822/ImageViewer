@@ -73,6 +73,7 @@ namespace ImageFramework.Model.Shader
             // remove bindings
             dev.Pixel.SetShaderResource(0, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            quad.Unbind();
         }
 
         /// <summary>
