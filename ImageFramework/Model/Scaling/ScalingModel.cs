@@ -90,7 +90,9 @@ namespace ImageFramework.Model.Scaling
 
             for (int curMip = 1; curMip < tex.NumMipmaps; ++curMip)
             {
-                shader.Run(tex, dstTex, curMip, hasAlpha, models.SharedModel.Upload, cache);
+                // don't use the previous mipmaps (too much error) => using 16 times bigger is okay
+                var srcMip = Math.Max(0, curMip - 4);
+                shader.Run(srcMip == 0 ? tex : dstTex, dstTex, srcMip, curMip, hasAlpha, models.SharedModel.Upload, cache);
             }
 
             if (!tex.HasUaViews) // write back from dstTex to tex

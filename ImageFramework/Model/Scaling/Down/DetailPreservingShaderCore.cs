@@ -46,7 +46,7 @@ namespace ImageFramework.Model.Scaling.Down
             public float FilterSizeFloatZ;
         }
 
-        public void Run(ITexture src, ITexture guide, ITexture dst, int dstMipmap, bool hasAlpha, UploadBuffer upload)
+        public void Run(ITexture src, ITexture guide, ITexture dst, int srcMipmap, int dstMipmap, bool hasAlpha, UploadBuffer upload)
         {
             Debug.Assert(guide.Size == dst.Size);
             Debug.Assert(guide.NumMipmaps >= dstMipmap);
@@ -56,7 +56,7 @@ namespace ImageFramework.Model.Scaling.Down
 
             var bufferData = new BufferData
             {
-               SrcSize = src.Size,
+               SrcSize = src.Size.GetMip(srcMipmap),
                DstSize = dst.Size.GetMip(dstMipmap),
                HasAlpha = hasAlpha?1:0,
             };
@@ -82,7 +82,7 @@ namespace ImageFramework.Model.Scaling.Down
                 bufferData.Layer = layer;
                 upload.SetData(bufferData);
                 dev.Compute.SetConstantBuffer(0, upload.Handle);
-                dev.Compute.SetShaderResource(0, src.GetSrView(layer, 0));
+                dev.Compute.SetShaderResource(0, src.GetSrView(layer, srcMipmap));
                 dev.Compute.SetShaderResource(1, guide.GetSrView(layer, dstMipmap));
                 dev.Compute.SetUnorderedAccessView(0, dst.GetUaView(dstMipmap));
 

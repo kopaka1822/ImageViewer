@@ -26,17 +26,17 @@ namespace ImageFramework.Model.Scaling.Down
             coreShader?.Dispose();
         }
 
-        public void Run(ITexture src, ITexture dst, int dstMipmap, bool hasAlpha, UploadBuffer upload, ITextureCache cache)
+        public void Run(ITexture src, ITexture dst, int srcMipmap, int dstMipmap, bool hasAlpha, UploadBuffer upload, ITextureCache cache)
         {
             // first execute the box scaling shader
-            boxScalingShader.Run(src, dst, dstMipmap, hasAlpha, upload, cache);
+            boxScalingShader.Run(src, dst, srcMipmap, dstMipmap, hasAlpha, upload, cache);
 
             // run fast 3x3 gaussian shader
             var guidanceTex = cache.GetTexture();
             gaussShader.Run(dst, guidanceTex, dstMipmap, hasAlpha, upload);
 
             // perform filter with guidance texture
-            coreShader.Run(src, guidanceTex, dst, dstMipmap, hasAlpha, upload);
+            coreShader.Run(src, guidanceTex, dst, srcMipmap, dstMipmap, hasAlpha, upload);
 
             cache.StoreTexture(guidanceTex);
         }

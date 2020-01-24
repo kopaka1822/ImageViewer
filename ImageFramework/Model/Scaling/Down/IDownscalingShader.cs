@@ -12,6 +12,6 @@ namespace ImageFramework.Model.Scaling.Down
         /// <param name="hasAlpha">indicates if the texture has an alpha channel</param>
         /// <param name="upload">used for constant buffer</param>
         /// <param name="cache">used for temporary texture. Must be the dimension of src texture</param>
-        void Run(ITexture src, ITexture dst, int dstMipmap, bool hasAlpha, UploadBuffer upload, ITextureCache cache);
+        void Run(ITexture src, ITexture dst, int srcMipmap, int dstMipmap, bool hasAlpha, UploadBuffer upload, ITextureCache cache);
     }
 }
