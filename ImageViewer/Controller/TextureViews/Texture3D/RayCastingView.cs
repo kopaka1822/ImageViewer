@@ -34,7 +34,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             marchingShader = new RayMarchingShader(models);
             emptySpaceSkippingShader = new EmptySpaceSkippingShader();
             displayEx = (RayCastingDisplayModel)models.Display.ExtendedViewData;
-            helpTextures = new SpaceSkippingTexture3D[4];
+            helpTextures = new SpaceSkippingTexture3D[models.NumPipelines];
         }
 
         public override void Draw(int id, ITexture texture)
@@ -82,22 +82,22 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             shader?.Dispose();
             marchingShader?.Dispose();
             emptySpaceSkippingShader?.Dispose();
+            foreach (var tex in helpTextures)
+            {
+                tex?.Dispose();
+            }
         }
 
         public override void UpdateImage(int id, ITexture texture)
         {
             base.UpdateImage(id, texture);
 
-            if (!(texture is null))
-            {
-                SpaceSkippingTexture3D tex = new SpaceSkippingTexture3D(texture.Size, texture.NumMipmaps);
-                helpTextures[id] = tex;
-                emptySpaceSkippingShader.Execute(texture.GetSrView(0, 0), helpTextures[id], texture.Size);
-            }
-            else
-            {
-                helpTextures[id].Dispose();
-            }
+            helpTextures[id]?.Dispose();
+            if (texture is null) return;
+
+            SpaceSkippingTexture3D tex = new SpaceSkippingTexture3D(texture.Size, texture.NumMipmaps);
+            helpTextures[id] = tex;
+            emptySpaceSkippingShader.Execute(texture.GetSrView(0, 0), helpTextures[id], texture.Size);
         }
 
         public class SpaceSkippingTexture3D : ImageFramework.DirectX.Texture3D
