@@ -51,7 +51,7 @@ namespace ImageFramework.DirectX
 
         public void CopyFrom(GpuBuffer buffer)
         {
-            Device.Get().CopyBufferData(buffer.Handle, stageBuffer, ByteSize);
+            Device.Get().CopyBufferData(buffer.Handle, stageBuffer, Math.Min(ByteSize, buffer.ByteSize));
         }
 
         public T GetData<T>() where T : struct

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GliImage.h"
 #include "compress_interface.h"
+#include "interface.h"
 
 // mofified copy of gli convert
 template <typename texture_type>
@@ -18,15 +19,21 @@ inline texture_type convert_mod(texture_type const& Texture, gli::format Format)
 
 	const auto isSrgb = gli::is_srgb(Texture.format());
 	const auto isCompressed = gli::is_compressed(Texture.format());
+	assert(!isCompressed); // this should be done by compressonator
 
 	// for some reason the gli loader doesn't revert srgb compression in this case
-	const auto convertFromSrgb = isSrgb && isCompressed;
+	//const auto convertFromSrgb = isSrgb && isCompressed;
 
 	fetch_type Fetch = gli::detail::convert<texture_type, T, gli::defaultp>::call(Texture.format()).Fetch;
 	write_type Write = gli::detail::convert<texture_type, T, gli::defaultp>::call(Format).Write;
 
 	gli::texture Storage(Texture.target(), Format, Texture.texture::extent(), Texture.layers(), Texture.faces(), Texture.levels(), Texture.swizzles());
 	texture_type Copy(Storage);
+
+	extent_type const& baseDim = Texture.texture::extent(0);
+	// divide by 100 for range [0, 100]
+	const size_t numSteps = std::max<size_t>(image::IImage::calcNumPixels(uint32_t(Texture.layers() * Texture.faces()), uint32_t(Texture.levels()), baseDim.x, baseDim.y, baseDim.z) / 100, 1);
+	size_t curSteps = 0;
 
 	for (size_type Layer = 0; Layer < Texture.layers(); ++Layer)
 		for (size_type Face = 0; Face < Texture.faces(); ++Face)
@@ -36,17 +43,23 @@ inline texture_type convert_mod(texture_type const& Texture, gli::format Format)
 
 				for (component_type k = 0; k < Dimensions.z; ++k)
 					for (component_type j = 0; j < Dimensions.y; ++j)
+					{
+						set_progress(uint32_t(curSteps / numSteps));
+
 						for (component_type i = 0; i < Dimensions.x; ++i)
 						{
 							typename texture_type::extent_type const Texelcoord(extent_type(i, j, k));
 							auto texel = Fetch(Texture, Texelcoord, Layer, Face, Level);
-							if (convertFromSrgb)
-								texel = gli::convertSRGBToLinear(texel);
+							//if (convertFromSrgb)
+							//	texel = gli::convertSRGBToLinear(texel);
 
 							Write(
 								Copy, Texelcoord, Layer, Face, Level,
 								texel);
 						}
+						curSteps += Dimensions.x;
+					}
+						
 			}
 
 	return texture_type(Copy);
@@ -96,7 +109,7 @@ void GliImage::flip()
 
 GliImage::GliImage(gli::format format, gli::format original, size_t nLayer, size_t nFaces, size_t nLevel, size_t width,
 	size_t height, size_t depth) :
-GliImageBase(initTex(nFaces, depth), original)
+GliImageBase(initTex(nFaces, gli::extent3d(width, height, depth)), original)
 {
 	if (m_type == Cubes) m_cube = gli::texture_cube_array(format, gli::extent2d{ width, height }, nLayer, nLevel);
 	else if (m_type == Volume)
@@ -110,11 +123,11 @@ GliImageBase(initTex(nFaces, depth), original)
 GliImage::GliImage(gli::format format, size_t nLayer, size_t nLevel, size_t width, size_t height, size_t depth)
 	:
 // create cube map array if nLayer == 6, otherwise 2d array
-GliImage(format, format, nLayer == 6? 1 : nLayer, nLayer == 6 ? 6 : 1, nLevel, width, height, depth)
+GliImage(format, format, (nLayer == 6 && width == height) ? 1 : nLayer, (nLayer == 6 && width == height) ? 6 : 1, nLevel, width, height, depth)
 {}
 
 GliImage::GliImage(const gli::texture& tex, gli::format original) :
-	GliImageBase(initTex(tex.faces(), tex.extent().z), original)
+	GliImageBase(initTex(tex.faces(), tex.extent()), original)
 {
 	if (tex.empty())
 		throw std::runtime_error("could not load image");
@@ -124,15 +137,15 @@ GliImage::GliImage(const gli::texture& tex, gli::format original) :
 	else m_array = gli::texture2d_array(tex);
 } 
 
-gli::texture& GliImage::initTex(size_t nFaces, size_t depth)
+gli::texture& GliImage::initTex(size_t nFaces, gli::extent3d size)
 {
-	if(depth > 1)
+	if(size.z > 1)
 	{
 		m_type = Volume;
 		return m_volume;
 	}
 
-	if(nFaces == 6)
+	if(nFaces == 6 && size.x == size.y)
 	{
 		m_type = Cubes;
 		return m_cube;

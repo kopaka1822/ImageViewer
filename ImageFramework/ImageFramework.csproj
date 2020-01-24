@@ -102,6 +102,7 @@
     <Compile Include="Model\Export\ExportDescription.cs" />
     <Compile Include="Model\Export\ExportFormatModel.cs" />
     <Compile Include="Model\Export\ExportModel.cs" />
+    <Compile Include="Model\Export\FFMpeg.cs" />
     <Compile Include="Model\Filter\FilterLoader.cs" />
     <Compile Include="Model\Filter\FilterModel.cs" />
     <Compile Include="Model\Filter\FiltersModel.cs" />
@@ -217,6 +218,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Filter\flip_cubemap.hlsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Filter\min_max_radius.hlsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Filter\mipmap_box.hlsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

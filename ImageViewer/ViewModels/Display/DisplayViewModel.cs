@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
@@ -20,6 +21,7 @@ using ImageViewer.Controller.TextureViews.Texture3D;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
 using ImageViewer.Views;
+using Color = System.Windows.Media.Color;
 using RayCastingView = ImageViewer.Views.Display.RayCastingView;
 using Single3DView = ImageViewer.Views.Display.Single3DView;
 
@@ -28,9 +30,21 @@ namespace ImageViewer.ViewModels.Display
     public class DisplayViewModel : INotifyPropertyChanged
     {
         private readonly ModelsEx models;
-        private static readonly ComboBoxItem<int> EmptyMipMap = new ComboBoxItem<int>("No Mipmap", -1);
-        private static readonly ComboBoxItem<int> EmptyLayer = new ComboBoxItem<int>("No Layer", -1);
-        private static readonly ComboBoxItem<DisplayModel.ViewMode> EmptyViewMode = new ComboBoxItem<DisplayModel.ViewMode>("Empty", DisplayModel.ViewMode.Empty);
+        private static readonly ListItemViewModel<int> EmptyMipMap = new ListItemViewModel<int>
+        {
+            Name = "No Mipmap",
+            Cargo = -1
+        };
+        private static readonly ListItemViewModel<int> EmptyLayer = new ListItemViewModel<int>
+        {
+            Name = "No Layer",
+            Cargo = -1
+        };
+        private static readonly ListItemViewModel<DisplayModel.ViewMode> EmptyViewMode = new ListItemViewModel<DisplayModel.ViewMode>
+        {
+            Name = "Empty",
+            Cargo = DisplayModel.ViewMode.Empty
+        };
 
         public DisplayViewModel(ModelsEx models)
         {
@@ -60,6 +74,18 @@ namespace ImageViewer.ViewModels.Display
                     OnPropertyChanged(nameof(IsAlphaCheckers));
                     OnPropertyChanged(nameof(IsAlphaTheme));
                     break;
+                case nameof(SettingsModel.NaNColor):
+                    OnPropertyChanged(nameof(NaNColor));
+                    break;
+            }
+        }
+
+        public SolidColorBrush NaNColor
+        {
+            get
+            {
+                var c = models.Settings.NaNColor;
+                return new SolidColorBrush(Color.FromScRgb(1.0f, c.Red, c.Green, c.Blue));
             }
         }
 
@@ -244,17 +270,25 @@ namespace ImageViewer.ViewModels.Display
 
         public Visibility ExtendedViewVisibility => extendedView == null ? Visibility.Collapsed : Visibility.Visible;
 
-        public ObservableCollection<ComboBoxItem<int>> AvailableMipMaps { get; } = new ObservableCollection<ComboBoxItem<int>>();
-        public ObservableCollection<ComboBoxItem<int>> AvailableLayers { get; } = new ObservableCollection<ComboBoxItem<int>>();
+        public ObservableCollection<ListItemViewModel<int>> AvailableMipMaps { get; } = new ObservableCollection<ListItemViewModel<int>>();
+        public ObservableCollection<ListItemViewModel<int>> AvailableLayers { get; } = new ObservableCollection<ListItemViewModel<int>>();
 
-        public ObservableCollection<ComboBoxItem<DisplayModel.SplitMode>> AvailableSplitModes { get; } = new ObservableCollection<ComboBoxItem<DisplayModel.SplitMode>>
+        public ObservableCollection<ListItemViewModel<DisplayModel.SplitMode>> AvailableSplitModes { get; } = new ObservableCollection<ListItemViewModel<DisplayModel.SplitMode>>
         {
-            new ComboBoxItem<DisplayModel.SplitMode>("Vertical", DisplayModel.SplitMode.Vertical),
-            new ComboBoxItem<DisplayModel.SplitMode>("Horizontal", DisplayModel.SplitMode.Horizontal)
+            new ListItemViewModel<DisplayModel.SplitMode>
+            {
+                Name = "Vertical",
+                Cargo = DisplayModel.SplitMode.Vertical
+            },
+            new ListItemViewModel<DisplayModel.SplitMode>
+            {
+                Name = "Horizontal",
+                Cargo = DisplayModel.SplitMode.Horizontal
+            }
         };
 
-        public ObservableCollection<ComboBoxItem<DisplayModel.ViewMode>> AvailableViewModes { get; } =
-            new ObservableCollection<ComboBoxItem<DisplayModel.ViewMode>>();
+        public ObservableCollection<ListItemViewModel<DisplayModel.ViewMode>> AvailableViewModes { get; } =
+            new ObservableCollection<ListItemViewModel<DisplayModel.ViewMode>>();
 
         public bool EnableMipMaps => AvailableMipMaps.Count > 1;
         public Visibility EnableLayers => AvailableLayers.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
@@ -265,8 +299,8 @@ namespace ImageViewer.ViewModels.Display
         public bool ChooseLayers => models.Display.ActiveView == DisplayModel.ViewMode.Single ||
                                     models.Display.ActiveView == DisplayModel.ViewMode.Polar;
 
-        private ComboBoxItem<int> selectedMipMap = EmptyMipMap;
-        public ComboBoxItem<int> SelectedMipMap
+        private ListItemViewModel<int> selectedMipMap = EmptyMipMap;
+        public ListItemViewModel<int> SelectedMipMap
         {
             get => selectedMipMap;
             set
@@ -282,8 +316,8 @@ namespace ImageViewer.ViewModels.Display
 
         public string Multiplier => models.Display.MultiplierString;
 
-        private ComboBoxItem<int> selectedLayer = EmptyLayer;
-        public ComboBoxItem<int> SelectedLayer
+        private ListItemViewModel<int> selectedLayer = EmptyLayer;
+        public ListItemViewModel<int> SelectedLayer
         {
             get => selectedLayer;
             set
@@ -297,8 +331,8 @@ namespace ImageViewer.ViewModels.Display
             }
         }
 
-        private ComboBoxItem<DisplayModel.SplitMode> selectedSplitMode;
-        public ComboBoxItem<DisplayModel.SplitMode> SelectedSplitMode
+        private ListItemViewModel<DisplayModel.SplitMode> selectedSplitMode;
+        public ListItemViewModel<DisplayModel.SplitMode> SelectedSplitMode
         {
             get => selectedSplitMode;
             set
@@ -310,8 +344,8 @@ namespace ImageViewer.ViewModels.Display
             }
         }
 
-        private ComboBoxItem<DisplayModel.ViewMode> selectedViewMode = EmptyViewMode;
-        public ComboBoxItem<DisplayModel.ViewMode> SelectedViewMode
+        private ListItemViewModel<DisplayModel.ViewMode> selectedViewMode = EmptyViewMode;
+        public ListItemViewModel<DisplayModel.ViewMode> SelectedViewMode
         {
             get => selectedViewMode;
             set
@@ -372,7 +406,11 @@ namespace ImageViewer.ViewModels.Display
                 if (models.Images.Size.Depth > 1)
                     txt += "x" + models.Images.GetDepth(curMip);
 
-                AvailableMipMaps.Add(new ComboBoxItem<int>(txt, curMip));
+                AvailableMipMaps.Add(new ListItemViewModel<int>
+                {
+                    Name = txt,
+                    Cargo = curMip
+                });
             }
 
             SelectedMipMap = AvailableMipMaps.Count != 0 ? AvailableMipMaps[0] : EmptyMipMap;
@@ -391,7 +429,11 @@ namespace ImageViewer.ViewModels.Display
             AvailableLayers.Clear();
             for (var layer = 0; layer < models.Images.NumLayers; ++layer)
             {
-                AvailableLayers.Add(new ComboBoxItem<int>("Layer " + layer, layer));
+                AvailableLayers.Add(new ListItemViewModel<int>
+                {
+                    Name = "Layer " + layer,
+                    Cargo = layer
+                });
             }
 
             SelectedLayer = AvailableLayers.Count != 0 ? AvailableLayers[0] : EmptyLayer;
@@ -406,10 +448,14 @@ namespace ImageViewer.ViewModels.Display
             var isEnabled = EnableViewModes;
             AvailableViewModes.Clear();
 
-            ComboBoxItem<DisplayModel.ViewMode> selected = EmptyViewMode;
+            var selected = EmptyViewMode;
             foreach (var view in models.Display.AvailableViews)
             {
-                var box = new ComboBoxItem<DisplayModel.ViewMode>(view.ToString(), view);
+                var box = new ListItemViewModel<DisplayModel.ViewMode>
+                {
+                    Name = view.ToString(),
+                    Cargo = view
+                };
                 if (view == models.Display.ActiveView)
                     selected = box;
 

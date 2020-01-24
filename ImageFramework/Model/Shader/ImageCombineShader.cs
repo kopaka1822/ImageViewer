@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
+using ImageFramework.Model.Equation.Token;
 
 namespace ImageFramework.Model.Shader
 {
@@ -62,8 +63,6 @@ $@"cbuffer InfoBuffer
 {GetTextureBindings(numImages, builder)}
 {GetTextureGetters(numImages, builder)}
 {GetHelperFunctions()}
-{Utility.Utility.FromSrgbFunction()}
-{Utility.Utility.ToSrgbFunction()}
 {builder.UavType} out_tex : register(u0);
 [numthreads({builder.LocalSizeX}, {builder.LocalSizeY}, {builder.LocalSizeZ})]
 void main(uint3 coord : SV_DISPATCHTHREADID)
@@ -118,7 +117,10 @@ void main(uint3 coord : SV_DISPATCHTHREADID)
                 GetCompareFunction("fsmaller", "<") +
                 GetCompareFunction("fbiggereq", ">=") +
                 GetCompareFunction("fsmallereq", "<=") +
-                GetExtendedConstructors();
+                GetExtendedConstructors() +
+                Utility.Utility.FromSrgbFunction() +
+                Utility.Utility.ToSrgbFunction() +
+                UnaryFunctionToken.GetUnaryHelperFunctions();
         }
 
         private static string GetCompareFunction(string name, string comparision)

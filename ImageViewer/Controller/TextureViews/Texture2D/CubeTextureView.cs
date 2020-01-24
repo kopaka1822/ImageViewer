@@ -1,4 +1,5 @@
-﻿using ImageFramework.DirectX;
+﻿using System;
+using ImageFramework.DirectX;
 using ImageFramework.Utility;
 using ImageViewer.Controller.TextureViews.Shader;
 using ImageViewer.Controller.TextureViews.Shared;
@@ -11,10 +12,10 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
     {
         private readonly CubeViewShader shader;
 
-        public CubeTextureView(ModelsEx models, TextureViewData data)
-            : base(models, data)
+        public CubeTextureView(ModelsEx models)
+            : base(models)
         {
-            shader = new CubeViewShader();
+            shader = new CubeViewShader(models);
         }
 
         public override void Dispose()
@@ -30,11 +31,11 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
             base.Draw(id, texture);
 
             var dev = Device.Get();
-            dev.OutputMerger.BlendState = data.AlphaBlendState;
+            dev.OutputMerger.BlendState = models.ViewData.AlphaBlendState;
 
-            shader.Run(data.Buffer, GetTransform(), models.Display.Multiplier, CalcFarplane(), models.Display.DisplayNegative, ((TextureArray2D)texture).GetCubeView(models.Display.ActiveMipmap), data.GetSampler(models.Display.LinearInterpolation));
+            shader.Run(GetTransform(), CalcFarplane(), ((TextureArray2D)texture).GetCubeView(models.Display.ActiveMipmap));
 
-            dev.OutputMerger.BlendState = data.DefaultBlendState;
+            dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
         }
 
         public override Size3 GetTexelPosition(Vector2 mouse)
@@ -46,78 +47,44 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
 
             viewDir.Normalize();
 
-            Vector3[] faces = new Vector3[6];
-            faces[0] = new Vector3(1.0f, 0.0f, 0.0f);
-            faces[1] = new Vector3(-1.0f, 0.0f, 0.0f);
-            faces[2] = new Vector3(0.0f, 1.0f, 0.0f);
-            faces[3] = new Vector3(0.0f, -1.0f, 0.0f);
-            faces[4] = new Vector3(0.0f, 0.0f, 1.0f);
-            faces[5] = new Vector3(0.0f, 0.0f, -1.0f);
-
-            float maxScalar = -1.0f;
-            int maxIndex = 0;
-            for (int i = 0; i < 6; ++i)
+            // according to dx spec: https://microsoft.github.io/DirectX-Specs/d3d/archive/D3D11_3_FunctionalSpec.htm#PointSampling
+            // Choose the largest magnitude component of the input vector. Call this magnitude of this value AxisMajor. In the case of a tie, the following precedence should occur: Z, Y, X. 
+            int axisMajor = 0;
+            int axisFlip = 0;
+            float axisMajorValue = 0.0f;
+            for (int i = 0; i < 3; ++i)
             {
-                float s = faces[i].X * viewDir.X +
-                          faces[i].Y * viewDir.Y +
-                          faces[i].Z * viewDir.Z;
-                if (s > maxScalar)
+                if (Math.Abs(viewDir[i]) >= axisMajorValue)
                 {
-                    maxScalar = s;
-                    maxIndex = i;
+                    axisMajor = i;
+                    axisFlip = viewDir[i] < 0.0f ? 1 : 0;
+                    axisMajorValue = Math.Abs(viewDir[i]);
                 }
             }
 
-            // determine texture coordinates from view direction
+            int faceId = axisMajor * 2 + axisFlip;
 
-            // 3. normal form: faces[maxIndex].X * x1 + faces[maxIndex].Y * x2 + faces[maxIndex].Z * x3 + 1 = 0
-            // line: (0 0 0) + r * dir
-            // solve: faces[maxIndex].X * r * dir.X + faces[maxIndex].Y * r * dir.Y + faces[maxIndex].Z * r * dir.Z + 1 = 0
-            // solve: faces[maxIndex].X * r * dir.X + faces[maxIndex].Y * r * dir.Y + faces[maxIndex].Z * r * dir.Z = -1
-            // solve: faces[maxIndex].X * dir.X + faces[maxIndex].Y * dir.Y + faces[maxIndex].Z * dir.Z = -1 / r
-            // solve: -1 * (faces[maxIndex].X * dir.X + faces[maxIndex].Y * dir.Y + faces[maxIndex].Z * dir.Z) = 1 / r
-            // solve: -1 / (faces[maxIndex].X * dir.X + faces[maxIndex].Y * dir.Y + faces[maxIndex].Z * dir.Z) = r
+            // Select and mirror the minor axes as defined by the TextureCube coordinate space. Call this new 2d coordinate Position.
+            // Project the coordinate onto the cube by dividing the components Position by AxisMajor. 
+            int axisMinor1 = axisMajor == 0 ? 2 : 0; // first coord is x or z
+            int axisMinor2 = 3 - axisMajor - axisMinor1;
+            float u = viewDir[axisMinor1] / axisMajorValue;
+            float v = -viewDir[axisMinor2] / axisMajorValue;
 
-            // intersection
-            float r = -1.0f / (faces[maxIndex].X * viewDir.X + faces[maxIndex].Y * viewDir.Y + faces[maxIndex].Z * viewDir.Z);
-
-            var intersectionPoint = viewDir * r;
-
-            // determine s and t coordinates
-            // ReSharper disable once CompareOfFloatsByEqualityOperator
-            int xIndex = (faces[maxIndex].X != 0.0f) ? 1 : 0;
-            // ReSharper disable once CompareOfFloatsByEqualityOperator
-            int yIndex = (xIndex == 0) ? ((faces[maxIndex].Y != 0.0f) ? 2 : 1) : 2;
-
-            float sc = intersectionPoint[xIndex];
-            float tc = intersectionPoint[yIndex];
-
-            // some tricking to get the coordinates right
-            switch (maxIndex)
+            switch (faceId)
             {
+                case 0:
+                case 5:
+                    u *= -1.0f;
+                    break;
                 case 2:
-                    sc *= -1.0f;
-                    tc *= -1.0f;
-                    break;
-                case 1:
-                    tc *= -1.0f;
-                    break;
-                case 3:
-                case 4:
-                    sc *= -1.0f;
+                    v *= -1.0f;
                     break;
             }
 
-            if (maxIndex == 0 || maxIndex == 1)
-            {
-                var t = sc;
-                sc = tc;
-                tc = t;
-            }
+            models.Display.ActiveLayer = faceId;
 
-            models.Display.ActiveLayer = maxIndex;
-
-            var pt = Utility.CanonicalToTexelCoordinates(sc, tc,
+            var pt = Utility.CanonicalToTexelCoordinates(u, v,
                 models.Images.GetWidth(models.Display.ActiveMipmap),
                 models.Images.GetHeight(models.Display.ActiveMipmap));
 

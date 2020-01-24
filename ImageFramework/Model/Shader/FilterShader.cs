@@ -9,11 +9,14 @@ using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.Model.Filter;
 using ImageFramework.Model.Filter.Parameter;
+using SharpDX.Direct3D11;
+using Device = ImageFramework.DirectX.Device;
 
 namespace ImageFramework.Model.Shader
 {
     internal class FilterShader : IDisposable
     {
+        private static readonly int TextureBindingStart = 2;
         private readonly FilterModel parent;
         private readonly DirectX.Shader shader;
         private readonly UploadBuffer paramBuffer;
@@ -95,6 +98,7 @@ namespace ImageFramework.Model.Shader
             dev.Compute.SetUnorderedAccessView(0, null);
             dev.Compute.SetShaderResource(0, null);
             dev.Compute.SetShaderResource(1, null);
+            UnbindTextureParameters();
         }
 
         /// <summary>
@@ -115,10 +119,19 @@ namespace ImageFramework.Model.Shader
 
         private void BindTextureParameters(ImagesModel image, int layer, int mipmap)
         {
-            var texSlot = 1;
+            var texSlot = TextureBindingStart;
             foreach (var texParam in parent.TextureParameters)
             {
                 Device.Get().Compute.SetShaderResource(texSlot++, image.Images[texParam.Source].Image.GetSrView(layer, mipmap));
+            }
+        }
+
+        private void UnbindTextureParameters()
+        {
+            var texSlot = TextureBindingStart;
+            foreach (var texParam in parent.TextureParameters)
+            {
+                Device.Get().Compute.SetShaderResource(texSlot++, null);
             }
         }
 
@@ -210,7 +223,7 @@ void main(uint3 coord : SV_DISPATCHTHREADID) {{
 
             string res = "";
 
-            var i = 1;
+            var i = TextureBindingStart;
             foreach (var tex in parameters)
             {
                 res += "Texture2D<float4> " + tex.TextureName + $" : register(t{i++});\n";

@@ -159,6 +159,23 @@ namespace ImageViewer.Models
             set => Settings.Default.FlipYAxis = value;
         }
 
+        public Color NaNColor
+        {
+            get => new Color(Settings.Default.NanRed, Settings.Default.NanGreen, Settings.Default.NanBlue);
+            set
+            {
+                // ReSharper disable CompareOfFloatsByEqualityOperator
+                if (Settings.Default.NanRed == value.Red && 
+                    Settings.Default.NanGreen == value.Green && 
+                    Settings.Default.NanBlue == value.Blue) return;
+
+                Settings.Default.NanRed = value.Red;
+                Settings.Default.NanGreen = value.Green;
+                Settings.Default.NanBlue = value.Blue;
+                OnPropertyChanged(nameof(NaNColor));
+            }
+        }
+
         public void Save()
         {
             Settings.Default.Save();

@@ -15,6 +15,7 @@ namespace ImageFramework.DirectX
         Size3 Size { get; }
         int NumMipmaps { get; }
         bool HasMipmaps { get; }
+        bool HasCubemap { get; }
         bool Is3D { get; }
         int NumLayers { get; }
         Format Format { get; }

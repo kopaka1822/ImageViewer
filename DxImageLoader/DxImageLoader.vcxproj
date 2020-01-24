@@ -96,6 +96,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -152,6 +153,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -179,6 +181,7 @@
     <ClInclude Include="Mipmap.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="pfm_interface.h" />
+    <ClInclude Include="png_interface.h" />
     <ClInclude Include="stbi_interface.h" />
     <ClInclude Include="VkFormat.h" />
   </ItemGroup>
@@ -198,11 +201,18 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="pfm_interface.cpp" />
+    <ClCompile Include="png_interface.cpp" />
     <ClCompile Include="stbi_interface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\dependencies\compressonator\Compressonator\VS2015\CompressonatorLib.vcxproj">
       <Project>{9ee67db2-4ad8-4b9a-ae58-2e536412033c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\dependencies\libpng\projects\vstudio\libpng\libpng.vcxproj">
+      <Project>{d6973076-9317-4ef2-a0b8-b7a18ac0713e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\dependencies\libpng\projects\vstudio\zlib\zlib.vcxproj">
+      <Project>{60f89955-91c6-3a36-8000-13c592fec2df}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -16,26 +16,46 @@ namespace ImageFramework.Model.Equation.Token
         public override string ToHlsl()
         {
             // aqcuire opengl function name
-            if (!GetOpenglFunction(funcName, out var start, out var end))
+            if (!GetHlslFunction(funcName, out var start, out var end))
                 throw new Exception("invalid string as function name: " + funcName);
             return start + value.ToHlsl() + end;
         }
 
-        private static bool GetOpenglFunction(string name, out string front, out string end)
+        public static string GetUnaryHelperFunctions()
+        {
+            return @"
+float4 srgbAsSnorm(float4 v)
+{
+    // undo srgb (linear color space values back to srgb space)
+    float4 res = toSrgb(v);
+    // only convert rgb    
+    [unroll] for(int i = 0; i < 3; ++i) {
+        // get byte value
+        int byte = int(res[i] * 255.0 + 0.5);
+        
+        // according to dx spec. 127 maps to 1.0, -127 (129) and -128 (128) maps to -1.0
+        if(byte <= 127)
+            res[i] = byte / 127.0;
+        else
+        {
+            byte |= 0xFFFFFF00; // extend sign
+            //res[i] = -(1.0 - min((byte - 127) / 127.0, 1.0));
+            res[i] = max(byte / 127.0, -1.0);
+        }
+    }
+    return res;
+}
+";
+        }
+
+        private static bool GetHlslFunction(string name, out string front, out string end)
         {
             switch (name)
             {
+                // image viewer extensions
                 case "alpha":
                     front = "(";
                     end = ").aaaa";
-                    break;
-                case "tosrgb":
-                    front = "toSrgb(";
-                    end = ")";
-                    break;
-                case "fromsrgb":
-                    front = "fromSrgb(";
-                    end = ")";
                     break;
                 case "red":
                     front = "(";
@@ -48,6 +68,20 @@ namespace ImageFramework.Model.Equation.Token
                 case "blue":
                     front = "(";
                     end = ").bbbb";
+                    break;
+                // image viewer conversion extensions
+                case "tosrgb": // linear to srgb
+                case "srgbasunorm": // reinterpret srgb image as unorm
+                    front = "toSrgb(";
+                    end = ")";
+                    break;
+                case "fromsrgb": // srgb to linear
+                    front = "fromSrgb(";
+                    end = ")";
+                    break;
+                case "srgbassnorm": // reinterpret srgb image as snorm
+                    front = "srgbAsSnorm(";
+                    end = ")";
                     break;
                 // original glsl functions
                 case "abs":

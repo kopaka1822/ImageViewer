@@ -86,24 +86,26 @@
     </ApplicationDefinition>
     <Compile Include="Commands\AddFilterCommand.cs" />
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
-    <Compile Include="Commands\Command.cs" />
-    <Compile Include="Commands\CubemapToLatLongCommand.cs" />
-    <Compile Include="Commands\DeleteMipmapsCommand.cs" />
-    <Compile Include="Commands\ExportCommand.cs" />
-    <Compile Include="Commands\GenerateMipmapsCommand.cs" />
-    <Compile Include="Commands\GifExportCommand.cs" />
+    <Compile Include="Commands\Helper\Command.cs" />
+    <Compile Include="Commands\Tools\CubemapToLatLongCommand.cs" />
+    <Compile Include="Commands\Tools\DeleteMipmapsCommand.cs" />
+    <Compile Include="Commands\Export\ExportCommand.cs" />
+    <Compile Include="Commands\Tools\GenerateMipmapsCommand.cs" />
+    <Compile Include="Commands\Export\GifExportCommand.cs" />
     <Compile Include="Commands\HelpDialogCommand.cs" />
-    <Compile Include="Commands\ImportArrayCommand.cs" />
-    <Compile Include="Commands\ImportCommand.cs" />
-    <Compile Include="Commands\ImportEquationImageCommand.cs" />
-    <Compile Include="Commands\LatLongToCubemapCommand.cs" />
-    <Compile Include="Commands\OpenCommand.cs" />
-    <Compile Include="Commands\ResizeWindowCommand.cs" />
-    <Compile Include="Commands\SetThemeCommand.cs" />
-    <Compile Include="Commands\ShowPixelColorCommand.cs" />
-    <Compile Include="Commands\ShowPixelDisplayCommand.cs" />
-    <Compile Include="Commands\ShowScaleCommand.cs" />
-    <Compile Include="Commands\SimpleCommand.cs" />
+    <Compile Include="Commands\Helper\ParameterCommandAdapter.cs" />
+    <Compile Include="Commands\Import\ImportArrayCommand.cs" />
+    <Compile Include="Commands\Import\ImportCommand.cs" />
+    <Compile Include="Commands\Import\ImportEquationImageCommand.cs" />
+    <Compile Include="Commands\Tools\LatLongToCubemapCommand.cs" />
+    <Compile Include="Commands\Import\OpenCommand.cs" />
+    <Compile Include="Commands\View\ResizeWindowCommand.cs" />
+    <Compile Include="Commands\View\SelectNaNColorCommand.cs" />
+    <Compile Include="Commands\View\SetThemeCommand.cs" />
+    <Compile Include="Commands\View\ShowPixelColorCommand.cs" />
+    <Compile Include="Commands\View\ShowPixelDisplayCommand.cs" />
+    <Compile Include="Commands\Tools\ShowScaleCommand.cs" />
+    <Compile Include="Commands\Helper\SimpleCommand.cs" />
     <Compile Include="Controller\ClientDropController.cs" />
     <Compile Include="Controller\ComputeImageController.cs" />
     <Compile Include="Controller\CropController.cs" />
@@ -130,7 +132,6 @@
     <Compile Include="Controller\TextureViews\Texture3D\Single3DView.cs" />
     <Compile Include="Controller\TextureViews\Shared\SingleTextureView.cs" />
     <Compile Include="Controller\TextureViews\Shared\TextureViewData.cs" />
-    <Compile Include="Controller\TextureViews\Shared\ViewBufferData.cs" />
     <Compile Include="Controller\TextureViews\Texture3D\Texture3DBaseView.cs" />
     <Compile Include="Controller\ViewModeController.cs" />
     <Compile Include="Models\Display\RayCastingDisplayModel.cs" />
@@ -158,15 +159,20 @@
     <Compile Include="ViewModels\Filter\IntFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\TextureFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\FormulaViewModel.cs" />
-    <Compile Include="ViewModels\ImagesViewModel.cs" />
+    <Compile Include="ViewModels\Image\ImageItemViewModel.cs" />
+    <Compile Include="ViewModels\Image\ImagesViewModel.cs" />
+    <Compile Include="ViewModels\ListItemViewModel.cs" />
     <Compile Include="ViewModels\ProgressViewModel.cs" />
     <Compile Include="ViewModels\StatisticsViewModel.cs" />
     <Compile Include="ViewModels\StatisticViewModel.cs" />
     <Compile Include="ViewModels\ViewModels.cs" />
-    <Compile Include="Views\ComboBoxItem.cs" />
+    <Compile Include="Views\Converter\BoolVisibilityConverter.cs" />
     <Compile Include="Views\CustomTextBox.cs" />
     <Compile Include="Views\Dialog\ArrayImportDialog.xaml.cs">
       <DependentUpon>ArrayImportDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\ColorPickerDialog.xaml.cs">
+      <DependentUpon>ColorPickerDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\ExportDialog.xaml.cs">
       <DependentUpon>ExportDialog.xaml</DependentUpon>
@@ -202,11 +208,18 @@
     <Compile Include="Views\Filter\FilterListBoxItem.cs" />
     <Compile Include="Views\Filter\FloatFilterParameterView.cs" />
     <Compile Include="Views\Filter\IntFilterParameterView.cs" />
-    <Compile Include="Views\Filter\TextureFilterParameterView.cs" />
+    <Compile Include="Views\Filter\TextureFilterParameterView.xaml.cs">
+      <DependentUpon>TextureFilterParameterView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ImagesTab.xaml.cs">
       <DependentUpon>ImagesTab.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\List\ImageListBoxItem.cs" />
+    <Compile Include="Views\List\ImageEquationView.xaml.cs">
+      <DependentUpon>ImageEquationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\List\ImageItemView.xaml.cs">
+      <DependentUpon>ImageItemView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MenuBar.xaml.cs">
       <DependentUpon>MenuBar.xaml</DependentUpon>
     </Compile>
@@ -226,7 +239,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Commands\ActionCommand.cs" />
+    <Compile Include="Commands\Helper\ActionCommand.cs" />
     <Compile Include="Controller\ResizeController.cs" />
     <Compile Include="DirectX\SwapChainAdapter.cs" />
     <Compile Include="MainWindow.xaml.cs">
@@ -234,6 +247,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\Dialog\ArrayImportDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\ColorPickerDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -277,7 +294,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Filter\TextureFilterParameterView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ImagesTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\List\ImageEquationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\List\ImageItemView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -426,6 +455,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\cube.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\chained.png" />
+    <Resource Include="Icons\unchained.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -33,6 +33,8 @@ namespace ImageFramework.Model
             public int NumLayers => Image.NumLayers;
             public bool IsHdr => Image.Format == Format.R32G32B32A32_Float;
             public string Filename { get; }
+            // name that will be displayed
+            public string Alias { get; set; }
             public GliFormat OriginalFormat { get; }
 
             internal ImageData(ITexture image, string filename, GliFormat originalFormat)
@@ -40,6 +42,7 @@ namespace ImageFramework.Model
                 Image = image;
                 Filename = filename;
                 OriginalFormat = originalFormat;
+                Alias = System.IO.Path.GetFileNameWithoutExtension(filename);
             }
 
             internal void GenerateMipmaps(int levels)

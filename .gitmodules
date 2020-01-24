@@ -14,3 +14,9 @@
 	path = dependencies/ktx
 	url = https://github.com/KhronosGroup/KTX-Software.git
 	branch = ktx2
+[submodule "dependencies/libpng"]
+	path = dependencies/libpng
+	url = https://github.com/kopaka1822/libpng.git
+[submodule "dependencies/zlib"]
+	path = dependencies/zlib
+	url = https://github.com/madler/zlib.git

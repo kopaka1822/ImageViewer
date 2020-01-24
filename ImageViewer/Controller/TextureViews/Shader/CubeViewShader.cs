@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Utility;
 using ImageViewer.Controller.TextureViews.Shared;
+using ImageViewer.Models;
 using SharpDX;
 using SharpDX.Direct3D11;
 using Device = ImageFramework.DirectX.Device;
@@ -14,36 +15,54 @@ namespace ImageViewer.Controller.TextureViews.Shader
 {
     public class CubeViewShader : ViewShader
     {
-        public CubeViewShader() 
-            : base(GetVertexSource(), GetPixelSource(), "Cube")
+        public CubeViewShader(ModelsEx models) 
+            : base(models, GetVertexSource(), GetPixelSource(), "Cube")
         {
 
         }
 
-        public void Run(UploadBuffer buffer, Matrix transform, float multiplier, float farplane, bool useAbs, ShaderResourceView texture, SamplerState sampler)
+        struct BufferData
         {
-            buffer.SetData(new ViewBufferData
+            public CommonBufferData Common;
+            public Matrix Transform;
+            public float Farplane;
+        }
+
+        public void Run(Matrix transform, float farplane, ShaderResourceView texture)
+        {
+            var v = models.ViewData;
+            v.Buffer.SetData(new BufferData
             {
+                Common = GetCommonData(),
                 Transform = transform,
-                Multiplier = multiplier,
                 Farplane = farplane,
-                UseAbs = useAbs ? 1 : 0
             });
 
             var dev = Device.Get();
             BindShader(dev);
 
-            dev.Vertex.SetConstantBuffer(0, buffer.Handle);
-            dev.Pixel.SetConstantBuffer(0, buffer.Handle);
+            dev.Vertex.SetConstantBuffer(0, v.Buffer.Handle);
+            dev.Pixel.SetConstantBuffer(0, v.Buffer.Handle);
 
             dev.Pixel.SetShaderResource(0, texture);
-            dev.Pixel.SetSampler(0, sampler);
+            dev.Pixel.SetSampler(0, v.GetSampler());
 
             dev.DrawQuad();
 
             // unbind
             dev.Pixel.SetShaderResource(0, null);
             UnbindShader(dev);
+        }
+
+        private static string ConstantBuffer()
+        {
+            return $@"
+cbuffer InfoBuffer : register(b0) {{
+    {CommonShaderBufferData()}
+    matrix transform;
+    float farplane;
+}};
+";
         }
 
         private static string GetVertexSource()
@@ -54,12 +73,7 @@ struct VertexOut {{
     float3 viewDir : VIEWDIR;  
 }};
 
-cbuffer InfoBuffer : register(b0) {{
-    matrix transform;
-    float4 crop;
-    float multiplier;
-    float farplane;
-}};
+{ConstantBuffer()}
 
 VertexOut main(uint id: SV_VertexID) {{
     VertexOut o;
@@ -83,13 +97,7 @@ TextureCube<float4> tex : register(t0);
 
 SamplerState texSampler : register(s0);
 
-cbuffer InfoBuffer : register(b0) {{
-    matrix transform;
-    float4 crop;
-    float multiplier;
-    float farplane;
-    bool useAbs;
-}};
+{ConstantBuffer()}
 
 {Utility.ToSrgbFunction()}
 

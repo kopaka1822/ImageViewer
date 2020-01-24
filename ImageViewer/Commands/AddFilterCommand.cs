@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Model.Filter;
+using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 using ImageViewer.ViewModels;
 using Microsoft.Win32;

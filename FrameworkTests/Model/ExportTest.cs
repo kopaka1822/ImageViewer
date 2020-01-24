@@ -7,10 +7,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FrameworkTests.DirectX;
+using FrameworkTests.Model.Equation;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
+using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDX.Direct3D11;
@@ -61,10 +63,9 @@ namespace FrameworkTests.Model
             model.AddImageFromFile(TestData.Directory + "small.bmp");
             // set formula to srgb but export with ldr mode unorm
             model.Pipelines[0].Color.Formula = "tosrgb(I0)";
-            model.Export.LdrExportMode = ExportModel.LdrMode.UNorm;
             model.Apply();
 
-            model.ExportPipelineImage(ExportDir + "unorm", "bmp", GliFormat.RGB8_SRGB);
+            model.ExportPipelineImage(ExportDir + "unorm", "bmp", GliFormat.RGB8_UNORM);
 
             TestData.CompareWithSmall(IO.LoadImage(ExportDir + "unorm.bmp"), Color.Channel.Rgb);
         }
@@ -200,7 +201,7 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void GrayTestAllJpg()
         {
-            TryExportAllFormatsAndCompareGray("jpg");
+            TryExportAllFormatsAndCompareGray("jpg", true);
         }
 
         [TestMethod]
@@ -224,7 +225,7 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void GrayTestAllBmp()
         {
-            TryExportAllFormatsAndCompareGray("bmp");
+            TryExportAllFormatsAndCompareGray("bmp", true);
         }
 
         [TestMethod]
@@ -384,7 +385,15 @@ namespace FrameworkTests.Model
             model.Apply();
             model.Export.Quality = 100;
             var origTex = (TextureArray2D)model.Pipelines[0].Image;
+            // normal colors
             var origColors = origTex.GetPixelColors(0, 0);
+            
+            // colors multiplied by 100 for integer precision formats
+            model.Pipelines[0].Color.Formula = "I0 * 100";
+            model.Apply();
+            var integerTex = (TextureArray2D)model.Pipelines[0].Image;
+            var origColors100 = integerTex.GetPixelColors(0, 0);
+
             Color[] newColors = null;
 
             var eFmt = model.Export.Formats.First(fmt => fmt.Extension == "dds");
@@ -396,8 +405,13 @@ namespace FrameworkTests.Model
                 try
                 {
                     // export to dds
+                    var isIntegerPrecision = IsIntegerPrecisionFormat(format);
                     var desc = new ExportDescription(ExportDir + "tmp", "dds", model.Export);
                     desc.FileFormat = format;
+                    if (isIntegerPrecision)
+                    {
+                        desc.Multiplier = 100.0f;
+                    }
                     model.Export.Export(origTex, desc);
 
                     // load with directx dds loader
@@ -405,14 +419,21 @@ namespace FrameworkTests.Model
                         out var resource, out var resourceView, 0, out var alphaMode);
 
                     // convert to obtain color data
-                    using (var newTex = model.Export.convert.ConvertFromRaw(resourceView, origTex.Size, Format.R32G32B32A32_Float))
+                    using (var newTex = model.Export.convert.ConvertFromRaw(resourceView, origTex.Size, Format.R32G32B32A32_Float, isIntegerPrecision))
                     {
                         resourceView.Dispose();
                         resource.Dispose();
 
                         newColors = newTex.GetPixelColors(0, 0);
                         // only compare with red channel since some formats only store red
-                        TestData.CompareColors(origColors, newColors, Color.Channel.R, 0.1f);
+                        if (isIntegerPrecision)
+                        {
+                            TestData.CompareColors(origColors100, newColors, Color.Channel.R, 1.0f);
+                        }
+                        else
+                        {
+                            TestData.CompareColors(origColors, newColors, Color.Channel.R, 0.1f);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -440,6 +461,12 @@ namespace FrameworkTests.Model
             var origColors = origTex.GetPixelColors(0, 0);
             Color[] newColors = null;
 
+            // colors multiplied by 100 for integer precision formats
+            model.Pipelines[0].Color.Formula = "I0 * 100";
+            model.Apply();
+            var integerTex = (Texture3D)model.Pipelines[0].Image;
+            var origColors100 = integerTex.GetPixelColors(0, 0);
+
             var eFmt = model.Export.Formats.First(fmt => fmt.Extension == "dds");
             string errors = "";
             int numErrors = 0;
@@ -452,8 +479,11 @@ namespace FrameworkTests.Model
                 try
                 {
                     // export to dds
+                    var isIntegerPrecision = IsIntegerPrecisionFormat(format);
                     var desc = new ExportDescription(ExportDir + "tmp", "dds", model.Export);
                     desc.FileFormat = format;
+                    if (isIntegerPrecision)
+                        desc.Multiplier = 100.0f;
                     model.Export.Export(origTex, desc);
 
                     // load with directx dds loader
@@ -461,14 +491,17 @@ namespace FrameworkTests.Model
                         out var resource, out var resourceView, 0, out var alphaMode);
 
                     // convert to obtain color data
-                    using (var newTex = model.Export.convert.ConvertFromRaw3D(resourceView, origTex.Size, Format.R32G32B32A32_Float))
+                    using (var newTex = model.Export.convert.ConvertFromRaw3D(resourceView, origTex.Size, Format.R32G32B32A32_Float, isIntegerPrecision))
                     {
                         resourceView.Dispose();
                         resource.Dispose();
 
                         newColors = newTex.GetPixelColors(0, 0);
                         // only compare with red channel since some formats only store red
-                        TestData.CompareColors(origColors, newColors, Color.Channel.R, 0.1f);
+                        if(isIntegerPrecision)
+                            TestData.CompareColors(origColors100, newColors, Color.Channel.R, 1.0f);
+                        else
+                            TestData.CompareColors(origColors, newColors, Color.Channel.R, 0.1f);
                     }
                 }
                 catch (Exception e)
@@ -579,9 +612,23 @@ namespace FrameworkTests.Model
                 throw new Exception($"export failed for {numErrors}/{eFmt.Formats.Count} formats:\n" + errors);
         }
 
-        private void TryExportAllFormatsAndCompareGray(string outputExtension)
+        private static bool IsIntegerPrecisionFormat(GliFormat format)
         {
-            var model = new Models(1);
+            switch (format.GetDataType())
+            {
+                case PixelDataType.SInt:
+                case PixelDataType.UInt:
+                case PixelDataType.SScaled:
+                case PixelDataType.UScaled:
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void TryExportAllFormatsAndCompareGray(string outputExtension, bool onlySrgb = false)
+        {
+            var model = new Models(2);
             model.AddImageFromFile(TestData.Directory + "gray.png");
             model.Apply();
             var tex = (TextureArray2D)model.Pipelines[0].Image;
@@ -597,16 +644,22 @@ namespace FrameworkTests.Model
             var i = 0;
             foreach (var format in eFmt.Formats)
             {
+                if(onlySrgb && format.GetDataType() != PixelDataType.Srgb) continue;
                 try
                 {
                     int numTries = 0;
                     while(true)
                     try
                     {
+                        var integerPrecision = IsIntegerPrecisionFormat(format);
                         var desc = new ExportDescription(ExportDir + "gray" + ++i, outputExtension, model.Export);
                         desc.FileFormat = format;
+                        if (integerPrecision)
+                            desc.Multiplier = 100.0f;
+
                         model.Export.Export(tex, desc);
                         Thread.Sleep(1);
+
                         // load and compare gray tone
                         using (var newTex = new TextureArray2D(IO.LoadImage($"{ExportDir}gray{i}.{outputExtension}")))
                         {
@@ -623,7 +676,14 @@ namespace FrameworkTests.Model
                             // some formats don't write to red
                             // ReSharper disable once CompareOfFloatsByEqualityOperator
                             //if(grayColor.Red != 0.0f) Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
-                            Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
+                            if (integerPrecision)
+                            {
+                                Assert.AreEqual(TestData.Gray * 100.0f, grayColor.Red, 1.0f);
+                            }
+                            else
+                            {
+                                Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
+                            }
                             //else Assert.AreEqual(TestData.Gray, grayColor.Green, tolerance);
                             break;
                         }

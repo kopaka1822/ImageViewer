@@ -39,6 +39,9 @@
     <Filter Include="dll">
       <UniqueIdentifier>{f0959f41-7625-49a6-987e-9e60b6f7214e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\png">
+      <UniqueIdentifier>{5fdd4c5c-13b7-4b9f-a95c-0dad8f9afc95}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Layer.h">
@@ -95,6 +98,9 @@
     <ClInclude Include="GliImage.h">
       <Filter>Source Files\gli</Filter>
     </ClInclude>
+    <ClInclude Include="png_interface.h">
+      <Filter>Source Files\png</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -129,6 +135,9 @@
     </ClCompile>
     <ClCompile Include="GliImage.cpp">
       <Filter>Source Files\gli</Filter>
+    </ClCompile>
+    <ClCompile Include="png_interface.cpp">
+      <Filter>Source Files\png</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

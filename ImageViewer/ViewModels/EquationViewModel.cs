@@ -6,9 +6,12 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageFramework.Utility;
+using ImageViewer.Commands;
+using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
 
@@ -39,7 +42,10 @@ namespace ImageViewer.ViewModels
             this.models.Settings.PropertyChanged += SettingsOnPropertyChanged;
             this.statistics.PropertyChanged += StatisticsOnPropertyChanged;
 
-            
+            ToggleAlphaCommand = new ActionCommand(() => AutoAlpha = !AutoAlpha);
+            ToggleVisibilityCommand = new ActionCommand(() => IsVisible = !IsVisible);
+
+            AdjustAlphaFormula();
         }
 
         private void StatisticsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -69,6 +75,9 @@ namespace ImageViewer.ViewModels
             {
                 case nameof(FormulaViewModel.HasChanges):
                     if (HasChangedChanged()) OnPropertyChanged(nameof(HasChanges));
+                    break;
+                case nameof(FormulaViewModel.FirstImageId):
+                    AdjustAlphaFormula();
                     break;
             }
         }
@@ -105,7 +114,7 @@ namespace ImageViewer.ViewModels
                     break;
                 case nameof(ImagePipeline.IsEnabled):
                     OnPropertyChanged(nameof(IsVisible));
-                    OnPropertyChanged(nameof(Visibility));
+                    OnPropertyChanged(nameof(UseAlphaEquation));
                     if (model.IsEnabled)
                         RecomputeTexelColor();
                     return;
@@ -115,18 +124,22 @@ namespace ImageViewer.ViewModels
             }
         }
 
+        public string Title => $"Equation {imageId + 1}";
+
+        public int Id => imageId;
         public bool IsVisible
         {
             get => model.IsEnabled;
             set
             {
                 model.IsEnabled = value;
-                if (value) return;
+                //if (value) return;
                 UseFilter = model.UseFilter;
+                // this might have changed while invisible
+                if(value)
+                    OnPropertyChanged(nameof(HasChanges));
             }
         }
-
-        public Visibility Visibility => model.IsEnabled ? Visibility.Visible : Visibility.Collapsed;
 
         private bool useFilter;
         public bool UseFilter
@@ -139,6 +152,36 @@ namespace ImageViewer.ViewModels
                 OnPropertyChanged(nameof(UseFilter));
                 if (HasChangedChanged()) OnPropertyChanged(nameof(HasChanges));
             }
+        }
+
+        public bool UseAlphaEquation => IsVisible && !AutoAlpha;
+
+        public ICommand ToggleAlphaCommand { get; }
+        public ICommand ToggleVisibilityCommand { get; }
+
+        private bool autoAlpha = true;
+        public bool AutoAlpha
+        {
+            get => autoAlpha;
+            set
+            {
+                if (value == autoAlpha) return;
+                autoAlpha = value;
+                OnPropertyChanged(nameof(AutoAlpha));
+                OnPropertyChanged(nameof(UseAlphaEquation));
+
+                if (AutoAlpha)
+                {
+                    AdjustAlphaFormula();
+                }
+            }
+        }
+
+        public void AdjustAlphaFormula()
+        {
+            if (!AutoAlpha) return;
+            // change in view model
+            Alpha.Formula = $"I{Color.FirstImageId}";
         }
 
         public FormulaViewModel Color { get; }

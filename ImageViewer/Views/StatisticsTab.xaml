@@ -5,25 +5,28 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImageViewer.Views"
              mc:Ignorable="d" 
+             Background="{StaticResource BackgroundBrush}"
              d:DesignHeight="800" d:DesignWidth="250">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Border Padding="5">
             <StackPanel>
                 <TextBlock
                     Text="Component"
-                    Margin="0 0 0 2"/>
+                    Margin="{StaticResource SmallBorderBottom}"/>
                 <ComboBox
-                    Margin="0 0 0 5"
+                    Margin="{StaticResource DefaultBorderBottom}"
                     ItemsSource="{Binding Statistics.AvailableChannels}"
-                    SelectedItem="{Binding Statistics.SelectedChannel}"/>
+                    SelectedItem="{Binding Statistics.SelectedChannel}"
+                    ItemTemplate="{StaticResource ListItemView}"/>
                 <TextBlock 
                     Text="Double click box to copy content to clipboard"
-                    Margin="0 0 0 5"
+                    Margin="{StaticResource DefaultBorderBottom}"
                     TextWrapping="Wrap"/>
 
                 <GroupBox
                     Header="Equation 1"
-                    Margin="0 0 0 5"
+                    Margin="{StaticResource DefaultBorderBottom}"
+                    Padding="{StaticResource DefaultBorderTop}"
                     Visibility="{Binding Statistics.Equation1.Visibility}">
 
                     <Grid>
@@ -41,48 +44,48 @@
                         <!--  Average -->
                         <TextBlock 
                                                 Text="Average:"
-                                                Margin="0 0 5 0"
+                                                Margin="{StaticResource DefaultBorderBotRight}"
                                                 Grid.Column="0"
                                                 Grid.Row="0"/>
                         <local:StatisticTextBox 
                                                 Text="{Binding Statistics.Equation1.Average}"
-                                                Margin="0 0 0 5"
+                                                Margin="{StaticResource DefaultBorderBottom}"
                                                 Grid.Column="1"
                                                 Grid.Row="0"/>
 
                         <!--  Root Average -->
                         <TextBlock 
                                                 Text="Root Avg:"
-                                                Margin="0 0 5 0"
+                                                Margin="{StaticResource DefaultBorderBotRight}"
                                                 Grid.Column="0"
                                                 Grid.Row="1"/>
                         <local:StatisticTextBox 
                                                 Text="{Binding Statistics.Equation1.RootAverage}"
-                                                Margin="0 0 0 5"
+                                                Margin="{StaticResource DefaultBorderBottom}"
                                                 Grid.Column="1"
                                                 Grid.Row="1"/>
 
                         <!--  Min -->
                         <TextBlock 
                                                 Text="Min:"
-                                                Margin="0 0 5 0"
+                                                Margin="{StaticResource DefaultBorderBotRight}"
                                                 Grid.Column="0"
                                                 Grid.Row="2"/>
                         <local:StatisticTextBox 
                                                 Text="{Binding Statistics.Equation1.Min}"
-                                                Margin="0 0 0 5"
+                                                Margin="{StaticResource DefaultBorderBottom}"
                                                 Grid.Column="1"
                                                 Grid.Row="2"/>
 
                         <!--  Max -->
                         <TextBlock 
                                                 Text="Max"
-                                                Margin="0 0 0 2"
+                                                Margin="{StaticResource DefaultBorderBotRight}"
                                                 Grid.Column="0"
                                                 Grid.Row="3"/>
                         <local:StatisticTextBox 
                                                 Text="{Binding Statistics.Equation1.Max}"
-                                                Margin="0 0 0 5"
+                                                Margin="{StaticResource DefaultBorderBottom}"
                                                 Grid.Column="1"
                                                 Grid.Row="3"/>
                     </Grid>

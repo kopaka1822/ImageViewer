@@ -26,13 +26,12 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         private readonly RayMarchingShader marchingShader;
         private readonly EmptySpaceSkippingShader emptySpaceSkippingShader;
         private RayCastingDisplayModel displayEx;
-
         private SpaceSkippingTexture3D[] helpTextures;
 
-        public RayCastingView(ModelsEx models, TextureViewData data) : base(models, data)
+        public RayCastingView(ModelsEx models) : base(models)
         {
-            shader = new RayCastingShader();
-            marchingShader = new RayMarchingShader();
+            shader = new RayCastingShader(models);
+            marchingShader = new RayMarchingShader(models);
             emptySpaceSkippingShader = new EmptySpaceSkippingShader();
             displayEx = (RayCastingDisplayModel)models.Display.ExtendedViewData;
             helpTextures = new SpaceSkippingTexture3D[4];
@@ -45,20 +44,20 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             base.Draw(id, texture);
 
             var dev = Device.Get();
-            dev.OutputMerger.BlendState = data.AlphaDarkenState;
+            dev.OutputMerger.BlendState = models.ViewData.AlphaDarkenState;
 
             if (models.Display.LinearInterpolation)
             {
-                shader.Run(data.Buffer, models.Display.ClientAspectRatio, GetWorldToImage(), models.Display.Multiplier, CalcFarplane(), models.Display.DisplayNegative,
+                shader.Run(models.Display.ClientAspectRatio, GetWorldToImage(), CalcFarplane(), 
                 texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap), helpTextures[id].GetSrView(0));
             }
             else
             {
-                marchingShader.Run(data.Buffer, models.Display.ClientAspectRatio, GetWorldToImage(), models.Display.Multiplier, CalcFarplane(), models.Display.DisplayNegative,
+                marchingShader.Run(models.Display.ClientAspectRatio, GetWorldToImage(), CalcFarplane(),
                 displayEx.FlatShading, texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap), helpTextures[id].GetSrView(0));
             }
 
-            dev.OutputMerger.BlendState = data.DefaultBlendState;
+            dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
         }
 
         private Matrix GetWorldToImage()

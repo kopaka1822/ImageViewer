@@ -26,7 +26,7 @@
             Content="OK"
             Width="80"
             HorizontalAlignment="Right"
-            Margin="5 5 5 5"
+            Margin="{StaticResource DefaultBorder}"
             Click="OkOnClick"/>
     </Grid>
 

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
  using System.Runtime.InteropServices;
  using System.Text;
-using System.Threading.Tasks;
+ using System.Threading;
+ using System.Threading.Tasks;
  using ImageFramework.DirectX;
+ using ImageFramework.Model;
  using ImageFramework.Utility;
  using SharpDX.DXGI;
 
@@ -40,6 +42,8 @@ namespace ImageFramework.ImageLoader
             return new Image(res, file, nLayer, nMipmaps, new ImageFormat((GliFormat)gliFormat), (GliFormat)originalFormat);
         }
 
+        
+
         /// <summary>
         /// loads image into the correct texture type
         /// </summary>
@@ -52,6 +56,30 @@ namespace ImageFramework.ImageLoader
                 if(img.Is3D) return new Texture3D(img);
                 return new TextureArray2D(img);
             }
+        }
+
+        public class TexInfo
+        {
+            public ITexture Texture { get; set; }
+            public GliFormat OriginalFormat { get; set; }
+        }
+
+        public static Task<TexInfo> LoadImageTextureAsync(string file, ProgressModel progress)
+        {
+            var task = Task.Run(() =>
+            {
+                var tex = LoadImageTexture(file, out var orig);
+                return new TexInfo
+                {
+                    Texture = tex,
+                    OriginalFormat = orig
+                };
+            });
+
+            var cts = new CancellationTokenSource();
+            progress.AddTask(task, cts);
+
+            return task;
         }
 
         public static Image CreateImage(ImageFormat format, Size3 size, int layer, int mipmaps)
@@ -81,5 +109,7 @@ namespace ImageFramework.ImageLoader
 
             return res;
         }
+
+        
     }
 }

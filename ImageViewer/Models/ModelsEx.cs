@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageViewer.Controller;
+using ImageViewer.Controller.TextureViews.Shared;
 using ImageViewer.Models.Display;
 
 namespace ImageViewer.Models
@@ -12,8 +13,9 @@ namespace ImageViewer.Models
     {
         public WindowModel Window { get; }
         public DisplayModel Display { get; }
-
         public SettingsModel Settings { get; }
+
+        public TextureViewData ViewData { get; }
 
         public IReadOnlyList<StatisticModel> Statistics { get; }
 
@@ -32,6 +34,7 @@ namespace ImageViewer.Models
             Settings = new SettingsModel();
             Window = new WindowModel(window);
             Display = new DisplayModel(this);
+            ViewData = new TextureViewData(this);
 
             var stats = new List<StatisticModel>();
             for(int i = 0; i < NumPipelines; ++i)
@@ -48,6 +51,7 @@ namespace ImageViewer.Models
         public override void Dispose()
         {
             Settings?.Save();
+            ViewData?.Dispose();
             paintController?.Dispose();
             base.Dispose();
         }

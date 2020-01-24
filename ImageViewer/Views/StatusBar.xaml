@@ -5,11 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImageViewer.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="25"
+             Height="28"
              d:DesignWidth="1500">
-    <StatusBar 
-                Grid.Row="1" 
-                BorderThickness="0 1 0 0">
+    <StatusBar BorderThickness="0 1 0 0">
         <!-- MOUSE POSITION -->
         <StatusBarItem 
                     Width="100" 
@@ -21,17 +19,21 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Image 
+                    Grid.Column="0"
+                    Grid.Row="0"
                     Source="../Icons/dx_system.png" 
                     Width="16" 
                     Height="16" 
-                    Margin="0 0 5 0"
+                    Margin="{StaticResource DefaultBorderRight}"
                     Visibility="{Binding Display.DxSystemVisibility, FallbackValue=Visible}"/>
 
                 <Image 
+                    Grid.Column="0"
+                    Grid.Row="0"
                     Source="../Icons/gl_system.png" 
                     Width="16" 
                     Height="16" 
-                    Margin="0 0 5 0"
+                    Margin="{StaticResource DefaultBorderRight}"
                     Visibility="{Binding Display.GlSystemVisibility, FallbackValue=Collapsed}"/>
                 <TextBlock 
                             Text="{Binding Display.TexelPosition}" 
@@ -39,6 +41,7 @@
             </Grid>
         </StatusBarItem>
 
+        <!-- Multiplier -->
         <StatusBarItem
             HorizontalAlignment="Left"
             BorderThickness="0 0 1 0"
@@ -46,101 +49,44 @@
             ToolTip="Colors will be multiplied by this value before displaying">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="x "/>
-                <TextBlock Text="{Binding Display.Multiplier}"/>
+                <TextBlock Text="{Binding Display.Multiplier, FallbackValue=16}"/>
             </StackPanel>
         </StatusBarItem>
 
-        <!-- MOUSE POSITION COLOR 1 -->
-        <StatusBarItem  
-                    HorizontalAlignment="Left" 
-                    BorderThickness="0 0 1 0"
-                    Visibility="{Binding Equations.Equation1.Visibility}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Image 
-                            Source="../Icons/eyedropper.png" 
-                            Width="16" 
-                            Height="16" 
-                            Margin="0 0 5 0"/>
-                <TextBlock  
-                            Text="{Binding Equations.Equation1.TexelColor}" 
-                            Grid.Column="1"
-                            FontFamily="Consolas"
-                            Margin="0 0 5 0"/>
-            </Grid>
-        </StatusBarItem>
-
-        <!-- MOUSE POSITION COLOR 2 -->
-        <StatusBarItem 
-                    HorizontalAlignment="Left" 
-                    BorderThickness="0 0 1 0"
-                    Visibility="{Binding Equations.Equation2.Visibility}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Image 
-                            Source="../Icons/eyedropper.png" 
-                            Width="16" 
-                            Height="16" 
-                            Margin="0 0 5 0"/>
-                <TextBlock  
-                            Text="{Binding Equations.Equation2.TexelColor}" 
-                            Grid.Column="1"
-                            FontFamily="Consolas"
-                            Margin="0 0 5 0"/>
-            </Grid>
-        </StatusBarItem>
-
-        <!-- MOUSE POSITION COLOR 3 -->
-        <StatusBarItem 
-                    HorizontalAlignment="Left" 
-                    BorderThickness="0 0 1 0"
-                    Visibility="{Binding Equations.Equation3.Visibility}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Image 
-                            Source="../Icons/eyedropper.png" 
-                            Width="16" 
-                            Height="16" 
-                            Margin="0 0 5 0"/>
-                <TextBlock  
-                            Text="{Binding Equations.Equation3.TexelColor}" 
-                            Grid.Column="1"
-                            FontFamily="Consolas"
-                            Margin="0 0 5 0"/>
-            </Grid>
-        </StatusBarItem>
-
-        <!-- MOUSE POSITION COLOR 4 -->
-        <StatusBarItem 
-                    HorizontalAlignment="Left" 
-                    BorderThickness="0 0 1 0"
-                    Visibility="{Binding Equations.Equation4.Visibility}">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Image 
-                            Source="../Icons/eyedropper.png" 
-                            Width="16" 
-                            Height="16" 
-                            Margin="0 0 5 0"/>
-                <TextBlock  
-                            Text="{Binding Equations.Equation4.TexelColor}" 
-                            Grid.Column="1"
-                            FontFamily="Consolas"
-                            Margin="0 0 5 0"/>
-            </Grid>
-        </StatusBarItem>
+        <!-- Equation Colors -->
+        <ItemsControl
+            ItemsSource="{Binding Equations.Equations}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <!-- Orientation for StatusBar -->
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StatusBarItem HorizontalAlignment="Left" 
+                                   BorderThickness="0 0 1 0"
+                                   Visibility="{Binding IsVisible, Converter={StaticResource VisibleCollapsedConverter}}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Image 
+                                Source="../Icons/eyedropper.png" 
+                                Width="16" 
+                                Height="16" 
+                                Margin="{StaticResource DefaultBorderRight}"/>
+                            <TextBlock  
+                                Text="{Binding TexelColor, FallbackValue=0}" 
+                                Grid.Column="1"
+                                FontFamily="Consolas"
+                                Margin="{StaticResource DefaultBorderRight}"/>
+                        </Grid>
+                    </StatusBarItem>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
         <!-- ZOOM -->
         <StatusBarItem 
@@ -156,7 +102,7 @@
                             Source="../Icons/zoom.png" 
                             Width="16" 
                             Height="16" 
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
                 <local:CustomTextBox 
                             Grid.Column="1" 
                             Width="70"
@@ -180,12 +126,13 @@
                             Source="../Icons/eye.png" 
                             Width="16" 
                             Height="16" 
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
                 <ComboBox 
                             Grid.Column="1" 
                             Width="120"
                             SelectedItem="{Binding Display.SelectedViewMode}"
-                            ItemsSource="{Binding Display.AvailableViewModes}"/>
+                            ItemsSource="{Binding Display.AvailableViewModes}"
+                            ItemTemplate="{StaticResource ListItemView}"/>
             </Grid>
         </StatusBarItem>
 
@@ -204,13 +151,14 @@
                             Source="../Icons/image_layer.png" 
                             Width="16" 
                             Height="16" 
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
                 <ComboBox 
                             Grid.Column="1" 
                             Width="120"
                             IsEnabled="{Binding Display.ChooseLayers}"
                             SelectedItem="{Binding Display.SelectedLayer}"
-                            ItemsSource="{Binding Display.AvailableLayers}"/>
+                            ItemsSource="{Binding Display.AvailableLayers}"
+                            ItemTemplate="{StaticResource ListItemView}"/>
             </Grid>
         </StatusBarItem>
 
@@ -229,34 +177,52 @@
                             Source="../Icons/image.png"
                             Width="16" 
                             Height="16" 
-                            Margin="0 0 5 0"/>
+                            Margin="{StaticResource DefaultBorderRight}"/>
                 <ComboBox 
                             Grid.Column="1" 
                             Width="120"
                             SelectedItem="{Binding Display.SelectedMipMap}"
                             ItemsSource="{Binding Display.AvailableMipMaps}"
-                            IsSynchronizedWithCurrentItem="True"/>
+                            IsSynchronizedWithCurrentItem="True"
+                            ItemTemplate="{StaticResource ListItemView}"/>
             </Grid>
-        </StatusBarItem>
-
-        <!--PROGRESS BAR-->
-        <StatusBarItem 
-                    Width="Auto"
-                    HorizontalContentAlignment="Stretch"
-                    VerticalContentAlignment="Stretch"
-                    Visibility="{Binding Progress.EnableProgress}">
-
-            <ProgressBar
-                        Value="{Binding Progress.ProgressValue}">
-
-            </ProgressBar>
         </StatusBarItem>
 
         <!-- FRAME TIME -->
         <StatusBarItem
-            HorizontalAlignment="Right"
-            Width="Auto">
-            <TextBlock Text="{Binding Display.FrameTime}"/>
+            DockPanel.Dock="Right">
+            <TextBlock Text="{Binding Display.FrameTime, FallbackValue=0.02 ms}"/>
+        </StatusBarItem>
+
+        <!--PROGRESS BAR-->
+        <StatusBarItem 
+            HorizontalContentAlignment="Stretch"
+            VerticalContentAlignment="Stretch"
+            Visibility="{Binding Progress.EnableProgress}">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <ProgressBar 
+                    Grid.Column="0"
+                    Value="{Binding Progress.ProgressValue}"/>
+                <TextBlock 
+                    Grid.Column="0"
+                    Text="{Binding Progress.ProgressDescription, FallbackValue=Current Task}"
+                    Foreground="Black"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"/>
+
+                <Button
+                    Grid.Column="1" Content="Abort"
+                    VerticalAlignment="Center"
+                    Command="{Binding Progress.CancelCommand}"
+                    Padding="2 0 2 0"
+                    Margin="{StaticResource DefaultBorderLeft}"
+                    Height="20"/>
+            </Grid>
         </StatusBarItem>
     </StatusBar>
 </UserControl>

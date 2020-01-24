@@ -87,17 +87,44 @@ namespace ImageViewer.Models.Display
         private IExtendedDisplayModel extendedView = null;
         public IExtendedDisplayModel ExtendedViewData => extendedView;
 
+        private static readonly float[] ZOOM_POINTS = { 0.01f, 0.02f, 0.05f, 0.1f, 0.25f, 0.33f, 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f };
         private float zoom = 1.0f;
         public float Zoom
         {
             get => zoom;
             set
             {
-                var clamped = Math.Min(Math.Max(value, 0.01f), 100.0f);
+                var clamped = Math.Min(Math.Max(value, 0.01f), 128.0f);
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (clamped == zoom) return;
                 zoom = clamped;
                 OnPropertyChanged(nameof(Zoom));
+            }
+        }
+        public void IncreaseZoom()
+        {
+            // Get the first number larger than zoom
+            foreach (float zoomPoint in ZOOM_POINTS)
+            {
+                if (zoomPoint > zoom)
+                {
+                    zoom = zoomPoint;
+                    OnPropertyChanged(nameof(Zoom));
+                    break;
+                }
+            }
+        }
+        public void DecreaseZoom()
+        {
+            // Get the first number smaller than zoom
+            foreach (float zoomPoint in ZOOM_POINTS.Reverse())
+            {
+                if (zoomPoint < zoom)
+                {
+                    zoom = zoomPoint;
+                    OnPropertyChanged(nameof(Zoom));
+                    break;
+                }
             }
         }
 
@@ -153,6 +180,22 @@ namespace ImageViewer.Models.Display
                 if (multiplierExponent < 0)
                     return "1/" + str;
                 return str;
+            }
+        }
+
+        private bool isExporting = false;
+
+        /// <summary>
+        /// indicates if the exporting dialog is open
+        /// </summary>
+        public bool IsExporting
+        {
+            get => isExporting;
+            set
+            {
+                if (value == isExporting) return;
+                isExporting = value;
+                OnPropertyChanged(nameof(IsExporting));
             }
         }
 
@@ -322,7 +365,7 @@ namespace ImageViewer.Models.Display
                     {
                         // first image was added
                         var modes = new List<ViewMode> { ViewMode.Single };
-                        if (models.Images.NumLayers == 6)
+                        if (models.Images.Images[0].Image.HasCubemap)
                         {
                             // cube map should be the default view
                             modes.Insert(0, ViewMode.CubeMap);

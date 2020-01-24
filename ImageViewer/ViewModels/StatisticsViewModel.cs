@@ -25,16 +25,18 @@ namespace ImageViewer.ViewModels
             @"Luminance is the radiant power weighted by a spectral sensitivity function that is characteristic of vision. 
 The magnitude of luminance is proportional to physical power. 
 But the spectral composition of luminance is related to the brightness sensitivity of human vision.
-Luminance is computed in linear color space with: dot(RGB, (0.2125, 0.7154, 0.0721)).",
+Luminance is computed in linear color space with: dot(RGB*A, (0.2125, 0.7154, 0.0721)).",
             // average
-            @"The average weight computed in linear space: dot(RGB, (1/3, 1/3, 1/3)).",
+            @"The average weight computed in linear space: dot(RGB*A, (1/3, 1/3, 1/3)).",
             // luma
             @"Luma is brightness computed in sRGB color space which is often used by video codecs.
-The ""NTSC"" luma formula is: dot(sRGB, (0.299, 0.587, 0.114)).",
+The ""NTSC"" luma formula is: dot(sRGB*A, (0.299, 0.587, 0.114)).",
             // lightness
             @"Human vision has a nonlinear perceptual response to brightness: a source having a luminance only 18% of a reference luminance appears about half as bright. 
 The perceptual response to luminance Y is called lightness L.
-It is computed from the luminance: L = 116 * Y ^ (1/3) - 16."
+It is computed from the luminance: L = 116 * Y ^ (1/3) - 16.",
+            // alpha
+            @"Alpha channel."
         };
 
         public StatisticsViewModel(ModelsEx models)
@@ -76,16 +78,37 @@ It is computed from the luminance: L = 116 * Y ^ (1/3) - 16."
 
         public string ChannelDescription { get; private set; } = "";
 
-        public List<ComboBoxItem<DefaultStatistics.Types>> AvailableChannels { get; } = new List<ComboBoxItem<DefaultStatistics.Types>>
+        public List<ListItemViewModel<DefaultStatistics.Types>> AvailableChannels { get; } = new List<ListItemViewModel<DefaultStatistics.Types>>
         {
-            new ComboBoxItem<DefaultStatistics.Types>("Luminance", DefaultStatistics.Types.Luminance),
-            new ComboBoxItem<DefaultStatistics.Types>("Average", DefaultStatistics.Types.Average),
-            new ComboBoxItem<DefaultStatistics.Types>("Luma", DefaultStatistics.Types.Luma),
-            new ComboBoxItem<DefaultStatistics.Types>("Lightness", DefaultStatistics.Types.Lightness),
+            new ListItemViewModel<DefaultStatistics.Types>
+            {
+                Name = "Luminance",
+                Cargo = DefaultStatistics.Types.Luminance
+            },
+            new ListItemViewModel<DefaultStatistics.Types>
+            {
+                Name = "Average",
+                Cargo = DefaultStatistics.Types.Average
+            },
+            new ListItemViewModel<DefaultStatistics.Types>
+            {
+                Name = "Luma",
+                Cargo = DefaultStatistics.Types.Luma
+            },
+            new ListItemViewModel<DefaultStatistics.Types>
+            {
+                Name = "Lightness",
+                Cargo = DefaultStatistics.Types.Lightness
+            },
+            new ListItemViewModel<DefaultStatistics.Types>
+            {
+                Name = "Alpha",
+                Cargo = DefaultStatistics.Types.Alpha
+            },
         };
 
-        private ComboBoxItem<DefaultStatistics.Types> selectedChannel;
-        public ComboBoxItem<DefaultStatistics.Types> SelectedChannel
+        private ListItemViewModel<DefaultStatistics.Types> selectedChannel;
+        public ListItemViewModel<DefaultStatistics.Types> SelectedChannel
         {
             get => selectedChannel;
             set

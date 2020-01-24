@@ -26,8 +26,12 @@ namespace ImageViewer.Controller.TextureViews.Shared
         public UploadBuffer Buffer { get; }
 
         public CheckersShader Checkers { get; }
+
+        private readonly ModelsEx models;
+
         public TextureViewData(ModelsEx models)
         {
+            this.models = models;
             var dev = ImageFramework.DirectX.Device.Get();
 
             DefaultBlendState = CreateBlendState(false, BlendOption.One, BlendOption.Zero);
@@ -94,41 +98,17 @@ namespace ImageViewer.Controller.TextureViews.Shared
             Checkers?.Dispose();
         }
 
-        public Vector4 GetCrop(ModelsEx models, int layer)
-        {
-            if (models.Export.Layer != -1) // only single layer
-            {
-                // darken due to layer mismatch?
-                if (models.Export.IsExporting && models.Export.Layer != layer)
-                {
-                    // everything is gray
-                    return Vector4.Zero;
-                }
-
-                if (models.Export.UseCropping && (models.Export.IsExporting || models.Display.ShowCropRectangle))
-                {
-                    int mipmap = Math.Max(models.Export.Mipmap, 0);
-                    float cropMaxX = models.Images.GetWidth(mipmap);
-                    float cropMaxY = models.Images.GetHeight(mipmap);
-
-                    Vector4 res;
-                    // crop start x
-                    res.X = models.Export.CropStartX / cropMaxX;
-                    res.Y = (models.Export.CropEndX + 1) / cropMaxX;
-                    res.Z = models.Export.CropStartY / cropMaxY;
-                    res.W = (models.Export.CropEndY + 1) / cropMaxY;
-
-                    return res;
-                }
-            }
-
-            // nothing is gray
-            return new Vector4(0.0f, 1.0f, 0.0f, 1.0f);
-        }
-
         public SamplerState GetSampler(bool displayLinearInterpolation)
         {
             return displayLinearInterpolation ? LinearSampler : PointSampler;
+        }
+
+        /// <summary>
+        /// Returns the linear or point sampler based on Display.LinearInterpolation
+        /// </summary>
+        public SamplerState GetSampler()
+        {
+            return GetSampler(models.Display.LinearInterpolation);
         }
     }
 }

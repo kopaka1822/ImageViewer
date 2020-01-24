@@ -12,10 +12,13 @@
 #include <map>
 #include "convert.h"
 #include "ktx_interface.h"
+#include "png_interface.h"
 
 static int s_currentID = 1;
 static std::unordered_map<int, std::unique_ptr<image::IImage>> s_resources;
 std::string s_error;
+static ProgressCallback s_progress_callback = nullptr;
+static uint32_t s_last_progress = -1;
 
 // key = extension (e.g. png), value = DXGI formats
 static std::map<std::string, std::vector<uint32_t>> s_exportFormats;
@@ -46,6 +49,7 @@ int image_open(const char* filename)
 {
 	// try loading the resource
 	// transform filename to lowercase for file extension check
+	s_last_progress = -1;
 	std::string fname = filename;
 	std::transform(fname.begin(), fname.end(), fname.begin(), ::tolower);
 
@@ -71,6 +75,10 @@ int image_open(const char* filename)
 		else if (hasEnding(fname, ".exr"))
 		{
 			res = openexr_load(filename);
+		}
+		else if(hasEnding(fname, ".png"))
+		{
+			res = png_load(filename);
 		}
 		else
 		{
@@ -162,6 +170,7 @@ unsigned char* image_get_mipmap(int id, int layer, int mipmap, uint32_t& size)
 
 bool image_save(int id, const char* filename, const char* extension, uint32_t format, int quality)
 {
+	s_last_progress = -1;
 	auto it = s_resources.find(id);
 	if (it == s_resources.end())
 	{
@@ -208,7 +217,12 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 				pfm_save(fullName.c_str(), width, height, nComponents, mip);
 			else assert(false);
 		}
-		else if (ext == "png" || ext == "jpg" || ext == "bmp")
+		else if(ext == "png")
+		{
+			assertSingleLayerMip(*it->second);
+			png_write(*it->second, fullName.c_str(), gli::format(format), quality);
+		}
+		else if (ext == "jpg" || ext == "bmp")
 		{
 			assertSingleLayerMip(*it->second);
 			if (it->second->getFormat() != gli::FORMAT_RGBA8_SRGB_PACK8 &&
@@ -220,27 +234,18 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 			auto mip = it->second->getData(0, 0, mipSize);
 			auto width = it->second->getWidth(0);
 			auto height = it->second->getHeight(0);
-			int nComponents = 0;
+			int nComponents = stb_ldr_get_num_components(gli::format(format));
 
-			if (format == gli::FORMAT_RGBA8_SRGB_PACK8)
+			if (nComponents == 3)
 			{
-				nComponents = 4;
-			}
-			else if (format == gli::FORMAT_RGB8_SRGB_PACK8)
-			{
-				nComponents = 3;
 				image::changeStride(mip, mipSize, 4, 3);
 			}
-			else if (format == gli::FORMAT_R8_SRGB_PACK8)
+			else if (nComponents == 1)
 			{
-				nComponents = 1;
 				image::changeStride(mip, mipSize, 4, 1);
 			}
-			else throw std::runtime_error("export format not supported for png, jpg, bmp");
 
-			if (ext == "png")
-				stb_save_png(fullName.c_str(), width, height, nComponents, mip);
-			else if (ext == "bmp")
+			if (ext == "bmp")
 				stb_save_bmp(fullName.c_str(), width, height, nComponents, mip);
 			else if (ext == "jpg")
 				stb_save_jpg(fullName.c_str(), width, height, nComponents, mip, quality);
@@ -266,7 +271,7 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 		s_exportFormats["pfm"] = pfm_get_export_formats();
 		s_exportFormats["hdr"] = stb_image_get_export_formats("hdr");
 		s_exportFormats["jpg"] = stb_image_get_export_formats("jpg");
-		s_exportFormats["png"] = stb_image_get_export_formats("png");
+		s_exportFormats["png"] = png_get_export_formats();
 		s_exportFormats["bmp"] = stb_image_get_export_formats("bmp");
 	}
 	auto it = s_exportFormats.find(extension);
@@ -280,6 +285,11 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 	return it->second.data();
 }
 
+void set_progress_callback(ProgressCallback cb)
+{
+	s_progress_callback = cb;
+}
+
 const char* get_error(int& length)
 {
 	length = static_cast<int>(s_error.length());
@@ -289,4 +299,17 @@ const char* get_error(int& length)
 void set_error(const std::string& str)
 {
 	s_error = str;
+}
+
+void set_progress(uint32_t progress, const char* description)
+{
+	if (!s_progress_callback) return;
+	progress = std::min(uint32_t(100), progress);
+
+	if (progress == s_last_progress) return;
+	s_last_progress = progress;
+	if (description == nullptr) description = "";
+
+	if (s_progress_callback(progress / 100.0f, description))
+		throw std::runtime_error("aborted by user");
 }

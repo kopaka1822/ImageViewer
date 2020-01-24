@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Utility;
 using ImageViewer.Controller.TextureViews.Shared;
+using ImageViewer.Models;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.Mathematics.Interop;
@@ -15,22 +16,19 @@ namespace ImageViewer.Controller.TextureViews.Shader
 {
     public class RayMarchingShader : ViewShader
     {
-        public struct ViewBufferData
+        struct BufferData
         {
+            public CommonBufferData Common;
             public Matrix Transform;
             public Matrix WorldToImage;
-            public Vector4 Crop;
-            public float Multiplier;
             public float Farplane;
-            public int UseAbs;
             public int UseFlatShading;
-
         }
 
         private readonly SamplerState sampler;
 
-        public RayMarchingShader()
-            : base(GetVertexSource(), GetPixelSource(), "RayMarchingShader")
+        public RayMarchingShader(ModelsEx models) 
+            : base(models, GetVertexSource(), GetPixelSource(), "RayMarchingShader")
         {
             sampler = new SamplerState(Device.Get().Handle, new SamplerStateDescription
             {
@@ -49,24 +47,24 @@ namespace ImageViewer.Controller.TextureViews.Shader
         }
 
 
-        public void Run(UploadBuffer buffer, Matrix rayTransform, Matrix worldToImage, float multiplier, float farplane,
-            bool useAbs, bool useFlatShading, ShaderResourceView texture, ShaderResourceView emptySpaceTex)
+        public void Run(Matrix rayTransform, Matrix worldToImage, float farplane,
+            bool useFlatShading,ShaderResourceView texture, ShaderResourceView emptySpaceTex)
         {
-            buffer.SetData(new ViewBufferData
+            var v = models.ViewData;
+            v.Buffer.SetData(new BufferData
             {
+                Common = GetCommonData(),
                 Transform = rayTransform,
                 WorldToImage = worldToImage,
-                Multiplier = multiplier,
                 Farplane = farplane,
-                UseAbs = useAbs ? 1 : 0,
                 UseFlatShading = useFlatShading ? 1 : 0
             });
 
             var dev = Device.Get();
             BindShader(dev);
 
-            dev.Vertex.SetConstantBuffer(0, buffer.Handle);
-            dev.Pixel.SetConstantBuffer(0, buffer.Handle);
+            dev.Vertex.SetConstantBuffer(0, v.Buffer.Handle);
+            dev.Pixel.SetConstantBuffer(0, v.Buffer.Handle);
 
             dev.Pixel.SetShaderResource(0, texture);
             dev.Pixel.SetShaderResource(1, emptySpaceTex);
@@ -78,6 +76,19 @@ namespace ImageViewer.Controller.TextureViews.Shader
             dev.Pixel.SetShaderResource(0, null);
             dev.Pixel.SetShaderResource(1, null);
             UnbindShader(dev);
+        }
+
+        private static string ConstantBuffer()
+        {
+            return $@"
+cbuffer InfoBuffer : register(b0) {{
+    {CommonShaderBufferData()}
+    matrix transform;
+    matrix toImage;
+    float farplane;
+    bool useFlatShading;
+}};
+";
         }
 
         private static string GetVertexSource()
@@ -285,21 +296,6 @@ float4 main(PixelIn i) : SV_TARGET {{
     {ApplyColorTransform()}
     return color;
 }}
-";
-        }
-
-        private static string ConstantBuffer()
-        {
-            return @"
-cbuffer InfoBuffer : register(b0) {
-    matrix transform;
-    matrix toImage;
-    float4 crop;
-    float multiplier;
-    float farplane;
-    bool useAbs;
-    bool useFlatShading;
-};
 ";
         }
     }

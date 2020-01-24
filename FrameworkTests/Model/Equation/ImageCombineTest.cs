@@ -61,11 +61,15 @@ namespace FrameworkTests.Model.Equation
         public void UnaryFunctionsExtended()
         {
             TestFormula("alpha(I0)");
-            TestFormula("tosrgb(I0)");
-            TestFormula("fromsrgb(I0)");
             TestFormula("red(I0)");
             TestFormula("green(I0)");
             TestFormula("blue(I0)");
+
+            TestFormula("tosrgb(I0)");
+            TestFormula("fromsrgb(I0)");
+
+            TestFormula("srgbAsUnorm(I0)");
+            TestFormula("srgbAsSnorm(I0)");
 
             TestFormula("normalize(I0)");
             TestFormula("length(I0)");

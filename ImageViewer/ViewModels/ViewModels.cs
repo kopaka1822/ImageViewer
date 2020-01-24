@@ -5,8 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ImageViewer.Commands;
+using ImageViewer.Commands.Export;
+using ImageViewer.Commands.Import;
+using ImageViewer.Commands.Tools;
+using ImageViewer.Commands.View;
 using ImageViewer.Models;
 using ImageViewer.ViewModels.Display;
+using ImageViewer.ViewModels.Image;
 
 namespace ImageViewer.ViewModels
 {
@@ -47,10 +52,11 @@ namespace ImageViewer.ViewModels
             GenerateMipmapsCommand = new GenerateMipmapsCommand(models);
             DeleteMipmapsCommand = new DeleteMipmapsCommand(models);
             HelpCommand = new HelpDialogCommand(models);
-            //GifExportCommand = new GifExportCommand(models);
+            GifExportCommand = new GifExportCommand(models);
             ImportArrayCommand = new ImportArrayCommand(models);
             LatLongToCubemapCommand = new LatLongToCubemapCommand(models);
             CubemapToLatLongCommand = new CubemapToLatLongCommand(models);
+            SelectNaNColorCommand = new SelectNaNColorCommand(models);
 
             ResizeCommand = new ResizeWindowCommand(models);
             SetThemeCommand = new SetThemeCommand(models);
@@ -108,11 +114,13 @@ namespace ImageViewer.ViewModels
 
         public ICommand AddFilterCommand { get; }
 
-        //public ICommand GifExportCommand { get; }
+        public ICommand GifExportCommand { get; }
 
         public ICommand ImportArrayCommand { get; }
 
         public ICommand LatLongToCubemapCommand { get; }
         public ICommand CubemapToLatLongCommand { get; }
+
+        public ICommand SelectNaNColorCommand { get; }
     }
 }

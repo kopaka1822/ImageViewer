@@ -15,6 +15,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
         private readonly ImageFramework.DirectX.Shader vertex;
         private readonly ImageFramework.DirectX.Shader pixel;
         private readonly Vector3 themeColor;
+        private readonly ModelsEx models;
 
         private struct BufferData
         {
@@ -25,26 +26,28 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
         public CheckersShader(ModelsEx models)
         {
+            this.models = models;
             vertex = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Vertex, GetVertexSource(), "CheckersVertexShader");
             pixel = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Pixel, GetPixelSource(), "CheckersPixelShader");
             themeColor = new Vector3(models.Window.ThemeColor.Red, models.Window.ThemeColor.Green, models.Window.ThemeColor.Blue);
         }
 
-        public void Run(UploadBuffer buffer, Matrix transform, SettingsModel.AlphaType background)
+        public void Run(Matrix transform)
         {
-            buffer.SetData(new BufferData
+            var v = models.ViewData;
+            v.Buffer.SetData(new BufferData
             {
                 Transform = transform,
                 ThemeColor = themeColor,
-                Type = (int)background
+                Type = (int)models.Settings.AlphaBackground
             });
 
             var dev = Device.Get();
             dev.Vertex.Set(vertex.Vertex);
             dev.Pixel.Set(pixel.Pixel);
 
-            dev.Vertex.SetConstantBuffer(0, buffer.Handle);
-            dev.Pixel.SetConstantBuffer(0, buffer.Handle);
+            dev.Vertex.SetConstantBuffer(0, v.Buffer.Handle);
+            dev.Pixel.SetConstantBuffer(0, v.Buffer.Handle);
 
             dev.DrawQuad();
         }

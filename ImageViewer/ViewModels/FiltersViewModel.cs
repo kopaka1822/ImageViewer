@@ -16,6 +16,7 @@ using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageFramework.Model.Filter;
 using ImageViewer.Commands;
+using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 using ImageViewer.ViewModels.Filter;
 using ImageViewer.Views.Filter;
@@ -110,8 +111,11 @@ namespace ImageViewer.ViewModels
             {
                 availableFilter = value;
                 OnPropertyChanged(nameof(AvailableFilter));
+                OnPropertyChanged(nameof(HasFilter));
             }
         }
+
+        public bool HasFilter => AvailableFilter.Count > 0;
 
         private void UpdateAvailableFilter()
         {

@@ -4,6 +4,8 @@
              xmlns:local="clr-namespace:ImageViewer"
              xmlns:views="clr-namespace:ImageViewer.Views" 
              xmlns:theme="clr-namespace:ImageViewer.Views.Theme"
+             xmlns:converter="clr-namespace:ImageViewer.Views.Converter"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -80,16 +82,74 @@
                 <Setter Property="Background" Value="{StaticResource BorderBrush}"/>
             </Style>
 
-            <Style TargetType="ListBox" BasedOn="{StaticResource BaseStyle}">
+            <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource BaseStyle}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListBox}">
+                            <Grid Width="Auto" Height="Auto">
+                                <Border x:Name="Border" 
+                                        BorderBrush="{StaticResource BorderBrush}" 
+                                        BorderThickness="1"/>
+                                <ScrollViewer Focusable="false" IsTabStop="False" HorizontalScrollBarVisibility="Disabled">
+                                    <StackPanel IsItemsHost="true"/>
+                                </ScrollViewer>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter TargetName="Border" Property="Border.Background" Value="{StaticResource DisabledBackgroundBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsGrouping" Value="true">
+                                    <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
                 <Setter Property="Background" Value="{StaticResource ListingBackgroundBrush}"/>
-                <Style.Triggers>
-                    <Trigger Property="IsEnabled" Value="False">
-                        <Setter Property="Background" Value="{StaticResource DisabledBackgroundBrush}"/>
-                    </Trigger>
-                </Style.Triggers>
             </Style>
 
             <Style TargetType="ToolTip" BasedOn="{StaticResource BaseStyle}"/>
+
+            <!-- Converters -->
+
+            <converter:CollapsedVisibleConverter x:Key="CollapsedVisibleConverter"/>
+            <converter:VisibleCollapsedConverter x:Key="VisibleCollapsedConverter"/>
+            <converter:HiddenVisibleConverter x:Key="HiddenVisibleConverter"/>
+            <converter:VisibleHiddenConverter x:Key="VisibleHiddenConverter"/>
+
+            <!-- Borders etc. -->
+
+            <system:Double x:Key="DefaultBorderValue">5</system:Double>
+            <system:Double x:Key="SmallBorderValue">2</system:Double>
+            <system:Double x:Key="SeparatorHeight">2</system:Double>
+
+            <Thickness x:Key="DefaultBorder" Bottom="{StaticResource DefaultBorderValue}" Left="{StaticResource DefaultBorderValue}"
+                       Right="{StaticResource DefaultBorderValue}" Top="{StaticResource DefaultBorderValue}" />
+
+            <Thickness x:Key="DefaultBorderRight" Bottom="0" Left="0"
+                       Right="{StaticResource DefaultBorderValue}" Top="0" />
+
+            <Thickness x:Key="DefaultBorderLeft" Bottom="0" Left="{StaticResource DefaultBorderValue}"
+                       Right="0" Top="0" />
+
+            <Thickness x:Key="DefaultBorderBottom" Bottom="{StaticResource DefaultBorderValue}" Left="0"
+                       Right="0" Top="0" />
+
+            <Thickness x:Key="DefaultBorderBotRight" Bottom="{StaticResource DefaultBorderValue}" Left="0"
+                       Right="{StaticResource DefaultBorderValue}" Top="0" />
+
+            <Thickness x:Key="DefaultBorderTop" Bottom="0" Left="0"
+                       Right="0" Top="{StaticResource DefaultBorderValue}"/>
+
+            <Thickness x:Key="SmallBorderBottom" Bottom="{StaticResource SmallBorderValue}" Left="0"
+                       Right="0" Top="0" />
+
+            <!-- UI Element templates -->
+            <DataTemplate x:Key="ListItemView">
+                <TextBlock Text="{Binding Name}"
+                           ToolTip="{Binding ToolTip}"/>
+            </DataTemplate>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

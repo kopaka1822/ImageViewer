@@ -55,14 +55,26 @@ namespace ImageViewer.ViewModels.Display
             }
         }
 
-        public List<ComboBoxItem<int>> AxisList { get; } = new List<ComboBoxItem<int>>
+        public List<ListItemViewModel<int>> AxisList { get; } = new List<ListItemViewModel<int>>
         {
-            new ComboBoxItem<int>("XY Plane", 2),
-            new ComboBoxItem<int>("XZ Plane", 1),
-            new ComboBoxItem<int>("YZ Plane", 0),
+            new ListItemViewModel<int>
+            {
+                Name = "XY Plane",
+                Cargo = 2
+            },
+            new ListItemViewModel<int>
+            {
+                Name = "XZ Plane",
+                Cargo = 1
+            },
+            new ListItemViewModel<int>
+            {
+                Name = "YZ Plane",
+                Cargo = 0
+            },
         };
 
-        public ComboBoxItem<int> SelectedAxis
+        public ListItemViewModel<int> SelectedAxis
         {
             get => AxisList[2 - displayEx.FixedAxis];
             set
