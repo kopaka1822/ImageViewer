@@ -48,7 +48,11 @@ namespace ImageFramework.Model.Shader
                 numBuffer.SetData(numElements);
                 Device.Get().Compute.SetConstantBuffer(0, numBuffer.Handle);
 
-                Device.Get().Dispatch(numGroups, 1);
+                // test if numGroups > DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION
+                var numSplits = Utility.Utility.DivideRoundUp(numGroups, Device.DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION);
+                if(numSplits > 1) Device.Get().Dispatch(Device.DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION, numSplits);
+                else Device.Get().Dispatch(numGroups, 1);
+
                 numElements = numGroups;
             }
 
@@ -76,10 +80,12 @@ cbuffer BufferData : register(b0)
 void main(uint3 localInvocationID : SV_GroupThreadID, uint3 workGroupID : SV_GroupID)
 {{
     uint localIndex = localInvocationID.x;
-    uint globalIndex = workGroupID.x * {LocalSize} + localIndex;
+    // reconstruct 1D workgroupID
+    uint workGroupId = workGroupID.x + workGroupID.y * {Device.DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION};
+    uint globalIndex = workGroupId * {LocalSize} + localIndex;
 
     {type} res = {defaultValue};
-    uint offset = workGroupID.x * {ElementsPerGroup} + localIndex;
+    uint offset = workGroupId * {ElementsPerGroup} + localIndex;
 
     // read in local data
     [unroll] for(uint i = 0; i < {ElementsPerThread}; ++i)
@@ -109,7 +115,7 @@ void main(uint3 localInvocationID : SV_GroupThreadID, uint3 workGroupID : SV_Gro
 
     // write back result
     if(localIndex != 0) return;
-    buffer[workGroupID.x] = cache[0];
+    buffer[workGroupId] = cache[0];
 }}
 ";
         }

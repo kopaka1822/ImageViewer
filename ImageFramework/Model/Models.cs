@@ -20,6 +20,7 @@ using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Device = ImageFramework.DirectX.Device;
+using Feature = SharpDX.DXGI.Feature;
 using Texture3D = ImageFramework.DirectX.Texture3D;
 
 namespace ImageFramework.Model
@@ -290,10 +291,6 @@ namespace ImageFramework.Model
                 if((sup & FormatSupport.Texture3D) == 0)
                     throw new Exception($"Texture3D support for {f} is required");
 
-                // TODO this can be optional
-                if ((sup & FormatSupport.MipAutogen) == 0)
-                    throw new Exception($"MipAutogen support for {f} is required");
-
                 if ((sup & FormatSupport.RenderTarget) == 0)
                     throw new Exception($"RenderTarget support for {f} is required");
 
@@ -305,6 +302,10 @@ namespace ImageFramework.Model
                         throw new Exception($"TextureCube support for {f} is required");
                 }
             }
+
+            // TODO make this optional
+            if(!dev.Handle.CheckFeatureSupport(SharpDX.Direct3D11.Feature.ShaderDoubles))
+                throw new Exception($"Double support for HLSL is required");
         }
 
         public virtual void Dispose()

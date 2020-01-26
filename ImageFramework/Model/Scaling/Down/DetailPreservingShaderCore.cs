@@ -44,7 +44,9 @@ namespace ImageFramework.Model.Scaling.Down
             public Size3 SrcSize;
             public int HasAlpha;
             public Size3 DstSize;
+#pragma warning disable 169
             private int Padding0;
+#pragma warning restore 169
             public float FilterSizeFloatX;
             public float FilterSizeFloatY;
             public float FilterSizeFloatZ;

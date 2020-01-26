@@ -186,8 +186,14 @@ namespace ImageFramework.DirectX
             }
         }
 
+        public static readonly int DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION = 65535;
+
         public void Dispatch(int x, int y, int z = 1)
         {
+            // test agains feature level 11.0 specs
+            Debug.Assert(x <= DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION);
+            Debug.Assert(y <= DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION);
+            Debug.Assert(z <= DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION);
             context.Dispatch(x, y, z);
         }
 
