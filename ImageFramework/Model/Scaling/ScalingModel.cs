@@ -80,15 +80,9 @@ namespace ImageFramework.Model.Scaling
 
         internal async Task WriteMipmapsAsync(ITexture tex, CancellationToken ct)
         {
-            Debug.Assert(tex.HasUaViews || tex.HasRtViews);
-
             var shader = GetMinify();
             var cache = GetMinifyTextureCache(tex);
             var hasAlpha = models.Stats.GetStatisticsFor(tex).HasAlpha;
-
-            ITexture dstTex = tex;
-            if (!tex.HasUaViews) // cannot write directly into texture
-                dstTex = cache.GetTexture(); // get texture from cache with unordered access view
 
             models.Progress.Progress = 0.0f;
             models.Progress.What = "Generating Mipmaps";
@@ -97,26 +91,11 @@ namespace ImageFramework.Model.Scaling
             {
                 // don't use the previous mipmaps (too much error) => using 16 times bigger is okay
                 var srcMip = Math.Max(0, curMip - 4);
-                shader.Run(srcMip == 0 ? tex : dstTex, dstTex, srcMip, curMip, hasAlpha, models.SharedModel.Upload, cache);
+                shader.Run(tex, tex, srcMip, curMip, hasAlpha, models.SharedModel.Upload, cache);
 
                 models.SharedModel.Sync.Set();
                 await models.SharedModel.Sync.WaitForGpuAsync(ct);
                 models.Progress.Progress = curMip / (float)(tex.NumMipmaps - 1);
-            }
-
-            if (!tex.HasUaViews) // write back from dstTex to tex
-            {
-                models.Progress.What = "Finalizing Mipmaps";
-                for (int curLayer = 0; curLayer < tex.NumLayers; ++curLayer)
-                {
-                    for (int curMip = 1; curMip < tex.NumMipmaps; ++curMip)
-                    {
-                        models.SharedModel.Convert.CopyLayer(dstTex, curLayer, curMip, tex, curLayer, curMip);
-                        models.SharedModel.Sync.Set();
-                        await models.SharedModel.Sync.WaitForGpuAsync(ct);
-                    }
-                }
-                cache.StoreTexture(dstTex);
             }
         }
 
@@ -134,17 +113,17 @@ namespace ImageFramework.Model.Scaling
             switch (Minify)
             {
                 case MinifyFilters.Box:
-                    return boxMinify ?? (boxMinify = new BoxScalingShader());
+                    return boxMinify ?? (boxMinify = new BoxScalingShader(models.SharedModel.QuadShader));
                 case MinifyFilters.Triangle:
-                    return triangleMinify ?? (triangleMinify = new TriangleScalingShader());
+                    return triangleMinify ?? (triangleMinify = new TriangleScalingShader(models.SharedModel.QuadShader));
                 case MinifyFilters.Lanzos:
-                    return lanzosMinify ?? (lanzosMinify = new LanzosScalingShader());
+                    return lanzosMinify ?? (lanzosMinify = new LanzosScalingShader(models.SharedModel.QuadShader));
                 case MinifyFilters.DetailPreserving:
-                    if(boxMinify == null) boxMinify = new BoxScalingShader();
-                    return detailPreservingMinify ?? (detailPreservingMinify = new DetailPreservingDownscalingShader(boxMinify, false));
+                    if(boxMinify == null) boxMinify = new BoxScalingShader(models.SharedModel.QuadShader);
+                    return detailPreservingMinify ?? (detailPreservingMinify = new DetailPreservingDownscalingShader(boxMinify, false, models.SharedModel.QuadShader));
                 case MinifyFilters.VeryDetailPreserving:
-                    if (boxMinify == null) boxMinify = new BoxScalingShader();
-                    return veryDetailPreservingMinify ?? (veryDetailPreservingMinify = new DetailPreservingDownscalingShader(boxMinify, true));
+                    if (boxMinify == null) boxMinify = new BoxScalingShader(models.SharedModel.QuadShader);
+                    return veryDetailPreservingMinify ?? (veryDetailPreservingMinify = new DetailPreservingDownscalingShader(boxMinify, true, models.SharedModel.QuadShader));
             }
 
             throw new Exception($"invalid minify filter specified: {minify}");

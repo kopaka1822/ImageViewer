@@ -7,25 +7,32 @@ using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
+using SharpDX.Direct3D11;
+using Device = ImageFramework.DirectX.Device;
 
 namespace ImageFramework.Model.Scaling.Down
 {
     // fast gauss shader for detail preserving downscaling
     internal class FastGaussShader : IDisposable
     {
+        private QuadShader quad;
         private DirectX.Shader shader = null;
         private DirectX.Shader shader3D = null;
 
-        private DirectX.Shader Shader => shader ?? (shader = new DirectX.Shader(DirectX.Shader.Type.Compute,
+        public FastGaussShader(QuadShader quad)
+        {
+            this.quad = quad;
+        }
+
+        private DirectX.Shader Shader => shader ?? (shader = new DirectX.Shader(DirectX.Shader.Type.Pixel,
                                              GetSource(ShaderBuilder.Builder2D), "FastGauss"));
 
-        private DirectX.Shader Shader3D => shader3D ?? (shader3D = new DirectX.Shader(DirectX.Shader.Type.Compute,
+        private DirectX.Shader Shader3D => shader3D ?? (shader3D = new DirectX.Shader(DirectX.Shader.Type.Pixel,
                                              GetSource(ShaderBuilder.Builder3D), "FastGauss3D"));
 
         private struct BufferData
         {
             public Size3 Size;
-            public int Layer;
             public int HasAlpha;
         }
 
@@ -37,9 +44,9 @@ namespace ImageFramework.Model.Scaling.Down
             Debug.Assert(texSrc.Size == texDst.Size);
 
             var dev = Device.Get();
-            dev.Compute.Set(texSrc.Is3D ? Shader3D.Compute : Shader.Compute);
-            var builder = texSrc.Is3D ? ShaderBuilder.Builder3D : ShaderBuilder.Builder2D;
-
+            quad.Bind(texSrc.Is3D);
+            dev.Pixel.Set(texSrc.Is3D ? Shader3D.Pixel : Shader.Pixel);
+            
             var data = new BufferData
             {
                 Size = texSrc.Size.GetMip(mipmap),
@@ -48,21 +55,18 @@ namespace ImageFramework.Model.Scaling.Down
 
             for (int layer = 0; layer < texSrc.NumLayers; ++layer)
             {
-                data.Layer = layer;
                 upload.SetData(data);
-                dev.Compute.SetConstantBuffer(0, upload.Handle);
-                dev.Compute.SetShaderResource(0, texSrc.GetSrView(layer, mipmap));
-                dev.Compute.SetUnorderedAccessView(0, texDst.GetUaView(mipmap));
+                dev.Pixel.SetConstantBuffer(0, upload.Handle);
+                dev.Pixel.SetShaderResource(0, texSrc.GetSrView(layer, mipmap));
 
-                dev.Dispatch(
-                    Utility.Utility.DivideRoundUp(data.Size.Width, builder.LocalSizeX),
-                    Utility.Utility.DivideRoundUp(data.Size.Height, builder.LocalSizeY),
-                    Utility.Utility.DivideRoundUp(data.Size.Depth, builder.LocalSizeZ)
-                );
+                dev.OutputMerger.SetRenderTargets(texDst.GetRtView(layer, mipmap));
+                dev.SetViewScissors(data.Size.Width, data.Size.Height);
+                dev.DrawFullscreenTriangle(data.Size.Depth);
             }
 
-            dev.Compute.SetShaderResource(0, null);
-            dev.Compute.SetUnorderedAccessView(0, null);
+            quad.Unbind();
+            dev.Pixel.SetShaderResource(0, null);
+            dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
         }
 
         public void Dispose()
@@ -75,26 +79,33 @@ namespace ImageFramework.Model.Scaling.Down
         {
             return $@"
 {builder.SrvSingleType} src_image : register(t0);
-{builder.UavType} dst_image : register(u0);
 
 cbuffer InputBuffer : register(b0) {{
     int3 size;
-    uint layer;
     bool hasAlpha;
 }};
 
 // texel helper function
 #if {builder.Is3DInt}
 uint3 texel(uint3 coord) {{ return coord; }}
-uint3 texel(uint3 coord, uint layer) {{ return coord; }}
 #else
 uint2 texel(uint3 coord) {{ return coord.xy; }}
-uint3 texel(uint3 coord, uint layer) {{ return uint3(coord.xy, layer); }}
 #endif
 
-[numthreads({builder.LocalSizeX}, {builder.LocalSizeY}, {builder.LocalSizeZ})]
-void main(int3 id : SV_DispatchThreadID) {{
-    if(any(id >= size)) return;
+struct PixelIn
+{{
+    float2 texcoord : TEXCOORD;
+    float4 projPos : SV_POSITION;
+#if {builder.Is3DInt}
+    uint depth : SV_RenderTargetArrayIndex;
+#endif
+}};
+
+float4 main(PixelIn pin) : SV_TARGET {{
+    int3 id = int3(pin.projPos.xy, 0);
+#if {builder.Is3DInt}
+    id.z = pin.depth;
+#endif
 
     int3 coord = 0;
     
@@ -117,7 +128,7 @@ void main(int3 id : SV_DispatchThreadID) {{
     if(!hasAlpha) dstColor.a = 1.0;
     if(dstColor.a != 0.0) dstColor.rgb /= dstColor.a;
 
-    dst_image[texel(id, layer)] = dstColor;
+    return dstColor;
 }}
 ";
         }

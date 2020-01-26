@@ -10,6 +10,7 @@ namespace ImageFramework.Model.Scaling.Down
 {
     internal class DownscalingShaderBase : IDownscalingShader
     {
+        private readonly QuadShader quad;
         private DirectX.Shader copyShader;
         private DirectX.Shader copyShader3D;
         private DirectX.Shader fastShader;
@@ -17,23 +18,23 @@ namespace ImageFramework.Model.Scaling.Down
         private DirectX.Shader slowShader;
         private DirectX.Shader slowShader3D;
 
-        private DirectX.Shader CopyShader => copyShader ?? (copyShader = new DirectX.Shader(DirectX.Shader.Type.Compute,
+        private DirectX.Shader CopyShader => copyShader ?? (copyShader = new DirectX.Shader(DirectX.Shader.Type.Pixel,
                                                  GetCopySource(ShaderBuilder.Builder2D), "MipCopy"));
 
         private DirectX.Shader CopyShader3D => copyShader3D ?? (copyShader3D =
-                                                   new DirectX.Shader(DirectX.Shader.Type.Compute,
+                                                   new DirectX.Shader(DirectX.Shader.Type.Pixel,
                                                        GetCopySource(ShaderBuilder.Builder3D), "MipCopy3D"));
 
-        private DirectX.Shader FastShader => fastShader ?? (fastShader = new DirectX.Shader(DirectX.Shader.Type.Compute,
+        private DirectX.Shader FastShader => fastShader ?? (fastShader = new DirectX.Shader(DirectX.Shader.Type.Pixel,
                                                  GetFastSource(ShaderBuilder.Builder2D), "MipFast"));
 
-        private DirectX.Shader FastShader3D => fastShader3D ?? (fastShader3D = new DirectX.Shader(DirectX.Shader.Type.Compute,
+        private DirectX.Shader FastShader3D => fastShader3D ?? (fastShader3D = new DirectX.Shader(DirectX.Shader.Type.Pixel,
                                                  GetFastSource(ShaderBuilder.Builder3D), "MipFast3D"));
 
-        private DirectX.Shader SlowShader => slowShader ?? (slowShader = new DirectX.Shader(DirectX.Shader.Type.Compute,
+        private DirectX.Shader SlowShader => slowShader ?? (slowShader = new DirectX.Shader(DirectX.Shader.Type.Pixel,
                                                  GetSlowSource(ShaderBuilder.Builder2D), "MipSlow"));
 
-        private DirectX.Shader SlowShader3D => slowShader3D ?? (slowShader3D = new DirectX.Shader(DirectX.Shader.Type.Compute,
+        private DirectX.Shader SlowShader3D => slowShader3D ?? (slowShader3D = new DirectX.Shader(DirectX.Shader.Type.Pixel,
                                                  GetSlowSource(ShaderBuilder.Builder3D), "MipSlow3D"));
 
         private struct BufferData
@@ -44,7 +45,6 @@ namespace ImageFramework.Model.Scaling.Down
             public int HasAlpha; // indicates if any pixel has alpha != 0
             public int NumSrcPixelsTotal; // src image dimension for the current direction
             public float FilterSize;// (float) number of pixels to process (per Kernel)
-            public int Layer;
         }
 
         private readonly string weightFunc;
@@ -53,10 +53,11 @@ namespace ImageFramework.Model.Scaling.Down
         /// <param name="weightFunc">the weight func is actually the integral of the kernel function and will be evaluated between -1 and 1.
         /// This allows well defined handling of partially covered pixels. As opposed to sampling theory, a pixel is regarded as a square of constant value</param>
         /// <param name="kernelStretch">modifies the kernel size (1 = normal size)</param>
-        protected DownscalingShaderBase(string weightFunc, int kernelStretch)
+        protected DownscalingShaderBase(string weightFunc, int kernelStretch, QuadShader quad)
         {
             this.weightFunc = weightFunc;
             this.kernelStretch = kernelStretch;
+            this.quad = quad;
         }
 
         // for testing purposes
@@ -93,24 +94,23 @@ namespace ImageFramework.Model.Scaling.Down
 
             for (int layer = 0; layer < src.NumLayers; ++layer)
             {
-                cbuffer.Layer = layer;
                 cbuffer.DstSize = srcSize;
                 cbuffer.DstSize.X = dstSize.X;
 
-                ExecuteDimension(ref cbuffer, upload,  src.Is3D, 0, srcSize, src.GetSrView(layer, srcMipmap), tmpTex1.GetUaView(srcMipmap));
+                ExecuteDimension(ref cbuffer, upload,  src.Is3D, 0, srcSize, src.GetSrView(layer, srcMipmap), tmpTex1.GetRtView(layer, srcMipmap));
                // var tst = tmpTex1.GetPixelColors(layer, 0);
 
                 cbuffer.DstSize.Y = dstSize.Y;
                 if (src.Is3D)
                 {
-                    ExecuteDimension(ref cbuffer, upload, src.Is3D, 1, srcSize, tmpTex1.GetSrView(layer, srcMipmap), tmpTex2.GetUaView(srcMipmap));
+                    ExecuteDimension(ref cbuffer, upload, src.Is3D, 1, srcSize, tmpTex1.GetSrView(layer, srcMipmap), tmpTex2.GetRtView(layer, srcMipmap));
 
                     cbuffer.DstSize.Z = dstSize.Z;
-                    ExecuteDimension(ref cbuffer, upload, src.Is3D, 2, srcSize, tmpTex2.GetSrView(layer, srcMipmap), dst.GetUaView(dstMipmap));
+                    ExecuteDimension(ref cbuffer, upload, src.Is3D, 2, srcSize, tmpTex2.GetSrView(layer, srcMipmap), dst.GetRtView(layer, dstMipmap));
                 }
                 else
                 {
-                    ExecuteDimension(ref cbuffer, upload, src.Is3D, 1, srcSize, tmpTex1.GetSrView(layer, srcMipmap), dst.GetUaView(dstMipmap));
+                    ExecuteDimension(ref cbuffer, upload, src.Is3D, 1, srcSize, tmpTex1.GetSrView(layer, srcMipmap), dst.GetRtView(layer, dstMipmap));
                 }
             }
 
@@ -123,18 +123,19 @@ namespace ImageFramework.Model.Scaling.Down
             return num % 2 != 0;
         }
 
-        private void ExecuteDimension(ref BufferData bufferData, UploadBuffer buffer, bool is3D, int dim, Size3 srcSize, ShaderResourceView srcTexture, UnorderedAccessView dstTexture)
+        private void ExecuteDimension(ref BufferData bufferData, UploadBuffer buffer, bool is3D, int dim, Size3 srcSize, ShaderResourceView srcTexture, RenderTargetView dstTexture)
         {
             // filter x direction
             bufferData.Dir = new Size3(0, 0, 0) {[dim] = 1};
             bufferData.NumSrcPixelsTotal = srcSize[dim];
 
             var dev = Device.Get();
+            quad.Bind(is3D);
 
             var iFilterSize = srcSize[dim] / bufferData.DstSize[dim];
             if (srcSize[dim] == bufferData.DstSize[dim]) // same size
             {
-                dev.Compute.Set(is3D ? CopyShader3D.Compute : CopyShader.Compute);
+                dev.Pixel.Set(is3D ? CopyShader3D.Pixel : CopyShader.Pixel);
 
                 // just copy
             }
@@ -142,33 +143,28 @@ namespace ImageFramework.Model.Scaling.Down
                      !(Odd(iFilterSize) && !Odd(kernelStretch))) // stretch does not result in half samples?
             {
                 bufferData.NumSrcPixels = iFilterSize;
-                dev.Compute.Set(is3D ? FastShader3D.Compute : FastShader.Compute);
+                dev.Pixel.Set(is3D ? FastShader3D.Pixel : FastShader.Pixel);
             }
             else
             {
                 bufferData.FilterSize = srcSize[dim] / (float)bufferData.DstSize[dim];
-                dev.Compute.Set(is3D ? SlowShader3D.Compute : SlowShader.Compute);
+                dev.Pixel.Set(is3D ? SlowShader3D.Pixel : SlowShader.Pixel);
             }
 
             // bind stuff
             buffer.SetData(bufferData);
-            dev.Compute.SetConstantBuffer(0, buffer.Handle);
-            dev.Compute.SetShaderResource(0, srcTexture);
-            dev.Compute.SetUnorderedAccessView(0, dstTexture);
+            dev.Pixel.SetConstantBuffer(0, buffer.Handle);
+            dev.Pixel.SetShaderResource(0, srcTexture);
 
-            var builder = is3D ? ShaderBuilder.Builder3D : ShaderBuilder.Builder2D;
-
-            dev.Dispatch(
-                Utility.Utility.DivideRoundUp(bufferData.DstSize.X, builder.LocalSizeX),
-                Utility.Utility.DivideRoundUp(bufferData.DstSize.Y, builder.LocalSizeY),
-                Utility.Utility.DivideRoundUp(bufferData.DstSize.Z, builder.LocalSizeZ)
-            );
+            dev.OutputMerger.SetRenderTargets(dstTexture);
+            dev.SetViewScissors(bufferData.DstSize.X, bufferData.DstSize.Y);
+            dev.DrawFullscreenTriangle(bufferData.DstSize.Z);
 
             // unbind stuff
-            dev.Compute.SetShaderResource(0, null);
-            dev.Compute.SetUnorderedAccessView(0, null);
-
-
+            quad.Unbind();
+            dev.Pixel.Set(null);
+            dev.Pixel.SetShaderResource(0, null);
+            dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
         }
 
         public void Dispose()
@@ -185,10 +181,8 @@ namespace ImageFramework.Model.Scaling.Down
         public static string GetCopySource(IShaderBuilder builder)
         {
             return $@"
-{HeaderAndMain(builder)}  {{
-    {ReturnIfOutside()}
-    
-    dst_image[texel(id, layer)] = src_image[texel(id)];
+{HeaderAndMain(builder)}
+    return src_image[texel(id)];
 }}
 ";
         }
@@ -199,10 +193,7 @@ namespace ImageFramework.Model.Scaling.Down
             return $@"
 {WeightFunc(weightFunc)}
 
-{HeaderAndMain(builder)}  {{
-    
-    {ReturnIfOutside()}
-
+{HeaderAndMain(builder)}
     int fullFilterSize = numSrcPixels * {kernelStretch};
     int3 srcPos = id * dir * numSrcPixels + id * (1 - dir);
 #if {kernelStretch} != 1
@@ -233,10 +224,7 @@ namespace ImageFramework.Model.Scaling.Down
             return $@"
 {WeightFunc(weightFunc)}
 
- {HeaderAndMain(builder)} {{
-    
-    {ReturnIfOutside()}
- 
+ {HeaderAndMain(builder)}
     // interval in float coordinates
     float startf = dot(id, dir) * filterSize;
     float endf = (dot(id, dir) + 1) * filterSize;
@@ -281,7 +269,7 @@ if(!hasAlpha) dstColor.a = 1.0; // not always true due to precision errors
 if(dstColor.a != 0.0) dstColor.rgb /= dstColor.a;
 
 // write back color
-dst_image[texel(id, layer)] = float4(dstColor);
+return float4(dstColor);
 ";
         }
 
@@ -303,16 +291,10 @@ leftWeight = rightWeight;
 ";
         }
 
-        private static string ReturnIfOutside()
-        {
-            return "if(any(id >= dstSize)) return;";
-        }
-
         private static string HeaderAndMain(IShaderBuilder builder)
         {
             return $@"
 {builder.SrvSingleType} src_image : register(t0);
-{builder.UavType} dst_image : register(u0);
 
 cbuffer InputBuffer : register(b0) {{
     int3 dir; // direction of the filter
@@ -321,24 +303,29 @@ cbuffer InputBuffer : register(b0) {{
     bool hasAlpha; // indicates if any pixel has alpha != 0
     int numSrcPixelsTotal; // total number of src pixels for the current direction
     float filterSize; // (float) number of pixels to process (per Kernel)
-    uint layer;
 }};
 
 int3 clampCoord(int3 coord) {{
     return clamp(dot(coord, dir), 0, numSrcPixelsTotal - 1) * dir + (1-dir) * coord;
 }}
 
-// texel helper function
-#if {builder.Is3DInt}
-uint3 texel(uint3 coord) {{ return coord; }}
-uint3 texel(uint3 coord, uint layer) {{ return coord; }}
-#else
-uint2 texel(uint3 coord) {{ return coord.xy; }}
-uint3 texel(uint3 coord, uint layer) {{ return uint3(coord.xy, layer); }}
-#endif
+{builder.TexelHelperFunctions}
 
-[numthreads({builder.LocalSizeX}, {builder.LocalSizeY}, {builder.LocalSizeZ})]
-void main(uint3 id : SV_DispatchThreadID)";
+struct PixelIn
+{{
+    float2 texcoord : TEXCOORD;
+    float4 projPos : SV_POSITION;
+#if {builder.Is3DInt}
+    uint depth : SV_RenderTargetArrayIndex;
+#endif
+}};
+
+float4 main(PixelIn pin) : SV_TARGET {{
+    int3 id = int3(pin.projPos.xy, 0);
+#if {builder.Is3DInt}
+    id.z = pin.depth;
+#endif
+";
         }
 
         private static string WeightFunc(string funcCore)

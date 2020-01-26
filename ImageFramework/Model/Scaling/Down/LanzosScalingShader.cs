@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Model.Shader;
 
 namespace ImageFramework.Model.Scaling.Down
 {
@@ -20,10 +21,10 @@ namespace ImageFramework.Model.Scaling.Down
 
         // for stretch = 3 (x will still be in [-1, 1]): sinc(pi * x * 3) * sinc(pi * x)
         // aprox. integral: x - 5.48311355 * x^3 + 18.1830303 * x^5
-        public LanzosScalingShader() : base(@"
+        public LanzosScalingShader(QuadShader quad) : base(@"
 float xsq = x * x;
 float xtri = xsq * x;
-return x - 5.48311355 * xtri + 18.1830303 * xtri * xsq;", 3)
+return x - 5.48311355 * xtri + 18.1830303 * xtri * xsq;", 3, quad)
         {
         }
     }
