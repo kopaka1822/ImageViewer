@@ -87,12 +87,16 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 else
                 {
                     DebugTex(pong);
-                    DebugTex(helpTex);
                 }
             }
 
             //DebugTex(helpTex);
-
+            
+            // unbind
+            dev.Compute.SetShaderResource(0, null);
+            dev.Compute.SetShaderResource(1, null);
+            dev.Compute.SetUnorderedAccessView(0, null);
+            dev.Compute.Set(null);
 
 
         }
@@ -103,12 +107,20 @@ namespace ImageViewer.Controller.TextureViews.Shader
             if (readHelpTex)
             {
                 readHelpTex = false;
+                
+                dev.Compute.SetShaderResource(1, null);
+                dev.Compute.SetUnorderedAccessView(0, null);
+
                 dev.Compute.SetShaderResource(1, pong.GetSrView(0));
                 dev.Compute.SetUnorderedAccessView(0, helpTex.GetUaView(0));
             }
             else
             {
                 readHelpTex = true;
+
+                dev.Compute.SetShaderResource(1, null);
+                dev.Compute.SetUnorderedAccessView(0, null);
+
                 dev.Compute.SetShaderResource(1, helpTex.GetSrView(0));
                 dev.Compute.SetUnorderedAccessView(0, pong.GetUaView(0));
             }
