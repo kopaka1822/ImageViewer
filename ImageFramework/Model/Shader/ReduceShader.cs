@@ -2,6 +2,7 @@
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,6 +29,7 @@ namespace ImageFramework.Model.Shader
             this.defaultValue = defaultValue;
 
             shader = new DirectX.Shader(DirectX.Shader.Type.Compute, GetSource(), "ReduceShader");
+            Debug.Assert(upload.ByteSize >= 4);
             numBuffer = upload;
         }
 

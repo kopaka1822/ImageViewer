@@ -152,8 +152,7 @@ namespace ImageFramework.Model
                 args.Models.Progress.Progress = 1.0f;
                 if (RecomputeMipmaps && args.Models.Images.NumMipmaps > 1)
                 {
-                    args.Models.Progress.What = "Generating Mipmaps";
-                    args.Models.Scaling.WriteMipmaps(Image);
+                    await args.Models.Scaling.WriteMipmapsAsync(Image, ct);
                 }
 
                 HasChanges = false;

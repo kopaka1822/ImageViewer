@@ -57,6 +57,22 @@ namespace ImageFramework.DirectX.Query
             isActive = false;
         }
 
+        public void WaitForGpu()
+        {
+            Debug.Assert(isActive);
+            // flush before wait to ensure that commands were submitted
+            Device.Get().Flush();
+            //await Task.Delay(4000, ct);
+            int timeout = 1; // start with waiting 1 ms
+            do
+            {
+                System.Threading.Thread.Sleep(timeout);
+                timeout = Math.Min(timeout * 2, 1000);
+            } while (!Device.Get().GetQueryEventData(query));
+
+            isActive = false;
+        }
+
         public void Dispose()
         {
             query?.Dispose();
