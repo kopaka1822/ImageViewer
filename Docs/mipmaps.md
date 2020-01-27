@@ -25,7 +25,7 @@ This filter is three times larger than the covored area and contains negative we
 
 ### Detail Preserving
 
-Based on the paper ["Rapid, Detail-Preserving Image Downscaling"](https://www.gcc.tu-darmstadt.de/home/proj/dpid/index.en.jsp) from Nicolas Weber et. al. this filter to preserves colors, that are different from the average color by giving them a higher weight. This results in **detail preservation** because details usually differ from the average pixel color.
+Based on the paper ["Rapid, Detail-Preserving Image Downscaling"](https://www.gcc.tu-darmstadt.de/home/proj/dpid/index.en.jsp) from Nicolas Weber et al. this filter preserves colors that differ from their neighbourhood. This results in **detail preservation** because details usually differ from neighbouring pixel colors.
 
 ## Implementation Notes
 
