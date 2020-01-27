@@ -180,7 +180,7 @@
                     IsChecked="{Binding Scale.UseTriangleFilter}"
                     ToolTip="The kernel function looks like a tent (1.0 - abs(x)) and the kernel radius is twice as large."/>
                 <MenuItem 
-                    Header="Lanzos Low-Pass"
+                    Header="Lanczos Low-Pass"
                     IsCheckable="True"
                     IsChecked="{Binding Scale.UseLanzosFilter}"
                     ToolTip="Samples near the center have a higher weight and the kernel radius is three times bigger. Very similar to Kaiser filter."/>
@@ -194,7 +194,21 @@
                     IsCheckable="True"
                     IsChecked="{Binding Scale.UseVeryDetailPreserving}"
                     ToolTip="Details are preserved when downscaling. Based on 'Rapid, Detail-Preserving Image Downscaling'"/>
-            </MenuItem>
+                <MenuItem 
+                    Header="Help"
+                    ToolTip="Displays overview of existing mipmap techniques."
+                    Command="{Binding HelpCommand}">
+                    <MenuItem.CommandParameter>
+                        <system:String>help/mipmaps.md</system:String>
+                    </MenuItem.CommandParameter>
+                    <MenuItem.Icon>
+                        <Image 
+                            Source="../Icons/help.png"
+                            Width="16" 
+                            Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                </MenuItem>
             <MenuItem 
                     Header="Delete Mipmaps"
                     Command="{Binding DeleteMipmapsCommand}"
@@ -249,13 +263,20 @@
                         <system:String>help/equation.md</system:String>
                     </MenuItem.CommandParameter>
             </MenuItem>
-                <MenuItem
+            <MenuItem
                     Header="Filter Manual"
                     Command="{Binding HelpCommand}">
                     <MenuItem.CommandParameter>
                         <system:String>help/filter_manual.md</system:String>
                     </MenuItem.CommandParameter>
             </MenuItem>
+            <MenuItem
+                Header="Mipmaps"
+                Command="{Binding HelpCommand}">
+                <MenuItem.CommandParameter>
+                    <system:String>help/mipmaps.md</system:String>
+                </MenuItem.CommandParameter>
             </MenuItem>
+        </MenuItem>
     </Menu>
 </UserControl>

@@ -42,6 +42,9 @@
     <Filter Include="Source Files\png">
       <UniqueIdentifier>{5fdd4c5c-13b7-4b9f-a95c-0dad8f9afc95}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Docs\img">
+      <UniqueIdentifier>{e9a0ecf1-1d70-4a7b-8bc3-0fa2bfeeb454}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Layer.h">
@@ -161,6 +164,21 @@
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\Docs\README.md">
       <Filter>Docs</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\mipmaps.md">
+      <Filter>Docs</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\box_kernel.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\lanzos_kernel.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\triangle_kernel.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\mip_compare.png">
+      <Filter>Docs\img</Filter>
     </CopyFileToFolders>
   </ItemGroup>
 </Project>

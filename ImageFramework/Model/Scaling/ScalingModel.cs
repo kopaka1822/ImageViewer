@@ -36,7 +36,7 @@ namespace ImageFramework.Model.Scaling
         {
             Box,
             Triangle,
-            Lanzos,
+            Lanczos,
             DetailPreserving, // Rapid, Detail-Preserving Image Downscaling 2016 with y = 0.5
             VeryDetailPreserving, // Rapid, Detail-Preserving Image Downscaling 2016 with y = 1.0
         }
@@ -116,7 +116,7 @@ namespace ImageFramework.Model.Scaling
                     return boxMinify ?? (boxMinify = new BoxScalingShader(models.SharedModel.QuadShader));
                 case MinifyFilters.Triangle:
                     return triangleMinify ?? (triangleMinify = new TriangleScalingShader(models.SharedModel.QuadShader));
-                case MinifyFilters.Lanzos:
+                case MinifyFilters.Lanczos:
                     return lanzosMinify ?? (lanzosMinify = new LanzosScalingShader(models.SharedModel.QuadShader));
                 case MinifyFilters.DetailPreserving:
                     if(boxMinify == null) boxMinify = new BoxScalingShader(models.SharedModel.QuadShader);

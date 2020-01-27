@@ -1,6 +1,6 @@
 # Filter Manual
 
-Filters are simple HLSL compute shader with a custom entry point. Filters can be written for 2D and 3D images. All filters have the entry point `float4 filter(...)` that will be invoked for each pixel in each layer in each mipmap.
+Filters are simple HLSL compute shader with a custom entry point. Filters can be written for 2D and 3D images. All filters have the entry point `float4 filter(...)` that will be invoked for each pixel in each layer in each mipmap. If "Gen Mipmaps" is enabled, the filter is only executed on the most detailed mipmap and mipmaps will be regenerated in the end.
 
 ### Source Image:
 

@@ -49,8 +49,8 @@ namespace ImageViewer.ViewModels
 
         public bool UseLanzosFilter
         {
-            get => models.Scaling.Minify == ScalingModel.MinifyFilters.Lanzos;
-            set => SetMinify(value, ScalingModel.MinifyFilters.Lanzos);
+            get => models.Scaling.Minify == ScalingModel.MinifyFilters.Lanczos;
+            set => SetMinify(value, ScalingModel.MinifyFilters.Lanczos);
         }
 
         public bool UseDetailPreserving

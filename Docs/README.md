@@ -39,6 +39,10 @@ Select a specific mipmap level and layer (face) of DDS and KTX textures and view
 
 ![](img/cube_level.jpg)
 
+[Generate mipmaps](mipmaps.md) with the following techniques:
+
+![](img/mip_compare.png)
+
 ### Lat-Long Polar Images
 
 View the raw polar image or look around in polar mode:
