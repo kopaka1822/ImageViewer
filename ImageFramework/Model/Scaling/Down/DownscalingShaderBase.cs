@@ -155,6 +155,7 @@ namespace ImageFramework.Model.Scaling.Down
             buffer.SetData(bufferData);
             dev.Pixel.SetConstantBuffer(0, buffer.Handle);
             dev.Pixel.SetShaderResource(0, srcTexture);
+            BindAdditionalResources(dev);
 
             dev.OutputMerger.SetRenderTargets(dstTexture);
             dev.SetViewScissors(bufferData.DstSize.X, bufferData.DstSize.Y);
@@ -165,9 +166,10 @@ namespace ImageFramework.Model.Scaling.Down
             dev.Pixel.Set(null);
             dev.Pixel.SetShaderResource(0, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            UnbindAdditionalResources(dev);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             copyShader?.Dispose();
             copyShader3D?.Dispose();
@@ -176,6 +178,12 @@ namespace ImageFramework.Model.Scaling.Down
             slowShader?.Dispose();
             slowShader3D?.Dispose();
         }
+
+        protected string AdditionalBindings { get; set; } = "";
+
+        protected virtual void BindAdditionalResources(Device dev) {}
+
+        protected virtual void UnbindAdditionalResources(Device dev) {}
 
         // just copies pixels because the dimension match (numSrcPixel == dir*dstSize)
         public static string GetCopySource(IShaderBuilder builder)
@@ -191,6 +199,7 @@ namespace ImageFramework.Model.Scaling.Down
         private string GetFastSource(IShaderBuilder builder)
         {
             return $@"
+{AdditionalBindings}
 {WeightFunc(weightFunc)}
 
 {HeaderAndMain(builder)}
@@ -222,6 +231,7 @@ namespace ImageFramework.Model.Scaling.Down
         public string GetSlowSource(IShaderBuilder builder)
         {
             return $@"
+{AdditionalBindings}
 {WeightFunc(weightFunc)}
 
  {HeaderAndMain(builder)}
