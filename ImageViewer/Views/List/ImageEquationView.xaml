@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImageViewer.Views.List" 
              xmlns:views="clr-namespace:ImageViewer.Views"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="200" 
              d:DesignWidth="200">
@@ -17,6 +18,11 @@
         Padding="{StaticResource DefaultBorderTop}">
         <GroupBox.Header>
             <Grid>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                        <i:InvokeCommandAction Command="{Binding ToggleVisibilityCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>

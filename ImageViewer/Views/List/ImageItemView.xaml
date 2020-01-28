@@ -18,7 +18,7 @@
         </ContextMenu>
     </UserControl.ContextMenu>
 
-    <Grid>
+    <Grid ToolTip="{Binding ToolTip}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
