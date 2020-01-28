@@ -125,7 +125,7 @@ cbuffer InputBuffer : register(b0) {{
     float3 filterSizeFloat;
 }};
 
-{Utility.Utility.ToSrgbFunction()}
+{Utility.Utility.ToSrgbFunctionUncapped()}
 
 static float4 guideValue; // in sRGB space (perceived difference)
 
