@@ -12,6 +12,7 @@ using ImageFramework.DirectX.Structs;
 using ImageFramework.Model;
 using ImageFramework.Model.Equation;
 using ImageFramework.Model.Filter;
+using ImageFramework.Model.Scaling;
 using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 
@@ -20,11 +21,9 @@ namespace ImageFramework.Controller
     /// <summary>
     /// controller that assures that the pipeline images are up to date
     /// </summary>
-    internal class PipelineController : IDisposable
+    internal class PipelineController
     {
         private readonly Models models;
-        private readonly UploadBuffer layerLevelBuffer;
-        private readonly SyncQuery syncQuery;
         public PipelineController(Models models)
         {
             this.models = models;
@@ -37,11 +36,27 @@ namespace ImageFramework.Controller
                 pipe.Alpha.PropertyChanged += (sender, e) => PipelineFormulaOnPropertyChanged(pipe, pipe.Alpha, e);
             }
 
-            layerLevelBuffer = models.SharedModel.Upload;
-            syncQuery = new SyncQuery();
-
             this.models.Filter.PropertyChanged += FilterOnPropertyChanged;
             this.models.Filter.ParameterChanged += FilterOnParameterChanged;
+            this.models.Scaling.PropertyChanged += ScalingOnPropertyChanged;
+        }
+
+        private void ScalingOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ScalingModel.Minify): 
+                    // mipmap technique has changed => mipmaps need to be recomputed
+                    if (models.Images.NumMipmaps > 1)
+                    {
+                        foreach (var pipeline in models.Pipelines)
+                        {
+                            if(pipeline.RecomputeMipmaps)
+                                pipeline.HasChanges = true;
+                        }
+                    }
+                    break;
+            }
         }
 
         private void FilterOnParameterChanged(object sender, FiltersModel.ParameterChangeEventArgs args)
@@ -87,12 +102,8 @@ namespace ImageFramework.Controller
         {
             var args = new ImagePipeline.UpdateImageArgs
             {
-                Images = models.Images,
-                LayerLevelBuffer = layerLevelBuffer,
-                Progress = models.Progress,
-                TextureCache = models.TextureCache,
+                Models = models,
                 Filters = null,
-                Sync = syncQuery
             };
 
             for (var i = 0; i < models.Pipelines.Count; i++)
@@ -100,10 +111,7 @@ namespace ImageFramework.Controller
                 var pipe = models.Pipelines[i];
                 if (pipe.HasChanges && pipe.IsValid && pipe.IsEnabled)
                 {
-                    if (pipe.UseFilter)
-                    {
-                        args.Filters = GetPipeFilters(i);
-                    }
+                    args.Filters = pipe.UseFilter ? GetPipeFilters(i) : null;
 
                     await pipe.UpdateImageAsync(args, ct);
                 }
@@ -174,11 +182,6 @@ namespace ImageFramework.Controller
         private void UpdateFormulaValidity(ImagePipeline pipe, int numImages)
         {
             pipe.IsValid = pipe.Color.MaxImageId < numImages && pipe.Alpha.MaxImageId < numImages;
-        }
-
-        public void Dispose()
-        {
-            syncQuery?.Dispose();
         }
     }
 }

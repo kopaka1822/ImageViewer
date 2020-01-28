@@ -8,6 +8,7 @@ using System.Windows;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
+using ImageFramework.Model.Scaling;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using SharpDX.DXGI;
@@ -45,9 +46,10 @@ namespace ImageFramework.Model
                 Alias = System.IO.Path.GetFileNameWithoutExtension(filename);
             }
 
-            internal void GenerateMipmaps(int levels)
+            internal void GenerateMipmaps(int levels, ScalingModel scaling)
             {
-                var tmp = Image.GenerateMipmapLevels(levels);
+                var tmp = Image.CloneWithMipmaps(levels);
+                scaling.WriteMipmaps(tmp);
                 Image.Dispose();
                 Image = tmp;
             }
@@ -64,9 +66,9 @@ namespace ImageFramework.Model
                 Image.Dispose();
             }
 
-            public void Scale(Size3 size, MitchellNetravaliScaleShader shader)
+            public void Scale(Size3 size, MitchellNetravaliScaleShader shader, ScalingModel scaling)
             {
-                var tmp = shader.Run((TextureArray2D) Image, size);
+                var tmp = shader.Run((TextureArray2D) Image, size, scaling);
                 Image.Dispose();
                 Image = tmp;
             }
@@ -260,17 +262,17 @@ namespace ImageFramework.Model
         /// <summary>
         /// generates mipmaps for all images
         /// </summary>
-        public void GenerateMipmaps()
+        public void GenerateMipmaps(ScalingModel scaling)
         {
             Debug.Assert(NumMipmaps == 1);
 
             // compute new mipmap levels
-            var levels = ComputeMaxMipLevels();
+            var levels = Size.MaxMipLevels;
             if (levels == NumMipmaps) return;
 
             foreach (var image in Images)
             {
-                image.GenerateMipmaps(levels);
+                image.GenerateMipmaps(levels, scaling);
             }
 
             // recalc dimensions array
@@ -292,22 +294,10 @@ namespace ImageFramework.Model
             OnPropertyChanged(nameof(NumMipmaps));
         }
 
-        public static int ComputeMaxMipLevels(Size3 size)
-        {
-            return ComputeMaxMipLevels(size.Max);
-        }
-
-        public static int ComputeMaxMipLevels(int width)
-        {
-            var maxMip = 1;
-            while ((width /= 2) > 0) ++maxMip;
-            return maxMip;
-        }
-
         /// <summary>
         /// scales all images to the given dimensions
         /// </summary>
-        public void ScaleImages(Size3 size)
+        public void ScaleImages(Size3 size, ScalingModel scaling)
         {
             if (NumImages == 0) return;
             if (Size == size) return;
@@ -318,7 +308,7 @@ namespace ImageFramework.Model
 
             foreach (var imageData in Images)
             {
-                imageData.Scale(size, scaleShader);
+                imageData.Scale(size, scaleShader, scaling);
             }
 
             InitDimensions(images[0].Image);
@@ -326,15 +316,6 @@ namespace ImageFramework.Model
             OnPropertyChanged(nameof(Size));
             if(prevMipmaps != NumMipmaps)
                 OnPropertyChanged(nameof(NumMipmaps));
-        }
-
-        /// <summary>
-        /// computes the maximum amount of mipmap levels for the current width and height
-        /// </summary>
-        /// <returns></returns>
-        private int ComputeMaxMipLevels()
-        {
-            return ComputeMaxMipLevels(Size.Max);
         }
 
         protected void InitDimensions(ITexture image)

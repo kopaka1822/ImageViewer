@@ -23,6 +23,11 @@ namespace ImageFramework.Model.Shader
         string Is3DString { get; }
 
         int Is3DInt { get; }
+
+        string TexelHelperFunctions { get; }
+
+        // doubles are not supported on all devices => this is either "float" or "double" based on the hardware
+        string Double { get; }
     }
 
     public static class ShaderBuilder

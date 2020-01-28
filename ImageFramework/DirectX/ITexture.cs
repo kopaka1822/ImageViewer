@@ -21,6 +21,9 @@ namespace ImageFramework.DirectX
         Format Format { get; }
 
         ShaderResourceView View { get; }
+        bool HasUaViews { get; }
+        bool HasSrViews { get; }
+        bool HasRtViews { get; }
 
         ShaderResourceView GetSrView(int layer, int mipmap);
 
@@ -32,15 +35,21 @@ namespace ImageFramework.DirectX
         unsafe byte[] GetBytes(int layer, int mipmap, uint size);
         void CopyPixels(int layer, int mipmap, IntPtr destination, uint size);
 
-        ITexture GenerateMipmapLevels(int levels);
-        ITexture CloneWithoutMipmaps(int mipmap = 0);
+        /// <summary>
+        /// Creates new texture with nLevels levels and clones the most detailed mipmap
+        /// </summary>
+        ITexture CloneWithMipmaps(int nLevels);
 
         /// <summary>
-        /// inplace mipmap regeneration based on the number of internal levels
+        /// Creates new texture with a single level with the size and data of the specified mipmap
         /// </summary>
-        void RegenerateMipmapLevels();
+        ITexture CloneWithoutMipmaps(int mipmap = 0);
+
         ITexture Create(int numLayer, int numMipmaps, Size3 size, Format format, bool createUav);
 
         ITexture Clone();
+
+        // indicates if both textures have the same dimension, layer, etc. (format excluded)
+        bool HasSameDimensions(ITexture other);
     }
 }

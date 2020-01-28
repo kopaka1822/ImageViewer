@@ -9,7 +9,7 @@
              d:DesignHeight="200" 
              d:DesignWidth="200">
     <UserControl.Resources>
-        <GridLength x:Key="TopGridLength">70</GridLength>
+        <GridLength x:Key="TopGridLength">82</GridLength>
         <GridLength x:Key="BotGridLength">34</GridLength>
     </UserControl.Resources>
     <GroupBox 
@@ -69,7 +69,23 @@
                 <TextBlock Text="Use Filter: "/>
                 <CheckBox 
                     Grid.Column="1"
+                    Grid.Row="0"
                     IsChecked="{Binding UseFilter}"
+                    IsEnabled="{Binding IsVisible}"
+                    VerticalAlignment="Center"/>
+            </Grid>
+            <Grid Margin="{StaticResource DefaultBorderBottom}"
+                  Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Display.EnableMipMaps, Converter={StaticResource VisibleCollapsedConverter}}"
+                  ToolTip="If enabled, mipmaps will be recomputed with the active mipmap technique as a last step">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource TopGridLength}"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Gen Mipmaps: "/>
+                <CheckBox 
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    IsChecked="{Binding RecomputeMipmaps}"
                     IsEnabled="{Binding IsVisible}"
                     VerticalAlignment="Center"/>
             </Grid>

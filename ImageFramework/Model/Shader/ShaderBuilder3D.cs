@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.DirectX;
 
 namespace ImageFramework.Model.Shader
 {
@@ -27,5 +28,12 @@ namespace ImageFramework.Model.Shader
 
         public string Is3DString => "true";
         public int Is3DInt => 1;
+
+        public string TexelHelperFunctions => @"
+int3 texel(int3 coord) {{ return coord; }}
+int3 texel(int3 coord, int layer) {{ return coord; }}
+";
+
+        public string Double => Device.Get().SupportsDouble ? "double" : "float";
     }
 }

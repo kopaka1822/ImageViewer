@@ -138,6 +138,15 @@
     <Compile Include="Model\ImagesModel.cs" />
     <Compile Include="Model\Models.cs" />
     <Compile Include="Model\ProgressModel.cs" />
+    <Compile Include="Model\Scaling\Down\DetailPreservingShaderCore.cs" />
+    <Compile Include="Model\Scaling\Down\DownscalingShaderBase.cs" />
+    <Compile Include="Model\Scaling\Down\BoxScalingShader.cs" />
+    <Compile Include="Model\Scaling\Down\DetailPreservingDownscalingShader.cs" />
+    <Compile Include="Model\Scaling\Down\FastGaussShader.cs" />
+    <Compile Include="Model\Scaling\Down\LanzosScalingShader.cs" />
+    <Compile Include="Model\Scaling\Down\TriangleScalingShader.cs" />
+    <Compile Include="Model\Scaling\Down\IDownscalingShader.cs" />
+    <Compile Include="Model\Scaling\ScalingModel.cs" />
     <Compile Include="Model\Shader\ConvertPolarShader.cs" />
     <Compile Include="Model\Shader\FilterShader.cs" />
     <Compile Include="Model\Shader\GifShader.cs" />
@@ -155,6 +164,8 @@
     <Compile Include="Model\Statistics\DefaultStatistics.cs" />
     <Compile Include="Model\Statistics\StatisticsModel.cs" />
     <Compile Include="Model\ThumbnailModel.cs" />
+    <Compile Include="Utility\ImageModelTextureCache.cs" />
+    <Compile Include="Utility\ITextureCache.cs" />
     <Compile Include="Utility\TextureCache.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -223,11 +234,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Filter\min_max_radius.hlsl">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Filter\mipmap_box.hlsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

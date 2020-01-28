@@ -74,6 +74,7 @@
     <Compile Include="Model\Equation\EquationTest.cs" />
     <Compile Include="Model\Equation\ImageCombineTest.cs" />
     <Compile Include="Model\ExportTest.cs" />
+    <Compile Include="Model\Scaling\DownscalingTest.cs" />
     <Compile Include="Model\Shader\ConvertFormatShaderTest.cs" />
     <Compile Include="Model\Shader\GifShaderTest.cs" />
     <Compile Include="Model\Shader\PixelValueShaderTest.cs" />

@@ -15,6 +15,7 @@ using ImageFramework.Model.Export;
 using ImageViewer.DirectX;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
+using SharpDX;
 using SharpDX.Mathematics.Interop;
 using Color = ImageFramework.Utility.Color;
 using Size = System.Drawing.Size;
@@ -155,7 +156,16 @@ namespace ImageViewer.Controller
                     gpuTimer.Stop();
                 }
 
-                swapChain.EndFrame();
+                try
+                {
+
+                    swapChain.EndFrame();
+                }
+                catch (SharpDXException e)
+                {
+                    models.Window.ShowErrorDialog(e.Message);
+                    models.Window.Window.Close();
+                }
             }
 
             models.Display.FrameTime = gpuTimer.Get();

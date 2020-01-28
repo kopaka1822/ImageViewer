@@ -166,7 +166,8 @@
             <MenuItem 
                     Header="Generate Mipmaps"
                     Command="{Binding GenerateMipmapsCommand}"
-                    IsEnabled="{Binding Progress.NotProcessing}">
+                    IsEnabled="{Binding Progress.NotProcessing}"
+                    ToolTip="Generates mipmaps with the current mipmap technique.">
                 <MenuItem.Icon>
                     <Image 
                             Source="../Icons/image.png"
@@ -174,6 +175,50 @@
                             Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <MenuItem
+                Header="Mipmap Technique"
+                ToolTip="Technique used for mipmap generation"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem 
+                    Header="Box Filter (Default)"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseBoxFilter}"
+                    ToolTip="All samples are weighted equally."/>
+                <MenuItem 
+                    Header="Triangle Low-Pass"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseTriangleFilter}"
+                    ToolTip="The kernel function looks like a tent (1.0 - abs(x)) and the kernel radius is twice as large."/>
+                <MenuItem 
+                    Header="Lanczos Low-Pass"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseLanzosFilter}"
+                    ToolTip="Samples near the center have a higher weight and the kernel radius is three times bigger. Very similar to Kaiser filter."/>
+                <MenuItem 
+                    Header="Detail Preserving"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseDetailPreserving}"
+                    ToolTip="Details are preserved when downscaling. Based on 'Rapid, Detail-Preserving Image Downscaling'"/>
+                <MenuItem 
+                    Header="Detail Preserving (Stronger)"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseVeryDetailPreserving}"
+                    ToolTip="Details are preserved when downscaling. Based on 'Rapid, Detail-Preserving Image Downscaling'"/>
+                <MenuItem 
+                    Header="Help"
+                    ToolTip="Displays overview of existing mipmap techniques."
+                    Command="{Binding HelpCommand}">
+                    <MenuItem.CommandParameter>
+                        <system:String>help/mipmaps.md</system:String>
+                    </MenuItem.CommandParameter>
+                    <MenuItem.Icon>
+                        <Image 
+                            Source="../Icons/help.png"
+                            Width="16" 
+                            Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                </MenuItem>
             <MenuItem 
                     Header="Delete Mipmaps"
                     Command="{Binding DeleteMipmapsCommand}"
@@ -228,13 +273,20 @@
                         <system:String>help/equation.md</system:String>
                     </MenuItem.CommandParameter>
             </MenuItem>
-                <MenuItem
+            <MenuItem
                     Header="Filter Manual"
                     Command="{Binding HelpCommand}">
                     <MenuItem.CommandParameter>
                         <system:String>help/filter_manual.md</system:String>
                     </MenuItem.CommandParameter>
             </MenuItem>
+            <MenuItem
+                Header="Mipmaps"
+                Command="{Binding HelpCommand}">
+                <MenuItem.CommandParameter>
+                    <system:String>help/mipmaps.md</system:String>
+                </MenuItem.CommandParameter>
             </MenuItem>
+        </MenuItem>
     </Menu>
 </UserControl>

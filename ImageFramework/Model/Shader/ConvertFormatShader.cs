@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.ImageLoader;
+using ImageFramework.Model.Scaling;
 using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
@@ -43,17 +44,16 @@ namespace ImageFramework.Model.Shader
         /// <param name="dst">destination texture</param>
         /// <param name="dstLayer"></param>
         /// <param name="dstMip"></param>
-        public void CopyLayer(TextureArray2D src, int srcLayer, int srcMip, TextureArray2D dst, int dstLayer,
-            int dstMip)
+        public void CopyLayer(ITexture src, int srcLayer, int srcMip, ITexture dst, int dstLayer, int dstMip)
         {
             Debug.Assert(src.Size == dst.Size);
 
             var dev = DirectX.Device.Get();
-            quad.Bind(false);
-            dev.Pixel.Set(convert2D.Pixel);
+            quad.Bind(src.Is3D);
+            if (src.Is3D) dev.Pixel.Set(convert3D.Pixel);
+            else dev.Pixel.Set(convert2D.Pixel);
 
             dev.Pixel.SetShaderResource(0, src.View);
-
  
             cbuffer.SetData(new LayerLevelOffsetData
             {
@@ -68,11 +68,12 @@ namespace ImageFramework.Model.Shader
             dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
             dev.OutputMerger.SetRenderTargets(dst.GetRtView(dstLayer, dstMip));
             dev.SetViewScissors(dim.Width, dim.Height);
-            dev.DrawQuad();
+            dev.DrawFullscreenTriangle(dim.Depth);
 
             // remove bindings
             dev.Pixel.SetShaderResource(0, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            quad.Unbind();
         }
 
         /// <summary>
@@ -83,9 +84,9 @@ namespace ImageFramework.Model.Shader
         /// <param name="mipmap">mipmap to export, -1 for all mipmaps</param>
         /// <param name="layer">layer to export, -1 for all layers</param>
         /// <param name="multiplier">rgb channels will be multiplied by this value</param>
-        public ITexture Convert(ITexture texture, SharpDX.DXGI.Format dstFormat, int mipmap = -1, int layer = -1, float multiplier = 1.0f)
+        public ITexture Convert(ITexture texture, SharpDX.DXGI.Format dstFormat, ScalingModel scaling, int mipmap = -1, int layer = -1, float multiplier = 1.0f)
        {
-            return Convert(texture, dstFormat, mipmap, layer, multiplier, false, Size3.Zero, Size3.Zero, Size3.Zero);
+            return Convert(texture, dstFormat, mipmap, layer, multiplier, false, Size3.Zero, Size3.Zero, Size3.Zero, scaling);
        }
 
         /// <summary>
@@ -102,7 +103,7 @@ namespace ImageFramework.Model.Shader
         /// <param name="align">if nonzero: texture width will be aligned to this (rounded down)</param>
         /// <returns></returns>
         public ITexture Convert(ITexture texture, SharpDX.DXGI.Format dstFormat, int mipmap, int layer, float multiplier, bool crop, 
-            Size3 offset, Size3 size, Size3 align)
+            Size3 offset, Size3 size, Size3 align, ScalingModel scaling)
         {
             Debug.Assert(ImageFormat.IsSupported(dstFormat));
             Debug.Assert(ImageFormat.IsSupported(texture.Format));
@@ -142,7 +143,7 @@ namespace ImageFramework.Model.Shader
             if (recomputeMips)
             {
                 // number of mipmaps might have changed
-                nMipmaps = ImagesModel.ComputeMaxMipLevels(size);
+                nMipmaps = size.MaxMipLevels;
                 recomputeMips = nMipmaps > 1;
             }
 
@@ -185,7 +186,7 @@ namespace ImageFramework.Model.Shader
 
             if (recomputeMips)
             {
-                res.RegenerateMipmapLevels();
+                scaling.WriteMipmaps(res);
             }
 
             return res;
@@ -289,13 +290,19 @@ struct PixelIn
 {{
     float2 texcoord : TEXCOORD;
     float4 projPos : SV_POSITION;
+#if {builder.Is3DInt}
     uint depth : SV_RenderTargetArrayIndex;
+#endif
 }};
 
 float4 main(PixelIn i) : SV_TARGET
 {{
     float4 coord = i.projPos;
-    float4 color = in_tex.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), layer + i.depth)];
+    uint curLayer = layer;
+#if {builder.Is3DInt}
+    curLayer += i.depth;
+#endif
+    float4 color = in_tex.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), curLayer)];
 	color.rgb *= multiplier;
 	return color;
 }}

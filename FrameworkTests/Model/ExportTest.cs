@@ -107,6 +107,8 @@ namespace FrameworkTests.Model
             model.Export.CropEndZ = 3;
             model.Apply();
             
+            TestData.TestCheckers3DLevel0(model.Pipelines[0].Image.GetPixelColors(0, 0));
+
             model.ExportPipelineImage(ExportDir + "cropped", "dds", GliFormat.RGBA8_SRGB);
             var newTex = new Texture3D(IO.LoadImage(ExportDir + "cropped.dds"));
 
@@ -419,7 +421,7 @@ namespace FrameworkTests.Model
                         out var resource, out var resourceView, 0, out var alphaMode);
 
                     // convert to obtain color data
-                    using (var newTex = model.Export.convert.ConvertFromRaw(resourceView, origTex.Size, Format.R32G32B32A32_Float, isIntegerPrecision))
+                    using (var newTex = model.SharedModel.Convert.ConvertFromRaw(resourceView, origTex.Size, Format.R32G32B32A32_Float, isIntegerPrecision))
                     {
                         resourceView.Dispose();
                         resource.Dispose();
@@ -491,7 +493,7 @@ namespace FrameworkTests.Model
                         out var resource, out var resourceView, 0, out var alphaMode);
 
                     // convert to obtain color data
-                    using (var newTex = model.Export.convert.ConvertFromRaw3D(resourceView, origTex.Size, Format.R32G32B32A32_Float, isIntegerPrecision))
+                    using (var newTex = model.SharedModel.Convert.ConvertFromRaw3D(resourceView, origTex.Size, Format.R32G32B32A32_Float, isIntegerPrecision))
                     {
                         resourceView.Dispose();
                         resource.Dispose();

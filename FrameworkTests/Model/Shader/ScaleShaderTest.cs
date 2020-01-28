@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
+using ImageFramework.Model;
 using ImageFramework.Model.Export;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
@@ -18,10 +19,11 @@ namespace FrameworkTests.Model.Shader
         [TestMethod]
         public void MitchelUpscale()
         {
+            var models = new Models(1);
             var shader = new MitchellNetravaliScaleShader(new QuadShader(), new UploadBuffer(256));
             var checkers = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere.png"));
 
-            var res = shader.Run(checkers, new Size3(62, 31));
+            var res = shader.Run(checkers, new Size3(62, 31), models.Scaling);
 
             var reference = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere_up.png"));
 
@@ -32,10 +34,11 @@ namespace FrameworkTests.Model.Shader
         [TestMethod]
         public void MitchelXYScale()
         {
+            var models = new Models(1);
             var shader = new MitchellNetravaliScaleShader(new QuadShader(), new UploadBuffer(256));
             var checkers = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere.png"));
 
-            var res = shader.Run(checkers, new Size3(20, 40));
+            var res = shader.Run(checkers, new Size3(20, 40), models.Scaling);
 
             var reference = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere_scaled.png"));
 

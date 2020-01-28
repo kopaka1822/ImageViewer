@@ -13,12 +13,14 @@ using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
 using ImageFramework.Model.Filter;
+using ImageFramework.Model.Scaling;
 using ImageFramework.Model.Shader;
 using ImageFramework.Model.Statistics;
 using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Device = ImageFramework.DirectX.Device;
+using Feature = SharpDX.DXGI.Feature;
 using Texture3D = ImageFramework.DirectX.Texture3D;
 
 namespace ImageFramework.Model
@@ -42,7 +44,7 @@ namespace ImageFramework.Model
         public int NumEnabled => Pipelines.Count(pipe => pipe.IsEnabled);
 
         private ExportModel export = null;
-        public ExportModel Export => export ?? (export = new ExportModel(SharedModel, Progress));
+        public ExportModel Export => export ?? (export = new ExportModel(this));
 
         // soft reset that clears images, filters and resets formulas
         public event EventHandler SoftReset;
@@ -54,7 +56,7 @@ namespace ImageFramework.Model
 
         public SharedModel SharedModel { get; }
         
-        internal TextureCache TextureCache { get; }
+        internal ITextureCache TextureCache { get; }
 
         private readonly PipelineController pipelineController;
 
@@ -78,6 +80,9 @@ namespace ImageFramework.Model
         private ConvertPolarShader PolarConvertShader =>
             polarConvertShader ?? (polarConvertShader = new ConvertPolarShader(SharedModel.QuadShader));
 
+        private ScalingModel scaling = null;
+        public ScalingModel Scaling => scaling ?? (scaling = new ScalingModel(this));
+
         #endregion
 
         public Models(int numPipelines = 1)
@@ -87,7 +92,7 @@ namespace ImageFramework.Model
 
             SharedModel = new SharedModel();
             Images = new ImagesModel(SharedModel.ScaleShader);
-            TextureCache = new TextureCache(Images);
+            TextureCache = new ImageModelTextureCache(Images);
 
             Filter = new FiltersModel(Images);
             Progress = new ProgressModel();
@@ -117,6 +122,8 @@ namespace ImageFramework.Model
             }
             OnSoftReset();
         }
+
+        
 
         private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -151,7 +158,7 @@ namespace ImageFramework.Model
         /// Image format will be BGRA8 because this is the format expected for windows bitmaps
         public TextureArray2D CreateThumbnail(int size, ITexture texture, int layer = 0)
         {
-            return Thumbnail.CreateThumbnail(size, texture, Format.B8G8R8A8_UNorm_SRgb, layer);
+            return Thumbnail.CreateThumbnail(size, texture, Format.B8G8R8A8_UNorm_SRgb, layer, Scaling);
         }
 
         /// <summary>
@@ -284,19 +291,15 @@ namespace ImageFramework.Model
                 if((sup & FormatSupport.Texture3D) == 0)
                     throw new Exception($"Texture3D support for {f} is required");
 
-                // TODO this can be optional
-                if ((sup & FormatSupport.MipAutogen) == 0)
-                    throw new Exception($"MipAutogen support for {f} is required");
-
                 if ((sup & FormatSupport.RenderTarget) == 0)
                     throw new Exception($"RenderTarget support for {f} is required");
+                if ((sup & FormatSupport.TextureCube) == 0)
+                    throw new Exception($"TextureCube support for {f} is required");
 
                 if (f == Format.R32G32B32A32_Float)
                 {
                     if ((sup & FormatSupport.TypedUnorderedAccessView) == 0)
-                        throw new Exception($"TypesUnorderedAccess support for {f} is required");
-                    if((sup & FormatSupport.TextureCube) == 0)
-                        throw new Exception($"TextureCube support for {f} is required");
+                        throw new Exception($"TypedUnorderedAccess support for {f} is required");
                 }
             }
         }
@@ -307,6 +310,7 @@ namespace ImageFramework.Model
             thumbnail?.Dispose();
             stats?.Dispose();
             gif?.Dispose();
+            scaling?.Dispose();
 
             Images?.Dispose();
             Filter?.Dispose();

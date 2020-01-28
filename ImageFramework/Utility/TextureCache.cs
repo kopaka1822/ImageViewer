@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using ImageFramework.DirectX;
-using ImageFramework.Model;
 using SharpDX.DXGI;
 
 namespace ImageFramework.Utility
 {
-    internal class TextureCache
+    internal class TextureCache : ITextureCache
     {
         private readonly Stack<ITexture> textures = new Stack<ITexture>(2);
-        private readonly ImagesModel images;
+        private readonly ITexture templateTex;
 
-        public TextureCache(ImagesModel images)
+        public TextureCache(ITexture templateTexture)
         {
-            this.images = images;
-            images.PropertyChanged += ImagesOnPropertyChanged;
+            this.templateTex = templateTexture;
         }
 
         /// <summary>
@@ -28,7 +25,8 @@ namespace ImageFramework.Utility
             if (textures.Count > 0) return textures.Pop();
 
             // make new texture with the current configuration
-            return images.CreateEmptyTexture();
+            return templateTex.Create(templateTex.NumLayers, templateTex.NumMipmaps, templateTex.Size,
+                Format.R32G32B32A32_Float, true);
         }
 
         /// <summary>
@@ -37,17 +35,16 @@ namespace ImageFramework.Utility
         /// <param name="tex"></param>
         public void StoreTexture(ITexture tex)
         {
+            Debug.Assert(IsCompatibleWith(tex));
+            
+            // can be used for later
+            textures.Push(tex);
+        }
+
+        public bool IsCompatibleWith(ITexture tex)
+        {
             Debug.Assert(tex != null);
-            if (images.HasMatchingProperties(tex))
-            {
-                // can be used for later
-                textures.Push(tex);
-            }
-            else
-            {
-                // immediately discard (incompatible image)
-                tex.Dispose();
-            }
+            return templateTex.HasSameDimensions(tex);
         }
 
         /// <summary>
@@ -60,15 +57,6 @@ namespace ImageFramework.Utility
                 tex.Dispose();
             }
             textures.Clear();
-        }
-
-        private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
-            if (args.PropertyName == nameof(ImagesModel.NumLayers) ||
-                args.PropertyName == nameof(ImagesModel.NumMipmaps) ||
-                args.PropertyName == nameof(ImagesModel.Size) || 
-                args.PropertyName == nameof(ImagesModel.ImageType))
-                Clear();
         }
 
         public void Dispose()

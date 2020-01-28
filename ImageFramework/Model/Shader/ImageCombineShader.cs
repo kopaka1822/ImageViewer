@@ -18,7 +18,7 @@ namespace ImageFramework.Model.Shader
                 GetShaderSource(colorFormula, alphaFormula, Math.Max(numImages, 1), builder), "ImageCombineShader");
         }
 
-        public void Run(ImagesModel images, UploadBuffer constantBuffer, ITexture target)
+        public void Run(ImagesModel images, UploadBuffer constantBuffer, ITexture target, int numMipmaps)
         {
             var dev = Device.Get();
             dev.Compute.Set(shader.Compute);
@@ -29,7 +29,8 @@ namespace ImageFramework.Model.Shader
                 dev.Compute.SetShaderResource(i, images.Images[i].Image.View);
             }
 
-            for (int curMipmap = 0; curMipmap < images.NumMipmaps; ++curMipmap)
+
+            for (int curMipmap = 0; curMipmap < numMipmaps; ++curMipmap)
             {
                 var size = images.GetSize(curMipmap);
 

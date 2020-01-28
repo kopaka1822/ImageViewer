@@ -42,6 +42,25 @@ namespace ImageFramework.Model
             }
         }
 
+        private bool recomputeMipmaps = false;
+        /// <summary>
+        /// indicates if mipmaps will be recomputed in the end.
+        /// if enabled: image combination and filters will only be executed on the upper layer => then mipmaps will be generated
+        /// if disabled: image combination and filters will be executed on all layers => no mipmap recalculation
+        /// </summary>
+        public bool RecomputeMipmaps
+        {
+            get => recomputeMipmaps;
+            set
+            {
+                if(value == recomputeMipmaps) return;
+                recomputeMipmaps = value;
+                OnPropertyChanged(nameof(RecomputeMipmaps));
+                HasChanges = true;
+            }
+        }
+        
+
         private bool isEnabled = true;
 
         /// <summary>
@@ -102,118 +121,146 @@ namespace ImageFramework.Model
 
         internal class UpdateImageArgs
         {
-            public ImagesModel Images;
-            public ProgressModel Progress;
-            public TextureCache TextureCache;
-            public UploadBuffer LayerLevelBuffer;
+            public Models Models;
             public List<FilterModel> Filters;
-            public SyncQuery Sync;
         }
 
         internal async Task UpdateImageAsync(UpdateImageArgs args, CancellationToken ct)
         {
             Debug.Assert(HasChanges);
             Debug.Assert(IsValid);
-            Debug.Assert(Color.MaxImageId < args.Images.NumImages);
-            Debug.Assert(Alpha.MaxImageId < args.Images.NumImages);
+            Debug.Assert(Color.MaxImageId < args.Models.Images.NumImages);
+            Debug.Assert(Alpha.MaxImageId < args.Models.Images.NumImages);
 
-            args.Progress.Progress = 0.0f;
-            args.Progress.What = "resolving equation";
+            args.Models.Progress.Progress = 0.0f;
+            args.Models.Progress.What = "resolving equation";
 
-            // early out if color and alpha are from an input image
-            if (Color.Formula.Length == 2 && Color.Formula.StartsWith("I") && Alpha.Formula == Color.Formula && (!UseFilter || args.Filters.Count == 0))
-            {
-                // just reference the input image
-                if (int.TryParse(Color.Formula.Substring(1), out var imgId))
-                {
-                    Image = args.Images.Images[imgId].Image;
-                    cachedTexture = false; // image was not taken from the image cache
-                    HasChanges = false;
-                    OnPropertyChanged(nameof(Image));
-                    return;
-                }
-            }
+            if (TryMatchingInputImage(args)) return;
 
             try
             {
-                // first, use the combine shader
-                using (var shader = new ImageCombineShader(Color.Converted, Alpha.Converted, args.Images.NumImages,
-                    ShaderBuilder.Get(args.Images.ImageType)))
-                {
-                    var texSrc = args.TextureCache.GetTexture();
-
-                    shader.Run(args.Images, args.LayerLevelBuffer, texSrc);
-
-                    Image = texSrc;
-                }
+                // combine according to color and alpha formula
+                ExecuteImageCombineShader(args);
 
                 // next, apply filter
                 if (UseFilter && args.Filters.Count != 0)
                 {
-                    Debug.Assert(args.Filters != null);
-
-                    // get a second texture and swap between source and destination image
-                    ITexture[] tex = new ITexture[2];
-                    tex[0] = Image;
-                    Image = null;
-                    tex[1] = args.TextureCache.GetTexture();
-                    int srcIdx = 0;
-
-                    try
-                    {
-                        for (var index = 0; index < args.Filters.Count; index++)
-                        {
-                            var filter = args.Filters[index];
-                            // TODO update parameters only on change
-                            filter.Shader.UpdateParamBuffer();
-
-                            for (int iteration = 0; iteration < filter.NumIterations; ++iteration)
-                            {
-                                await DoFilterIterationAsync(args, index, tex[srcIdx], tex[1 - srcIdx], iteration, ct);
-                                srcIdx = 1 - srcIdx;
-                            }
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        args.TextureCache.StoreTexture(tex[0]);
-                        args.TextureCache.StoreTexture(tex[1]);
-                        throw;
-                    }
-
-                    // all filter were executed
-                    Image = tex[srcIdx];
-                    args.TextureCache.StoreTexture(tex[1 - srcIdx]);
+                    await ExecuteFilter(args, ct);
                 }
 
-                args.Progress.Progress = 1.0f;
+                // compute mipmaps
+                args.Models.Progress.Progress = 1.0f;
+                if (RecomputeMipmaps && args.Models.Images.NumMipmaps > 1)
+                {
+                    await args.Models.Scaling.WriteMipmapsAsync(Image, ct);
+                }
+
                 HasChanges = false;
                 OnPropertyChanged(nameof(Image));
             }
             catch (OperationCanceledException)
             {
                 // changes remain true
+                Console.WriteLine("ImagePipeline threw OperationCancelledException");
                 IsValid = false;
                 throw;
             }
         }
+
+        private bool TryMatchingInputImage(UpdateImageArgs args)
+        {
+            // early out if color and alpha are from an input image
+            if (Color.Formula.Length == 2 && Color.Formula.StartsWith("I") && Alpha.Formula == Color.Formula // one of the input images
+                && (!UseFilter || args.Filters.Count == 0) // no filters used
+                && (!RecomputeMipmaps || args.Models.Images.NumMipmaps <= 1)) // no mipmap re computation
+            {
+                // just reference the input image
+                if (int.TryParse(Color.Formula.Substring(1), out var imgId))
+                {
+                    Image = args.Models.Images.Images[imgId].Image;
+                    cachedTexture = false; // image was not taken from the image cache
+                    HasChanges = false;
+                    OnPropertyChanged(nameof(Image));
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void ExecuteImageCombineShader(UpdateImageArgs args)
+        {
+            // first, use the combine shader
+            using (var shader = new ImageCombineShader(Color.Converted, Alpha.Converted, args.Models.Images.NumImages,
+                ShaderBuilder.Get(args.Models.Images.ImageType)))
+            {
+                var texSrc = args.Models.TextureCache.GetTexture();
+
+                // do for all mipmaps if no mipmap re computation is enabled
+                var nMipmaps = RecomputeMipmaps ? 1 : args.Models.Images.NumMipmaps;
+                shader.Run(args.Models.Images, args.Models.SharedModel.Upload, texSrc, nMipmaps);
+
+                Image = texSrc;
+            }
+        }
+
+        private async Task ExecuteFilter(UpdateImageArgs args, CancellationToken ct)
+        {
+            // get a second texture and swap between source and destination image
+            ITexture[] tex = new ITexture[2];
+            tex[0] = Image;
+            Image = null;
+            tex[1] = args.Models.TextureCache.GetTexture();
+            int srcIdx = 0;
+
+            try
+            {
+                for (var index = 0; index < args.Filters.Count; index++)
+                {
+                    var filter = args.Filters[index];
+                    // TODO update parameters only on change
+                    filter.Shader.UpdateParamBuffer();
+
+                    for (int iteration = 0; iteration < filter.NumIterations; ++iteration)
+                    {
+                        await DoFilterIterationAsync(args, index, tex[srcIdx], tex[1 - srcIdx], iteration, ct);
+                        srcIdx = 1 - srcIdx;
+                    }
+                }
+                // last chance before mipmap generation
+                ct.ThrowIfCancellationRequested();
+            }
+            catch (Exception)
+            {
+                args.Models.TextureCache.StoreTexture(tex[0]);
+                args.Models.TextureCache.StoreTexture(tex[1]);
+                throw;
+            }
+
+            // all filter were executed
+            args.Models.TextureCache.StoreTexture(tex[1 - srcIdx]);
+            Image = tex[srcIdx];
+        }
+
 
         private Task DoFilterIterationAsync(UpdateImageArgs args, int index, ITexture src, ITexture dst, int iteration, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
             var filter = args.Filters[index];
 
-            filter.Shader.Run(args.Images, src, dst, args.LayerLevelBuffer, iteration);
-            args.Sync.Set();
+            // do for all mipmaps if no mipmap re computation is enabled
+            var nMipmaps = RecomputeMipmaps ? 1 : args.Models.Images.NumMipmaps;
+            filter.Shader.Run(args.Models.Images, src, dst, args.Models.SharedModel.Upload, iteration, nMipmaps);
+            args.Models.SharedModel.Sync.Set();
 
             var step = 1.0f / args.Filters.Count;
-            args.Progress.Progress = index * step + iteration * step * 0.5f;
-            args.Progress.What = filter.Name;
+            args.Models.Progress.Progress = index * step + iteration * step * 0.5f;
+            args.Models.Progress.What = filter.Name;
 
-            return args.Sync.WaitForGpuAsync(ct);
+            return args.Models.SharedModel.Sync.WaitForGpuAsync(ct);
         }
 
-        internal void ResetImage(TextureCache cache)
+        internal void ResetImage(ITextureCache cache)
         {
             if (Image != null)
             {

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using FrameworkTests.ImageLoader;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
+using ImageFramework.Model;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -18,17 +19,19 @@ namespace FrameworkTests.Model.Shader
     public class ConvertFormatShaderTest
     {
         private ConvertFormatShader shader;
+        private Models models;
 
         [TestInitialize]
         public void Init()
         {
-            shader = new ConvertFormatShader(new QuadShader(), new UploadBuffer(256));
+            models = new Models(1);
+            shader = models.SharedModel.Convert;
         }
 
         [TestCleanup]
         public void Cleanup()
         {
-            shader?.Dispose();
+            models?.Dispose();
         }
 
         [TestMethod]
@@ -36,7 +39,7 @@ namespace FrameworkTests.Model.Shader
         {
             var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "small_a.png"));
 
-            var newTex = shader.Convert(tex, Format.R32G32B32A32_Float);
+            var newTex = shader.Convert(tex, Format.R32G32B32A32_Float, models.Scaling);
 
             TestData.CompareWithSmall(newTex.GetPixelColors(0, 0), Color.Channel.Rgba);
         }
@@ -47,7 +50,7 @@ namespace FrameworkTests.Model.Shader
             // convert from RGBA32F to RGBA8_SRGB
             var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "small.pfm"));
 
-            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb);
+            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, models.Scaling);
 
             TestData.CompareWithSmall(newTex.GetPixelColors(0, 0), Color.Channel.Rgb);
         }
@@ -55,13 +58,14 @@ namespace FrameworkTests.Model.Shader
         [TestMethod]
         public void ExtractMipmap()
         {
+ 
             var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "checkers.dds"));
             Assert.AreEqual(3, tex.NumMipmaps);
             TestData.TestCheckersLevel0(tex.GetPixelColors(0, 0));
             TestData.TestCheckersLevel1(tex.GetPixelColors(0, 1));
             TestData.TestCheckersLevel2(tex.GetPixelColors(0, 2));
 
-            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 1);
+            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, models.Scaling, 1);
             Assert.AreEqual(1, newTex.NumMipmaps);
             Assert.AreEqual(2, newTex.Size.Width);
             Assert.AreEqual(2, newTex.Size.Height);
@@ -77,7 +81,7 @@ namespace FrameworkTests.Model.Shader
             TestData.TestCheckersLevel1(tex.GetPixelColors(0, 1));
             TestData.TestCheckersLevel2(tex.GetPixelColors(0, 2));
 
-            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, -1, 1.0f, true, new Size3(1, 1, 0), new Size3(2, 2), Size3.Zero);
+            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, -1, 1.0f, true, new Size3(1, 1, 0), new Size3(2, 2), Size3.Zero, models.Scaling);
             Assert.AreEqual(1, newTex.NumMipmaps);
             Assert.AreEqual(2, newTex.Size.Width);
             Assert.AreEqual(2, newTex.Size.Height);
@@ -94,7 +98,7 @@ namespace FrameworkTests.Model.Shader
             Assert.AreEqual(1, tex.Size.Height % 4);
             
             // convert with 4 texel alignment
-            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, 0, 1.0f, false, Size3.Zero, Size3.Zero, new Size3(4, 4, 0));
+            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, 0, 1.0f, false, Size3.Zero, Size3.Zero, new Size3(4, 4, 0), models.Scaling);
             Assert.AreEqual(0, newTex.Size.Width % 4);
             Assert.AreEqual(0, newTex.Size.Height % 4);
         }
@@ -105,7 +109,7 @@ namespace FrameworkTests.Model.Shader
             var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "checkers.dds"));
 
             // multiply with 0.5f
-            var newTex = shader.Convert(tex, Format.B8G8R8A8_UNorm_SRgb, 1, 0, 0.5f);
+            var newTex = shader.Convert(tex, Format.B8G8R8A8_UNorm_SRgb, models.Scaling, 1, 0, 0.5f);
             var colors = newTex.GetPixelColors(0, 0);
 
             Assert.AreEqual(2, newTex.Size.Width);

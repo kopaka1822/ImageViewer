@@ -54,6 +54,17 @@ namespace ImageFramework.Utility
         public int Min => Math.Min(Math.Min(X, Y), Z);
         public int Product => X * Y * Z;
 
+        public int MaxMipLevels
+        {
+            get
+            {
+                var max = Max;
+                var maxMip = 1;
+                while ((max /= 2) > 0) ++maxMip;
+                return maxMip;
+            }
+        }
+
         public Size3(int val = 0)
         {
             X = val;

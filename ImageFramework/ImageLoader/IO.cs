@@ -42,7 +42,6 @@ namespace ImageFramework.ImageLoader
             return new Image(res, file, nLayer, nMipmaps, new ImageFormat((GliFormat)gliFormat), (GliFormat)originalFormat);
         }
 
-        
 
         /// <summary>
         /// loads image into the correct texture type
@@ -56,6 +55,12 @@ namespace ImageFramework.ImageLoader
                 if(img.Is3D) return new Texture3D(img);
                 return new TextureArray2D(img);
             }
+        }
+
+        /// <inheritdoc cref="LoadImageTexture(string,out ImageFramework.ImageLoader.GliFormat)"/>
+        public static ITexture LoadImageTexture(string file)
+        {
+            return LoadImageTexture(file, out var dummy);
         }
 
         public class TexInfo

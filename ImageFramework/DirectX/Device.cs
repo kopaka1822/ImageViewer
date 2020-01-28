@@ -27,6 +27,8 @@ namespace ImageFramework.DirectX
         public SharpDX.Direct3D11.Device Handle { get; }
         public SharpDX.DXGI.Factory FactoryHandle { get; }
 
+        public bool SupportsDouble { get; }
+
         private static Device instance = new Device();
         private Device()
         {
@@ -44,6 +46,7 @@ namespace ImageFramework.DirectX
             context = Handle.ImmediateContext;
 
             SetDefaults();
+            SupportsDouble = Handle.CheckFeatureSupport(SharpDX.Direct3D11.Feature.ShaderDoubles);
         }
 
         public static Device Get()
@@ -69,12 +72,6 @@ namespace ImageFramework.DirectX
             context.CopySubresourceRegion(src, srcSubresource, new ResourceRegion(0, 0, 0, size.Width, size.Height, size.Depth), 
                 dst, dstSubresource);
         }
-
-        public void GenerateMips(ShaderResourceView res)
-        {
-            context.GenerateMips(res);
-        }
-
         public byte[] GetData(Resource res, int subresource, Size3 size, int pixelByteSize)
         {
             var result = new byte[size.Product * pixelByteSize];
@@ -192,8 +189,14 @@ namespace ImageFramework.DirectX
             }
         }
 
+        public static readonly int DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION = 65535;
+
         public void Dispatch(int x, int y, int z = 1)
         {
+            // test agains feature level 11.0 specs
+            Debug.Assert(x <= DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION);
+            Debug.Assert(y <= DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION);
+            Debug.Assert(z <= DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION);
             context.Dispatch(x, y, z);
         }
 

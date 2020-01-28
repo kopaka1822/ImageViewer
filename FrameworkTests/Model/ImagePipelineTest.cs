@@ -151,7 +151,7 @@ namespace FrameworkTests.Model
 
             Assert.IsFalse(model.Pipelines[0].HasChanges);
 
-            model.Images.ScaleImages( new Size3(5, 6));
+            model.Images.ScaleImages( new Size3(5, 6), model.Scaling);
             Assert.IsTrue(model.Pipelines[0].HasChanges);
 
             model.Apply();
@@ -159,6 +159,30 @@ namespace FrameworkTests.Model
             Assert.AreEqual(6, model.Images.Size.Height);
             Assert.AreEqual(5, model.Pipelines[0].Image.Size.Width);
             Assert.AreEqual(6, model.Pipelines[0].Image.Size.Height);
+        }
+
+        [TestMethod]
+        public void MipmapGeneration()
+        {
+            var model = new Models(1);
+            model.AddImageFromFile(TestData.Directory + "checkers.dds");
+            model.Pipelines[0].Color.Formula = "(I0+1)^2"; // nonlinear transformation on image
+            model.Pipelines[0].RecomputeMipmaps = true;
+            model.Apply();
+
+            Assert.IsFalse(model.Pipelines[0].HasChanges);
+            // check image data
+            var mip1 = model.Pipelines[0].Image.GetPixelColors(0, 1);
+            Assert.AreEqual(4, mip1.Length);
+            Assert.IsTrue(mip1[0].Equals(new Color(1.0f), Color.Channel.Rgb));
+            Assert.IsTrue(mip1[1].Equals(new Color(3.968f) , Color.Channel.Rgb));
+            Assert.IsTrue(mip1[2].Equals(new Color(3.968f), Color.Channel.Rgb));
+            Assert.IsTrue(mip1[3].Equals(new Color(1.0f), Color.Channel.Rgb));
+
+            // test if the highest mipmap was actually recalculated instead of averaged
+            var mip2 = model.Pipelines[0].Image.GetPixelColors(0, 2);
+            Assert.AreEqual(1, mip2.Length);
+            Assert.IsTrue(mip2[0].Equals(new Color(2.484f), Color.Channel.Rgb)); // average of all pixels should be ~2.5 
         }
     }
 }
