@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:ImageViewer.Views.List" 
              xmlns:views="clr-namespace:ImageViewer.Views"
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="200" 
              d:DesignWidth="200">
@@ -26,6 +27,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Button 
@@ -53,7 +55,7 @@
                     Grid.Column="2"
                     Padding="0" 
                     Height="18" 
-                    Margin="0"
+                    Margin="{StaticResource DefaultBorderRight}"
                     CommandParameter="{Binding Id}"
                     Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.ImportEquationImageCommand}"
                     ToolTip="Import this equation as a new image"
@@ -62,6 +64,21 @@
                     <Image 
                         Width="14" Height="14" 
                         Source="../../Icons/import.png"/>
+                </Button>
+                <Button 
+                    Grid.Column="3"
+                    Padding="0" 
+                    Height="18" 
+                    Margin="0"
+                    Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.HelpCommand}"
+                    HorizontalAlignment="Right"
+                    IsEnabled="{Binding IsVisible}">
+                    <Button.CommandParameter>
+                        <system:String>help/equation.md</system:String>
+                    </Button.CommandParameter>
+                    <Image 
+                        Width="14" Height="14" 
+                        Source="../../Icons/help.png"/>
                 </Button>
             </Grid>
         </GroupBox.Header>

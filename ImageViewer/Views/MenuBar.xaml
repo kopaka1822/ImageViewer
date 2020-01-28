@@ -265,13 +265,20 @@
                 <MenuItem.CommandParameter>
                     <system:String>help/about.md</system:String>
                 </MenuItem.CommandParameter>
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/help.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
             </MenuItem>
-                <MenuItem
-                    Header="Equation"
-                    Command="{Binding HelpCommand}">
-                    <MenuItem.CommandParameter>
-                        <system:String>help/equation.md</system:String>
-                    </MenuItem.CommandParameter>
+            <Separator/>
+            <MenuItem
+                Header="Equation"
+                Command="{Binding HelpCommand}">
+                <MenuItem.CommandParameter>
+                    <system:String>help/equation.md</system:String>
+                </MenuItem.CommandParameter>
             </MenuItem>
             <MenuItem
                     Header="Filter Manual"
