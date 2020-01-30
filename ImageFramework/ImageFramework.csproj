@@ -149,6 +149,7 @@
     <Compile Include="Model\Scaling\ScalingModel.cs" />
     <Compile Include="Model\Shader\ConvertPolarShader.cs" />
     <Compile Include="Model\Shader\FilterShader.cs" />
+    <Compile Include="Model\Shader\GaussShader.cs" />
     <Compile Include="Model\Shader\GifShader.cs" />
     <Compile Include="Model\Shader\ImageCombineShader.cs" />
     <Compile Include="Model\Shader\IShaderBuilder.cs" />

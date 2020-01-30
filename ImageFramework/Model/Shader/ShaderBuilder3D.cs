@@ -35,5 +35,6 @@ int3 texel(int3 coord, int layer) {{ return coord; }}
 ";
 
         public string Double => Device.Get().SupportsDouble ? "double" : "float";
+        public string IntVec => "int3";
     }
 }

@@ -76,6 +76,7 @@
     <Compile Include="Model\ExportTest.cs" />
     <Compile Include="Model\Scaling\DownscalingTest.cs" />
     <Compile Include="Model\Shader\ConvertFormatShaderTest.cs" />
+    <Compile Include="Model\Shader\GaussShaderTest.cs" />
     <Compile Include="Model\Shader\GifShaderTest.cs" />
     <Compile Include="Model\Shader\PixelValueShaderTest.cs" />
     <Compile Include="Model\Shader\ReduceTest.cs" />

@@ -28,6 +28,9 @@ namespace ImageFramework.Model.Shader
 
         // doubles are not supported on all devices => this is either "float" or "double" based on the hardware
         string Double { get; }
+
+        // either int2 or int3
+        string IntVec { get; }
     }
 
     public static class ShaderBuilder
