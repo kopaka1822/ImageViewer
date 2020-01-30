@@ -83,25 +83,25 @@ namespace ImageViewer.ViewModels
 
         public string Average
         {
-            get => model.Stats.Get(viewModel.SelectedChannel.Cargo, DefaultStatistics.Metrics.Avg).ToString(ImageFramework.Model.Models.Culture);
+            get => model.Stats.Get((DefaultStatistics.Types)viewModel.SelectedChannel.Cargo, DefaultStatistics.Metrics.Avg).ToString(ImageFramework.Model.Models.Culture);
             set { }
         }
 
         public string RootAverage
         {
-            get => Math.Sqrt(model.Stats.Get(viewModel.SelectedChannel.Cargo, DefaultStatistics.Metrics.Avg)).ToString(ImageFramework.Model.Models.Culture);
+            get => Math.Sqrt(model.Stats.Get((DefaultStatistics.Types)viewModel.SelectedChannel.Cargo, DefaultStatistics.Metrics.Avg)).ToString(ImageFramework.Model.Models.Culture);
             set { }
         }
 
         public string Min
         {
-            get => model.Stats.Get(viewModel.SelectedChannel.Cargo, DefaultStatistics.Metrics.Min).ToString(ImageFramework.Model.Models.Culture);
+            get => model.Stats.Get((DefaultStatistics.Types)viewModel.SelectedChannel.Cargo, DefaultStatistics.Metrics.Min).ToString(ImageFramework.Model.Models.Culture);
             set { }
         }
 
         public string Max
         {
-            get => model.Stats.Get(viewModel.SelectedChannel.Cargo, DefaultStatistics.Metrics.Max).ToString(ImageFramework.Model.Models.Culture);
+            get => model.Stats.Get((DefaultStatistics.Types)viewModel.SelectedChannel.Cargo, DefaultStatistics.Metrics.Max).ToString(ImageFramework.Model.Models.Culture);
             set { }
         }
 

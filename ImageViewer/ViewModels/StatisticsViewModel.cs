@@ -17,6 +17,16 @@ namespace ImageViewer.ViewModels
 {
     public class StatisticsViewModel : INotifyPropertyChanged
     {
+        public enum Types
+        {
+            Luminance = DefaultStatistics.Types.Luminance,
+            Average = DefaultStatistics.Types.Average,
+            Luma = DefaultStatistics.Types.Luma,
+            Lightness = DefaultStatistics.Types.Lightness,
+            Alpha = DefaultStatistics.Types.Alpha,
+            SSIM
+        }
+
         private readonly ModelsEx models;
         private readonly StatisticViewModel[] viewModels;
         private static readonly string[] channelDescriptions = new[]
@@ -36,7 +46,9 @@ The ""NTSC"" luma formula is: dot(sRGB*A, (0.299, 0.587, 0.114)).",
 The perceptual response to luminance Y is called lightness L.
 It is computed from the luminance: L = 116 * Y ^ (1/3) - 16.",
             // alpha
-            @"Alpha channel."
+            "Alpha channel.",
+            @"The Structural Similarity Index (SSIM) is a metric that measures the perceived difference between two images.
+SSIM is based on visible structure differences instead of per-pixel absolute differences (like MSE)."
         };
 
         public StatisticsViewModel(ModelsEx models)
@@ -64,6 +76,8 @@ It is computed from the luminance: L = 116 * Y ^ (1/3) - 16.",
         public StatisticViewModel Equation3 => viewModels[2];
         public StatisticViewModel Equation4 => viewModels[3];
 
+        public bool ShowSSim => selectedChannel.Cargo == Types.SSIM;
+
         private bool isVisible = false;
         public bool IsVisible
         {
@@ -78,37 +92,42 @@ It is computed from the luminance: L = 116 * Y ^ (1/3) - 16.",
 
         public string ChannelDescription { get; private set; } = "";
 
-        public List<ListItemViewModel<DefaultStatistics.Types>> AvailableChannels { get; } = new List<ListItemViewModel<DefaultStatistics.Types>>
+        public List<ListItemViewModel<Types>> AvailableChannels { get; } = new List<ListItemViewModel<Types>>
         {
-            new ListItemViewModel<DefaultStatistics.Types>
+            new ListItemViewModel<Types>
             {
                 Name = "Luminance",
-                Cargo = DefaultStatistics.Types.Luminance
+                Cargo = Types.Luminance
             },
-            new ListItemViewModel<DefaultStatistics.Types>
+            new ListItemViewModel<Types>
+            {
+                Name = "SSIM",
+                Cargo = Types.SSIM
+            },
+            new ListItemViewModel<Types>
             {
                 Name = "Average",
-                Cargo = DefaultStatistics.Types.Average
+                Cargo = Types.Average
             },
-            new ListItemViewModel<DefaultStatistics.Types>
+            new ListItemViewModel<Types>
             {
                 Name = "Luma",
-                Cargo = DefaultStatistics.Types.Luma
+                Cargo = Types.Luma
             },
-            new ListItemViewModel<DefaultStatistics.Types>
+            new ListItemViewModel<Types>
             {
                 Name = "Lightness",
-                Cargo = DefaultStatistics.Types.Lightness
+                Cargo = Types.Lightness
             },
-            new ListItemViewModel<DefaultStatistics.Types>
+            new ListItemViewModel<Types>
             {
                 Name = "Alpha",
-                Cargo = DefaultStatistics.Types.Alpha
+                Cargo = Types.Alpha
             },
         };
 
-        private ListItemViewModel<DefaultStatistics.Types> selectedChannel;
-        public ListItemViewModel<DefaultStatistics.Types> SelectedChannel
+        private ListItemViewModel<Types> selectedChannel;
+        public ListItemViewModel<Types> SelectedChannel
         {
             get => selectedChannel;
             set
@@ -116,9 +135,13 @@ It is computed from the luminance: L = 116 * Y ^ (1/3) - 16.",
                 if (ReferenceEquals(value, selectedChannel)) return;
                 selectedChannel = value;
                 ChannelDescription = channelDescriptions[(int)value.Cargo];
+                OnPropertyChanged(nameof(ShowSSim));
                 OnPropertyChanged(nameof(SelectedChannel));
                 OnPropertyChanged(nameof(ChannelDescription));
-                models.Settings.StatisticsChannel = value.Cargo;
+                if ((int) value.Cargo < (int) DefaultStatistics.Types.Size)
+                {
+                    models.Settings.StatisticsChannel = (DefaultStatistics.Types)value.Cargo;
+                }
             }
         }
 

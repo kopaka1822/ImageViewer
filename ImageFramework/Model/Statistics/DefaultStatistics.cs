@@ -65,7 +65,8 @@ namespace ImageFramework.Model.Statistics
             Average,
             Luma,
             Lightness,
-            Alpha
+            Alpha,
+            Size // placeholder
         }
 
         public enum Metrics
