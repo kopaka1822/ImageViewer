@@ -231,6 +231,9 @@
     <Compile Include="Views\Statistics\DefaultStatisticView.xaml.cs">
       <DependentUpon>DefaultStatisticView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Statistics\SSIMView.xaml.cs">
+      <DependentUpon>SSIMView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\StatusBar.xaml.cs">
       <DependentUpon>StatusBar.xaml</DependentUpon>
     </Compile>
@@ -323,6 +326,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Statistics\DefaultStatisticView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Statistics\SSIMView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
