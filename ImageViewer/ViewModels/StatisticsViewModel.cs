@@ -54,8 +54,9 @@ SSIM is based on visible structure differences instead of per-pixel absolute dif
         public StatisticsViewModel(ModelsEx models)
         {
             this.models = models;
-            selectedChannel = AvailableChannels[(int)models.Settings.StatisticsChannel];
-            ChannelDescription = channelDescriptions[(int)models.Settings.StatisticsChannel];
+            var settingsValue = (Types)(int)models.Settings.StatisticsChannel;
+            selectedChannel = AvailableChannels.Find(v => v.Cargo == settingsValue);
+            ChannelDescription = channelDescriptions[(int)settingsValue];
 
             viewModels = new StatisticViewModel[models.NumPipelines];
             for (int i = 0; i < viewModels.Length; ++i)
@@ -76,7 +77,7 @@ SSIM is based on visible structure differences instead of per-pixel absolute dif
         public StatisticViewModel Equation3 => viewModels[2];
         public StatisticViewModel Equation4 => viewModels[3];
 
-        public bool ShowSSim => selectedChannel.Cargo == Types.SSIM;
+        public bool ShowSSIM => selectedChannel.Cargo == Types.SSIM;
 
         private bool isVisible = false;
         public bool IsVisible
@@ -135,7 +136,7 @@ SSIM is based on visible structure differences instead of per-pixel absolute dif
                 if (ReferenceEquals(value, selectedChannel)) return;
                 selectedChannel = value;
                 ChannelDescription = channelDescriptions[(int)value.Cargo];
-                OnPropertyChanged(nameof(ShowSSim));
+                OnPropertyChanged(nameof(ShowSSIM));
                 OnPropertyChanged(nameof(SelectedChannel));
                 OnPropertyChanged(nameof(ChannelDescription));
                 if ((int) value.Cargo < (int) DefaultStatistics.Types.Size)

@@ -28,11 +28,14 @@ namespace ImageViewer.ViewModels
             this.viewModel = viewModel;
             this.model = models.Statistics[index];
             this.pipe = models.Pipelines[index];
+            Name = "Equation " + (index + 1);
 
             viewModel.PropertyChanged += ViewModelOnPropertyChanged;
             model.PropertyChanged += ModelOnPropertyChanged;
             pipe.PropertyChanged += PipeOnPropertyChanged;
         }
+
+        public string Name { get; }
 
         private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
