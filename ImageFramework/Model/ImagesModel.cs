@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -11,6 +12,7 @@ using ImageFramework.ImageLoader;
 using ImageFramework.Model.Scaling;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
+using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 
 namespace ImageFramework.Model
@@ -36,7 +38,9 @@ namespace ImageFramework.Model
             public string Filename { get; }
             // name that will be displayed
             public string Alias { get; set; }
-            public GliFormat OriginalFormat { get; }
+            public GliFormat OriginalFormat { get; private set; }
+
+            public DateTime? LastModified { get; }
 
             internal ImageData(ITexture image, string filename, GliFormat originalFormat)
             {
@@ -44,6 +48,10 @@ namespace ImageFramework.Model
                 Filename = filename;
                 OriginalFormat = originalFormat;
                 Alias = System.IO.Path.GetFileNameWithoutExtension(filename);
+                if (File.Exists(Filename))
+                {
+                    LastModified = File.GetLastWriteTime(Filename);
+                }
             }
 
             internal void GenerateMipmaps(int levels, ScalingModel scaling)
@@ -71,6 +79,13 @@ namespace ImageFramework.Model
                 var tmp = shader.Run((TextureArray2D) Image, size, scaling);
                 Image.Dispose();
                 Image = tmp;
+            }
+
+            public void Replace(ITexture image, GliFormat originalFormat)
+            {
+                Image.Dispose();
+                Image = image;
+                OriginalFormat = originalFormat;
             }
         }
 
@@ -164,27 +179,7 @@ namespace ImageFramework.Model
             }
             else // test if compatible with previous images
             {
-                if(image.GetType() != ImageType)
-                    throw new Exception($"{name}: Incompatible with internal texture types. Expected {ImageType.Name} but got {image.GetType().Name}");
-
-                if (image.NumLayers != NumLayers)
-                    throw new Exception(
-                        $"{name}: Inconsistent amount of layers. Expected {NumLayers} got {image.NumLayers}");
-
-                if (image.Size != Size)
-                {
-                    if (Size.Depth > 1)
-                        throw new Exception(
-                            $"{name}: Image resolution mismatch. Expected {Size.X}x{Size.Y}x{Size.Z} but got {image.Size.X}x{image.Size.Y}x{image.Size.Z}");
-
-                    throw new Exception(
-                        $"{name}: Image resolution mismatch. Expected {Size.X}x{Size.Y} but got {image.Size.X}x{image.Size.Y}");
-                }
-
-
-                if (image.NumMipmaps != NumMipmaps)
-                    throw new ImagesModel.MipmapMismatch(
-                        $"{name}: Inconsistent amount of mipmaps. Expected {NumMipmaps} got {image.NumMipmaps}");
+                TestCompability(image, name);
 
                 // remember old properties
                 var isHdr = IsHdr;
@@ -196,6 +191,27 @@ namespace ImageFramework.Model
                 if (isHdr != IsHdr)
                     OnPropertyChanged(nameof(IsHdr));
             }
+        }
+
+        /// <summary>
+        /// replaces an existing image. (Name will be kept)
+        /// </summary>
+        /// <param name="idx">replace idx</param>
+        /// <param name="image">new image</param>
+        /// <param name="originalFormat">new format</param>
+        public void ReplaceImage(int idx, ITexture image, GliFormat originalFormat)
+        {
+            Debug.Assert(idx < NumImages);
+            TestCompability(image, images[idx].Filename);
+
+            // remember old properties
+            var isHdr = IsHdr;
+
+            images[idx].Replace(image, originalFormat);
+            OnPropertyChanged(nameof(ImageOrder));
+
+            if (isHdr != IsHdr)
+                OnPropertyChanged(nameof(IsHdr));
         }
 
         public void Clear()
@@ -325,6 +341,35 @@ namespace ImageFramework.Model
             {
                 dimensions[i] = image.Size.GetMip(i);
             }
+        }
+
+        /// <summary>
+        /// tests if the image properties match with the current image configuration
+        /// </summary>
+        private void TestCompability(ITexture image, string name)
+        {
+            Debug.Assert(NumImages > 0);
+            if (image.GetType() != ImageType)
+                throw new Exception($"{name}: Incompatible with internal texture types. Expected {ImageType.Name} but got {image.GetType().Name}");
+
+            if (image.NumLayers != NumLayers)
+                throw new Exception(
+                    $"{name}: Inconsistent amount of layers. Expected {NumLayers} got {image.NumLayers}");
+
+            if (image.Size != Size)
+            {
+                if (Size.Depth > 1)
+                    throw new Exception(
+                        $"{name}: Image resolution mismatch. Expected {Size.X}x{Size.Y}x{Size.Z} but got {image.Size.X}x{image.Size.Y}x{image.Size.Z}");
+
+                throw new Exception(
+                    $"{name}: Image resolution mismatch. Expected {Size.X}x{Size.Y} but got {image.Size.X}x{image.Size.Y}");
+            }
+
+
+            if (image.NumMipmaps != NumMipmaps)
+                throw new ImagesModel.MipmapMismatch(
+                    $"{name}: Inconsistent amount of mipmaps. Expected {NumMipmaps} got {image.NumMipmaps}");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

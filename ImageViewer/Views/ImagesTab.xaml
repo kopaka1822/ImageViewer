@@ -17,8 +17,9 @@
                 <!--Image Label + Import Button-->
                 <Grid  Margin="0 0 0 2">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock 
                         Text="Images:" 
@@ -27,6 +28,7 @@
                         Grid.Column="1" 
                         Width="110" 
                         HorizontalAlignment="Right"
+                        Margin="0"
                         Command="{Binding ImportCommand}">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -35,11 +37,22 @@
                             </Grid.ColumnDefinitions>
                             <Image 
                                 Source="../Icons/import.png"
-                                Margin="{StaticResource DefaultBorderRight}"/>
+                                Margin="{StaticResource DefaultBorderRight}"
+                                Width="16"
+                                Height="16"/>
                             <TextBlock 
                                 Grid.Column="1" 
                                 Text="Import Image"/>
                         </Grid>
+                    </Button>
+                    <Button 
+                        Grid.Column="2"
+                        Command="{Binding ReloadImagesCommand}"
+                        ToolTip="Reload images from disk.">
+                        <Image 
+                            Source="../Icons/refresh.png"
+                            Width="16"
+                            Height="16"/>
                     </Button>
                 </Grid>
 

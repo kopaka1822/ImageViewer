@@ -48,6 +48,7 @@ namespace ImageViewer.ViewModels
             ImportCommand = new ImportCommand(models);
             ImportEquationImageCommand = new ImportEquationImageCommand(models);
             ExportCommand = new ExportCommand(models);
+            ReloadImagesCommand = new ReloadImagesCommand(models);
 
             ShowPixelDisplayCommand = new ShowPixelDisplayCommand(models);
             ShowPixelColorCommand = new ShowPixelColorCommand(models);
@@ -125,5 +126,7 @@ namespace ImageViewer.ViewModels
         public ICommand CubemapToLatLongCommand { get; }
 
         public ICommand SelectNaNColorCommand { get; }
+
+        public ICommand ReloadImagesCommand { get; }
     }
 }
