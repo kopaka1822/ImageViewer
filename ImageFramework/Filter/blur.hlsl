@@ -16,7 +16,7 @@ float kernel(int _offset)
 
 float4 getPixel(int3 pos, int3 size)
 {
-	pos = clamp(pos, 0, size);
+	pos = clamp(pos, 0, size-1);
 	return src_image[texel(pos)];
 }
 
