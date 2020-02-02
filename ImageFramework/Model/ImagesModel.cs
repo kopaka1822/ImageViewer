@@ -37,7 +37,7 @@ namespace ImageFramework.Model
             public bool IsHdr => Image.Format == Format.R32G32B32A32_Float;
             public string Filename { get; }
             // name that will be displayed
-            public string Alias { get; set; }
+            public string Alias { get; internal set; }
             public GliFormat OriginalFormat { get; private set; }
 
             public DateTime? LastModified { get; }
@@ -94,6 +94,9 @@ namespace ImageFramework.Model
 
         // this property change will be triggered if the image order changes (and not if the number of images changes)
         public static string ImageOrder = nameof(ImageOrder);
+        // this property change will be triggered if an images changed its alias
+        public static string ImageAlias = nameof(ImageAlias);
+
         public int NumImages => Images.Count;
         public int NumMipmaps => Images.Count == 0 ? 0 : Images[0].NumMipmaps;
         public int NumLayers => Images.Count == 0 ? 0 : Images[0].NumLayers;
@@ -212,6 +215,16 @@ namespace ImageFramework.Model
 
             if (isHdr != IsHdr)
                 OnPropertyChanged(nameof(IsHdr));
+        }
+
+        /// <summary>
+        /// changed alias of the specified image
+        /// </summary>
+        public void RenameImage(int idx, string newAlias)
+        {
+            Debug.Assert(idx < NumImages);
+            images[idx].Alias = newAlias;
+            OnPropertyChanged(nameof(ImageAlias));
         }
 
         public void Clear()

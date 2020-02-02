@@ -14,12 +14,13 @@ namespace ImageViewer.ViewModels.Image
 {
     public class ImageItemViewModel : INotifyPropertyChanged
     {
-        private readonly ImagesModel.ImageData imgData;
+        private readonly ImagesModel images;
 
         public ImageItemViewModel(ImagesModel images, int id)
         {
+            this.images = images;
             this.Id = id;
-            imgData = images.Images[id];
+            var imgData = images.Images[id];
 
             Prefix = $"I{id} - ";
             ToolTip = imgData.Filename + "\n" + imgData.OriginalFormat;
@@ -27,7 +28,7 @@ namespace ImageViewer.ViewModels.Image
             if (imgData.Alias.StartsWith("__imported"))
             {
                 imageName = "";
-                imgData.Alias = "";
+                images.RenameImage(id, "");
                 System.Windows.Threading.Dispatcher.CurrentDispatcher.BeginInvoke((Action)OnRename);
             }
             else imageName = imgData.Alias;
@@ -53,7 +54,7 @@ namespace ImageViewer.ViewModels.Image
                 imageName = value;
                 OnPropertyChanged(nameof(ImageName));
                 IsRenaming = false;
-                imgData.Alias = imageName;
+                images.RenameImage(Id, imageName);
             }
         }
 
