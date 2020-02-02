@@ -39,8 +39,15 @@
                         DataContext="{Binding Statistics.Equation4}"/>
                 </StackPanel>
 
-                <statistics:SSIMView
-                    Visibility="{Binding Statistics.ShowSSIM, Converter={StaticResource VisibleCollapsedConverter}}"/>
+                <ItemsControl
+                    ItemsSource="{Binding Statistics.SSIM.Items}"
+                    Visibility="{Binding Statistics.ShowSSIM, Converter={StaticResource VisibleCollapsedConverter}}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <statistics:SSIMView/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 <TextBlock 
                     Margin="0 4 0 0"

@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using ImageFramework.Annotations;
-using ImageFramework.Model;
-using ImageFramework.Model.Shader;
 using ImageFramework.Model.Statistics;
 using ImageViewer.Models;
-using ImageViewer.Views;
 
-namespace ImageViewer.ViewModels
+namespace ImageViewer.ViewModels.Statistics
 {
     public class StatisticsViewModel : INotifyPropertyChanged
     {
@@ -48,7 +41,7 @@ It is computed from the luminance: L = 116 * Y ^ (1/3) - 16.",
             // alpha
             "Alpha channel.",
             @"The Structural Similarity Index (SSIM) is a metric that measures the perceived difference between two images.
-SSIM is based on visible structure differences instead of per-pixel absolute differences (like MSE)."
+SSIM is based on visible structure differences instead of per-pixel absolute differences (like RMSE or MAE)."
         };
 
         public StatisticsViewModel(ModelsEx models)
@@ -65,6 +58,7 @@ SSIM is based on visible structure differences instead of per-pixel absolute dif
             }
 
             models.Window.Window.TabControl.SelectionChanged += TabControlOnSelectionChanged;
+            SSIM = new SSIMsViewModel(models);
         }
 
         private void TabControlOnSelectionChanged(object sender, SelectionChangedEventArgs selectionChangedEventArgs)
@@ -76,6 +70,8 @@ SSIM is based on visible structure differences instead of per-pixel absolute dif
         public StatisticViewModel Equation2 => viewModels[1];
         public StatisticViewModel Equation3 => viewModels[2];
         public StatisticViewModel Equation4 => viewModels[3];
+
+        public SSIMsViewModel SSIM { get; }
 
         public bool ShowSSIM => selectedChannel.Cargo == Types.SSIM;
 

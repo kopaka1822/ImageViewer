@@ -9,6 +9,7 @@
              d:DesignHeight="200" 
              d:DesignWidth="200">
     <StackPanel>
+        <Separator Margin="{StaticResource DefaultBorderBottom}"/>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -28,7 +29,10 @@
             <ComboBox
                 Grid.Column="1"
                 Grid.Row="0"
-                Margin="{StaticResource DefaultBorderBottom}"/>
+                Margin="{StaticResource DefaultBorderBottom}"
+                ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.ImageSources}"
+                ItemTemplate="{StaticResource ListItemView}"
+                />
 
             <TextBlock
                 Grid.Column="0"
@@ -39,7 +43,9 @@
             <ComboBox
                 Grid.Column="1"
                 Grid.Row="1"
-                Margin="{StaticResource DefaultBorderBottom}"/>
+                Margin="{StaticResource DefaultBorderBottom}"
+                ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.ImageSources}"
+                ItemTemplate="{StaticResource ListItemView}"/>
         </Grid>
         <Grid
             IsEnabled="{Binding IsValid, FallbackValue=False}">
@@ -76,7 +82,9 @@
                 Height="18"
                 Padding="0"
                 Margin="{StaticResource DefaultBorderBottom}"
-                ToolTip="Import this as a new image">
+                ToolTip="Import this as a new image"
+                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.LuminanceCommand}"
+                CommandParameter="{Binding Id}">
                 <Image 
                     Width="14"
                     Height="14" 
@@ -103,7 +111,9 @@
                 Height="18"
                 Padding="0"
                 Margin="{StaticResource DefaultBorderBottom}"
-                ToolTip="Import this as a new image">
+                ToolTip="Import this as a new image"
+                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.ContrastCommand}"
+                CommandParameter="{Binding Id}">
                 <Image 
                     Width="14"
                     Height="14" 
@@ -130,7 +140,9 @@
                 Height="18"
                 Padding="2"
                 Margin="{StaticResource DefaultBorderBottom}"
-                ToolTip="Import this as a new image">
+                ToolTip="Import this as a new image"
+                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.StructureCommand}"
+                CommandParameter="{Binding Id}">
                 <Image 
                     Width="14"
                     Height="14" 
@@ -157,7 +169,9 @@
                 Height="18"
                 Padding="2"
                 Margin="{StaticResource DefaultBorderBottom}"
-                ToolTip="Import this as a new image">
+                ToolTip="Import this as a new image"
+                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.SSIMCommand}"
+                CommandParameter="{Binding Id}">
                 <Image 
                     Width="14"
                     Height="14" 

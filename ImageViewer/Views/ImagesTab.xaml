@@ -102,7 +102,7 @@
                     ItemsSource="{Binding Equations.Equations}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <list:ImageEquationView></list:ImageEquationView>
+                            <list:ImageEquationView/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

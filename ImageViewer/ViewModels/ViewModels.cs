@@ -12,6 +12,7 @@ using ImageViewer.Commands.View;
 using ImageViewer.Models;
 using ImageViewer.ViewModels.Display;
 using ImageViewer.ViewModels.Image;
+using ImageViewer.ViewModels.Statistics;
 
 namespace ImageViewer.ViewModels
 {

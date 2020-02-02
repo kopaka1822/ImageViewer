@@ -164,8 +164,10 @@
     <Compile Include="ViewModels\ListItemViewModel.cs" />
     <Compile Include="ViewModels\ProgressViewModel.cs" />
     <Compile Include="ViewModels\ScalingViewModel.cs" />
-    <Compile Include="ViewModels\StatisticsViewModel.cs" />
-    <Compile Include="ViewModels\StatisticViewModel.cs" />
+    <Compile Include="ViewModels\Statistics\SSIMsViewModel.cs" />
+    <Compile Include="ViewModels\Statistics\SSIMViewModel.cs" />
+    <Compile Include="ViewModels\Statistics\StatisticsViewModel.cs" />
+    <Compile Include="ViewModels\Statistics\StatisticViewModel.cs" />
     <Compile Include="ViewModels\ViewModels.cs" />
     <Compile Include="Views\Converter\BoolVisibilityConverter.cs" />
     <Compile Include="Views\CustomTextBox.cs" />

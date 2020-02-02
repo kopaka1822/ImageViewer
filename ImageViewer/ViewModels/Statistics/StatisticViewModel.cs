@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageFramework.Model.Statistics;
 using ImageViewer.Models;
 
-namespace ImageViewer.ViewModels
+namespace ImageViewer.ViewModels.Statistics
 {
     public class StatisticViewModel : INotifyPropertyChanged
     {
