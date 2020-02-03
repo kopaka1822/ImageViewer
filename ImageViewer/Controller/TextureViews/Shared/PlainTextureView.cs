@@ -54,7 +54,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
 
         public void OnDrag2(Vector2 diff)
         {
-            
+            OnDrag(diff);
         }
 
         public abstract Size3 GetTexelPosition(Vector2 mouse);
