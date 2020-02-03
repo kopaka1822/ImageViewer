@@ -230,7 +230,19 @@
                             Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
-
+            
+            <Separator/>
+            <MenuItem
+                Header="Add Zombox"
+                Command="{Binding StartZoombox}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/image_box.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
             <Separator/>
             <MenuItem
                 Header="LatLong to Cubemap"

@@ -100,6 +100,7 @@
     <Compile Include="Commands\Import\ImportEquationImageCommand.cs" />
     <Compile Include="Commands\Tools\LatLongToCubemapCommand.cs" />
     <Compile Include="Commands\Import\OpenCommand.cs" />
+    <Compile Include="Commands\Tools\StartZoomboxCommand.cs" />
     <Compile Include="Commands\View\ResizeWindowCommand.cs" />
     <Compile Include="Commands\View\SelectNaNColorCommand.cs" />
     <Compile Include="Commands\View\SetThemeCommand.cs" />
@@ -479,6 +480,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\refresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\image_box.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

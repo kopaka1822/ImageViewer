@@ -32,7 +32,7 @@
                 <MenuItem.Icon>
                     <Image Source="Icons/displayconfig.png"/>
                 </MenuItem.Icon>
-                </MenuItem>
+            </MenuItem>
         </ContextMenu>
     </Window.Resources>
     <Window.InputBindings>
