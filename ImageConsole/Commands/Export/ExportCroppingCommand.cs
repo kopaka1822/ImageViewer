@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Model;
+using ImageFramework.Utility;
 
 namespace ImageConsole.Commands.Export
 {
@@ -31,10 +32,8 @@ namespace ImageConsole.Commands.Export
                 reader.ExpectNoMoreArgs();
 
                 model.Export.UseCropping = enable;
-                model.Export.CropStartX = xStart;
-                model.Export.CropStartY = yStart;
-                model.Export.CropEndX = xEnd;
-                model.Export.CropEndY = yEnd;
+                model.Export.CropStart = new Size3(xStart, yStart, 0);
+                model.Export.CropEnd = new Size3(xEnd, yEnd, 0);
             }
         }
     }

@@ -62,12 +62,12 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 float cropMaxY = models.Images.GetHeight(mipmap);
                 float cropMaxZ = models.Images.GetDepth(mipmap);
 
-                res.CropX.X = models.Export.CropStartX / cropMaxX;
-                res.CropX.Y = (models.Export.CropEndX + 1) / cropMaxX;
-                res.CropY.X = models.Export.CropStartY / cropMaxY;
-                res.CropY.Y = (models.Export.CropEndY + 1) / cropMaxY;
-                res.CropZ.X = models.Export.CropStartZ / cropMaxZ;
-                res.CropZ.Y = (models.Export.CropEndZ + 1) / cropMaxZ;
+                res.CropX.X = models.Export.CropStart.X / cropMaxX;
+                res.CropX.Y = (models.Export.CropEnd.X + 1) / cropMaxX;
+                res.CropY.X = models.Export.CropStart.Y / cropMaxY;
+                res.CropY.Y = (models.Export.CropEnd.Y + 1) / cropMaxY;
+                res.CropZ.X = models.Export.CropStart.Z / cropMaxZ;
+                res.CropZ.Y = (models.Export.CropEnd.Z + 1) / cropMaxZ;
             }
             else // no cropping
             {

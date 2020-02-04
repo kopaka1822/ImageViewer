@@ -86,10 +86,8 @@ namespace ImageViewer.Controller
         {
             switch (e.PropertyName)
             {
-                case nameof(ExportModel.CropStartX):
-                case nameof(ExportModel.CropStartY):
-                case nameof(ExportModel.CropEndX):
-                case nameof(ExportModel.CropEndY):
+                case nameof(ExportModel.CropStart):
+                case nameof(ExportModel.CropEnd):
                 case nameof(ExportModel.UseCropping):
                 case nameof(ExportModel.Mipmap):
                 case nameof(ExportModel.Layer):

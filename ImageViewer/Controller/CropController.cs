@@ -61,28 +61,17 @@ namespace ImageViewer.Controller
             // no valid mipmap set yet
             if (mip >= models.Images.NumMipmaps) return;
 
-            var maxX = models.Images.GetWidth(mip) - 1;
-            var maxY = models.Images.GetHeight(mip) - 1;
-            var maxZ = models.Images.GetDepth(mip) - 1;
+            var maxDim = models.Images.Size.GetMip(mip) - new Size3(1);
 
             if (overwrite)
             {
-                models.Export.CropStartX = 0;
-                models.Export.CropStartY = 0;
-                models.Export.CropStartZ = 0;
-                models.Export.CropEndX = maxX;
-                models.Export.CropEndY = maxY;
-                models.Export.CropEndZ = maxZ;
+                models.Export.CropStart = Size3.Zero;
+                models.Export.CropEnd = maxDim;
             }
             else
             {
-                models.Export.CropStartX = Utility.Clamp(models.Export.CropStartX, 0, maxX);
-                models.Export.CropStartY = Utility.Clamp(models.Export.CropStartY, 0, maxY);
-                models.Export.CropStartZ = Utility.Clamp(models.Export.CropStartZ, 0, maxZ);
-
-                models.Export.CropEndX = Utility.Clamp(models.Export.CropEndX, models.Export.CropStartX, maxX);
-                models.Export.CropEndY = Utility.Clamp(models.Export.CropEndY, models.Export.CropStartY, maxY);
-                models.Export.CropEndZ = Utility.Clamp(models.Export.CropEndZ, models.Export.CropStartZ, maxZ);
+                models.Export.CropStart = models.Export.CropStart.Clamp(Size3.Zero, maxDim);
+                models.Export.CropEnd = models.Export.CropEnd.Clamp(models.Export.CropStart, maxDim);
             }
         }
     }

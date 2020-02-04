@@ -146,7 +146,7 @@ namespace ImageViewer.ViewModels.Dialog
 
             models.Export.PropertyChanged += ExportOnPropertyChanged;
 
-            if (models.Export.CropEndX == 0 && models.Export.CropEndY == 0 && models.Export.CropEndZ == 0)
+            if (models.Export.CropEnd == Size3.Zero)
             {
                 // assume cropping was not set
                 SetMaxCropping();
@@ -186,29 +186,13 @@ namespace ImageViewer.ViewModels.Dialog
                     OnPropertyChanged(nameof(UseCropping));
                     OnPropertyChanged(nameof(IsValid));
                     break;
-                case nameof(ExportModel.CropStartX):
+                case nameof(ExportModel.CropStart):
+                case nameof(ExportModel.CropEnd):
                     OnPropertyChanged(nameof(CropStartX));
-                    OnPropertyChanged(nameof(IsValid));
-                    break;
-                case nameof(ExportModel.CropStartY):
                     OnPropertyChanged(nameof(CropStartY));
-                    OnPropertyChanged(nameof(CropEndY));
-                    OnPropertyChanged(nameof(IsValid));
-                    break;
-                case nameof(ExportModel.CropStartZ):
                     OnPropertyChanged(nameof(CropStartZ));
-                    OnPropertyChanged(nameof(IsValid));
-                    break;
-                case nameof(ExportModel.CropEndX):
                     OnPropertyChanged(nameof(CropEndX));
-                    OnPropertyChanged(nameof(IsValid));
-                    break;
-                case nameof(ExportModel.CropEndY):
                     OnPropertyChanged(nameof(CropEndY));
-                    OnPropertyChanged(nameof(CropStartY));
-                    OnPropertyChanged(nameof(IsValid));
-                    break;
-                case nameof(ExportModel.CropEndZ):
                     OnPropertyChanged(nameof(CropEndZ));
                     OnPropertyChanged(nameof(IsValid));
                     break;
@@ -412,11 +396,14 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropStartX
         {
-            get => models.Export.CropStartX;
+            get => models.Export.CropStart.X;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinX, CropMaxX);
-                models.Export.CropStartX = clamped;
+                models.Export.CropStart = new Size3(models.Export.CropStart)
+                {
+                    X = clamped
+                };
 
                 if(clamped != value) OnPropertyChanged(nameof(CropStartX));
                 CropEndX = CropEndX; // maybe adjust this value
@@ -425,19 +412,25 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropStartY
         {
-            get => models.Settings.FlipYAxis ? FlipY(models.Export.CropEndY) : models.Export.CropStartY;
+            get => models.Settings.FlipYAxis ? FlipY(models.Export.CropEnd.Y) : models.Export.CropStart.Y;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinY, CropMaxY);
                 if (models.Settings.FlipYAxis)
                 {
                     // set crop end y
-                    models.Export.CropEndY = FlipY(clamped);
+                    models.Export.CropEnd = new Size3(models.Export.CropEnd)
+                    {
+                        Y = FlipY(clamped)
+                    };
                 }
                 else
                 {
                     // set crop start y
-                    models.Export.CropStartY = clamped;
+                    models.Export.CropStart = new Size3(models.Export.CropStart)
+                    {
+                        Y = clamped
+                    };
                 }
 
                 if (clamped != value) OnPropertyChanged(nameof(CropStartY));
@@ -446,11 +439,14 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropStartZ
         {
-            get => models.Export.CropStartZ;
+            get => models.Export.CropStart.Z;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinZ, CropMaxZ);
-                models.Export.CropStartZ = clamped;
+                models.Export.CropStart = new Size3(models.Export.CropStart)
+                {
+                    Z = clamped
+                };
 
                 if (clamped != value) OnPropertyChanged(nameof(CropStartZ));
                 CropEndZ = CropEndZ; // maybe adjust this value
@@ -459,30 +455,39 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropEndX
         {
-            get => models.Export.CropEndX;
+            get => models.Export.CropEnd.X;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinX, CropMaxX);
-                models.Export.CropEndX = clamped;
+                models.Export.CropEnd = new Size3(models.Export.CropEnd)
+                {
+                    X = clamped
+                };
 
-                if(clamped != value) OnPropertyChanged(nameof(CropEndX));
+                if (clamped != value) OnPropertyChanged(nameof(CropEndX));
             }
         }
 
         public int CropEndY
         {
-            get => models.Settings.FlipYAxis ? FlipY(models.Export.CropStartY) :  models.Export.CropEndY;
+            get => models.Settings.FlipYAxis ? FlipY(models.Export.CropStart.Y) :  models.Export.CropEnd.Y;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinY, CropMaxY);
                 if (models.Settings.FlipYAxis)
                 {
                     // set crop start y
-                    models.Export.CropStartY = FlipY(clamped);
+                    models.Export.CropStart = new Size3(models.Export.CropStart)
+                    {
+                        Y = FlipY(clamped)
+                    };
                 }
                 else
                 {
-                    models.Export.CropEndY = clamped;
+                    models.Export.CropEnd = new Size3(models.Export.CropEnd)
+                    {
+                        Y = clamped
+                    };
                 }
 
                 if(clamped != value) OnPropertyChanged(nameof(CropEndY));
@@ -491,11 +496,14 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropEndZ
         {
-            get => models.Export.CropEndZ;
+            get => models.Export.CropEnd.Z;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinZ, CropMaxZ);
-                models.Export.CropEndZ = clamped;
+                models.Export.CropEnd = new Size3(models.Export.CropEnd)
+                {
+                    Z = clamped
+                };
 
                 if (clamped != value) OnPropertyChanged(nameof(CropEndZ));
             }

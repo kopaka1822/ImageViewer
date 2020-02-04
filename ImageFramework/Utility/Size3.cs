@@ -79,6 +79,13 @@ namespace ImageFramework.Utility
             Z = z;
         }
 
+        public Size3(Size3 copy)
+        {
+            X = copy.X;
+            Y = copy.Y;
+            Z = copy.Z;
+        }
+
         /// returns corresponding mipmap size
         public Size3 GetMip(int mipmap)
         {
@@ -102,6 +109,45 @@ namespace ImageFramework.Utility
         public static bool operator !=(Size3 left, Size3 right)
         {
             return !(left == right);
+        }
+
+        public static Bool3 operator<(Size3 left, Size3 right)
+        {
+            return new Bool3(left.X < right.X, left.Y < right.Y, left.Z < right.Z);
+        }
+
+        public static Bool3 operator <=(Size3 left, Size3 right)
+        {
+            return new Bool3(left.X <= right.X, left.Y <= right.Y, left.Z <= right.Z);
+        }
+
+        public static Bool3 operator >(Size3 left, Size3 right)
+        {
+            return new Bool3(left.X > right.X, left.Y > right.Y, left.Z > right.Z);
+        }
+
+        public static Bool3 operator >=(Size3 left, Size3 right)
+        {
+            return new Bool3(left.X >= right.X, left.Y >= right.Y, left.Z >= right.Z);
+        }
+
+        public static Size3 operator +(Size3 left, Size3 right)
+        {
+            return new Size3(left.X + right.X, left.Y + right.Y, left.Z + right.Z);
+        }
+
+        public static Size3 operator -(Size3 left, Size3 right)
+        {
+            return new Size3(left.X - right.X, left.Y - right.Y, left.Z - right.Z);
+        }
+
+        public Size3 Clamp(Size3 min, Size3 max)
+        {
+            return new Size3(
+                Utility.Clamp(X, min.X, max.X),
+                Utility.Clamp(Y, min.Y, max.Y),
+                Utility.Clamp(Z, min.Z, max.Z)
+            );
         }
 
         public static readonly Size3 Zero = new Size3();

@@ -105,84 +105,28 @@ namespace ImageFramework.Model.Export
             }
         }
 
-        private int cropStartX = 0;
-        public int CropStartX
+        private Size3 cropStart = new Size3(0);
+        public Size3 CropStart
         {
-            get => cropStartX;
+            get => cropStart;
             set
             {
-                //Debug.Assert(UseCropping);
-                if (value == cropStartX) return;
-                cropStartX = value;
-                OnPropertyChanged(nameof(CropStartX));
+                if(value == cropStart) return;
+                cropStart = value;
+                OnPropertyChanged(nameof(CropStart));
             }
         }
 
-        private int cropStartY = 0;
+        private Size3 cropEnd = new Size3(0);
 
-        public int CropStartY
+        public Size3 CropEnd
         {
-            get => cropStartY;
+            get => cropEnd;
             set
             {
-                //Debug.Assert(UseCropping);
-                if (value == cropStartY) return;
-                cropStartY = value;
-                OnPropertyChanged(nameof(CropStartY));
-            }
-        }
-
-        private int cropStartZ = 0;
-
-        public int CropStartZ
-        {
-            get => cropStartZ;
-            set
-            {
-                if (value == cropStartZ) return;
-                cropStartZ = value;
-                OnPropertyChanged(nameof(CropStartZ));
-            }
-        }
-
-        private int cropEndX = 0;
-
-        public int CropEndX
-        {
-            get => cropEndX;
-            set
-            {
-                //Debug.Assert(UseCropping);
-                if (value == cropEndX) return;
-                cropEndX = value;
-                OnPropertyChanged(nameof(CropEndX));
-            }
-        }
-
-        private int cropEndY = 0;
-
-        public int CropEndY
-        {
-            get => cropEndY;
-            set
-            {
-                //Debug.Assert(UseCropping);
-                if (value == cropEndY) return;
-                cropEndY = value;
-                OnPropertyChanged(nameof(CropEndY));
-            }
-        }
-
-        private int cropEndZ = 0;
-
-        public int CropEndZ
-        {
-            get => cropEndZ;
-            set
-            {
-                if (value == cropEndZ) return;
-                cropEndZ = value;
-                OnPropertyChanged(nameof(CropEndZ));
+                if (value == cropEnd) return;
+                cropEnd = value;
+                OnPropertyChanged(nameof(CropEnd));
             }
         }
 
@@ -220,33 +164,20 @@ namespace ImageFramework.Model.Export
                 // general boundaries
                 var mipDim = image.Size.GetMip(mipIdx);
 
-                if(CropStartX < 0 || CropStartX >= mipDim.Width)
-                    throw new Exception("export crop start x out of range: " + CropStartX);
-                if(CropStartY < 0 || CropStartY >= mipDim.Height)
-                    throw new Exception("export crop start y out of range: " + CropStartY);
-                if(CropStartZ < 0 || CropStartZ >= mipDim.Depth)
-                    throw new Exception("export crop start z out of range: " + CropStartZ);
+                if((CropStart < Size3.Zero).AnyTrue() || (CropStart >= mipDim).AnyTrue())
+                    throw new Exception("export crop start out of range: " + CropStart);
 
-                if (CropEndX < 0 || CropEndX >= mipDim.Width)
-                    throw new Exception("export crop end x out of range: " + CropEndX);
-                if(CropEndY < 0 || CropEndY >= mipDim.Height)
-                    throw new Exception("export crop end y out of range: " + CropEndY);
-                if(CropEndZ < 0 || CropEndZ >= mipDim.Depth)
-                    throw new Exception("export crop end z out of range: " + CropEndZ);
+                if ((CropEnd < Size3.Zero).AnyTrue() || (CropEnd >= mipDim).AnyTrue())
+                    throw new Exception("export crop end out of range: " + CropEnd);
 
                 // end >= max
-                if(CropStartX > CropEndX)
-                    throw new Exception("export crop start x must be smaller or equal to crop end x");
-                if (CropStartY > CropEndY)
-                    throw new Exception("export crop start y must be smaller or equal to crop end y");
-                if(CropStartZ > CropEndZ)
-                    throw new Exception("export crop start z must be smaller or equal to crop end z");
+                if((CropStart > CropEnd).AnyTrue())
+                    throw new Exception("export crop start must be smaller or equal to crop end");
 
                 // set cropping to active if the image was actually cropped
-                if (CropStartX != 0 || CropStartY != 0 || CropStartZ != 0) croppingActive = true;
-                if (CropEndX != mipDim.Width - 1) croppingActive = true;
-                if (CropEndY != mipDim.Height - 1) croppingActive = true;
-                if (CropEndZ != mipDim.Depth - 1) croppingActive = true;
+                if(CropStart != Size3.Zero) croppingActive = true;
+                if (CropEnd != mipDim - new Size3(1))
+                    croppingActive = true;
             }
 
             bool alignmentActive = false;
@@ -269,8 +200,8 @@ namespace ImageFramework.Model.Export
             
             // do some conversion before exporting
             using (var tmpTex = models.SharedModel.Convert.Convert(image, stagingFormat.DxgiFormat, Mipmap, Layer,
-                desc.Multiplier, UseCropping, new Size3(CropStartX, CropStartY, CropStartZ),
-                new Size3(CropEndX - CropStartX + 1, CropEndY - CropStartY + 1, CropEndZ - CropStartZ + 1),
+                desc.Multiplier, UseCropping, CropStart,
+                CropEnd - CropStart + new Size3(1),
                 new Size3(desc.FileFormat.GetAlignmentX(), desc.FileFormat.GetAlignmentY(), 0), models.Scaling, models.Overlay.Overlay))
             {
                 // the final texture only has the relevant layers and mipmaps
