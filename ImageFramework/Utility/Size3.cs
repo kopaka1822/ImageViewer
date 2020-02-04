@@ -151,6 +151,7 @@ namespace ImageFramework.Utility
         }
 
         public static readonly Size3 Zero = new Size3();
+        public static readonly Size3 One = new Size3(1);
 
         public bool Equals(Size3 other)
         {
@@ -172,6 +173,17 @@ namespace ImageFramework.Utility
                 hashCode = (hashCode * 397) ^ Z;
                 return hashCode;
             }
+        }
+
+        // converts[0, size] to [0, 1]
+        public Float3 ToCoords(Size3 size)
+        {
+            if(size == Zero) return new Float3(0.0f);
+            return new Float3(
+                (X + 0.5f) / size.X,
+                (Y + 0.5f) / size.Y,
+                (Z + 0.5f) / size.Z
+            );
         }
     }
 }

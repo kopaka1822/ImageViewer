@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.Utility;
 using ImageViewer.Models;
 using SharpDX;
 using Color = ImageFramework.Utility.Color;
@@ -58,16 +59,17 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 res.CropLayer = models.Export.Layer;
 
                 int mipmap = Math.Max(models.Export.Mipmap, 0);
-                float cropMaxX = models.Images.GetWidth(mipmap);
-                float cropMaxY = models.Images.GetHeight(mipmap);
-                float cropMaxZ = models.Images.GetDepth(mipmap);
+                var dim = models.Images.Size.GetMip(mipmap);
 
-                res.CropX.X = models.Export.CropStart.X / cropMaxX;
-                res.CropX.Y = (models.Export.CropEnd.X + 1) / cropMaxX;
-                res.CropY.X = models.Export.CropStart.Y / cropMaxY;
-                res.CropY.Y = (models.Export.CropEnd.Y + 1) / cropMaxY;
-                res.CropZ.X = models.Export.CropStart.Z / cropMaxZ;
-                res.CropZ.Y = (models.Export.CropEnd.Z + 1) / cropMaxZ;
+                var end = (models.Export.CropEnd.ToPixels(dim) + Size3.One);
+                var start = models.Export.CropStart.ToPixels(dim);
+
+                res.CropX.X = (float) start.X / dim.X;
+                res.CropX.Y = (float)end.X / dim.X;
+                res.CropY.X = (float)start.Y / dim.Y;
+                res.CropY.Y = (float)end.Y / dim.Y;
+                res.CropZ.X = (float)start.Z / dim.Z;
+                res.CropZ.Y = (float)end.Z / dim.Z;
             }
             else // no cropping
             {

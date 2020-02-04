@@ -105,27 +105,41 @@ namespace ImageFramework.Model.Export
             }
         }
 
-        private Size3 cropStart = new Size3(0);
-        public Size3 CropStart
+        private Float3 cropStartf = Float3.Zero;
+
+        /// <summary>
+        /// crop start in relative coordinates [0, 1]
+        /// CropStart.ToPixel is the first included pixel
+        /// </summary>
+        public Float3 CropStart
         {
-            get => cropStart;
+            get => cropStartf;
             set
             {
-                if(value == cropStart) return;
-                cropStart = value;
+                Debug.Assert((value >= Float3.Zero).AllTrue());
+                Debug.Assert((value <= Float3.One).AllTrue());
+                if(value == cropStartf) return;
+                cropStartf = value;
                 OnPropertyChanged(nameof(CropStart));
             }
         }
 
-        private Size3 cropEnd = new Size3(0);
+        private Float3 cropEndf = Float3.One;
 
-        public Size3 CropEnd
+        /// <summary>
+        /// crop end in relative coordinates [0, 1]
+        /// CropEnd.ToPixel is the last included pixel.
+        /// CropStart == CropEnd => exactly one pixel will be exported
+        /// </summary>
+        public Float3 CropEnd
         {
-            get => cropEnd;
+            get => cropEndf;
             set
             {
-                if (value == cropEnd) return;
-                cropEnd = value;
+                Debug.Assert((value >= Float3.Zero).AllTrue());
+                Debug.Assert((value <= Float3.One).AllTrue());
+                if(value == cropEndf) return;
+                cropEndf = value;
                 OnPropertyChanged(nameof(CropEnd));
             }
         }
@@ -155,35 +169,40 @@ namespace ImageFramework.Model.Export
             if(Layer >= image.NumLayers)
                 throw new Exception("export layer out of range");
 
+            var mipIdx = Math.Max(Mipmap, 0);
+            // general boundaries
+            var mipDim = image.Size.GetMip(mipIdx);
+
+            // default crop (entire screen)
+            var cropStart = Size3.Zero;
+            var cropEnd = mipDim;
+
             // test cropping dimensions
             bool croppingActive = false;
             if (UseCropping)
             {
-                var mipIdx = Math.Max(Mipmap, 0);
-               
-                // general boundaries
-                var mipDim = image.Size.GetMip(mipIdx);
+                cropStart = CropStart.ToPixels(mipDim);
+                cropEnd = CropEnd.ToPixels(mipDim);
 
-                if((CropStart < Size3.Zero).AnyTrue() || (CropStart >= mipDim).AnyTrue())
-                    throw new Exception("export crop start out of range: " + CropStart);
+                if((cropStart < Size3.Zero).AnyTrue() || (cropStart >= mipDim).AnyTrue())
+                    throw new Exception("export crop start out of range: " + cropStart);
 
-                if ((CropEnd < Size3.Zero).AnyTrue() || (CropEnd >= mipDim).AnyTrue())
-                    throw new Exception("export crop end out of range: " + CropEnd);
+                if ((cropEnd < Size3.Zero).AnyTrue() || (cropEnd >= mipDim).AnyTrue())
+                    throw new Exception("export crop end out of range: " + cropEnd);
 
                 // end >= max
-                if((CropStart > CropEnd).AnyTrue())
+                if((cropStart > cropEnd).AnyTrue())
                     throw new Exception("export crop start must be smaller or equal to crop end");
 
                 // set cropping to active if the image was actually cropped
-                if(CropStart != Size3.Zero) croppingActive = true;
-                if (CropEnd != mipDim - new Size3(1))
+                if(cropStart != Size3.Zero) croppingActive = true;
+                if (cropEnd != mipDim - new Size3(1))
                     croppingActive = true;
             }
 
             bool alignmentActive = false;
             if (desc.FileFormat.IsCompressed())
             {
-                var mipIdx = Math.Max(Mipmap, 0);
                 if (image.Size.GetMip(mipIdx).Width % desc.FileFormat.GetAlignmentX() != 0)
                     alignmentActive = true;
                 if (image.Size.GetMip(mipIdx).Height % desc.FileFormat.GetAlignmentY() != 0)
@@ -200,8 +219,8 @@ namespace ImageFramework.Model.Export
             
             // do some conversion before exporting
             using (var tmpTex = models.SharedModel.Convert.Convert(image, stagingFormat.DxgiFormat, Mipmap, Layer,
-                desc.Multiplier, UseCropping, CropStart,
-                CropEnd - CropStart + new Size3(1),
+                desc.Multiplier, UseCropping, cropStart,
+                cropEnd - cropStart + new Size3(1),
                 new Size3(desc.FileFormat.GetAlignmentX(), desc.FileFormat.GetAlignmentY(), 0), models.Scaling, models.Overlay.Overlay))
             {
                 // the final texture only has the relevant layers and mipmaps

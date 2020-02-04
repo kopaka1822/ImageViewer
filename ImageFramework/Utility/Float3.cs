@@ -63,6 +63,7 @@ namespace ImageFramework.Utility
         }
 
         public static readonly Float3 Zero = new Float3();
+        public static readonly Float3 One = new Float3(1.0f);
 
         public override string ToString()
         {
@@ -82,6 +83,36 @@ namespace ImageFramework.Utility
         public bool Equals(Float3 other)
         {
             return X == other.X && Y == other.Y && Z == other.Z;
+        }
+
+        public static Bool3 operator <(Float3 left, Float3 right)
+        {
+            return new Bool3(left.X < right.X, left.Y < right.Y, left.Z < right.Z);
+        }
+
+        public static Bool3 operator <=(Float3 left, Float3 right)
+        {
+            return new Bool3(left.X <= right.X, left.Y <= right.Y, left.Z <= right.Z);
+        }
+
+        public static Bool3 operator >(Float3 left, Float3 right)
+        {
+            return new Bool3(left.X > right.X, left.Y > right.Y, left.Z > right.Z);
+        }
+
+        public static Bool3 operator >=(Float3 left, Float3 right)
+        {
+            return new Bool3(left.X >= right.X, left.Y >= right.Y, left.Z >= right.Z);
+        }
+
+        public static Float3 operator +(Float3 left, Float3 right)
+        {
+            return new Float3(left.X + right.X, left.Y + right.Y, left.Z + right.Z);
+        }
+
+        public static Float3 operator -(Float3 left, Float3 right)
+        {
+            return new Float3(left.X - right.X, left.Y - right.Y, left.Z - right.Z);
         }
 
         public override bool Equals(object obj)
@@ -105,6 +136,25 @@ namespace ImageFramework.Utility
         {
             float* fp = &v;
             return *(int*) fp;
+        }
+
+        // converts [0, 1] range to [0, size-1]
+        public Size3 ToPixels(Size3 size)
+        {
+            return new Size3(
+                Utility.Clamp((int)(X * size.X), 0, size.X - 1),
+                Utility.Clamp((int)(Y * size.Y), 0, size.Y - 1),
+                Utility.Clamp((int)(Z * size.Z), 0, size.Z - 1)
+            );
+        }
+
+        public Float3 Clamp(Float3 min, Float3 max)
+        {
+            return new Float3(
+                Utility.Clamp(X, min.X, max.X),
+                Utility.Clamp(Y, min.Y, max.Y),
+                Utility.Clamp(Z, min.Z, max.Z)
+            );
         }
     }
 }

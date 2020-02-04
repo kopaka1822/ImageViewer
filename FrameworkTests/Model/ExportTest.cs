@@ -77,8 +77,8 @@ namespace FrameworkTests.Model
             model.AddImageFromFile(TestData.Directory + "checkers.dds");
             model.Export.Mipmap = 0;
             model.Export.UseCropping = true;
-            model.Export.CropStart = new Size3(1, 1, 0);
-            model.Export.CropEnd = new Size3(2, 2, 0);
+            model.Export.CropStart = new Size3(1, 1, 0).ToCoords(model.Images.Size);
+            model.Export.CropEnd = new Size3(2, 2, 0).ToCoords(model.Images.Size);
             model.Apply();
 
             model.ExportPipelineImage(ExportDir + "cropped", "dds", GliFormat.RGBA8_SRGB);
@@ -95,8 +95,8 @@ namespace FrameworkTests.Model
             model.Export.Mipmap = 0;
             model.Export.UseCropping = true;
 
-            model.Export.CropStart = new Size3(1, 0, 2);
-            model.Export.CropEnd = new Size3(2, 1, 3);
+            model.Export.CropStart = new Size3(1, 0, 2).ToCoords(model.Images.Size);
+            model.Export.CropEnd = new Size3(2, 1, 3).ToCoords(model.Images.Size);
             model.Apply();
             
             TestData.TestCheckers3DLevel0(model.Pipelines[0].Image.GetPixelColors(0, 0));
@@ -125,8 +125,8 @@ namespace FrameworkTests.Model
             model.AddImageFromFile(TestData.Directory + "checkers.dds");
             model.Export.Mipmap = -1;
             model.Export.UseCropping = true;
-            model.Export.CropStart = new Size3(1, 1, 0);
-            model.Export.CropEnd = new Size3(2, 2, 0);
+            model.Export.CropStart = new Size3(1, 1, 0).ToCoords(model.Images.Size);
+            model.Export.CropEnd = new Size3(2, 2, 0).ToCoords(model.Images.Size);
             model.Apply();
 
             model.ExportPipelineImage(ExportDir + "cropped", "dds", GliFormat.RGBA8_SRGB);

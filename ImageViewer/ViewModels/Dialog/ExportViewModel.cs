@@ -146,7 +146,7 @@ namespace ImageViewer.ViewModels.Dialog
 
             models.Export.PropertyChanged += ExportOnPropertyChanged;
 
-            if (models.Export.CropEnd == Size3.Zero)
+            if (models.Export.CropEnd == Float3.Zero)
             {
                 // assume cropping was not set
                 SetMaxCropping();
@@ -203,19 +203,18 @@ namespace ImageViewer.ViewModels.Dialog
                         selectedMipmap = AvailableMipmaps[models.Export.Mipmap];
                     OnPropertyChanged(nameof(SelectedMipmap));
                     OnPropertyChanged(nameof(UseCropping));
+
+                    OnPropertyChanged(nameof(CropStartX));
+                    OnPropertyChanged(nameof(CropStartY));
+                    OnPropertyChanged(nameof(CropStartZ));
+                    OnPropertyChanged(nameof(CropEndX));
+                    OnPropertyChanged(nameof(CropEndY));
+                    OnPropertyChanged(nameof(CropEndZ));
+
                     OnPropertyChanged(nameof(CropMaxX));
                     OnPropertyChanged(nameof(CropMaxY));
                     OnPropertyChanged(nameof(CropMaxZ));
-                    // refit start and end since dimensions changed
-                    CropStartX = CropStartX;
-                    CropStartY = CropStartY;
-                    CropStartZ = CropStartZ;
-                    CropEndX = CropEndX;
-                    CropEndY = CropEndY;
-                    CropEndZ = CropEndZ;
-                    // force change on y components because coordinate flipping
-                    OnPropertyChanged(nameof(CropStartY));
-                    OnPropertyChanged(nameof(CropEndY));
+
                     OnPropertyChanged(nameof(IsValid));
                     break;
                 case nameof(ExportModel.Layer):
@@ -386,6 +385,8 @@ namespace ImageViewer.ViewModels.Dialog
             set => models.Export.UseCropping = value;
         }
 
+        private Size3 curDim => models.Images.Size.GetMip(Math.Max(selectedMipmap.Cargo, 0));
+
         public int CropMinX => 0;
         public int CropMaxX => models.Images.GetWidth(Math.Max(selectedMipmap.Cargo, 0)) - 1;
         public int CropMinY => 0;
@@ -396,14 +397,11 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropStartX
         {
-            get => models.Export.CropStart.X;
+            get => models.Export.CropStart.ToPixels(curDim).X;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinX, CropMaxX);
-                models.Export.CropStart = new Size3(models.Export.CropStart)
-                {
-                    X = clamped
-                };
+                SetCropStart(clamped, 0);
 
                 if(clamped != value) OnPropertyChanged(nameof(CropStartX));
                 CropEndX = CropEndX; // maybe adjust this value
@@ -412,25 +410,19 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropStartY
         {
-            get => models.Settings.FlipYAxis ? FlipY(models.Export.CropEnd.Y) : models.Export.CropStart.Y;
+            get => models.Settings.FlipYAxis ? FlipY(models.Export.CropEnd.ToPixels(curDim).Y) : models.Export.CropStart.ToPixels(curDim).Y;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinY, CropMaxY);
                 if (models.Settings.FlipYAxis)
                 {
                     // set crop end y
-                    models.Export.CropEnd = new Size3(models.Export.CropEnd)
-                    {
-                        Y = FlipY(clamped)
-                    };
+                    SetCropEnd(FlipY(clamped), 1);
                 }
                 else
                 {
                     // set crop start y
-                    models.Export.CropStart = new Size3(models.Export.CropStart)
-                    {
-                        Y = clamped
-                    };
+                    SetCropStart(clamped, 1);
                 }
 
                 if (clamped != value) OnPropertyChanged(nameof(CropStartY));
@@ -439,14 +431,11 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropStartZ
         {
-            get => models.Export.CropStart.Z;
+            get => models.Export.CropStart.ToPixels(curDim).Z;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinZ, CropMaxZ);
-                models.Export.CropStart = new Size3(models.Export.CropStart)
-                {
-                    Z = clamped
-                };
+                SetCropStart(clamped, 2);
 
                 if (clamped != value) OnPropertyChanged(nameof(CropStartZ));
                 CropEndZ = CropEndZ; // maybe adjust this value
@@ -455,14 +444,11 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropEndX
         {
-            get => models.Export.CropEnd.X;
+            get => models.Export.CropEnd.ToPixels(curDim).X;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinX, CropMaxX);
-                models.Export.CropEnd = new Size3(models.Export.CropEnd)
-                {
-                    X = clamped
-                };
+                SetCropEnd(clamped, 0);
 
                 if (clamped != value) OnPropertyChanged(nameof(CropEndX));
             }
@@ -470,24 +456,18 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropEndY
         {
-            get => models.Settings.FlipYAxis ? FlipY(models.Export.CropStart.Y) :  models.Export.CropEnd.Y;
+            get => models.Settings.FlipYAxis ? FlipY(models.Export.CropStart.ToPixels(curDim).Y) :  models.Export.CropEnd.ToPixels(curDim).Y;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinY, CropMaxY);
                 if (models.Settings.FlipYAxis)
                 {
                     // set crop start y
-                    models.Export.CropStart = new Size3(models.Export.CropStart)
-                    {
-                        Y = FlipY(clamped)
-                    };
+                    SetCropStart(FlipY(clamped), 1);
                 }
                 else
                 {
-                    models.Export.CropEnd = new Size3(models.Export.CropEnd)
-                    {
-                        Y = clamped
-                    };
+                    SetCropEnd(clamped, 1);
                 }
 
                 if(clamped != value) OnPropertyChanged(nameof(CropEndY));
@@ -496,14 +476,11 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropEndZ
         {
-            get => models.Export.CropEnd.Z;
+            get => models.Export.CropEnd.ToPixels(curDim).Z;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinZ, CropMaxZ);
-                models.Export.CropEnd = new Size3(models.Export.CropEnd)
-                {
-                    Z = clamped
-                };
+                SetCropEnd(clamped, 2);
 
                 if (clamped != value) OnPropertyChanged(nameof(CropEndZ));
             }
@@ -512,6 +489,20 @@ namespace ImageViewer.ViewModels.Dialog
         private int FlipY(int value)
         {
             return CropMaxY - value;
+        }
+
+        private void SetCropStart(int v, int axis)
+        {
+            var res = models.Export.CropStart;
+            res[axis] = (v + 0.5f) / curDim[axis];
+            models.Export.CropStart = res;
+        }
+
+        private void SetCropEnd(int v, int axis)
+        {
+            var res = models.Export.CropEnd;
+            res[axis] = (v + 0.5f) / curDim[axis];
+            models.Export.CropEnd = res;
         }
 
         private bool hasQualityValue = false;

@@ -32,8 +32,8 @@ namespace ImageConsole.Commands.Export
                 reader.ExpectNoMoreArgs();
 
                 model.Export.UseCropping = enable;
-                model.Export.CropStart = new Size3(xStart, yStart, 0);
-                model.Export.CropEnd = new Size3(xEnd, yEnd, 0);
+                model.Export.CropStart = new Size3(xStart, yStart, 0).ToCoords(model.Images.Size);
+                model.Export.CropEnd = new Size3(xEnd, yEnd, 0).ToCoords(model.Images.Size);
             }
         }
     }

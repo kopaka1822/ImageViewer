@@ -22,17 +22,6 @@ namespace ImageViewer.Controller
         {
             this.models = models;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
-            this.models.Export.PropertyChanged += ExportOnPropertyChanged;
-        }
-
-        private void ExportOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(ExportModel.Mipmap):
-                    AdjustCroppingRect(false);
-                    break;
-            }
         }
 
         private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -41,38 +30,16 @@ namespace ImageViewer.Controller
             {
                 case nameof(ImagesModel.NumImages):
                     if (models.Images.PrevNumImages == 0)
-                        AdjustCroppingRect(true);
+                        AdjustCroppingRect();
                     break;
             }
         }
 
-        private void AdjustCroppingRect(bool overwrite)
+        private void AdjustCroppingRect()
         {
-            if (models.Images.NumImages == 0)
-                return; // no need to adjust
-
-            var mip = models.Export.Mipmap;
-            if (models.Images.NumMipmaps == 1) // => all mipmaps (-1) is equal to the first mipmap
-                mip = 0;
-
-            // all mipmaps does not support cropping
-            if (mip == -1) return;
-
-            // no valid mipmap set yet
-            if (mip >= models.Images.NumMipmaps) return;
-
-            var maxDim = models.Images.Size.GetMip(mip) - new Size3(1);
-
-            if (overwrite)
-            {
-                models.Export.CropStart = Size3.Zero;
-                models.Export.CropEnd = maxDim;
-            }
-            else
-            {
-                models.Export.CropStart = models.Export.CropStart.Clamp(Size3.Zero, maxDim);
-                models.Export.CropEnd = models.Export.CropEnd.Clamp(models.Export.CropStart, maxDim);
-            }
+            // reset cropping rect
+            models.Export.CropStart = Float3.Zero;
+            models.Export.CropEnd = Float3.One;
         }
     }
 }
