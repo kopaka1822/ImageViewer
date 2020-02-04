@@ -12,6 +12,9 @@ using Format = SharpDX.DXGI.Format;
 
 namespace ImageFramework.Model.Overlay
 {
+    /// <summary>
+    /// image overlay that draws colored boxes (zoom boxes)
+    /// </summary>
     public class BoxOverlayShader : IDisposable
     {
         private readonly DirectX.Shader vertex;

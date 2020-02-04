@@ -139,6 +139,7 @@
     <Compile Include="Model\Models.cs" />
     <Compile Include="Model\Overlay\BoxOverlay.cs" />
     <Compile Include="Model\Overlay\BoxOverlayShader.cs" />
+    <Compile Include="Model\Overlay\CropOverlay.cs" />
     <Compile Include="Model\Overlay\IOverlay.cs" />
     <Compile Include="Model\Overlay\OverlayModel.cs" />
     <Compile Include="Model\ProgressModel.cs" />

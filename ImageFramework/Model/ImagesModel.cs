@@ -14,6 +14,7 @@ using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+using Texture3D = ImageFramework.DirectX.Texture3D;
 
 namespace ImageFramework.Model
 {
@@ -115,6 +116,7 @@ namespace ImageFramework.Model
         public int PrevNumImages { get; protected set; } = 0;
 
         public Size3 Size => Images.Count == 0 ? Size3.Zero : GetSize(0);
+        public bool Is3D => Images.Count != 0 && images[0].Image.Is3D;
 
         /// size of the mipmap
         public Size3 GetSize(int mipmap)
