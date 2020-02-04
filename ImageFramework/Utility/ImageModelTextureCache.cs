@@ -68,12 +68,26 @@ namespace ImageFramework.Utility
                 args.PropertyName == nameof(ImagesModel.NumMipmaps) ||
                 args.PropertyName == nameof(ImagesModel.Size) ||
                 args.PropertyName == nameof(ImagesModel.ImageType))
+            {
                 Clear();
+                OnChanged();
+            }
         }
 
         public void Dispose()
         {
             Clear();
         }
+
+        // event that will be called if the texture properties have changed
+        public event EventHandler Changed;
+
+        protected virtual void OnChanged()
+        {
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
+
+        // cache can only give valid images if the images model contains imagtes
+        public bool IsValid => images.NumImages > 0;
     }
 }

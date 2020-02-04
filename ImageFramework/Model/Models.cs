@@ -13,6 +13,7 @@ using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
 using ImageFramework.Model.Filter;
+using ImageFramework.Model.Overlay;
 using ImageFramework.Model.Scaling;
 using ImageFramework.Model.Shader;
 using ImageFramework.Model.Statistics;
@@ -32,7 +33,6 @@ namespace ImageFramework.Model
         public readonly int NumPipelines;
 
         #region Required Components
-
 
         public ImagesModel Images { get; }
 
@@ -56,7 +56,7 @@ namespace ImageFramework.Model
 
         public SharedModel SharedModel { get; }
         
-        internal ITextureCache TextureCache { get; }
+        internal ImageModelTextureCache TextureCache { get; }
 
         private readonly PipelineController pipelineController;
 
@@ -82,6 +82,9 @@ namespace ImageFramework.Model
 
         private ScalingModel scaling = null;
         public ScalingModel Scaling => scaling ?? (scaling = new ScalingModel(this));
+
+        private OverlayModel overlay = null;
+        public OverlayModel Overlay => overlay ?? (overlay = new OverlayModel(TextureCache));
 
         #endregion
 
@@ -311,6 +314,7 @@ namespace ImageFramework.Model
             stats?.Dispose();
             gif?.Dispose();
             scaling?.Dispose();
+            overlay?.Dispose();
 
             Images?.Dispose();
             Filter?.Dispose();

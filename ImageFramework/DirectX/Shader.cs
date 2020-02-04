@@ -72,7 +72,7 @@ namespace ImageFramework.DirectX
 
         public Type ShaderType { get; }
 
-        public Shader(Type type, string source, string debugName)
+        public Shader(Type type, string source, string debugName, out byte[] outBytecode, bool getBytecode = true)
         {
             ShaderType = type;
 
@@ -88,6 +88,8 @@ namespace ImageFramework.DirectX
                     SecondaryDataFlags.None,
                     null))
                 {
+                    outBytecode = getBytecode ? byteCode.Bytecode.Data : null;
+
                     switch (type)
                     {
                         case Type.Vertex:
@@ -113,6 +115,10 @@ namespace ImageFramework.DirectX
                 throw new Exception($"{debugName} compilation failed: {e.Message}\nsource:\n{AddLineNumbers(source)}");
             }
         }
+
+        public Shader(Type type, string source, string debugName)
+        : this(type, source, debugName, out var tmp, false)
+        {}
 
         private string AddLineNumbers(string source)
         {

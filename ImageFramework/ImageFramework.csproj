@@ -137,6 +137,10 @@
     <Compile Include="Model\ImagePipeline.cs" />
     <Compile Include="Model\ImagesModel.cs" />
     <Compile Include="Model\Models.cs" />
+    <Compile Include="Model\Overlay\BoxOverlay.cs" />
+    <Compile Include="Model\Overlay\BoxOverlayShader.cs" />
+    <Compile Include="Model\Overlay\IOverlay.cs" />
+    <Compile Include="Model\Overlay\OverlayModel.cs" />
     <Compile Include="Model\ProgressModel.cs" />
     <Compile Include="Model\Scaling\Down\DetailPreservingShaderCore.cs" />
     <Compile Include="Model\Scaling\Down\DownscalingShaderBase.cs" />
