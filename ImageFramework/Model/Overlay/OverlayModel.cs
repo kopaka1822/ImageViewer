@@ -34,6 +34,7 @@ namespace ImageFramework.Model.Overlay
             InvalidateOld();
 
             // subscribe to change events
+            if(e.NewItems != null)
             foreach (var newItem in e.NewItems)
             {
                 var o = (IOverlay) newItem;
@@ -41,6 +42,7 @@ namespace ImageFramework.Model.Overlay
             }
 
             // unsubscribe from change events
+            if(e.OldItems != null)
             foreach (var oldItem in e.OldItems)
             {
                 var o = (IOverlay)oldItem;
@@ -84,7 +86,7 @@ namespace ImageFramework.Model.Overlay
             get
             {
                 if (overlayTex != null) return overlayTex;
-                if (!cache.IsValid || Overlays.Count == 0) return null;
+                if (!cache.IsValid || !HasWork()) return null;
 
                 // recompute texture
                 var dev = Device.Get();
@@ -97,11 +99,13 @@ namespace ImageFramework.Model.Overlay
                         dev.ClearRenderTargetView(overlayTex.GetRtView(layer, mipmap), new RawColor4(0.0f, 0.0f, 0.0f, 0.0f));
                         dev.OutputMerger.SetRenderTargets(overlayTex.GetRtView(layer, mipmap));
                         var size = overlayTex.Size.GetMip(mipmap);
+                        dev.SetViewScissors(size.Width, size.Height);
 
                         // draw all overlays
                         foreach (var overlay in Overlays)
                         {
-                            overlay.Render(layer, mipmap, size);
+                            if(overlay.HasWork)
+                                overlay.Render(layer, mipmap, size);
                         }
                     }
                 }
@@ -111,6 +115,12 @@ namespace ImageFramework.Model.Overlay
 
                 return overlayTex;
             }
+        }
+
+        private bool HasWork()
+        {
+            if (Overlays.Count == 0) return false;
+            return Overlays.Any(ol => ol.HasWork);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

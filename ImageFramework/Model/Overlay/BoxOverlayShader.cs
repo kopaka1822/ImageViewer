@@ -55,7 +55,8 @@ namespace ImageFramework.Model.Overlay
         {
             var dev = Device.Get();
             dev.InputAssembler.InputLayout = null;
-            dev.InputAssembler.SetVertexBuffers(0, null);
+            dev.InputAssembler.SetVertexBuffers(0, new VertexBufferBinding(null, 0, 0));
+            
         }
 
         public void Dispose()
@@ -70,7 +71,7 @@ namespace ImageFramework.Model.Overlay
             return @"
 float4 main(float2 pos : POSITION) : SV_POSITION
 {
-    return pos;
+    return float4(pos.x, -pos.y, 0.0, 1.0);
 }
 ";
         }

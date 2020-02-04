@@ -61,7 +61,8 @@ namespace ImageFramework.Model.Shader
                 Level = srcMip,
                 Xoffset = 0,
                 Yoffset = 0,
-                Multiplier = 1.0f
+                Multiplier = 1.0f,
+                UseOverlay = 0
             });
 
             var dim = dst.Size.GetMip(dstMip);
@@ -81,12 +82,13 @@ namespace ImageFramework.Model.Shader
         /// </summary>
         /// <param name="texture">source texture</param>
         /// <param name="dstFormat">destination format</param>
+        /// <param name="scaling">required for regenerating mipmaps after cropping</param>
         /// <param name="mipmap">mipmap to export, -1 for all mipmaps</param>
         /// <param name="layer">layer to export, -1 for all layers</param>
         /// <param name="multiplier">rgb channels will be multiplied by this value</param>
         public ITexture Convert(ITexture texture, SharpDX.DXGI.Format dstFormat, ScalingModel scaling, int mipmap = -1, int layer = -1, float multiplier = 1.0f)
        {
-            return Convert(texture, dstFormat, mipmap, layer, multiplier, false, Size3.Zero, Size3.Zero, Size3.Zero, scaling);
+            return Convert(texture, dstFormat, mipmap, layer, multiplier, false, Size3.Zero, Size3.Zero, Size3.Zero, scaling, null);
        }
 
         /// <summary>
@@ -101,13 +103,16 @@ namespace ImageFramework.Model.Shader
         /// <param name="offset">if crop: offset in source image</param>
         /// <param name="size">if crop: size of the destination image</param>
         /// <param name="align">if nonzero: texture width will be aligned to this (rounded down)</param>
+        /// <param name="scaling">required for regenerating mipmaps after cropping.</param>
+        /// <param name="overlay"></param>
         /// <returns></returns>
         public ITexture Convert(ITexture texture, SharpDX.DXGI.Format dstFormat, int mipmap, int layer, float multiplier, bool crop, 
-            Size3 offset, Size3 size, Size3 align, ScalingModel scaling)
+            Size3 offset, Size3 size, Size3 align, ScalingModel scaling, ITexture overlay = null)
         {
             Debug.Assert(ImageFormat.IsSupported(dstFormat));
             Debug.Assert(ImageFormat.IsSupported(texture.Format));
-
+            Debug.Assert(overlay == null || texture.HasSameDimensions(overlay));
+            
             // set width, height mipmap
             int firstMipmap = Math.Max(mipmap, 0);
             int firstLayer = Math.Max(layer, 0);
@@ -155,6 +160,8 @@ namespace ImageFramework.Model.Shader
             else dev.Pixel.Set(convert2D.Pixel);
 
             dev.Pixel.SetShaderResource(0, texture.View);
+            if(overlay != null)
+                dev.Pixel.SetShaderResource(1, overlay.View);
 
             for (int curLayer = 0; curLayer < nLayer; ++curLayer)
             {
@@ -166,7 +173,8 @@ namespace ImageFramework.Model.Shader
                         Level = curMipmap + firstMipmap,
                         Xoffset = offset.X,
                         Yoffset = offset.Y,
-                        Multiplier = multiplier
+                        Multiplier = multiplier,
+                        UseOverlay = overlay != null ? 1 : 0
                     });
 
                     var dim = res.Size.GetMip(curMipmap);
@@ -181,6 +189,7 @@ namespace ImageFramework.Model.Shader
 
             // remove bindings
             dev.Pixel.SetShaderResource(0, null);
+            dev.Pixel.SetShaderResource(1, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView) null);
             quad.Unbind();
 
@@ -216,7 +225,8 @@ namespace ImageFramework.Model.Shader
                 Level = 0,
                 Xoffset = 0,
                 Yoffset = 0,
-                Multiplier = 1.0f
+                Multiplier = 1.0f,
+                UseOverlay = 0
             });
 
             dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
@@ -256,7 +266,8 @@ namespace ImageFramework.Model.Shader
                 Level = 0,
                 Xoffset = 0,
                 Yoffset = 0,
-                Multiplier = 1.0f
+                Multiplier = 1.0f,
+                UseOverlay = 0
             });
 
             dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
@@ -276,6 +287,7 @@ namespace ImageFramework.Model.Shader
         {
             return $@"
 {builder.SrvType} in_tex : register(t0);
+{builder.SrvType} in_overlay : register(t1);
 
 cbuffer InfoBuffer : register(b0)
 {{
@@ -284,6 +296,7 @@ cbuffer InfoBuffer : register(b0)
     uint xoffset;
     uint yoffset;
     float multiplier;
+    bool useOverlay;
 }};
 
 struct PixelIn
@@ -304,6 +317,12 @@ float4 main(PixelIn i) : SV_TARGET
 #endif
     float4 color = in_tex.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), curLayer)];
 	color.rgb *= multiplier;
+    if(useOverlay)
+    {{
+        float4 overlay = in_overlay.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), curLayer)];
+        color.rgb = overlay.a * overlay.rgb + (1.0 - overlay.a) * color.rgb;
+        color.a = overlay.a + (1.0 - overlay.a) * color.a;
+    }}
 	return color;
 }}
 ";

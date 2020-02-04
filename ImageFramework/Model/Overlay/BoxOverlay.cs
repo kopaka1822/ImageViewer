@@ -23,7 +23,7 @@ namespace ImageFramework.Model.Overlay
         private BoxOverlayShader Shader => shader ?? (shader = new BoxOverlayShader());
         private bool hasChanges = false;
 
-        public BoxOverlay(Models models, DirectX.Shader pixel)
+        public BoxOverlay(Models models)
         {
             this.images = models.Images;
             this.cbuffer = models.SharedModel.Upload;
