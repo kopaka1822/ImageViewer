@@ -313,6 +313,9 @@ namespace ImageViewer.Models.Display
             }
         }
 
+        // previous mouse position on the texture (should be used for context menu things because the texel)
+        public Size3 PrevTexelPosition { get; private set; } = Size3.Zero;
+
         private Size3 texelPosition = Size3.Zero;
         // the mouse position on the texture
         public Size3 TexelPosition
@@ -320,6 +323,7 @@ namespace ImageViewer.Models.Display
             get => texelPosition;
             set
             {
+                PrevTexelPosition = texelPosition;
                 if (value.Equals(texelPosition)) return;
                 texelPosition = value;
                 OnPropertyChanged(nameof(TexelPosition));

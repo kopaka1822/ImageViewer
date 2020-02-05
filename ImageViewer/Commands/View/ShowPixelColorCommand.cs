@@ -54,7 +54,7 @@ namespace ImageViewer.Commands.View
                     var tex = models.Pipelines[i].Image;
                     if(tex == null) continue;
 
-                    var color = models.GetPixelValue(tex, new Size3(models.Display.TexelPosition.X, models.Display.TexelPosition.Y, 0),
+                    var color = models.GetPixelValue(tex, new Size3(models.Display.PrevTexelPosition.X, models.Display.PrevTexelPosition.Y, 0),
                         models.Display.ActiveLayer, models.Display.ActiveMipmap, models.Display.TexelRadius);
 
                     colors.Add(new PixelColorDialog.Element(color, i, models.Statistics[i].Stats.HasAlpha));
@@ -63,7 +63,7 @@ namespace ImageViewer.Commands.View
 
             if (colors.Count > 0)
             {
-                var dia = new PixelColorDialog(colors);
+                var dia = new PixelColorDialog(colors, models.Display.PrevTexelPosition, models.Images.Is3D);
                 models.Window.ShowDialog(dia);
             }
         }
