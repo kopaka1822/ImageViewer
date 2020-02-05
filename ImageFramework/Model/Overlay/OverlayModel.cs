@@ -109,7 +109,7 @@ namespace ImageFramework.Model.Overlay
                         }
                     }
                 }
-
+                
                 // unbind rendertargets
                 dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
 
@@ -138,6 +138,11 @@ namespace ImageFramework.Model.Overlay
             {
                 overlay.Dispose();
             }
+        }
+
+        public void Recompute()
+        {
+            var dummy = Overlay;
         }
     }
 }

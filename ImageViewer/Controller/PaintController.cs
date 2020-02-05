@@ -12,6 +12,7 @@ using ImageFramework.DirectX;
 using ImageFramework.DirectX.Query;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
+using ImageFramework.Model.Overlay;
 using ImageViewer.DirectX;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
@@ -41,6 +42,7 @@ namespace ImageViewer.Controller
             models.Display.PropertyChanged += DisplayOnPropertyChanged;
             models.Export.PropertyChanged += ExportOnPropertyChanged;
             models.Window.PropertyChanged += WindowOnPropertyChanged;
+            models.Overlay.PropertyChanged += OverlayOnPropertyChanged;
 
             // client mouse events
             models.Window.Window.BorderHost.PreviewMouseMove += (sender, e) => ScheduleRedraw();
@@ -59,6 +61,17 @@ namespace ImageViewer.Controller
             clearColor.G = col.Green;
             clearColor.B = col.Blue;
             clearColor.A = 1.0f;
+        }
+
+        private void OverlayOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(OverlayModel.Overlay):
+                    ScheduleRedraw();
+                    break;
+            }
+            
         }
 
         private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -130,6 +143,9 @@ namespace ImageViewer.Controller
             try
             {
                 var dev = Device.Get();
+                // recompute overlay before binding rendertargets
+                models.Overlay.Recompute();
+
                 dev.ClearRenderTargetView(swapChain.Rtv, clearColor);
 
                 var size = new Size(swapChain.Width, swapChain.Height);
