@@ -28,12 +28,12 @@ namespace ImageViewer.Controller.TextureViews.Shader
             public float Farplane;
         }
 
-        public void Run(Matrix transform, float farplane, ShaderResourceView texture)
+        public void Run(Matrix transform, float farplane, ShaderResourceView texture, ShaderResourceView overlay)
         {
             var v = models.ViewData;
             v.Buffer.SetData(new BufferData
             {
-                Common = GetCommonData(),
+                Common = GetCommonData(overlay),
                 Transform = transform,
                 Farplane = farplane,
             });
@@ -45,12 +45,14 @@ namespace ImageViewer.Controller.TextureViews.Shader
             dev.Pixel.SetConstantBuffer(0, v.Buffer.Handle);
 
             dev.Pixel.SetShaderResource(0, texture);
+            dev.Pixel.SetShaderResource(1, overlay);
             dev.Pixel.SetSampler(0, v.GetSampler());
 
             dev.DrawQuad();
 
             // unbind
             dev.Pixel.SetShaderResource(0, null);
+            dev.Pixel.SetShaderResource(1, null);
             UnbindShader(dev);
         }
 
@@ -94,6 +96,7 @@ VertexOut main(uint id: SV_VertexID) {{
         {
             return $@"
 TextureCube<float4> tex : register(t0);
+TextureCube<float4> overlay : register(t1);
 
 SamplerState texSampler : register(s0);
 
@@ -109,8 +112,8 @@ struct PixelIn {{
 float4 main(PixelIn i) : SV_TARGET {{
     float4 color = tex.Sample(texSampler, i.viewDir);
     color.rgb *= multiplier;
-    // TODO cropping?
     {ApplyColorTransform()}
+    {ApplyOverlayCube("i.viewDir", "color")}
     return color;
 }}
 ";

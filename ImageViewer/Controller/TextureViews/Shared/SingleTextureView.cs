@@ -17,7 +17,9 @@ namespace ImageViewer.Controller.TextureViews.Shared
         {
             if (texture == null) return;
 
-            DrawLayer(Matrix.Identity, models.Display.ActiveLayer, texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap));
+            DrawLayer(Matrix.Identity, 
+                texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap),
+                       models.Overlay.Overlay?.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap));
         }
 
         public override Size3 GetTexelPosition(Vector2 mouse)

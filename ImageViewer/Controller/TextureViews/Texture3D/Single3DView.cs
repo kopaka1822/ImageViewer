@@ -22,8 +22,9 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         {
             if (texture == null) return;
 
-            DrawLayer(Matrix.Identity, models.Display.ActiveLayer, 
+            DrawLayer(Matrix.Identity,
                 texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap),
+                models.Overlay.Overlay?.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap),
                 displayEx.FreeAxis1, displayEx.FreeAxis2, displayEx.FixedAxisSlice);
         }
 

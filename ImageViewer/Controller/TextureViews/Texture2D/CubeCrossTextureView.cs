@@ -19,17 +19,17 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
 
             var mip = models.Display.ActiveMipmap;
             // -x
-            DrawLayer(Matrix.Translation(-2.0f, 0.0f, 0.0f), 1, texture.GetSrView(1, mip));
+            DrawLayer(Matrix.Translation(-2.0f, 0.0f, 0.0f),  texture.GetSrView(1, mip), models.Overlay.Overlay?.GetSrView(1, mip));
             // -y
-            DrawLayer(Matrix.Translation(0.0f, -2.0f, 0.0f), 3, texture.GetSrView(3, mip));
+            DrawLayer(Matrix.Translation(0.0f, -2.0f, 0.0f),  texture.GetSrView(3, mip), models.Overlay.Overlay?.GetSrView(3, mip));
             // +y
-            DrawLayer(Matrix.Translation(0.0f, 2.0f, 0.0f), 2, texture.GetSrView(2, mip));
+            DrawLayer(Matrix.Translation(0.0f, 2.0f, 0.0f), texture.GetSrView(2, mip), models.Overlay.Overlay?.GetSrView(2, mip));
             // +z
-            DrawLayer(Matrix.Translation(0.0f, 0.0f, 0.0f), 4, texture.GetSrView(4, mip));
+            DrawLayer(Matrix.Translation(0.0f, 0.0f, 0.0f), texture.GetSrView(4, mip), models.Overlay.Overlay?.GetSrView(4, mip));
             // +x
-            DrawLayer(Matrix.Translation(2.0f, 0.0f, 0.0f), 0, texture.GetSrView(0, mip));
+            DrawLayer(Matrix.Translation(2.0f, 0.0f, 0.0f), texture.GetSrView(0, mip), models.Overlay.Overlay?.GetSrView(0, mip));
             // -z
-            DrawLayer(Matrix.Translation(4.0f, 0.0f, 0.0f), 5, texture.GetSrView(5, mip));
+            DrawLayer(Matrix.Translation(4.0f, 0.0f, 0.0f), texture.GetSrView(5, mip), models.Overlay.Overlay?.GetSrView(5, mip));
         }
 
         public override Size3 GetTexelPosition(Vector2 mouse)

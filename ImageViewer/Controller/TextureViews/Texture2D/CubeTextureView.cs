@@ -5,6 +5,8 @@ using ImageViewer.Controller.TextureViews.Shader;
 using ImageViewer.Controller.TextureViews.Shared;
 using ImageViewer.Models;
 using SharpDX;
+using SharpDX.Direct3D11;
+using Device = ImageFramework.DirectX.Device;
 
 namespace ImageViewer.Controller.TextureViews.Texture2D
 {
@@ -33,7 +35,12 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
             var dev = Device.Get();
             dev.OutputMerger.BlendState = models.ViewData.AlphaBlendState;
 
-            shader.Run(GetTransform(), CalcFarplane(), ((TextureArray2D)texture).GetCubeView(models.Display.ActiveMipmap));
+            ShaderResourceView overlay = null;
+            if (models.Overlay.Overlay != null)
+            {
+                overlay = ((TextureArray2D) models.Overlay.Overlay).GetCubeView(models.Display.ActiveMipmap);
+            }
+            shader.Run(GetTransform(), CalcFarplane(), ((TextureArray2D)texture).GetCubeView(models.Display.ActiveMipmap), overlay);
 
             dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
         }

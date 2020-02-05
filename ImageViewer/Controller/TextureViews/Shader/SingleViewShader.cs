@@ -30,20 +30,18 @@ namespace ImageViewer.Controller.TextureViews.Shader
             public int XAxis;
             public int YAxis;
             public int ZValue;
-            public int Layer;
         }
 
-        public void Run(Matrix transform, ShaderResourceView texture, int layer, int xaxis, int yaxis, int zvalue)
+        public void Run(Matrix transform, ShaderResourceView texture, ShaderResourceView overlay, int xaxis, int yaxis, int zvalue)
         {
             var v = models.ViewData;
             v.Buffer.SetData(new BufferData
             {
-                Common = GetCommonData(),
+                Common = GetCommonData(overlay),
                 Transform = transform,
                 XAxis = xaxis,
                 YAxis = yaxis,
-                ZValue = zvalue,
-                Layer = layer
+                ZValue = zvalue
             });
 
             var dev = Device.Get();
@@ -53,12 +51,14 @@ namespace ImageViewer.Controller.TextureViews.Shader
             dev.Pixel.SetConstantBuffer(0 , v.Buffer.Handle);
 
             dev.Pixel.SetShaderResource(0, texture);
+            dev.Pixel.SetShaderResource(1, overlay);
             dev.Pixel.SetSampler(0, v.GetSampler());
 
             dev.DrawQuad();
 
             // unbind
             dev.Pixel.SetShaderResource(0, null);
+            dev.Pixel.SetShaderResource(1, null);
             UnbindShader(dev);
         }
 
@@ -71,7 +71,6 @@ cbuffer InfoBuffer : register(b0) {{
     int xaxis;
     int yaxis;
     int zvalue;
-    int layer;
 }};
 ";
         }
@@ -101,6 +100,7 @@ VertexOut main(uint id: SV_VertexID) {{
         {
             return $@"
 {builder.SrvSingleType} tex : register(t0);
+{builder.SrvSingleType} overlay : register(t1);
 
 SamplerState texSampler : register(s0);
 
@@ -134,8 +134,8 @@ float4 main(PixelIn i) : SV_TARGET {{
     TexcoordT texcoord = getCoord(i.texcoord);
     float4 color = tex.Sample(texSampler, texcoord);
     color.rgb *= multiplier;
-    {ApplyColorCrop("texcoord", "layer", builder.Is3D)}
     {ApplyColorTransform()}
+    {(builder.Is3D ? ApplyOverlay3D("texcoord", "color"):ApplyOverlay2D("texcoord", "color"))}
     return color;
 }}
 ";

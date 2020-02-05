@@ -96,7 +96,8 @@ namespace ImageViewer.Controller.TextureViews.Shared
             return Matrix.Scaling(1.0f, -1.0f, 1.0f);
         }
 
-        protected void DrawLayer(Matrix offset, int layer, ShaderResourceView texture,
+        protected void DrawLayer(Matrix offset, ShaderResourceView texture,
+            ShaderResourceView overlay,
             int xaxis = 0, int yaxis = 1, int zvalue = 1)
         {
             var dev = ImageFramework.DirectX.Device.Get();
@@ -107,8 +108,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
             
             // blend over the final image
             dev.OutputMerger.BlendState = models.ViewData.AlphaBlendState;
-
-            shader.Run(finalTransform, texture, layer, xaxis, yaxis, zvalue);
+            shader.Run(finalTransform, texture, overlay, xaxis, yaxis, zvalue);
 
             dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
         }

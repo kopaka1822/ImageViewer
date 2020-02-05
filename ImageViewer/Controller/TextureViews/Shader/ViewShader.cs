@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ImageFramework.DirectX;
 using ImageFramework.Utility;
 using ImageViewer.Models;
 using SharpDX;
+using SharpDX.Direct3D11;
 using Color = ImageFramework.Utility.Color;
+using Device = ImageFramework.DirectX.Device;
 
 namespace ImageViewer.Controller.TextureViews.Shader
 {
@@ -19,21 +20,14 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
         public struct CommonBufferData
         {
-            public Vector2 CropX;
-            public Vector2 CropY;
-
-            public Vector2 CropZ;
             public float Multiplier;
             public int UseAbs;
-
-            public Vector4 NanColor;
-
-            public int CropLayer; // layer => -1 don't crop any layer. layer > 0 => crop this layer / discard others
+            public int UseOverlay;
 #pragma warning disable 169 // never used
             private int pad0;
-            private int pad1;
-            private int pad3;
 #pragma warning restore 169
+
+            public Vector4 NanColor;
         }
 
         protected ViewShader(ModelsEx models, string vertex, string pixel, string debugName)
@@ -43,73 +37,66 @@ namespace ImageViewer.Controller.TextureViews.Shader
             this.pixel = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Pixel, pixel, debugName + "PixelViewShader");
         }
 
-        protected CommonBufferData GetCommonData()
+        protected CommonBufferData GetCommonData(ShaderResourceView overlay)
         {
             var res = new CommonBufferData
             {
                 Multiplier = models.Display.Multiplier,
                 UseAbs = models.Display.DisplayNegative?1:0,
                 NanColor = ColorToVec(models.Settings.NaNColor),
-                CropLayer = -1
+                UseOverlay = overlay == null ? 0 : 1
             };
 
-            // set cropping
-            if (models.Export.UseCropping && (models.Display.IsExporting || models.Display.ShowCropRectangle))
-            {
-                res.CropLayer = models.Export.Layer;
-
-                int mipmap = Math.Max(models.Export.Mipmap, 0);
-                var dim = models.Images.Size.GetMip(mipmap);
-
-                var end = (models.Export.CropEnd.ToPixels(dim) + Size3.One);
-                var start = models.Export.CropStart.ToPixels(dim);
-
-                res.CropX.X = (float) start.X / dim.X;
-                res.CropX.Y = (float)end.X / dim.X;
-                res.CropY.X = (float)start.Y / dim.Y;
-                res.CropY.Y = (float)end.Y / dim.Y;
-                res.CropZ.X = (float)start.Z / dim.Z;
-                res.CropZ.Y = (float)end.Z / dim.Z;
-            }
-            else // no cropping
-            {
-                res.CropX.X = 0.0f;
-                res.CropX.Y = 1.0f;
-                res.CropY.X = 0.0f;
-                res.CropY.Y = 1.0f;
-                res.CropZ.X = 0.0f;
-                res.CropZ.Y = 1.0f;
-            }
             return res;
         }
 
-        protected static string ApplyColorCrop(string texcoord, string layer, bool is3D)
+        protected static string ApplyOverlay2D(string texcoord, string color)
         {
             return $@"
-if((cropLayer != -1 && cropLayer != {layer}) // gray all out if on the wrong layer
-|| {texcoord}.x < cropX.x || {texcoord}.x > cropX.y // otherwise, gray out based on crop rectangle
-|| {texcoord}.y < cropY.x || {texcoord}.y > cropY.y
-{(is3D? $"|| {texcoord}.y < cropZ.x || {texcoord}.y > cropZ.y" : "")})
-    color.rgb = clamp(color.rgb, -1.0, 1.0) * 0.5;
+if(useOverlay) {{
+    float4 ol = overlay.Sample(texSampler, {texcoord});
+    {CalcOverlay(color)}
+}}
+";
+        }
+
+        protected static string ApplyOverlay3D(string texcoord, string color)
+        {
+            return $@"
+if(useOverlay) {{
+    float4 ol = overlay.Sample(texSampler, {texcoord});
+    {CalcOverlay(color)}
+}}
+";
+        }
+
+        protected static string ApplyOverlayCube(string dir, string color)
+        {
+            return $@"
+if(useOverlay) {{
+    float4 ol = overlay.Sample(texSampler, {dir});
+    {CalcOverlay(color)}
+}}
+";
+        }
+
+        private static string CalcOverlay(string color)
+        {
+            return $@"
+{color}.rgb = ol.a * ol.rgb + (1.0 - ol.a) * {color}.rgb;
+{color}.a = 1.0 - ((1.0 - ol.a) * (1.0 - {color}.a));
 ";
         }
 
         protected static string CommonShaderBufferData()
         {
             return @"
-float2 cropX;
-float2 cropY;
-
-float2 cropZ;
 float multiplier;
 bool useAbs;
+bool useOverlay;
+int pad0_;
 
 float4 nancolor;
-
-int cropLayer;
-int pad0_;
-int pad1_;
-int pad2_;
 ";
         }
 

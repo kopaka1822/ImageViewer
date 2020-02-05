@@ -321,7 +321,7 @@ float4 main(PixelIn i) : SV_TARGET
     {{
         float4 overlay = in_overlay.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), curLayer)];
         color.rgb = overlay.a * overlay.rgb + (1.0 - overlay.a) * color.rgb;
-        color.a = overlay.a + (1.0 - overlay.a) * color.a;
+        color.a = 1.0 - ((1.0 - overlay.a) * (1.0 - color.a));
     }}
 	return color;
 }}

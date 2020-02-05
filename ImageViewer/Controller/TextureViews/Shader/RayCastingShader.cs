@@ -51,7 +51,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
             var v = models.ViewData;
             v.Buffer.SetData(new BufferData
             {
-                Common = GetCommonData(),
+                Common = GetCommonData(null),
                 Transform = rayTransform,
                 WorldToImage = worldToImage,
                 Farplane = farplane,
