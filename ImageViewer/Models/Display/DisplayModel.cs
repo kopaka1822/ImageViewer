@@ -20,7 +20,7 @@ using Size = System.Drawing.Size;
 namespace ImageViewer.Models.Display
 {
     public interface IExtendedDisplayModel : IDisposable, INotifyPropertyChanged { }
-    public class DisplayModel : INotifyPropertyChanged
+    public class DisplayModel : INotifyPropertyChanged, IDisposable
     {
         public enum ViewMode
         {
@@ -81,6 +81,21 @@ namespace ImageViewer.Models.Display
                 }
                 OnPropertyChanged(nameof(ActiveView));
                 OnPropertyChanged(nameof(ExtendedViewData));
+            }
+        }
+
+        private IDisplayOverlay activeOverlay = null;
+
+        public IDisplayOverlay ActiveOverlay
+        {
+            get => activeOverlay;
+            set
+            {
+                if(ReferenceEquals(value, activeOverlay)) return;
+                activeOverlay?.Dispose();
+                activeOverlay = value;
+                activeOverlay?.MouseMove(TexelPosition);
+                OnPropertyChanged(nameof(ActiveOverlay));
             }
         }
 
@@ -327,6 +342,8 @@ namespace ImageViewer.Models.Display
                 if (value.Equals(texelPosition)) return;
                 texelPosition = value;
                 OnPropertyChanged(nameof(TexelPosition));
+
+                ActiveOverlay?.MouseMove(texelPosition);
             }
         }
 
@@ -422,6 +439,12 @@ namespace ImageViewer.Models.Display
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void Dispose()
+        {
+            activeOverlay?.Dispose();
+            extendedView?.Dispose();
         }
     }
 

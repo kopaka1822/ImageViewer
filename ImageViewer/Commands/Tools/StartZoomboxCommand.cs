@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Model;
 using ImageViewer.Commands.Helper;
+using ImageViewer.Controller.Overlays;
 using ImageViewer.Models;
 
 namespace ImageViewer.Commands.Tools
@@ -33,7 +34,8 @@ namespace ImageViewer.Commands.Tools
 
         public override void Execute()
         {
-            
+            var overlay = new ZoomBoxOverlay(models);
+            models.Display.ActiveOverlay = overlay;
         }
     }
 }

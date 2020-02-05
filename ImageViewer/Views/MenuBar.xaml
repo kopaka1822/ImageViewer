@@ -234,7 +234,7 @@
             <Separator/>
             <MenuItem
                 Header="Add Zombox"
-                Command="{Binding StartZoombox}"
+                Command="{Binding StartZoomboxCommand}"
                 IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
                     <Image 

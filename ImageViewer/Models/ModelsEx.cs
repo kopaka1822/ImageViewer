@@ -53,6 +53,7 @@ namespace ImageViewer.Models
             Settings?.Save();
             ViewData?.Dispose();
             paintController?.Dispose();
+            Display?.Dispose();
             base.Dispose();
         }
     }

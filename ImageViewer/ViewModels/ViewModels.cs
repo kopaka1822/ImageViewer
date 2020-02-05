@@ -65,6 +65,7 @@ namespace ImageViewer.ViewModels
 
             ResizeCommand = new ResizeWindowCommand(models);
             SetThemeCommand = new SetThemeCommand(models);
+            StartZoomboxCommand = new StartZoomboxCommand(models);
 
             AddFilterCommand = new AddFilterCommand(models, Filter);
 
@@ -129,5 +130,7 @@ namespace ImageViewer.ViewModels
         public ICommand SelectNaNColorCommand { get; }
 
         public ICommand ReloadImagesCommand { get; }
+
+        public ICommand StartZoomboxCommand { get; }
     }
 }

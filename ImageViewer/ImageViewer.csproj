@@ -112,6 +112,7 @@
     <Compile Include="Controller\ComputeImageController.cs" />
     <Compile Include="Controller\CropController.cs" />
     <Compile Include="Controller\ImportDialogController.cs" />
+    <Compile Include="Controller\Overlays\ZoomBoxOverlay.cs" />
     <Compile Include="Controller\PaintController.cs" />
     <Compile Include="Controller\TextureViews\Shader\RayMarchingShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\RayCastingShader.cs" />
@@ -135,6 +136,7 @@
     <Compile Include="Controller\TextureViews\Shared\TextureViewData.cs" />
     <Compile Include="Controller\TextureViews\Texture3D\Texture3DBaseView.cs" />
     <Compile Include="Controller\ViewModeController.cs" />
+    <Compile Include="Models\Display\IDisplayOverlay.cs" />
     <Compile Include="Models\Display\RayCastingDisplayModel.cs" />
     <Compile Include="Models\Display\Single3DDisplayModel.cs" />
     <Compile Include="Models\SettingsModel.cs" />
