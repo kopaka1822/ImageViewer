@@ -44,6 +44,14 @@ namespace ImageFramework.Utility
             Alpha = 1.0f;
         }
 
+        public Color(Color c)
+        {
+            Red = c.Red;
+            Green = c.Green;
+            Blue = c.Blue;
+            Alpha = c.Alpha;
+        }
+
         public Color(byte r, byte g, byte b, byte a, bool isSigned = false)
         {
             if (isSigned)
@@ -241,6 +249,20 @@ namespace ImageFramework.Utility
                 res = " " + res;
             }
 
+            return res;
+        }
+
+        public Color Scale(float scalar, Channel channels)
+        {
+            Color res = new Color(this);
+            if ((channels & Channel.R) != 0)
+                res.Red *= scalar;
+            if ((channels & Channel.G) != 0)
+                res.Green *= scalar;
+            if ((channels & Channel.B) != 0)
+                res.Blue *= scalar;
+            if ((channels & Channel.A) != 0)
+                res.Alpha *= scalar;
             return res;
         }
     }

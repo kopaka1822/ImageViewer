@@ -31,25 +31,84 @@ namespace ImageFramework.Model.Overlay
             images = models.Images;
         }
 
+        private bool isEnabled = true;
+
+        public bool IsEnabled
+        {
+            get => isEnabled;
+            set
+            {
+                if(value == isEnabled) return;
+                isEnabled = value;
+                OnHasChanged();
+            }
+        }
+
+        private Float3? start;
         // start of the crop area (mipmap level 0)
-        public Size3? Start { get; set; }
+        public Float3? Start
+        {
+            get => start;
+            set
+            {
+                if (value == start) return;
+                start = value;
+                if(isEnabled)
+                    OnHasChanged();
+            }
+        }
 
+        private Float3? end;
         // end of the crop area (mipmap level 0)
-        public Size3? End { get; set; }
+        public Float3? End
+        {
+            get => end;
+            set
+            {
+                if(value == end) return;
+                end = value;
+                if(isEnabled)
+                    OnHasChanged();
+            }
+        }
 
-        public int Layer { get; set; } = -1;
+
+        private int cropLayer = -1;
+
+        public int Layer
+        {
+            get => cropLayer;
+            set
+            {
+                if(value == cropLayer) return;
+                cropLayer = value;
+                if(isEnabled)
+                    OnHasChanged();
+            }
+        }
+
 
         private struct BufferData
         {
-            public float StartX;
-            public float StartY;
-            public float StartZ;
+            public Float3 Start;
             public int CropLayer;
-            public float EndX;
-            public float EndY;
-            public float EndZ;
+            public Float3 End;
             public float Depth;
             public int Layer;
+        }
+
+        public override bool HasWork
+        {
+            get
+            {
+                if (!isEnabled) return false;
+
+                // everything gray?
+                if (!Start.HasValue || !End.HasValue) return true;
+                if (Layer != -1) return true;
+
+                return Start != Float3.Zero || End != Float3.One;
+            }
         }
 
         public override void Render(int layer, int mipmap, Size3 size)
@@ -69,19 +128,23 @@ namespace ImageFramework.Model.Overlay
             }
             else
             {
-                // keep the spot between start and end bright
-                data.StartX = Start.Value.X;
-                data.StartY = Start.Value.Y;
-                data.StartZ = Start.Value.Z;
-                data.EndX = End.Value.X;
-                data.EndY = End.Value.Y;
-                data.EndZ = End.Value.Z;
+                data.CropLayer = Layer;
+
+                // adjust float boundaries to pixel boundaries
+                var istart = Start.Value.ToPixels(size);
+                var iend = End.Value.ToPixels(size) + Size3.One;
+                for (int i = 0; i < 3; ++i)
+                {
+                    data.Start[i] = (float) istart[i] / size[i];
+                    data.End[i] = (float) iend[i] / size[i];
+                }
             }
 
             cbuffer.SetData(data);
             var dev = Device.Get();
             quad.Bind(images.Is3D);
             dev.Pixel.Set(images.Is3D ? Shader3D.Pixel : Shader.Pixel);
+            dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
 
             dev.DrawFullscreenTriangle(size.Depth);
 
@@ -118,18 +181,19 @@ struct PixelIn
 
 float4 main(PixelIn i) : SV_TARGET
 {{
-    float3 coord = float3(i.projPos, 0.5);
+    float3 coord = float3(i.texcoord, 0.5);
 #if {builder.Is3DInt}
-    coord.z = i.depth / depth;
+    coord.z = (i.depth + 0.5) / depth;
 #endif
     
 	if((cropLayer != -1 && cropLayer != layer) // gray all out if on the wrong layer
-    || i.texcoord.x < start.x || i.texcoord.x > end.x // otherwise, gray out based on crop rectangle
-    || i.texcoord.y < start.y || i.texcoord.y > end.y
-    || i.texcoord.z < start.z || i.texcoord.z > end.z)
+    || coord.x < start.x || coord.x > end.x // otherwise, gray out based on crop rectangle
+    || coord.y < start.y || coord.y > end.y
+    || coord.z < start.z || coord.z > end.z)
         return float4(0.0, 0.0, 0.0, 0.5); // gray out this area
     
     discard;
+    return 0.0;
 }}
 ";
         }
