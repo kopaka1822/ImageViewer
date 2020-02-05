@@ -69,10 +69,10 @@ namespace ImageViewer.ViewModels
             AddFilterCommand = new AddFilterCommand(models, Filter);
 
             // key input
-            models.Window.Window.KeyUp += WindowOnKeyUp;
+            models.Window.Window.KeyDown += WindowOnKeyDown;
         }
 
-        private void WindowOnKeyUp(object sender, KeyEventArgs e)
+        private void WindowOnKeyDown(object sender, KeyEventArgs e)
         {
             if (Filter.HasKeyToInvoke(e.Key))
             {
