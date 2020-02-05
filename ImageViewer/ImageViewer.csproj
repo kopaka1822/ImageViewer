@@ -201,6 +201,9 @@
     <Compile Include="Views\Dialog\ScaleDialog.xaml.cs">
       <DependentUpon>ScaleDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Dialog\ZoomBoxDialog.xaml.cs">
+      <DependentUpon>ZoomBoxDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Display\RayCastingView.xaml.cs">
       <DependentUpon>RayCastingView.xaml</DependentUpon>
     </Compile>
@@ -291,6 +294,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialog\ScaleDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\ZoomBoxDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

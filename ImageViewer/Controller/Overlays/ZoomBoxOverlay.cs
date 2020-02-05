@@ -10,6 +10,7 @@ using ImageFramework.Model.Overlay;
 using ImageFramework.Utility;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
+using ImageViewer.Views.Dialog;
 
 namespace ImageViewer.Controller.Overlays
 {
@@ -46,8 +47,25 @@ namespace ImageViewer.Controller.Overlays
             else
             {
                 SetCropRect(GetCurrentCoords(texel));
-                // TODO show advanced dialog
-                models.Window.ShowInfoDialog("You got mail!");
+                var dia = new ZoomBoxDialog(new Color(1.0f, 0.0f, 0.0f), 3);
+                if (models.Window.ShowDialog(dia) == true)
+                {
+                    var start = Start.Value.ToPixels(models.Images.Size);
+                    var end = End.Value.ToPixels(models.Images.Size);
+
+                    // add zoom box
+                    var box = new BoxOverlay.Box
+                    {
+                        Border = dia.BorderSize,
+                        Color = dia.Color,
+                        StartX = start.X,
+                        EndX = end.X,
+                        StartY = start.Y,
+                        EndY = end.Y
+                    };
+                    models.ZoomBox.Boxes.Add(box);
+                }
+
                 models.Display.ActiveOverlay = null;
             }
         }

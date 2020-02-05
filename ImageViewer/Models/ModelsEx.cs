@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Model.Overlay;
 using ImageViewer.Controller;
 using ImageViewer.Controller.TextureViews.Shared;
 using ImageViewer.Models.Display;
@@ -16,6 +17,8 @@ namespace ImageViewer.Models
         public SettingsModel Settings { get; }
 
         public TextureViewData ViewData { get; }
+        
+        public BoxOverlay ZoomBox { get; }
 
         public IReadOnlyList<StatisticModel> Statistics { get; }
 
@@ -40,6 +43,9 @@ namespace ImageViewer.Models
             for(int i = 0; i < NumPipelines; ++i)
                 stats.Add(new StatisticModel(this, Display, i));
             Statistics = stats;
+
+            ZoomBox = new BoxOverlay(this);
+            Overlay.Overlays.Add(ZoomBox);
 
             resizeController = new ResizeController(this);
             computeImageController = new ComputeImageController(this);
