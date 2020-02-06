@@ -207,13 +207,21 @@ float4 main(PixelIn i) : SV_TARGET {{
     const float stepsize = 4.0;
     float3 ray = normalize(i.rayDir) * 2.0f / float(height) / stepsize;
 
+    float3 unDividedRay = normalize(i.rayDir) * 2.0f / float(height) ;
+
     // transform ray to image space
     ray = mul(toImage, float4(ray, 0.0)).xyz;
+    unDividedRay = mul(toImage, float4(unDividedRay, 0.0)).xyz;
     float3 pos;    
 
     if(!getIntersection(i.origin, ray, pos)) return color;
     
     [loop] do{{
+        
+        //skip empty space
+        pos += emptySpaceTex[pos] * unDividedRay;
+
+       
         float4 s = tex.SampleLevel(texSampler, pos, 0);
         float invAlpha = pow(max(1.0 - s.a, 0.0), 1.0 / stepsize);
         float alpha = 1.0 - invAlpha;
@@ -222,8 +230,7 @@ float4 main(PixelIn i) : SV_TARGET {{
         
         pos += ray;
 
-        //skip empty space
-        pos += emptySpaceTex[pos] * ray;
+
 
     }} while(isInside(pos) && color.a > 0.0);
    

@@ -258,7 +258,7 @@ float4 main(PixelIn i) : SV_TARGET {{
     [loop] do{{
         
         //skip empty space
-        rayPos += emptySpaceTex[rayPos] * absDir;        
+        rayPos += emptySpaceTex[rayPos] * ray;   
 
         float4 s = tex[rayPos];
         if(!useFlatShading){{
@@ -287,7 +287,8 @@ float4 main(PixelIn i) : SV_TARGET {{
             distance.y = projLength.y;
             diffuse = absDir.y;
         }}    
-            
+        
+
 
     }} while(isInside(rayPos,textureDimension) && color.a > 0.0);
 
