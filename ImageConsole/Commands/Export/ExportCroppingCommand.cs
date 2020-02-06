@@ -10,9 +10,12 @@ namespace ImageConsole.Commands.Export
 {
     class ExportCroppingCommand : Command
     {
-        public ExportCroppingCommand() 
+        private readonly ExportCommand export;
+
+        public ExportCroppingCommand(ExportCommand export) 
             : base("-exportcrop", "true/false [xStart yStart xEnd yEnd]", "enables/disables export cropping and sets cropping boundaries")
         {
+            this.export = export;
         }
 
         public override void Execute(List<string> arguments, Models model)
@@ -21,7 +24,7 @@ namespace ImageConsole.Commands.Export
             var enable = reader.ReadBool("enabled");
             if (!reader.HasMoreArgs())
             {
-                model.Export.UseCropping = enable;
+                export.UseCropping = enable;
             }
             else
             {
@@ -31,9 +34,9 @@ namespace ImageConsole.Commands.Export
                 var yEnd = reader.ReadInt("yEnd");
                 reader.ExpectNoMoreArgs();
 
-                model.Export.UseCropping = enable;
-                model.Export.CropStart = new Size3(xStart, yStart, 0).ToCoords(model.Images.Size);
-                model.Export.CropEnd = new Size3(xEnd, yEnd, 0).ToCoords(model.Images.Size);
+                export.UseCropping = enable;
+                export.CropStart = new Size3(xStart, yStart, 0).ToCoords(model.Images.Size);
+                export.CropEnd = new Size3(xEnd, yEnd, 0).ToCoords(model.Images.Size);
             }
         }
     }

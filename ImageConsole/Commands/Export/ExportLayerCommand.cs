@@ -9,9 +9,12 @@ namespace ImageConsole.Commands.Export
 {
     public class ExportLayerCommand : Command
     {
-        public ExportLayerCommand() 
+        private readonly ExportCommand export;
+
+        public ExportLayerCommand(ExportCommand export) 
             : base("-exportlayer", "layer", "sets the layer that should be exported. -1 means all layers")
         {
+            this.export = export;
         }
 
         public override void Execute(List<string> arguments, Models model)
@@ -20,7 +23,7 @@ namespace ImageConsole.Commands.Export
             var layer = reader.ReadInt("layer");
             reader.ExpectNoMoreArgs();
 
-            model.Export.Layer = layer;
+            export.Layer = layer;
         }
     }
 }

@@ -26,11 +26,11 @@ namespace ImageViewer.Controller
             {
                 this.models = models;
                 models.Display.PropertyChanged += DisplayOnPropertyChanged;
-                models.Export.PropertyChanged += ExportOnPropertyChanged;
+                models.ExportConfig.PropertyChanged += ExportOnPropertyChanged;
 
-                Start = models.Export.CropStart;
-                End = models.Export.CropEnd;
-                Layer = models.Export.Layer;
+                Start = models.ExportConfig.CropStart;
+                End = models.ExportConfig.CropEnd;
+                Layer = models.ExportConfig.Layer;
                 EvaluateIsEnabled();
             }
 
@@ -38,17 +38,17 @@ namespace ImageViewer.Controller
             {
                 switch (e.PropertyName)
                 {
-                    case nameof(models.Export.UseCropping):
+                    case nameof(ExportConfigModel.UseCropping):
                         EvaluateIsEnabled();
                         break;
-                    case nameof(models.Export.CropStart):
-                        Start = models.Export.CropStart;
+                    case nameof(ExportConfigModel.CropStart):
+                        Start = models.ExportConfig.CropStart;
                         break;
-                    case nameof(models.Export.CropEnd):
-                        End = models.Export.CropEnd;
+                    case nameof(ExportConfigModel.CropEnd):
+                        End = models.ExportConfig.CropEnd;
                         break;
-                    case nameof(models.Export.Layer):
-                        Layer = models.Export.Layer;
+                    case nameof(ExportConfigModel.Layer):
+                        Layer = models.ExportConfig.Layer;
                         break;
                 }
 
@@ -67,7 +67,7 @@ namespace ImageViewer.Controller
 
             private void EvaluateIsEnabled()
             {
-                IsEnabled = models.Export.UseCropping &&
+                IsEnabled = models.ExportConfig.UseCropping &&
                             (models.Display.IsExporting || models.Display.ShowCropRectangle);
             }
         }
@@ -95,8 +95,8 @@ namespace ImageViewer.Controller
         private void AdjustCroppingRect()
         {
             // reset cropping rect
-            models.Export.CropStart = Float3.Zero;
-            models.Export.CropEnd = Float3.One;
+            models.ExportConfig.CropStart = Float3.Zero;
+            models.ExportConfig.CropEnd = Float3.One;
         }
     }
 }

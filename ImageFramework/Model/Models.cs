@@ -226,7 +226,6 @@ namespace ImageFramework.Model
         /// <param name="pipelineId"></param>
         public void ExportPipelineImage(string filename, string extension, GliFormat format, int pipelineId = 0)
         {
-            var desc = new ExportDescription(filename, extension, Export) { FileFormat = format };
             if (!Pipelines[pipelineId].IsValid)
                 throw new Exception($"current image formula is invalid. At least " +
                                     $"{Math.Max(Math.Max(Pipelines[pipelineId].Color.MaxImageId, Pipelines[pipelineId].Alpha.MaxImageId), 1)} " +
@@ -234,7 +233,9 @@ namespace ImageFramework.Model
 
             // apply changes before exporting
             Apply();
-            Export.Export(Pipelines[pipelineId].Image, desc);
+            var desc = new ExportDescription(Pipelines[pipelineId].Image, filename, extension) { FileFormat = format };
+            
+            Export.Export(desc);
         }
 
         /// <summary>

@@ -37,9 +37,8 @@ namespace ImageViewer.ViewModels.Dialog
             this.extension = extension;
             this.filename = filename;
             this.is3D = is3D;
-            this.usedFormat = models.Export.Formats.First(fmt => fmt.Extension == extension);
+            this.usedFormat = ExportDescription.GetExportFormat(extension);
             models.Display.IsExporting = true;
-            Quality = models.Settings.LastQuality;
 
             // init layers
             for (var i = 0; i < models.Images.NumLayers; ++i)
@@ -50,8 +49,10 @@ namespace ImageViewer.ViewModels.Dialog
                     Name = "Layer " + i
                 });
             }
-            selectedLayer = AvailableLayers[models.Export.Layer];
-            Debug.Assert(selectedLayer.Cargo == models.Export.Layer);
+
+            models.ExportConfig.Layer = models.Display.ActiveLayer;
+            selectedLayer = AvailableLayers[models.Display.ActiveLayer];
+            Debug.Assert(selectedLayer.Cargo == models.Display.ActiveLayer);
 
             // init mipmaps
             for (var i = 0; i < models.Images.NumMipmaps; ++i)
@@ -62,8 +63,10 @@ namespace ImageViewer.ViewModels.Dialog
                     Name = "Mipmap " + i
                 });
             }
-            selectedMipmap = AvailableMipmaps[models.Export.Mipmap];
-            Debug.Assert(selectedMipmap.Cargo == models.Export.Mipmap);
+
+            models.ExportConfig.Mipmap = models.Display.ActiveMipmap;
+            selectedMipmap = AvailableMipmaps[models.Display.ActiveMipmap];
+            Debug.Assert(selectedMipmap.Cargo == models.Display.ActiveMipmap);
 
             // all layer option for ktx and dds
             if (models.Images.NumLayers > 1 && (extension == "ktx" || extension == "dds"))
@@ -74,7 +77,7 @@ namespace ImageViewer.ViewModels.Dialog
                     Name = "All Layer"
                 });
                 selectedLayer = AvailableLayers.Last();
-                models.Export.Layer = selectedLayer.Cargo;
+                models.ExportConfig.Layer = -1;
             }
 
             // all mipmaps option for ktx and dds
@@ -86,7 +89,7 @@ namespace ImageViewer.ViewModels.Dialog
                     Name = "All Mipmaps"
                 });
                 selectedMipmap = AvailableMipmaps.Last();
-                models.Export.Mipmap = selectedMipmap.Cargo;
+                models.ExportConfig.Mipmap = -1;
             }
 
             // init available pixel data types
@@ -144,12 +147,23 @@ namespace ImageViewer.ViewModels.Dialog
             }
             else SetKtxDdsQuality();
 
-            models.Export.PropertyChanged += ExportOnPropertyChanged;
+            models.ExportConfig.PropertyChanged += ExportConfigOnPropertyChanged;
+            models.Settings.PropertyChanged += SettingsOnPropertyChanged;
 
-            if (models.Export.CropEnd == Float3.Zero)
+            if (models.ExportConfig.CropEnd == Float3.Zero)
             {
                 // assume cropping was not set
                 SetMaxCropping();
+            }
+        }
+
+        private void SettingsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(SettingsModel.LastQuality):
+                    OnPropertyChanged(nameof(Quality));
+                    break;
             }
         }
 
@@ -173,21 +187,21 @@ namespace ImageViewer.ViewModels.Dialog
 
         public void Dispose()
         {
-            models.Export.PropertyChanged -= ExportOnPropertyChanged;
-            models.Settings.LastQuality = Quality;
+            models.ExportConfig.PropertyChanged -= ExportConfigOnPropertyChanged;
+            models.Settings.PropertyChanged -= SettingsOnPropertyChanged;
             models.Display.IsExporting = false;
         }
 
-        private void ExportOnPropertyChanged(object sender, PropertyChangedEventArgs args)
+        private void ExportConfigOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            switch (args.PropertyName)
+            switch (e.PropertyName)
             {
-                case nameof(ExportModel.UseCropping):
+                case nameof(ExportConfigModel.UseCropping):
                     OnPropertyChanged(nameof(UseCropping));
                     OnPropertyChanged(nameof(IsValid));
                     break;
-                case nameof(ExportModel.CropStart):
-                case nameof(ExportModel.CropEnd):
+                case nameof(ExportConfigModel.CropStart):
+                case nameof(ExportConfigModel.CropEnd):
                     OnPropertyChanged(nameof(CropStartX));
                     OnPropertyChanged(nameof(CropStartY));
                     OnPropertyChanged(nameof(CropStartZ));
@@ -196,13 +210,23 @@ namespace ImageViewer.ViewModels.Dialog
                     OnPropertyChanged(nameof(CropEndZ));
                     OnPropertyChanged(nameof(IsValid));
                     break;
-                case nameof(ExportModel.Mipmap):
-                    if (models.Export.Mipmap < 0)
+                case nameof(ExportConfigModel.Layer):
+                    if (models.ExportConfig.Layer < 0)
+                        selectedLayer = AvailableLayers.Last();
+                    else
+                        selectedLayer = AvailableLayers[models.ExportConfig.Layer];
+                    OnPropertyChanged(nameof(SelectedLayer));
+
+                    // preview layer
+                    if (models.ExportConfig.Layer >= 0)
+                        models.Display.ActiveLayer = models.ExportConfig.Layer;
+                    break;
+                case nameof(ExportConfigModel.Mipmap):
+                    if (models.ExportConfig.Mipmap < 0)
                         selectedMipmap = AvailableMipmaps.Last();
                     else
-                        selectedMipmap = AvailableMipmaps[models.Export.Mipmap];
+                        selectedMipmap = AvailableMipmaps[models.ExportConfig.Mipmap];
                     OnPropertyChanged(nameof(SelectedMipmap));
-                    OnPropertyChanged(nameof(UseCropping));
 
                     OnPropertyChanged(nameof(CropStartX));
                     OnPropertyChanged(nameof(CropStartY));
@@ -215,17 +239,8 @@ namespace ImageViewer.ViewModels.Dialog
                     OnPropertyChanged(nameof(CropMaxY));
                     OnPropertyChanged(nameof(CropMaxZ));
 
-                    OnPropertyChanged(nameof(IsValid));
-                    break;
-                case nameof(ExportModel.Layer):
-                    if (models.Export.Layer < 0)
-                        selectedLayer = AvailableLayers.Last();
-                    else
-                        selectedLayer = AvailableLayers[models.Export.Layer];
-                    OnPropertyChanged(nameof(SelectedLayer));
-                    break;
-                case nameof(ExportModel.Quality):
-                    OnPropertyChanged(nameof(Quality));
+                    // preview mipmap
+                    models.Display.ActiveMipmap = Math.Max(models.ExportConfig.Mipmap, 0);
                     break;
             }
         }
@@ -259,14 +274,8 @@ namespace ImageViewer.ViewModels.Dialog
             get => selectedLayer;
             set
             {
-                if (value == null || value == selectedLayer) return;
-                //selectedLayer = value;
-                models.Export.Layer = value.Cargo;
-                //OnPropertyChanged(nameof(SelectedLayer));
-                
-                // preview layer
-                if(value.Cargo >= 0)
-                    models.Display.ActiveLayer = value.Cargo;
+                if (value == null) return;
+                models.ExportConfig.Layer = selectedLayer.Cargo;
             }
         }
 
@@ -276,15 +285,8 @@ namespace ImageViewer.ViewModels.Dialog
             get => selectedMipmap;
             set
             {
-                if (value == null || value == selectedMipmap) return;
-                //selectedMipmap = value;
-                models.Export.Mipmap = value.Cargo;
-                //OnPropertyChanged(nameof(SelectedMipmap));
-                OnPropertyChanged(nameof(CropMaxX));
-                OnPropertyChanged(nameof(CropMaxY));
-                OnPropertyChanged(nameof(CropMaxZ));
-                // preview mipmap
-                models.Display.ActiveMipmap = Math.Max(value.Cargo, 0);
+                if (value == null) return;
+                models.ExportConfig.Mipmap = value.Cargo;
             }
         }
 
@@ -385,8 +387,8 @@ namespace ImageViewer.ViewModels.Dialog
         }
         public bool UseCropping
         {
-            get => models.Export.UseCropping;
-            set => models.Export.UseCropping = value;
+            get => models.ExportConfig.UseCropping;
+            set => models.ExportConfig.UseCropping = value;
         }
 
         private Size3 curDim => models.Images.Size.GetMip(Math.Max(selectedMipmap.Cargo, 0));
@@ -401,7 +403,7 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropStartX
         {
-            get => models.Export.CropStart.ToPixels(curDim).X;
+            get => models.ExportConfig.CropStart.ToPixels(curDim).X;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinX, CropMaxX);
@@ -414,7 +416,7 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropStartY
         {
-            get => models.Settings.FlipYAxis ? FlipY(models.Export.CropEnd.ToPixels(curDim).Y) : models.Export.CropStart.ToPixels(curDim).Y;
+            get => models.Settings.FlipYAxis ? FlipY(models.ExportConfig.CropEnd.ToPixels(curDim).Y) : models.ExportConfig.CropStart.ToPixels(curDim).Y;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinY, CropMaxY);
@@ -435,7 +437,7 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropStartZ
         {
-            get => models.Export.CropStart.ToPixels(curDim).Z;
+            get => models.ExportConfig.CropStart.ToPixels(curDim).Z;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinZ, CropMaxZ);
@@ -448,7 +450,7 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropEndX
         {
-            get => models.Export.CropEnd.ToPixels(curDim).X;
+            get => models.ExportConfig.CropEnd.ToPixels(curDim).X;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinX, CropMaxX);
@@ -460,7 +462,7 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropEndY
         {
-            get => models.Settings.FlipYAxis ? FlipY(models.Export.CropStart.ToPixels(curDim).Y) :  models.Export.CropEnd.ToPixels(curDim).Y;
+            get => models.Settings.FlipYAxis ? FlipY(models.ExportConfig.CropStart.ToPixels(curDim).Y) :  models.ExportConfig.CropEnd.ToPixels(curDim).Y;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinY, CropMaxY);
@@ -480,7 +482,7 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int CropEndZ
         {
-            get => models.Export.CropEnd.ToPixels(curDim).Z;
+            get => models.ExportConfig.CropEnd.ToPixels(curDim).Z;
             set
             {
                 var clamped = Utility.Clamp(value, CropMinZ, CropMaxZ);
@@ -497,16 +499,16 @@ namespace ImageViewer.ViewModels.Dialog
 
         private void SetCropStart(int v, int axis)
         {
-            var res = models.Export.CropStart;
+            var res = models.ExportConfig.CropStart;
             res[axis] = (v + 0.5f) / curDim[axis];
-            models.Export.CropStart = res;
+            models.ExportConfig.CropStart = res;
         }
 
         private void SetCropEnd(int v, int axis)
         {
-            var res = models.Export.CropEnd;
+            var res = models.ExportConfig.CropEnd;
             res[axis] = (v + 0.5f) / curDim[axis];
-            models.Export.CropEnd = res;
+            models.ExportConfig.CropEnd = res;
         }
 
         private bool hasQualityValue = false;
@@ -523,12 +525,12 @@ namespace ImageViewer.ViewModels.Dialog
         }
 
         public Visibility HasQuality => HasQualityValue ? Visibility.Visible : Visibility.Collapsed;
-        public int MinQuality => ExportModel.QualityMin;
-        public int MaxQuality => ExportModel.QualityMax;
+        public int MinQuality => ExportDescription.QualityMin;
+        public int MaxQuality => ExportDescription.QualityMax;
         public int Quality
         {
-            get => models.Export.Quality;
-            set => models.Export.Quality = value;
+            get => models.Settings.LastQuality;
+            set => models.Settings.LastQuality = value;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

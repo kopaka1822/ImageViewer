@@ -40,7 +40,6 @@ namespace ImageViewer.Controller
 
             // model events
             models.Display.PropertyChanged += DisplayOnPropertyChanged;
-            models.Export.PropertyChanged += ExportOnPropertyChanged;
             models.Window.PropertyChanged += WindowOnPropertyChanged;
             models.Overlay.PropertyChanged += OverlayOnPropertyChanged;
 
@@ -90,20 +89,6 @@ namespace ImageViewer.Controller
             switch (e.PropertyName)
             {
                 case nameof(WindowModel.ClientSize):
-                    ScheduleRedraw();
-                    break;
-            }
-        }
-
-        private void ExportOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(ExportModel.CropStart):
-                case nameof(ExportModel.CropEnd):
-                case nameof(ExportModel.UseCropping):
-                case nameof(ExportModel.Mipmap):
-                case nameof(ExportModel.Layer):
                     ScheduleRedraw();
                     break;
             }

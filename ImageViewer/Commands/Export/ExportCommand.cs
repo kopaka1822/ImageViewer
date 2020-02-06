@@ -135,19 +135,26 @@ namespace ImageViewer.Commands.Export
             exportDirectory = System.IO.Path.GetDirectoryName(sfd.FileName);
             SetExportDirectory(exportDirectory);
 
-            models.Export.Mipmap = models.Display.ActiveMipmap;
-            models.Export.Layer = models.Display.ActiveLayer;
+            
             var viewModel = new ExportViewModel(models, exportExtension, exportFormat.Value, sfd.FileName, tex.Is3D, models.Statistics[id].Stats);
             var dia = new ExportDialog(viewModel);
 
             if (models.Window.ShowDialog(dia) != true) return;
 
-            var desc = new ExportDescription(exportDirectory + "/" + exportFilename, exportExtension, models.Export);
+            var desc = new ExportDescription(tex, exportDirectory + "/" + exportFilename, exportExtension)
+            {
+                Multiplier = multiplier,
+                Mipmap = models.ExportConfig.Mipmap,
+                Layer = models.ExportConfig.Layer,
+                UseCropping = models.ExportConfig.UseCropping,
+                CropStart = models.ExportConfig.CropStart,
+                CropEnd = models.ExportConfig.CropEnd,
+                Overlay = models.Overlay.Overlay
+            };
             desc.TrySetFormat(viewModel.SelectedFormatValue);
-            desc.Multiplier = multiplier;
             exportFormat = desc.FileFormat;
 
-            models.Export.ExportAsync(tex, desc);
+            models.Export.ExportAsync(desc);
         }
 
         private static Dictionary<string, string> filter = new Dictionary<string, string>

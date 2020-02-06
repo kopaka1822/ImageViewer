@@ -22,6 +22,8 @@ namespace ImageViewer.Models
 
         public IReadOnlyList<StatisticModel> Statistics { get; }
 
+        public ExportConfigModel ExportConfig { get; }
+
         private readonly ResizeController resizeController;
         private readonly ComputeImageController computeImageController;
         private readonly ClientDropController clientDropController;
@@ -37,6 +39,7 @@ namespace ImageViewer.Models
             Settings = new SettingsModel();
             Window = new WindowModel(window);
             Display = new DisplayModel(this);
+            ExportConfig = new ExportConfigModel();
             ViewData = new TextureViewData(this);
 
             var stats = new List<StatisticModel>();

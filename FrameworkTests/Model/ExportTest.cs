@@ -75,13 +75,16 @@ namespace FrameworkTests.Model
         {
             var model = new Models(1);
             model.AddImageFromFile(TestData.Directory + "checkers.dds");
-            model.Export.Mipmap = 0;
-            model.Export.UseCropping = true;
-            model.Export.CropStart = new Size3(1, 1, 0).ToCoords(model.Images.Size);
-            model.Export.CropEnd = new Size3(2, 2, 0).ToCoords(model.Images.Size);
             model.Apply();
 
-            model.ExportPipelineImage(ExportDir + "cropped", "dds", GliFormat.RGBA8_SRGB);
+            model.Export.Export(new ExportDescription(model.Pipelines[0].Image, ExportDir + "cropped", "dds")
+            {
+                FileFormat = GliFormat.RGBA8_SRGB,
+                Mipmap = 0,
+                UseCropping = true,
+                CropStart = new Size3(1, 1, 0).ToCoords(model.Images.Size),
+                CropEnd = new Size3(2, 2, 0).ToCoords(model.Images.Size)
+            });
             var newTex = new TextureArray2D(IO.LoadImage(ExportDir + "cropped.dds"));
 
             TestData.TestCheckersLevel1(newTex.GetPixelColors(0, 0));
@@ -92,16 +95,19 @@ namespace FrameworkTests.Model
         {
             var model = new Models(1);
             model.AddImageFromFile(TestData.Directory + "checkers3d.dds");
-            model.Export.Mipmap = 0;
-            model.Export.UseCropping = true;
-
-            model.Export.CropStart = new Size3(1, 0, 2).ToCoords(model.Images.Size);
-            model.Export.CropEnd = new Size3(2, 1, 3).ToCoords(model.Images.Size);
             model.Apply();
             
             TestData.TestCheckers3DLevel0(model.Pipelines[0].Image.GetPixelColors(0, 0));
 
-            model.ExportPipelineImage(ExportDir + "cropped", "dds", GliFormat.RGBA8_SRGB);
+            model.Export.Export(new ExportDescription(model.Pipelines[0].Image, ExportDir + "cropped", "dds")
+            {
+                FileFormat = GliFormat.RGBA8_SRGB,
+                Mipmap = 0,
+                UseCropping = true,
+                CropStart = new Size3(1, 0, 2).ToCoords(model.Images.Size),
+                CropEnd = new Size3(2, 1, 3).ToCoords(model.Images.Size)
+        });
+
             var newTex = new Texture3D(IO.LoadImage(ExportDir + "cropped.dds"));
 
             var colors = newTex.GetPixelColors(0);
@@ -123,13 +129,16 @@ namespace FrameworkTests.Model
         {
             var model = new Models(1);
             model.AddImageFromFile(TestData.Directory + "checkers.dds");
-            model.Export.Mipmap = -1;
-            model.Export.UseCropping = true;
-            model.Export.CropStart = new Size3(1, 1, 0).ToCoords(model.Images.Size);
-            model.Export.CropEnd = new Size3(2, 2, 0).ToCoords(model.Images.Size);
             model.Apply();
 
-            model.ExportPipelineImage(ExportDir + "cropped", "dds", GliFormat.RGBA8_SRGB);
+            model.Export.Export(new ExportDescription(model.Pipelines[0].Image, ExportDir + "cropped", "dds")
+            {
+                FileFormat = GliFormat.RGBA8_SRGB,
+                Mipmap = -1,
+                UseCropping = true,
+                CropStart = new Size3(1, 1, 0).ToCoords(model.Images.Size),
+                CropEnd = new Size3(2, 2, 0).ToCoords(model.Images.Size)
+            });
             var newTex = new TextureArray2D(IO.LoadImage(ExportDir + "cropped.dds"));
 
             Assert.AreEqual(2, newTex.Size.Width);
@@ -147,8 +156,8 @@ namespace FrameworkTests.Model
             var orig = IO.LoadImageTexture(TestData.Directory + "checkers3d.dds", out var format);
             model.Images.AddImage(orig, "tsts", format);
             model.Apply();
-            model.Export.Mipmap = -1;
             
+
             model.ExportPipelineImage(ExportDir + "tmp3d", "dds", format);
 
             var newTex = IO.LoadImageTexture(ExportDir + "tmp3d.dds", out var newFormat);
@@ -170,8 +179,11 @@ namespace FrameworkTests.Model
             model.Images.AddImage(orig, "tsts", format);
             model.Apply();
 
-            model.Export.Mipmap = 0;
-            model.ExportPipelineImage(ExportDir + "tmp3d", "dds", GliFormat.RGBA32_SFLOAT);
+            model.Export.Export(new ExportDescription(model.Pipelines[0].Image, ExportDir + "tmp3d", "dds")
+            {
+                FileFormat = GliFormat.RGBA32_SFLOAT,
+                Mipmap = 0
+            });
 
             var newTex = IO.LoadImageTexture(ExportDir + "tmp3d.dds", out var newFormat);
             Assert.AreEqual(GliFormat.RGBA32_SFLOAT, newFormat);
@@ -375,7 +387,6 @@ namespace FrameworkTests.Model
             var model = new Models(1);
             model.AddImageFromFile(TestData.Directory + "small_scaled.png");
             model.Apply();
-            model.Export.Quality = 100;
             var origTex = (TextureArray2D)model.Pipelines[0].Image;
             // normal colors
             var origColors = origTex.GetPixelColors(0, 0);
@@ -388,7 +399,7 @@ namespace FrameworkTests.Model
 
             Color[] newColors = null;
 
-            var eFmt = model.Export.Formats.First(fmt => fmt.Extension == "dds");
+            var eFmt = ExportDescription.GetExportFormat("dds");
             string errors = "";
             int numErrors = 0;
 
@@ -398,13 +409,14 @@ namespace FrameworkTests.Model
                 {
                     // export to dds
                     var isIntegerPrecision = IsIntegerPrecisionFormat(format);
-                    var desc = new ExportDescription(ExportDir + "tmp", "dds", model.Export);
+                    var desc = new ExportDescription(origTex, ExportDir + "tmp", "dds");
                     desc.FileFormat = format;
+                    desc.Quality = 100;
                     if (isIntegerPrecision)
                     {
                         desc.Multiplier = 100.0f;
                     }
-                    model.Export.Export(origTex, desc);
+                    model.Export.Export(desc);
 
                     // load with directx dds loader
                     DDSTextureLoader.CreateDDSTextureFromFile(Device.Get().Handle, Device.Get().ContextHandle, ExportDir + "tmp.dds",
@@ -448,7 +460,6 @@ namespace FrameworkTests.Model
             var model = new Models(1);
             model.AddImageFromFile(TestData.Directory + "checkers3d.dds");
             model.Apply();
-            model.Export.Quality = 100;
             var origTex = (Texture3D)model.Pipelines[0].Image;
             var origColors = origTex.GetPixelColors(0, 0);
             Color[] newColors = null;
@@ -459,7 +470,7 @@ namespace FrameworkTests.Model
             var integerTex = (Texture3D)model.Pipelines[0].Image;
             var origColors100 = integerTex.GetPixelColors(0, 0);
 
-            var eFmt = model.Export.Formats.First(fmt => fmt.Extension == "dds");
+            var eFmt = ExportDescription.GetExportFormat("dds");
             string errors = "";
             int numErrors = 0;
             int nFormats = 0;
@@ -472,11 +483,12 @@ namespace FrameworkTests.Model
                 {
                     // export to dds
                     var isIntegerPrecision = IsIntegerPrecisionFormat(format);
-                    var desc = new ExportDescription(ExportDir + "tmp", "dds", model.Export);
+                    var desc = new ExportDescription(origTex, ExportDir + "tmp", "dds");
                     desc.FileFormat = format;
+                    desc.Quality = 100;
                     if (isIntegerPrecision)
                         desc.Multiplier = 100.0f;
-                    model.Export.Export(origTex, desc);
+                    model.Export.Export(desc);
 
                     // load with directx dds loader
                     DDSTextureLoader.CreateDDSTextureFromFile(Device.Get().Handle, Device.Get().ContextHandle, ExportDir + "tmp.dds",
@@ -520,9 +532,9 @@ namespace FrameworkTests.Model
             model.Apply();
 
             // export
-            var desc = new ExportDescription(ExportDir + "tmp", "dds", model.Export);
+            var desc = new ExportDescription(model.Pipelines[0].Image, ExportDir + "tmp", "dds");
             desc.FileFormat = GliFormat.RGBA8_SRGB;
-            model.Export.Export(model.Pipelines[0].Image, desc);
+            model.Export.Export(desc);
 
             // try loading with dds loader
             DDSTextureLoader.CreateDDSTextureFromFile(Device.Get().Handle, Device.Get().ContextHandle, ExportDir + "tmp.dds",
@@ -543,9 +555,12 @@ namespace FrameworkTests.Model
             model.AddImageFromFile(inputImage);
             model.Apply();
             var origTex = (TextureArray2D)model.Pipelines[0].Image;
-            model.Export.Quality = 100;
 
-            model.Export.Export(origTex, new ExportDescription(outputImage, outputExtension, model.Export){FileFormat = format});
+            model.Export.Export(new ExportDescription(origTex, outputImage, outputExtension)
+            {
+                FileFormat = format,
+                Quality = 100
+            });
             var expTex = new TextureArray2D(IO.LoadImage(outputImage + "." + outputExtension));
 
             for (int curLayer = 0; curLayer < origTex.NumLayers; ++curLayer)
@@ -575,7 +590,7 @@ namespace FrameworkTests.Model
             model.Apply();
             var tex = (TextureArray2D)model.Pipelines[0].Image;
 
-            var eFmt = model.Export.Formats.First(fmt => fmt.Extension == outputExtension);
+            var eFmt = ExportDescription.GetExportFormat(outputExtension);
             string errors = "";
             int numErrors = 0;
 
@@ -589,9 +604,9 @@ namespace FrameworkTests.Model
 
                 try
                 {
-                    var desc = new ExportDescription(outputImage, outputExtension, model.Export);
+                    var desc = new ExportDescription(tex, outputImage, outputExtension);
                     desc.FileFormat = format;
-                    model.Export.Export(tex, desc);
+                    model.Export.Export(desc);
                 }
                 catch (Exception e)
                 {
@@ -624,9 +639,8 @@ namespace FrameworkTests.Model
             model.AddImageFromFile(TestData.Directory + "gray.png");
             model.Apply();
             var tex = (TextureArray2D)model.Pipelines[0].Image;
-            model.Export.Quality = 100;
 
-            var eFmt = model.Export.Formats.First(fmt => fmt.Extension == outputExtension);
+            var eFmt = ExportDescription.GetExportFormat(outputExtension);
 
             string errors = "";
             int numErrors = 0;
@@ -644,12 +658,13 @@ namespace FrameworkTests.Model
                     try
                     {
                         var integerPrecision = IsIntegerPrecisionFormat(format);
-                        var desc = new ExportDescription(ExportDir + "gray" + ++i, outputExtension, model.Export);
+                        var desc = new ExportDescription(tex, ExportDir + "gray" + ++i, outputExtension);
                         desc.FileFormat = format;
+                        desc.Quality = 100;
                         if (integerPrecision)
                             desc.Multiplier = 100.0f;
 
-                        model.Export.Export(tex, desc);
+                        model.Export.Export(desc);
                         Thread.Sleep(1);
 
                         // load and compare gray tone

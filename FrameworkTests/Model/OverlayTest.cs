@@ -48,7 +48,7 @@ namespace FrameworkTests.Model
             var refColors = reference.GetPixelColors(0, 0);
             var actualColors = models.Overlay.Overlay.GetPixelColors(0, 0);
 
-            models.Export.Export(models.Overlay.Overlay, new ExportDescription(ExportTest.ExportDir + "overlay_tmp", "png", models.Export)
+            models.Export.Export(new ExportDescription(models.Overlay.Overlay, ExportTest.ExportDir + "overlay_tmp", "png")
             {
                 FileFormat = GliFormat.RGBA8_SRGB
             });
@@ -92,9 +92,10 @@ namespace FrameworkTests.Model
             var filename = ExportTest.ExportDir + "overlayed";
             // create export directory
             ExportTest.Init(null);
-            models.Export.Export(models.Pipelines[0].Image, new ExportDescription(filename, "png", models.Export)
+            models.Export.Export(new ExportDescription(models.Pipelines[0].Image, filename, "png")
             {
-                FileFormat = GliFormat.RGBA8_SRGB
+                FileFormat = GliFormat.RGBA8_SRGB,
+                Overlay = models.Overlay.Overlay
             });
 
             var imported = IO.LoadImageTexture(filename + ".png");
@@ -211,10 +212,11 @@ namespace FrameworkTests.Model
         private static Color[] GetColorAfterExport(Models models, int layer = 0)
         {
             ExportTest.Init(null);
-            models.Export.Layer = layer;
-            models.Export.Export(models.Pipelines[0].Image, new ExportDescription( ExportTest.ExportDir + "crop_test", "dds", models.Export)
+            models.Export.Export(new ExportDescription(models.Pipelines[0].Image, ExportTest.ExportDir + "crop_test", "dds")
             {
                 FileFormat = GliFormat.RGBA32_SFLOAT,
+                Layer = layer,
+                Overlay = models.Overlay.Overlay
             });
             var imported = IO.LoadImageTexture(ExportTest.ExportDir + "crop_test.dds");
             return imported.GetPixelColors(0, 0);

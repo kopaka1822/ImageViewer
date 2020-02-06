@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Model;
+using ImageFramework.Model.Export;
 
 namespace ImageConsole.Commands.Export
 {
@@ -19,7 +20,7 @@ namespace ImageConsole.Commands.Export
             var ext = reader.ReadString("file extension");
             reader.ExpectNoMoreArgs();
 
-            foreach (var exportFormatModel in model.Export.Formats)
+            foreach (var exportFormatModel in ExportDescription.Formats)
             {
                 if (exportFormatModel.Extension == ext)
                 {

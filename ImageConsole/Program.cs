@@ -47,12 +47,13 @@ namespace ImageConsole
             AddCommand(new TellFilterCommand());
             AddCommand(new TellFilterParamsCommand());
 
-            AddCommand(new ExportCommand());
+            var export = new ExportCommand();
+            AddCommand(export);
             AddCommand(new TellFormatsCommand());
-            AddCommand(new ExportMipmapCommand());
-            AddCommand(new ExportLayerCommand());
-            AddCommand(new ExportCroppingCommand());
-            AddCommand(new ExportQualityCommand());
+            AddCommand(new ExportMipmapCommand(export));
+            AddCommand(new ExportLayerCommand(export));
+            AddCommand(new ExportCroppingCommand(export));
+            AddCommand(new ExportQualityCommand(export));
 
             AddCommand(new TellPixelCommand());
             AddCommand(new StatisticsCommand(this));
