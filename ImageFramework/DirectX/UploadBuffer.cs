@@ -18,13 +18,13 @@ namespace ImageFramework.DirectX
         public readonly Buffer Handle;
         public int ByteSize { get; }
 
-        public UploadBuffer(int byteSize)
+        public UploadBuffer(int byteSize, BindFlags binding = BindFlags.ConstantBuffer)
         {
             ByteSize = Utility.Utility.AlignTo(byteSize, 16);
 
             var bufferDesc = new BufferDescription
             {
-                BindFlags = BindFlags.ConstantBuffer,
+                BindFlags = binding,
                 CpuAccessFlags = CpuAccessFlags.None,
                 OptionFlags = ResourceOptionFlags.None,
                 SizeInBytes = ByteSize,

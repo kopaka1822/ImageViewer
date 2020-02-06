@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -28,6 +29,21 @@ namespace ImageFramework.Model.Overlay
             this.images = models.Images;
             this.cbuffer = models.SharedModel.Upload;
             Boxes.CollectionChanged += BoxesOnCollectionChanged;
+            images.PropertyChanged += ImagesOnPropertyChanged;
+        }
+
+        private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ImagesModel.Size):
+                    if (!hasChanges)
+                    {
+                        hasChanges = true;
+                        OnHasChanged();
+                    }
+                    break;
+            }
         }
 
         private void BoxesOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -42,12 +58,10 @@ namespace ImageFramework.Model.Overlay
 
         public struct Box
         {
-            // top left corner on mip 0 (included)
-            public int StartX;
-            public int StartY;
-            // bottom right corner on mip 0 (included)
-            public int EndX;
-            public int EndY;
+            // top left corner
+            public Float2 Start;
+            // bottom right corner
+            public Float2 End;
 
             // border color
             public Color Color;
@@ -62,22 +76,14 @@ namespace ImageFramework.Model.Overlay
         {
             Debug.Assert(HasWork);
 
-            if(hasChanges)
-                UpdateData();
+            UpdateData(mipmap);
 
             Shader.Bind(new VertexBufferBinding(positionBuffer.Handle, 2 * sizeof(float), 0));
-            Shader.Draw(Boxes, cbuffer);
+            Shader.Draw(Boxes, cbuffer, mipmap, size.XY);
             Shader.Unbind();
         }
 
-        private float ToCanonical(int pos, int size)
-        {
-            Debug.Assert(pos <= size);
-            Debug.Assert(pos >= 0);
-            return (float) (pos) / (float) (size) * 2.0f - 1.0f;
-        }
-
-        private void UpdateData()
+        private void UpdateData(int mipmap)
         {
             if(Boxes.Count == 0) return;
 
@@ -86,36 +92,41 @@ namespace ImageFramework.Model.Overlay
             {
                 // resize buffer
                 positionBuffer?.Dispose();
-                positionBuffer = new UploadBuffer(floatCount * sizeof(float));
+                positionBuffer = new UploadBuffer(floatCount * sizeof(float), BindFlags.VertexBuffer);
             }
 
             // fill buffer
             var data = new float[floatCount];
-            var imgSize = images.Size;
+            var dim = images.Size.GetMip(mipmap);
+            // offset float coordinates by half a unit so the quad covers the area
+            var offset = Size2.Zero.ToCoords(dim.XY);
+            
             for (var i = 0; i < Boxes.Count; i++)
             {
                 var box = Boxes[i];
-                float xStart = ToCanonical(box.StartX, imgSize.X);
-                float xEnd = ToCanonical(box.EndX + 1, imgSize.X);
-                float yStart = ToCanonical(box.StartY, imgSize.Y);
-                float yEnd = ToCanonical(box.EndY + 1, imgSize.Y);
 
                 // top left
-                data[i * 8] = xStart;
-                data[i * 8 + 1] = yStart;
+                data[i * 8] = ToCanonical(box.Start.X - offset.X);
+                data[i * 8 + 1] = ToCanonical(box.Start.Y - offset.Y);
                 // top right
-                data[i * 8 + 2] = xEnd;
-                data[i * 8 + 3] = yStart;
+                data[i * 8 + 2] = ToCanonical(box.End.X + offset.X);
+                data[i * 8 + 3] = ToCanonical(box.Start.Y - offset.Y);
                 // bot left
-                data[i * 8 + 4] = xStart;
-                data[i * 8 + 5] = yEnd;
+                data[i * 8 + 4] = ToCanonical(box.Start.X - offset.X);
+                data[i * 8 + 5] = ToCanonical(box.End.Y + offset.Y);
                 // bot right
-                data[i * 8 + 6] = xEnd;
-                data[i * 8 + 7] = yEnd;
+                data[i * 8 + 6] = ToCanonical(box.End.X + offset.X);
+                data[i * 8 + 7] = ToCanonical(box.End.Y + offset.Y);
             }
 
             // upload buffer
             positionBuffer.SetData(data);
+        }
+
+        // transform [0, 1] to [-1, 1]
+        private static float ToCanonical(float texcoord)
+        {
+            return texcoord * 2.0f - 1.0f;
         }
 
         public override bool HasWork => Boxes.Count != 0;

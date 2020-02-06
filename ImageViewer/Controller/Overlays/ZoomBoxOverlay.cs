@@ -50,18 +50,16 @@ namespace ImageViewer.Controller.Overlays
                 var dia = new ZoomBoxDialog(new Color(1.0f, 0.0f, 0.0f), 3);
                 if (models.Window.ShowDialog(dia) == true)
                 {
-                    var start = Start.Value.ToPixels(models.Images.Size);
-                    var end = End.Value.ToPixels(models.Images.Size);
+                    Debug.Assert(Start.HasValue);
+                    Debug.Assert(End.HasValue);
 
                     // add zoom box
                     var box = new BoxOverlay.Box
                     {
                         Border = dia.BorderSize,
                         Color = dia.Color,
-                        StartX = start.X,
-                        EndX = end.X,
-                        StartY = start.Y,
-                        EndY = end.Y
+                        Start = Start.Value.XY,
+                        End = End.Value.XY,
                     };
                     models.ZoomBox.Boxes.Add(box);
                 }

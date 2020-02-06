@@ -32,12 +32,11 @@ namespace FrameworkTests.Model
             Assert.IsNull(models.Overlay.Overlay);
             Assert.IsFalse(boxes.HasWork);
 
+            var dim = models.Images.Size;
             boxes.Boxes.Add(new BoxOverlay.Box
             {
-                StartX = 1,
-                StartY = 2,
-                EndX = 8,
-                EndY = 7,
+                Start = new Size2(1, 2).ToCoords(dim.XY),
+                End = new Size2(8, 7).ToCoords(dim.XY),
                 Border = 2,
                 Color = new Color(1.0f, 0.0f, 0.0f)
             });
@@ -49,10 +48,10 @@ namespace FrameworkTests.Model
             var refColors = reference.GetPixelColors(0, 0);
             var actualColors = models.Overlay.Overlay.GetPixelColors(0, 0);
 
-            /*models.Export.Export(models.Overlay.Overlay, new ExportDescription(TestData.Directory + "overlay_tmp", "png", models.Export)
+            models.Export.Export(models.Overlay.Overlay, new ExportDescription(ExportTest.ExportDir + "overlay_tmp", "png", models.Export)
             {
                 FileFormat = GliFormat.RGBA8_SRGB
-            });*/
+            });
 
             TestData.CompareColors(refColors, actualColors, Color.Channel.Rgba, 0.0f);
         }
@@ -70,22 +69,19 @@ namespace FrameworkTests.Model
             var boxes = new BoxOverlay(models);
             models.Overlay.Overlays.Add(boxes);
 
+            var dim = models.Images.Size;
             boxes.Boxes.Add(new BoxOverlay.Box
             {
-                StartX = 18,
-                StartY = 11,
-                EndX = 24,
-                EndY = 20,
+                Start = new Size2(18, 11).ToCoords(dim.XY),
+                End = new Size2(24, 20).ToCoords(dim.XY),
                 Border = 1,
                 Color = new Color(1.0f, 1.0f, 0.0f)
             });
 
             boxes.Boxes.Add(new BoxOverlay.Box
             {
-                StartX = 7,
-                StartY = 9,
-                EndX = 15,
-                EndY = 15,
+                Start = new Size2(7, 9).ToCoords(dim.XY),
+                End = new Size2(15, 15).ToCoords(dim.XY),
                 Border = 2,
                 Color = new Color(1.0f, 0.0f, 0.0f)
             });

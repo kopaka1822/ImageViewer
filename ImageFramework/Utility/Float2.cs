@@ -58,6 +58,26 @@ namespace ImageFramework.Utility
             return !(left == right);
         }
 
+        public static Float2 operator +(Float2 left, Float2 right)
+        {
+            return new Float2(left.X + right.X, left.Y + right.Y);
+        }
+
+        public static Float2 operator -(Float2 left, Float2 right)
+        {
+            return new Float2(left.X - right.X, left.Y - right.Y);
+        }
+
+        public static Float2 operator *(Float2 left, Float2 right)
+        {
+            return new Float2(left.X * right.X, left.Y * right.Y);
+        }
+
+        public static Float2 operator /(Float2 left, Float2 right)
+        {
+            return new Float2(left.X / right.X, left.Y / right.Y);
+        }
+
         public bool Equals(Float2 other)
         {
             return X == other.X && Y == other.Y;
@@ -83,6 +103,22 @@ namespace ImageFramework.Utility
         {
             float* fp = &v;
             return *(int*)fp;
+        }
+
+        public Size2 ToPixels(Size2 size)
+        {
+            return new Size2(
+                Utility.Clamp((int)(X * size.X), 0, size.X - 1),
+                Utility.Clamp((int)(Y * size.Y), 0, size.Y - 1)
+            );
+        }
+
+        public Float2 Clamp(Float2 min, Float2 max)
+        {
+            return new Float2(
+                Utility.Clamp(X, min.X, max.X),
+                Utility.Clamp(Y, min.Y, max.Y)
+            );
         }
     }
 }

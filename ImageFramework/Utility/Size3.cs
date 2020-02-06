@@ -13,7 +13,11 @@ namespace ImageFramework.Utility
         public int X;
         public int Y;
         public int Z;
-        // size alias
+        
+        public Size2 XY => new Size2(X, Y);
+        public Size2 YZ => new Size2(Y, Z);
+        public Size2 XZ => new Size2(X, Z);
+
         public int Width
         {
             get => X;
