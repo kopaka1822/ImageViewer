@@ -16,6 +16,7 @@
 
     <Window.Resources>
         <GridLength x:Key="GridWidth">60</GridLength>
+        <GridLength x:Key="BoxesGridWidth">100</GridLength>
     </Window.Resources>
     <Grid>
         <Border Padding="5">
@@ -178,6 +179,57 @@
                         </StackPanel>
                     </StackPanel>
 
+                </GroupBox>
+                
+                <!-- Zoom Box -->
+                <GroupBox
+                    Visibility="{Binding HasZoomBox, Converter={StaticResource VisibleCollapsedConverter}}"
+                    Margin="{StaticResource DefaultBorderBottom}"
+                    Padding="{StaticResource DefaultBorderTop}">
+                    <GroupBox.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Export Zoom Boxes:" Margin="{StaticResource DefaultBorderRight}" HorizontalAlignment="Center"/>
+                            <CheckBox 
+                                HorizontalAlignment="Center"
+                                IsChecked="{Binding ExportZoomBox}"/>
+                        </StackPanel>
+                    </GroupBox.Header>
+                    <Grid IsEnabled="{Binding ExportZoomBox}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="{StaticResource BoxesGridWidth}"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock
+                            Text="Include Border:"
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Margin="{StaticResource DefaultBorderBottom}"/>
+
+                        <CheckBox 
+                            IsChecked="{Binding ZoomBorders}"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Margin="{StaticResource DefaultBorderBottom}"
+                            VerticalAlignment="Center"/>
+
+                        <TextBlock
+                            Text="Scale:"
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Margin="{StaticResource DefaultBorderBottom}"/>
+
+                        <xctk:IntegerUpDown
+                            Grid.Row="1"
+                            Grid.Column="1"  
+                            Minimum="1"
+                            Maximum="16"
+                            Value="{Binding ZoomBoxScale}"/>
+                    </Grid>
                 </GroupBox>
 
                 <TextBlock 

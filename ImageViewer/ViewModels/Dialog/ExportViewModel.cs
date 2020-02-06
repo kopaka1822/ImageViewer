@@ -326,6 +326,10 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
+        public bool HasZoomBox => models.ZoomBox.Boxes.Count != 0;
+
+
+
         private ListItemViewModel<GliFormat> selectedFormat;
         public ListItemViewModel<GliFormat> SelectedFormat
         {
