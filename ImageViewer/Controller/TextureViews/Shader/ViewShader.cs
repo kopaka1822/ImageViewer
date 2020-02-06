@@ -27,7 +27,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
             private int pad0;
 #pragma warning restore 169
 
-            public Vector4 NanColor;
+            public Color NanColor;
         }
 
         protected ViewShader(ModelsEx models, string vertex, string pixel, string debugName)
@@ -43,7 +43,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
             {
                 Multiplier = models.Display.Multiplier,
                 UseAbs = models.Display.DisplayNegative?1:0,
-                NanColor = ColorToVec(models.Settings.NaNColor),
+                NanColor = models.Settings.NaNColor,
                 UseOverlay = overlay == null ? 0 : 1
             };
 
@@ -108,9 +108,9 @@ float4 nancolor;
         protected static string ApplyColorTransform()
         {
             return @"
+color.rgb *= multiplier;
 if(useAbs) color.rgb = abs(color.rgb);
 if(any(isnan(color))) color = nancolor;
-else color = toSrgb(color);
 ";
         }
 
@@ -130,11 +130,6 @@ else color = toSrgb(color);
         {
             vertex?.Dispose();
             pixel?.Dispose();
-        }
-
-        private Vector4 ColorToVec(Color c)
-        {
-            return new Vector4(c.Red, c.Green, c.Blue, c.Alpha);
         }
     }
 }

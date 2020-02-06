@@ -111,10 +111,9 @@ struct PixelIn {{
 
 float4 main(PixelIn i) : SV_TARGET {{
     float4 color = tex.Sample(texSampler, i.viewDir);
-    color.rgb *= multiplier;
     {ApplyColorTransform()}
     {ApplyOverlayCube("i.viewDir", "color")}
-    return color;
+    return toSrgb(color);
 }}
 ";
         }

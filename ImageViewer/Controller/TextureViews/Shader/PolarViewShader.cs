@@ -126,10 +126,9 @@ float4 main(PixelIn i) : SV_TARGET {{
     if(polarDirection.x < 0.0) polarDirection.x += 1.0;
     
     float4 color = tex.Sample(texSampler, polarDirection);
-    color.rgb *= multiplier;
     {ApplyColorTransform()}
     {ApplyOverlay2D("polarDirection", "color")}
-    return color;
+    return toSrgb(color);
 }}
 ";
         }

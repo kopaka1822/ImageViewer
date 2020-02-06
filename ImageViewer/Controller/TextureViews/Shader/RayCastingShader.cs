@@ -220,9 +220,8 @@ float4 main(PixelIn i) : SV_TARGET {{
         pos += ray;
     }} while(isInside(pos) && color.a > 0.0);
    
-    color.rgb *= multiplier;
     {ApplyColorTransform()}
-    return color;
+    return toSrgb(color);
 }}
 ";
         }

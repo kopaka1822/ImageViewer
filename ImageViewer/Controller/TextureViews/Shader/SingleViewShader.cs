@@ -133,10 +133,9 @@ float2 getCoord(float2 coord) {{ return coord; }}
 float4 main(PixelIn i) : SV_TARGET {{
     TexcoordT texcoord = getCoord(i.texcoord);
     float4 color = tex.Sample(texSampler, texcoord);
-    color.rgb *= multiplier;
     {ApplyColorTransform()}
     {(builder.Is3D ? ApplyOverlay3D("texcoord", "color"):ApplyOverlay2D("texcoord", "color"))}
-    return color;
+    return toSrgb(color);
 }}
 ";
         }

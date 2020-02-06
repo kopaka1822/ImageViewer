@@ -161,7 +161,7 @@ namespace ImageFramework.Utility
         {
             if (c >= 1.0f) return 1.0f;
             if (c <= 0.0f) return 0.0f;
-            if (c < 0.0031308) return 12.92f * c;
+            if (c <= 0.0031308) return 12.92f * c;
             return 1.055f * (float)Math.Pow(c, 0.41666) - 0.055f;
         }
 
@@ -177,6 +177,8 @@ namespace ImageFramework.Utility
 
         private float FromSrgb(float c)
         {
+            if (c >= 1.0f) return 1.0f;
+            if (c <= 0.0f) return 0.0f;
             if (c <= 0.04045f) return c / 12.92f;
             return (float)Math.Pow((c + 0.055) / 1.055, 2.4);
         }
