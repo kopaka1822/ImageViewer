@@ -83,14 +83,8 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
             }
 
-            if (readHelpTex)
-            {
-                DebugTex(pong);
-            }
-            else
-            {
-                DebugTex(helpTex);
-            }
+            //DebugTex(helpTex);
+           
 
             // unbind
             dev.Compute.SetShaderResource(0, null);

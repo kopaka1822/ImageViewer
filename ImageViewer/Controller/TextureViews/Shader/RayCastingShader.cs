@@ -202,6 +202,7 @@ float4 main(PixelIn i) : SV_TARGET {{
 
     uint width, height, depth;
     tex.GetDimensions(width, height, depth);
+    uint3 size = uint3(width, height, depth);
 
     // the height of the cube is 2.0 in world space. Width and Depth depend on aspect of height
     const float stepsize = 4.0;
@@ -211,15 +212,16 @@ float4 main(PixelIn i) : SV_TARGET {{
 
     // transform ray to image space
     ray = mul(toImage, float4(ray, 0.0)).xyz;
-    unDividedRay = mul(toImage, float4(unDividedRay, 0.0)).xyz;
+    unDividedRay = ray * stepsize;
     float3 pos;    
 
     if(!getIntersection(i.origin, ray, pos)) return color;
     
     [loop] do{{
         
+        float3 pos2 = float3(pos.xy,1-pos.z);
         //skip empty space
-        pos += emptySpaceTex[pos] * unDividedRay;
+        pos += max(emptySpaceTex[min(size-1,size*pos2)] ,0) * unDividedRay;
 
        
         float4 s = tex.SampleLevel(texSampler, pos, 0);
