@@ -24,7 +24,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         }
 
 
-        public virtual void Draw(ITexture texture)
+        public virtual void Draw(int id, ITexture texture)
         {
             // draw transparent background
             models.ViewData.Checkers.Run(Matrix.Identity);

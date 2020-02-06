@@ -24,11 +24,11 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
             base.Dispose();
         }
 
-        public override void Draw(ITexture texture)
+        public override void Draw(int id, ITexture texture)
         {
             if (texture == null) return;
 
-            base.Draw(texture);
+            base.Draw(id, texture);
 
             var dev = Device.Get();
             dev.OutputMerger.BlendState = models.ViewData.AlphaBlendState;

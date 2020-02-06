@@ -13,7 +13,7 @@ namespace ImageViewer.Controller.TextureViews
 {
     public class EmptyView : ITextureView
     {
-        public void Draw(ITexture texture)
+        public void Draw(int id, ITexture texture)
         {
             Debug.Assert(texture == null);
         }

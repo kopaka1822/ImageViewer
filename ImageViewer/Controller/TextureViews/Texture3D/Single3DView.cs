@@ -18,7 +18,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             displayEx = (Single3DDisplayModel)models.Display.ExtendedViewData;
         }
 
-        public override void Draw(ITexture texture)
+        public override void Draw(int id, ITexture texture)
         {
             if (texture == null) return;
 

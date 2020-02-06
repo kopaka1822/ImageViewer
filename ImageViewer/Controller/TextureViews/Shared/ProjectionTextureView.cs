@@ -19,7 +19,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
         public virtual void Dispose()
         {}
 
-        public virtual void Draw(ITexture texture)
+        public virtual void Draw(int id, ITexture texture)
         {
             models.ViewData.Checkers.Run(Matrix.Identity);
         }

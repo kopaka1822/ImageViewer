@@ -115,6 +115,7 @@
     <Compile Include="Controller\ImportDialogController.cs" />
     <Compile Include="Controller\Overlays\ZoomBoxOverlay.cs" />
     <Compile Include="Controller\PaintController.cs" />
+    <Compile Include="Controller\TextureViews\Shader\EmptySpaceSkippingShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\RayMarchingShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\RayCastingShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\ShearWarpShader.cs" />

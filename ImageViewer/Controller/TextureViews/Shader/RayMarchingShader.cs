@@ -48,7 +48,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
 
         public void Run(Matrix rayTransform, Matrix worldToImage, float farplane,
-            bool useFlatShading,ShaderResourceView texture)
+            bool useFlatShading,ShaderResourceView texture, ShaderResourceView emptySpaceTex)
         {
             var v = models.ViewData;
             v.Buffer.SetData(new BufferData
@@ -67,12 +67,14 @@ namespace ImageViewer.Controller.TextureViews.Shader
             dev.Pixel.SetConstantBuffer(0, v.Buffer.Handle);
 
             dev.Pixel.SetShaderResource(0, texture);
+            dev.Pixel.SetShaderResource(1, emptySpaceTex);
             dev.Pixel.SetSampler(0, sampler);
 
             dev.DrawQuad();
 
             // unbind
             dev.Pixel.SetShaderResource(0, null);
+            dev.Pixel.SetShaderResource(1, null);
             UnbindShader(dev);
         }
 
@@ -121,6 +123,7 @@ VertexOut main(uint id : SV_VertexID) {{
         {
             return $@"
 Texture3D<float4> tex : register(t0);
+Texture3D<uint> emptySpaceTex : register(t1);
 SamplerState texSampler : register(s0);
 
 {ConstantBuffer()}
@@ -205,9 +208,7 @@ bool getIntersection(float3 origin, float3 dir, out float3 intersect) {{
 }}
 
 float4 main(PixelIn i) : SV_TARGET {{
-    float4 color = 0.0;
-    color.a = 1.0; // transmittance
-
+    
     uint width, height, depth;
     tex.GetDimensions(width, height, depth);
     uint3 textureDimension = uint3(width,height, depth);
@@ -218,7 +219,7 @@ float4 main(PixelIn i) : SV_TARGET {{
     ray = normalize(ray);
     float3 pos;    
 
-    if(!getIntersection(i.origin, ray, pos)) return color;
+    if(!getIntersection(i.origin, ray, pos)) return float4(0.0,0.0,0.0,1.0);
     
     int3 dirSign; 
     dirSign.x = ray.x < 0.0f ? -1 : 1;
@@ -236,28 +237,40 @@ float4 main(PixelIn i) : SV_TARGET {{
     if(dirSign.z == 1) distance.z = 1-distance.z;
     distance *= projLength;
 
-    
-    float first_diffuse = 1;
+     
+    float4 color = 0.0;
+    color.a = 1.0; //transmittance
+
+    //dot(normal,absDir) for first intersection with bounding box
+    float diffuse = 1;
     if(useFlatShading){{
         if(pos.x == 1 || pos.x == 0){{
-         first_diffuse = absDir.x;
+         diffuse = absDir.x;
         }}
         if(pos.y == 1 || pos.y == 0){{
-         first_diffuse = absDir.y;
+         diffuse = absDir.y;
         }}
         if(pos.z == 1 || pos.z == 0){{
-         first_diffuse = absDir.z;
+         diffuse = absDir.z;
         }}
     }}
 
-    float4 first = tex[rayPos];
-    color.rgb += color.a * first.a * first.rgb * first_diffuse;
-    color.a *= 1 - first.a;
-     
-    
-
     [loop] do{{
-        float diffuse = 0;
+        
+        //skip empty space
+        //rayPos += emptySpaceTex[rayPos] * ray;   
+
+        float4 s = tex[rayPos];
+        if(!useFlatShading){{
+           diffuse = 1;
+        }}
+        color.rgb += color.a * s.a * s.rgb * diffuse;
+        color.a *= 1 - s.a;
+
+        int numIterations = max(emptySpaceTex[rayPos],1);
+
+        while(numIterations-- != 0){{
+
         if(distance.x < distance.y || distance.z < distance.y) {{
             if(distance.x < distance.z){{
                 rayPos.x += dirSign.x;
@@ -278,15 +291,9 @@ float4 main(PixelIn i) : SV_TARGET {{
             distance.y = projLength.y;
             diffuse = absDir.y;
         }}    
-    
         
-        float4 s = tex[rayPos];
-        if(!useFlatShading){{
-           diffuse = 1;
         }}
-        color.rgb += color.a * s.a * s.rgb * diffuse;
-        color.a *= 1 - s.a;
-        
+
     }} while(isInside(rayPos,textureDimension) && color.a > 0.0);
 
 

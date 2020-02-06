@@ -26,7 +26,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
             shader.Dispose();
         }
 
-        public abstract void Draw(ITexture texture);
+        public abstract void Draw(int id, ITexture texture);
 
         public void OnScroll(float amount, Vector2 mouse)
         {

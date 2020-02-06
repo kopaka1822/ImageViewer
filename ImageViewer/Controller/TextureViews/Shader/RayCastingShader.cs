@@ -46,7 +46,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
         }
 
 
-        public void Run(Matrix rayTransform, Matrix worldToImage, float farplane, ShaderResourceView texture)
+        public void Run(Matrix rayTransform, Matrix worldToImage, float farplane, ShaderResourceView texture, ShaderResourceView emptySpaceTex)
         {
             var v = models.ViewData;
             v.Buffer.SetData(new BufferData
@@ -66,11 +66,13 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
             dev.Pixel.SetShaderResource(0, texture);
             dev.Pixel.SetSampler(0, sampler);
+            dev.Pixel.SetShaderResource(1, emptySpaceTex);
 
             dev.DrawQuad();
 
             // unbind
             dev.Pixel.SetShaderResource(0, null);
+            dev.Pixel.SetShaderResource(1, null);
             UnbindShader(dev);
         }
 
@@ -118,6 +120,7 @@ VertexOut main(uint id : SV_VertexID) {{
         {
             return $@"
 Texture3D<float4> tex : register(t0);
+Texture3D<uint> emptySpaceTex : register(t1);
 SamplerState texSampler : register(s0);
 
 {ConstantBuffer()}
@@ -199,18 +202,28 @@ float4 main(PixelIn i) : SV_TARGET {{
 
     uint width, height, depth;
     tex.GetDimensions(width, height, depth);
+    uint3 size = uint3(width, height, depth);
 
     // the height of the cube is 2.0 in world space. Width and Depth depend on aspect of height
     const float stepsize = 4.0;
     float3 ray = normalize(i.rayDir) * 2.0f / float(height) / stepsize;
 
+    float3 unDividedRay = normalize(i.rayDir) * 2.0f / float(height) ;
+
     // transform ray to image space
     ray = mul(toImage, float4(ray, 0.0)).xyz;
+    unDividedRay = ray * stepsize;
     float3 pos;    
 
     if(!getIntersection(i.origin, ray, pos)) return color;
     
     [loop] do{{
+        
+        float3 pos2 = float3(pos.xy,1-pos.z);
+        //skip empty space
+        pos += max(emptySpaceTex[min(size-1,size*pos2)] ,0) * unDividedRay;
+
+       
         float4 s = tex.SampleLevel(texSampler, pos, 0);
         float invAlpha = pow(max(1.0 - s.a, 0.0), 1.0 / stepsize);
         float alpha = 1.0 - invAlpha;
@@ -218,6 +231,9 @@ float4 main(PixelIn i) : SV_TARGET {{
         color.a *= invAlpha;
         
         pos += ray;
+
+
+
     }} while(isInside(pos) && color.a > 0.0);
    
     {ApplyColorTransform()}

@@ -37,7 +37,7 @@ namespace ImageFramework.DirectX
             flags |= DeviceCreationFlags.Debug;
 #endif
             // create 11.1 if possible (disable gpu timeout) but 11.0 is also fine
-            Handle = new SharpDX.Direct3D11.Device(DriverType.Hardware, flags, new FeatureLevel[]{ FeatureLevel.Level_11_1, FeatureLevel.Level_11_0});
+            Handle = new SharpDX.Direct3D11.Device(DriverType.Hardware, flags, new FeatureLevel[] { FeatureLevel.Level_11_1, FeatureLevel.Level_11_0 });
 
             // obtain the factory that created the device
             var obj = Handle.QueryInterface<SharpDX.DXGI.Device>();
@@ -69,7 +69,7 @@ namespace ImageFramework.DirectX
         /// </summary>
         public void CopySubresource(Resource src, Resource dst, int srcSubresource, int dstSubresource, Size3 size)
         {
-            context.CopySubresourceRegion(src, srcSubresource, new ResourceRegion(0, 0, 0, size.Width, size.Height, size.Depth), 
+            context.CopySubresourceRegion(src, srcSubresource, new ResourceRegion(0, 0, 0, size.Width, size.Height, size.Depth),
                 dst, dstSubresource);
         }
         public byte[] GetData(Resource res, int subresource, Size3 size, int pixelByteSize)
@@ -101,10 +101,12 @@ namespace ImageFramework.DirectX
 
         public void GetData(Resource res, Format format, int subresource, Size3 dim, IntPtr dst, uint size)
         {
-            Debug.Assert(IO.SupportedFormats.Contains(format));
+            Debug.Assert(IO.SupportedFormats.Contains(format) || format == Format.R8_UInt);
             int pixelSize = 4;
             if (format == Format.R32G32B32A32_Float)
                 pixelSize = 16;
+            if (format == Format.R8_UInt)
+                pixelSize = 1;
 
             // verify expected size
             Debug.Assert((uint)(dim.Product * pixelSize) == size);
@@ -144,7 +146,7 @@ namespace ImageFramework.DirectX
                 dst[i] = Marshal.PtrToStructure<T>(data.DataPointer);
                 data.DataPointer += elementSize;
             }
-            
+
             context.UnmapSubresource(b, 0);
         }
 
@@ -155,7 +157,7 @@ namespace ImageFramework.DirectX
         /// <returns></returns>
         public unsafe Color[] GetColorData(Resource res, Format format, int subresource, Size3 size)
         {
-            Debug.Assert(IO.SupportedFormats.Contains(format));
+            Debug.Assert(IO.SupportedFormats.Contains(format) || format == Format.R8_UInt);
 
             if (format == Format.R32G32B32A32_Float)
             {
@@ -169,6 +171,22 @@ namespace ImageFramework.DirectX
 
                 return result;
             }
+            else if (format == Format.R8_UInt)
+            {
+                var tmp = GetData(res, subresource, size, 1);
+                var result = new Color[size.Product];
+                fixed (byte* pBuffer = tmp)
+                {
+                    for (int dst = 0, src = 0; dst < result.Length; ++dst, src += 1)
+                    {
+                        result[dst] = new Color((float)(pBuffer[src]), 0.0f, 0.0f);
+                    }
+                }
+                return result;
+
+            }
+
+
             else
             {
                 var tmp = GetData(res, subresource, size, 4);
@@ -296,7 +314,7 @@ namespace ImageFramework.DirectX
 
         public void CopyBufferData(Buffer src, Buffer dst, int size, int srcOffset = 0, int dstOffstet = 0)
         {
-            context.CopySubresourceRegion(src, 0, new ResourceRegion(srcOffset, 0, 0, srcOffset + size, 1, 1), 
+            context.CopySubresourceRegion(src, 0, new ResourceRegion(srcOffset, 0, 0, srcOffset + size, 1, 1),
                 dst, 0, dstOffstet, 0, 0);
         }
 

@@ -39,6 +39,7 @@ namespace ImageFramework.DirectX
 
         public RenderTargetView GetRtView(int layer, int mipmap)
         {
+            Debug.Assert(rtViews != null);
             return rtViews[GetSubresourceIndex(layer, mipmap)];
         }
 
