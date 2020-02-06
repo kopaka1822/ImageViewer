@@ -82,9 +82,10 @@ if(useOverlay) {{
 
         private static string CalcOverlay(string color)
         {
+            // overlay has alpha premultiplied color and alpha channel contains inverse alpha (occlusion)
             return $@"
-{color}.rgb = ol.a * ol.rgb + (1.0 - ol.a) * {color}.rgb;
-{color}.a = 1.0 - ((1.0 - ol.a) * (1.0 - {color}.a));
+{color}.rgb = ol.rgb + ol.a * {color}.rgb;
+{color}.a = 1.0 - (ol.a * (1.0 - {color}.a));
 ";
         }
 

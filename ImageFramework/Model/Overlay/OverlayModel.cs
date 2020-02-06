@@ -21,11 +21,33 @@ namespace ImageFramework.Model.Overlay
         private readonly ImageModelTextureCache cache;
         public ObservableCollection<IOverlay> Overlays { get; } = new ObservableCollection<IOverlay>();
 
+        private BlendState blendState;
+
         internal OverlayModel(ImageModelTextureCache cache)
         {
             this.cache = cache;
             cache.Changed += CacheOnChanged;
             Overlays.CollectionChanged += OverlaysOnCollectionChanged;
+
+            var blendDesc = new BlendStateDescription
+            {
+                AlphaToCoverageEnable = false,
+                IndependentBlendEnable = false
+            };
+            blendDesc.RenderTarget[0].IsBlendEnabled = true;
+            blendDesc.RenderTarget[0].RenderTargetWriteMask = ColorWriteMaskFlags.All;
+
+            // C' = a_src * c_src + (1.0 - a_src) * a_dst
+            blendDesc.RenderTarget[0].BlendOperation = BlendOperation.Add;
+            blendDesc.RenderTarget[0].SourceBlend = BlendOption.SourceAlpha;
+            blendDesc.RenderTarget[0].DestinationBlend = BlendOption.InverseSourceAlpha;
+
+            // A' = (1.0 - a_src) * a_dst (inverse alpha, render target starts with a == 1)
+            blendDesc.RenderTarget[0].AlphaBlendOperation = BlendOperation.Add;
+            blendDesc.RenderTarget[0].SourceAlphaBlend = BlendOption.Zero;
+            blendDesc.RenderTarget[0].DestinationAlphaBlend = BlendOption.InverseSourceAlpha;
+
+            blendState = new BlendState(Device.Get().Handle, blendDesc);
         }
 
         private void OverlaysOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -81,6 +103,10 @@ namespace ImageFramework.Model.Overlay
         }
 
         private ITexture overlayTex;
+        /// <summary>
+        /// RGB channels = alpha premultiplied color
+        /// A = occlusion (inverse alpha)
+        /// </summary>
         public ITexture Overlay 
         { 
             get
@@ -96,8 +122,9 @@ namespace ImageFramework.Model.Overlay
                     for (int mipmap = 0; mipmap < overlayTex.NumMipmaps; ++mipmap)
                     {
                         // bind and clear rendertarget
-                        dev.ClearRenderTargetView(overlayTex.GetRtView(layer, mipmap), new RawColor4(0.0f, 0.0f, 0.0f, 0.0f));
+                        dev.ClearRenderTargetView(overlayTex.GetRtView(layer, mipmap), new RawColor4(0.0f, 0.0f, 0.0f, 1.0f));
                         dev.OutputMerger.SetRenderTargets(overlayTex.GetRtView(layer, mipmap));
+                        dev.OutputMerger.SetBlendState(blendState);
                         var size = overlayTex.Size.GetMip(mipmap);
                         dev.SetViewScissors(size.Width, size.Height);
 
@@ -112,6 +139,7 @@ namespace ImageFramework.Model.Overlay
                 
                 // unbind rendertargets
                 dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+                dev.OutputMerger.SetBlendState(null);
 
                 return overlayTex;
             }
@@ -134,6 +162,7 @@ namespace ImageFramework.Model.Overlay
         public void Dispose()
         {
             overlayTex?.Dispose();
+            blendState?.Dispose();
             foreach (var overlay in Overlays)
             {
                 overlay.Dispose();

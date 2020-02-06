@@ -11,6 +11,8 @@ using ImageFramework.Utility;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
 using ImageViewer.Views.Dialog;
+using SharpDX.Direct3D11;
+using Device = ImageFramework.DirectX.Device;
 
 namespace ImageViewer.Controller.Overlays
 {
@@ -98,6 +100,7 @@ namespace ImageViewer.Controller.Overlays
             isDisposed = true;
             models.Overlay.Overlays.Remove(this);
             base.Dispose();
+
         }
     }
 }

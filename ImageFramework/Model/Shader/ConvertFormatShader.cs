@@ -162,6 +162,7 @@ namespace ImageFramework.Model.Shader
             dev.Pixel.SetShaderResource(0, texture.View);
             if(overlay != null)
                 dev.Pixel.SetShaderResource(1, overlay.View);
+            else dev.Pixel.SetShaderResource(1, null);
 
             for (int curLayer = 0; curLayer < nLayer; ++curLayer)
             {
@@ -319,9 +320,10 @@ float4 main(PixelIn i) : SV_TARGET
 	color.rgb *= multiplier;
     if(useOverlay)
     {{
+        // overlay has alpha premultiplied color and alpha channel contains inverse alpha (occlusion)
         float4 overlay = in_overlay.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), curLayer)];
-        color.rgb = overlay.a * overlay.rgb + (1.0 - overlay.a) * color.rgb;
-        color.a = 1.0 - ((1.0 - overlay.a) * (1.0 - color.a));
+        color.rgb = overlay.rgb + overlay.a * color.rgb;
+        color.a = 1.0 - (overlay.a * (1.0 - color.a));
     }}
 	return color;
 }}
