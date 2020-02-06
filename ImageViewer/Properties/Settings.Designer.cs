@@ -214,5 +214,53 @@ namespace ImageViewer.Properties {
                 this["NanBlue"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public float ZoomBoxRed {
+            get {
+                return ((float)(this["ZoomBoxRed"]));
+            }
+            set {
+                this["ZoomBoxRed"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float ZoomBoxGreen {
+            get {
+                return ((float)(this["ZoomBoxGreen"]));
+            }
+            set {
+                this["ZoomBoxGreen"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float ZoomBoxBlue {
+            get {
+                return ((float)(this["ZoomBoxBlue"]));
+            }
+            set {
+                this["ZoomBoxBlue"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public int ZoomBoxBorder {
+            get {
+                return ((int)(this["ZoomBoxBorder"]));
+            }
+            set {
+                this["ZoomBoxBorder"] = value;
+            }
+        }
     }
 }

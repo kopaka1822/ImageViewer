@@ -49,9 +49,12 @@ namespace ImageViewer.Controller.Overlays
             else
             {
                 SetCropRect(GetCurrentCoords(texel));
-                var dia = new ZoomBoxDialog(new Color(1.0f, 0.0f, 0.0f), 3);
+                var dia = new ZoomBoxDialog(models.Settings.ZoomBoxColor, models.Settings.ZoomBoxBorder);
                 if (models.Window.ShowDialog(dia) == true)
                 {
+                    models.Settings.ZoomBoxColor = dia.Color;
+                    models.Settings.ZoomBoxBorder = dia.BorderSize;
+
                     Debug.Assert(Start.HasValue);
                     Debug.Assert(End.HasValue);
 
@@ -65,7 +68,6 @@ namespace ImageViewer.Controller.Overlays
                     };
                     models.ZoomBox.Boxes.Add(box);
                 }
-
                 models.Display.ActiveOverlay = null;
             }
         }

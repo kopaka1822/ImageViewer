@@ -176,6 +176,34 @@ namespace ImageViewer.Models
             }
         }
 
+        public Color ZoomBoxColor
+        {
+            get => new Color(Settings.Default.ZoomBoxRed, Settings.Default.ZoomBoxGreen, Settings.Default.ZoomBoxBlue);
+            set
+            {
+                // ReSharper disable CompareOfFloatsByEqualityOperator
+                if (Settings.Default.ZoomBoxRed == value.Red &&
+                    Settings.Default.ZoomBoxGreen == value.Green &&
+                    Settings.Default.ZoomBoxBlue == value.Blue) return;
+
+                Settings.Default.ZoomBoxRed = value.Red;
+                Settings.Default.ZoomBoxGreen = value.Green;
+                Settings.Default.ZoomBoxBlue = value.Blue;
+                OnPropertyChanged(nameof(ZoomBoxColor));
+            }
+        }
+
+        public int ZoomBoxBorder
+        {
+            get => Settings.Default.ZoomBoxBorder;
+            set
+            {
+                if(Settings.Default.ZoomBoxBorder == value) return;
+                Settings.Default.ZoomBoxBorder = value;
+                OnPropertyChanged(nameof(ZoomBoxBorder));
+            }
+        }
+
         public void Save()
         {
             Settings.Default.Save();
