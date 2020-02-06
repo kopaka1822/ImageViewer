@@ -243,6 +243,40 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <MenuItem
+                Header="Remove Zombox"
+                Command="{Binding StartZoomboxCommand}"
+                IsEnabled="{Binding ZoomBox.HasBoxes}"
+                ItemsSource="{Binding ZoomBox.Boxes}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/cancel.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+                <MenuItem.ItemTemplate>
+                    <DataTemplate DataType="Border">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Box "
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Id}"
+                                       Margin="{StaticResource DefaultBorderRight}"
+                                       VerticalAlignment="Center"/>
+                            <Border 
+                                Width="16" 
+                                Height="16"
+                                Background="{Binding Brush, FallbackValue=Blue}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </MenuItem.ItemTemplate>
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="MenuItem">
+                        <Setter Property="Header" Value="{Binding}"/>
+                        <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.RemoveZoomboxCommand}"/>
+                        <Setter Property="CommandParameter" Value="{Binding Id}"/>
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+            </MenuItem>
             <Separator/>
             <MenuItem
                 Header="LatLong to Cubemap"

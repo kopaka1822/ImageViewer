@@ -31,6 +31,8 @@ namespace ImageViewer.ViewModels
         public StatisticsViewModel Statistics { get; }
 
         public ScalingViewModel Scale { get; }
+
+        public ZoomBoxViewModel ZoomBox { get; }
         public ViewModels(ModelsEx models)
         {
             this.models = models;
@@ -43,6 +45,7 @@ namespace ImageViewer.ViewModels
             Filter = new FiltersViewModel(models);
             Statistics = new StatisticsViewModel(models);
             Scale = new ScalingViewModel(models);
+            ZoomBox = new ZoomBoxViewModel(models);
 
             // commands
             OpenCommand = new OpenCommand(models);
@@ -66,6 +69,7 @@ namespace ImageViewer.ViewModels
             ResizeCommand = new ResizeWindowCommand(models);
             SetThemeCommand = new SetThemeCommand(models);
             StartZoomboxCommand = new StartZoomboxCommand(models);
+            RemoveZoomboxCommand = new RemoveZoomBoxCommand(models);
 
             AddFilterCommand = new AddFilterCommand(models, Filter);
 
@@ -132,5 +136,7 @@ namespace ImageViewer.ViewModels
         public ICommand ReloadImagesCommand { get; }
 
         public ICommand StartZoomboxCommand { get; }
+
+        public ICommand RemoveZoomboxCommand { get; }
     }
 }

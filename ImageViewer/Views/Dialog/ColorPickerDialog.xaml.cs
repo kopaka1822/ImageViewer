@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ImageFramework.Utility;
+using ImageViewer.UtilityEx;
 
 namespace ImageViewer.Views.Dialog
 {
@@ -27,7 +28,7 @@ namespace ImageViewer.Views.Dialog
             this.intialColor = color;
             InitializeComponent();
 
-            ColorPicker.SelectedColor = System.Windows.Media.Color.FromScRgb(1.0f, color.Red, color.Green, color.Blue);
+            ColorPicker.SelectedColor = color.ToMediaColor();
         }
 
         public ImageFramework.Utility.Color Color

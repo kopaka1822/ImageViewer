@@ -22,7 +22,6 @@ namespace ImageFramework.Model.Overlay
         private UploadBuffer positionBuffer;
         private BoxOverlayShader shader;
         private BoxOverlayShader Shader => shader ?? (shader = new BoxOverlayShader());
-        private bool hasChanges = false;
 
         public BoxOverlay(Models models)
         {
@@ -37,11 +36,7 @@ namespace ImageFramework.Model.Overlay
             switch (e.PropertyName)
             {
                 case nameof(ImagesModel.Size):
-                    if (!hasChanges)
-                    {
-                        hasChanges = true;
-                        OnHasChanged();
-                    }
+                    OnHasChanged();
                     break;
             }
         }
@@ -49,11 +44,7 @@ namespace ImageFramework.Model.Overlay
         private void BoxesOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             // update positions
-            if (!hasChanges)
-            {
-                hasChanges = true;
-                OnHasChanged();
-            }
+            OnHasChanged();
         }
 
         public struct Box
