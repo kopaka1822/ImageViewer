@@ -169,8 +169,11 @@ namespace ImageFramework.Model.Statistics
                 rating += signWeight;
 
             // range 0 1?
-            if (!isUnormed && pixelType.IsUnormed())
-                rating -= unormWeight; // unorm is not sufficient
+            if (!isUnormed && pixelType == PixelDataType.UNorm) // unorm is not sufficient
+                rating -= unormWeight;
+            else if (!isUnormed && pixelType == PixelDataType.Srgb) // maybe tonemapping to srgb? better than unorm probably
+                rating -= unormWeight / 10;
+
             //else if (isUnormed == pixelType.IsUnormed())
             //    rating += unormWeight;
 
@@ -190,9 +193,16 @@ namespace ImageFramework.Model.Statistics
                 rating += 150;
 
             // keep srgb specifier
-            if (isSrgb == (format.GetDataType() == PixelDataType.Srgb))
+            if (isSrgb == (pixelType == PixelDataType.Srgb))
                 rating += 200;
-            else rating -= 200;
+            else
+            {
+                // prefer srgb formats over unorm etc. when converting from hdr to ldr
+                if (!preferredFormat.IsAtMost8bit() && !preferredPixelType.IsUnormed() && pixelType == PixelDataType.Srgb)
+                    rating -= 50;
+                else
+                    rating -= 200;
+            }
 
             // small bonus for same datatype
             if (preferredPixelType == pixelType)
@@ -209,6 +219,18 @@ namespace ImageFramework.Model.Statistics
             // small bonus for kept compression
             if (preferredFormat.IsCompressed() && format.IsCompressed())
                 rating += 10;
+
+            // try to keep hdr formats
+            if (!preferredFormat.IsAtMost8bit() && !format.IsAtMost8bit())
+            {
+                // keep unorm property
+                if(preferredPixelType.IsUnormed() == pixelType.IsUnormed())
+                    rating += 50;
+            }
+                
+
+
+
 
             return rating;
         }
