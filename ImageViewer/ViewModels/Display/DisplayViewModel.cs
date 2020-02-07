@@ -89,6 +89,8 @@ namespace ImageViewer.ViewModels.Display
             }
         }
 
+        public string UserInfo => models.Display.UserInfo;
+
         public bool HasKeyToInvoke(Key key)
         {
             switch (key)
@@ -226,6 +228,10 @@ namespace ImageViewer.ViewModels.Display
 
                 case nameof(DisplayModel.FrameTime):
                     OnPropertyChanged(nameof(FrameTime));
+                    break;
+
+                case nameof(DisplayModel.UserInfo):
+                    OnPropertyChanged(nameof(UserInfo));
                     break;
             }
         }

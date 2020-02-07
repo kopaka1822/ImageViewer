@@ -28,6 +28,7 @@ namespace ImageViewer.Controller.Overlays
             IsEnabled = true;
             Layer = models.Display.ActiveLayer;
             models.Overlay.Overlays.Add(this);
+            models.Display.UserInfo = "Click left to start zoombox";
         }
 
         public void MouseMove(Size3 texel)
@@ -35,6 +36,11 @@ namespace ImageViewer.Controller.Overlays
             Layer = models.Display.ActiveLayer;
             if (firstPoint == null) return;
             SetCropRect(GetCurrentCoords(texel));
+            var dim = models.Images.Size.GetMip(models.Display.ActiveMipmap);
+            var start = Start.Value.ToPixels(dim);
+            var end = End.Value.ToPixels(dim);
+            models.Display.UserInfo =
+                $"Zoombox size: {end.X - start.X + 1} x {end.Y - start.Y + 1}";
         }
 
         public void MouseClick(MouseButton button, bool down, Size3 texel)
@@ -102,7 +108,7 @@ namespace ImageViewer.Controller.Overlays
             isDisposed = true;
             models.Overlay.Overlays.Remove(this);
             base.Dispose();
-
+            models.Display.UserInfo = "";
         }
     }
 }

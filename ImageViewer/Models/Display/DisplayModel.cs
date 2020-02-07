@@ -328,6 +328,19 @@ namespace ImageViewer.Models.Display
             }
         }
 
+        private string userInfo = "";
+
+        public string UserInfo
+        {
+            get => userInfo;
+            set
+            {
+                if(userInfo == value) return;
+                userInfo = value;
+                OnPropertyChanged(nameof(UserInfo));
+            }
+        }
+
         // previous mouse position on the texture (should be used for context menu things because the texel)
         public Size3 PrevTexelPosition { get; private set; } = Size3.Zero;
 
