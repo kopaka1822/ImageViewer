@@ -164,6 +164,12 @@ namespace ImageViewer.ViewModels.Dialog
                 case nameof(SettingsModel.LastQuality):
                     OnPropertyChanged(nameof(Quality));
                     break;
+                case nameof(SettingsModel.ExportZoomBoxBorder):
+                    OnPropertyChanged(nameof(ZoomBorders));
+                    break;
+                case nameof(SettingsModel.ExportZoomBoxScale):
+                    OnPropertyChanged(nameof(ZoomBoxScale));
+                    break;
             }
         }
 
@@ -328,9 +334,36 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
+        #region ZOOMBOX
+
         public bool HasZoomBox => models.ZoomBox.Boxes.Count != 0;
 
+        private static bool exportZoomBox = true;
 
+        public bool ExportZoomBox
+        {
+            get => exportZoomBox;
+            set
+            {
+                if(value == exportZoomBox) return;
+                exportZoomBox = value;
+                OnPropertyChanged(nameof(ExportZoomBox));
+            }
+        }
+
+        public bool ZoomBorders
+        {
+            get => models.Settings.ExportZoomBoxBorder;
+            set => models.Settings.ExportZoomBoxBorder = value;
+        }
+
+        public int ZoomBoxScale
+        {
+            get => models.Settings.ExportZoomBoxScale;
+            set => models.Settings.ExportZoomBoxScale = value;
+        }
+
+        #endregion
 
         private ListItemViewModel<GliFormat> selectedFormat;
         public ListItemViewModel<GliFormat> SelectedFormat
@@ -385,6 +418,9 @@ namespace ImageViewer.ViewModels.Dialog
                 OnPropertyChanged(nameof(WarningVisibility));
             }
         }
+
+        #region CROPPONG
+
         public bool UseCropping
         {
             get => models.ExportConfig.UseCropping;
@@ -510,6 +546,8 @@ namespace ImageViewer.ViewModels.Dialog
             res[axis] = (v + 0.5f) / curDim[axis];
             models.ExportConfig.CropEnd = res;
         }
+
+        #endregion
 
         private bool hasQualityValue = false;
 

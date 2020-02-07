@@ -175,24 +175,5 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
         [numthreads({workgroupSize.X},{workgroupSize.Y},{workgroupSize.Z})]
 ";
         }
-
-        private void DebugTex(SpaceSkippingTexture3D tex)
-        {
-            var desc = new Texture3DDescription
-            {
-                Width = tex.Size.Width,
-                Height = tex.Size.Height,
-                Depth = tex.Size.Depth,
-                Format = SharpDX.DXGI.Format.R8_UInt,
-                MipLevels = 1,
-                BindFlags = BindFlags.None,
-                CpuAccessFlags = CpuAccessFlags.Read,
-                OptionFlags = ResourceOptionFlags.None,
-                Usage = ResourceUsage.Staging
-            };
-
-            var tmp = tex.GetPixelColors(0, 0);
-            int a = 0;
-        }
     }
 }

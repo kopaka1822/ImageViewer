@@ -262,5 +262,29 @@ namespace ImageViewer.Properties {
                 this["ZoomBoxBorder"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ExportZoomBoxBorder {
+            get {
+                return ((bool)(this["ExportZoomBoxBorder"]));
+            }
+            set {
+                this["ExportZoomBoxBorder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        public int ExportZoomBoxScale {
+            get {
+                return ((int)(this["ExportZoomBoxScale"]));
+            }
+            set {
+                this["ExportZoomBoxScale"] = value;
+            }
+        }
     }
 }

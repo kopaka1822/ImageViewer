@@ -204,6 +204,28 @@ namespace ImageViewer.Models
             }
         }
 
+        public bool ExportZoomBoxBorder
+        {
+            get => Settings.Default.ExportZoomBoxBorder;
+            set
+            {
+                if(Settings.Default.ExportZoomBoxBorder == value) return;
+                Settings.Default.ExportZoomBoxBorder = value;
+                OnPropertyChanged(nameof(ExportZoomBoxBorder));
+            }
+        }
+
+        public int ExportZoomBoxScale
+        {
+            get => Settings.Default.ExportZoomBoxScale;
+            set
+            {
+                if (Settings.Default.ExportZoomBoxScale == value) return;
+                Settings.Default.ExportZoomBoxScale = value;
+                OnPropertyChanged(nameof(ExportZoomBoxScale));
+            }
+        }
+
         public void Save()
         {
             Settings.Default.Save();

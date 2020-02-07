@@ -4,6 +4,7 @@ using System.Diagnostics;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
+using ImageFramework.Utility;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 using ImageViewer.ViewModels.Dialog;
@@ -70,7 +71,7 @@ namespace ImageViewer.Commands.Export
             return models.Images.NumImages > 0 && models.NumEnabled > 0;
         }
 
-        public override void Execute()
+        public override async void Execute()
         {
             // make sure only one image is visible
             if (models.NumEnabled != 1)
@@ -155,6 +156,31 @@ namespace ImageViewer.Commands.Export
             exportFormat = desc.FileFormat;
 
             models.Export.ExportAsync(desc);
+
+            // export additional zoom boxes?
+            if (viewModel.HasZoomBox && viewModel.ExportZoomBox)
+            {
+                for (int i = 0; i < models.ZoomBox.Boxes.Count; ++i)
+                {
+                    var box = models.ZoomBox.Boxes[i];
+                    var zdesc = new ExportDescription(tex, $"{exportDirectory}/{exportFilename}_zoom{i}",
+                        exportExtension)
+                    {
+                        Multiplier = multiplier,
+                        Mipmap = models.ExportConfig.Mipmap,
+                        Layer = models.ExportConfig.Layer,
+                        UseCropping = true,
+                        CropStart = new Float3(box.Start, 0.0f),
+                        CropEnd = new Float3(box.End, 1.0f),
+                        Overlay = viewModel.ZoomBorders ? models.Overlay.Overlay : null
+                    };
+                    zdesc.TrySetFormat(viewModel.SelectedFormatValue);
+
+                    await models.Progress.WaitForTaskAsync();
+                    models.Export.ExportAsync(zdesc);
+                }
+            }
+            
         }
 
         private static Dictionary<string, string> filter = new Dictionary<string, string>
