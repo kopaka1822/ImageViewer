@@ -191,7 +191,9 @@
                             <TextBlock Text="Export Zoom Boxes:" Margin="{StaticResource DefaultBorderRight}" HorizontalAlignment="Center"/>
                             <CheckBox 
                                 HorizontalAlignment="Center"
-                                IsChecked="{Binding ExportZoomBox}"/>
+                                IsChecked="{Binding ExportZoomBox}"
+                                VerticalAlignment="Center"
+                                ToolTip="The colored zoom boxes will be exported as well and saved as 'filename_zoomID'"/>
                         </StackPanel>
                     </GroupBox.Header>
                     <Grid IsEnabled="{Binding ExportZoomBox}">
@@ -215,7 +217,8 @@
                             Grid.Row="0"
                             Grid.Column="1"
                             Margin="{StaticResource DefaultBorderBottom}"
-                            VerticalAlignment="Center"/>
+                            VerticalAlignment="Center"
+                            ToolTip="The colored border will be included for export of the zoom box images"/>
 
                         <TextBlock
                             Text="Scale:"

@@ -233,7 +233,7 @@
             
             <Separator/>
             <MenuItem
-                Header="Add Zombox"
+                Header="Add Zoombox"
                 Command="{Binding StartZoomboxCommand}"
                 IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
@@ -244,7 +244,7 @@
                 </MenuItem.Icon>
             </MenuItem>
             <MenuItem
-                Header="Remove Zombox"
+                Header="Remove Zoombox"
                 Command="{Binding StartZoomboxCommand}"
                 IsEnabled="{Binding ZoomBox.HasBoxes}"
                 ItemsSource="{Binding ZoomBox.Boxes}">
