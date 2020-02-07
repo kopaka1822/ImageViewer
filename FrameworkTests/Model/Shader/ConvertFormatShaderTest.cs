@@ -124,5 +124,39 @@ namespace FrameworkTests.Model.Shader
             Assert.IsTrue(gray.Equals(colors[1], Color.Channel.Rgba));
             Assert.IsTrue(gray.Equals(colors[2], Color.Channel.Rgba));
         }
+
+        [TestMethod]
+        public void Scaling()
+        {
+            var tex = IO.LoadImageTexture(TestData.Directory + "checkers.dds");
+
+            // upscale mipmap 1 (should be equivalent to mipmap 0 then)
+            var newTex = shader.Convert(tex, tex.Format, 1, 0, 1.0f, false, Size3.Zero, Size3.Zero, Size3.Zero,
+                models.Scaling, null, 2);
+
+            Assert.AreEqual(newTex.Size.Width, 4);
+            Assert.AreEqual(newTex.Size.Height, 4);
+            Assert.AreEqual(newTex.NumMipmaps, 1);
+
+            TestData.TestCheckersLevel0(newTex.GetPixelColors(0, 0));
+        }
+
+        [TestMethod]
+        public void ScalingAndCrop()
+        {
+            var tex = IO.LoadImageTexture(TestData.Directory + "checkers.dds");
+
+            // upscale mipmap 1 (should be equivalent to mipmap 0 then)
+            var newTex = shader.Convert(tex, tex.Format, -1, 0, 1.0f, true, new Size3(1, 1, 0), new Size3(2, 2, 1), Size3.Zero,
+                models.Scaling, null, 4);
+
+            Assert.AreEqual(newTex.Size.Width, 8);
+            Assert.AreEqual(newTex.Size.Height, 8);
+            Assert.AreEqual(newTex.NumMipmaps, 4);
+
+            TestData.TestCheckersLevel0(newTex.GetPixelColors(0, 1));
+            TestData.TestCheckersLevel1(newTex.GetPixelColors(0, 2));
+            TestData.TestCheckersLevel2(newTex.GetPixelColors(0, 3));
+        }
     }
 }

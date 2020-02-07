@@ -172,7 +172,8 @@ namespace ImageViewer.Commands.Export
                         UseCropping = true,
                         CropStart = new Float3(box.Start, 0.0f),
                         CropEnd = new Float3(box.End, 1.0f),
-                        Overlay = viewModel.ZoomBorders ? models.Overlay.Overlay : null
+                        Overlay = viewModel.ZoomBorders ? models.Overlay.Overlay : null,
+                        Scale = viewModel.ZoomBoxScale
                     };
                     zdesc.TrySetFormat(viewModel.SelectedFormatValue);
 

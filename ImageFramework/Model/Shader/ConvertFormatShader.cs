@@ -62,7 +62,8 @@ namespace ImageFramework.Model.Shader
                 Xoffset = 0,
                 Yoffset = 0,
                 Multiplier = 1.0f,
-                UseOverlay = 0
+                UseOverlay = 0,
+                Scale = 1
             });
 
             var dim = dst.Size.GetMip(dstMip);
@@ -104,15 +105,17 @@ namespace ImageFramework.Model.Shader
         /// <param name="size">if crop: size of the destination image</param>
         /// <param name="align">if nonzero: texture width will be aligned to this (rounded down)</param>
         /// <param name="scaling">required for regenerating mipmaps after cropping.</param>
-        /// <param name="overlay"></param>
+        /// <param name="overlay">overlay</param>
+        /// <param name="scale">scales the destination image by this factor</param>
         /// <returns></returns>
         public ITexture Convert(ITexture texture, SharpDX.DXGI.Format dstFormat, int mipmap, int layer, float multiplier, bool crop, 
-            Size3 offset, Size3 size, Size3 align, ScalingModel scaling, ITexture overlay = null)
+            Size3 offset, Size3 size, Size3 align, ScalingModel scaling, ITexture overlay = null, int scale = 1)
         {
             Debug.Assert(ImageFormat.IsSupported(dstFormat));
             Debug.Assert(ImageFormat.IsSupported(texture.Format));
             Debug.Assert(overlay == null || texture.HasSameDimensions(overlay));
-            
+            Debug.Assert(scale >= 1);
+
             // set width, height mipmap
             int firstMipmap = Math.Max(mipmap, 0);
             int firstLayer = Math.Max(layer, 0);
@@ -124,6 +127,16 @@ namespace ImageFramework.Model.Shader
             {
                 size = texture.Size.GetMip(firstMipmap);
                 offset = Size3.Zero;
+            }
+
+            if (scale != 1)
+            {
+                size.X *= scale;
+                size.Y *= scale;
+                if (texture.Is3D) size.Z *= scale;
+                offset.X *= scale;
+                offset.Y *= scale;
+                if (texture.Is3D) offset.Z *= scale;
             }
 
             // adjust alignments
@@ -144,7 +157,7 @@ namespace ImageFramework.Model.Shader
                 }
             }
 
-            bool recomputeMips = nMipmaps > 1 && crop;
+            bool recomputeMips = nMipmaps > 1 && (crop || scale != 1);
             if (recomputeMips)
             {
                 // number of mipmaps might have changed
@@ -175,7 +188,8 @@ namespace ImageFramework.Model.Shader
                         Xoffset = offset.X,
                         Yoffset = offset.Y,
                         Multiplier = multiplier,
-                        UseOverlay = overlay != null ? 1 : 0
+                        UseOverlay = overlay != null ? 1 : 0,
+                        Scale = scale
                     });
 
                     var dim = res.Size.GetMip(curMipmap);
@@ -227,7 +241,8 @@ namespace ImageFramework.Model.Shader
                 Xoffset = 0,
                 Yoffset = 0,
                 Multiplier = 1.0f,
-                UseOverlay = 0
+                UseOverlay = 0,
+                Scale = 1
             });
 
             dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
@@ -268,7 +283,8 @@ namespace ImageFramework.Model.Shader
                 Xoffset = 0,
                 Yoffset = 0,
                 Multiplier = 1.0f,
-                UseOverlay = 0
+                UseOverlay = 0,
+                Scale = 1
             });
 
             dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
@@ -298,6 +314,7 @@ cbuffer InfoBuffer : register(b0)
     uint yoffset;
     float multiplier;
     bool useOverlay;
+    uint scale;
 }};
 
 struct PixelIn
@@ -311,17 +328,16 @@ struct PixelIn
 
 float4 main(PixelIn i) : SV_TARGET
 {{
-    float4 coord = i.projPos;
-    uint curLayer = layer;
+    uint3 coord = uint3((uint2(i.projPos.xy) + uint2(xoffset, yoffset)) / scale, layer);
 #if {builder.Is3DInt}
-    curLayer += i.depth;
+    coord.z = (i.depth + layer) / scale;
 #endif
-    float4 color = in_tex.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), curLayer)];
+    float4 color = in_tex.mips[level][coord];
 	color.rgb *= multiplier;
     if(useOverlay)
     {{
         // overlay has alpha premultiplied color and alpha channel contains inverse alpha (occlusion)
-        float4 overlay = in_overlay.mips[level][uint3(xoffset + uint(coord.x), yoffset + uint(coord.y), curLayer)];
+        float4 overlay = in_overlay.mips[level][coord];
         color.rgb = overlay.rgb + overlay.a * color.rgb;
         color.a = 1.0 - (overlay.a * (1.0 - color.a));
     }}

@@ -148,6 +148,19 @@ namespace ImageFramework.Model.Export
             }
         }
 
+        private int scale = 1;
+
+        /// image can be upscaled with point interpolation
+        public int Scale
+        {
+            get => scale;
+            set
+            {
+                Debug.Assert(scale >= 1);
+                scale = value;
+            }
+        }
+
         internal readonly ExportFormatModel ExportFormat;
 
         public ExportDescription(ITexture texture, string filename, string extension)

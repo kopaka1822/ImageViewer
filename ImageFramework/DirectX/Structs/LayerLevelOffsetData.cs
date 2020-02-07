@@ -14,5 +14,6 @@ namespace ImageFramework.DirectX.Structs
         public int Yoffset;
         public float Multiplier;
         public int UseOverlay;
+        public int Scale;
     }
 }

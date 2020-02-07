@@ -193,7 +193,6 @@ namespace FrameworkTests.Model
 
             TestData.CompareColors(orig.GetPixelColors(0, 0), newTex.GetPixelColors(0, 0));
         }
-
         
 
         [TestMethod]

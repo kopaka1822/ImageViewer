@@ -70,14 +70,14 @@ namespace ImageFramework.Model.Export
             
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (desc.Texture.Format == stagingFormat.DxgiFormat && !croppingActive && desc.Multiplier == 1.0f &&
-                !desc.RequiresAlignment && desc.Overlay == null)
+                !desc.RequiresAlignment && desc.Overlay == null && desc.Scale == 1)
                 return ExportTexture(desc.Texture, desc, desc.Mipmap, desc.Layer, ct);
             
             // do some conversion before exporting
             using (var tmpTex = models.SharedModel.Convert.Convert(desc.Texture, stagingFormat.DxgiFormat, desc.Mipmap, desc.Layer,
                 desc.Multiplier, desc.UseCropping, cropStart,
                 cropEnd - cropStart + new Size3(1),
-                new Size3(desc.FileFormat.GetAlignmentX(), desc.FileFormat.GetAlignmentY(), 0), models.Scaling, desc.Overlay))
+                new Size3(desc.FileFormat.GetAlignmentX(), desc.FileFormat.GetAlignmentY(), 0), models.Scaling, desc.Overlay, desc.Scale))
             {
                 // the final texture only has the relevant layers and mipmaps
                 return ExportTexture(tmpTex, desc, -1, -1, ct);
