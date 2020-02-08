@@ -9,44 +9,40 @@ using System.Windows.Interop;
 using ImageFramework.DirectX;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
-using SharpDX.Direct3D11;
-using Device = ImageFramework.DirectX.Device;
 
 namespace ImageFramework.Model.Scaling.Down
 {
     // core of the detail preserving shader
     internal class DetailPreservingShaderCore : IDisposable
     {
-        private readonly QuadShader quad;
         private DirectX.Shader fastShader;
         private DirectX.Shader fastShader3D;
         private DirectX.Shader slowShader;
         private DirectX.Shader slowShader3D;
         private readonly bool isDetailed;
 
-        private DirectX.Shader FastShader => fastShader ?? (fastShader = new DirectX.Shader(DirectX.Shader.Type.Pixel,
+        private DirectX.Shader FastShader => fastShader ?? (fastShader = new DirectX.Shader(DirectX.Shader.Type.Compute,
                                                  GetFastSource(ShaderBuilder.Builder2D, isDetailed), "DetailFast"));
-        private DirectX.Shader FastShader3D => fastShader3D ?? (fastShader3D = new DirectX.Shader(DirectX.Shader.Type.Pixel,
+        private DirectX.Shader FastShader3D => fastShader3D ?? (fastShader3D = new DirectX.Shader(DirectX.Shader.Type.Compute,
                                                  GetFastSource(ShaderBuilder.Builder3D, isDetailed), "DetailFast3D"));
-        private DirectX.Shader SlowShader => slowShader ?? (slowShader = new DirectX.Shader(DirectX.Shader.Type.Pixel,
+        private DirectX.Shader SlowShader => slowShader ?? (slowShader = new DirectX.Shader(DirectX.Shader.Type.Compute,
                                                    GetSlowSource(ShaderBuilder.Builder2D, isDetailed), "DetailSlow"));
-        private DirectX.Shader SlowShader3D => slowShader3D ?? (slowShader3D = new DirectX.Shader(DirectX.Shader.Type.Pixel,
+        private DirectX.Shader SlowShader3D => slowShader3D ?? (slowShader3D = new DirectX.Shader(DirectX.Shader.Type.Compute,
                                                    GetSlowSource(ShaderBuilder.Builder3D, isDetailed), "DetailSlow3D"));
 
-        public DetailPreservingShaderCore(bool isDetailed, QuadShader quad)
+        public DetailPreservingShaderCore(bool isDetailed)
         {
             this.isDetailed = isDetailed;
-            this.quad = quad;
         }
 
         private struct BufferData
         {
             public Size3 SrcSize;
-            public int HasAlpha;
+            public int Layer;
+
             public Size3 DstSize;
-#pragma warning disable 169
-            private int Padding0;
-#pragma warning restore 169
+            public int HasAlpha;
+
             public float FilterSizeFloatX;
             public float FilterSizeFloatY;
             public float FilterSizeFloatZ;
@@ -76,30 +72,32 @@ namespace ImageFramework.Model.Scaling.Down
                                 && (bufferData.SrcSize.Y % bufferData.DstSize.Y == 0)
                                 && (bufferData.SrcSize.Z % bufferData.DstSize.Z == 0);
 
-            quad.Bind(src.Is3D);
             DirectX.Shader shader;
             if (isFastShader) shader = src.Is3D ? FastShader3D : FastShader;          
             else shader = src.Is3D ? SlowShader3D : SlowShader;
 
             var dev = Device.Get();
-            dev.Pixel.Set(shader.Pixel);
+            dev.Compute.Set(shader.Compute);
 
             for (int layer = 0; layer < src.NumLayers; ++layer)
             {
+                bufferData.Layer = layer;
                 upload.SetData(bufferData);
-                dev.Pixel.SetConstantBuffer(0, upload.Handle);
-                dev.Pixel.SetShaderResource(0, src.GetSrView(layer, srcMipmap));
-                dev.Pixel.SetShaderResource(1, guide.GetSrView(layer, dstMipmap));
+                dev.Compute.SetConstantBuffer(0, upload.Handle);
+                dev.Compute.SetShaderResource(0, src.GetSrView(layer, srcMipmap));
+                dev.Compute.SetShaderResource(1, guide.GetSrView(layer, dstMipmap));
+                dev.Compute.SetUnorderedAccessView(0, dst.GetUaView(dstMipmap));
 
-                dev.OutputMerger.SetRenderTargets(dst.GetRtView(layer, dstMipmap));
-                dev.SetViewScissors(bufferData.DstSize.X, bufferData.DstSize.Y);
-                dev.DrawFullscreenTriangle(bufferData.DstSize.Z);
+                dev.Dispatch(
+                    Utility.Utility.DivideRoundUp(bufferData.DstSize.X, builder.LocalSizeX / 2),
+                    Utility.Utility.DivideRoundUp(bufferData.DstSize.Y, builder.LocalSizeY / 2),
+                    Utility.Utility.DivideRoundUp(bufferData.DstSize.Z, Math.Max(builder.LocalSizeZ / 2, 1))
+                );
             }
 
-            quad.Unbind();
-            dev.Pixel.SetShaderResource(0, null);
-            dev.Pixel.SetShaderResource(1, null);
-            dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            dev.Compute.SetShaderResource(0, null);
+            dev.Compute.SetShaderResource(1, null);
+            dev.Compute.SetUnorderedAccessView(0, null);
         }
 
         internal void CompileShaders()
@@ -116,12 +114,15 @@ namespace ImageFramework.Model.Scaling.Down
             return $@"
 {builder.SrvSingleType} src_image : register(t0);
 {builder.SrvSingleType} guide : register(t1);
+{builder.UavType} dst_image : register(u0);
 
 cbuffer InputBuffer : register(b0) {{
     uint3 srcSize;
-    bool hasAlpha;
+    uint layer;
+
     uint3 dstSize;
-    int padding0;
+    bool hasAlpha;
+
     float3 filterSizeFloat;
 }};
 
@@ -155,20 +156,9 @@ float getVisibility(float position, float start, float end)
 
 float weight();
 
-struct PixelIn
-{{
-    float2 texcoord : TEXCOORD;
-    float4 projPos : SV_POSITION;
-#if {builder.Is3DInt}
-    uint depth : SV_RenderTargetArrayIndex;
-#endif
-}};
-
-float4 main(PixelIn pin) : SV_TARGET {{
-    int3 id = int3(pin.projPos.xy, 0);
-#if {builder.Is3DInt}
-    id.z = pin.depth;
-#endif
+[numthreads({builder.LocalSizeX/2}, {builder.LocalSizeY/2}, {Math.Max(builder.LocalSizeZ/2, 1)})]
+void main(uint3 id : SV_DispatchThreadID){{
+    if(any(id >= dstSize)) return;
 
     guideValue = toSrgb(guide[texel(id)]);
 
@@ -180,7 +170,7 @@ float4 main(PixelIn pin) : SV_TARGET {{
         private static string GetFastSource(IShaderBuilder builder, bool veryDetailed)
         {
             return $@"
-{HeaderAndMain(builder, veryDetailed)}
+{HeaderAndMain(builder, veryDetailed)} // {{
     
     uint3 startPos = id * (srcSize / dstSize);
     uint3 endPos = (id + 1) * (srcSize / dstSize);
@@ -202,7 +192,7 @@ float4 main(PixelIn pin) : SV_TARGET {{
         private static string GetSlowSource(IShaderBuilder builder, bool veryDetailed)
         {
             return $@"
-{HeaderAndMain(builder, veryDetailed)}
+{HeaderAndMain(builder, veryDetailed)} // {{
 
     float3 startPosf = id * filterSizeFloat;
     float3 endPosf = (id + 1) * filterSizeFloat;
@@ -238,7 +228,7 @@ if(dcolor.a != 0.0) dcolor.rgb /= dcolor.a;
 if(weightSum <= 0.0) // there was not difference in color => take guide value (all pixels were equal to the guide)
     dcolor = guide[texel(id)];
 
-return float4(dcolor);";
+dst_image[texel(id, layer)] = float4(dcolor);";
         }
 
         public void Dispose()

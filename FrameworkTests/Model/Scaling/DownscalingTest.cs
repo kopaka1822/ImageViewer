@@ -8,7 +8,6 @@ using ImageFramework.ImageLoader;
 using ImageFramework.Model;
 using ImageFramework.Model.Scaling;
 using ImageFramework.Model.Scaling.Down;
-using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDX.DXGI;
@@ -132,37 +131,37 @@ namespace FrameworkTests.Model.Scaling
         [TestMethod]
         public void BoxCompile()
         {
-            var s = new BoxScalingShader(new QuadShader());
+            var s = new BoxScalingShader();
             s.CompileShaders();
         }
 
         [TestMethod]
         public void TriangleCompile()
         {
-            var s = new TriangleScalingShader(new QuadShader());
+            var s = new TriangleScalingShader();
             s.CompileShaders();
         }
 
         [TestMethod]
         public void LanzosCompile()
         {
-            var s = new LanzosScalingShader(new QuadShader());
+            var s = new LanzosScalingShader();
             s.CompileShaders();
         }
 
         [TestMethod]
         public void DetailPreservingCompile()
         {
-            var s = new DetailPreservingDownscalingShader(null, true, null);
+            var s = new DetailPreservingDownscalingShader(null, true);
             s.CompileShaders();
         }
 
         [TestMethod]
         public void CompileDetailPreservingCore()
         {
-            var s = new DetailPreservingShaderCore(true, null);
+            var s = new DetailPreservingShaderCore(true);
             s.CompileShaders();
-            s = new DetailPreservingShaderCore(false, null);
+            s = new DetailPreservingShaderCore(false);
             s.CompileShaders();
         }
 
@@ -174,7 +173,7 @@ namespace FrameworkTests.Model.Scaling
             // 2 4 2
             // 1 2 1
 
-            var s = new FastGaussShader(new QuadShader());
+            var s = new FastGaussShader();
             var img = IO.LoadImageTexture(TestData.Directory + "small.pfm");
             var dst = new TextureArray2D(1, 1, img.Size, Format.R32G32B32A32_Float, true);
 

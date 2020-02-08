@@ -28,9 +28,9 @@ namespace ImageFramework.Model.Scaling.Down
 
         // for stretch = 3 (x will still be in [-1, 1]): sinc(pi * x * 3) * sinc(pi * x)
         // aprox. integral is given in s_values (128 values between -1 and 1)
-        public unsafe LanzosScalingShader(QuadShader quad) : base(@"
+        public unsafe LanzosScalingShader() : base(@"
 return valueTex.SampleLevel(valueSampler, x * 0.5 + 0.5, 0).x; 
-", 3, quad)
+", 3)
         {
             // pin s_values
             fixed (float* pValues = s_values)
@@ -65,14 +65,14 @@ SamplerState valueSampler : register(s0);
 
         protected override void BindAdditionalResources(Device dev)
         {
-            dev.Pixel.SetShaderResource(1, valueTexView);
-            dev.Pixel.SetSampler(0, valueSampler);
+            dev.Compute.SetShaderResource(1, valueTexView);
+            dev.Compute.SetSampler(0, valueSampler);
         }
 
         protected override void UnbindAdditionalResources(Device dev)
         {
-            dev.Pixel.SetShaderResource(1, null);
-            dev.Pixel.SetSampler(0, null);
+            dev.Compute.SetShaderResource(1, null);
+            dev.Compute.SetSampler(0, null);
         }
 
         public override void Dispose()

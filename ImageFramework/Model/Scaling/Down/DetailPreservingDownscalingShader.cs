@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
-using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 
 namespace ImageFramework.Model.Scaling.Down
@@ -14,11 +13,11 @@ namespace ImageFramework.Model.Scaling.Down
         private readonly IDownscalingShader boxScalingShader;
         private readonly FastGaussShader gaussShader;
         private readonly DetailPreservingShaderCore coreShader;
-        public DetailPreservingDownscalingShader(IDownscalingShader boxScalingShader, bool veryDetailed, QuadShader quad)
+        public DetailPreservingDownscalingShader(IDownscalingShader boxScalingShader, bool veryDetailed)
         {
             this.boxScalingShader = boxScalingShader;
-            gaussShader = new FastGaussShader(quad);
-            coreShader = new DetailPreservingShaderCore(veryDetailed, quad);
+            gaussShader = new FastGaussShader();
+            coreShader = new DetailPreservingShaderCore(veryDetailed);
         }
 
         public void Dispose()
