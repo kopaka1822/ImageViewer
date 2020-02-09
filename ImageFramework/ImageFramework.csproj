@@ -166,6 +166,7 @@
     <Compile Include="Model\Shader\ShaderBuilder2D.cs" />
     <Compile Include="Model\Shader\ShaderBuilder3D.cs" />
     <Compile Include="Model\Shader\StatisticsShader.cs" />
+    <Compile Include="Model\Shader\TransformShader.cs" />
     <Compile Include="Model\SharedModel.cs" />
     <Compile Include="Model\Statistics\DefaultStatistics.cs" />
     <Compile Include="Model\Statistics\SSIMModel.cs" />

@@ -82,6 +82,7 @@
     <Compile Include="Model\Shader\PixelValueShaderTest.cs" />
     <Compile Include="Model\Shader\ReduceTest.cs" />
     <Compile Include="Model\Shader\ScaleShaderTest.cs" />
+    <Compile Include="Model\Shader\TransformShaderTest.cs" />
     <Compile Include="Model\StatisticsTest.cs" />
     <Compile Include="Model\ThumbnailTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
