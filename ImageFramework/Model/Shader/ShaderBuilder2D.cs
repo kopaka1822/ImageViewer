@@ -10,17 +10,17 @@ namespace ImageFramework.Model.Shader
 {
     public class ShaderBuilder2D : IShaderBuilder
     {
-        private readonly string type;
+        public string Type { get; }
 
         public ShaderBuilder2D(string type = "float4")
         {
-            this.type = type;
+            this.Type = type;
         }
 
-        public string SrvType => $"Texture2DArray<{type}>";
-        public string SrvSingleType => $"Texture2D<{type}>";
+        public string SrvType => $"Texture2DArray<{Type}>";
+        public string SrvSingleType => $"Texture2D<{Type}>";
 
-        public string UavType => $"RWTexture2DArray<{type}>";
+        public string UavType => $"RWTexture2DArray<{Type}>";
 
         public int LocalSizeX => 32;
         public int LocalSizeY => 32;

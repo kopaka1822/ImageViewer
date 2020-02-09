@@ -31,6 +31,9 @@ namespace ImageFramework.Model.Shader
 
         // either int2 or int3
         string IntVec { get; }
+        
+        // underlying texture type (float4 etc.)
+        string Type { get; }
     }
 
     public static class ShaderBuilder

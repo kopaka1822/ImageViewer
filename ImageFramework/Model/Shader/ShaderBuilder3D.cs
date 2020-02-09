@@ -9,17 +9,17 @@ namespace ImageFramework.Model.Shader
 {
     public class ShaderBuilder3D : IShaderBuilder
     {
-        private readonly string type;
+        public string Type { get; }
 
         public ShaderBuilder3D(string type = "float4")
         {
-            this.type = type;
+            this.Type = type;
         }
 
-        public string SrvType => $"Texture3D<{type}>";
+        public string SrvType => $"Texture3D<{Type}>";
         public string SrvSingleType => SrvType;
 
-        public string UavType => $"RWTexture3D<{type}>";
+        public string UavType => $"RWTexture3D<{Type}>";
 
         public int LocalSizeX => 10;
         public int LocalSizeY => 10;

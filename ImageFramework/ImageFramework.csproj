@@ -168,6 +168,7 @@
     <Compile Include="Model\Shader\StatisticsShader.cs" />
     <Compile Include="Model\SharedModel.cs" />
     <Compile Include="Model\Statistics\DefaultStatistics.cs" />
+    <Compile Include="Model\Statistics\SSIMModel.cs" />
     <Compile Include="Model\Statistics\StatisticsModel.cs" />
     <Compile Include="Model\ThumbnailModel.cs" />
     <Compile Include="Utility\Bool3.cs" />
