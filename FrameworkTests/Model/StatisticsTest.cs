@@ -141,5 +141,12 @@ namespace FrameworkTests.Model
                 Min = min
             };
         }
+
+        [TestMethod]
+        public void SSIMCompile()
+        {
+            var models = new Models(1);
+            var s = models.SSIM;
+        }
     }
 }

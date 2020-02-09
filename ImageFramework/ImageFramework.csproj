@@ -169,6 +169,8 @@
     <Compile Include="Model\Shader\TransformShader.cs" />
     <Compile Include="Model\SharedModel.cs" />
     <Compile Include="Model\Statistics\DefaultStatistics.cs" />
+    <Compile Include="Model\Statistics\ImagesCovarianceStats.cs" />
+    <Compile Include="Model\Statistics\ImageVarianceStats.cs" />
     <Compile Include="Model\Statistics\SSIMModel.cs" />
     <Compile Include="Model\Statistics\StatisticsModel.cs" />
     <Compile Include="Model\ThumbnailModel.cs" />

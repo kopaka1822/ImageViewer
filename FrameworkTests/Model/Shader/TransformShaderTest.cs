@@ -26,7 +26,7 @@ namespace FrameworkTests.Model.Shader
         [TestMethod]
         public void RunSmall()
         {
-            var s = new TransformShader("return float4(value.rgb * 2.0, value.a)");
+            var s = new TransformShader("return float4(value.rgb * 2.0, value.a)", "float4", "float4");
             var img = IO.LoadImageTexture(TestData.Directory + "small.pfm");
 
             var dst = new TextureArray2D(img.NumLayers, img.NumMipmaps, img.Size, Format.R32G32B32A32_Float, true);

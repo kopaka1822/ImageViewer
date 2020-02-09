@@ -86,6 +86,9 @@ namespace ImageFramework.Model
         private OverlayModel overlay = null;
         public OverlayModel Overlay => overlay ?? (overlay = new OverlayModel(TextureCache));
 
+        private SSIMModel ssim = null;
+        public SSIMModel SSIM => ssim ?? (ssim = new SSIMModel(this));
+
         #endregion
 
         public Models(int numPipelines = 1)
@@ -316,6 +319,7 @@ namespace ImageFramework.Model
             gif?.Dispose();
             scaling?.Dispose();
             overlay?.Dispose();
+            ssim?.Dispose();
 
             Images?.Dispose();
             Filter?.Dispose();

@@ -19,11 +19,33 @@ namespace ImageFramework.Model.Shader
         private readonly string pixelTypeIn;
         private readonly string pixelTypeOut;
         private readonly string transform;
+        private readonly string[] inputs;
 
         public static readonly string TransformLuma = StatisticsShader.LumaValue;
 
-        public TransformShader(string transform, string pixelTypeIn = "float4", string pixelTypeOut = "float4")
+        /// <summary>
+        /// ctor for a single input image
+        /// </summary>
+        /// <param name="transform">transform "value" from pixelTypeIn to pixelTypeOut</param>
+        /// <param name="pixelTypeIn"></param>
+        /// <param name="pixelTypeOut"></param>
+        public TransformShader(string transform, string pixelTypeIn, string pixelTypeOut)
+        : this(
+            new string[]{"src_image"}, 
+            $"{pixelTypeIn} value = src_image[coord]; {transform}", 
+            pixelTypeIn, pixelTypeOut)
+        {}
+
+        /// <summary>
+        /// ctor for multiple input images
+        /// </summary>
+        /// <param name="inputs">names of input images</param>
+        /// <param name="transform">use "coord" to fetch and tranform data of input images to pixelTypeOut</param>
+        /// <param name="pixelTypeIn"></param>
+        /// <param name="pixelTypeOut"></param>
+        public TransformShader(string[] inputs, string transform, string pixelTypeIn, string pixelTypeOut)
         {
+            this.inputs = inputs;
             this.transform = transform;
             this.pixelTypeIn = pixelTypeIn;
             this.pixelTypeOut = pixelTypeOut;
@@ -48,19 +70,33 @@ namespace ImageFramework.Model.Shader
 
         public void Run(ITexture src, ITexture dst, int layer, int mipmap, UploadBuffer upload)
         {
-            Debug.Assert(src.HasSameDimensions(dst));
+            Run(new[]{src}, dst, layer, mipmap, upload);
+        }
 
-            var size = src.Size.GetMip(mipmap);
+        public void Run(ITexture[] sources, ITexture dst, int layer, int mipmap, UploadBuffer upload)
+        {
+            Debug.Assert(sources.Length == inputs.Length);
+            foreach (var src in sources)
+            {
+                Debug.Assert(src.HasSameDimensions(dst));
+            }
+
+            var size = sources[0].Size.GetMip(mipmap);
             upload.SetData(new BufferData
             {
                 Layer = layer,
                 Size = size
             });
             var dev = Device.Get();
-            var builder = src.Is3D ? ShaderBuilder.Builder3D : ShaderBuilder.Builder2D;
-            dev.Compute.Set(src.Is3D ? Shader3D.Compute : Shader.Compute);
+            var builder = sources[0].Is3D ? ShaderBuilder.Builder3D : ShaderBuilder.Builder2D;
+            dev.Compute.Set(sources[0].Is3D ? Shader3D.Compute : Shader.Compute);
             dev.Compute.SetConstantBuffer(0, upload.Handle);
-            dev.Compute.SetShaderResource(0, src.GetSrView(layer, mipmap));
+            for (var i = 0; i < sources.Length; i++)
+            {
+                var src = sources[i];
+                dev.Compute.SetShaderResource(i, src.GetSrView(layer, mipmap));
+            }
+
             dev.Compute.SetUnorderedAccessView(0, dst.GetUaView(mipmap));
 
             dev.Dispatch(
@@ -69,7 +105,10 @@ namespace ImageFramework.Model.Shader
                 Utility.Utility.DivideRoundUp(size.Z, builder.LocalSizeZ)
             );
 
-            dev.Compute.SetShaderResource(0, null);
+            for (var i = 0; i < sources.Length; i++)
+            {
+                dev.Compute.SetShaderResource(i, null);
+            }
             dev.Compute.SetUnorderedAccessView(0, null);
         }
 
@@ -82,7 +121,7 @@ namespace ImageFramework.Model.Shader
         private string GetSource(IShaderBuilder builderIn, IShaderBuilder builderOut)
         {
             return $@"
-{builderIn.SrvSingleType} src_image : register(t0);
+{GetInputs(builderIn)}
 {builderOut.UavType} out_image : register(u0);
 
 cbuffer InputBuffer : register(b0) {{
@@ -93,7 +132,7 @@ cbuffer InputBuffer : register(b0) {{
 {Utility.Utility.ToSrgbFunction()}
 {builderIn.TexelHelperFunctions}
 
-{builderOut.Type} transform({builderIn.Type} value) {{
+{builderOut.Type} transform({builderIn.IntVec} coord) {{
     {transform};
 }}
 
@@ -101,9 +140,21 @@ cbuffer InputBuffer : register(b0) {{
 void main(int3 id : SV_DispatchThreadID)
 {{
     if(any(id >= size)) return;
-    out_image[texel(id, layer)] = transform(src_image[texel(id)]);
+    out_image[texel(id, layer)] = transform(texel(id));
 }}
 ";
+        }
+
+        private string GetInputs(IShaderBuilder builder)
+        {
+            string res = "";
+            int id = 0;
+            foreach (var input in inputs)
+            {
+                res += $"{builder.SrvSingleType} {input} : register(t{id++});\n";
+            }
+
+            return res;
         }
     }
 }
