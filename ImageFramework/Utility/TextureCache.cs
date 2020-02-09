@@ -10,10 +10,14 @@ namespace ImageFramework.Utility
     {
         private readonly Stack<ITexture> textures = new Stack<ITexture>(2);
         private readonly ITexture templateTex;
+        private readonly Format format;
+        private readonly bool createUav;
 
-        public TextureCache(ITexture templateTexture)
+        public TextureCache(ITexture templateTexture, Format format = Format.R32G32B32A32_Float, bool createUav = true)
         {
             this.templateTex = templateTexture;
+            this.createUav = createUav;
+            this.format = format;
         }
 
         /// <summary>
@@ -26,7 +30,7 @@ namespace ImageFramework.Utility
 
             // make new texture with the current configuration
             return templateTex.Create(templateTex.NumLayers, templateTex.NumMipmaps, templateTex.Size,
-                Format.R32G32B32A32_Float, true);
+                format, createUav);
         }
 
         /// <summary>

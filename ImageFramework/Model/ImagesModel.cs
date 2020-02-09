@@ -403,10 +403,10 @@ namespace ImageFramework.Model
             }
         }
 
-        public ITexture CreateEmptyTexture()
+        internal ITexture CreateEmptyTexture(Format format, bool createUav)
         {
             Debug.Assert(images.Count != 0);
-            return images[0].Image.Create(NumLayers, NumMipmaps, Size, Format.R32G32B32A32_Float, true);
+            return images[0].Image.Create(NumLayers, NumMipmaps, Size, format, createUav);
         }
     }
 }

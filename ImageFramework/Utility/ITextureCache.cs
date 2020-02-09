@@ -8,7 +8,7 @@ using ImageFramework.DirectX;
 
 namespace ImageFramework.Utility
 {
-    interface ITextureCache : IDisposable
+    public interface ITextureCache : IDisposable
     {
         /// <summary>
         /// returns one unused texture if available. creates a new texture if not textures were available

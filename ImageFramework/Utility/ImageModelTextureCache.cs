@@ -7,20 +7,25 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
+using SharpDX.DXGI;
 
 namespace ImageFramework.Utility
 {
     /// <summary>
     /// texture cache that is synchronized with images model
     /// </summary>
-    class ImageModelTextureCache : ITextureCache
+    public class ImageModelTextureCache : ITextureCache
     {
         private readonly Stack<ITexture> textures = new Stack<ITexture>(2);
         private readonly ImagesModel images;
+        private readonly Format format;
+        private readonly bool createUav;
 
-        public ImageModelTextureCache(ImagesModel images)
+        public ImageModelTextureCache(ImagesModel images, Format format = Format.R32G32B32A32_Float, bool createUav = true)
         {
             this.images = images;
+            this.createUav = createUav;
+            this.format = format;
             images.PropertyChanged += ImagesOnPropertyChanged;
         }
 
@@ -29,7 +34,7 @@ namespace ImageFramework.Utility
             if (textures.Count > 0) return textures.Pop();
 
             // make new texture with the current configuration
-            return images.CreateEmptyTexture();
+            return images.CreateEmptyTexture(format, createUav);
         }
 
         public void StoreTexture(ITexture tex)
