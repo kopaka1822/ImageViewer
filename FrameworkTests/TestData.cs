@@ -13,6 +13,7 @@ namespace FrameworkTests
     static class TestData
     {
         public static string Directory = "../../FrameworkTests/TestData/";
+        public static string KtxDirectory = "../../dependencies/ktx/tests/testimages/";
 
         public static readonly float Gray = 0.2119141f; // value of small.png gray and gray.png
 

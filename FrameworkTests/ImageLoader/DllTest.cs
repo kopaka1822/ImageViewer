@@ -95,5 +95,23 @@ namespace FrameworkTests.ImageLoader
             Assert.AreEqual(6, tex.NumLayers);
             Assert.AreEqual(3, tex.NumMipmaps);
         }
+
+        [TestMethod]
+        public void LoadKtx2()
+        {
+            var tex = new TextureArray2D(IO.LoadImage(TestData.KtxDirectory + "rgb-mipmap-reference-u.ktx2"));
+            Assert.AreEqual(tex.NumMipmaps, 7);
+            Assert.AreEqual(tex.Size.Width, 64);
+            Assert.AreEqual(tex.Size.Height, 64);
+
+            // test colors
+            Assert.IsTrue(tex.GetPixelColors(0, 0)[0].Equals(new Color(1.0f, 0.0f, 0.0f), Color.Channel.Rgb));
+            Assert.IsTrue(tex.GetPixelColors(0, 1)[0].Equals(new Color(1.0f, 0.175f, 0.0f), Color.Channel.Rgb));
+            Assert.IsTrue(tex.GetPixelColors(0, 2)[0].Equals(new Color(1.0f, 1.0f, 0.0f), Color.Channel.Rgb));
+            Assert.IsTrue(tex.GetPixelColors(0, 3)[0].Equals(new Color(0.0f, 1.0f, 0.0f), Color.Channel.Rgb));
+            Assert.IsTrue(tex.GetPixelColors(0, 4)[0].Equals(new Color(0.0f, 0.0f, 1.0f), Color.Channel.Rgb));
+            Assert.IsTrue(tex.GetPixelColors(0, 5)[0].Equals(new Color(0.0f, 1.0f, 1.0f), Color.Channel.Rgb));
+            Assert.IsTrue(tex.GetPixelColors(0, 6)[0].Equals(new Color(1.0f, 0.0f, 1.0f), Color.Channel.Rgb));
+        }
     }
 }
