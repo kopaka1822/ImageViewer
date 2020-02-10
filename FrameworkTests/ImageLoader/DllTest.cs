@@ -113,5 +113,15 @@ namespace FrameworkTests.ImageLoader
             Assert.IsTrue(tex.GetPixelColors(0, 5)[0].Equals(new Color(0.0f, 1.0f, 1.0f), Color.Channel.Rgb));
             Assert.IsTrue(tex.GetPixelColors(0, 6)[0].Equals(new Color(1.0f, 0.0f, 1.0f), Color.Channel.Rgb));
         }
+
+        [TestMethod]
+        public void LoadKtx2BasisU()
+        {
+            var tex = IO.LoadImageTexture(TestData.KtxDirectory + "alpha_simple_basis.ktx2");
+
+            var refTex = IO.LoadImageTexture(TestData.KtxDirectory + "alpha_simple.png");
+
+            TestData.CompareColors(refTex.GetPixelColors(0, 0), tex.GetPixelColors(0, 0), Color.Channel.Rgba);
+        }
     }
 }
