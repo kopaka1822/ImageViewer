@@ -26,7 +26,7 @@ public:
 		// checkers: Black White
 		//           White Black
 
-		const uint8_t white = 254;
+		const uint8_t white = 255;
 
 		// top left
 		Assert::AreEqual(data[0], uint8_t(0)); // red
