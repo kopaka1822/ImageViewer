@@ -11,14 +11,24 @@ namespace ImageFramework.Model.Statistics
     /// <summary>
     /// expected value and variance for a texture
     /// </summary>
-    public class ImageVarianceStats
+    internal class ImageVarianceStats
     {
-        public ImageVarianceStats(ITexture luma, ITexture expected, ITexture variance)
+        public ImageVarianceStats(ITextureCache cache)
         {
-            Luma = luma;
-            Expected = expected;
-            Variance = variance;
+            Cache = cache;
+            Luma = cache.GetTexture();
+            Expected = cache.GetTexture();
+            Variance = cache.GetTexture();
         }
+
+        public void Dispose()
+        {
+            Cache.StoreTexture(Luma);
+            Cache.StoreTexture(Expected);
+            Cache.StoreTexture(Variance);
+        }
+
+        public ITextureCache Cache { get; }
 
         public ITexture Luma { get; }
         public ITexture Expected { get; }

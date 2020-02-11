@@ -33,10 +33,10 @@ out_image[texel(id, layer)] = coSum / weightSum;
 ", "float")
         { }
 
-        public void Run(ITexture values, ITexture expectedValues, ITexture dst, LayerMipmapSlice lm,
+        public void Run(ITexture values1, ITexture values2, ITexture expected1, ITexture expected2, ITexture dst, LayerMipmapSlice lm,
             UploadBuffer upload)
         {
-            Run(new[] { values, expectedValues }, dst, lm, upload);
+            Run(new[] { values1, values2, expected1, expected2 }, dst, lm, upload);
         }
     }
 }
