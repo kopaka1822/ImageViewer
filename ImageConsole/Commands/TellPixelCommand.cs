@@ -26,7 +26,7 @@ namespace ImageConsole.Commands
             reader.ExpectNoMoreArgs();
 
             model.Apply();
-            var color = model.GetPixelValue(model.Pipelines[0].Image, new Size3(x, y, 0), layer, mipmap, radius);
+            var color = model.GetPixelValue(model.Pipelines[0].Image, new Size3(x, y, 0), new LayerMipmapSlice(layer, mipmap), radius);
             Console.Out.WriteLine(color.ToDecimalString(true, 5));
             
             color = color.ToSrgb();

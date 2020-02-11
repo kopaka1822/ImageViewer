@@ -43,21 +43,21 @@ namespace ImageFramework.Model.Shader
         {
             Debug.Assert(latlong.NumLayers == 1);
 
-            var dst = new TextureArray2D(6, 1, new Size3(resolution, resolution), Format.R32G32B32A32_Float, false);
+            var dst = new TextureArray2D(new LayerMipmapCount(6, 1), new Size3(resolution, resolution), Format.R32G32B32A32_Float, false);
 
             var dev = Device.Get();
             quad.Bind(false);
             dev.Pixel.Set(toCube.Pixel);
 
-            dev.Pixel.SetShaderResource(0, latlong.GetSrView(0, 0));
+            dev.Pixel.SetShaderResource(0, latlong.GetSrView(LayerMipmapSlice.Mip0));
             dev.Pixel.SetSampler(0, sampler);
             dev.OutputMerger.SetRenderTargets(null, 
-                dst.GetRtView(0, 0), 
-                dst.GetRtView(1, 0),
-                dst.GetRtView(2, 0),
-                dst.GetRtView(3, 0),
-                dst.GetRtView(4, 0),
-                dst.GetRtView(5, 0));
+                dst.GetRtView(new LayerMipmapSlice(0, 0)), 
+                dst.GetRtView(new LayerMipmapSlice(1, 0)),
+                dst.GetRtView(new LayerMipmapSlice(2, 0)),
+                dst.GetRtView(new LayerMipmapSlice(3, 0)),
+                dst.GetRtView(new LayerMipmapSlice(4, 0)),
+                dst.GetRtView(new LayerMipmapSlice(5, 0)));
             dev.SetViewScissors(resolution, resolution);
             dev.DrawQuad();
 
@@ -74,7 +74,7 @@ namespace ImageFramework.Model.Shader
         {
             Debug.Assert(cube.NumLayers == 6);
 
-            var dst = new TextureArray2D(1, 1, new Size3(resolution, Math.Max(resolution / 2, 1)), Format.R32G32B32A32_Float, false);
+            var dst = new TextureArray2D(LayerMipmapCount.One, new Size3(resolution, Math.Max(resolution / 2, 1)), Format.R32G32B32A32_Float, false);
 
             var dev = Device.Get();
             quad.Bind(false);
@@ -83,7 +83,7 @@ namespace ImageFramework.Model.Shader
             var dim = dst.Size;
             dev.Pixel.SetShaderResource(0, cube.GetCubeView(0));
             dev.Pixel.SetSampler(0, sampler);
-            dev.OutputMerger.SetRenderTargets(dst.GetRtView(0, 0));
+            dev.OutputMerger.SetRenderTargets(dst.GetRtView(LayerMipmapSlice.Mip0));
             dev.SetViewScissors(dim.Width, dim.Height);
             dev.DrawQuad();
 

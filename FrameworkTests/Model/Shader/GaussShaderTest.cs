@@ -35,9 +35,9 @@ namespace FrameworkTests.Model.Shader
             var cache = new TextureCache(img);
             var dst = cache.GetTexture();
 
-            s.Run(img, dst, 0, 0, new UploadBuffer(256), cache);
+            s.Run(img, dst, LayerMipmapSlice.Mip0, new UploadBuffer(256), cache);
 
-            var origColors = img.GetPixelColors(0, 0);
+            var origColors = img.GetPixelColors(LayerMipmapSlice.Mip0);
             var expectedColors = new Color[origColors.Length];
  
             // do gauss blur with radius 1
@@ -71,7 +71,7 @@ namespace FrameworkTests.Model.Shader
                 expectedColors[y * dim.Width + x] = c;
             }
 
-            var gaussColors = dst.GetPixelColors(0, 0);
+            var gaussColors = dst.GetPixelColors(LayerMipmapSlice.Mip0);
 
             TestData.CompareColors(expectedColors, gaussColors, Color.Channel.Rgba);
         }

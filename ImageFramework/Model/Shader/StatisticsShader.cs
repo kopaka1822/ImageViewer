@@ -44,29 +44,31 @@ return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
         /// <summary>
         /// puts statistic data of all pixels into the buffer
         /// </summary>
-        internal void CopyToBuffer(ITexture source, GpuBuffer buffer, int layer = -1, int mipmap = 0)
+        internal void CopyToBuffer(ITexture source, GpuBuffer buffer, LayerMipmapRange lm)
         {
+            Debug.Assert(!lm.AllMipmaps);
+
             // copy pixels from the source image into a texture from the texture cache
             var dev = Device.Get();
             if(source.Is3D) dev.Compute.Set(shader3d.Compute);
             else dev.Compute.Set(shader.Compute);
 
-            var dim = source.Size.GetMip(mipmap);
-            var numLayers = source.NumLayers;
+            var dim = source.Size.GetMip(lm.Mipmap);
+            var numLayers = source.LayerMipmap.Layers;
             var curData = new StatisticsData
             {
-                Level = mipmap,
+                Level = lm.Mipmap,
                 TrueBool = true
             };
 
-            if (layer == -1)
+            if (lm.AllLayer)
             {
                 dev.Compute.SetShaderResource(0, source.View);
             }
             else
             {
                 // single layer
-                dev.Compute.SetShaderResource(0, source.GetSrView(layer, mipmap));
+                dev.Compute.SetShaderResource(0, source.GetSrView(lm.Single));
                 curData.Level = 0; // view with single level
                 numLayers = 1;
             }

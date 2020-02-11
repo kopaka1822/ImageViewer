@@ -93,7 +93,7 @@ namespace ImageFramework.Model.Scaling
             models.Progress.Progress = 0.0f;
             models.Progress.What = "Generating Mipmaps";
 
-            for (int curMip = 1; curMip < tex.NumMipmaps; ++curMip)
+            for (int curMip = 1; curMip < tex.LayerMipmap.Mipmaps; ++curMip)
             {
                 // don't use the previous mipmaps (too much error) => using 16 times bigger is okay
                 var srcMip = Math.Max(0, curMip - 4);
@@ -101,7 +101,7 @@ namespace ImageFramework.Model.Scaling
 
                 models.SharedModel.Sync.Set();
                 await models.SharedModel.Sync.WaitForGpuAsync(ct);
-                models.Progress.Progress = curMip / (float)(tex.NumMipmaps - 1);
+                models.Progress.Progress = curMip / (float)(tex.LayerMipmap.Mipmaps - 1);
             }
 
             if (!tex.HasUaViews) // write back from dstTex to tex
@@ -111,7 +111,8 @@ namespace ImageFramework.Model.Scaling
                 {
                     for (int curMip = 1; curMip < tex.NumMipmaps; ++curMip)
                     {
-                        models.SharedModel.Convert.CopyLayer(dstTex, curLayer, curMip, tex, curLayer, curMip);
+                        var lm = new LayerMipmapSlice(curLayer, curMip);
+                        models.SharedModel.Convert.CopyLayer(dstTex, lm, tex, lm);
                         models.SharedModel.Sync.Set();
                         await models.SharedModel.Sync.WaitForGpuAsync(ct);
                     }

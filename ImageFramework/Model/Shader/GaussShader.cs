@@ -44,14 +44,13 @@ namespace ImageFramework.Model.Shader
             public Size3 Size;
         }
 
-        public void Run(ITexture src, ITexture dst, int layer, int mipmap, UploadBuffer buffer, ITextureCache cache)
+        public void Run(ITexture src, ITexture dst, LayerMipmapSlice lm, UploadBuffer buffer, ITextureCache cache)
         {
             Debug.Assert(src.HasSameDimensions(dst));
             Debug.Assert(cache.IsCompatibleWith(src));
-            Debug.Assert(layer < src.NumLayers);
-            Debug.Assert(mipmap < src.NumMipmaps);
+            Debug.Assert(lm.IsIn(src.LayerMipmap));
 
-            var srcSize = src.Size.GetMip(mipmap);
+            var srcSize = src.Size.GetMip(lm.Mipmap);
 
             var dev = Device.Get();
             dev.Compute.Set(src.Is3D ? Shader3D.Compute : Shader.Compute);
@@ -62,13 +61,13 @@ namespace ImageFramework.Model.Shader
             {
                 Size = srcSize,   
                 Direction = new Size3(1, 0, 0),
-                Layer = layer
+                Layer = lm.Layer
             });
             dev.Compute.SetConstantBuffer(0, buffer.Handle);
-            dev.Compute.SetShaderResource(0, src.GetSrView(layer, mipmap));
+            dev.Compute.SetShaderResource(0, src.GetSrView(lm));
             var tmp1 = cache.GetTexture();
             ITexture tmp2 = null;
-            dev.Compute.SetUnorderedAccessView(0, tmp1.GetUaView(mipmap));
+            dev.Compute.SetUnorderedAccessView(0, tmp1.GetUaView(lm.Mipmap));
 
             dev.Dispatch(
                 Utility.Utility.DivideRoundUp(srcSize.Width, builder.LocalSizeX),
@@ -78,21 +77,19 @@ namespace ImageFramework.Model.Shader
        
             UnbindResources(dev);
 
-            var tst = tmp1.GetPixelColors(0, 0);
-
             // execute y
             buffer.SetData(new BufferData
             {
                 Size = srcSize,
                 Direction = new Size3(0, 1, 0),
-                Layer = layer
+                Layer = lm.Layer
             });
             dev.Compute.SetConstantBuffer(0, buffer.Handle);
-            dev.Compute.SetShaderResource(0, tmp1.GetSrView(layer, mipmap));
+            dev.Compute.SetShaderResource(0, tmp1.GetSrView(lm));
             if (src.Is3D)
             {
                 tmp2 = cache.GetTexture();
-                dev.Compute.SetUnorderedAccessView(0, tmp2.GetUaView(mipmap));
+                dev.Compute.SetUnorderedAccessView(0, tmp2.GetUaView(lm.Mipmap));
 
                 dev.Dispatch(
                     Utility.Utility.DivideRoundUp(srcSize.Width, builder.LocalSizeX),
@@ -107,14 +104,14 @@ namespace ImageFramework.Model.Shader
                 {
                     Size = srcSize,
                     Direction = new Size3(0, 0, 1),
-                    Layer = layer
+                    Layer = lm.Layer
                 });
                 dev.Compute.SetConstantBuffer(0, buffer.Handle);
-                dev.Compute.SetShaderResource(0, tmp2.GetSrView(layer, mipmap));
+                dev.Compute.SetShaderResource(0, tmp2.GetSrView(lm));
             }
 
             // bind final target
-            dev.Compute.SetUnorderedAccessView(0, dst.GetUaView(mipmap));
+            dev.Compute.SetUnorderedAccessView(0, dst.GetUaView(lm.Mipmap));
 
             dev.Dispatch(
                 Utility.Utility.DivideRoundUp(srcSize.Width, builder.LocalSizeX),

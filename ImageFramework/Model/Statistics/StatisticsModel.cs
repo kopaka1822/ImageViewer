@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using ImageFramework.DirectX;
 using ImageFramework.Model.Shader;
+using ImageFramework.Utility;
 
 namespace ImageFramework.Model.Statistics
 {
@@ -38,11 +40,13 @@ namespace ImageFramework.Model.Statistics
         internal ReduceShader AvgReduce => avgReduce ?? (avgReduce = new ReduceShader(shared.Upload, "a+b", "0.0"));
         //public bool HasAlpha => !(Min.Alpha == 1.0f && Max.Alpha == 1.0f);
 
-        internal float GetStats(ITexture texture, int layer, int mipmap, StatisticsShader statShader, ReduceShader redShader, bool normalize)
+        internal float GetStats(ITexture texture, LayerMipmapRange lm, StatisticsShader statShader, ReduceShader redShader, bool normalize)
         {
+            Debug.Assert(lm.IsSingleMipmap);
+
             // obtain a buffer that is big enough
-            int numElements = texture.Size.GetMip(mipmap).Product;
-            if(layer == -1) numElements *= texture.NumLayers;
+            int numElements = texture.Size.GetMip(lm.FirstMipmap).Product;
+            if(lm.AllLayer) numElements *= texture.LayerMipmap.Layers;
 
             if (buffer == null || buffer.ElementCount < numElements)
             {
@@ -51,7 +55,7 @@ namespace ImageFramework.Model.Statistics
             }
 
             // copy all values into buffer
-            statShader.CopyToBuffer(texture, buffer, layer, mipmap);
+            statShader.CopyToBuffer(texture, buffer, lm);
 
             // execute reduce
             redShader.Run(buffer, numElements);
@@ -63,9 +67,14 @@ namespace ImageFramework.Model.Statistics
             return res;
         }
 
-        public DefaultStatistics GetStatisticsFor(ITexture texture, int layer = -1, int mipmap = 0)
+        public DefaultStatistics GetStatisticsFor(ITexture texture, LayerMipmapRange lm)
         {
-            return new DefaultStatistics(this, texture, layer, mipmap);
+            return new DefaultStatistics(this, texture, lm);
+        }
+
+        public DefaultStatistics GetStatisticsFor(ITexture texture)
+        {
+            return new DefaultStatistics(this, texture, LayerMipmapRange.MostDetailed);
         }
 
         public void Dispose()

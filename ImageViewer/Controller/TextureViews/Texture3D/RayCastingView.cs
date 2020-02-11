@@ -49,12 +49,12 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             if (models.Display.LinearInterpolation)
             {
                 shader.Run(models.Display.ClientAspectRatio, GetWorldToImage(), CalcFarplane(), 
-                texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap), helpTextures[id].GetSrView(models.Display.ActiveMipmap));
+                texture.GetSrView(models.Display.ActiveLayerMipmap), helpTextures[id].GetSrView(models.Display.ActiveMipmap));
             }
             else
             {
                 marchingShader.Run(models.Display.ClientAspectRatio, GetWorldToImage(), CalcFarplane(),
-                displayEx.FlatShading, texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap), helpTextures[id].GetSrView(models.Display.ActiveMipmap));
+                displayEx.FlatShading, texture.GetSrView(models.Display.ActiveLayerMipmap), helpTextures[id].GetSrView(models.Display.ActiveMipmap));
             }
 
             dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
@@ -97,7 +97,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
 
             SpaceSkippingTexture3D tex = new SpaceSkippingTexture3D(texture.Size, texture.NumMipmaps);
             helpTextures[id] = tex;
-            emptySpaceSkippingShader.Execute(texture.GetSrView(0, 0), helpTextures[id], texture.Size);
+            emptySpaceSkippingShader.Execute(texture.GetSrView(LayerMipmapSlice.Mip0), helpTextures[id], texture.Size);
 
         }
 

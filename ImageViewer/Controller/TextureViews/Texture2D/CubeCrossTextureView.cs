@@ -19,17 +19,23 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
 
             var mip = models.Display.ActiveMipmap;
             // -x
-            DrawLayer(Matrix.Translation(-2.0f, 0.0f, 0.0f),  texture.GetSrView(1, mip), models.Overlay.Overlay?.GetSrView(1, mip));
+            var lm = new LayerMipmapSlice(1, mip);
+            DrawLayer(Matrix.Translation(-2.0f, 0.0f, 0.0f),  texture.GetSrView(lm), models.Overlay.Overlay?.GetSrView(lm));
             // -y
-            DrawLayer(Matrix.Translation(0.0f, -2.0f, 0.0f),  texture.GetSrView(3, mip), models.Overlay.Overlay?.GetSrView(3, mip));
+            lm.Layer = 3;
+            DrawLayer(Matrix.Translation(0.0f, -2.0f, 0.0f),  texture.GetSrView(lm), models.Overlay.Overlay?.GetSrView(lm));
             // +y
-            DrawLayer(Matrix.Translation(0.0f, 2.0f, 0.0f), texture.GetSrView(2, mip), models.Overlay.Overlay?.GetSrView(2, mip));
+            lm.Layer = 2;
+            DrawLayer(Matrix.Translation(0.0f, 2.0f, 0.0f), texture.GetSrView(lm), models.Overlay.Overlay?.GetSrView(lm));
             // +z
-            DrawLayer(Matrix.Translation(0.0f, 0.0f, 0.0f), texture.GetSrView(4, mip), models.Overlay.Overlay?.GetSrView(4, mip));
+            lm.Layer = 4;
+            DrawLayer(Matrix.Translation(0.0f, 0.0f, 0.0f), texture.GetSrView(lm), models.Overlay.Overlay?.GetSrView(lm));
             // +x
-            DrawLayer(Matrix.Translation(2.0f, 0.0f, 0.0f), texture.GetSrView(0, mip), models.Overlay.Overlay?.GetSrView(0, mip));
+            lm.Layer = 0;
+            DrawLayer(Matrix.Translation(2.0f, 0.0f, 0.0f), texture.GetSrView(lm), models.Overlay.Overlay?.GetSrView(lm));
             // -z
-            DrawLayer(Matrix.Translation(4.0f, 0.0f, 0.0f), texture.GetSrView(5, mip), models.Overlay.Overlay?.GetSrView(5, mip));
+            lm.Layer = 5;
+            DrawLayer(Matrix.Translation(4.0f, 0.0f, 0.0f), texture.GetSrView(lm), models.Overlay.Overlay?.GetSrView(lm));
         }
 
         public override Size3 GetTexelPosition(Vector2 mouse)

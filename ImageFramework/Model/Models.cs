@@ -155,9 +155,9 @@ namespace ImageFramework.Model
         }
        
         /// <inheritdoc cref="PixelValueShader.Run"/>
-        public Color GetPixelValue(ITexture image, Size3 coord, int layer = 0, int mipmap = 0, int radius = 0)
+        public Color GetPixelValue(ITexture image, Size3 coord, LayerMipmapSlice lm, int radius = 0)
         {
-            return PixelValueShader.Run(image, coord, layer, mipmap, radius);
+            return PixelValueShader.Run(image, coord, lm, radius);
         }
 
         /// <inheritdoc cref="ThumbnailModel.CreateThumbnail"/>
@@ -195,12 +195,12 @@ namespace ImageFramework.Model
         {
             if (textures.Count == 0) return null;
             var first = textures[0];
-            var tex = new TextureArray2D(textures.Count, first.NumMipmaps, first.Size, Format.R32G32B32A32_Float, false);
+            var tex = new TextureArray2D(new LayerMipmapCount(textures.Count, first.NumMipmaps), first.Size, Format.R32G32B32A32_Float, false);
             for(int i = 0; i < textures.Count; ++i)
             {
                 for (int curMip = 0; curMip < first.NumMipmaps; ++curMip)
                 {
-                    SharedModel.Convert.CopyLayer(textures[i], 0, curMip, tex, i, curMip);
+                    SharedModel.Convert.CopyLayer(textures[i], new LayerMipmapSlice(0, curMip), tex, new LayerMipmapSlice(i, curMip));
                 }
             }
 

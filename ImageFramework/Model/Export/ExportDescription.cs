@@ -148,6 +148,8 @@ namespace ImageFramework.Model.Export
             }
         }
 
+        public LayerMipmapRange LayerMipmap => new LayerMipmapRange(Layer, Mipmap);
+
         private int scale = 1;
 
         /// image can be upscaled with point interpolation

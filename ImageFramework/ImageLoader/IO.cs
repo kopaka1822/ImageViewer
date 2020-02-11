@@ -1,6 +1,7 @@
 ﻿ using System;
 using System.Collections.Generic;
-using System.Linq;
+ using System.Diagnostics;
+ using System.Linq;
  using System.Runtime.InteropServices;
  using System.Text;
  using System.Threading;
@@ -39,7 +40,7 @@ namespace ImageFramework.ImageLoader
             var res = new Resource(file);
             Dll.image_info(res.Id, out var gliFormat, out var originalFormat, out var nLayer, out var nMipmaps);
 
-            return new Image(res, file, nLayer, nMipmaps, new ImageFormat((GliFormat)gliFormat), (GliFormat)originalFormat);
+            return new Image(res, file, new LayerMipmapCount(nLayer, nMipmaps), new ImageFormat((GliFormat)gliFormat), (GliFormat)originalFormat);
         }
 
 
@@ -87,11 +88,11 @@ namespace ImageFramework.ImageLoader
             return task;
         }
 
-        public static Image CreateImage(ImageFormat format, Size3 size, int layer, int mipmaps)
+        public static Image CreateImage(ImageFormat format, Size3 size, LayerMipmapCount lm)
         {
-            var res = new Resource((uint)format.GliFormat, size, layer, mipmaps);
+            var res = new Resource((uint)format.GliFormat, size, lm);
 
-            return new Image(res, "tmp", layer, mipmaps, format, format.GliFormat);
+            return new Image(res, "tmp", lm, format, format.GliFormat);
         }
 
         public static void SaveImage(Image image, string filename, string extension, GliFormat format, int quality = 0)

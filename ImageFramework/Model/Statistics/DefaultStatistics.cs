@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Shader;
+using ImageFramework.Utility;
 using SharpDX.DXGI;
 
 namespace ImageFramework.Model.Statistics
@@ -20,24 +21,22 @@ namespace ImageFramework.Model.Statistics
         private readonly StatisticsModel parent;
         private readonly StatisticsShader shader;
         private readonly ITexture texture;
-        private readonly int mipmap;
-        private readonly int layer;
+        private readonly LayerMipmapRange lm;
 
         private float? minValue;
         private float? maxValue;
         private float? avgValue;
 
-        public float Min => (float) (minValue ?? (minValue = parent.GetStats(texture, layer, mipmap, shader, parent.MinReduce, false)));
-        public float Max => (float) (maxValue ?? (maxValue = parent.GetStats(texture, layer, mipmap, shader, parent.MaxReduce, false)));
-        public float Avg => (float) (avgValue ?? (avgValue = parent.GetStats(texture, layer, mipmap, shader, parent.AvgReduce, true)));
+        public float Min => (float) (minValue ?? (minValue = parent.GetStats(texture, lm, shader, parent.MinReduce, false)));
+        public float Max => (float) (maxValue ?? (maxValue = parent.GetStats(texture, lm, shader, parent.MaxReduce, false)));
+        public float Avg => (float) (avgValue ?? (avgValue = parent.GetStats(texture, lm, shader, parent.AvgReduce, true)));
 
-        internal DefaultStatisticsType(StatisticsShader shader, ITexture texture, StatisticsModel parent, int layer, int mipmap)
+        internal DefaultStatisticsType(StatisticsShader shader, ITexture texture, StatisticsModel parent, LayerMipmapRange lm)
         {
             this.shader = shader;
             this.texture = texture;
             this.parent = parent;
-            this.layer = layer;
-            this.mipmap = mipmap;
+            this.lm = lm;
             minValue = null;
             maxValue = null;
             avgValue = null;
@@ -119,13 +118,13 @@ namespace ImageFramework.Model.Statistics
             return 0.0f;
         }
 
-        internal DefaultStatistics(StatisticsModel parent, ITexture texture, int layer, int mipmap)
+        internal DefaultStatistics(StatisticsModel parent, ITexture texture, LayerMipmapRange lm)
         {
-            Luminance = new DefaultStatisticsType(parent.LuminanceShader, texture, parent, layer, mipmap);
-            Average = new DefaultStatisticsType(parent.UniformShader, texture, parent, layer, mipmap);
-            Luma = new DefaultStatisticsType(parent.LumaShader, texture, parent, layer, mipmap);
-            Lightness = new DefaultStatisticsType(parent.LightnessShader, texture, parent, layer, mipmap);
-            Alpha = new DefaultStatisticsType(parent.AlphaShader, texture, parent, layer, mipmap);
+            Luminance = new DefaultStatisticsType(parent.LuminanceShader, texture, parent, lm);
+            Average = new DefaultStatisticsType(parent.UniformShader, texture, parent, lm);
+            Luma = new DefaultStatisticsType(parent.LumaShader, texture, parent, lm);
+            Lightness = new DefaultStatisticsType(parent.LightnessShader, texture, parent, lm);
+            Alpha = new DefaultStatisticsType(parent.AlphaShader, texture, parent, lm);
         }
 
         /// empty model constructor

@@ -13,11 +13,11 @@ namespace ImageFramework.DirectX
     public interface ITexture : IDisposable
     {
         Size3 Size { get; }
-        int NumMipmaps { get; }
-        bool HasMipmaps { get; }
         bool HasCubemap { get; }
         bool Is3D { get; }
+        LayerMipmapCount LayerMipmap { get; }
         int NumLayers { get; }
+        int NumMipmaps { get; }
         Format Format { get; }
 
         ShaderResourceView View { get; }
@@ -25,15 +25,15 @@ namespace ImageFramework.DirectX
         bool HasSrViews { get; }
         bool HasRtViews { get; }
 
-        ShaderResourceView GetSrView(int layer, int mipmap);
+        ShaderResourceView GetSrView(LayerMipmapSlice lm);
 
-        RenderTargetView GetRtView(int layer, int mipmap);
+        RenderTargetView GetRtView(LayerMipmapSlice lm);
 
         UnorderedAccessView GetUaView(int mipmap);
 
-        Color[] GetPixelColors(int layer, int mipmap);
-        unsafe byte[] GetBytes(int layer, int mipmap, uint size);
-        void CopyPixels(int layer, int mipmap, IntPtr destination, uint size);
+        Color[] GetPixelColors(LayerMipmapSlice lm);
+        unsafe byte[] GetBytes(LayerMipmapSlice lm, uint size);
+        void CopyPixels(LayerMipmapSlice lm, IntPtr destination, uint size);
 
         /// <summary>
         /// Creates new texture with nLevels levels and clones the most detailed mipmap
@@ -45,7 +45,7 @@ namespace ImageFramework.DirectX
         /// </summary>
         ITexture CloneWithoutMipmaps(int mipmap = 0);
 
-        ITexture Create(int numLayer, int numMipmaps, Size3 size, Format format, bool createUav);
+        ITexture Create(LayerMipmapCount lm, Size3 size, Format format, bool createUav);
 
         ITexture Clone();
 

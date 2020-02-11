@@ -28,7 +28,7 @@ namespace FrameworkTests.Model.Shader
             var reference = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere_up.png"));
 
             // compare with gimp reference
-            TestData.CompareColors(reference.GetPixelColors(0, 0), res.GetPixelColors(0, 0));
+            TestData.CompareColors(reference.GetPixelColors(LayerMipmapSlice.Mip0), res.GetPixelColors(LayerMipmapSlice.Mip0));
         }
 
         [TestMethod]
@@ -43,7 +43,7 @@ namespace FrameworkTests.Model.Shader
             var reference = new TextureArray2D(IO.LoadImage(TestData.Directory + "sphere_scaled.png"));
 
             // compare with gimp reference
-            TestData.CompareColors(reference.GetPixelColors(0, 0), res.GetPixelColors(0, 0));
+            TestData.CompareColors(reference.GetPixelColors(LayerMipmapSlice.Mip0), res.GetPixelColors(LayerMipmapSlice.Mip0));
         }
     }
 }

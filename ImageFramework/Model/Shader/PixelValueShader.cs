@@ -31,13 +31,11 @@ namespace ImageFramework.Model.Shader
         /// </summary>
         /// <param name="image">source image</param>
         /// <param name="coord">x pixel coordinate</param>
-        /// <param name="layer">layer</param>
-        /// <param name="mipmap">mipmap</param>
         /// <param name="radius">summation radius (0 = only this pixel)</param>
         /// <returns></returns>
-        public Color Run(ITexture image, Size3 coord, int layer, int mipmap, int radius = 0)
+        public Color Run(ITexture image, Size3 coord, LayerMipmapSlice lm, int radius = 0)
         {
-            var dim = image.Size.GetMip(mipmap);
+            var dim = image.Size.GetMip(lm.SingleMipmap);
 
             cbuffer.SetData(new PixelValueData
             {
@@ -54,7 +52,7 @@ namespace ImageFramework.Model.Shader
             if(image.Is3D) dev.Compute.Set(shader3D.Compute);
             else dev.Compute.Set(shader2D.Compute);
             dev.Compute.SetConstantBuffer(0, cbuffer.Handle);
-            dev.Compute.SetShaderResource(0, image.GetSrView(layer, mipmap));
+            dev.Compute.SetShaderResource(0, image.GetSrView(lm));
             dev.Compute.SetUnorderedAccessView(0, dstBuffer.View);
 
             dev.Dispatch(1, 1);

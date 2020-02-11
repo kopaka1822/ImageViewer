@@ -111,12 +111,12 @@ namespace ImageFramework.Model.Overlay
             }
         }
 
-        public override void Render(int layer, int mipmap, Size3 size)
+        public override void Render(LayerMipmapSlice lm, Size3 size)
         {
             var data = new BufferData
             {
                 CropLayer = Layer,
-                Layer = layer,
+                Layer = lm.SingleLayer,
                 Depth = size.Depth,
             };
 

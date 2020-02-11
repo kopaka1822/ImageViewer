@@ -9,6 +9,7 @@ using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageFramework.Model.Shader;
 using ImageFramework.Model.Statistics;
+using ImageFramework.Utility;
 using ImageViewer.Models.Display;
 
 namespace ImageViewer.Models
@@ -64,11 +65,11 @@ namespace ImageViewer.Models
                     display.ActiveView == DisplayModel.ViewMode.CubeMap)
                 {
                     // compute for all layers
-                    Stats = models.Stats.GetStatisticsFor(pipe.Image, -1, display.ActiveMipmap);
+                    Stats = models.Stats.GetStatisticsFor(pipe.Image, new LayerMipmapRange(-1, display.ActiveMipmap));
                 }
                 else // compute for single layer
                 {
-                    Stats = models.Stats.GetStatisticsFor(pipe.Image, display.ActiveLayer, display.ActiveMipmap);
+                    Stats = models.Stats.GetStatisticsFor(pipe.Image, new LayerMipmapSlice(display.ActiveLayer, display.ActiveMipmap));
                 }
                 
                 OnPropertyChanged(nameof(Stats));

@@ -55,7 +55,7 @@ namespace ImageViewer.Commands.View
                     if(tex == null) continue;
 
                     var color = models.GetPixelValue(tex, new Size3(models.Display.PrevTexelPosition.X, models.Display.PrevTexelPosition.Y, 0),
-                        models.Display.ActiveLayer, models.Display.ActiveMipmap, models.Display.TexelRadius);
+                        models.Display.ActiveLayerMipmap, models.Display.TexelRadius);
 
                     colors.Add(new PixelColorDialog.Element(color, i, models.Statistics[i].Stats.HasAlpha));
                 }

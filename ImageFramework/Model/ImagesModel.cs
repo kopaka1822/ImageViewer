@@ -406,7 +406,7 @@ namespace ImageFramework.Model
         internal ITexture CreateEmptyTexture(Format format, bool createUav)
         {
             Debug.Assert(images.Count != 0);
-            return images[0].Image.Create(NumLayers, NumMipmaps, Size, format, createUav);
+            return images[0].Image.Create(new LayerMipmapCount(NumLayers, NumMipmaps), Size, format, createUav);
         }
     }
 }

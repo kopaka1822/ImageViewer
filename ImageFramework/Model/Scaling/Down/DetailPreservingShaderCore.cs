@@ -84,8 +84,8 @@ namespace ImageFramework.Model.Scaling.Down
                 bufferData.Layer = layer;
                 upload.SetData(bufferData);
                 dev.Compute.SetConstantBuffer(0, upload.Handle);
-                dev.Compute.SetShaderResource(0, src.GetSrView(layer, srcMipmap));
-                dev.Compute.SetShaderResource(1, guide.GetSrView(layer, dstMipmap));
+                dev.Compute.SetShaderResource(0, src.GetSrView(new LayerMipmapSlice(layer, srcMipmap)));
+                dev.Compute.SetShaderResource(1, guide.GetSrView(new LayerMipmapSlice(layer, dstMipmap)));
                 dev.Compute.SetUnorderedAccessView(0, dst.GetUaView(dstMipmap));
 
                 dev.Dispatch(

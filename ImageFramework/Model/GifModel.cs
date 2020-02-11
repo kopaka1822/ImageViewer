@@ -11,6 +11,7 @@ using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
 using ImageFramework.Model.Shader;
+using ImageFramework.Utility;
 using Microsoft.SqlServer.Server;
 using Format = SharpDX.DXGI.Format;
 
@@ -60,20 +61,20 @@ namespace ImageFramework.Model
             try
             {
                 progress.EnableDllProgress = false;
-                var leftView = left.GetSrView(0, 0);
-                var rightView = right.GetSrView(0, 0);
+                var leftView = left.GetSrView(LayerMipmapSlice.Mip0);
+                var rightView = right.GetSrView(LayerMipmapSlice.Mip0);
 
                 // create frames
-                using (var dst = IO.CreateImage(new ImageFormat(Format.R8G8B8A8_UNorm_SRgb), left.Size, 1, 1))
+                using (var dst = IO.CreateImage(new ImageFormat(Format.R8G8B8A8_UNorm_SRgb), left.Size, LayerMipmapCount.One))
                 {
                     var dstPtr = dst.Layers[0].Mipmaps[0].Bytes;
                     var dstSize = dst.Layers[0].Mipmaps[0].Size;
 
                     // render frames into texture
-                    using (var frame = new TextureArray2D(1, 1, left.Size,
+                    using (var frame = new TextureArray2D(LayerMipmapCount.One, left.Size,
                         Format.R8G8B8A8_UNorm_SRgb, false))
                     {
-                        var frameView = frame.GetRtView(0, 0);
+                        var frameView = frame.GetRtView(LayerMipmapSlice.Mip0);
 
                         for (int i = 0; i < numFrames; ++i)
                         {
@@ -85,7 +86,7 @@ namespace ImageFramework.Model
                                 frame.Size.Width, frame.Size.Height);
 
                             // save frame as png
-                            frame.CopyPixels(0, 0, dstPtr, dstSize);
+                            frame.CopyPixels(LayerMipmapSlice.Mip0, dstPtr, dstSize);
                             var filename = $"{cfg.TmpFilename}{i:D4}";
                             await Task.Run(() =>IO.SaveImage(dst, filename, "png", GliFormat.RGBA8_SRGB), ct);
                             progress.Progress = i / (float)numFrames;

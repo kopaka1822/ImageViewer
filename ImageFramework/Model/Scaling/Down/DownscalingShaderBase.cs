@@ -91,26 +91,26 @@ namespace ImageFramework.Model.Scaling.Down
             if (src.Is3D) tmpTex2 = cache.GetTexture();
 
 
-            for (int layer = 0; layer < src.NumLayers; ++layer)
+            foreach (var srcLm in src.LayerMipmap.LayersOfMipmap(srcMipmap))
             {
-                cbuffer.Layer = layer;
+                cbuffer.Layer = srcLm.Layer;
                 cbuffer.DstSize = srcSize;
                 cbuffer.DstSize.X = dstSize.X;
 
-                ExecuteDimension(ref cbuffer, upload,  src.Is3D, 0, srcSize, src.GetSrView(layer, srcMipmap), tmpTex1.GetUaView(srcMipmap));
+                ExecuteDimension(ref cbuffer, upload,  src.Is3D, 0, srcSize, src.GetSrView(srcLm), tmpTex1.GetUaView(srcMipmap));
                // var tst = tmpTex1.GetPixelColors(layer, 0);
 
                 cbuffer.DstSize.Y = dstSize.Y;
                 if (src.Is3D)
                 {
-                    ExecuteDimension(ref cbuffer, upload, src.Is3D, 1, srcSize, tmpTex1.GetSrView(layer, srcMipmap), tmpTex2.GetUaView(srcMipmap));
+                    ExecuteDimension(ref cbuffer, upload, src.Is3D, 1, srcSize, tmpTex1.GetSrView(srcLm), tmpTex2.GetUaView(srcMipmap));
 
                     cbuffer.DstSize.Z = dstSize.Z;
-                    ExecuteDimension(ref cbuffer, upload, src.Is3D, 2, srcSize, tmpTex2.GetSrView(layer, srcMipmap), dst.GetUaView(dstMipmap));
+                    ExecuteDimension(ref cbuffer, upload, src.Is3D, 2, srcSize, tmpTex2.GetSrView(srcLm), dst.GetUaView(dstMipmap));
                 }
                 else
                 {
-                    ExecuteDimension(ref cbuffer, upload, src.Is3D, 1, srcSize, tmpTex1.GetSrView(layer, srcMipmap), dst.GetUaView(dstMipmap));
+                    ExecuteDimension(ref cbuffer, upload, src.Is3D, 1, srcSize, tmpTex1.GetSrView(srcLm), dst.GetUaView(dstMipmap));
                 }
             }
 

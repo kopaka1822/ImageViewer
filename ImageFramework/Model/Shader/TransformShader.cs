@@ -68,12 +68,12 @@ namespace ImageFramework.Model.Shader
             public Size3 Size;
         }
 
-        public void Run(ITexture src, ITexture dst, int layer, int mipmap, UploadBuffer upload)
+        public void Run(ITexture src, ITexture dst, LayerMipmapSlice lm, UploadBuffer upload)
         {
-            Run(new[]{src}, dst, layer, mipmap, upload);
+            Run(new[]{src}, dst, lm, upload);
         }
 
-        public void Run(ITexture[] sources, ITexture dst, int layer, int mipmap, UploadBuffer upload)
+        public void Run(ITexture[] sources, ITexture dst, LayerMipmapSlice lm, UploadBuffer upload)
         {
             Debug.Assert(sources.Length == inputs.Length);
             foreach (var src in sources)
@@ -81,10 +81,10 @@ namespace ImageFramework.Model.Shader
                 Debug.Assert(src.HasSameDimensions(dst));
             }
 
-            var size = sources[0].Size.GetMip(mipmap);
+            var size = sources[0].Size.GetMip(lm.SingleMipmap);
             upload.SetData(new BufferData
             {
-                Layer = layer,
+                Layer = lm.SingleLayer,
                 Size = size
             });
             var dev = Device.Get();
@@ -94,10 +94,10 @@ namespace ImageFramework.Model.Shader
             for (var i = 0; i < sources.Length; i++)
             {
                 var src = sources[i];
-                dev.Compute.SetShaderResource(i, src.GetSrView(layer, mipmap));
+                dev.Compute.SetShaderResource(i, src.GetSrView(lm));
             }
 
-            dev.Compute.SetUnorderedAccessView(0, dst.GetUaView(mipmap));
+            dev.Compute.SetUnorderedAccessView(0, dst.GetUaView(lm.SingleMipmap));
 
             dev.Dispatch(
                 Utility.Utility.DivideRoundUp(size.X, builder.LocalSizeX),

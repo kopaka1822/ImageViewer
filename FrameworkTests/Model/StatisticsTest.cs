@@ -32,7 +32,7 @@ namespace FrameworkTests.Model
             var stats = models.Stats.GetStatisticsFor(models.Pipelines[0].Image);
 
             // calculate (alpha) statistics by hand
-            //var cpuStats = CalcCpuStats(models.Pipelines[0].Image.GetPixelColors(0, 0));
+            //var cpuStats = CalcCpuStats(models.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0));
 
             // alpha
             Assert.AreEqual(1.0f, stats.Alpha.Min);
@@ -107,7 +107,7 @@ namespace FrameworkTests.Model
             var stats = models.Stats.GetStatisticsFor(models.Pipelines[0].Image);
 
             // calculate (alpha) statistics by hand
-            var cpuStats = CalcCpuStats(models.Pipelines[0].Image.GetPixelColors(0, 0));
+            var cpuStats = CalcCpuStats(models.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0));
             
             Assert.AreEqual(cpuStats.Min, stats.Alpha.Min);
             Assert.AreEqual(cpuStats.Max, stats.Alpha.Max);

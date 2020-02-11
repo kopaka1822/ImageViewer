@@ -24,16 +24,16 @@ namespace FrameworkTests.DirectX
             Assert.AreEqual(3, tex.NumMipmaps);
             Assert.AreEqual(4, tex.Size.Width);
             Assert.AreEqual(4, tex.Size.Height);
-            TestData.TestCheckersLevel0(tex.GetPixelColors(0, 0));
-            TestData.TestCheckersLevel1(tex.GetPixelColors(0, 1));
-            TestData.TestCheckersLevel2(tex.GetPixelColors(0, 2));
+            TestData.TestCheckersLevel0(tex.GetPixelColors(LayerMipmapSlice.Mip0));
+            TestData.TestCheckersLevel1(tex.GetPixelColors(LayerMipmapSlice.Mip1));
+            TestData.TestCheckersLevel2(tex.GetPixelColors(LayerMipmapSlice.Mip2));
 
             // remove mipmaps
             tex = tex.CloneWithoutMipmapsT();
             Assert.AreEqual(1, tex.NumMipmaps);
             Assert.AreEqual(4, tex.Size.Width);
             Assert.AreEqual(4, tex.Size.Height);
-            TestData.TestCheckersLevel0(tex.GetPixelColors(0, 0));
+            TestData.TestCheckersLevel0(tex.GetPixelColors(LayerMipmapSlice.Mip0));
         }
     }
 }

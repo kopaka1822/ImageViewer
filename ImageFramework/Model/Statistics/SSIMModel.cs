@@ -48,40 +48,50 @@ float C3 = 0.009 * 0.5; // C3 = 0.5 * C2
 return (in_v12[coord] + C3) / (sqrt(in_v1[coord])*sqrt(in_v2[coord]) + C3);
 ", "float", "float");
 
+        private TransformShader redToRgbaTransform = new TransformShader("return float4(value, value, value, 1.0);", "float", "float4");
+
         public SSIMModel(Models models)
         {
             this.models = models;
         }
 
-        private void GetLuminance(ImagesCovarianceStats src, ITexture dst, int layer, int mipmap)
+        private void GetLuminance(ImagesCovarianceStats src, ITexture dst, LayerMipmapSlice lm)
         {
             luminanceShader.Run(new []
             {
                 src.Image1.Expected,
                 src.Image2.Expected
-            }, dst, layer, mipmap, models.SharedModel.Upload);
+            }, dst, lm, models.SharedModel.Upload);
         }
 
-        private void GetContrast(ImagesCovarianceStats src, ITexture dst, int layer, int mipmap)
+        /// <summary>
+        /// writes the ssim luminance metric into dst image
+        /// </summary>
+        public void GetLumuminance(ITexture image1, ITexture image2, ITexture dst)
+        {
+            // get required data
+        }
+
+        private void GetContrast(ImagesCovarianceStats src, ITexture dst, LayerMipmapSlice lm)
         {
             contrastShader.Run(new []
             {
                 src.Image1.Variance,
                 src.Image2.Variance
-            }, dst, layer, mipmap, models.SharedModel.Upload);
+            }, dst, lm, models.SharedModel.Upload);
         }
 
-        private void GetStructure(ImagesCovarianceStats src, ITexture dst, int layer, int mipmap)
+        private void GetStructure(ImagesCovarianceStats src, ITexture dst, LayerMipmapSlice lm)
         {
             structureShader.Run(new []
             {
                 src.Image1.Variance,
                 src.Image2.Variance,
                 src.Covariance
-            }, dst, layer, mipmap, models.SharedModel.Upload);
+            }, dst, lm, models.SharedModel.Upload);
         }
 
-        private ITexture GetSSIM(ITexture luminance, ITexture contrast, ITexture structure, ITexture dst, int layer, int mipmap)
+        private ITexture GetSSIM(ITexture luminance, ITexture contrast, ITexture structure, ITexture dst, LayerMipmapSlice lm)
         {
             Debug.Assert(luminance.HasSameDimensions(contrast));
             Debug.Assert(luminance.HasSameDimensions(structure));
@@ -90,17 +100,17 @@ return (in_v12[coord] + C3) / (sqrt(in_v1[coord])*sqrt(in_v2[coord]) + C3);
             return null;
         }
 
-        private ImageVarianceStats GetImageVariance(ITexture src, int layer, int mipmap)
+        private ImageVarianceStats GetImageVariance(ITexture src, LayerMipmapSlice lm)
         {
             var cache = GetCache(src);
 
             // get luma image
             var luma = cache.GetTexture();
-            lumaTransformShader.Run(src, luma, layer, mipmap, models.SharedModel.Upload);
+            lumaTransformShader.Run(src, luma, lm, models.SharedModel.Upload);
 
             // calc expected value from luma
             var expected = cache.GetTexture();
-            gaussShader.Run(luma, expected, layer, mipmap, models.SharedModel.Upload, cache);
+            gaussShader.Run(luma, expected, lm, models.SharedModel.Upload, cache);
 
             // calc variance with expected value and luma
             var variance = cache.GetTexture();
@@ -120,6 +130,8 @@ return (in_v12[coord] + C3) / (sqrt(in_v1[coord])*sqrt(in_v2[coord]) + C3);
 
             return new ImagesCovarianceStats(image1, image2, cov);
         }
+
+        
 
         private ITextureCache GetCache(ITexture src)
         {

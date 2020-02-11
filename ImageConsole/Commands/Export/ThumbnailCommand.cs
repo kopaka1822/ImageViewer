@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Model;
+using ImageFramework.Utility;
 
 namespace ImageConsole.Commands.Export
 {
@@ -26,7 +27,7 @@ namespace ImageConsole.Commands.Export
             {
                 var width = tex.Size.Width;
                 var heigth = tex.Size.Height;
-                var bytes = tex.GetBytes(0, 0, (uint)(width * heigth * 4));
+                var bytes = tex.GetBytes(LayerMipmapSlice.Mip0, (uint)(width * heigth * 4));
 
                 Console.Out.WriteLine(width);
                 Console.Out.WriteLine(heigth);

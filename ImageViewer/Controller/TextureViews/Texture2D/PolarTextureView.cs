@@ -34,8 +34,8 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
             dev.OutputMerger.BlendState = models.ViewData.AlphaBlendState;
 
             shader.Run(GetTransform(), CalcFarplane(), 
-                texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap),
-                models.Overlay.Overlay?.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap));
+                texture.GetSrView(models.Display.ActiveLayerMipmap),
+                models.Overlay.Overlay?.GetSrView(models.Display.ActiveLayerMipmap));
 
             dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
         }

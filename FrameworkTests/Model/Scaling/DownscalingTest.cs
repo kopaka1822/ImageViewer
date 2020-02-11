@@ -38,20 +38,20 @@ namespace FrameworkTests.Model.Scaling
             models.Scaling.WriteMipmaps(mipped);
 
             // test mipmaps
-            var mip1 = mipped.GetPixelColors(0, 1);
-            var refMip1 = IO.LoadImageTexture(TestData.Directory + "checkers_wide_mip1.png").GetPixelColors(0, 0);
+            var mip1 = mipped.GetPixelColors(LayerMipmapSlice.Mip1);
+            var refMip1 = IO.LoadImageTexture(TestData.Directory + "checkers_wide_mip1.png").GetPixelColors(LayerMipmapSlice.Mip0);
 
             Console.Out.WriteLine("Testing fast results");
 
             TestData.CompareColors(refMip1, mip1);
 
-            var mip2 = mipped.GetPixelColors(0, 2);
+            var mip2 = mipped.GetPixelColors(LayerMipmapSlice.Mip2);
             Assert.AreEqual(2, mip2.Length);
             Assert.IsTrue(new Color(0.5f).Equals(mip2[0], Color.Channel.Rgb));
 
             Console.Out.WriteLine("Testing copy results");
 
-            var mip3 = mipped.GetPixelColors(0, 3);
+            var mip3 = mipped.GetPixelColors(LayerMipmapSlice.Mip3);
             Assert.AreEqual(1, mip3.Length);
             Assert.IsTrue(new Color(0.5f).Equals(mip3[0], Color.Channel.Rgb));
         }
@@ -76,11 +76,11 @@ namespace FrameworkTests.Model.Scaling
             models.Scaling.WriteMipmaps(mipped);
 
             // test mipmaps
-            var mip1 = mipped.GetPixelColors(0, 1);
-            var refMip1 = IO.LoadImageTexture(TestData.Directory + "checkers3x7_mip1.png").GetPixelColors(0, 0);
+            var mip1 = mipped.GetPixelColors(LayerMipmapSlice.Mip1);
+            var refMip1 = IO.LoadImageTexture(TestData.Directory + "checkers3x7_mip1.png").GetPixelColors(LayerMipmapSlice.Mip0);
             TestData.CompareColors(refMip1, mip1);
 
-            var mip2 = mipped.GetPixelColors(0, 2);
+            var mip2 = mipped.GetPixelColors(LayerMipmapSlice.Mip2);
             Assert.AreEqual(1, mip2.Length);
             Assert.IsTrue(new Color(0.476f).Equals(mip2[0], Color.Channel.Rgb));
         }
@@ -98,11 +98,11 @@ namespace FrameworkTests.Model.Scaling
             Assert.AreEqual(Format.R8G8B8A8_UNorm_SRgb, mipped.Format);
 
             // test mipmaps
-            var mip1 = mipped.GetPixelColors(0, 1);
-            var refMip1 = IO.LoadImageTexture(TestData.Directory + "checkers3x7_mip1.png").GetPixelColors(0, 0);
+            var mip1 = mipped.GetPixelColors(LayerMipmapSlice.Mip1);
+            var refMip1 = IO.LoadImageTexture(TestData.Directory + "checkers3x7_mip1.png").GetPixelColors(LayerMipmapSlice.Mip0);
             TestData.CompareColors(refMip1, mip1);
 
-            var mip2 = mipped.GetPixelColors(0, 2);
+            var mip2 = mipped.GetPixelColors(LayerMipmapSlice.Mip2);
             Assert.AreEqual(1, mip2.Length);
             Assert.IsTrue(new Color(0.476f).Equals(mip2[0], Color.Channel.Rgb));
         }
@@ -124,8 +124,8 @@ namespace FrameworkTests.Model.Scaling
             // overwrite mipmaps
             models.Scaling.WriteMipmaps(dst);
 
-            TestData.CompareColors(original.GetPixelColors(0, 1), dst.GetPixelColors(0, 1));
-            TestData.CompareColors(original.GetPixelColors(0, 2), dst.GetPixelColors(0, 2));
+            TestData.CompareColors(original.GetPixelColors(LayerMipmapSlice.Mip1), dst.GetPixelColors(LayerMipmapSlice.Mip1));
+            TestData.CompareColors(original.GetPixelColors(LayerMipmapSlice.Mip2), dst.GetPixelColors(LayerMipmapSlice.Mip2));
         }
 
         [TestMethod]
@@ -175,12 +175,12 @@ namespace FrameworkTests.Model.Scaling
 
             var s = new FastGaussShader();
             var img = IO.LoadImageTexture(TestData.Directory + "small.pfm");
-            var dst = new TextureArray2D(1, 1, img.Size, Format.R32G32B32A32_Float, true);
+            var dst = new TextureArray2D(LayerMipmapCount.One, img.Size, Format.R32G32B32A32_Float, true);
 
             s.Run(img, dst, 0, false, new UploadBuffer(256));
 
-            var src = img.GetPixelColors(0, 0);
-            var res = dst.GetPixelColors(0, 0);
+            var src = img.GetPixelColors(LayerMipmapSlice.Mip0);
+            var res = dst.GetPixelColors(LayerMipmapSlice.Mip0);
             Assert.AreEqual(3 * 3, res.Length);
 
             // expected values calculated by hand
@@ -217,10 +217,10 @@ namespace FrameworkTests.Model.Scaling
             var img = models.Pipelines[0].Image;
             Assert.IsNotNull(img);
             Assert.IsTrue(img.NumMipmaps > 1);
-            var refStats = models.Stats.GetStatisticsFor(img, 0, 0);
+            var refStats = models.Stats.GetStatisticsFor(img, LayerMipmapSlice.Mip0);
             for (int i = 1; i < img.NumMipmaps; ++i)
             {
-                var s = models.Stats.GetStatisticsFor(img, 0, i);
+                var s = models.Stats.GetStatisticsFor(img, new LayerMipmapSlice(0, i));
 
                 Assert.AreEqual(refStats.Average.Avg, s.Average.Avg, 0.01f);
             }
@@ -261,10 +261,10 @@ namespace FrameworkTests.Model.Scaling
             var img = models.Pipelines[0].Image;
             Assert.IsNotNull(img);
             Assert.IsTrue(img.NumMipmaps > 1);
-            var refStats = models.Stats.GetStatisticsFor(img, 0, 0);
+            var refStats = models.Stats.GetStatisticsFor(img, LayerMipmapSlice.Mip0);
             for (int i = 1; i < img.NumMipmaps; ++i)
             {
-                var s = models.Stats.GetStatisticsFor(img, 0, i);
+                var s = models.Stats.GetStatisticsFor(img, new LayerMipmapSlice(0, i));
 
                 Assert.AreEqual(refStats.Average.Avg, s.Average.Avg, 0.01f);
             }

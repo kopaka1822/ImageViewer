@@ -44,7 +44,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             var projection = Matrix.PerspectiveFovLH(1.57f, models.Window.ClientSize.Width / (float)models.Window.ClientSize.Height, 0.01f, 10000.0f);
 
             shader.Run(models.ViewData.Buffer, projection, GetModel(), models.Display.Multiplier, models.Display.DisplayNegative,
-                texture.GetSrView(models.Display.ActiveLayer, models.Display.ActiveMipmap),
+                texture.GetSrView(models.Display.ActiveLayerMipmap),
                 models.ViewData.GetSampler(models.Display.LinearInterpolation), models.Images.Size.GetMip(models.Display.ActiveMipmap));
 
             dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;

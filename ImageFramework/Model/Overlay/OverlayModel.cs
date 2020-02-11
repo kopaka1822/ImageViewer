@@ -117,23 +117,20 @@ namespace ImageFramework.Model.Overlay
                 // recompute texture
                 var dev = Device.Get();
                 overlayTex = cache.GetTexture();
-                for (int layer = 0; layer < overlayTex.NumLayers; ++layer)
+                foreach (var lm in overlayTex.LayerMipmap.Range)
                 {
-                    for (int mipmap = 0; mipmap < overlayTex.NumMipmaps; ++mipmap)
-                    {
-                        // bind and clear rendertarget
-                        dev.ClearRenderTargetView(overlayTex.GetRtView(layer, mipmap), new RawColor4(0.0f, 0.0f, 0.0f, 1.0f));
-                        dev.OutputMerger.SetRenderTargets(overlayTex.GetRtView(layer, mipmap));
-                        dev.OutputMerger.SetBlendState(blendState);
-                        var size = overlayTex.Size.GetMip(mipmap);
-                        dev.SetViewScissors(size.Width, size.Height);
+                    // bind and clear rendertarget
+                    dev.ClearRenderTargetView(overlayTex.GetRtView(lm), new RawColor4(0.0f, 0.0f, 0.0f, 1.0f));
+                    dev.OutputMerger.SetRenderTargets(overlayTex.GetRtView(lm));
+                    dev.OutputMerger.SetBlendState(blendState);
+                    var size = overlayTex.Size.GetMip(lm.Mipmap);
+                    dev.SetViewScissors(size.Width, size.Height);
 
-                        // draw all overlays
-                        foreach (var overlay in Overlays)
-                        {
-                            if(overlay.HasWork)
-                                overlay.Render(layer, mipmap, size);
-                        }
+                    // draw all overlays
+                    foreach (var overlay in Overlays)
+                    {
+                        if(overlay.HasWork)
+                            overlay.Render(lm, size);
                     }
                 }
                 

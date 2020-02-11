@@ -26,7 +26,7 @@ namespace FrameworkTests.Model
             model.Apply();
             // look at the generated image
             Assert.IsNotNull(model.Pipelines[0].Image);
-            var colors = model.Pipelines[0].Image.GetPixelColors(0, 0);
+            var colors = model.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0);
             TestData.CompareWithSmall(colors, Color.Channel.Rgb);
         }
 
@@ -40,7 +40,7 @@ namespace FrameworkTests.Model
             model.Apply();
 
             Assert.IsNotNull(model.Pipelines[0].Image);
-            var colors = model.Pipelines[0].Image.GetPixelColors(0, 0);
+            var colors = model.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0);
             TestData.TestCheckersLevel0(colors);
         }
 
@@ -61,7 +61,7 @@ namespace FrameworkTests.Model
             model.Filter.AddFilter(filter);
 
             model.Apply();
-            var colors = model.Pipelines[0].Image.GetPixelColors(0, 0);
+            var colors = model.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0);
 
             // compare with reference image
             var refColors = TestData.GetColors("smallx4.pfm");
@@ -76,7 +76,7 @@ namespace FrameworkTests.Model
             model.AddImageFromFile(TestData.Directory + "sphere_salt.png");
             model.Filter.AddFilter(model.CreateFilter("filter/median.hlsl"));
             model.Apply();
-            var colors = model.Pipelines[0].Image.GetPixelColors(0, 0);
+            var colors = model.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0);
 
             // compare with refence image
             var refColors = TestData.GetColors("sphere_median.png");
@@ -91,7 +91,7 @@ namespace FrameworkTests.Model
             model.AddImageFromFile(TestData.Directory + "sphere.png");
             model.Filter.AddFilter(model.CreateFilter("filter/blur.hlsl"));
             model.Apply();
-            var colors = model.Pipelines[0].Image.GetPixelColors(0, 0);
+            var colors = model.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0);
 
             // compare with refence image
             var refColors = TestData.GetColors("sphere_blur.png");
@@ -123,9 +123,9 @@ namespace FrameworkTests.Model
             model.Apply();
 
             Assert.IsTrue(ReferenceEquals(model.Pipelines[0].Image, model.Images.Images[0].Image));
-            TestData.TestCheckers3DLevel0(model.Pipelines[0].Image.GetPixelColors(0, 0));
-            TestData.TestCheckers3DLevel1(model.Pipelines[0].Image.GetPixelColors(0, 1));
-            TestData.TestCheckersLevel2(model.Pipelines[0].Image.GetPixelColors(0, 2));
+            TestData.TestCheckers3DLevel0(model.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0));
+            TestData.TestCheckers3DLevel1(model.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip1));
+            TestData.TestCheckersLevel2(model.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip2));
 
             model.Pipelines[0].Color.Formula = "1 - I0";
             model.Apply();
@@ -133,13 +133,13 @@ namespace FrameworkTests.Model
 
             var tex = model.Pipelines[0].Image;
             // compare with checkers texture
-            TestData.TestCheckersLevel0Inverted(TestData.GetSlice(tex.GetPixelColors(0, 0), 0 * 4 * 4, 4 * 4));
-            TestData.TestCheckersLevel0Inverted(TestData.GetSlice(tex.GetPixelColors(0, 0), 1 * 4 * 4, 4 * 4));
-            TestData.TestCheckersLevel0(TestData.GetSlice(tex.GetPixelColors(0, 0), 2 * 4 * 4, 4 * 4));
-            TestData.TestCheckersLevel0(TestData.GetSlice(tex.GetPixelColors(0, 0), 3 * 4 * 4, 4 * 4));
+            TestData.TestCheckersLevel0Inverted(TestData.GetSlice(tex.GetPixelColors(LayerMipmapSlice.Mip0), 0 * 4 * 4, 4 * 4));
+            TestData.TestCheckersLevel0Inverted(TestData.GetSlice(tex.GetPixelColors(LayerMipmapSlice.Mip0), 1 * 4 * 4, 4 * 4));
+            TestData.TestCheckersLevel0(TestData.GetSlice(tex.GetPixelColors(LayerMipmapSlice.Mip0), 2 * 4 * 4, 4 * 4));
+            TestData.TestCheckersLevel0(TestData.GetSlice(tex.GetPixelColors(LayerMipmapSlice.Mip0), 3 * 4 * 4, 4 * 4));
             
-            TestData.TestCheckersLevel1Inverted(TestData.GetSlice(tex.GetPixelColors(0, 1), 0, 2 * 2));
-            TestData.TestCheckersLevel1(TestData.GetSlice(tex.GetPixelColors(0, 1), 2 * 2, 2 * 2));
+            TestData.TestCheckersLevel1Inverted(TestData.GetSlice(tex.GetPixelColors(LayerMipmapSlice.Mip1), 0, 2 * 2));
+            TestData.TestCheckersLevel1(TestData.GetSlice(tex.GetPixelColors(LayerMipmapSlice.Mip1), 2 * 2, 2 * 2));
         }
 
         [TestMethod]
@@ -172,7 +172,7 @@ namespace FrameworkTests.Model
 
             Assert.IsFalse(model.Pipelines[0].HasChanges);
             // check image data
-            var mip1 = model.Pipelines[0].Image.GetPixelColors(0, 1);
+            var mip1 = model.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip1);
             Assert.AreEqual(4, mip1.Length);
             Assert.IsTrue(mip1[0].Equals(new Color(1.0f), Color.Channel.Rgb));
             Assert.IsTrue(mip1[1].Equals(new Color(4.0f) , Color.Channel.Rgb));
@@ -180,7 +180,7 @@ namespace FrameworkTests.Model
             Assert.IsTrue(mip1[3].Equals(new Color(1.0f), Color.Channel.Rgb));
 
             // test if the highest mipmap was actually recalculated instead of averaged
-            var mip2 = model.Pipelines[0].Image.GetPixelColors(0, 2);
+            var mip2 = model.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip2);
             Assert.AreEqual(1, mip2.Length);
             Assert.IsTrue(mip2[0].Equals(new Color(2.5f), Color.Channel.Rgb)); // average of all pixels should be ~2.5 
         }

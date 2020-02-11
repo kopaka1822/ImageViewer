@@ -27,7 +27,7 @@ namespace FrameworkTests
         public static void CompareWithSmall(Image image, Color.Channel channels)
         {
             var tex = new TextureArray2D(image);
-            var colors = tex.GetPixelColors(0, 0);
+            var colors = tex.GetPixelColors(LayerMipmapSlice.Mip0);
 
             CompareWithSmall(colors, channels);
         }
@@ -153,7 +153,7 @@ namespace FrameworkTests
         {
             using (var tex = new TextureArray2D(IO.LoadImage(Directory + filename)))
             {
-                return tex.GetPixelColors(0, 0);
+                return tex.GetPixelColors(LayerMipmapSlice.Mip0);
             }
         }
     }

@@ -21,8 +21,7 @@ namespace ImageFramework.DirectX
         public Texture3D(int numMipmaps, Size3 size, Format format, bool createUav, bool createRt = true)
         {
             Size = size;
-            NumLayers = 1;
-            NumMipmaps = numMipmaps;
+            LayerMipmap = new LayerMipmapCount(1, numMipmaps);
             Format = format;
 
             handle = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, CreateTextureDescription(createUav, createRt));
@@ -33,13 +32,12 @@ namespace ImageFramework.DirectX
         public Texture3D(ImageLoader.Image image, int layer = 0)
         {
             Size = image.GetSize(0);
-            NumLayers = 1;
-            NumMipmaps = image.NumMipmaps;
+            LayerMipmap = image.LayerMipmap;
             Format = image.Format.DxgiFormat;
 
-            var data = new DataBox[NumMipmaps];
+            var data = new DataBox[LayerMipmap.Mipmaps];
 
-            for (int curMipmap = 0; curMipmap < NumMipmaps; ++curMipmap)
+            for (int curMipmap = 0; curMipmap < LayerMipmap.Mipmaps; ++curMipmap)
             {
                 var mip = image.Layers[layer].Mipmaps[curMipmap];
                 var idx = curMipmap;
@@ -52,10 +50,10 @@ namespace ImageFramework.DirectX
             CreateTextureViews(false,true);
         }
 
-        public override Texture3D CreateT(int numLayer, int numMipmaps, Size3 size, Format format, bool createUav)
+        public override Texture3D CreateT(LayerMipmapCount lm, Size3 size, Format format, bool createUav)
         {
-            Debug.Assert(numLayer == 1);
-            return new Texture3D(numMipmaps, size, format, createUav);
+            Debug.Assert(lm.Layers == 1);
+            return new Texture3D(lm.Mipmaps, size, format, createUav);
         }
 
         protected override Resource GetHandle()
@@ -65,20 +63,19 @@ namespace ImageFramework.DirectX
 
         public Color[] GetPixelColors(int mipmap)
         {
-            return GetPixelColors(0, mipmap);
+            return GetPixelColors(new LayerMipmapSlice(0, mipmap));
         }
 
         public override bool Is3D => true;
 
-        protected override Resource GetStagingTexture(int layer, int mipmap)
+        protected override Resource GetStagingTexture(LayerMipmapSlice lm)
         {
             Debug.Assert(IO.SupportedFormats.Contains(Format) || Format == Format.R8_UInt);
 
-            Debug.Assert(layer == 0);
-            Debug.Assert(mipmap >= 0);
-            Debug.Assert(mipmap < NumMipmaps);
+            Debug.Assert(lm.Layer == 0);
+            Debug.Assert(lm.IsIn(LayerMipmap));
 
-            var mipDim = Size.GetMip(mipmap);
+            var mipDim = Size.GetMip(lm.Mipmap);
             var desc = new Texture3DDescription
             {
                 Width = mipDim.Width,
@@ -96,15 +93,13 @@ namespace ImageFramework.DirectX
             var staging = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, desc);
 
             // copy data to staging texture
-            Device.Get().CopySubresource(handle, staging, GetSubresourceIndex(layer, mipmap), 0, mipDim);
+            Device.Get().CopySubresource(handle, staging, GetSubresourceIndex(lm), 0, mipDim);
 
             return staging;
         }
 
         private Texture3DDescription CreateTextureDescription(bool createUav, bool createRt)
         {
-            Debug.Assert(NumLayers > 0);
-            Debug.Assert(NumMipmaps > 0);
             Debug.Assert(Size.Min > 0);
             Debug.Assert(Format != Format.Unknown);
 
@@ -123,7 +118,7 @@ namespace ImageFramework.DirectX
                 Depth = Size.Depth,
                 BindFlags = flags,
                 CpuAccessFlags = CpuAccessFlags.None,
-                MipLevels = NumMipmaps,
+                MipLevels = LayerMipmap.Mipmaps,
                 OptionFlags = ResourceOptionFlags.None,
                 Usage = ResourceUsage.Default
             };
@@ -131,8 +126,7 @@ namespace ImageFramework.DirectX
 
         public ShaderResourceView GetSrView(int mipmap)
         {
-            Debug.Assert(mipmap >= 0);
-            Debug.Assert(mipmap < NumMipmaps);
+            Debug.Assert(LayerMipmap.IsMipmapInside(mipmap));
             return views[mipmap];
         }
 
@@ -147,18 +141,18 @@ namespace ImageFramework.DirectX
                 Format = Format,
                 Texture3D = new ShaderResourceViewDescription.Texture3DResource
                 {
-                    MipLevels = NumMipmaps,
+                    MipLevels = LayerMipmap.Mipmaps,
                     MostDetailedMip = 0
                 }
             });
 
-            views = new ShaderResourceView[NumMipmaps];
+            views = new ShaderResourceView[LayerMipmap.Mipmaps];
             if (createRt)
-                rtViews = new RenderTargetView[NumMipmaps];
+                rtViews = new RenderTargetView[LayerMipmap.Mipmaps];
             if (createUav)
-                uaViews = new UnorderedAccessView[NumMipmaps];
+                uaViews = new UnorderedAccessView[LayerMipmap.Mipmaps];
 
-            for (int curMip = 0; curMip < NumMipmaps; ++curMip)
+            for (int curMip = 0; curMip < LayerMipmap.Mipmaps; ++curMip)
             {
                 views[curMip] = new ShaderResourceView(Device.Get().Handle, handle, new ShaderResourceViewDescription
                 {

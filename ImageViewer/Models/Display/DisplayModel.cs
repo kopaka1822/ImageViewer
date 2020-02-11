@@ -279,6 +279,9 @@ namespace ImageViewer.Models.Display
             }
         }
 
+        // only active layer and active mipmap will appear in OnPropertyChanged
+        public LayerMipmapSlice ActiveLayerMipmap => new LayerMipmapSlice(ActiveLayer, ActiveMipmap);
+
         private bool linearInterpolation = false;
         public bool LinearInterpolation
         {

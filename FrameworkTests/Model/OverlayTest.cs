@@ -45,8 +45,8 @@ namespace FrameworkTests.Model
             Assert.IsNotNull(models.Overlay.Overlay);
 
             var reference = IO.LoadImageTexture(TestData.Directory + "sphere_overlay.png");
-            var refColors = reference.GetPixelColors(0, 0);
-            var actualColors = models.Overlay.Overlay.GetPixelColors(0, 0);
+            var refColors = reference.GetPixelColors(LayerMipmapSlice.Mip0);
+            var actualColors = models.Overlay.Overlay.GetPixelColors(LayerMipmapSlice.Mip0);
 
             models.Export.Export(new ExportDescription(models.Overlay.Overlay, ExportTest.ExportDir + "overlay_tmp", "png")
             {
@@ -101,7 +101,7 @@ namespace FrameworkTests.Model
             var imported = IO.LoadImageTexture(filename + ".png");
             var reference = IO.LoadImageTexture(TestData.Directory + "sphere_with_overlay.png");
 
-            TestData.CompareColors(reference.GetPixelColors(0, 0), imported.GetPixelColors(0, 0), Color.Channel.Rgba, 0.0f);
+            TestData.CompareColors(reference.GetPixelColors(LayerMipmapSlice.Mip0), imported.GetPixelColors(LayerMipmapSlice.Mip0), Color.Channel.Rgba, 0.0f);
         }
 
         [TestMethod]
@@ -121,7 +121,7 @@ namespace FrameworkTests.Model
             crop.IsEnabled = false;
             
             // nothing should change
-            var expectedColors = models.Pipelines[0].Image.GetPixelColors(0, 0);
+            var expectedColors = models.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0);
             var actualColors = GetColorAfterExport(models);
 
             TestData.CompareColors(expectedColors, actualColors, Color.Channel.Rgba, 0.0f);
@@ -150,7 +150,7 @@ namespace FrameworkTests.Model
             crop.End = null;
             crop.IsEnabled = true;
 
-            var expectedColors = models.Pipelines[0].Image.GetPixelColors(0, 0);
+            var expectedColors = models.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0);
             for (var i = 0; i < expectedColors.Length; i++)
             {
                 expectedColors[i] = expectedColors[i].Scale(0.5f, Color.Channel.Rgb);
@@ -182,12 +182,12 @@ namespace FrameworkTests.Model
             crop.Layer = 1;
             var refColors = new Color[][]
             {
-                models.Pipelines[0].Image.GetPixelColors(0, 0),
-                models.Pipelines[0].Image.GetPixelColors(1, 0),
-                models.Pipelines[0].Image.GetPixelColors(2, 0),
-                models.Pipelines[0].Image.GetPixelColors(3, 0),
-                models.Pipelines[0].Image.GetPixelColors(4, 0),
-                models.Pipelines[0].Image.GetPixelColors(5, 0),
+                models.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Layer0),
+                models.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Layer1),
+                models.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Layer2),
+                models.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Layer3),
+                models.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Layer4),
+                models.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Layer5),
             };
 
             // gray out all layers except layer 1
@@ -219,7 +219,7 @@ namespace FrameworkTests.Model
                 Overlay = models.Overlay.Overlay
             });
             var imported = IO.LoadImageTexture(ExportTest.ExportDir + "crop_test.dds");
-            return imported.GetPixelColors(0, 0);
+            return imported.GetPixelColors(LayerMipmapSlice.Mip0);
         }
     }
 }

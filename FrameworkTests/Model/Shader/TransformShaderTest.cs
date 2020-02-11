@@ -29,10 +29,10 @@ namespace FrameworkTests.Model.Shader
             var s = new TransformShader("return float4(value.rgb * 2.0, value.a)", "float4", "float4");
             var img = IO.LoadImageTexture(TestData.Directory + "small.pfm");
 
-            var dst = new TextureArray2D(img.NumLayers, img.NumMipmaps, img.Size, Format.R32G32B32A32_Float, true);
-            s.Run(img, dst, 0, 0, new UploadBuffer(256));
+            var dst = new TextureArray2D(img.LayerMipmap, img.Size, Format.R32G32B32A32_Float, true);
+            s.Run(img, dst, LayerMipmapSlice.Mip0, new UploadBuffer(256));
 
-            var expected = img.GetPixelColors(0, 0);
+            var expected = img.GetPixelColors(LayerMipmapSlice.Mip0);
             for (var index = 0; index < expected.Length; index++)
             {
                 expected[index].Red *= 2.0f;
@@ -40,7 +40,7 @@ namespace FrameworkTests.Model.Shader
                 expected[index].Blue *= 2.0f;
             }
 
-            var actual  = dst.GetPixelColors(0, 0);
+            var actual  = dst.GetPixelColors(LayerMipmapSlice.Mip0);
             TestData.CompareColors(expected, actual, Color.Channel.Rgba);
         }
     }

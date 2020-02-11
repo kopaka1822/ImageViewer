@@ -63,14 +63,14 @@ namespace ImageFramework.Model.Overlay
 
         public ObservableCollection<Box> Boxes { get; } = new ObservableCollection<Box>();
 
-        public override void Render(int layer, int mipmap, Size3 size)
+        public override void Render(LayerMipmapSlice lm, Size3 size)
         {
             Debug.Assert(HasWork);
 
-            UpdateData(mipmap);
+            UpdateData(lm.Mipmap);
 
             Shader.Bind(new VertexBufferBinding(positionBuffer.Handle, 2 * sizeof(float), 0));
-            Shader.Draw(Boxes, cbuffer, mipmap, size.XY);
+            Shader.Draw(Boxes, cbuffer, lm.Mipmap, size.XY);
             Shader.Unbind();
         }
 

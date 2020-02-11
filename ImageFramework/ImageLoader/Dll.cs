@@ -15,7 +15,7 @@ namespace ImageFramework.ImageLoader
         public static extern int image_open(string filename);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int image_allocate(uint format, int width, int height, int depth, int layer, int mipmaps);
+        public static extern int image_allocate(uint format, int width, int height, int depth, int layer, int mipmap);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         public static extern void image_release(int id);

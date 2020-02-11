@@ -71,39 +71,34 @@ namespace ImageFramework.Model.Export
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (desc.Texture.Format == stagingFormat.DxgiFormat && !croppingActive && desc.Multiplier == 1.0f &&
                 !desc.RequiresAlignment && desc.Overlay == null && desc.Scale == 1)
-                return ExportTexture(desc.Texture, desc, desc.Mipmap, desc.Layer, ct);
+                return ExportTexture(desc.Texture, desc, desc.LayerMipmap, ct);
             
             // do some conversion before exporting
-            using (var tmpTex = models.SharedModel.Convert.Convert(desc.Texture, stagingFormat.DxgiFormat, desc.Mipmap, desc.Layer,
+            using (var tmpTex = models.SharedModel.Convert.Convert(desc.Texture, stagingFormat.DxgiFormat, desc.LayerMipmap,
                 desc.Multiplier, desc.UseCropping, cropStart,
                 cropEnd - cropStart + new Size3(1),
                 new Size3(desc.FileFormat.GetAlignmentX(), desc.FileFormat.GetAlignmentY(), 0), models.Scaling, desc.Overlay, desc.Scale))
             {
                 // the final texture only has the relevant layers and mipmaps
-                return ExportTexture(tmpTex, desc, -1, -1, ct);
+                return ExportTexture(tmpTex, desc, LayerMipmapRange.All, ct);
             }
         }
 
-        private Task ExportTexture(ITexture texture, ExportDescription desc, int mipmap, int layer, CancellationToken ct)
+        private Task ExportTexture(ITexture texture, ExportDescription desc, LayerMipmapRange lm, CancellationToken ct)
         {
             Debug.Assert(desc.StagingFormat.DxgiFormat == texture.Format);
 
-            int firstMipmap = Math.Max(mipmap, 0);
-            int nMipmaps = mipmap == -1 ? texture.NumMipmaps : 1;
-            int firstLayer = Math.Max(layer, 0);
-            int nLayer = layer == -1 ? texture.NumLayers : 1;
+            int nMipmaps = lm.IsSingleMipmap ? 1 : texture.NumMipmaps;
+            int nLayer = lm.IsSingleLayer ? 1 : texture.NumLayers;
 
-            var img = IO.CreateImage(desc.StagingFormat, texture.Size.GetMip(firstMipmap), nLayer, nMipmaps);
+            var img = IO.CreateImage(desc.StagingFormat, texture.Size.GetMip(lm.FirstMipmap), new LayerMipmapCount(nLayer, nMipmaps));
             
             // fill with data
-            for (int curLayer = 0; curLayer < nLayer; ++curLayer)
+            foreach (var dstLm in img.LayerMipmap.Range)
             {
-                for (int curMipmap = 0; curMipmap < nMipmaps; ++curMipmap)
-                {
-                    var mip = img.Layers[curLayer].Mipmaps[curMipmap];
-                    // transfer image data
-                    texture.CopyPixels(firstLayer + curLayer, firstMipmap + curMipmap, mip.Bytes, mip.Size);
-                }
+                var mip = img.Layers[dstLm.Layer].Mipmaps[dstLm.Mipmap];
+                // transfer image data
+                texture.CopyPixels(new LayerMipmapSlice( lm.FirstLayer + dstLm.Layer, lm.FirstMipmap + dstLm.Mipmap), mip.Bytes, mip.Size);
             }
 
             return Task.Run(() =>

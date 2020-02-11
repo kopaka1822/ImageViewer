@@ -41,7 +41,7 @@ namespace FrameworkTests.Model.Shader
 
             var newTex = shader.Convert(tex, Format.R32G32B32A32_Float, models.Scaling);
 
-            TestData.CompareWithSmall(newTex.GetPixelColors(0, 0), Color.Channel.Rgba);
+            TestData.CompareWithSmall(newTex.GetPixelColors(LayerMipmapSlice.Mip0), Color.Channel.Rgba);
         }
 
         [TestMethod]
@@ -52,7 +52,7 @@ namespace FrameworkTests.Model.Shader
 
             var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, models.Scaling);
 
-            TestData.CompareWithSmall(newTex.GetPixelColors(0, 0), Color.Channel.Rgb);
+            TestData.CompareWithSmall(newTex.GetPixelColors(LayerMipmapSlice.Mip0), Color.Channel.Rgb);
         }
 
         [TestMethod]
@@ -61,33 +61,33 @@ namespace FrameworkTests.Model.Shader
  
             var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "checkers.dds"));
             Assert.AreEqual(3, tex.NumMipmaps);
-            TestData.TestCheckersLevel0(tex.GetPixelColors(0, 0));
-            TestData.TestCheckersLevel1(tex.GetPixelColors(0, 1));
-            TestData.TestCheckersLevel2(tex.GetPixelColors(0, 2));
+            TestData.TestCheckersLevel0(tex.GetPixelColors(LayerMipmapSlice.Mip0));
+            TestData.TestCheckersLevel1(tex.GetPixelColors(LayerMipmapSlice.Mip1));
+            TestData.TestCheckersLevel2(tex.GetPixelColors(LayerMipmapSlice.Mip2));
 
             var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, models.Scaling, 1);
             Assert.AreEqual(1, newTex.NumMipmaps);
             Assert.AreEqual(2, newTex.Size.Width);
             Assert.AreEqual(2, newTex.Size.Height);
 
-            TestData.TestCheckersLevel1(newTex.GetPixelColors(0, 0));
+            TestData.TestCheckersLevel1(newTex.GetPixelColors(LayerMipmapSlice.Mip0));
         }
 
         [TestMethod]
         public void Cropping()
         {
             var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "checkers.dds"));
-            TestData.TestCheckersLevel0(tex.GetPixelColors(0, 0));
-            TestData.TestCheckersLevel1(tex.GetPixelColors(0, 1));
-            TestData.TestCheckersLevel2(tex.GetPixelColors(0, 2));
+            TestData.TestCheckersLevel0(tex.GetPixelColors(LayerMipmapSlice.Mip0));
+            TestData.TestCheckersLevel1(tex.GetPixelColors(LayerMipmapSlice.Mip1));
+            TestData.TestCheckersLevel2(tex.GetPixelColors(LayerMipmapSlice.Mip2));
 
-            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, -1, 1.0f, true, new Size3(1, 1, 0), new Size3(2, 2), Size3.Zero, models.Scaling);
+            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, new LayerMipmapRange(-1, 0), 1.0f, true, new Size3(1, 1, 0), new Size3(2, 2), Size3.Zero, models.Scaling);
             Assert.AreEqual(1, newTex.NumMipmaps);
             Assert.AreEqual(2, newTex.Size.Width);
             Assert.AreEqual(2, newTex.Size.Height);
 
             // should be the same as first mipmap level
-            TestData.TestCheckersLevel1(newTex.GetPixelColors(0, 0));
+            TestData.TestCheckersLevel1(newTex.GetPixelColors(LayerMipmapSlice.Mip0));
         }
 
         [TestMethod]
@@ -98,7 +98,7 @@ namespace FrameworkTests.Model.Shader
             Assert.AreEqual(1, tex.Size.Height % 4);
             
             // convert with 4 texel alignment
-            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, 0, 0, 1.0f, false, Size3.Zero, Size3.Zero, new Size3(4, 4, 0), models.Scaling);
+            var newTex = shader.Convert(tex, Format.R8G8B8A8_UNorm_SRgb, LayerMipmapSlice.Mip0, 1.0f, false, Size3.Zero, Size3.Zero, new Size3(4, 4, 0), models.Scaling);
             Assert.AreEqual(0, newTex.Size.Width % 4);
             Assert.AreEqual(0, newTex.Size.Height % 4);
         }
@@ -110,7 +110,7 @@ namespace FrameworkTests.Model.Shader
 
             // multiply with 0.5f
             var newTex = shader.Convert(tex, Format.B8G8R8A8_UNorm_SRgb, models.Scaling, 1, 0, 0.5f);
-            var colors = newTex.GetPixelColors(0, 0);
+            var colors = newTex.GetPixelColors(LayerMipmapSlice.Mip0);
 
             Assert.AreEqual(2, newTex.Size.Width);
             Assert.AreEqual(2, newTex.Size.Height);
@@ -131,14 +131,14 @@ namespace FrameworkTests.Model.Shader
             var tex = IO.LoadImageTexture(TestData.Directory + "checkers.dds");
 
             // upscale mipmap 1 (should be equivalent to mipmap 0 then)
-            var newTex = shader.Convert(tex, tex.Format, 1, 0, 1.0f, false, Size3.Zero, Size3.Zero, Size3.Zero,
+            var newTex = shader.Convert(tex, tex.Format, LayerMipmapSlice.Mip1, 1.0f, false, Size3.Zero, Size3.Zero, Size3.Zero,
                 models.Scaling, null, 2);
 
             Assert.AreEqual(newTex.Size.Width, 4);
             Assert.AreEqual(newTex.Size.Height, 4);
             Assert.AreEqual(newTex.NumMipmaps, 1);
 
-            TestData.TestCheckersLevel0(newTex.GetPixelColors(0, 0));
+            TestData.TestCheckersLevel0(newTex.GetPixelColors(LayerMipmapSlice.Mip0));
         }
 
         [TestMethod]
@@ -147,16 +147,16 @@ namespace FrameworkTests.Model.Shader
             var tex = IO.LoadImageTexture(TestData.Directory + "checkers.dds");
 
             // upscale mipmap 1 (should be equivalent to mipmap 0 then)
-            var newTex = shader.Convert(tex, tex.Format, -1, 0, 1.0f, true, new Size3(1, 1, 0), new Size3(2, 2, 1), Size3.Zero,
+            var newTex = shader.Convert(tex, tex.Format, new LayerMipmapRange(0,  -1), 1.0f, true, new Size3(1, 1, 0), new Size3(2, 2, 1), Size3.Zero,
                 models.Scaling, null, 4);
 
             Assert.AreEqual(newTex.Size.Width, 8);
             Assert.AreEqual(newTex.Size.Height, 8);
             Assert.AreEqual(newTex.NumMipmaps, 4);
 
-            TestData.TestCheckersLevel0(newTex.GetPixelColors(0, 1));
-            TestData.TestCheckersLevel1(newTex.GetPixelColors(0, 2));
-            TestData.TestCheckersLevel2(newTex.GetPixelColors(0, 3));
+            TestData.TestCheckersLevel0(newTex.GetPixelColors(LayerMipmapSlice.Mip1));
+            TestData.TestCheckersLevel1(newTex.GetPixelColors(LayerMipmapSlice.Mip2));
+            TestData.TestCheckersLevel2(newTex.GetPixelColors(LayerMipmapSlice.Mip3));
         }
     }
 }

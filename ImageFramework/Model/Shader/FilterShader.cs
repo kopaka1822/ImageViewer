@@ -9,6 +9,7 @@ using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.Model.Filter;
 using ImageFramework.Model.Filter.Parameter;
+using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using Device = ImageFramework.DirectX.Device;
 
@@ -74,8 +75,8 @@ namespace ImageFramework.Model.Shader
                 for (int curLayer = 0; curLayer < image.NumLayers; ++curLayer)
                 {
                     // src textures
-                    dev.Compute.SetShaderResource(0, src.GetSrView(curLayer, curMipmap));
-                    BindTextureParameters(image, curLayer, curMipmap);
+                    dev.Compute.SetShaderResource(0, src.GetSrView(new LayerMipmapSlice(curLayer, curMipmap)));
+                    BindTextureParameters(image, new LayerMipmapSlice(curLayer, curMipmap));
 
                     cbuffer.SetData(new LayerLevelFilter
                     {
@@ -118,12 +119,12 @@ namespace ImageFramework.Model.Shader
             paramBuffer.SetData(data);
         }
 
-        private void BindTextureParameters(ImagesModel image, int layer, int mipmap)
+        private void BindTextureParameters(ImagesModel image, LayerMipmapSlice lm)
         {
             var texSlot = TextureBindingStart;
             foreach (var texParam in parent.TextureParameters)
             {
-                Device.Get().Compute.SetShaderResource(texSlot++, image.Images[texParam.Source].Image.GetSrView(layer, mipmap));
+                Device.Get().Compute.SetShaderResource(texSlot++, image.Images[texParam.Source].Image.GetSrView(lm));
             }
         }
 

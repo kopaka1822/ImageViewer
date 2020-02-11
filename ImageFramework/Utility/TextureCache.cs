@@ -29,7 +29,7 @@ namespace ImageFramework.Utility
             if (textures.Count > 0) return textures.Pop();
 
             // make new texture with the current configuration
-            return templateTex.Create(templateTex.NumLayers, templateTex.NumMipmaps, templateTex.Size,
+            return templateTex.Create(templateTex.LayerMipmap, templateTex.Size,
                 format, createUav);
         }
 

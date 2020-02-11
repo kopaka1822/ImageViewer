@@ -46,12 +46,12 @@ namespace ImageFramework.Model.Scaling.Down
                 HasAlpha = hasAlpha?1:0,
             };
 
-            for (int layer = 0; layer < texSrc.NumLayers; ++layer)
+            foreach (var lm in texSrc.LayerMipmap.LayersOfMipmap(mipmap))
             {
-                data.Layer = layer;
+                data.Layer = lm.Layer;
                 upload.SetData(data);
                 dev.Compute.SetConstantBuffer(0, upload.Handle);
-                dev.Compute.SetShaderResource(0, texSrc.GetSrView(layer, mipmap));
+                dev.Compute.SetShaderResource(0, texSrc.GetSrView(lm));
                 dev.Compute.SetUnorderedAccessView(0, texDst.GetUaView(mipmap));
 
                 dev.Dispatch(

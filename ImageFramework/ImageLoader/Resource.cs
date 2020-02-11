@@ -18,9 +18,9 @@ namespace ImageFramework.ImageLoader
                 throw new Exception("error in " + file + ": " + Dll.GetError());
         }
 
-        public Resource(uint format, Size3 size, int layer, int mipmaps)
+        public Resource(uint format, Size3 size, LayerMipmapCount lm)
         {
-            Id = Dll.image_allocate(format, size.Width, size.Height, size.Depth, layer, mipmaps);
+            Id = Dll.image_allocate(format, size.Width, size.Height, size.Depth, lm.Layers, lm.Mipmaps);
             if(Id == 0)
                 throw new Exception("error allocating image: " + Dll.GetError());
         }

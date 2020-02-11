@@ -77,7 +77,7 @@ namespace ImageFramework.Model
             Debug.Assert(width <= size);
             Debug.Assert(height <= size);
 
-            var res = new TextureArray2D(1, 1, new Size3(width, height), dstFormat, false);
+            var res = new TextureArray2D(LayerMipmapCount.One, new Size3(width, height), dstFormat, false);
 
             // compute which mipmap has the closest fit
             var mipmap = 0;
@@ -98,11 +98,11 @@ namespace ImageFramework.Model
                 tmpTex = texture.CloneWithMipmaps(mipmap + 1);
                 
                 scaling.WriteMipmaps(tmpTex);
-                dev.Pixel.SetShaderResource(0, tmpTex.GetSrView(layer, mipmap));
+                dev.Pixel.SetShaderResource(0, tmpTex.GetSrView(new LayerMipmapSlice(layer, mipmap)));
             }
             else
             {
-                dev.Pixel.SetShaderResource(0, texture.GetSrView(layer, mipmap));
+                dev.Pixel.SetShaderResource(0, texture.GetSrView(new LayerMipmapSlice(layer, mipmap)));
             }
 
             quad.Bind(false);
@@ -111,7 +111,7 @@ namespace ImageFramework.Model
 
             dev.Pixel.SetSampler(0, sampler);
 
-            dev.OutputMerger.SetRenderTargets(res.GetRtView(0, 0));
+            dev.OutputMerger.SetRenderTargets(res.GetRtView(LayerMipmapSlice.Mip0));
             dev.SetViewScissors(width, height);
             dev.DrawFullscreenTriangle(1);
 

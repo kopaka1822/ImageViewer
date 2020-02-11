@@ -28,7 +28,7 @@ namespace FrameworkTests.Model
             Assert.AreEqual(2, res.Size.Width);
             Assert.AreEqual(2, res.Size.Height);
 
-            var colors = res.GetPixelColors(0, 0);
+            var colors = res.GetPixelColors(LayerMipmapSlice.Mip0);
             TestData.TestCheckersLevel1(colors);
         }
 
@@ -39,14 +39,14 @@ namespace FrameworkTests.Model
             var model = new ThumbnailModel(new QuadShader());
             var checkers = new TextureArray2D(IO.LoadImage(TestData.Directory + "checkers.dds"));
             var lvl0Checkers = checkers.CloneWithoutMipmapsT();
-            TestData.TestCheckersLevel0(lvl0Checkers.GetPixelColors(0, 0));
+            TestData.TestCheckersLevel0(lvl0Checkers.GetPixelColors(LayerMipmapSlice.Mip0));
 
             var res = model.CreateThumbnail(2, lvl0Checkers, Format.R8G8B8A8_UNorm_SRgb, 0, models.Scaling);
 
             Assert.AreEqual(2, res.Size.Width);
             Assert.AreEqual(2, res.Size.Height);
 
-            var colors = res.GetPixelColors(0, 0);
+            var colors = res.GetPixelColors(LayerMipmapSlice.Mip0);
             TestData.TestCheckersLevel1(colors);
         }
 
@@ -63,7 +63,7 @@ namespace FrameworkTests.Model
             Assert.AreEqual(4, res.Size.Width);
             Assert.AreEqual(4, res.Size.Height);
 
-            var colors = res.GetPixelColors(0, 0);
+            var colors = res.GetPixelColors(LayerMipmapSlice.Mip0);
             TestData.TestCheckersLevel0(colors);
         }
 
@@ -78,7 +78,7 @@ namespace FrameworkTests.Model
             Assert.AreEqual(4, res.Size.Width);
             Assert.AreEqual(4, res.Size.Height);
 
-            var colors = res.GetPixelColors(0, 0);
+            var colors = res.GetPixelColors(LayerMipmapSlice.Mip0);
             TestData.TestCheckersLevel0(colors);
         }
     }

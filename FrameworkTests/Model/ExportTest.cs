@@ -87,7 +87,7 @@ namespace FrameworkTests.Model
             });
             var newTex = new TextureArray2D(IO.LoadImage(ExportDir + "cropped.dds"));
 
-            TestData.TestCheckersLevel1(newTex.GetPixelColors(0, 0));
+            TestData.TestCheckersLevel1(newTex.GetPixelColors(LayerMipmapSlice.Mip0));
         }
 
         [TestMethod]
@@ -97,7 +97,7 @@ namespace FrameworkTests.Model
             model.AddImageFromFile(TestData.Directory + "checkers3d.dds");
             model.Apply();
             
-            TestData.TestCheckers3DLevel0(model.Pipelines[0].Image.GetPixelColors(0, 0));
+            TestData.TestCheckers3DLevel0(model.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0));
 
             model.Export.Export(new ExportDescription(model.Pipelines[0].Image, ExportDir + "cropped", "dds")
             {
@@ -145,8 +145,8 @@ namespace FrameworkTests.Model
             Assert.AreEqual(2, newTex.Size.Height);
             Assert.AreEqual(2, newTex.NumMipmaps);
 
-            TestData.TestCheckersLevel1(newTex.GetPixelColors(0, 0));
-            TestData.TestCheckersLevel2(newTex.GetPixelColors(0, 1));
+            TestData.TestCheckersLevel1(newTex.GetPixelColors(LayerMipmapSlice.Mip0));
+            TestData.TestCheckersLevel2(newTex.GetPixelColors(LayerMipmapSlice.Mip1));
         }
 
         [TestMethod]
@@ -166,9 +166,9 @@ namespace FrameworkTests.Model
             Assert.AreEqual(orig.NumLayers, newTex.NumLayers);
             Assert.AreEqual(orig.NumMipmaps, newTex.NumMipmaps);
 
-            TestData.CompareColors(orig.GetPixelColors(0, 0), newTex.GetPixelColors(0, 0));
-            TestData.CompareColors(orig.GetPixelColors(0, 1), newTex.GetPixelColors(0, 1));
-            TestData.CompareColors(orig.GetPixelColors(0, 2), newTex.GetPixelColors(0, 2));
+            TestData.CompareColors(orig.GetPixelColors(LayerMipmapSlice.Mip0), newTex.GetPixelColors(LayerMipmapSlice.Mip0));
+            TestData.CompareColors(orig.GetPixelColors(LayerMipmapSlice.Mip1), newTex.GetPixelColors(LayerMipmapSlice.Mip1));
+            TestData.CompareColors(orig.GetPixelColors(LayerMipmapSlice.Mip2), newTex.GetPixelColors(LayerMipmapSlice.Mip2));
         }
 
         [TestMethod]
@@ -191,7 +191,7 @@ namespace FrameworkTests.Model
             Assert.AreEqual(orig.NumLayers, newTex.NumLayers);
             Assert.AreEqual(1, newTex.NumMipmaps);
 
-            TestData.CompareColors(orig.GetPixelColors(0, 0), newTex.GetPixelColors(0, 0));
+            TestData.CompareColors(orig.GetPixelColors(LayerMipmapSlice.Mip0), newTex.GetPixelColors(LayerMipmapSlice.Mip0));
         }
         
 
@@ -388,13 +388,13 @@ namespace FrameworkTests.Model
             model.Apply();
             var origTex = (TextureArray2D)model.Pipelines[0].Image;
             // normal colors
-            var origColors = origTex.GetPixelColors(0, 0);
+            var origColors = origTex.GetPixelColors(LayerMipmapSlice.Mip0);
             
             // colors multiplied by 100 for integer precision formats
             model.Pipelines[0].Color.Formula = "I0 * 100";
             model.Apply();
             var integerTex = (TextureArray2D)model.Pipelines[0].Image;
-            var origColors100 = integerTex.GetPixelColors(0, 0);
+            var origColors100 = integerTex.GetPixelColors(LayerMipmapSlice.Mip0);
 
             Color[] newColors = null;
 
@@ -427,7 +427,7 @@ namespace FrameworkTests.Model
                         resourceView.Dispose();
                         resource.Dispose();
 
-                        newColors = newTex.GetPixelColors(0, 0);
+                        newColors = newTex.GetPixelColors(LayerMipmapSlice.Mip0);
                         // only compare with red channel since some formats only store red
                         if (isIntegerPrecision)
                         {
@@ -460,14 +460,14 @@ namespace FrameworkTests.Model
             model.AddImageFromFile(TestData.Directory + "checkers3d.dds");
             model.Apply();
             var origTex = (Texture3D)model.Pipelines[0].Image;
-            var origColors = origTex.GetPixelColors(0, 0);
+            var origColors = origTex.GetPixelColors(LayerMipmapSlice.Mip0);
             Color[] newColors = null;
 
             // colors multiplied by 100 for integer precision formats
             model.Pipelines[0].Color.Formula = "I0 * 100";
             model.Apply();
             var integerTex = (Texture3D)model.Pipelines[0].Image;
-            var origColors100 = integerTex.GetPixelColors(0, 0);
+            var origColors100 = integerTex.GetPixelColors(LayerMipmapSlice.Mip0);
 
             var eFmt = ExportDescription.GetExportFormat("dds");
             string errors = "";
@@ -499,7 +499,7 @@ namespace FrameworkTests.Model
                         resourceView.Dispose();
                         resource.Dispose();
 
-                        newColors = newTex.GetPixelColors(0, 0);
+                        newColors = newTex.GetPixelColors(LayerMipmapSlice.Mip0);
                         // only compare with red channel since some formats only store red
                         if(isIntegerPrecision)
                             TestData.CompareColors(origColors100, newColors, Color.Channel.R, 1.0f);
@@ -562,15 +562,12 @@ namespace FrameworkTests.Model
             });
             var expTex = new TextureArray2D(IO.LoadImage(outputImage + "." + outputExtension));
 
-            for (int curLayer = 0; curLayer < origTex.NumLayers; ++curLayer)
+            foreach (var lm in origTex.LayerMipmap.Range)
             {
-                for (int curMipmap = 0; curMipmap < origTex.NumMipmaps; ++curMipmap)
-                {
-                    var origColors = origTex.GetPixelColors(curLayer, curMipmap);
-                    var expColor = expTex.GetPixelColors(curLayer, curMipmap);
+                var origColors = origTex.GetPixelColors(lm);
+                var expColor = expTex.GetPixelColors(lm);
 
-                    TestData.CompareColors(origColors, expColor, channels, tolerance);
-                }
+                TestData.CompareColors(origColors, expColor, channels, tolerance);
             }
         }
 
@@ -671,7 +668,7 @@ namespace FrameworkTests.Model
                         {
                             Assert.AreEqual(8, newTex.Size.Width);
                             Assert.AreEqual(4, newTex.Size.Height);
-                            colors = newTex.GetPixelColors(0, 0);
+                            colors = newTex.GetPixelColors(LayerMipmapSlice.Mip0);
                             // compare last texel
                             var grayColor = colors[lastTexel];
 

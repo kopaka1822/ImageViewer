@@ -29,7 +29,7 @@ namespace ImageFramework.Model.Shader
         public TextureArray2D Run(TextureArray2D src, Size3 dstSize, ScalingModel scaling)
         {
             Debug.Assert(src.Size != dstSize);
-            var genMipmaps = src.HasMipmaps;
+            var genMipmaps = src.NumMipmaps > 1;
             var numMipmaps = 1;
             if (genMipmaps)
                 numMipmaps = dstSize.MaxMipLevels;
@@ -44,14 +44,14 @@ namespace ImageFramework.Model.Shader
                 if (changeHeight) // only temporary texture with a single mipmap
                     curMips = 1;
                 
-                var tmp = new TextureArray2D(src.NumLayers, curMips, new Size3(dstSize.Width, src.Size.Height), src.Format, false);               
+                var tmp = new TextureArray2D(new LayerMipmapCount(src.NumLayers, curMips), new Size3(dstSize.Width, src.Size.Height), src.Format, false);               
                 Apply(src, tmp, 1, 0);
                 src = tmp;
             }
 
             if (changeHeight)
             {
-                var tmp = new TextureArray2D(src.NumLayers, numMipmaps, dstSize, src.Format, false);
+                var tmp = new TextureArray2D(new LayerMipmapCount(src.NumLayers, numMipmaps), dstSize, src.Format, false);
 
                 Apply(src, tmp, 0, 1);
                 if (changeWidth) // delete temporary texture created by width invocation
@@ -83,10 +83,10 @@ namespace ImageFramework.Model.Shader
             dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
             dev.SetViewScissors(dst.Size.Width, dst.Size.Height);
 
-            for (var curLayer = 0; curLayer < src.NumLayers; ++curLayer)
+            foreach (var lm in src.LayerMipmap.LayersOfMipmap(0))
             {
-                dev.Pixel.SetShaderResource(0, src.GetSrView(curLayer, 0));
-                dev.OutputMerger.SetRenderTargets(dst.GetRtView(curLayer, 0));
+                dev.Pixel.SetShaderResource(0, src.GetSrView(lm));
+                dev.OutputMerger.SetRenderTargets(dst.GetRtView(lm));
                 dev.DrawQuad();
             }
 

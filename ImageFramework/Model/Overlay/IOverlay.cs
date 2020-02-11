@@ -10,7 +10,7 @@ namespace ImageFramework.Model.Overlay
     public interface IOverlay : IDisposable
     {
         // draw overlay over the currently bound texture
-        void Render(int layer, int mipmap, Size3 size);
+        void Render(LayerMipmapSlice lm, Size3 size);
 
         event EventHandler HasChanged;
 
@@ -20,7 +20,7 @@ namespace ImageFramework.Model.Overlay
 
     public abstract class OverlayBase : IOverlay
     {
-        public abstract void Render(int layer, int mipmap, Size3 size);
+        public abstract void Render(LayerMipmapSlice lm, Size3 size);
 
         public event EventHandler HasChanged;
         public virtual bool HasWork => true;

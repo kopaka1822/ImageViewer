@@ -10,7 +10,7 @@ namespace ImageFramework.Model.Statistics
     /// <summary>
     /// expected value, variance and covariance of two images
     /// </summary>
-    class ImagesCovarianceStats
+    public class ImagesCovarianceStats
     {
         public ImagesCovarianceStats(ImageVarianceStats image1, ImageVarianceStats image2, ITexture covariance)
         {

@@ -15,10 +15,12 @@ namespace ImageFramework.DirectX
     public abstract class TextureBase<T> : ITexture where T : TextureBase<T>
     {
         public Size3 Size { get; protected set; }
-        public int NumMipmaps { get; protected set; }
-        public bool HasMipmaps => NumMipmaps > 1;
-        public bool HasCubemap => NumLayers == 6 && Size.Width == Size.Height;
-        public int NumLayers { get; protected set; }
+        public bool HasCubemap => LayerMipmap.Layers == 6 && Size.Width == Size.Height;
+
+        public LayerMipmapCount LayerMipmap { get; protected set; }
+        public int NumLayers => LayerMipmap.Layers;
+        public int NumMipmaps => LayerMipmap.Mipmaps;
+
         public Format Format { get; protected set; }
 
         public abstract bool Is3D { get; }
@@ -32,77 +34,75 @@ namespace ImageFramework.DirectX
         public bool HasSrViews => views != null;
         public bool HasRtViews => rtViews != null;
 
-        public ShaderResourceView GetSrView(int layer, int mipmap)
+        public ShaderResourceView GetSrView(LayerMipmapSlice lm)
         {
-            return views[GetSubresourceIndex(layer, mipmap)];
+            return views[GetSubresourceIndex(lm)];
         }
 
-        public RenderTargetView GetRtView(int layer, int mipmap)
+        public RenderTargetView GetRtView(LayerMipmapSlice lm)
         {
             Debug.Assert(rtViews != null);
-            return rtViews[GetSubresourceIndex(layer, mipmap)];
+            return rtViews[GetSubresourceIndex(lm)];
         }
 
         public UnorderedAccessView GetUaView(int mipmap)
         {
             Debug.Assert(uaViews != null);
-            Debug.Assert(mipmap < NumMipmaps);
-            Debug.Assert(mipmap >= 0);
+            Debug.Assert(LayerMipmap.IsMipmapInside(mipmap));
             return uaViews[mipmap];
         }
 
-        protected int GetSubresourceIndex(int layer, int mipmap)
+        protected int GetSubresourceIndex(LayerMipmapSlice lm)
         {
-            Debug.Assert(layer < NumLayers);
-            Debug.Assert(mipmap < NumMipmaps);
-            Debug.Assert(layer >= 0);
-            Debug.Assert(mipmap >= 0);
+            Debug.Assert(lm.IsIn(LayerMipmap));
 
-            return layer * NumMipmaps + mipmap;
+            return lm.Layer * LayerMipmap.Mipmaps + lm.Mipmap;
         }
 
-        protected abstract Resource GetStagingTexture(int layer, int mipmap);
+        protected abstract Resource GetStagingTexture(LayerMipmapSlice lm);
 
-        public Color[] GetPixelColors(int layer, int mipmap)
+        public Color[] GetPixelColors(LayerMipmapSlice lm)
         {
             // create staging texture
-            using (var staging = GetStagingTexture(layer, mipmap))
+            using (var staging = GetStagingTexture(lm))
             {
                 // obtain data from staging resource
-                return Device.Get().GetColorData(staging, Format, 0, Size.GetMip(mipmap));
+                return Device.Get().GetColorData(staging, Format, 0, Size.GetMip(lm.Mipmap));
             }
         }
 
-        public unsafe byte[] GetBytes(int layer, int mipmap, uint size)
+        public unsafe byte[] GetBytes(LayerMipmapSlice lm, uint size)
         {
             byte[] res = new byte[size];
             fixed (byte* ptr = res)
             {
-                CopyPixels(layer, mipmap, new IntPtr(ptr), size);
+                CopyPixels(lm, new IntPtr(ptr), size);
             }
 
             return res;
         }
 
-        public void CopyPixels(int layer, int mipmap, IntPtr destination, uint size)
+        public void CopyPixels(LayerMipmapSlice lm, IntPtr destination, uint size)
         {
             // create staging texture
-            using (var staging = GetStagingTexture(layer, mipmap))
+            using (var staging = GetStagingTexture(lm))
             {
                 // obtain data from staging resource
-                Device.Get().GetData(staging, Format, 0, Size.GetMip(mipmap), destination, size);
+                Device.Get().GetData(staging, Format, 0, Size.GetMip(lm.Mipmap), destination, size);
             }
         }
 
         public ITexture CloneWithMipmaps(int nLevels)
         {
-            var newTex = CreateT(NumLayers, nLevels, Size, Format, uaViews != null);
+            var newTex = CreateT(new LayerMipmapCount(LayerMipmap.Layers, nLevels), Size, Format, uaViews != null);
 
             // copy all layers
-            for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
+            for (int curLayer = 0; curLayer < LayerMipmap.Layers; ++curLayer)
             {
                 // copy image data of first level
-                Device.Get().CopySubresource(GetHandle(), newTex.GetHandle(), GetSubresourceIndex(curLayer, 0), newTex.GetSubresourceIndex(curLayer, 0), Size);
+                Device.Get().CopySubresource(GetHandle(), newTex.GetHandle(), 
+                    GetSubresourceIndex(new LayerMipmapSlice(curLayer, 0)), 
+                    newTex.GetSubresourceIndex(new LayerMipmapSlice(curLayer, 0)), Size);
             }
 
             return newTex;
@@ -119,13 +119,15 @@ namespace ImageFramework.DirectX
         /// <returns></returns>
         public T CloneWithoutMipmapsT(int mipmap = 0)
         {
-            var newTex = CreateT(NumLayers, 1, Size.GetMip(mipmap), Format,
+            var newTex = CreateT(new LayerMipmapCount(LayerMipmap.Layers, 1), Size.GetMip(mipmap), Format,
                 uaViews != null);
 
-            for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
+            for (int curLayer = 0; curLayer < LayerMipmap.Layers; ++curLayer)
             {
                 // copy data of first level
-                Device.Get().CopySubresource(GetHandle(), newTex.GetHandle(), GetSubresourceIndex(curLayer, mipmap), newTex.GetSubresourceIndex(curLayer, 0), Size.GetMip(mipmap));
+                Device.Get().CopySubresource(GetHandle(), newTex.GetHandle(), 
+                    GetSubresourceIndex(new LayerMipmapSlice(curLayer, mipmap)), 
+                    newTex.GetSubresourceIndex(new LayerMipmapSlice(curLayer, 0)), Size.GetMip(mipmap));
             }
 
             return newTex;
@@ -138,8 +140,7 @@ namespace ImageFramework.DirectX
 
         public bool HasSameDimensions(ITexture other)
         {
-            if (NumLayers != other.NumLayers) return false;
-            if (NumMipmaps != other.NumMipmaps) return false;
+            if (LayerMipmap != other.LayerMipmap) return false;
             if (Size != other.Size) return false;
             if (GetType() != other.GetType()) return false;
             return true;
@@ -147,18 +148,18 @@ namespace ImageFramework.DirectX
 
         public T CloneT()
         {
-            var newTex = CreateT(NumLayers, NumMipmaps, Size, Format, uaViews != null);
+            var newTex = CreateT(LayerMipmap, Size, Format, uaViews != null);
 
             Device.Get().CopyResource(GetHandle(), newTex.GetHandle());
             return newTex;
         }
 
-        public ITexture Create(int numLayer, int numMipmaps, Size3 size, Format format, bool createUav)
+        public ITexture Create(LayerMipmapCount lm, Size3 size, Format format, bool createUav)
         {
-            return CreateT(numLayer, numMipmaps, size, format, createUav);
+            return CreateT(lm, size, format, createUav);
         }
 
-        public abstract T CreateT(int numLayer, int numMipmaps, Size3 size, Format format,
+        public abstract T CreateT(LayerMipmapCount lm, Size3 size, Format format,
             bool createUav);
 
         protected abstract Resource GetHandle();

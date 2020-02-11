@@ -20,12 +20,11 @@ namespace ImageFramework.DirectX
         private readonly Texture2D handle;
         private ShaderResourceView[] cubeViews;
 
-        public TextureArray2D(int numLayer, int numMipmaps, Size3 size, Format format, bool createUav)
+        public TextureArray2D(LayerMipmapCount lm, Size3 size, Format format, bool createUav)
         {
             Debug.Assert(size.Depth == 1);
             Size = size;
-            NumMipmaps = numMipmaps;
-            NumLayers = numLayer;
+            LayerMipmap = lm;
             this.Format = format;
            
             handle = new SharpDX.Direct3D11.Texture2D(Device.Get().Handle, CreateTextureDescription(createUav));
@@ -37,21 +36,17 @@ namespace ImageFramework.DirectX
         {
             Size = image.GetSize(0);
             Debug.Assert(Size.Depth == 1);
-            NumMipmaps = image.NumMipmaps;
-            NumLayers = image.NumLayers;
+            LayerMipmap = image.LayerMipmap;
             Format = image.Format.DxgiFormat;
 
-            var data = new DataRectangle[NumLayers * NumMipmaps];
-            for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
+            var data = new DataRectangle[LayerMipmap.Layers * LayerMipmap.Mipmaps];
+            foreach (var lm in LayerMipmap.Range)
             {
-                for (int curMipmap = 0; curMipmap < NumMipmaps; ++curMipmap)
-                {
-                    var mip = image.Layers[curLayer].Mipmaps[curMipmap];
-                    var idx = GetSubresourceIndex(curLayer, curMipmap);
-                    data[idx].DataPointer = mip.Bytes;
-                    // The distance (in bytes) from the beginning of one line of a texture to the next line.
-                    data[idx].Pitch = (int)(mip.Size / mip.Height);
-                }
+                var mip = image.Layers[lm.Layer].Mipmaps[lm.Mipmap];
+                var idx = GetSubresourceIndex(lm);
+                data[idx].DataPointer = mip.Bytes;
+                // The distance (in bytes) from the beginning of one line of a texture to the next line.
+                data[idx].Pitch = (int)(mip.Size / mip.Height);
             }
 
             handle = new Texture2D(Device.Get().Handle, CreateTextureDescription(false), data);
@@ -62,23 +57,17 @@ namespace ImageFramework.DirectX
         public ShaderResourceView GetCubeView(int mipmap)
         {
             Debug.Assert(cubeViews != null);
-            Debug.Assert(mipmap < NumMipmaps);
-            Debug.Assert(mipmap >= 0);
+            Debug.Assert(LayerMipmap.IsMipmapInside(mipmap));
             return cubeViews[mipmap];
         }
 
         public override bool Is3D => false;
 
-        protected override SharpDX.Direct3D11.Resource GetStagingTexture(int layer, int mipmap)
+        protected override SharpDX.Direct3D11.Resource GetStagingTexture(LayerMipmapSlice lm)
         {
             Debug.Assert(IO.SupportedFormats.Contains(Format));
 
-            Debug.Assert(mipmap >= 0);
-            Debug.Assert(mipmap < NumMipmaps);
-            Debug.Assert(layer >= 0);
-            Debug.Assert(layer < NumLayers);
-
-            var newSize = Size.GetMip(mipmap);
+            var newSize = Size.GetMip(lm.Mipmap);
 
             var desc = new Texture2DDescription
             {
@@ -99,16 +88,16 @@ namespace ImageFramework.DirectX
 
             // copy data to staging resource
             Device.Get().CopySubresource(handle, staging,
-                GetSubresourceIndex(layer, mipmap), 0,
+                GetSubresourceIndex(lm), 0,
                 newSize
             );
 
             return staging;
         }
 
-        public override TextureArray2D CreateT(int numLayer, int numMipmaps, Size3 size, Format format, bool createUav)
+        public override TextureArray2D CreateT(LayerMipmapCount lm, Size3 size, Format format, bool createUav)
         {
-            return new TextureArray2D(numLayer, numMipmaps, size, format, createUav);
+            return new TextureArray2D(lm, size, format, createUav);
         }
 
         protected override SharpDX.Direct3D11.Resource GetHandle()
@@ -140,9 +129,9 @@ namespace ImageFramework.DirectX
                 Format = Format,
                 Texture2DArray = new ShaderResourceViewDescription.Texture2DArrayResource
                 {
-                    ArraySize = NumLayers,
+                    ArraySize = LayerMipmap.Layers,
                     FirstArraySlice = 0,
-                    MipLevels = NumMipmaps,
+                    MipLevels = LayerMipmap.Mipmaps,
                     MostDetailedMip = 0
                 }
             };
@@ -150,8 +139,8 @@ namespace ImageFramework.DirectX
 
             if (HasCubemap)
             {
-                cubeViews = new ShaderResourceView[NumMipmaps];
-                for (int curMipmap = 0; curMipmap < NumMipmaps; ++curMipmap)
+                cubeViews = new ShaderResourceView[LayerMipmap.Mipmaps];
+                for (int curMipmap = 0; curMipmap < LayerMipmap.Mipmaps; ++curMipmap)
                 {
                     var cubeDesc = new ShaderResourceViewDescription
                     {
@@ -169,47 +158,44 @@ namespace ImageFramework.DirectX
             }
 
             // single slice views
-            views = new ShaderResourceView[NumLayers * NumMipmaps];
-            rtViews = new RenderTargetView[NumLayers * NumMipmaps];
-            for (int curLayer = 0; curLayer < NumLayers; ++curLayer)
+            views = new ShaderResourceView[LayerMipmap.Layers * LayerMipmap.Mipmaps];
+            rtViews = new RenderTargetView[LayerMipmap.Layers * LayerMipmap.Mipmaps];
+            foreach (var lm in LayerMipmap.Range)
             {
-                for (int curMipmap = 0; curMipmap < NumMipmaps; ++curMipmap)
+                var desc = new ShaderResourceViewDescription
                 {
-                    var desc = new ShaderResourceViewDescription
+                    Dimension = ShaderResourceViewDimension.Texture2DArray,
+                    Format = Format,
+                    Texture2DArray = new ShaderResourceViewDescription.Texture2DArrayResource
                     {
-                        Dimension = ShaderResourceViewDimension.Texture2DArray,
-                        Format = Format,
-                        Texture2DArray = new ShaderResourceViewDescription.Texture2DArrayResource
-                        {
-                            MipLevels = 1,
-                            MostDetailedMip = curMipmap,
-                            ArraySize = 1,
-                            FirstArraySlice = curLayer
-                        }
-                    };
+                        MipLevels = 1,
+                        MostDetailedMip = lm.Mipmap,
+                        ArraySize = 1,
+                        FirstArraySlice = lm.Layer
+                    }
+                };
 
-                    views[GetSubresourceIndex(curLayer, curMipmap)] = new ShaderResourceView(Device.Get().Handle, handle, desc);
+                views[GetSubresourceIndex(lm)] = new ShaderResourceView(Device.Get().Handle, handle, desc);
 
-                    var rtDesc = new RenderTargetViewDescription
+                var rtDesc = new RenderTargetViewDescription
+                {
+                    Dimension = RenderTargetViewDimension.Texture2DArray,
+                    Format = Format,
+                    Texture2DArray = new RenderTargetViewDescription.Texture2DArrayResource
                     {
-                        Dimension = RenderTargetViewDimension.Texture2DArray,
-                        Format = Format,
-                        Texture2DArray = new RenderTargetViewDescription.Texture2DArrayResource
-                        {
-                            ArraySize = 1,
-                            FirstArraySlice = curLayer,
-                            MipSlice = curMipmap
-                        }
-                    };
+                        ArraySize = 1,
+                        FirstArraySlice = lm.Layer,
+                        MipSlice = lm.Mipmap
+                    }
+                };
 
-                    rtViews[GetSubresourceIndex(curLayer, curMipmap)] = new RenderTargetView(Device.Get().Handle, handle, rtDesc);
-                }
+                rtViews[GetSubresourceIndex(lm)] = new RenderTargetView(Device.Get().Handle, handle, rtDesc);
             }
 
             if (createUav)
             {
-                uaViews = new UnorderedAccessView[NumMipmaps];
-                for (int curMipmap = 0; curMipmap < NumMipmaps; ++curMipmap)
+                uaViews = new UnorderedAccessView[LayerMipmap.Mipmaps];
+                for (int curMipmap = 0; curMipmap < LayerMipmap.Mipmaps; ++curMipmap)
                 {
                     var desc = new UnorderedAccessViewDescription
                     {
@@ -217,7 +203,7 @@ namespace ImageFramework.DirectX
                         Format = Format,
                         Texture2DArray = new UnorderedAccessViewDescription.Texture2DArrayResource
                         {
-                            ArraySize = NumLayers,
+                            ArraySize = LayerMipmap.Layers,
                             FirstArraySlice = 0,
                             MipSlice = curMipmap
                         }
