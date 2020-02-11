@@ -11,6 +11,9 @@ using Device = ImageFramework.DirectX.Device;
 
 namespace ImageFramework.Model.Shader
 {
+    /// <summary>
+    /// seperatable gauss shader
+    /// </summary>
     internal class GaussShader : IDisposable
     {
         private readonly int radius;
@@ -151,7 +154,7 @@ cbuffer InputBuffer : register(b0) {{
 {builder.TexelHelperFunctions}
 
 float kernel(int offset) {{
-    return exp(-0.5 * offset * offset / {variance});
+    return exp(-0.5 * (offset * offset) / {variance});
 }}
 
 bool isInside(int3 pos) {{

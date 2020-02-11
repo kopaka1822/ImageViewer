@@ -159,6 +159,7 @@
     <Compile Include="Model\Shader\ImageCombineShader.cs" />
     <Compile Include="Model\Shader\IShaderBuilder.cs" />
     <Compile Include="Model\Shader\MitchellNetravaliScaleShader.cs" />
+    <Compile Include="Model\Shader\NonSepKernelShader.cs" />
     <Compile Include="Model\Shader\PixelValueShader.cs" />
     <Compile Include="Model\Shader\QuadShader.cs" />
     <Compile Include="Model\Shader\ConvertFormatShader.cs" />
@@ -168,11 +169,13 @@
     <Compile Include="Model\Shader\StatisticsShader.cs" />
     <Compile Include="Model\Shader\TransformShader.cs" />
     <Compile Include="Model\SharedModel.cs" />
+    <Compile Include="Model\Statistics\CorrelationCoefficientShader.cs" />
     <Compile Include="Model\Statistics\DefaultStatistics.cs" />
     <Compile Include="Model\Statistics\ImagesCovarianceStats.cs" />
     <Compile Include="Model\Statistics\ImageVarianceStats.cs" />
     <Compile Include="Model\Statistics\SSIMModel.cs" />
     <Compile Include="Model\Statistics\StatisticsModel.cs" />
+    <Compile Include="Model\Statistics\VarianceShader.cs" />
     <Compile Include="Model\ThumbnailModel.cs" />
     <Compile Include="Utility\Bool3.cs" />
     <Compile Include="Utility\Float2.cs" />

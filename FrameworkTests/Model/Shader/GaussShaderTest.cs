@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Shader;
+using ImageFramework.Model.Statistics;
 using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -79,6 +80,68 @@ namespace FrameworkTests.Model.Shader
         private float Kernel(int offset)
         {
             return (float)Math.Exp(-0.5 * offset * offset);
+        }
+
+        // not directly gauss shader but uses gauss weights as well:
+
+        [TestMethod]
+        public void VarianceCompile()
+        {
+            var s = new VarianceShader(5, 2.25f);
+            s.CompileShaders();
+        }
+
+        [TestMethod]
+        public void CorrelationCoefficientCompile()
+        {
+            var s = new CorrelationCoefficientShader(5, 2.25f);
+            s.CompileShaders();
+        }
+
+        // test shader with a gauss kernel => should have same result as seperatable shader
+        class NonSepGaussShader : NonSepKernelShader
+        {
+            public NonSepGaussShader() : base(1, new []{"in_values"}, @"
+float weightSum = 0.0;
+float4 pixelSum = 0.0;
+", @"
+int radius2 = dot(id - coord, id - coord); // current squared radius
+float w = exp(-0.5 * radius2); // gauss weight
+weightSum += w;
+pixelSum += w * in_values[texel(coord)];
+", @"
+out_image[texel(id, layer)] = pixelSum / weightSum;
+", "float4")
+            {
+            }
+
+            public void Run(ITexture values, ITexture dst, LayerMipmapSlice lm,
+                UploadBuffer upload)
+            {
+                Run(new[] { values }, dst, lm, upload);
+            }
+        }
+
+        [TestMethod]
+        public void NonSepGaussSmall()
+        {
+            // sep was tested in previous unit test (ResultSmall)
+            var sep = new GaussShader(1, 1.0f, "float4");
+            var nonSep = new NonSepGaussShader();
+
+            var img = IO.LoadImageTexture(TestData.Directory + "small.pfm");
+
+            var cache = new TextureCache(img);
+            var dstRef = cache.GetTexture();
+            var dstNonSep = cache.GetTexture();
+
+            sep.Run(img, dstRef, LayerMipmapSlice.Mip0, new UploadBuffer(256), cache);
+            nonSep.Run(img, dstNonSep, LayerMipmapSlice.Mip0, new UploadBuffer(256));
+
+            var expected = dstRef.GetPixelColors(LayerMipmapSlice.Mip0);
+            var actual = dstNonSep.GetPixelColors(LayerMipmapSlice.Mip0);
+
+            TestData.CompareColors(expected, actual, Color.Channel.Rgba);
         }
     }
 }
