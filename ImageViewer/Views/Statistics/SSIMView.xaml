@@ -32,6 +32,7 @@
                 Margin="{StaticResource DefaultBorderBottom}"
                 ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.ImageSources}"
                 ItemTemplate="{StaticResource ListItemView}"
+                SelectedItem="{Binding Image1}"
                 />
 
             <TextBlock
@@ -45,7 +46,8 @@
                 Grid.Row="1"
                 Margin="{StaticResource DefaultBorderBottom}"
                 ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.ImageSources}"
-                ItemTemplate="{StaticResource ListItemView}"/>
+                ItemTemplate="{StaticResource ListItemView}"
+                SelectedItem="{Binding Image2}"/>
         </Grid>
         <Grid
             IsEnabled="{Binding IsValid, FallbackValue=False}">

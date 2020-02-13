@@ -57,20 +57,28 @@ namespace ImageViewer.Models
             }
         }
 
-        private void UpdateStatistics()
+        public LayerMipmapRange StatisticRange
         {
-            if (pipe.Image != null)
+            get
             {
                 if (display.ActiveView == DisplayModel.ViewMode.CubeCrossView ||
                     display.ActiveView == DisplayModel.ViewMode.CubeMap)
                 {
                     // compute for all layers
-                    Stats = models.Stats.GetStatisticsFor(pipe.Image, new LayerMipmapRange(-1, display.ActiveMipmap));
+                    return new LayerMipmapRange(-1, display.ActiveMipmap);
                 }
                 else // compute for single layer
                 {
-                    Stats = models.Stats.GetStatisticsFor(pipe.Image, new LayerMipmapSlice(display.ActiveLayer, display.ActiveMipmap));
+                    return new LayerMipmapSlice(display.ActiveLayer, display.ActiveMipmap);
                 }
+            }
+        }
+
+        private void UpdateStatistics()
+        {
+            if (pipe.Image != null)
+            {
+                Stats = models.Stats.GetStatisticsFor(pipe.Image, StatisticRange);
                 
                 OnPropertyChanged(nameof(Stats));
             }

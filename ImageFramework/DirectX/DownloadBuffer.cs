@@ -49,9 +49,11 @@ namespace ImageFramework.DirectX
             stageBuffer = new Buffer(Device.Get().Handle, stageDesc);
         }
 
-        public void CopyFrom(GpuBuffer buffer)
+        public void CopyFrom(GpuBuffer buffer, int size)
         {
-            Device.Get().CopyBufferData(buffer.Handle, stageBuffer, Math.Min(ByteSize, buffer.ByteSize));
+            Debug.Assert(size <= ByteSize);
+            Debug.Assert(size <= buffer.ByteSize);
+            Device.Get().CopyBufferData(buffer.Handle, stageBuffer, size);
         }
 
         public T GetData<T>() where T : struct

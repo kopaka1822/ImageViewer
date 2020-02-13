@@ -10,6 +10,9 @@ using ImageFramework.Utility;
 
 namespace ImageFramework.Model.Shader
 {
+    /// <summary>
+    /// shader that copies a single float for each texel into a buffer
+    /// </summary>
     public class StatisticsShader : IDisposable
     {
         private readonly DirectX.Shader shader;
@@ -27,6 +30,7 @@ float lum = dot(value.a * value.rgb, float3(0.2125, 0.7154, 0.0721));
 return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
         public static readonly string LumaValue = "return dot(value.a * toSrgb(value).rgb, float3(0.299, 0.587, 0.114))";
         public static readonly string AlphaValue = "return value.a";
+        public static readonly string RedValue = "return value.r";
 
         /// <summary>
         /// shader used for statistics calculation
@@ -46,7 +50,7 @@ return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
         /// </summary>
         internal void CopyToBuffer(ITexture source, GpuBuffer buffer, LayerMipmapRange lm)
         {
-            Debug.Assert(!lm.AllMipmaps);
+            Debug.Assert(lm.IsSingleMipmap);
 
             // copy pixels from the source image into a texture from the texture cache
             var dev = Device.Get();

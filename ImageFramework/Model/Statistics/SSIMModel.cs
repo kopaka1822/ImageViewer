@@ -25,13 +25,15 @@ namespace ImageFramework.Model.Statistics
         private VarianceShader varianceShader = new VarianceShader(5, 1.5f * 1.5f);
         private CorrelationCoefficientShader cocoefShader = new CorrelationCoefficientShader(5, 1.5f * 1.5f);
 
+        private StatisticsShader copyToBufferShader;
+
         private TransformShader luminanceShader = new TransformShader(new []
         {
             "in_u1", "in_u2" // expected values
         }, @"
 float C1 = 0.0001; // assume dynamic range (L) of 1 => C1 = (K1*L) = (0.01 * 1)^1
-float u1 = u1[coord];
-float u2 = u2[coord];
+float u1 = in_u1[coord];
+float u2 = in_u2[coord];
 return (2.0 * u1 * u2 + C1) / (u1 * u1 + u2 * u2 + C1);
 ", "float", "float");
 
@@ -61,11 +63,24 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
 ", "float", "float");
 
         private TransformShader redToRgbaTransform = new TransformShader("return float4(value, value, value, 1.0);", "float", "float4");
-        
+
+        internal void CompileShaders()
+        {
+            lumaTransformShader.CompileShaders();
+            gaussShader.CompileShaders();
+            varianceShader.CompileShaders();
+            cocoefShader.CompileShaders();
+            luminanceShader.CompileShaders();
+            contrastShader.CompileShaders();
+            structureShader.CompileShaders();
+            ssimShader.CompileShaders();
+            redToRgbaTransform.CompileShaders();
+        }
 
         public SSIMModel(Models models)
         {
             this.models = models;
+            this.copyToBufferShader = new StatisticsShader(models.SharedModel.Upload, StatisticsShader.RedValue);
         }
 
         /// <summary>
@@ -169,6 +184,7 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             public float Contrast;
             public float Structure;
             public float SSIM;
+            public float DSSIM => (1.0f - SSIM) / 2.0f;
         }
 
         public Stats GetStats(ITexture image1, ITexture image2, LayerMipmapRange lmRange)
@@ -198,21 +214,36 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
                 }
             }
 
-            // TODO put data into a buffer and read result
-
+            var stats = new Stats
+            {
+                Luminance = GetAveragedValue(lumTex, lmRange),
+                Contrast = GetAveragedValue(contTex, lmRange),
+                Structure = GetAveragedValue(strucTex, lmRange),
+                SSIM = GetAveragedValue(ssimTex, lmRange)
+            };
 
             cache.StoreTexture(lumTex);
             cache.StoreTexture(contTex);
             cache.StoreTexture(strucTex);
             cache.StoreTexture(ssimTex);
 
-            return new Stats
-            {
-                Luminance = 1.0f,
-                Contrast = 1.0f,
-                Structure = 1.0f,
-                SSIM = 1.0f
-            };
+            return stats;
+        }
+
+        private float GetAveragedValue(ITexture tex, LayerMipmapRange lm)
+        {
+            // obtain gpu buffer that is big enough to hold all elements
+            var numElements = tex.Size.GetMip(lm.SingleMipmap).Product;
+            if (lm.AllLayer) numElements *= tex.NumLayers;
+
+            var buffer = models.Stats.GetBuffer(numElements);
+            var reduce = models.Stats.AvgReduce;
+
+            // copy values into buffer for scan
+            copyToBufferShader.CopyToBuffer(tex, buffer, lm);
+            reduce.Run(buffer, numElements);
+            models.SharedModel.Download.CopyFrom(buffer, sizeof(float));
+            return models.SharedModel.Download.GetData<float>() / numElements;
         }
 
         private void RenderLuminance(ImagesCorrelationStats src, ITexture dst, LayerMipmapSlice lm)
@@ -284,14 +315,10 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
         {
             // determine which texture cache to use
             ITextureCache cache = customTexCache;
-            if (models.TextureCache.IsCompatibleWith(src))
-            {
-                cache = models.TextureCache;
-            }
-            else if (customTexCache == null || !customTexCache.IsCompatibleWith(src))
+            if (cache == null || !cache.IsCompatibleWith(src))
             {
                 customTexCache?.Dispose();
-                cache = customTexCache = new TextureCache(src);
+                cache = customTexCache = new TextureCache(src, Format.R32_Float, true);
             }
 
             return cache;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
@@ -62,7 +63,7 @@ namespace ImageFramework.Model.Shader
             dev.Compute.SetUnorderedAccessView(0, null);
 
             // obtain data
-            readBuffer.CopyFrom(dstBuffer);
+            readBuffer.CopyFrom(dstBuffer, Marshal.SizeOf(typeof(Color)));
             return readBuffer.GetData<Color>();
         }
 

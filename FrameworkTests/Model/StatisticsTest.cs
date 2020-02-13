@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.ImageLoader;
 using ImageFramework.Model;
 using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -147,6 +148,37 @@ namespace FrameworkTests.Model
         {
             var models = new Models(1);
             var s = models.SSIM;
+            s.CompileShaders();
+        }
+
+        [TestMethod]
+        public void SSIMSphereIdentical()
+        {
+            var models = new Models(1);
+            var sphere1 = IO.LoadImageTexture(TestData.Directory + "sphere.png");
+            var sphere2 = IO.LoadImageTexture(TestData.Directory + "sphere.png");
+
+            var stats = models.SSIM.GetStats(sphere1, sphere2, LayerMipmapRange.MostDetailed);
+            Assert.AreEqual(1.0f, stats.Luminance, 0.01f);
+            Assert.AreEqual(1.0f, stats.Structure, 0.01f);
+            Assert.AreEqual(1.0f, stats.Contrast, 0.01f);
+            Assert.AreEqual(1.0f, stats.SSIM, 0.01f);
+            Assert.AreEqual(0.0f, stats.DSSIM, 0.01f);
+        }
+
+        [TestMethod]
+        public void SSIMSphereTest()
+        {
+            var models = new Models(1);
+            var sphere = IO.LoadImageTexture(TestData.Directory + "sphere.png");
+            var sphereMedian = IO.LoadImageTexture(TestData.Directory + "sphere_median.png");
+            var sphereBlur = IO.LoadImageTexture(TestData.Directory + "sphere_blur.png");
+
+            var stats = models.SSIM.GetStats(sphere, sphereMedian, LayerMipmapRange.MostDetailed);
+            Assert.AreEqual(0.9912f, stats.SSIM);
+
+            stats = models.SSIM.GetStats(sphere, sphereBlur, LayerMipmapRange.MostDetailed);
+            Assert.AreEqual(0.320421f, stats.SSIM);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -19,7 +20,7 @@ namespace ImageViewer.ViewModels.Statistics
     {
         private readonly ModelsEx models;
 
-        public struct ImageSourceItem
+        public class ImageSourceItem
         {
             public string Name { get; set; }
             public bool IsEquation { get; set; }
@@ -32,9 +33,11 @@ namespace ImageViewer.ViewModels.Statistics
         {
             this.models = models;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
+            var pipeId = 0;
             foreach (var pipe in models.Pipelines)
             {
-                pipe.PropertyChanged += PipeOnPropertyChanged;
+                int copiedId = pipeId++;
+                pipe.PropertyChanged += (sender, e) => PipeOnPropertyChanged(copiedId, e);
             }
 
             LuminanceCommand = new ActionCommand<int>((int id) => Items[id].ImportLuminance());
@@ -42,18 +45,24 @@ namespace ImageViewer.ViewModels.Statistics
             StructureCommand = new ActionCommand<int>((int id) => Items[id].ImportStructure());
             SSIMCommand = new ActionCommand<int>((int id) => Items[id].ImportSSIM());
 
-            Items.Add(new SSIMViewModel(models, 0));
-            Items.Add(new SSIMViewModel(models, 1));
+            Items.Add(new SSIMViewModel(this, models, 0));
+            Items.Add(new SSIMViewModel(this, models, 1));
 
             RefreshImageSources();
         }
 
-        private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void PipeOnPropertyChanged(int id, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
                 case nameof(ImagePipeline.IsEnabled):
                     RefreshImageSources();
+                    break;
+                case nameof(ImagePipeline.Image):
+                    foreach (var vm in Items)
+                    {
+                        vm.OnPipelineImageChanged(id);
+                    }
                     break;
             }
         }
@@ -108,6 +117,10 @@ namespace ImageViewer.ViewModels.Statistics
             }
 
             ImageSources = res;
+            foreach (var vms in Items)
+            {
+                vms.UpdateImageSources();
+            }
             OnPropertyChanged(nameof(ImageSources));
         }
 

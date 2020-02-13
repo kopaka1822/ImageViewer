@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -88,7 +89,7 @@ namespace FrameworkTests.Model.Shader
 
                 using (var res = new DownloadBuffer(4))
                 {
-                    res.CopyFrom(buf);
+                    res.CopyFrom(buf, Marshal.SizeOf<T>());
 
                     var resData = res.GetData<T>();
 

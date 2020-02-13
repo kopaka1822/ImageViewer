@@ -84,7 +84,7 @@
                     Grid.Column="2"
                     DockPanel.Dock="Left"
                     HorizontalAlignment="Stretch"
-                    SelectedIndex="0"
+                    SelectedIndex="{Binding SelectedTabIndex, FallbackValue=0}"
                     BorderThickness="0"
                     x:Name="TabControl"   
                 >

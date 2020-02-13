@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using ImageFramework.Annotations;
+using ImageFramework.Model;
 using ImageViewer.Commands;
 using ImageViewer.Commands.Export;
 using ImageViewer.Commands.Import;
@@ -16,7 +20,7 @@ using ImageViewer.ViewModels.Statistics;
 
 namespace ImageViewer.ViewModels
 {
-    public class ViewModels : IDisposable
+    public class ViewModels : INotifyPropertyChanged, IDisposable
     {
         private readonly ModelsEx models;
 
@@ -33,6 +37,19 @@ namespace ImageViewer.ViewModels
         public ScalingViewModel Scale { get; }
 
         public ZoomBoxViewModel ZoomBox { get; }
+
+        private int selectedTabIndex = 0;
+        public int SelectedTabIndex
+        {
+            get => selectedTabIndex;
+            set
+            {
+                if(value == selectedTabIndex) return;
+                selectedTabIndex = value;
+                OnPropertyChanged(nameof(SelectedTabIndex));
+            }
+        }
+
         public ViewModels(ModelsEx models)
         {
             this.models = models;
@@ -75,6 +92,17 @@ namespace ImageViewer.ViewModels
 
             // key input
             models.Window.Window.KeyDown += WindowOnKeyDown;
+            models.Images.PropertyChanged += ImagesOnPropertyChanged;
+        }
+
+        private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ImagesModel.NumImages):
+                    SelectedTabIndex = 0; // set view to images tab
+                    break;
+            }
         }
 
         private void WindowOnKeyDown(object sender, KeyEventArgs e)
@@ -138,5 +166,12 @@ namespace ImageViewer.ViewModels
         public ICommand StartZoomboxCommand { get; }
 
         public ICommand RemoveZoomboxCommand { get; }
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

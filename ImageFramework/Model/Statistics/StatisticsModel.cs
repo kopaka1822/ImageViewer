@@ -48,11 +48,8 @@ namespace ImageFramework.Model.Statistics
             int numElements = texture.Size.GetMip(lm.FirstMipmap).Product;
             if(lm.AllLayer) numElements *= texture.LayerMipmap.Layers;
 
-            if (buffer == null || buffer.ElementCount < numElements)
-            {
-                buffer?.Dispose();
-                buffer = new GpuBuffer(4, numElements);
-            }
+            // allocate buffer that is big enough
+            GetBuffer(numElements);
 
             // copy all values into buffer
             statShader.CopyToBuffer(texture, buffer, lm);
@@ -60,11 +57,27 @@ namespace ImageFramework.Model.Statistics
             // execute reduce
             redShader.Run(buffer, numElements);
 
-            shared.Download.CopyFrom(buffer);
+            shared.Download.CopyFrom(buffer, sizeof(float));
 
             var res = shared.Download.GetData<float>();
             if (normalize) res /= numElements;
             return res;
+        }
+
+        /// <summary>
+        /// allocates a buffer that is big enough to hold numElement floats
+        /// </summary>
+        /// <param name="numElements"></param>
+        /// <returns></returns>
+        internal GpuBuffer GetBuffer(int numElements)
+        {
+            if (buffer == null || buffer.ElementCount < numElements)
+            {
+                buffer?.Dispose();
+                buffer = new GpuBuffer(4, numElements);
+            }
+
+            return buffer;
         }
 
         public DefaultStatistics GetStatisticsFor(ITexture texture, LayerMipmapRange lm)
