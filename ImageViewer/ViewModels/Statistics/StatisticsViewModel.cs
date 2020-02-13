@@ -40,8 +40,11 @@ The perceptual response to luminance Y is called lightness L.
 It is computed from the luminance: L = 116 * Y ^ (1/3) - 16.",
             // alpha
             "Alpha channel.",
-            @"The Structural Similarity Index (SSIM) is a metric that measures the perceived difference between two images.
-SSIM is based on visible structure differences instead of per-pixel absolute differences (like RMSE or MAE)."
+            // ssim
+            @"The Structural Similarity Index (SSIM) is a metric that measures the perceived difference between two images. 
+SSIM is based on visible structure differences instead of per-pixel absolute differences (like RMSE or MAE). 
+SSIM is computed with the luma grayscale image: dot(sRGB*A, (0.299, 0.587, 0.114)). 
+Note that RGB will be clamped between 0.0 and 1.0 which results in an SSIM value between 0.0 and 1.0 (higher is better)."
         };
 
         public StatisticsViewModel(ModelsEx models)

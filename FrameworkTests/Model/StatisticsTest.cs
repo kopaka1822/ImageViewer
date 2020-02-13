@@ -175,10 +175,10 @@ namespace FrameworkTests.Model
             var sphereBlur = IO.LoadImageTexture(TestData.Directory + "sphere_blur.png");
 
             var stats = models.SSIM.GetStats(sphere, sphereMedian, LayerMipmapRange.MostDetailed);
-            Assert.AreEqual(0.9912f, stats.SSIM);
+            Assert.AreEqual(0.9912f, stats.SSIM, 0.01f);
 
             stats = models.SSIM.GetStats(sphere, sphereBlur, LayerMipmapRange.MostDetailed);
-            Assert.AreEqual(0.320421f, stats.SSIM);
+            Assert.AreEqual(0.320421f, stats.SSIM, 0.01f);
         }
     }
 }
