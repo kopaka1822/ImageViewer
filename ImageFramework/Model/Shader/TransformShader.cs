@@ -22,6 +22,7 @@ namespace ImageFramework.Model.Shader
         private readonly string[] inputs;
 
         public static readonly string TransformLuma = StatisticsShader.LumaValue;
+        //public static readonly string TransformLuma = "return  dot(value.a * sign(value.rgb) * toSrgb(abs(value)).rgb, float3(0.299, 0.587, 0.114))";
 
         /// <summary>
         /// ctor for a single input image

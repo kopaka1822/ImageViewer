@@ -296,9 +296,9 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             // luma values
             lumaTransformShader.Run(src, dst.Luma, lm, models.SharedModel.Upload);
             // expected value
-            gaussShader.Run(src, dst.Expected, lm, models.SharedModel.Upload, dst.Cache);
+            gaussShader.Run(dst.Luma, dst.Expected, lm, models.SharedModel.Upload, dst.Cache);
             // variance
-            varianceShader.Run(src, dst.Expected, dst.Variance, lm, models.SharedModel.Upload);
+            varianceShader.Run(dst.Luma, dst.Expected, dst.Variance, lm, models.SharedModel.Upload);
         }
 
         private void RenderImagesCorrelation(ITexture src1, ITexture src2, ImagesCorrelationStats dst,
@@ -308,7 +308,7 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             RenderImageVariance(src1, dst.Image1, lm);
             RenderImageVariance(src2, dst.Image2, lm);
             // calc correlation coefficient
-            cocoefShader.Run(dst.Correlation, dst.Image1.Luma, dst.Image2.Luma, dst.Image1.Expected, dst.Image2.Expected, lm, models.SharedModel.Upload);
+            cocoefShader.Run(dst.Image1.Luma, dst.Image2.Luma, dst.Image1.Expected, dst.Image2.Expected, dst.Correlation, lm, models.SharedModel.Upload);
         }
 
         private ITextureCache GetCache(ITexture src)
