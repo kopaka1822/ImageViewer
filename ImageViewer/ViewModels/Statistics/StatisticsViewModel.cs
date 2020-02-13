@@ -10,16 +10,6 @@ namespace ImageViewer.ViewModels.Statistics
 {
     public class StatisticsViewModel : INotifyPropertyChanged
     {
-        public enum Types
-        {
-            Luminance = DefaultStatistics.Types.Luminance,
-            Average = DefaultStatistics.Types.Average,
-            Luma = DefaultStatistics.Types.Luma,
-            Lightness = DefaultStatistics.Types.Lightness,
-            Alpha = DefaultStatistics.Types.Alpha,
-            SSIM
-        }
-
         private readonly ModelsEx models;
         private readonly StatisticViewModel[] viewModels;
         private static readonly string[] channelDescriptions = new[]
@@ -50,7 +40,7 @@ Note that RGB will be clamped between 0.0 and 1.0 which results in an SSIM value
         public StatisticsViewModel(ModelsEx models)
         {
             this.models = models;
-            var settingsValue = (Types)(int)models.Settings.StatisticsChannel;
+            var settingsValue = models.Settings.StatisticsChannel;
             selectedChannel = AvailableChannels.Find(v => v.Cargo == settingsValue);
             ChannelDescription = channelDescriptions[(int)settingsValue];
 
@@ -76,7 +66,7 @@ Note that RGB will be clamped between 0.0 and 1.0 which results in an SSIM value
 
         public SSIMsViewModel SSIM { get; }
 
-        public bool ShowSSIM => selectedChannel.Cargo == Types.SSIM;
+        public bool ShowSSIM => selectedChannel.Cargo == SettingsModel.Statistics.SSIM;
 
         private bool isVisible = false;
         public bool IsVisible
@@ -92,42 +82,42 @@ Note that RGB will be clamped between 0.0 and 1.0 which results in an SSIM value
 
         public string ChannelDescription { get; private set; } = "";
 
-        public List<ListItemViewModel<Types>> AvailableChannels { get; } = new List<ListItemViewModel<Types>>
+        public List<ListItemViewModel<SettingsModel.Statistics>> AvailableChannels { get; } = new List<ListItemViewModel<SettingsModel.Statistics>>
         {
-            new ListItemViewModel<Types>
+            new ListItemViewModel<SettingsModel.Statistics>
             {
                 Name = "Luminance",
-                Cargo = Types.Luminance
+                Cargo = SettingsModel.Statistics.Luminance
             },
-            new ListItemViewModel<Types>
+            new ListItemViewModel<SettingsModel.Statistics>
             {
                 Name = "SSIM",
-                Cargo = Types.SSIM
+                Cargo = SettingsModel.Statistics.SSIM
             },
-            new ListItemViewModel<Types>
+            new ListItemViewModel<SettingsModel.Statistics>
             {
                 Name = "Average",
-                Cargo = Types.Average
+                Cargo = SettingsModel.Statistics.Average
             },
-            new ListItemViewModel<Types>
+            new ListItemViewModel<SettingsModel.Statistics>
             {
                 Name = "Luma",
-                Cargo = Types.Luma
+                Cargo = SettingsModel.Statistics.Luma
             },
-            new ListItemViewModel<Types>
+            new ListItemViewModel<SettingsModel.Statistics>
             {
                 Name = "Lightness",
-                Cargo = Types.Lightness
+                Cargo = SettingsModel.Statistics.Lightness
             },
-            new ListItemViewModel<Types>
+            new ListItemViewModel<SettingsModel.Statistics>
             {
                 Name = "Alpha",
-                Cargo = Types.Alpha
+                Cargo = SettingsModel.Statistics.Alpha
             },
         };
 
-        private ListItemViewModel<Types> selectedChannel;
-        public ListItemViewModel<Types> SelectedChannel
+        private ListItemViewModel<SettingsModel.Statistics> selectedChannel;
+        public ListItemViewModel<SettingsModel.Statistics> SelectedChannel
         {
             get => selectedChannel;
             set
@@ -138,10 +128,7 @@ Note that RGB will be clamped between 0.0 and 1.0 which results in an SSIM value
                 OnPropertyChanged(nameof(ShowSSIM));
                 OnPropertyChanged(nameof(SelectedChannel));
                 OnPropertyChanged(nameof(ChannelDescription));
-                if ((int) value.Cargo < (int) DefaultStatistics.Types.Size)
-                {
-                    models.Settings.StatisticsChannel = (DefaultStatistics.Types)value.Cargo;
-                }
+                models.Settings.StatisticsChannel = value.Cargo;
             }
         }
 

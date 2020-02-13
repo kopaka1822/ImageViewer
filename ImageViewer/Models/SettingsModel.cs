@@ -25,6 +25,16 @@ namespace ImageViewer.Models
             SrgbByte
         }
 
+        public enum Statistics
+        {
+            Luminance = DefaultStatistics.Types.Luminance,
+            Average = DefaultStatistics.Types.Average,
+            Luma = DefaultStatistics.Types.Luma,
+            Lightness = DefaultStatistics.Types.Lightness,
+            Alpha = DefaultStatistics.Types.Alpha,
+            SSIM
+        }
+
         public SettingsModel()
         {
             // required if assembly version changes
@@ -105,9 +115,9 @@ namespace ImageViewer.Models
             get => Settings.Default.FilterPath ?? "";
             set => Settings.Default.FilterPath = value;
         }
-        public DefaultStatistics.Types StatisticsChannel
+        public Statistics StatisticsChannel
         {
-            get => (DefaultStatistics.Types) Settings.Default.StatisticsChannel;
+            get => (Statistics) Settings.Default.StatisticsChannel;
             set => Settings.Default.StatisticsChannel = (int) value;
         }
 
