@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Input;
 using ImageFramework.Annotations;
 using ImageFramework.Model;
@@ -107,6 +108,11 @@ namespace ImageViewer.ViewModels
 
         private void WindowOnKeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Handled) return;
+            // dont steal text from textboxes (they don't set handled to true...)
+            if (e.OriginalSource is TextBox) return;
+            
+
             if (Filter.HasKeyToInvoke(e.Key))
             {
                 // invoke the key
