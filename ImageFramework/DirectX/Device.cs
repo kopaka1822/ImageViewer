@@ -49,6 +49,9 @@ namespace ImageFramework.DirectX
             SupportsDouble = Handle.CheckFeatureSupport(SharpDX.Direct3D11.Feature.ShaderDoubles);
         }
 
+        // it is probably a low end device if feature level 11.1 was not available
+        public bool IsLowEndDevice => Handle.FeatureLevel == FeatureLevel.Level_11_0;
+
         public static Device Get()
         {
             return instance;

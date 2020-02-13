@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,8 +23,8 @@ namespace ImageFramework.Model.Shader
 
         public string UavType => $"RWTexture2DArray<{Type}>";
 
-        public int LocalSizeX => 32;
-        public int LocalSizeY => 32;
+        public int LocalSizeX => Device.Get().IsLowEndDevice ? 16 : 32;
+        public int LocalSizeY => Device.Get().IsLowEndDevice ? 16 : 32;
         public int LocalSizeZ => 1;
 
         public bool Is3D => false;
