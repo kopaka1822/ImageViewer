@@ -35,6 +35,7 @@ float C1 = 0.0001; // assume dynamic range (L) of 1 => C1 = (K1*L) = (0.01 * 1)^
 float u1 = in_u1[coord];
 float u2 = in_u2[coord];
 return (2.0 * u1 * u2 + C1) / (u1 * u1 + u2 * u2 + C1);
+//return (2.0 * u1 * u2 + (u1 * u2 < 0.0 ? -1 : 1) * C1) / (u1 * u1 + u2 * u2 + C1);
 ", "float", "float");
 
         private TransformShader contrastShader = new TransformShader(new []
@@ -51,8 +52,11 @@ return (2.0 * sqrt(v1) * sqrt(v2) + C2) / (v1 + v2 + C2);
         {
             "in_v1", "in_v2", "in_v12"
         }, @"
-float C3 = 0.009 * 0.5; // C3 = 0.5 * C2
-return (in_v12[coord] + C3) / (sqrt(in_v1[coord])*sqrt(in_v2[coord]) + C3);
+float C3 = 0.0009 * 0.5; // C3 = 0.5 * C2
+float v12 = in_v12[coord];
+//return (v12 + C3) / (sqrt(in_v1[coord])*sqrt(in_v2[coord]) + C3);
+// v12 can be negative => it is better to offset with the same sign
+return (v12 + (v12 < 0 ? -1 : 1) * C3) / (sqrt(in_v1[coord])*sqrt(in_v2[coord]) + C3);
 ", "float", "float");
         
         private TransformShader ssimShader = new TransformShader(new []
