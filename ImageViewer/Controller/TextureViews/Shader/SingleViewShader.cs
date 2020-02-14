@@ -114,7 +114,7 @@ struct PixelIn {{
 }};
 
 #if {builder.Is3DInt}
-float3 getCoord(float2 coord){{
+float3 getCoord(float2 coord, out float2 ddxystep){{
     float res[3];
     uint size[3];
     tex.GetDimensions(size[0], size[1], size[2]);
@@ -122,17 +122,66 @@ float3 getCoord(float2 coord){{
     res[yaxis] = coord.y;
     // convert zvalue to float
     res[3 - xaxis - yaxis] = (zvalue + 0.5f) / size[3 - xaxis - yaxis];
+    ddxystep.x = 1.0 / size[xaxis];
+    ddxystep.y = 1.0 / size[yaxis];
     return float3(res[0], res[1], res[2]);
 }}
 #define TexcoordT float3
 #else
-float2 getCoord(float2 coord) {{ return coord; }}
+float2 getCoord(float2 coord, out float2 ddxystep) {{ 
+    uint size[2];
+    tex.GetDimensions(size[0], size[1]);
+    ddxystep.x = 1.0 / size[0];
+    ddxystep.y = 1.0 / size[1];
+    return coord; 
+}}
 #define TexcoordT float2
 #endif
 
+
+#define N_SAMPLES 16
+/*static const float2 samplePoints[N_SAMPLES] = {{
+    float2(-3.0/8.0,  1.0/8.0),
+    float2(-1.0/8.0, -3.0/8.0),
+    float2( 1.0/8.0,  3.0/8.0),
+    float2( 3.0/8.0, -1.0/8.0)
+}};*/
+
+static const float2 samplePoints[N_SAMPLES] = {{
+    float2( 1.0/16.0,  1.0/16.0),
+    float2(-1.0/16.0, -3.0/16.0),
+    float2(-3.0/16.0,  2.0/16.0),
+    float2( 4.0/16.0, -1.0/16.0),
+    float2(-5.0/16.0, -2.0/16.0),
+    float2( 2.0/16.0,  5.0/16.0),
+    float2( 5.0/16.0,  3.0/16.0),
+    float2( 3.0/16.0, -5.0/16.0),
+    float2(-2.0/16.0,  6.0/16.0),
+    float2( 0.0/16.0, -7.0/16.0),
+    float2(-4.0/16.0, -6.0/16.0),
+    float2(-6.0/16.0,  4.0/16.0),
+    float2(-8.0/16.0,  0.0/16.0),
+    float2( 7.0/16.0, -4.0/16.0),
+    float2( 6.0/16.0,  7.0/16.0),
+    float2(-7.0/16.0, -8.0/16.0)
+}};
+
 float4 main(PixelIn i) : SV_TARGET {{
-    TexcoordT texcoord = getCoord(i.texcoord);
-    float4 color = tex.Sample(texSampler, texcoord);
+    float2 maxdxy;
+    TexcoordT texcoord = getCoord(i.texcoord, maxdxy);
+    
+    TexcoordT dx = ddx(texcoord);
+    TexcoordT dy = ddy(texcoord);
+    float4 color = 0.0;
+
+    if(length(dx) > maxdxy.x || length(dy) > maxdxy.y) {{
+        // use supersampling for minification
+        [unroll] for(uint si = 0; si < N_SAMPLES; ++si)
+            color += tex.Sample(texSampler, texcoord + samplePoints[si].x * dx + samplePoints[si].y * dy);
+        color /= N_SAMPLES;
+    }} else color = tex.Sample(texSampler, texcoord);
+
+
     {ApplyColorTransform()}
     {(builder.Is3D ? ApplyOverlay3D("texcoord", "color"):ApplyOverlay2D("texcoord", "color"))}
     return toSrgb(color);
