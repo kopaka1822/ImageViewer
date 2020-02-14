@@ -65,6 +65,7 @@ namespace ImageViewer.Models.Display
                 if (value == activeView) return;
                 // active view must be in available views
                 Debug.Assert(availableViews.Contains(value));
+                bool updateVisibleLayerMipmap = value.IsMultiLayerView() != activeView.IsMultiLayerView();
                 activeView = value;
                 extendedView?.Dispose();
                 if (activeView == ViewMode.Single && models.Images.ImageType == typeof(Texture3D))
@@ -81,6 +82,8 @@ namespace ImageViewer.Models.Display
                 }
                 OnPropertyChanged(nameof(ActiveView));
                 OnPropertyChanged(nameof(ExtendedViewData));
+                if(updateVisibleLayerMipmap)
+                    OnPropertyChanged(nameof(VisibleLayerMipmap));
             }
         }
 
@@ -263,6 +266,8 @@ namespace ImageViewer.Models.Display
                 if (value == activeLayer) return;
                 activeLayer = value;
                 OnPropertyChanged(nameof(ActiveLayer));
+                if(!activeView.IsMultiLayerView())
+                    OnPropertyChanged(nameof(VisibleLayerMipmap));
             }
         }
 
@@ -276,11 +281,15 @@ namespace ImageViewer.Models.Display
                 if (value == activeMipmap) return;
                 activeMipmap = value;
                 OnPropertyChanged(nameof(ActiveMipmap));
+                OnPropertyChanged(nameof(VisibleLayerMipmap));
             }
         }
 
         // only active layer and active mipmap will appear in OnPropertyChanged
         public LayerMipmapSlice ActiveLayerMipmap => new LayerMipmapSlice(ActiveLayer, ActiveMipmap);
+
+        // can contain all layers if the view shows multiple layers at once (cube map view)
+        public LayerMipmapRange VisibleLayerMipmap => new LayerMipmapRange(activeView.IsMultiLayerView() ? -1 : ActiveLayer, ActiveMipmap);
 
         private bool linearInterpolation = false;
         public bool LinearInterpolation
@@ -481,6 +490,18 @@ namespace ImageViewer.Models.Display
                     return false;
                 default:
                     return true;
+            }
+        }
+
+        public static bool IsMultiLayerView(this DisplayModel.ViewMode vm)
+        {
+            switch (vm)
+            {
+                case DisplayModel.ViewMode.CubeCrossView:
+                case DisplayModel.ViewMode.CubeMap:
+                    return true;
+                default:
+                    return false;
             }
         }
     }

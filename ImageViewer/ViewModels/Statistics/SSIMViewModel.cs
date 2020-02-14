@@ -26,7 +26,18 @@ namespace ImageViewer.ViewModels.Statistics
         {
             this.parent = parent;
             this.models = models;
+            this.models.Display.PropertyChanged += DisplayOnPropertyChanged;
             this.id = id;
+        }
+
+        private void DisplayOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(DisplayModel.VisibleLayerMipmap):
+                    OnImagesChanged();
+                    break;
+            }
         }
 
         private int id;
@@ -112,24 +123,6 @@ namespace ImageViewer.ViewModels.Statistics
             return null;
         }
 
-        // TODO put this into display?
-        public LayerMipmapRange StatisticRange
-        {
-            get
-            {
-                if (models.Display.ActiveView == DisplayModel.ViewMode.CubeCrossView ||
-                    models.Display.ActiveView == DisplayModel.ViewMode.CubeMap)
-                {
-                    // compute for all layers
-                    return new LayerMipmapRange(-1, models.Display.ActiveMipmap);
-                }
-                else // compute for single layer
-                {
-                    return new LayerMipmapSlice(models.Display.ActiveLayer, models.Display.ActiveMipmap);
-                }
-            }
-        }
-
         private void OnImagesChanged()
         {
             if (!IsValidImage(image1) || !IsValidImage(image2))
@@ -146,7 +139,7 @@ namespace ImageViewer.ViewModels.Statistics
             Debug.Assert(i1 != null);
             Debug.Assert(i2 != null);
 
-            var stats = models.SSIM.GetStats(i1, i2, StatisticRange);
+            var stats = models.SSIM.GetStats(i1, i2, models.Display.VisibleLayerMipmap);
 
             Luminance = stats.Luminance.ToString(ImageFramework.Model.Models.Culture);
             Structure = stats.Structure.ToString(ImageFramework.Model.Models.Culture);

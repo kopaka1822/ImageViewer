@@ -33,15 +33,7 @@ namespace ImageViewer.Models
         {
             switch (e.PropertyName)
             {
-                case nameof(DisplayModel.ActiveLayer):
-                    if (display.ActiveView == DisplayModel.ViewMode.CubeCrossView ||
-                        display.ActiveView == DisplayModel.ViewMode.CubeMap)
-                        return; // does not need to be recomputed
-
-                    UpdateStatistics();
-                    break;
-                case nameof(DisplayModel.ActiveMipmap):
-                case nameof(DisplayModel.ActiveView):
+                case nameof(DisplayModel.VisibleLayerMipmap):
                     UpdateStatistics();
                     break;
             }
@@ -57,28 +49,11 @@ namespace ImageViewer.Models
             }
         }
 
-        public LayerMipmapRange StatisticRange
-        {
-            get
-            {
-                if (display.ActiveView == DisplayModel.ViewMode.CubeCrossView ||
-                    display.ActiveView == DisplayModel.ViewMode.CubeMap)
-                {
-                    // compute for all layers
-                    return new LayerMipmapRange(-1, display.ActiveMipmap);
-                }
-                else // compute for single layer
-                {
-                    return new LayerMipmapSlice(display.ActiveLayer, display.ActiveMipmap);
-                }
-            }
-        }
-
         private void UpdateStatistics()
         {
             if (pipe.Image != null)
             {
-                Stats = models.Stats.GetStatisticsFor(pipe.Image, StatisticRange);
+                Stats = models.Stats.GetStatisticsFor(pipe.Image, display.VisibleLayerMipmap);
                 
                 OnPropertyChanged(nameof(Stats));
             }
