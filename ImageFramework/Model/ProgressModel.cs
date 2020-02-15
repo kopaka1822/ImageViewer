@@ -128,6 +128,8 @@ namespace ImageFramework.Model
             if(currentTask != null)
                 WaitForTask();
 
+            Debug.Assert(cts != null);
+            Debug.Assert(t != null);
             currentTask = t;
             currentTaskCancellation = cts;
             LastError = "";

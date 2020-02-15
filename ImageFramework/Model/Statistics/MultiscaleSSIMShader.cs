@@ -55,7 +55,7 @@ namespace ImageFramework.Model.Statistics
             public int Layer;
             public Size3 Size;
             public float InvWeightSum;
-            public float NumMipmaps;
+            public int NumMipmaps;
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace ImageFramework.Model.Statistics
             dev.Compute.SetConstantBuffer(0, upload.Handle);
             dev.Compute.SetSampler(0, sampler);
 
-            dev.Compute.SetUnorderedAccessView(0, tex.GetUaView(0));
+            dev.Compute.SetUnorderedAccessView(0, tex.GetUaView(lm.Mipmap));
             dev.Compute.SetShaderResource(0, tex.GetSrView(lm.AddMipmap(Math.Min(4, nMipmaps - 1))));
             
             dev.Dispatch(
@@ -167,10 +167,10 @@ cbuffer InputBuffer : register(b0) {{
 void main(int3 id : SV_DispatchThreadID)
 {{
     if(any(id >= size)) return;
-    float color = 1.0;
+
     // keep sign of upper layer (important for structure)
     float sign = primary_layer[texel(id, layer)] < 0 ? -1.0f : 1.0f;
-    color *= pow(abs(primary_layer[texel(id, layer)]), 0.0448 * invWeightSum);
+    float color = pow(abs(primary_layer[texel(id, layer)]), 0.0448 * invWeightSum);
     float3 tId = (id + 0.5) / size;
     
     color *= pow(abs(other_layer[0].SampleLevel(texSampler, texel(tId), 0)), 0.2856 * invWeightSum);
