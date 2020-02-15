@@ -174,10 +174,13 @@ float4 main(PixelIn i) : SV_TARGET {{
     TexcoordT dy = ddy(texcoord);
     float4 color = 0.0;
 
-    if(length(dx) > maxdxy.x || length(dy) > maxdxy.y) {{
+    if(length(dx) > maxdxy.x * 1.01 || length(dy) > maxdxy.y * 1.01) {{
         // use supersampling for minification
-        [unroll] for(uint si = 0; si < N_SAMPLES; ++si)
-            color += tex.Sample(texSampler, texcoord + samplePoints[si].x * dx + samplePoints[si].y * dy);
+        [unroll] for(uint si = 0; si < N_SAMPLES; ++si){{
+            float4 c = tex.Sample(texSampler, texcoord + samplePoints[si].x * dx + samplePoints[si].y * dy);
+            if(useAbs) c = abs(c);
+            color += c;
+        }}
         color /= N_SAMPLES;
     }} else color = tex.Sample(texSampler, texcoord);
 
