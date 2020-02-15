@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Remoting.Channels;
@@ -11,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using ImageFramework.Annotations;
 using ImageFramework.Model;
+using ImageFramework.Model.Statistics;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 
@@ -74,6 +76,12 @@ namespace ImageViewer.ViewModels.Statistics
                 case nameof(ImagesModel.ImageOrder):
                 case nameof(ImagesModel.ImageAlias):
                 case nameof(ImagesModel.NumImages):
+                    if (models.Images.PrevNumImages == 0 && UseMultiscale)
+                    {
+                        // mipmaps are required
+                        GenMipmapsForMultiscale();
+                    }
+
                     RefreshImageSources();
                     break;
             }
@@ -122,6 +130,53 @@ namespace ImageViewer.ViewModels.Statistics
                 vms.UpdateImageSources();
             }
             OnPropertyChanged(nameof(ImageSources));
+        }
+
+        private bool useMultiscale = false;
+
+        public bool UseMultiscale
+        {
+            get => useMultiscale;
+            set
+            {
+                if(value == useMultiscale) return;
+                useMultiscale = value;
+                // mipmaps need to be generated in order to use multiscale
+                if(value) GenMipmapsForMultiscale();
+                OnPropertyChanged(nameof(UseMultiscale));
+                OnSettingsChanged();
+            }
+        }
+
+        private void GenMipmapsForMultiscale()
+        {
+            Debug.Assert(UseMultiscale);
+
+            // put all pipelines to gen mipmaps afterwards (for correct ms-ssim generation)
+            foreach (var pipe in models.Pipelines)
+            {
+                pipe.RecomputeMipmaps = true;
+            }
+
+            // mipmaps are required for multiscale
+            if (models.Images.NumMipmaps == 1)
+            {
+                models.Images.GenerateMipmaps(models.Scaling);
+            }
+                
+        }
+
+        public SSIMModel.Settings Settings => new SSIMModel.Settings
+        {
+            Multiscale = UseMultiscale
+        };
+
+        private void OnSettingsChanged()
+        {
+            foreach (var vm in Items)
+            {
+                vm.OnSettingsChanged();
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

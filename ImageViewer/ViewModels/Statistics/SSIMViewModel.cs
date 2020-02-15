@@ -139,7 +139,7 @@ namespace ImageViewer.ViewModels.Statistics
             Debug.Assert(i1 != null);
             Debug.Assert(i2 != null);
 
-            var stats = models.SSIM.GetStats(i1, i2, models.Display.VisibleLayerMipmap);
+            var stats = models.SSIM.GetStats(i1, i2, models.Display.VisibleLayerMipmap, parent.Settings);
 
             Luminance = stats.Luminance.ToString(ImageFramework.Model.Models.Culture);
             Structure = stats.Structure.ToString(ImageFramework.Model.Models.Culture);
@@ -183,7 +183,7 @@ namespace ImageViewer.ViewModels.Statistics
             var i1 = GetImage(image1);
             var i2 = GetImage(image2);
             var tex = models.Images.CreateEmptyTexture(Format.R32G32B32A32_Float, true);
-            models.SSIM.GetLuminanceTexture(i1, i2, tex);
+            models.SSIM.GetLuminanceTexture(i1, i2, tex, parent.Settings);
             models.Images.AddImage(tex, "__importedLuminance", GliFormat.RGBA32_SFLOAT);
         }
 
@@ -193,7 +193,7 @@ namespace ImageViewer.ViewModels.Statistics
             var i1 = GetImage(image1);
             var i2 = GetImage(image2);
             var tex = models.Images.CreateEmptyTexture(Format.R32G32B32A32_Float, true);
-            models.SSIM.GetContrastTexture(i1, i2, tex);
+            models.SSIM.GetContrastTexture(i1, i2, tex, parent.Settings);
             models.Images.AddImage(tex, "__importedLuminance", GliFormat.RGBA32_SFLOAT);
         }
 
@@ -203,7 +203,7 @@ namespace ImageViewer.ViewModels.Statistics
             var i1 = GetImage(image1);
             var i2 = GetImage(image2);
             var tex = models.Images.CreateEmptyTexture(Format.R32G32B32A32_Float, true);
-            models.SSIM.GetStructureTexture(i1, i2, tex);
+            models.SSIM.GetStructureTexture(i1, i2, tex, parent.Settings);
             models.Images.AddImage(tex, "__importedLuminance", GliFormat.RGBA32_SFLOAT);
         }
 
@@ -213,7 +213,7 @@ namespace ImageViewer.ViewModels.Statistics
             var i1 = GetImage(image1);
             var i2 = GetImage(image2);
             var tex = models.Images.CreateEmptyTexture(Format.R32G32B32A32_Float, true);
-            models.SSIM.GetSSIMTexture(i1, i2, tex);
+            models.SSIM.GetSSIMTexture(i1, i2, tex, parent.Settings);
             models.Images.AddImage(tex, "__importedLuminance", GliFormat.RGBA32_SFLOAT);
         }
 
@@ -231,6 +231,12 @@ namespace ImageViewer.ViewModels.Statistics
             bool recompute = (image1.IsEquation && image1.Id == pipeId) || (image2.IsEquation && image2.Id == pipeId);
             if (!recompute) return;
 
+            OnImagesChanged();
+        }
+
+        public void OnSettingsChanged()
+        {
+            if (image1 == null || image2 == null) return;
             OnImagesChanged();
         }
     }

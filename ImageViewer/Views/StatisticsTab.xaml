@@ -39,16 +39,40 @@
                         DataContext="{Binding Statistics.Equation4}"/>
                 </StackPanel>
 
-                <ItemsControl
-                    ItemsSource="{Binding Statistics.SSIM.Items}"
+                <StackPanel
                     Visibility="{Binding Statistics.ShowSSIM, Converter={StaticResource VisibleCollapsedConverter}}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <statistics:SSIMView/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Text="Multi-Scale: "
+                            Margin="{StaticResource DefaultBorderBotRight}"
+                            ToolTip="SSIM values from different mipmaps will be used to determine the final SSIM index"/>
+                        
+                        <CheckBox
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            IsChecked="{Binding Statistics.SSIM.UseMultiscale}"
+                            Margin="{StaticResource DefaultBorderBottom}"
+                            VerticalAlignment="Center"/>
+                    </Grid>
+                    <ItemsControl
+                        ItemsSource="{Binding Statistics.SSIM.Items}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <statistics:SSIMView/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                </StackPanel>
+                
                 <TextBlock 
                     Margin="0 4 0 0"
                     TextWrapping="Wrap" 

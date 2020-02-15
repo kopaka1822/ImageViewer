@@ -81,6 +81,11 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             redToRgbaTransform.CompileShaders();
         }
 
+        public class Settings
+        {
+            public bool Multiscale { get; set; } = false;
+        }
+
         public SSIMModel(Models models)
         {
             this.models = models;
@@ -90,7 +95,7 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
         /// <summary>
         /// renders the ssim luminance into a texture
         /// </summary>
-        public void GetLuminanceTexture(ITexture image1, ITexture image2, ITexture dst)
+        public void GetLuminanceTexture(ITexture image1, ITexture image2, ITexture dst, Settings s)
         {
             Debug.Assert(image1.HasSameDimensions(image2));
             Debug.Assert(image1.HasSameDimensions(dst));
@@ -109,10 +114,13 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             cache.StoreTexture(lumTex);
         }
 
+        public void GetLuminanceTexture(ITexture image1, ITexture image2, ITexture dst)
+         => GetLuminanceTexture(image1, image2, dst, new Settings());
+
         /// <summary>
         /// renders the ssim contrast into a texture
         /// </summary>
-        public void GetContrastTexture(ITexture image1, ITexture image2, ITexture dst)
+        public void GetContrastTexture(ITexture image1, ITexture image2, ITexture dst, Settings s)
         {
             Debug.Assert(image1.HasSameDimensions(image2));
             Debug.Assert(image1.HasSameDimensions(dst));
@@ -131,10 +139,13 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             cache.StoreTexture(contTex);
         }
 
+        public void GetContrastTexture(ITexture image1, ITexture image2, ITexture dst)
+        => GetContrastTexture(image1, image2, dst, new Settings());
+
         /// <summary>
         /// renders the ssim structure into a texture
         /// </summary>
-        public void GetStructureTexture(ITexture image1, ITexture image2, ITexture dst)
+        public void GetStructureTexture(ITexture image1, ITexture image2, ITexture dst, Settings s)
         {
             Debug.Assert(image1.HasSameDimensions(image2));
             Debug.Assert(image1.HasSameDimensions(dst));
@@ -153,7 +164,10 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             cache.StoreTexture(structTex);
         }
 
-        public void GetSSIMTexture(ITexture image1, ITexture image2, ITexture dst)
+        public void GetStructureTexture(ITexture image1, ITexture image2, ITexture dst)
+            => GetStructureTexture(image1, image2, dst, new Settings());
+
+        public void GetSSIMTexture(ITexture image1, ITexture image2, ITexture dst, Settings s)
         {
             Debug.Assert(image1.HasSameDimensions(image2));
             Debug.Assert(image1.HasSameDimensions(dst));
@@ -182,6 +196,9 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             cache.StoreTexture(ssimTex);
         }
 
+        public void GetSSIMTexture(ITexture image1, ITexture image2, ITexture dst)
+        => GetSSIMTexture(image1, image2, dst, new Settings());
+
         public class Stats
         {
             public float Luminance;
@@ -191,7 +208,7 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             public float DSSIM => (1.0f - SSIM) / 2.0f;
         }
 
-        public Stats GetStats(ITexture image1, ITexture image2, LayerMipmapRange lmRange)
+        public Stats GetStats(ITexture image1, ITexture image2, LayerMipmapRange lmRange, Settings s)
         {
             Debug.Assert(image1.HasSameDimensions(image2));
             Debug.Assert(lmRange.IsSingleMipmap);
@@ -233,6 +250,9 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
 
             return stats;
         }
+
+        public Stats GetStats(ITexture image1, ITexture image2, LayerMipmapRange lmRange)
+            => GetStats(image1, image2, lmRange, new Settings());
 
         private float GetAveragedValue(ITexture tex, LayerMipmapRange lm)
         {

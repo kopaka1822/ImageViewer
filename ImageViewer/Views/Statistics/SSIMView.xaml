@@ -157,7 +157,18 @@
                 Grid.Row="3"
                 Text="SSIM: "
                 Margin="{StaticResource DefaultBorderBotRight}"
-                VerticalAlignment="Center"/>
+                VerticalAlignment="Center"
+                Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.UseMultiscale, Converter={StaticResource CollapsedVisibleConverter}}"/>
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="3"
+                Text="MS-SSIM: "
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"
+                ToolTip="Multi-Scale SSIM"
+                Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.UseMultiscale, Converter={StaticResource VisibleCollapsedConverter}, FallbackValue=Collapsed}"/>
+
 
             <views:StatisticTextBox 
                 Text="{Binding SSIM}"
