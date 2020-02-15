@@ -4,11 +4,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FrameworkTests.Model.Shader;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
+using ImageFramework.Model.Statistics;
 using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SharpDX.DXGI;
 
 namespace FrameworkTests.Model
 {
@@ -179,6 +182,49 @@ namespace FrameworkTests.Model
 
             stats = models.SSIM.GetStats(sphere, sphereBlur, LayerMipmapRange.MostDetailed);
             Assert.AreEqual(0.320421f, stats.SSIM, 0.01f);
+        }
+
+        [TestMethod]
+        public void SSIMMultiscaleCompile()
+        {
+            var s = new MultiscaleSSIMShader();
+            s.CompileShaders();
+        }
+
+        [TestMethod]
+        public void SSIMMultiscaleLuminance()
+        {
+            var s = new MultiscaleSSIMShader();
+            var toRed = new ImageFramework.Model.Shader.TransformShader("return value.r;", "float4", "float");
+            var fromRed = new ImageFramework.Model.Shader.TransformShader("return float4(value, value, value, 1.0);", "float", "float4");
+            var tex = IO.LoadImageTexture(TestData.Directory + "checkers.dds");
+            var redTex = new TextureArray2D(tex.LayerMipmap, tex.Size, Format.R32_Float, true);
+            var dstTex = new TextureArray2D(tex.LayerMipmap, tex.Size, Format.R32G32B32A32_Float, true);
+            var upload = new UploadBuffer(256);
+
+            Assert.AreEqual(tex.NumMipmaps, 3);
+            var expected = tex.GetPixelColors(LayerMipmapSlice.Mip2)[0];
+
+            // copy checkers red channel only
+            foreach (var lm in tex.LayerMipmap.Range)
+            {
+                toRed.Run(tex, redTex, lm, upload);
+            }
+
+            // this should copy lowest resolution mipmap to first mipmap
+            s.RunCopy(redTex, LayerMipmapSlice.Mip0, upload);
+
+            // copy back
+            foreach (var lm in tex.LayerMipmap.Range)
+            {
+                fromRed.Run(redTex, dstTex, lm, upload);
+            }
+
+            var actual = dstTex.GetPixelColors(LayerMipmapSlice.Mip0);
+            foreach (var color in actual)
+            {
+                Assert.IsTrue(color.Equals(expected, Color.Channel.R, 0.001f));
+            }
         }
     }
 }

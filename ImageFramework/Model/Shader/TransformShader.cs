@@ -12,7 +12,7 @@ namespace ImageFramework.Model.Shader
     /// <summary>
     /// transforms all values from an image
     /// </summary>
-    class TransformShader : IDisposable
+    internal class TransformShader : IDisposable
     {
         private DirectX.Shader shader;
         private DirectX.Shader shader3D;

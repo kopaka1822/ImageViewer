@@ -52,5 +52,10 @@ namespace ImageFramework.Utility
         public static readonly LayerMipmapSlice Layer3 = new LayerMipmapSlice(3, 0);
         public static readonly LayerMipmapSlice Layer4 = new LayerMipmapSlice(4, 0);
         public static readonly LayerMipmapSlice Layer5 = new LayerMipmapSlice(5, 0);
+
+        public LayerMipmapSlice AddMipmap(int i)
+        {
+            return new LayerMipmapSlice(Layer, Mipmap + i);
+        }
     }
 }

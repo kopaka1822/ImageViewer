@@ -92,8 +92,9 @@ namespace ImageFramework.Utility
         public static readonly LayerMipmapRange All = new LayerMipmapRange(-1, -1);
         public static readonly LayerMipmapRange MostDetailed = new LayerMipmapRange(-1, 0);
 
-       
-
-        
+        public LayerMipmapRange OffsetMipmap(int i)
+        {
+            return new LayerMipmapRange(Layer, SingleMipmap + i);
+        }
     }
 }

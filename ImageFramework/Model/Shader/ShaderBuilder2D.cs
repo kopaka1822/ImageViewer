@@ -35,6 +35,7 @@ namespace ImageFramework.Model.Shader
         public string TexelHelperFunctions => @"
 int2 texel(int3 coord) {{ return coord.xy; }}
 int3 texel(int3 coord, int layer) {{ return uint3(coord.xy, layer); }}
+float2 texel(float3 coord) {{ return coord.xy; }}
 ";
 
         public string Double => Device.Get().SupportsDouble ? "double" : "float";

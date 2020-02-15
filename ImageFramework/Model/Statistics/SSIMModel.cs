@@ -67,6 +67,7 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
 ", "float", "float");
 
         private TransformShader redToRgbaTransform = new TransformShader("return float4(value, value, value, 1.0);", "float", "float4");
+        private MultiscaleSSIMShader multiscale = new MultiscaleSSIMShader();
 
         internal void CompileShaders()
         {
@@ -108,6 +109,13 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
                 {
                     RenderImagesCorrelation(image1, image2, data, lm);
                     RenderLuminance(data, lumTex, lm);
+                    if(!s.Multiscale)
+                        RenderRedToRgba(lumTex, dst, lm);
+                }
+
+                if (s.Multiscale) foreach (var lm in image1.LayerMipmap.Range)
+                {
+                    RenderLuminanceMultiscale(lumTex, lm);
                     RenderRedToRgba(lumTex, dst, lm);
                 }
             }
@@ -133,6 +141,14 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
                 {
                     RenderImagesCorrelation(image1, image2, data, lm);
                     RenderContrast(data, contTex, lm);
+
+                    if(!s.Multiscale)
+                        RenderRedToRgba(contTex, dst, lm);
+                }
+
+                if (s.Multiscale) foreach (var lm in image1.LayerMipmap.Range)
+                {
+                    RenderContrastStructureMultiscale(contTex, lm);
                     RenderRedToRgba(contTex, dst, lm);
                 }
             }
@@ -158,6 +174,13 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
                 {
                     RenderImagesCorrelation(image1, image2, data, lm);
                     RenderStructure(data, structTex, lm);
+                    if(!s.Multiscale)
+                        RenderRedToRgba(structTex, dst, lm);
+                }
+
+                if (s.Multiscale) foreach (var lm in image1.LayerMipmap.Range)
+                {
+                    RenderContrastStructureMultiscale(structTex, lm);
                     RenderRedToRgba(structTex, dst, lm);
                 }
             }
@@ -185,6 +208,19 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
                     RenderLuminance(data, lumTex, lm);
                     RenderContrast(data, contTex, lm);
                     RenderStructure(data, strucTex, lm);
+                    if (!s.Multiscale)
+                    {
+                        RenderSSIM(lumTex, contTex, strucTex, ssimTex, lm);
+                        RenderRedToRgba(ssimTex, dst, lm);
+                    }
+                }
+
+                if (s.Multiscale) foreach (var lm in image1.LayerMipmap.Range)
+                {
+                    // update scales
+                    RenderLuminanceMultiscale(lumTex, lm);
+                    RenderContrastStructureMultiscale(contTex, lm);
+                    RenderContrastStructureMultiscale(strucTex, lm);
                     RenderSSIM(lumTex, contTex, strucTex, ssimTex, lm);
                     RenderRedToRgba(ssimTex, dst, lm);
                 }
@@ -220,18 +256,51 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             var ssimTex = cache.GetTexture();
             using (var data = new ImagesCorrelationStats(cache))
             {
-                foreach (var lm in image1.LayerMipmap.RangeOf(lmRange))
+                if (!s.Multiscale)
                 {
-                    // determine expected value, variance, correlation
-                    RenderImagesCorrelation(image1, image2, data, lm);
+                    foreach (var lm in image1.LayerMipmap.RangeOf(lmRange))
+                    {
+                        // determine expected value, variance, correlation
+                        RenderImagesCorrelation(image1, image2, data, lm);
 
-                    // calc the three components
-                    RenderLuminance(data, lumTex, lm);
-                    RenderContrast(data, contTex, lm);
-                    RenderStructure(data, strucTex, lm);
+                        // calc the three components
+                        RenderLuminance(data, lumTex, lm);
+                        RenderContrast(data, contTex, lm);
+                        RenderStructure(data, strucTex, lm);
 
-                    // build ssim
-                    RenderSSIM(lumTex, strucTex, contTex, ssimTex, lm);
+                        // build ssim
+                        RenderSSIM(lumTex, strucTex, contTex, ssimTex, lm);
+                    }
+                }
+                else // multiscale
+                {
+                    int endMipmap = Math.Min(lmRange.Mipmap + 5, image1.NumMipmaps);
+                    for (int curMip = lmRange.Mipmap; curMip < endMipmap; ++curMip)
+                    {
+                        foreach (var lm in image1.LayerMipmap.RangeOf(new LayerMipmapRange(lmRange.Layer, curMip)))
+                        {
+                            // determine expected value, variance, correlation
+                            RenderImagesCorrelation(image1, image2, data, lm);
+
+                            // calc components
+                            if(curMip == endMipmap - 1) // luminance only for last mipmap
+                                RenderLuminance(data, lumTex, lm);
+                            RenderContrast(data, contTex, lm);
+                            RenderStructure(data, strucTex, lm);
+                        }
+                    }
+
+                    // combine values of different scales to compute ssim
+                    foreach (var lm in image1.LayerMipmap.RangeOf(lmRange))
+                    {
+                        // determine appropriate scale scores
+                        RenderLuminanceMultiscale(lumTex, lm);
+                        RenderContrastStructureMultiscale(contTex, lm);
+                        RenderContrastStructureMultiscale(strucTex, lm);
+
+                        // build ssim
+                        RenderSSIM(lumTex, strucTex, contTex, ssimTex, lm);
+                    }
                 }
             }
 
@@ -279,6 +348,11 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             }, dst, lm, models.SharedModel.Upload);
         }
 
+        private void RenderLuminanceMultiscale(ITexture texture, LayerMipmapSlice lm)
+        {
+            multiscale.RunCopy(texture, lm, models.SharedModel.Upload);
+        }
+
         private void RenderContrast(ImagesCorrelationStats src, ITexture dst, LayerMipmapSlice lm)
         {
             contrastShader.Run(new []
@@ -288,6 +362,10 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             }, dst, lm, models.SharedModel.Upload);
         }
 
+        private void RenderContrastStructureMultiscale(ITexture texture, LayerMipmapSlice lm)
+        {
+            multiscale.RunWeighted(texture, lm, models.SharedModel.Upload);
+        }
         private void RenderStructure(ImagesCorrelationStats src, ITexture dst, LayerMipmapSlice lm)
         {
             structureShader.Run(new []
