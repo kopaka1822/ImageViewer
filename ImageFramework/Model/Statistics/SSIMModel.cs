@@ -52,8 +52,8 @@ return (2.0 * u1 * u2 + C1) / (u1 * u1 + u2 * u2 + C1);
             "in_v1", "in_v2" // variance
         }, @"
 float C2 = 0.0009; // assume dynamic range (L) of 1 => C2 = (K2*L) = (0.03 * 1)^2
-float v1 = in_v1[coord];
-float v2 = in_v2[coord];
+float v1 = max(in_v1[coord], 0.0);
+float v2 = max(in_v2[coord], 0.0);
 return (2.0 * sqrt(v1) * sqrt(v2) + C2) / (v1 + v2 + C2);
 ", "float", "float");
 
@@ -63,9 +63,11 @@ return (2.0 * sqrt(v1) * sqrt(v2) + C2) / (v1 + v2 + C2);
         }, @"
 float C3 = 0.0009 * 0.5; // C3 = 0.5 * C2
 float v12 = in_v12[coord];
-//return (v12 + C3) / (sqrt(in_v1[coord])*sqrt(in_v2[coord]) + C3);
+float v1 = max(in_v1[coord], 0.0);
+float v2 = max(in_v2[coord], 0.0);
+//return (v12 + C3) / (sqrt(v1)*sqrt(v2) + C3);
 // v12 can be negative => it is better to offset with the same sign
-return (v12 + (v12 < 0 ? -1 : 1) * C3) / (sqrt(in_v1[coord])*sqrt(in_v2[coord]) + C3);
+return (v12 + (v12 < 0 ? -1 : 1) * C3) / (sqrt(v1)*sqrt(v2) + C3);
 ", "float", "float");
         
         private TransformShader ssimShader = new TransformShader(new []
