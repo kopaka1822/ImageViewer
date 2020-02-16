@@ -77,6 +77,22 @@ return (v12 + (v12 < 0 ? -1 : 1) * C3) / (sqrt(v1)*sqrt(v2) + C3);
 return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
 ", "float", "float");
 
+        private TransformShader ssimShader2 = new TransformShader(new []
+        {
+            "in_u1", "in_u2", "in_v1", "in_v2", "in_v12"
+        }, @"
+float C1 = 0.0001;
+float C2 = 0.0009;
+float u1 = in_u1[coord];
+float u2 = in_u2[coord];
+float v12 = in_v12[coord];
+float v1 = max(in_v1[coord], 0.0);
+float v2 = max(in_v2[coord], 0.0);
+//return (2*u1*u2+C1) * (2*v12+C2) / ((u1*u1+u2*u2+C1) * (v1 + v2 + C2));
+float C2Sign = v12 < 0 ? -1 : 1;
+return (2*u1*u2+C1) * (2*v12+C2Sign*C2) / ((u1*u1+u2*u2+C1) * (v1 + v2 + C2));
+", "float", "float");
+
         private TransformShader redToRgbaTransform = new TransformShader("return float4(value, value, value, 1.0);", "float", "float4");
         private MultiscaleSSIMShader multiscale = new MultiscaleSSIMShader();
 
@@ -91,13 +107,14 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             structureShader.CompileShaders();
             ssimShader.CompileShaders();
             redToRgbaTransform.CompileShaders();
+            ssimShader2.CompileShaders();
         }
 
         public class Settings
         {
             public bool Multiscale { get; set; } = false;
             // excludes ssim values near the image borders (5 pixels)
-            public bool ExcludeBorders { get; set; } = false;
+            public bool ExcludeBorders { get; set; } = true;
         }
 
         public SSIMModel(Models models)
@@ -282,6 +299,7 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
                         RenderStructure(data, strucTex, lm);
 
                         // build ssim
+                        //RenderSSIM(data, ssimTex, lm);
                         RenderSSIM(lumTex, strucTex, contTex, ssimTex, lm);
                     }
                 }
@@ -397,6 +415,11 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             Debug.Assert(luminance.HasSameDimensions(dst));
 
             ssimShader.Run(new[] { luminance, contrast, structure }, dst, lm, models.SharedModel.Upload);
+        }
+
+        private void RenderSSIM(ImagesCorrelationStats src, ITexture dst, LayerMipmapSlice lm)
+        {
+            ssimShader2.Run(new []{src.Image1.Expected, src.Image2.Expected, src.Image1.Variance, src.Image2.Variance, src.Correlation}, dst, lm, models.SharedModel.Upload);
         }
 
         private void RenderRedToRgba(ITexture src, ITexture dst, LayerMipmapSlice lm)
