@@ -163,7 +163,7 @@ namespace FrameworkTests.Model
 
             var stats = models.SSIM.GetStats(sphere1, sphere2, LayerMipmapRange.MostDetailed, new SSIMModel.Settings
             {
-                NoBorders = false
+                ExcludeBorders = false
             });
             Assert.AreEqual(1.0f, stats.Luminance, 0.01f);
             Assert.AreEqual(1.0f, stats.Structure, 0.01f);
@@ -182,7 +182,7 @@ namespace FrameworkTests.Model
 
             var settings = new SSIMModel.Settings
             {
-                NoBorders = false
+                ExcludeBorders = false
             };
 
             var stats = models.SSIM.GetStats(sphere, sphereMedian, LayerMipmapRange.MostDetailed, settings);
