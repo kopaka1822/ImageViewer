@@ -22,10 +22,19 @@ namespace ImageFramework.Model.Statistics
         private TransformShader lumaTransformShader = new TransformShader(TransformShader.TransformLuma, "float4", "float");
         // gauss blur as described in the paper: 11x11 window, 1.5 standard deviation
         private GaussShader gaussShader = new GaussShader(5, 1.5f * 1.5f, "float");
-        private VarianceShader varianceShader = new VarianceShader(5, 1.5f * 1.5f);
-        private CorrelationCoefficientShader cocoefShader = new CorrelationCoefficientShader(5, 1.5f * 1.5f);
-
+       
         private StatisticsShader copyToBufferShader;
+
+        private TransformShader multiplyShader = new TransformShader(new string[]
+        {
+            "in_v1", "in_v2"
+        }, "return in_v1[coord] * in_v2[coord];", "float", "float");
+
+        private TransformShader subtractProductShader = new TransformShader(new string[]
+        {
+            "in_left", "in_right1", "in_right2"
+        }, "return in_left[coord] - in_right1[coord] * in_right2[coord];", "float", "float");
+
 
         private TransformShader luminanceShader = new TransformShader(new []
         {
@@ -73,8 +82,8 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
         {
             lumaTransformShader.CompileShaders();
             gaussShader.CompileShaders();
-            varianceShader.CompileShaders();
-            cocoefShader.CompileShaders();
+            multiplyShader.CompileShaders();
+            subtractProductShader.CompileShaders();
             luminanceShader.CompileShaders();
             contrastShader.CompileShaders();
             structureShader.CompileShaders();
@@ -399,8 +408,19 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             lumaTransformShader.Run(src, dst.Luma, lm, models.SharedModel.Upload);
             // expected value
             gaussShader.Run(dst.Luma, dst.Expected, lm, models.SharedModel.Upload, dst.Cache);
-            // variance
-            varianceShader.Run(dst.Luma, dst.Expected, dst.Variance, lm, models.SharedModel.Upload);
+
+            // calculate luma squared
+            var lumaSq = dst.Cache.GetTexture();
+            multiplyShader.Run(new []{dst.Luma, dst.Luma}, lumaSq, lm, models.SharedModel.Upload);
+            // blur luma squared
+            var lumaBlur = dst.Cache.GetTexture();
+            gaussShader.Run(lumaSq, lumaBlur, lm, models.SharedModel.Upload, dst.Cache);
+            
+            // calc variance with: blurred(luma^2) - mu^2
+            subtractProductShader.Run(new []{lumaBlur, dst.Expected, dst.Expected}, dst.Variance, lm, models.SharedModel.Upload);
+
+            dst.Cache.StoreTexture(lumaSq);
+            dst.Cache.StoreTexture(lumaBlur);
         }
 
         private void RenderImagesCorrelation(ITexture src1, ITexture src2, ImagesCorrelationStats dst,
@@ -410,7 +430,17 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
             RenderImageVariance(src1, dst.Image1, lm);
             RenderImageVariance(src2, dst.Image2, lm);
             // calc correlation coefficient
-            cocoefShader.Run(dst.Image1.Luma, dst.Image2.Luma, dst.Image1.Expected, dst.Image2.Expected, dst.Correlation, lm, models.SharedModel.Upload);
+            var lumaMult = dst.Cache.GetTexture();
+            multiplyShader.Run(new []{dst.Image1.Luma, dst.Image2.Luma}, lumaMult, lm, models.SharedModel.Upload);
+            // blur result
+            var lumaBlur = dst.Cache.GetTexture();
+            gaussShader.Run(lumaMult, lumaBlur, lm, models.SharedModel.Upload, dst.Cache);
+
+            // calc correlation with blurred(luma1*luma2) - mu1*mu2
+            subtractProductShader.Run(new []{lumaBlur, dst.Image1.Expected, dst.Image2.Expected}, dst.Correlation, lm, models.SharedModel.Upload);
+
+            dst.Cache.StoreTexture(lumaMult);
+            dst.Cache.StoreTexture(lumaBlur);
         }
 
         private ITextureCache GetCache(ITexture src)

@@ -84,20 +84,6 @@ namespace FrameworkTests.Model.Shader
 
         // not directly gauss shader but uses gauss weights as well:
 
-        [TestMethod]
-        public void VarianceCompile()
-        {
-            var s = new VarianceShader(5, 2.25f);
-            s.CompileShaders();
-        }
-
-        [TestMethod]
-        public void CorrelationCoefficientCompile()
-        {
-            var s = new CorrelationCoefficientShader(5, 2.25f);
-            s.CompileShaders();
-        }
-
         // test shader with a gauss kernel => should have same result as seperatable shader
         class NonSepGaussShader : NonSepKernelShader
         {

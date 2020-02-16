@@ -13,11 +13,11 @@ namespace ImageFramework.Model.Statistics
     /// </summary>
     internal class ImagesCorrelationStats : IDisposable
     {
-        private readonly ITextureCache cache;
+        public ITextureCache Cache { get; }
 
         public ImagesCorrelationStats(ITextureCache cache)
         {
-            this.cache = cache;
+            this.Cache = cache;
             Image1 = new ImageVarianceStats(cache);
             Image2 = new ImageVarianceStats(cache);
             Correlation = cache.GetTexture();
@@ -31,7 +31,7 @@ namespace ImageFramework.Model.Statistics
         {
             Image1.Dispose();
             Image2.Dispose();
-            cache.StoreTexture(Correlation);
+            Cache.StoreTexture(Correlation);
         }
     }
 }

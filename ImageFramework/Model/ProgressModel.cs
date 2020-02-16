@@ -172,9 +172,14 @@ namespace ImageFramework.Model
         private void OnTaskFinished(Task prevTask)
         {
             currentTask = null;
-            LastTaskCancelledByUser = currentTaskCancellation.IsCancellationRequested;
-            currentTaskCancellation.Dispose();
-            currentTaskCancellation = null;
+            LastTaskCancelledByUser = false;
+            if (currentTaskCancellation != null)
+            {
+                LastTaskCancelledByUser = currentTaskCancellation.IsCancellationRequested;
+                currentTaskCancellation.Dispose();
+                currentTaskCancellation = null;
+            }
+                
             OnPropertyChanged(nameof(IsProcessing));
 
             // don't set error if cancellation was requested by the user

@@ -169,14 +169,12 @@
     <Compile Include="Model\Shader\StatisticsShader.cs" />
     <Compile Include="Model\Shader\TransformShader.cs" />
     <Compile Include="Model\SharedModel.cs" />
-    <Compile Include="Model\Statistics\CorrelationCoefficientShader.cs" />
     <Compile Include="Model\Statistics\DefaultStatistics.cs" />
     <Compile Include="Model\Statistics\ImagesCorrelationStats.cs" />
     <Compile Include="Model\Statistics\ImageVarianceStats.cs" />
     <Compile Include="Model\Statistics\MultiscaleSSIMShader.cs" />
     <Compile Include="Model\Statistics\SSIMModel.cs" />
     <Compile Include="Model\Statistics\StatisticsModel.cs" />
-    <Compile Include="Model\Statistics\VarianceShader.cs" />
     <Compile Include="Model\ThumbnailModel.cs" />
     <Compile Include="Utility\Bool3.cs" />
     <Compile Include="Utility\Float2.cs" />
