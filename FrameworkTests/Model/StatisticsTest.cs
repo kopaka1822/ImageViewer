@@ -161,7 +161,10 @@ namespace FrameworkTests.Model
             var sphere1 = IO.LoadImageTexture(TestData.Directory + "sphere.png");
             var sphere2 = IO.LoadImageTexture(TestData.Directory + "sphere.png");
 
-            var stats = models.SSIM.GetStats(sphere1, sphere2, LayerMipmapRange.MostDetailed);
+            var stats = models.SSIM.GetStats(sphere1, sphere2, LayerMipmapRange.MostDetailed, new SSIMModel.Settings
+            {
+                NoBorders = false
+            });
             Assert.AreEqual(1.0f, stats.Luminance, 0.01f);
             Assert.AreEqual(1.0f, stats.Structure, 0.01f);
             Assert.AreEqual(1.0f, stats.Contrast, 0.01f);
@@ -177,10 +180,15 @@ namespace FrameworkTests.Model
             var sphereMedian = IO.LoadImageTexture(TestData.Directory + "sphere_median.png");
             var sphereBlur = IO.LoadImageTexture(TestData.Directory + "sphere_blur.png");
 
-            var stats = models.SSIM.GetStats(sphere, sphereMedian, LayerMipmapRange.MostDetailed);
+            var settings = new SSIMModel.Settings
+            {
+                NoBorders = false
+            };
+
+            var stats = models.SSIM.GetStats(sphere, sphereMedian, LayerMipmapRange.MostDetailed, settings);
             Assert.AreEqual(0.9912f, stats.SSIM, 0.01f);
 
-            stats = models.SSIM.GetStats(sphere, sphereBlur, LayerMipmapRange.MostDetailed);
+            stats = models.SSIM.GetStats(sphere, sphereBlur, LayerMipmapRange.MostDetailed, settings);
             Assert.AreEqual(0.320421f, stats.SSIM, 0.01f);
         }
 

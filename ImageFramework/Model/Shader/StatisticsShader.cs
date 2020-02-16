@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.Utility;
+using SharpDX.Mathematics.Interop;
 
 namespace ImageFramework.Model.Shader
 {
@@ -45,10 +46,17 @@ return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
             shader3d = new DirectX.Shader(DirectX.Shader.Type.Compute, GetSource(ShaderBuilder.Builder3D), "StatisticsShader");
         }
 
+        internal void CopyToBuffer(ITexture source, GpuBuffer buffer, LayerMipmapRange lm)
+        => CopyToBuffer(source, buffer, lm, Size3.Zero);
+
         /// <summary>
         /// puts statistic data of all pixels into the buffer
         /// </summary>
-        internal void CopyToBuffer(ITexture source, GpuBuffer buffer, LayerMipmapRange lm)
+        /// <param name="lm">range with single mipmap</param>
+        /// <param name="offset">offset in each direction</param>
+        /// <param name="source"></param>
+        /// <param name="buffer"></param>
+        internal void CopyToBuffer(ITexture source, GpuBuffer buffer, LayerMipmapRange lm, Size3 offset)
         {
             Debug.Assert(lm.IsSingleMipmap);
 
@@ -58,11 +66,15 @@ return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
             else dev.Compute.Set(shader.Compute);
 
             var dim = source.Size.GetMip(lm.Mipmap);
+            AdjustDim(ref dim, ref offset, source.Is3D);
+
             var numLayers = source.LayerMipmap.Layers;
-            var curData = new StatisticsData
+            var curData = new BufferData
             {
                 Level = lm.Mipmap,
-                TrueBool = true
+                TrueBool = true,
+                Offset = offset,
+                Size = dim
             };
 
             if (lm.AllLayer)
@@ -92,6 +104,40 @@ return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
             dev.Compute.SetShaderResource(0, null);
         }
 
+        private void AdjustDim(ref Size3 dim, ref Size3 offset, bool is3D)
+        {
+            var fullDim = dim;
+
+            dim.X = Math.Max(dim.X - 2 * offset.X, 1);
+            if (dim.X == 1) offset.X = fullDim.X / 2;
+
+            dim.Y = Math.Max(dim.Y - 2 * offset.Y, 1);
+            if (dim.Y == 1) offset.Y = fullDim.Y / 2;
+
+            if (is3D) dim.Z = Math.Max(dim.Z - 2 * offset.Z, 1);
+            if (dim.Z == 1) offset.Z = fullDim.Z / 2;
+        }
+
+        /// <summary>
+        /// calculates the number of buffer elements required with the current configuation
+        /// </summary>
+        public int GetRequiredElementCount(ITexture tex, LayerMipmapRange lm, Size3 offset)
+        {
+            var dim = tex.Size.GetMip(lm.SingleMipmap);
+            AdjustDim(ref dim, ref offset, tex.Is3D);
+            var res = dim.Product;
+            if (lm.AllLayer) res *= tex.NumLayers;
+            return res;
+        }
+
+        private struct BufferData
+        {
+            public Size3 Offset;
+            public int Level;
+            public Size3 Size;
+            public RawBool TrueBool;
+        }
+
         private string GetSource(IShaderBuilder builder)
         {
             return $@"
@@ -99,7 +145,9 @@ return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
 RWStructuredBuffer<float> dst_buffer : register(u0);
 
 cbuffer InputBuffer : register(b0) {{
+    uint3 offset;
     uint level;
+    uint3 size;
     bool trueBool;
 }};
 
@@ -136,14 +184,12 @@ float getPixel(int3 pos) {{
 [numthreads({LocalSizeX}, {LocalSizeY}, 1)]
 void main(ComputeIn i){{
     uint3 pos = i.global.xyz;
-    uint width, height, depth, numLevels;
-    src_image.GetDimensions(level, width, height, depth, numLevels);
 
-    if(pos.x >= width || pos.y >= height) return;
+    if(pos.x >= size.x || pos.y >= size.y) return;
     
-    float value = getPixel(pos);
+    float value = getPixel(pos + offset);
     
-    dst_buffer[pos.z * width * height  + pos.y * width + pos.x] = value;
+    dst_buffer[pos.z * size.x * size.y  + pos.y * size.x + pos.x] = value;
 }}
 ";
         }

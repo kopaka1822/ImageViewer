@@ -94,6 +94,8 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
         public class Settings
         {
             public bool Multiscale { get; set; } = false;
+            // excludes ssim values near the image borders (5 pixels)
+            public bool ExcludeBorders { get; set; } = false;
         }
 
         public SSIMModel(Models models)
@@ -315,10 +317,10 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
 
             var stats = new Stats
             {
-                Luminance = GetAveragedValue(lumTex, lmRange),
-                Contrast = GetAveragedValue(contTex, lmRange),
-                Structure = GetAveragedValue(strucTex, lmRange),
-                SSIM = GetAveragedValue(ssimTex, lmRange)
+                Luminance = GetAveragedValue(lumTex, lmRange, s.ExcludeBorders),
+                Contrast = GetAveragedValue(contTex, lmRange, s.ExcludeBorders),
+                Structure = GetAveragedValue(strucTex, lmRange, s.ExcludeBorders),
+                SSIM = GetAveragedValue(ssimTex, lmRange, s.ExcludeBorders)
             };
 
             cache.StoreTexture(lumTex);
@@ -332,17 +334,18 @@ return in_luminance[coord] * in_structure[coord] * in_contrast[coord];
         public Stats GetStats(ITexture image1, ITexture image2, LayerMipmapRange lmRange)
             => GetStats(image1, image2, lmRange, new Settings());
 
-        private float GetAveragedValue(ITexture tex, LayerMipmapRange lm)
+        private float GetAveragedValue(ITexture tex, LayerMipmapRange lm, bool noBorders)
         {
+            var offset = noBorders ? new Size3(5) : Size3.Zero; // don't get values from blur borders
+
             // obtain gpu buffer that is big enough to hold all elements
-            var numElements = tex.Size.GetMip(lm.SingleMipmap).Product;
-            if (lm.AllLayer) numElements *= tex.NumLayers;
+            var numElements = copyToBufferShader.GetRequiredElementCount(tex, lm, offset);
 
             var buffer = models.Stats.GetBuffer(numElements);
             var reduce = models.Stats.AvgReduce;
 
             // copy values into buffer for scan
-            copyToBufferShader.CopyToBuffer(tex, buffer, lm);
+            copyToBufferShader.CopyToBuffer(tex, buffer, lm, offset);
             reduce.Run(buffer, numElements);
             models.SharedModel.Download.CopyFrom(buffer, sizeof(float));
             return models.SharedModel.Download.GetData<float>() / numElements;
