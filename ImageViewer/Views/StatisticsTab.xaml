@@ -42,7 +42,8 @@
                 <StackPanel
                     Visibility="{Binding Statistics.ShowSSIM, Converter={StaticResource VisibleCollapsedConverter}}">
                     
-                    <Grid>
+                    <!-- this will be disabled until im satisfied with the implementation-->
+                    <!--<Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
@@ -61,7 +62,7 @@
                             IsChecked="{Binding Statistics.SSIM.UseMultiscale}"
                             Margin="{StaticResource DefaultBorderBottom}"
                             VerticalAlignment="Center"/>
-                    </Grid>
+                    </Grid>-->
                     <ItemsControl
                         ItemsSource="{Binding Statistics.SSIM.Items}">
                         <ItemsControl.ItemTemplate>
