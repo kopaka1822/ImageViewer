@@ -10,7 +10,7 @@ An image viewer for anyone related to computer graphics.
 - Maximilian Bason
 
 ### Icons
-- App Icon made by https://www.flaticon.com/authors/smashicons Smashicons from https://www.flaticon.com/
+- App Icon made by [Smashicons](https://www.flaticon.com/authors/smashicons) from https://www.flaticon.com/
 - Other Icons were taken from the Visual Studio Image Library
 
 ### Libraries

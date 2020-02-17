@@ -6,6 +6,7 @@ An image viewer for anyone related to computer graphics.
 * [arithmetic image manipulation](equation.md) (image calculator)
 * [image statistics](statistics.md) (MSE, SSIM and more)
 * [layer, mipmap](#Images-with-multiple-mipmaps-and-faces) and [360° views](#Lat-Long-Polar-Images)
+* [lat-long cubemap conversion](#Lat-Long-Cubemap-Conversion)
 * [mipmap generation](mipmaps.md) (including box filter and lanczos)
 * [customisable filter](#Custom-HLSL-Compute-Shader-Filter) in HLSL
 * computations are done in linear color space
@@ -45,10 +46,6 @@ The status bar displays the current texture coordinates (cursor) along with the 
 Select a specific mipmap level and layer (face) of DDS and KTX textures and view cubemaps in projection or crossview:
 
 ![](img/cube_level.jpg)
-
-[Generate mipmaps](mipmaps.md) with the following techniques:
-
-![](img/mip_compare.png)
 
 ### Lat-Long Polar Images
 
