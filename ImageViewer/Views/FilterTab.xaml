@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImageViewer.Views" 
-             xmlns:dd="urn:gong-wpf-dragdrop"
+             xmlns:dd="urn:gong-wpf-dragdrop" 
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              Background="{StaticResource BackgroundBrush}"
              d:DesignHeight="450" d:DesignWidth="250">
@@ -17,6 +18,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock 
                         Text="Filter:" 
@@ -38,6 +40,20 @@
                                 Grid.Column="1" 
                                 Text="Add Filter"/>
                         </Grid>
+                    </Button>
+
+                    <Button 
+                        Grid.Column="2"
+                        Margin="0"
+                        Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.HelpCommand}"
+                        HorizontalAlignment="Right"
+                        IsEnabled="{Binding IsVisible}">
+                        <Button.CommandParameter>
+                            <system:String>help/filter_manual.md</system:String>
+                        </Button.CommandParameter>
+                        <Image 
+                            Width="16" Height="16" 
+                            Source="../Icons/help.png"/>
                     </Button>
                 </Grid>
 

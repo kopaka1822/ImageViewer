@@ -181,4 +181,9 @@
       <Filter>Docs\img</Filter>
     </CopyFileToFolders>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Docs\statistics.md">
+      <Filter>Docs</Filter>
+    </None>
+  </ItemGroup>
 </Project>

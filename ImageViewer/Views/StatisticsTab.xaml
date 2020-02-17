@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImageViewer.Views"
              xmlns:statistics="clr-namespace:ImageViewer.Views.Statistics"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              Background="{StaticResource BackgroundBrush}"
              d:DesignHeight="800" d:DesignWidth="250">
@@ -14,11 +15,35 @@
                 <TextBlock
                     Text="Component"
                     Margin="{StaticResource SmallBorderBottom}"/>
-                <ComboBox
-                    Margin="{StaticResource DefaultBorderBottom}"
-                    ItemsSource="{Binding Statistics.AvailableChannels}"
-                    SelectedItem="{Binding Statistics.SelectedChannel}"
-                    ItemTemplate="{StaticResource ListItemView}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ComboBox
+                        Margin="{StaticResource DefaultBorderBotRight}"
+                        ItemsSource="{Binding Statistics.AvailableChannels}"
+                        SelectedItem="{Binding Statistics.SelectedChannel}"
+                        ItemTemplate="{StaticResource ListItemView}"
+                        VerticalAlignment="Center"/>
+                    
+                    <Button 
+                        Grid.Column="1"
+                        Margin="{StaticResource DefaultBorderBottom}"
+                        Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.HelpCommand}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        IsEnabled="{Binding IsVisible}">
+                        <Button.CommandParameter>
+                            <system:String>help/statistics.md</system:String>
+                        </Button.CommandParameter>
+                        <Image 
+                            Width="16" Height="16" 
+                            Source="../Icons/help.png"/>
+                    </Button>
+                </Grid>
+                
                 <TextBlock 
                     Text="Double click box to copy content to clipboard"
                     Margin="{StaticResource DefaultBorderBottom}"

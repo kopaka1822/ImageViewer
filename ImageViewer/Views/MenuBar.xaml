@@ -340,6 +340,14 @@
                     <system:String>help/mipmaps.md</system:String>
                 </MenuItem.CommandParameter>
             </MenuItem>
+            <Separator/>
+            <MenuItem
+                Header="Statistics"
+                Command="{Binding HelpCommand}">
+                <MenuItem.CommandParameter>
+                    <system:String>help/statistics.md</system:String>
+                </MenuItem.CommandParameter>
+            </MenuItem>
         </MenuItem>
     </Menu>
 </UserControl>
