@@ -192,6 +192,41 @@ namespace FrameworkTests.Model
             Assert.AreEqual(0.320421f, stats.SSIM, 0.01f);
         }
 
+
+        [TestMethod]
+        public void SSIMEinsteinTest()
+        {
+            var models = new Models(1);
+            var einstein = IO.LoadImageTexture(TestData.Directory + "einstein/ref.jpg");
+            var einstein0662 = IO.LoadImageTexture(TestData.Directory + "einstein/ssim0662.jpg");
+            var einstein0694 = IO.LoadImageTexture(TestData.Directory + "einstein/ssim0694.jpg");
+            var einstein0840 = IO.LoadImageTexture(TestData.Directory + "einstein/ssim0840.jpg");
+            var einstein0913 = IO.LoadImageTexture(TestData.Directory + "einstein/ssim0913.jpg");
+            var einstein0988 = IO.LoadImageTexture(TestData.Directory + "einstein/ssim0988.jpg");
+
+            var settings = new SSIMModel.Settings
+            {
+                ExcludeBorders = true
+            };
+
+            // reference values are taken from the authors matlab implementation
+
+            var stats = models.SSIM.GetStats(einstein, einstein0662, LayerMipmapRange.MostDetailed, settings);
+            Assert.AreEqual(0.71071f, stats.SSIM, 0.01f);
+
+            stats = models.SSIM.GetStats(einstein, einstein0694, LayerMipmapRange.MostDetailed, settings);
+            Assert.AreEqual(0.73680f, stats.SSIM, 0.01f);
+
+            stats = models.SSIM.GetStats(einstein, einstein0840, LayerMipmapRange.MostDetailed, settings);
+            Assert.AreEqual(0.86391f, stats.SSIM, 0.01f);
+
+            stats = models.SSIM.GetStats(einstein, einstein0913, LayerMipmapRange.MostDetailed, settings);
+            Assert.AreEqual(0.88293f, stats.SSIM, 0.01f);
+
+            stats = models.SSIM.GetStats(einstein, einstein0988, LayerMipmapRange.MostDetailed, settings);
+            Assert.AreEqual(0.98780f, stats.SSIM, 0.01f);
+        }
+
         [TestMethod]
         public void SSIMMultiscaleCompile()
         {
@@ -231,7 +266,7 @@ namespace FrameworkTests.Model
             var actual = dstTex.GetPixelColors(LayerMipmapSlice.Mip0);
             foreach (var color in actual)
             {
-                Assert.IsTrue(color.Equals(expected, Color.Channel.R, 0.001f));
+                Assert.IsTrue(color.Equals(expected, Color.Channel.R, 0.0011f));
             }
         }
     }

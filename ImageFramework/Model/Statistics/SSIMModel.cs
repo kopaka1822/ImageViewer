@@ -65,9 +65,9 @@ float C3 = 0.0009 * 0.5; // C3 = 0.5 * C2
 float v12 = in_v12[coord];
 float v1 = max(in_v1[coord], 0.0);
 float v2 = max(in_v2[coord], 0.0);
-//return (v12 + C3) / (sqrt(v1)*sqrt(v2) + C3);
-// v12 can be negative => it is better to offset with the same sign
-return (v12 + (v12 < 0 ? -1 : 1) * C3) / (sqrt(v1)*sqrt(v2) + C3);
+return (v12 + C3) / (sqrt(v1)*sqrt(v2) + C3);
+//v12 can be negative => it is better to offset with the same sign
+//return (v12 + (v12 < 0 ? -1 : 1) * C3) / (sqrt(v1)*sqrt(v2) + C3);
 ", "float", "float");
         
         private TransformShader ssimShader = new TransformShader(new []
@@ -88,9 +88,9 @@ float u2 = in_u2[coord];
 float v12 = in_v12[coord];
 float v1 = max(in_v1[coord], 0.0);
 float v2 = max(in_v2[coord], 0.0);
-//return (2*u1*u2+C1) * (2*v12+C2) / ((u1*u1+u2*u2+C1) * (v1 + v2 + C2));
-float C2Sign = v12 < 0 ? -1 : 1;
-return (2*u1*u2+C1) * (2*v12+C2Sign*C2) / ((u1*u1+u2*u2+C1) * (v1 + v2 + C2));
+return (2*u1*u2+C1) * (2*v12+C2) / ((u1*u1+u2*u2+C1) * (v1 + v2 + C2));
+//float C2Sign = v12 < 0 ? -1 : 1;
+//return (2*u1*u2+C1) * (2*v12+C2Sign*C2) / ((u1*u1+u2*u2+C1) * (v1 + v2 + C2));
 ", "float", "float");
 
         private TransformShader redToRgbaTransform = new TransformShader("return float4(value, value, value, 1.0);", "float", "float4");
