@@ -24,6 +24,7 @@ Most of the popular error metrics can be computed by using an appropriate image 
 |MSE         |`(I1-I0)^2`     |*Average*|Mean Squared Error|
 |RMSE        |`(I1-I0)^2`     |*Root Average*|Root MSE|
 |RMSRE       |`(I1/I0-1)^2`   |*Root Average*|Root Mean Squared Relative Error|
+|RMSRE (alt.)|`(2*(I1 - I0)/(I1 + I0))^2`|*Root Average*|Alternative version of RMSRE|
 
 Rule of thumb:
 
