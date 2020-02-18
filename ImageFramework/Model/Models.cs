@@ -80,6 +80,11 @@ namespace ImageFramework.Model
         private ConvertPolarShader PolarConvertShader =>
             polarConvertShader ?? (polarConvertShader = new ConvertPolarShader(SharedModel.QuadShader));
 
+        private ConvertTo3DShader convertTo3DShader = null;
+
+        private ConvertTo3DShader ConvertTo3DShader =>
+            convertTo3DShader ?? (convertTo3DShader = new ConvertTo3DShader(SharedModel.QuadShader));
+
         private ScalingModel scaling = null;
         public ScalingModel Scaling => scaling ?? (scaling = new ScalingModel(this));
 
@@ -219,6 +224,11 @@ namespace ImageFramework.Model
             return PolarConvertShader.ConvertToLatLong(cube, resolution);
         }
 
+        public Texture3D ConvertTo3D(TextureArray2D texArray)
+        {
+            return ConvertTo3DShader.ConvertTo3D(texArray);
+        }
+
         /// <summary>
         /// exports a pipeline image with the given format and extension.
         /// Apply will be called by this method if required
@@ -324,6 +334,7 @@ namespace ImageFramework.Model
             Images?.Dispose();
             Filter?.Dispose();
             polarConvertShader?.Dispose();
+            convertTo3DShader?.Dispose();
             foreach (var imagePipeline in pipelines)
             {
                 imagePipeline.Dispose();

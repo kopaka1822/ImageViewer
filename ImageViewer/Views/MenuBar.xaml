@@ -300,7 +300,28 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
-
+            <MenuItem
+                Header="TextureArray to Texture3D"
+                Command="{Binding ArrayTo3DCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/cube.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <!--<MenuItem
+                Header="Texture3D to TextureArray"
+                Command="{Binding CubemapToLatLongCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/image_layer.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>-->
         </MenuItem>
         <!--END TOOLS-->
 

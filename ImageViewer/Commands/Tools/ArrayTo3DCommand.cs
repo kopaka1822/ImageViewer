@@ -1,18 +1,21 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
-using ImageViewer.ViewModels.Dialog;
-using ImageViewer.Views.Dialog;
 
 namespace ImageViewer.Commands.Tools
 {
-    public class CubemapToLatLongCommand : Command
+    public class ArrayTo3DCommand : Command
     {
         private readonly ModelsEx models;
 
-        public CubemapToLatLongCommand(ModelsEx models)
+        public ArrayTo3DCommand(ModelsEx models)
         {
             this.models = models;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
@@ -23,7 +26,6 @@ namespace ImageViewer.Commands.Tools
             switch (e.PropertyName)
             {
                 case nameof(ImagesModel.NumLayers):
-                case nameof(ImagesModel.ImageType):
                     OnCanExecuteChanged();
                     break;
             }
@@ -31,7 +33,7 @@ namespace ImageViewer.Commands.Tools
 
         public override bool CanExecute()
         {
-            return models.Images.NumLayers == 6 && models.Images.ImageType == typeof(TextureArray2D);
+            return models.Images.NumLayers > 1;
         }
 
         public override void Execute()
@@ -51,18 +53,10 @@ namespace ImageViewer.Commands.Tools
             var texName = firstImage.Filename;
             var origFormat = firstImage.OriginalFormat;
 
-            var vm = new ResolutionViewModel(2);
-            var dia = new ResolutionDialog
-            {
-                DataContext = vm
-            };
-            if (models.Window.ShowDialog(dia) != true) return;
-
-            var tex = models.ConvertToLatLong((TextureArray2D)srcTex, vm.Width);
+            var tex = models.ConvertTo3D((TextureArray2D) srcTex);
 
             // clear all images
             models.Reset();
-
             models.Images.AddImage(tex, texName, origFormat);
         }
     }

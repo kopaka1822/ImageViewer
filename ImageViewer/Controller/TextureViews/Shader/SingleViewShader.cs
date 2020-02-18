@@ -174,6 +174,9 @@ float4 main(PixelIn i) : SV_TARGET {{
     TexcoordT dy = ddy(texcoord);
     float4 color = 0.0;
 
+#if {builder.Is3DInt}
+    color = tex.Sample(texSampler, texcoord);
+#else
     if(length(dx) > maxdxy.x * 1.01 || length(dy) > maxdxy.y * 1.01) {{
         // use supersampling for minification
         [unroll] for(uint si = 0; si < N_SAMPLES; ++si){{
@@ -183,6 +186,7 @@ float4 main(PixelIn i) : SV_TARGET {{
         }}
         color /= N_SAMPLES;
     }} else color = tex.Sample(texSampler, texcoord);
+#endif
 
 
     {ApplyColorTransform()}

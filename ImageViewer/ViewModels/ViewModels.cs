@@ -82,6 +82,7 @@ namespace ImageViewer.ViewModels
             ImportArrayCommand = new ImportArrayCommand(models);
             LatLongToCubemapCommand = new LatLongToCubemapCommand(models);
             CubemapToLatLongCommand = new CubemapToLatLongCommand(models);
+            ArrayTo3DCommand = new ArrayTo3DCommand(models);
             SelectNaNColorCommand = new SelectNaNColorCommand(models);
 
             ResizeCommand = new ResizeWindowCommand(models);
@@ -172,6 +173,9 @@ namespace ImageViewer.ViewModels
         public ICommand StartZoomboxCommand { get; }
 
         public ICommand RemoveZoomboxCommand { get; }
+
+        public ICommand ArrayTo3DCommand { get; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

@@ -158,5 +158,12 @@ namespace FrameworkTests.Model.Shader
             TestData.TestCheckersLevel1(newTex.GetPixelColors(LayerMipmapSlice.Mip2));
             TestData.TestCheckersLevel2(newTex.GetPixelColors(LayerMipmapSlice.Mip3));
         }
+
+        // not convert format but other conversions
+        [TestMethod]
+        public void ConvertTo3DCompile()
+        {
+            var s = new ConvertTo3DShader(new QuadShader());
+        }
     }
 }
