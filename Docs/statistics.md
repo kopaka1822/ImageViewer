@@ -26,11 +26,28 @@ Most of the popular error metrics can be computed by using an appropriate image 
 |RMSRE       |`(I1/I0-1)^2`   |*Root Average*|Root Mean Squared Relative Error|
 
 Rule of thumb:
+
 * Choose *Luminance* for RGB weighted linear error
 * Choose *Average* if RGB should be weighted equally
-* Choose *SSIM* for percieved error
+* Choose [*SSIM*](#SSIM) for perceived error
+
+### PSNR
+
+Peak signal-to-noise ratio (PSNR) is the ratio between the maximum possible power of a signal and the power of corrupting noise that affects the fidelity of its representation. PSNR is defined as:
+`PSNR = 20*log10(MAX_I0) - 10*log10(MSE)`
+
+Three steps are required to determine the PSNR:
+
+1. set `I0` as equation and copy the *Max* value
+2. set `(I1-I0)^2` as equation and copy the *Average* value
+3. use first value as `MAX_I0` and second value as `MSE`
 
 ## SSIM
 
-The [Structural Similarity (SSIM) index](https://www.cns.nyu.edu/pub/eero/wang03-reprint.pdf) is another method for predicting the percieved difference between two images. SSIM is based on visible structure differences instead of per-pixel absolute differences (like RMSE or MAE). 
-It is computed from the luma grayscale image and ranges from -1 for inverse to 1 for identical images.
+The [Structural Similarity (SSIM) index](https://www.cns.nyu.edu/pub/eero/wang03-reprint.pdf) is another method for predicting the perceived difference between two images. SSIM is based on visible structure differences instead of per-pixel absolute differences (like RMSE or MAE). It is computed with the luma grayscale (sRGB space).
+
+|SSIM|Interpretation|
+|----|--------------|
+|1   |Images are identical|
+|0   |Images have no relation|
+|-1  |Images are inversed|
