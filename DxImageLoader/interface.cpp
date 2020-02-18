@@ -91,6 +91,20 @@ int image_open(const char* filename)
 	}
 	if (!res) return 0;
 
+	if(res->requiresGrayscalePostprocess())
+	{
+		assert(image::isSupported(res->getFormat()));
+		for(uint32_t layer = 0; layer < res->getNumLayers(); ++layer)
+			for(uint32_t mip = 0; mip < res->getNumMipmaps(); ++mip)
+			{
+				uint32_t size;
+				auto data = res->getData(layer, mip, size);
+				if (res->getFormat() == gli::FORMAT_RGBA32_SFLOAT_PACK32)
+					image::copyRedToGreenBlue<4>(data, size);
+				else image::copyRedToGreenBlue<1>(data, size);
+			}
+	}
+
 	int id = s_currentID++;
 	s_resources[id] = move(res);
 

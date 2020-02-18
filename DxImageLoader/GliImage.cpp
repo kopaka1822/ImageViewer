@@ -3,6 +3,8 @@
 #include "compress_interface.h"
 #include "interface.h"
 
+bool is_grayscale(gli::format f);
+
 // mofified copy of gli convert
 template <typename texture_type>
 inline texture_type convert_mod(texture_type const& Texture, gli::format Format)
@@ -19,6 +21,7 @@ inline texture_type convert_mod(texture_type const& Texture, gli::format Format)
 
 	const auto isSrgb = gli::is_srgb(Texture.format());
 	const auto isCompressed = gli::is_compressed(Texture.format());
+
 	assert(!isCompressed); // this should be done by compressonator
 
 	// for some reason the gli loader doesn't revert srgb compression in this case
@@ -63,6 +66,12 @@ inline texture_type convert_mod(texture_type const& Texture, gli::format Format)
 			}
 
 	return texture_type(Copy);
+}
+
+bool GliImageBase::requiresGrayscalePostprocess()
+{
+	// neither compressonator nor gli load grayscale correctly (only red channel filled)
+	return is_grayscale(getOriginalFormat());
 }
 
 GliImage::GliImage(const gli::texture& tex)
@@ -152,4 +161,49 @@ gli::texture& GliImage::initTex(size_t nFaces, gli::extent3d size)
 	}
 	m_type = Planes;
 	return m_array;
+}
+
+bool is_grayscale(gli::format f)
+{
+	switch (f)
+	{
+	case gli::FORMAT_R8_UNORM_PACK8:  
+	case gli::FORMAT_R8_SNORM_PACK8:  
+	case gli::FORMAT_R8_USCALED_PACK8:  
+	case gli::FORMAT_R8_SSCALED_PACK8:  
+	case gli::FORMAT_R8_UINT_PACK8:  
+	case gli::FORMAT_R8_SINT_PACK8:  
+	case gli::FORMAT_R8_SRGB_PACK8:  
+	case gli::FORMAT_R16_UNORM_PACK16:  
+	case gli::FORMAT_R16_SNORM_PACK16:  
+	case gli::FORMAT_R16_USCALED_PACK16:  
+	case gli::FORMAT_R16_SSCALED_PACK16:  
+	case gli::FORMAT_R16_UINT_PACK16:  
+	case gli::FORMAT_R16_SINT_PACK16:  
+	case gli::FORMAT_R16_SFLOAT_PACK16:  
+	case gli::FORMAT_R32_UINT_PACK32:  
+	case gli::FORMAT_R32_SINT_PACK32:  
+	case gli::FORMAT_R32_SFLOAT_PACK32:  
+	case gli::FORMAT_R64_UINT_PACK64:  
+	case gli::FORMAT_R64_SINT_PACK64:  
+	case gli::FORMAT_R64_SFLOAT_PACK64:  
+	case gli::FORMAT_D16_UNORM_PACK16:  
+	case gli::FORMAT_D24_UNORM_PACK32:  
+	case gli::FORMAT_D32_SFLOAT_PACK32:  
+	case gli::FORMAT_S8_UINT_PACK8:  
+	case gli::FORMAT_R_ATI1N_UNORM_BLOCK8:  
+	case gli::FORMAT_R_ATI1N_SNORM_BLOCK8:  
+	case gli::FORMAT_R_EAC_UNORM_BLOCK8:  
+	case gli::FORMAT_R_EAC_SNORM_BLOCK8:  
+	case gli::FORMAT_L8_UNORM_PACK8:  
+	case gli::FORMAT_A8_UNORM_PACK8:
+	case gli::FORMAT_LA8_UNORM_PACK8:  
+	case gli::FORMAT_L16_UNORM_PACK16:  
+	case gli::FORMAT_A16_UNORM_PACK16:  
+	case gli::FORMAT_LA16_UNORM_PACK16:  
+	case gli::FORMAT_AR8_SRGB_PACK8:  
+	case gli::FORMAT_RA16_UNORM_PACK16:  
+		return true;
+	}
+	return false;
 }

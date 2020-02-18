@@ -26,6 +26,11 @@ namespace image
 		// progress helper
 		static size_t calcNumPixels(uint32_t numLayer, uint32_t numLevels, uint32_t width, uint32_t height, uint32_t depth);
 		size_t getNumPixels() const;
+
+		// additional postprocessing
+		
+		// if true indicates that the value of the red channel should be written to green and blue as well
+		virtual bool requiresGrayscalePostprocess() { return false; }
 	};
 
 	// default interface that supplies internal storage for a single layer/mipmap
