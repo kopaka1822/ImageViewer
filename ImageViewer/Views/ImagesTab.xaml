@@ -4,19 +4,22 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImageViewer.Views" 
-             xmlns:dd="urn:gong-wpf-dragdrop"
+             xmlns:dd="urn:gong-wpf-dragdrop" 
+             xmlns:list="clr-namespace:ImageViewer.Views.List"
              mc:Ignorable="d" 
-             d:DesignHeight="450" 
+             Background="{StaticResource BackgroundBrush}"
+             d:DesignHeight="800" 
              d:DesignWidth="300"
              >
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Border Padding="5">
+        <Border Padding="{StaticResource DefaultBorder}">
             <StackPanel IsEnabled="{Binding Progress.NotProcessing}">
                 <!--Image Label + Import Button-->
                 <Grid  Margin="0 0 0 2">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock 
                         Text="Images:" 
@@ -25,6 +28,7 @@
                         Grid.Column="1" 
                         Width="110" 
                         HorizontalAlignment="Right"
+                        Margin="0"
                         Command="{Binding ImportCommand}">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -33,255 +37,75 @@
                             </Grid.ColumnDefinitions>
                             <Image 
                                 Source="../Icons/import.png"
-                                Margin="0 0 5 0"/>
+                                Margin="{StaticResource DefaultBorderRight}"
+                                Width="16"
+                                Height="16"/>
                             <TextBlock 
                                 Grid.Column="1" 
                                 Text="Import Image"/>
                         </Grid>
                     </Button>
+                    <Button 
+                        Grid.Column="2"
+                        Command="{Binding ReloadImagesCommand}"
+                        ToolTip="Reload images from disk.">
+                        <Image 
+                            Source="../Icons/refresh.png"
+                            Width="16"
+                            Height="16"/>
+                    </Button>
                 </Grid>
 
                 <ListBox 
-                    SelectedIndex="0" 
                     ScrollViewer.VerticalScrollBarVisibility="Visible"                       
                     Height="180"
-                    Margin="0 0 0 5"
+                    Margin="{StaticResource DefaultBorderBottom}"
                     ItemsSource="{Binding Images.ImageListItems}"
-                    SelectedItem="{Binding Images.SelectedImageListItem}"
+                    HorizontalContentAlignment="Stretch"
                     dd:DragDrop.IsDragSource="True"
                     dd:DragDrop.IsDropTarget="True"
-                    dd:DragDrop.DropHandler="{Binding Images}"/>
-
+                    dd:DragDrop.DropHandler="{Binding Images}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <list:ImageItemView/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
                 <Button
                     Command="{Binding Equations.Apply}"
                     Content="Apply"
                     Width="80"
                     HorizontalAlignment="Right"
-                    Margin="0 0 0 5"/>
+                    Margin="{StaticResource DefaultBorderBottom}"/>
 
-                <Separator Height="2"/>
+                <Separator Height="{StaticResource SeparatorHeight}"/>
+
+                <Border
+                    x:Name="ExtendedViewHost"
+                    Visibility="{Binding Display.ExtendedViewVisibility}">
+                </Border>
+
+                <Separator Height="2"  Visibility="{Binding Display.ExtendedViewVisibility}"/>
 
                 <!--Split Mode-->
                 <TextBlock 
                     Text="Split Mode:" 
-                    Margin="0 0 0 5"/>
+                    Margin="{StaticResource DefaultBorderBottom}"/>
                 <ComboBox 
-                    Margin="0 0 0 5"
+                    Margin="{StaticResource DefaultBorderBottom}"
                     IsEnabled="{Binding Display.EnableSplitMode}"
                     SelectedItem="{Binding Display.SelectedSplitMode}"
-                    ItemsSource="{Binding Display.AvailableSplitModes}"/>
+                    ItemsSource="{Binding Display.AvailableSplitModes}"
+                    ItemTemplate="{StaticResource ListItemView}"/>
 
-                <!--Equation 1-->
-                <GroupBox 
-                    Header="Equation 1" 
-                    Margin="0 0 0 5">
-                    <StackPanel>
-                        <Grid Margin="0 5 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="70"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Visible: "/>
-                            <CheckBox 
-                                Grid.Column="1"
-                                IsChecked="{Binding Equations.Equation1.IsVisible}"/>
-                        </Grid>
-                        <Grid Margin="0 0 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="70"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Use Filter: "/>
-                            <CheckBox 
-                                Grid.Column="1"
-                                IsChecked="{Binding Equations.Equation1.UseFilter}"
-                                IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
-                        </Grid>
-                        <Grid Margin="0 0 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="RGB: "/>
-                            <local:CustomTextBox 
-                                Grid.Column="1"
-                                Text="{Binding Equations.Equation1.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                Margin="0 0 0 5"
-                                IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
-                        </Grid>
-                        <Grid Margin="0 0 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Alpha: "/>
-                            <local:CustomTextBox 
-                                Grid.Column="1"
-                                Text="{Binding Equations.Equation1.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                Margin="0 0 0 5"
-                                IsEnabled="{Binding Equations.Equation1.IsVisible}"/>
-                        </Grid>
-                    </StackPanel>
-                </GroupBox>
-
-                <!--Equation 2-->
-                <GroupBox 
-                    Header="Equation 2" 
-                    Margin="0 0 0 5">
-                    <StackPanel>
-                        <Grid Margin="0 5 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="70"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Visible: "/>
-                            <CheckBox 
-                                Grid.Column="1"
-                                IsChecked="{Binding Equations.Equation2.IsVisible}"/>
-                        </Grid>
-                        <Grid Margin="0 0 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="70"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Use Filter: "/>
-                            <CheckBox 
-                                Grid.Column="1"
-                                IsChecked="{Binding Equations.Equation2.UseFilter}"
-                                IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
-                        </Grid>
-                        <Grid Margin="0 0 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="RGB: "/>
-                            <local:CustomTextBox 
-                                Grid.Column="1"
-                                Text="{Binding Equations.Equation2.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                Margin="0 0 0 5"
-                                IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
-                        </Grid>
-                        <Grid Margin="0 0 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Alpha: " Height="23" VerticalAlignment="Top"/>
-                            <local:CustomTextBox 
-                                Grid.Column="1"
-                                Text="{Binding Equations.Equation2.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                Margin="0 0 0 5"
-                                IsEnabled="{Binding Equations.Equation2.IsVisible}"/>
-                        </Grid>
-                    </StackPanel>
-                </GroupBox>
-
-                <!--Equation 3-->
-                <GroupBox 
-                    Header="Equation 3" 
-                    Margin="0 0 0 5">
-                    <StackPanel>
-                        <Grid Margin="0 5 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="70"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Visible: "/>
-                            <CheckBox 
-                                Grid.Column="1"
-                                IsChecked="{Binding Equations.Equation3.IsVisible}"/>
-                        </Grid>
-                        <Grid Margin="0 0 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="70"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Use Filter: "/>
-                            <CheckBox 
-                                Grid.Column="1"
-                                IsChecked="{Binding Equations.Equation3.UseFilter}"
-                                IsEnabled="{Binding Equations.Equation3.IsVisible}"/>
-                        </Grid>
-                        <Grid Margin="0 0 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="RGB: "/>
-                            <local:CustomTextBox 
-                                Grid.Column="1"
-                                Text="{Binding Equations.Equation3.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                Margin="0 0 0 5"
-                                IsEnabled="{Binding Equations.Equation3.IsVisible}"/>
-                        </Grid>
-                        <Grid Margin="0 0 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Alpha: " Height="23" VerticalAlignment="Top"/>
-                            <local:CustomTextBox 
-                                Grid.Column="1"
-                                Text="{Binding Equations.Equation3.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                Margin="0 0 0 5"
-                                IsEnabled="{Binding Equations.Equation3.IsVisible}"/>
-                        </Grid>
-                    </StackPanel>
-                </GroupBox>
-
-                <!--Equation 4-->
-                <GroupBox 
-                    Header="Equation 4" 
-                    Margin="0 0 0 5">
-                    <StackPanel>
-                        <Grid Margin="0 5 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="70"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Visible: "/>
-                            <CheckBox 
-                                Grid.Column="1"
-                                IsChecked="{Binding Equations.Equation4.IsVisible}"/>
-                        </Grid>
-                        <Grid Margin="0 0 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="70"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Use Filter: "/>
-                            <CheckBox 
-                                Grid.Column="1"
-                                IsChecked="{Binding Equations.Equation4.UseFilter}"
-                                IsEnabled="{Binding Equations.Equation4.IsVisible}"/>
-                        </Grid>
-                        <Grid Margin="0 0 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="RGB: "/>
-                            <local:CustomTextBox 
-                                Grid.Column="1"
-                                Text="{Binding Equations.Equation4.Color.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                Margin="0 0 0 5"
-                                IsEnabled="{Binding Equations.Equation4.IsVisible}"/>
-                        </Grid>
-                        <Grid Margin="0 0 0 5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Alpha: " Height="23" VerticalAlignment="Top"/>
-                            <local:CustomTextBox 
-                                Grid.Column="1"
-                                Text="{Binding Equations.Equation4.Alpha.Formula, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                                Margin="0 0 0 5"
-                                IsEnabled="{Binding Equations.Equation4.IsVisible}"/>
-                        </Grid>
-                    </StackPanel>
-                </GroupBox>
+                <ItemsControl 
+                    ItemsSource="{Binding Equations.Equations}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <list:ImageEquationView/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </StackPanel>
         </Border>
     </ScrollViewer>

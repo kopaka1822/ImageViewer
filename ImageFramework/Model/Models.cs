@@ -13,11 +13,16 @@ using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
 using ImageFramework.Model.Filter;
+using ImageFramework.Model.Overlay;
+using ImageFramework.Model.Scaling;
 using ImageFramework.Model.Shader;
+using ImageFramework.Model.Statistics;
 using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Device = ImageFramework.DirectX.Device;
+using Feature = SharpDX.DXGI.Feature;
+using Texture3D = ImageFramework.DirectX.Texture3D;
 
 namespace ImageFramework.Model
 {
@@ -26,55 +31,82 @@ namespace ImageFramework.Model
         public static readonly CultureInfo Culture = new CultureInfo("en-US");
 
         public readonly int NumPipelines;
+
+        #region Required Components
+
         public ImagesModel Images { get; }
+
         public FiltersModel Filter { get; }
+
+        private List<ImagePipeline> pipelines = new List<ImagePipeline>();
         public IReadOnlyList<ImagePipeline> Pipelines { get; }
 
         public int NumEnabled => Pipelines.Count(pipe => pipe.IsEnabled);
 
-        public ExportModel Export { get; }
+        private ExportModel export = null;
+        public ExportModel Export => export ?? (export = new ExportModel(this));
 
         // soft reset that clears images, filters and resets formulas
         public event EventHandler SoftReset;
 
-        //public GifModel Gif { get; }
+        private GifModel gif = null;
+        public GifModel Gif => gif ?? (gif = new GifModel(SharedModel.QuadShader, SharedModel.Upload, Progress));
 
         public ProgressModel Progress { get; }
 
-        private ThumbnailModel thumbnail;
-
-        internal TextureCache TextureCache { get; }
-
-        private readonly SharedModel sharedModel;
-
-        private readonly List<ImagePipeline> pipelines = new List<ImagePipeline>();
+        public SharedModel SharedModel { get; }
+        
+        internal ImageModelTextureCache TextureCache { get; }
 
         private readonly PipelineController pipelineController;
 
-        private readonly PixelValueShader pixelValueShader;
+        #endregion
 
-        private readonly ConvertPolarShader polarConvertShader;
+        #region On Demand Properties
 
-        private readonly PreprocessModel preprocess;
+        private ThumbnailModel thumbnail = null;
+        private ThumbnailModel Thumbnail => thumbnail ?? (thumbnail = new ThumbnailModel(SharedModel.QuadShader));
+
+        private PixelValueShader pixelValueShader = null;
+
+        private PixelValueShader PixelValueShader =>
+            pixelValueShader ?? (pixelValueShader = new PixelValueShader(SharedModel));
+
+        private StatisticsModel stats = null;
+        public StatisticsModel Stats => stats ?? (stats = new StatisticsModel(SharedModel));
+
+        private ConvertPolarShader polarConvertShader = null;
+
+        private ConvertPolarShader PolarConvertShader =>
+            polarConvertShader ?? (polarConvertShader = new ConvertPolarShader(SharedModel.QuadShader));
+
+        private ConvertTo3DShader convertTo3DShader = null;
+
+        private ConvertTo3DShader ConvertTo3DShader =>
+            convertTo3DShader ?? (convertTo3DShader = new ConvertTo3DShader(SharedModel.QuadShader));
+
+        private ScalingModel scaling = null;
+        public ScalingModel Scaling => scaling ?? (scaling = new ScalingModel(this));
+
+        private OverlayModel overlay = null;
+        public OverlayModel Overlay => overlay ?? (overlay = new OverlayModel(TextureCache));
+
+        private SSIMModel ssim = null;
+        public SSIMModel SSIM => ssim ?? (ssim = new SSIMModel(this));
+
+        #endregion
 
         public Models(int numPipelines = 1)
         {
             NumPipelines = numPipelines;
-
             CheckDeviceCapabilities();
-            pixelValueShader = new PixelValueShader();
-            sharedModel = new SharedModel();
-            polarConvertShader = new ConvertPolarShader(sharedModel.QuadShader);
 
-            // models
-            Images = new ImagesModel(sharedModel.ScaleShader);
-            Export = new ExportModel(sharedModel);
-            //Gif = new GifModel(sharedModel.QuadShader);
+            SharedModel = new SharedModel();
+            Images = new ImagesModel(SharedModel.ScaleShader);
+            TextureCache = new ImageModelTextureCache(Images);
+
+            Filter = new FiltersModel(Images);
             Progress = new ProgressModel();
-            Filter = new FiltersModel();
-            preprocess = new PreprocessModel();
-            TextureCache = new TextureCache(Images);
-            thumbnail = new ThumbnailModel(sharedModel.QuadShader);
 
             for (int i = 0; i < numPipelines; ++i)
             {
@@ -102,6 +134,8 @@ namespace ImageFramework.Model
             OnSoftReset();
         }
 
+        
+
         private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -120,31 +154,22 @@ namespace ImageFramework.Model
         /// <returns></returns>
         public FilterModel CreateFilter(string filename)
         {
-            var loader = new FilterLoader(filename);
+            var loader = new FilterLoader(filename, Filter.CurrentTarget);
             
             return new FilterModel(loader, NumPipelines);
         }
-
+       
         /// <inheritdoc cref="PixelValueShader.Run"/>
-        public Color GetPixelValue(TextureArray2D image, int x, int y, int layer = 0, int mipmap = 0, int radius = 0)
+        public Color GetPixelValue(ITexture image, Size3 coord, LayerMipmapSlice lm, int radius = 0)
         {
-            return pixelValueShader.Run(image, x, y, layer, mipmap, radius);
+            return PixelValueShader.Run(image, coord, lm, radius);
         }
 
         /// <inheritdoc cref="ThumbnailModel.CreateThumbnail"/>
         /// Image format will be BGRA8 because this is the format expected for windows bitmaps
-        public TextureArray2D CreateThumbnail(int size, TextureArray2D texture, int layer = 0)
+        public TextureArray2D CreateThumbnail(int size, ITexture texture, int layer = 0)
         {
-            return thumbnail.CreateThumbnail(size, texture, Format.B8G8R8A8_UNorm_SRgb, layer);
-        }
-
-        /// <summary>
-        /// gets statistics about from the image
-        /// </summary>
-        /// <returns></returns>
-        public StatisticsModel GetStatistics(TextureArray2D image, int layer = 0, int mipmap = 0)
-        {
-            return preprocess.GetStatistics(image, layer, mipmap, pixelValueShader, TextureCache);
+            return Thumbnail.CreateThumbnail(size, texture, Format.B8G8R8A8_UNorm_SRgb, layer, Scaling);
         }
 
         /// <summary>
@@ -154,19 +179,15 @@ namespace ImageFramework.Model
         /// <exception cref="Exception"></exception>
         public void AddImageFromFile(string filename)
         {
-            using (var image = IO.LoadImage(filename))
+            var tex = IO.LoadImageTexture(filename, out var originalFormat);
+            try
             {
-                var tex = new TextureArray2D(image);
-
-                try
-                {
-                    Images.AddImage(tex, filename, image.OriginalFormat);
-                }
-                catch (Exception)
-                {
-                    tex.Dispose();
-                    throw;
-                }
+                Images.AddImage(tex, filename, originalFormat);
+            }
+            catch (Exception)
+            {
+                tex.Dispose();
+                throw;
             }
         }
 
@@ -179,12 +200,12 @@ namespace ImageFramework.Model
         {
             if (textures.Count == 0) return null;
             var first = textures[0];
-            var tex = new TextureArray2D(textures.Count, first.NumMipmaps, first.Width, first.Height, Format.R32G32B32A32_Float, false);
+            var tex = new TextureArray2D(new LayerMipmapCount(textures.Count, first.NumMipmaps), first.Size, Format.R32G32B32A32_Float, false);
             for(int i = 0; i < textures.Count; ++i)
             {
                 for (int curMip = 0; curMip < first.NumMipmaps; ++curMip)
                 {
-                    sharedModel.Convert.CopyLayer(textures[i], 0, curMip, tex, i, curMip);
+                    SharedModel.Convert.CopyLayer(textures[i], new LayerMipmapSlice(0, curMip), tex, new LayerMipmapSlice(i, curMip));
                 }
             }
 
@@ -194,13 +215,18 @@ namespace ImageFramework.Model
         /// converts lat long to cubemap
         public TextureArray2D ConvertToCubemap(TextureArray2D latLong, int resolution)
         {
-            return polarConvertShader.ConvertToCube(latLong, resolution);
+            return PolarConvertShader.ConvertToCube(latLong, resolution);
         }
 
         /// converts cubemap to lat long
         public TextureArray2D ConvertToLatLong(TextureArray2D cube, int resolution)
         {
-            return polarConvertShader.ConvertToLatLong(cube, resolution);
+            return PolarConvertShader.ConvertToLatLong(cube, resolution);
+        }
+
+        public Texture3D ConvertTo3D(TextureArray2D texArray)
+        {
+            return ConvertTo3DShader.ConvertTo3D(texArray);
         }
 
         /// <summary>
@@ -213,15 +239,16 @@ namespace ImageFramework.Model
         /// <param name="pipelineId"></param>
         public void ExportPipelineImage(string filename, string extension, GliFormat format, int pipelineId = 0)
         {
-            var desc = new ExportDescription(filename, extension, Export) {FileFormat = format};
-            if(!Pipelines[pipelineId].IsValid)
+            if (!Pipelines[pipelineId].IsValid)
                 throw new Exception($"current image formula is invalid. At least " +
                                     $"{Math.Max(Math.Max(Pipelines[pipelineId].Color.MaxImageId, Pipelines[pipelineId].Alpha.MaxImageId), 1)} " +
                                     $"images are required for it to be valid");
 
             // apply changes before exporting
             Apply();
-            Export.Export(Pipelines[pipelineId].Image, desc);
+            var desc = new ExportDescription(Pipelines[pipelineId].Image, filename, extension) { FileFormat = format };
+            
+            Export.Export(desc);
         }
 
         /// <summary>
@@ -230,8 +257,8 @@ namespace ImageFramework.Model
         public List<int> GetEnabledPipelines()
         {
             var res = new List<int>();
-            for(int i = 0; i < Pipelines.Count; ++i)
-                if(Pipelines[i].IsEnabled)
+            for (int i = 0; i < Pipelines.Count; ++i)
+                if (Pipelines[i].IsEnabled)
                     res.Add(i);
 
             return res;
@@ -243,7 +270,7 @@ namespace ImageFramework.Model
         /// </summary>
         public int GetFirstEnabledPipeline()
         {
-            for(int i = 0; i < Pipelines.Count; ++i)
+            for (int i = 0; i < Pipelines.Count; ++i)
                 if (Pipelines[i].IsEnabled)
                     return i;
             throw new Exception("no pipeline enabled");
@@ -254,18 +281,14 @@ namespace ImageFramework.Model
         /// </summary>
         public void Apply()
         {
-            using (var cts = new CancellationTokenSource())
-            {
-                ApplyAsync(cts.Token).Wait();
-            }
+            ApplyAsync();
+            Progress.WaitForTask();
         }
 
-        /// <summary>
-        /// Forces all pending pipeline changes to be computed
-        /// </summary>
-        public async Task ApplyAsync(CancellationToken ct)
+        public void ApplyAsync()
         {
-            await pipelineController.UpdateImagesAsync(ct);
+            var cts = new CancellationTokenSource();
+            Progress.AddTask(pipelineController.UpdateImagesAsync(cts.Token), cts);
         }
 
         /// <summary>
@@ -279,38 +302,45 @@ namespace ImageFramework.Model
             {
                 var sup = dev.CheckFormatSupport(f);
 
+                // TODO this should depend on the type
                 if ((sup & FormatSupport.Texture2D) == 0)
                     throw new Exception($"Texture2D support for {f} is required");
-                // TODO this can be optional
-                if ((sup & FormatSupport.MipAutogen) == 0)
-                    throw new Exception($"MipAutogen support for {f} is required");
+                if((sup & FormatSupport.Texture3D) == 0)
+                    throw new Exception($"Texture3D support for {f} is required");
 
                 if ((sup & FormatSupport.RenderTarget) == 0)
                     throw new Exception($"RenderTarget support for {f} is required");
+                if ((sup & FormatSupport.TextureCube) == 0)
+                    throw new Exception($"TextureCube support for {f} is required");
 
                 if (f == Format.R32G32B32A32_Float)
                 {
-                    if((sup & FormatSupport.TypedUnorderedAccessView) == 0)
-                        throw new Exception($"TypesUnorderedAccess support for {f} is required");
+                    if ((sup & FormatSupport.TypedUnorderedAccessView) == 0)
+                        throw new Exception($"TypedUnorderedAccess support for {f} is required");
                 }
             }
         }
 
         public virtual void Dispose()
         {
-            //Gif?.Dispose();
-            TextureCache?.Dispose();
+            Progress?.Dispose();
+            thumbnail?.Dispose();
+            stats?.Dispose();
+            gif?.Dispose();
+            scaling?.Dispose();
+            overlay?.Dispose();
+            ssim?.Dispose();
+
             Images?.Dispose();
             Filter?.Dispose();
-            preprocess?.Dispose();
             polarConvertShader?.Dispose();
+            convertTo3DShader?.Dispose();
             foreach (var imagePipeline in pipelines)
             {
                 imagePipeline.Dispose();
             }
-            pipelineController?.Dispose();
             pixelValueShader?.Dispose();
-            sharedModel?.Dispose();
+            SharedModel?.Dispose();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -44,6 +44,14 @@ namespace ImageFramework.Utility
             Alpha = 1.0f;
         }
 
+        public Color(Color c)
+        {
+            Red = c.Red;
+            Green = c.Green;
+            Blue = c.Blue;
+            Alpha = c.Alpha;
+        }
+
         public Color(byte r, byte g, byte b, byte a, bool isSigned = false)
         {
             if (isSigned)
@@ -153,7 +161,7 @@ namespace ImageFramework.Utility
         {
             if (c >= 1.0f) return 1.0f;
             if (c <= 0.0f) return 0.0f;
-            if (c < 0.0031308) return 12.92f * c;
+            if (c <= 0.0031308) return 12.92f * c;
             return 1.055f * (float)Math.Pow(c, 0.41666) - 0.055f;
         }
 
@@ -169,6 +177,8 @@ namespace ImageFramework.Utility
 
         private float FromSrgb(float c)
         {
+            if (c >= 1.0f) return 1.0f;
+            if (c <= 0.0f) return 0.0f;
             if (c <= 0.04045f) return c / 12.92f;
             return (float)Math.Pow((c + 0.055) / 1.055, 2.4);
         }
@@ -241,6 +251,20 @@ namespace ImageFramework.Utility
                 res = " " + res;
             }
 
+            return res;
+        }
+
+        public Color Scale(float scalar, Channel channels)
+        {
+            Color res = new Color(this);
+            if ((channels & Channel.R) != 0)
+                res.Red *= scalar;
+            if ((channels & Channel.G) != 0)
+                res.Green *= scalar;
+            if ((channels & Channel.B) != 0)
+                res.Blue *= scalar;
+            if ((channels & Channel.A) != 0)
+                res.Alpha *= scalar;
             return res;
         }
     }

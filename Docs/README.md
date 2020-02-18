@@ -1,17 +1,24 @@
 # Image Viewer and Tonemapper
 
-An image viewer for anyone related to computer graphics. It supports quick side-by-side comparison, arithmetic image manipulation, customisable filter effects (HLSL) and 360° views.
+An image viewer for anyone related to computer graphics.
+
+* quick [side-by-side comparison](#Side-By-Side-Comparision-and-Image-Manipulation)
+* [arithmetic image manipulation](equation.md) (image calculator)
+* [image statistics](statistics.md) (MSE, SSIM and more)
+* [layer, mipmap](#Images-with-multiple-mipmaps-and-faces) and [360° views](#Lat-Long-Polar-Images)
+* [lat-long cubemap conversion](#Lat-Long-Cubemap-Conversion)
+* [mipmap generation](mipmaps.md) (including box filter and lanczos)
+* [customisable filter](#Custom-HLSL-Compute-Shader-Filter) in HLSL
+* computations are done in linear color space
 
 ## File Formats
 
-Currently the following image formats can be used:
 * PNG, JPG, BMP
 * HDR, PFM
 * uncompressed DDS, KTX
 * block compression (BC1-BC7) for DDS, KTX
+* experimental KTX2
 * EXR (only import)
-
-[Used Libraries](about.md)
 
 ## Download
 
@@ -20,9 +27,13 @@ System Requirements:
 - .Net 4.6.1
 - DirextX 11 compatible graphics card
 
+Version 3.2 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/raw/Release/Build/ImageViewer3_2.zip)
+
 Version 3.1 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/raw/Release/Build/ImageViewer3_1.zip)
 
 Version 2.1 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/raw/Release/Build/Texture%20Viewer.zip)
+
+[Used Libraries](about.md)
 
 ## View Modes
 ### Simple Images
@@ -41,6 +52,9 @@ Select a specific mipmap level and layer (face) of DDS and KTX textures and view
 View the raw polar image or look around in polar mode:
 
 ![](img/polar.jpg)
+
+### Lat-Long Cubemap Conversion
+Convert between Lat-Long and Cubemaps with `Tools->LatLong to Cubemap` and `Tools->Cubemap to LatLong`. You can create a Cubemap or an arbitrary Texture2DArray from multiple images with `File->Import as Array`.
 
 ## Side By Side Comparision and Image Manipulation
 

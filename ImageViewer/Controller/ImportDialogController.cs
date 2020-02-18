@@ -40,25 +40,23 @@ namespace ImageViewer.Controller
             return ofd.FileNames;
         }
 
-        public void ImportImage(string file)
+        public async Task ImportImageAsync(string file)
         {
             try
             {
-                using (var img = IO.LoadImage(file))
-                {
-                    // create texture
-                    var tex = new TextureArray2D(img);
 
-                    ImportTexture(tex, file, img.OriginalFormat);
-                }
+                var img = await IO.LoadImageTextureAsync(file, models.Progress);
+                
+                ImportTexture(img.Texture, file, img.OriginalFormat);
             }
             catch (Exception e)
             {
-                models.Window.ShowErrorDialog(e.Message);
+                if(!models.Progress.LastTaskCancelledByUser)
+                    models.Window.ShowErrorDialog(e.Message);
             }
         }
 
-        private void ImportTexture(TextureArray2D tex, string file, GliFormat imgOriginalFormat)
+        private void ImportTexture(ITexture tex, string file, GliFormat imgOriginalFormat)
         {
             try
             {
@@ -70,7 +68,8 @@ namespace ImageViewer.Controller
                 // silently generate mipmaps and import
                 if (models.Images.NumMipmaps > 1 && tex.NumMipmaps == 1)
                 {
-                    var tmp = tex.GenerateMipmapLevels(models.Images.NumMipmaps);
+                    var tmp = tex.CloneWithMipmaps(models.Images.NumMipmaps);
+                    models.Scaling.WriteMipmaps(tmp);
                     ImportTexture(tmp, file, imgOriginalFormat);
                 }
                 else

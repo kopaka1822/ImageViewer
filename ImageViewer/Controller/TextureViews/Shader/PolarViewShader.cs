@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Utility;
+using ImageViewer.Controller.TextureViews.Shared;
+using ImageViewer.Models;
 using SharpDX;
 using SharpDX.Direct3D11;
 using Device = ImageFramework.DirectX.Device;
@@ -13,37 +15,59 @@ namespace ImageViewer.Controller.TextureViews.Shader
 {
     public class PolarViewShader : ViewShader
     {
-        public PolarViewShader() 
-            : base(GetVertexSource(), GetPixelSource(), "Polar")
+        public PolarViewShader(ModelsEx models) 
+            : base(models, GetVertexSource(), GetPixelSource(), "Polar")
         {
 
         }
 
-        public void Run(UploadBuffer<ViewBufferData> buffer, Matrix transform, Vector4 crop, float multiplier, float farplane, bool useAbs, ShaderResourceView texture, SamplerState sampler)
+        struct BufferData
         {
-            buffer.SetData(new ViewBufferData
+            public CommonBufferData Common;
+            public Matrix Transform;
+            public float Farplane;
+            public int Layer;
+        }
+
+        public void Run(Matrix transform, float farplane, ShaderResourceView texture, ShaderResourceView overlay)
+        {
+            var v = models.ViewData;
+            v.Buffer.SetData(new BufferData
             {
+                Common = GetCommonData(overlay),
                 Transform = transform,
-                Crop = crop,
-                Multiplier = multiplier,
                 Farplane = farplane,
-                UseAbs = useAbs ? 1 : 0
+                Layer = models.Display.ActiveLayer
             });
 
             var dev = Device.Get();
             BindShader(dev);
 
-            dev.Vertex.SetConstantBuffer(0, buffer.Handle);
-            dev.Pixel.SetConstantBuffer(0 , buffer.Handle);
+            dev.Vertex.SetConstantBuffer(0, v.Buffer.Handle);
+            dev.Pixel.SetConstantBuffer(0 , v.Buffer.Handle);
 
             dev.Pixel.SetShaderResource(0, texture);
-            dev.Pixel.SetSampler(0, sampler);
+            dev.Pixel.SetShaderResource(1, overlay);
+            dev.Pixel.SetSampler(0, v.GetSampler());
 
             dev.DrawQuad();
 
             // unbind
             dev.Pixel.SetShaderResource(0, null);
+            dev.Pixel.SetShaderResource(1, null);
             UnbindShader(dev);
+        }
+
+        private static string ConstantBuffer()
+        {
+            return $@"
+cbuffer InfoBuffer : register(b0) {{
+    {CommonShaderBufferData()}
+    matrix transform;
+    float farplane;
+    int layer;
+}};
+";
         }
 
         private static string GetVertexSource()
@@ -54,12 +78,7 @@ struct VertexOut {{
     float3 rayDir : RAYDIR;  
 }};
 
-cbuffer InfoBuffer : register(b0) {{
-    matrix transform;
-    float4 crop;
-    float multiplier;
-    float farplane;
-}};
+{ConstantBuffer()}
 
 VertexOut main(uint id: SV_VertexID) {{
     VertexOut o;
@@ -81,16 +100,10 @@ VertexOut main(uint id: SV_VertexID) {{
         {
             return $@"
 Texture2D<float4> tex : register(t0);
-
+Texture2D<float4> overlay : register(t1);
 SamplerState texSampler : register(s0);
 
-cbuffer InfoBuffer : register(b0) {{
-    matrix transform;
-    float4 crop;
-    float multiplier;
-    float farplane;
-    bool useAbs;
-}};
+{ConstantBuffer()}
 
 {Utility.ToSrgbFunction()}
 
@@ -113,10 +126,9 @@ float4 main(PixelIn i) : SV_TARGET {{
     if(polarDirection.x < 0.0) polarDirection.x += 1.0;
     
     float4 color = tex.Sample(texSampler, polarDirection);
-    color.rgb *= multiplier;
-    {ApplyColorCrop("polarDirection")}
     {ApplyColorTransform()}
-    return color;
+    {ApplyOverlay2D("polarDirection", "color")}
+    return toSrgb(color);
 }}
 ";
         }

@@ -19,10 +19,10 @@ namespace ImageViewer.ViewModels.Filter
         private readonly TextureFilterParameterModel model;
         private readonly ImagesModel images;
 
-        public ObservableCollection<ComboBoxItem<int>> AvailableTextures { get; } = new ObservableCollection<ComboBoxItem<int>>();
-        private ComboBoxItem<int> selectedTexture;
+        public ObservableCollection<ListItemViewModel<int>> AvailableTextures { get; } = new ObservableCollection<ListItemViewModel<int>>();
+        private ListItemViewModel<int> selectedTexture;
 
-        public ComboBoxItem<int> SelectedTexture
+        public ListItemViewModel<int> SelectedTexture
         {
             get => selectedTexture;
             set
@@ -94,11 +94,19 @@ namespace ImageViewer.ViewModels.Filter
             AvailableTextures.Clear();
             for (int i = 0; i < images.NumImages; ++i)
             {
-                AvailableTextures.Add(new ComboBoxItem<int>($"I{i} - {System.IO.Path.GetFileNameWithoutExtension(images.Images[i].Filename)}", i));
+                AvailableTextures.Add(new ListItemViewModel<int>
+                {
+                    Name = $"I{i} - {System.IO.Path.GetFileNameWithoutExtension(images.Images[i].Filename)}",
+                    Cargo = i
+                });
             }
             if (AvailableTextures.Count == 0)
                 // add dummy texture
-                AvailableTextures.Add(new ComboBoxItem<int>("I0", 0));
+                AvailableTextures.Add(new ListItemViewModel<int>
+                {
+                    Name = "I0",
+                    Cargo = 0
+                });
 
             // set the correct selected texture
             // is the source from model still in a valid range?

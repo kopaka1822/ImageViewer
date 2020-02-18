@@ -14,6 +14,7 @@ namespace image
 		virtual uint32_t getNumMipmaps() const = 0;
 		virtual uint32_t getWidth(uint32_t mipmap) const = 0;
 		virtual uint32_t getHeight(uint32_t mipmap) const = 0;
+		virtual uint32_t getDepth(uint32_t mipmap) const = 0;
 		
 		// must fulfill isSupported(format)
 		virtual gli::format getFormat() const = 0;
@@ -21,6 +22,10 @@ namespace image
 		virtual gli::format getOriginalFormat() const = 0;
 		virtual uint8_t* getData(uint32_t layer, uint32_t mipmap, uint32_t& size) = 0;
 		virtual const uint8_t* getData(uint32_t layer, uint32_t mipmap, uint32_t& size) const = 0;
+
+		// progress helper
+		static size_t calcNumPixels(uint32_t numLayer, uint32_t numLevels, uint32_t width, uint32_t height, uint32_t depth);
+		size_t getNumPixels() const;
 	};
 
 	// default interface that supplies internal storage for a single layer/mipmap
@@ -33,6 +38,7 @@ namespace image
 		uint32_t getNumMipmaps() const override { return 1; }
 		uint32_t getWidth(uint32_t mipmap) const override { return m_width; }
 		uint32_t getHeight(uint32_t mipmap) const override { return m_height; }
+		uint32_t getDepth(uint32_t mipmap) const override { return 1; }
 		gli::format getFormat() const override { return m_format; }
 		gli::format getOriginalFormat() const override { return m_original; }
 		uint8_t* getData(uint32_t layer, uint32_t mipmap, uint32_t& size) override

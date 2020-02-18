@@ -9,10 +9,14 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 using ImageFramework.DirectX;
+using ImageFramework.DirectX.Query;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
+using ImageFramework.Model.Overlay;
 using ImageViewer.DirectX;
 using ImageViewer.Models;
+using ImageViewer.Models.Display;
+using SharpDX;
 using SharpDX.Mathematics.Interop;
 using Color = ImageFramework.Utility.Color;
 using Size = System.Drawing.Size;
@@ -27,15 +31,17 @@ namespace ImageViewer.Controller
         private SwapChain swapChain = null;
         private bool scheduledRedraw = false;
         private RawColor4 clearColor;
+        private readonly AdvancedGpuTimer gpuTimer;
         public PaintController(ModelsEx models)
         {
             this.models = models;
+            this.gpuTimer = new AdvancedGpuTimer();
             viewMode = new ViewModeController(models);
 
             // model events
             models.Display.PropertyChanged += DisplayOnPropertyChanged;
-            models.Export.PropertyChanged += ExportOnPropertyChanged;
             models.Window.PropertyChanged += WindowOnPropertyChanged;
+            models.Overlay.PropertyChanged += OverlayOnPropertyChanged;
 
             // client mouse events
             models.Window.Window.BorderHost.PreviewMouseMove += (sender, e) => ScheduleRedraw();
@@ -49,13 +55,22 @@ namespace ImageViewer.Controller
             models.Window.Window.Loaded += WindowOnLoaded;
 
             // clear color
-            var bgBrush = (SolidColorBrush)models.Window.Window.FindResource("BackgroundBrush");
-            var tmpColor = new Color(bgBrush.Color.ScR, bgBrush.Color.ScG, bgBrush.Color.ScB, 1.0f);
-            tmpColor = tmpColor.ToSrgb();
-            clearColor.R = tmpColor.Red;
-            clearColor.G = tmpColor.Green;
-            clearColor.B = tmpColor.Blue;
+            var col = models.Window.ThemeColor;
+            clearColor.R = col.Red;
+            clearColor.G = col.Green;
+            clearColor.B = col.Blue;
             clearColor.A = 1.0f;
+        }
+
+        private void OverlayOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(OverlayModel.Overlay):
+                    ScheduleRedraw();
+                    break;
+            }
+            
         }
 
         private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -74,23 +89,6 @@ namespace ImageViewer.Controller
             switch (e.PropertyName)
             {
                 case nameof(WindowModel.ClientSize):
-                    ScheduleRedraw();
-                    break;
-            }
-        }
-
-        private void ExportOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(ExportModel.CropStartX):
-                case nameof(ExportModel.CropStartY):
-                case nameof(ExportModel.CropEndX):
-                case nameof(ExportModel.CropEndY):
-                case nameof(ExportModel.UseCropping):
-                case nameof(ExportModel.Mipmap):
-                case nameof(ExportModel.Layer):
-                case nameof(ExportModel.IsExporting):
                     ScheduleRedraw();
                     break;
             }
@@ -125,10 +123,14 @@ namespace ImageViewer.Controller
             scheduledRedraw = false;
             if (swapChain == null) return;
 
+            var timerStarted = false;
             swapChain.BeginFrame();
             try
             {
                 var dev = Device.Get();
+                // recompute overlay before binding rendertargets
+                models.Overlay.Recompute();
+
                 dev.ClearRenderTargetView(swapChain.Rtv, clearColor);
 
                 var size = new Size(swapChain.Width, swapChain.Height);
@@ -136,7 +138,11 @@ namespace ImageViewer.Controller
                 dev.Rasterizer.SetScissorRectangle(0, 0, size.Width, size.Height);
                 dev.OutputMerger.SetRenderTargets(swapChain.Rtv);
 
+                gpuTimer.Start();
+                timerStarted = true;
+
                 viewMode.Repaint(size);
+
             }
             catch (Exception e)
             {
@@ -144,8 +150,24 @@ namespace ImageViewer.Controller
             }
             finally
             {
-                swapChain.EndFrame();
+                if (timerStarted)
+                {
+                    gpuTimer.Stop();
+                }
+
+                try
+                {
+
+                    swapChain.EndFrame();
+                }
+                catch (SharpDXException e)
+                {
+                    models.Window.ShowErrorDialog(e.Message);
+                    models.Window.Window.Close();
+                }
             }
+
+            models.Display.FrameTime = gpuTimer.Get();
         }
 
         private void DisplayOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -161,7 +183,14 @@ namespace ImageViewer.Controller
                 case nameof(DisplayModel.ShowCropRectangle):
                 case nameof(DisplayModel.Multiplier):
                 case nameof(DisplayModel.DisplayNegative):
+                case nameof(DisplayModel.IsExporting):
                     ScheduleRedraw();
+                    break;
+                case nameof(DisplayModel.ExtendedViewData):
+                    if (models.Display.ExtendedViewData != null)
+                    {
+                        models.Display.ExtendedViewData.PropertyChanged += (s, ev) => ScheduleRedraw();
+                    }
                     break;
             }
         }
@@ -171,6 +200,7 @@ namespace ImageViewer.Controller
         {
             viewMode?.Dispose();
             swapChain?.Dispose();
+            gpuTimer?.Dispose();
         }
     }
 }

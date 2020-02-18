@@ -4,291 +4,101 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImageViewer.Views"
+             xmlns:statistics="clr-namespace:ImageViewer.Views.Statistics"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
+             Background="{StaticResource BackgroundBrush}"
              d:DesignHeight="800" d:DesignWidth="250">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Border Padding="5">
             <StackPanel>
                 <TextBlock
                     Text="Component"
-                    Margin="0 0 0 2"/>
-                <ComboBox
-                    Margin="0 0 0 5"
-                    ItemsSource="{Binding Statistics.AvailableChannels}"
-                    SelectedItem="{Binding Statistics.SelectedChannel}"/>
+                    Margin="{StaticResource SmallBorderBottom}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <ComboBox
+                        Margin="{StaticResource DefaultBorderBotRight}"
+                        ItemsSource="{Binding Statistics.AvailableChannels}"
+                        SelectedItem="{Binding Statistics.SelectedChannel}"
+                        ItemTemplate="{StaticResource ListItemView}"
+                        VerticalAlignment="Center"/>
+                    
+                    <Button 
+                        Grid.Column="1"
+                        Margin="{StaticResource DefaultBorderBottom}"
+                        Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.HelpCommand}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        IsEnabled="{Binding IsVisible}">
+                        <Button.CommandParameter>
+                            <system:String>help/statistics.md</system:String>
+                        </Button.CommandParameter>
+                        <Image 
+                            Width="16" Height="16" 
+                            Source="../Icons/help.png"/>
+                    </Button>
+                </Grid>
+                
                 <TextBlock 
                     Text="Double click box to copy content to clipboard"
-                    Margin="0 0 0 5"
+                    Margin="{StaticResource DefaultBorderBottom}"
                     TextWrapping="Wrap"/>
 
-                <GroupBox
-                    Header="Equation 1"
-                    Margin="0 0 0 5"
-                    Visibility="{Binding Statistics.Equation1.Visibility}">
+                <StackPanel
+                    Visibility="{Binding Statistics.ShowSSIM, Converter={StaticResource CollapsedVisibleConverter}}">
+                    <statistics:DefaultStatisticView
+                        DataContext="{Binding Statistics.Equation1}"/>
 
-                    <Grid>
+                    <statistics:DefaultStatisticView
+                        DataContext="{Binding Statistics.Equation2}"/>
+
+                    <statistics:DefaultStatisticView
+                        DataContext="{Binding Statistics.Equation3}"/>
+
+                    <statistics:DefaultStatisticView
+                        DataContext="{Binding Statistics.Equation4}"/>
+                </StackPanel>
+
+                <StackPanel
+                    Visibility="{Binding Statistics.ShowSSIM, Converter={StaticResource VisibleCollapsedConverter}}">
+                    
+                    <!-- this will be disabled until im satisfied with the implementation-->
+                    <!--<Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
 
-                        <!--  Average -->
-                        <TextBlock 
-                                                Text="Average:"
-                                                Margin="0 0 5 0"
-                                                Grid.Column="0"
-                                                Grid.Row="0"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation1.Average}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="0"/>
+                        <TextBlock
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Text="Multi-Scale: "
+                            Margin="{StaticResource DefaultBorderBotRight}"
+                            ToolTip="SSIM values from different mipmaps will be used to determine the final SSIM index"/>
+                        
+                        <CheckBox
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            IsChecked="{Binding Statistics.SSIM.UseMultiscale}"
+                            Margin="{StaticResource DefaultBorderBottom}"
+                            VerticalAlignment="Center"/>
+                    </Grid>-->
+                    <ItemsControl
+                        ItemsSource="{Binding Statistics.SSIM.Items}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <statistics:SSIMView/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
-                        <!--  Root Average -->
-                        <TextBlock 
-                                                Text="Root Avg:"
-                                                Margin="0 0 5 0"
-                                                Grid.Column="0"
-                                                Grid.Row="1"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation1.RootAverage}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="1"/>
-
-                        <!--  Min -->
-                        <TextBlock 
-                                                Text="Min:"
-                                                Margin="0 0 5 0"
-                                                Grid.Column="0"
-                                                Grid.Row="2"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation1.Min}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="2"/>
-
-                        <!--  Max -->
-                        <TextBlock 
-                                                Text="Max"
-                                                Margin="0 0 0 2"
-                                                Grid.Column="0"
-                                                Grid.Row="3"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation1.Max}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="3"/>
-                    </Grid>
-                </GroupBox>
-
-                <GroupBox
-                                        Header="Equation 2"
-                                        Margin="0 0 0 5"
-                                        Visibility="{Binding Statistics.Equation2.Visibility}">
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-
-                        <!--  Average -->
-                        <TextBlock 
-                                                Text="Average:"
-                                                Margin="0 0 5 0"
-                                                Grid.Column="0"
-                                                Grid.Row="0"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation2.Average}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="0"/>
-
-                        <!--  Root Average -->
-                        <TextBlock 
-                                                Text="Root Avg:"
-                                                Margin="0 0 5 0"
-                                                Grid.Column="0"
-                                                Grid.Row="1"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation2.RootAverage}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="1"/>
-
-                        <!--  Min -->
-                        <TextBlock 
-                                                Text="Min:"
-                                                Margin="0 0 5 0"
-                                                Grid.Column="0"
-                                                Grid.Row="2"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation2.Min}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="2"/>
-
-                        <!--  Max -->
-                        <TextBlock 
-                                                Text="Max"
-                                                Margin="0 0 0 2"
-                                                Grid.Column="0"
-                                                Grid.Row="3"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation2.Max}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="3"/>
-                    </Grid>
-                </GroupBox>
-
-                <GroupBox
-                                        Header="Equation 3"
-                                        Margin="0 0 0 5"
-                                        Visibility="{Binding Statistics.Equation3.Visibility}">
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-
-                        <!--  Average -->
-                        <TextBlock 
-                                                Text="Average:"
-                                                Margin="0 0 5 0"
-                                                Grid.Column="0"
-                                                Grid.Row="0"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation3.Average}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="0"/>
-
-                        <!--  Root Average -->
-                        <TextBlock 
-                                                Text="Root Avg:"
-                                                Margin="0 0 5 0"
-                                                Grid.Column="0"
-                                                Grid.Row="1"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation3.RootAverage}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="1"/>
-
-                        <!--  Min -->
-                        <TextBlock 
-                                                Text="Min:"
-                                                Margin="0 0 5 0"
-                                                Grid.Column="0"
-                                                Grid.Row="2"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation3.Min}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="2"/>
-
-                        <!--  Max -->
-                        <TextBlock 
-                                                Text="Max"
-                                                Margin="0 0 0 2"
-                                                Grid.Column="0"
-                                                Grid.Row="3"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation3.Max}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="3"/>
-                    </Grid>
-                </GroupBox>
-
-                <GroupBox
-                                        Header="Equation 4"
-                                        Margin="0 0 0 5"
-                                        Visibility="{Binding Statistics.Equation4.Visibility}">
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-
-                        <!--  Average -->
-                        <TextBlock 
-                                                Text="Average:"
-                                                Margin="0 0 5 0"
-                                                Grid.Column="0"
-                                                Grid.Row="0"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation4.Average}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="0"/>
-
-                        <!--  Root Average -->
-                        <TextBlock 
-                                                Text="Root Avg:"
-                                                Margin="0 0 5 0"
-                                                Grid.Column="0"
-                                                Grid.Row="1"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation4.RootAverage}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="1"/>
-
-                        <!--  Min -->
-                        <TextBlock 
-                                                Text="Min:"
-                                                Margin="0 0 5 0"
-                                                Grid.Column="0"
-                                                Grid.Row="2"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation4.Min}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="2"/>
-
-                        <!--  Max -->
-                        <TextBlock 
-                                                Text="Max"
-                                                Margin="0 0 0 2"
-                                                Grid.Column="0"
-                                                Grid.Row="3"/>
-                        <local:StatisticTextBox 
-                                                Text="{Binding Statistics.Equation4.Max}"
-                                                Margin="0 0 0 5"
-                                                Grid.Column="1"
-                                                Grid.Row="3"/>
-                    </Grid>
-                </GroupBox>
-
+                </StackPanel>
+                
                 <TextBlock 
                     Margin="0 4 0 0"
                     TextWrapping="Wrap" 

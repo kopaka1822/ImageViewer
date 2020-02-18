@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Utility;
 
 namespace ImageFramework.ImageLoader
 {
@@ -18,7 +19,7 @@ namespace ImageFramework.ImageLoader
         // link to the dll resource id
         public Resource Resource { get; }
 
-        public Image(Resource resource, string filename, int nLayer, int nMipmaps, ImageFormat format, GliFormat originalFormat)
+        public Image(Resource resource, string filename, LayerMipmapCount lm, ImageFormat format, GliFormat originalFormat)
         {
             Resource = resource;
             Filename = filename;
@@ -26,29 +27,26 @@ namespace ImageFramework.ImageLoader
             OriginalFormat = originalFormat;
             // load relevant information
 
-            Layers = new List<Layer>(nLayer);
-            for (var curLayer = 0; curLayer < nLayer; ++curLayer)
+            Layers = new List<Layer>(lm.Layers);
+            for (var curLayer = 0; curLayer < lm.Layers; ++curLayer)
             {
-                Layers.Add(new Layer(resource, curLayer, nMipmaps));
+                Layers.Add(new Layer(resource, curLayer, lm.Mipmaps));
             }
         }
 
-        public int GetWidth(int mipmap)
+        public Size3 GetSize(int mipmap)
         {
             if (Layers.Count > 0 && (uint)mipmap < Layers[0].Mipmaps.Count)
-                return Layers[0].Mipmaps[mipmap].Width;
-            return 0;
+                return new Size3(Layers[0].Mipmaps[mipmap].Width, Layers[0].Mipmaps[mipmap].Height, Layers[0].Mipmaps[mipmap].Depth);
+            return Size3.Zero;
         }
 
-        public int GetHeight(int mipmap)
-        {
-            if (Layers.Count > 0 && (uint)mipmap < Layers[0].Mipmaps.Count)
-                return Layers[0].Mipmaps[mipmap].Height;
-            return 0;
-        }
+        public LayerMipmapCount LayerMipmap => new LayerMipmapCount(NumLayers, NumMipmaps);
 
         public int NumMipmaps => Layers.Count > 0 ? Layers[0].Mipmaps.Count : 0;
         public int NumLayers => Layers.Count;
+
+        public bool Is3D => NumMipmaps > 0 && Layers[0].Mipmaps[0].Depth > 1;
 
         public void Dispose()
         {

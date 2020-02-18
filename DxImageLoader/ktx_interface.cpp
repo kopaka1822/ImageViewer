@@ -23,6 +23,13 @@ std::unique_ptr<image::IImage> ktx_load(const char* filename)
 
 	ktxTexture2* ktex2 = reinterpret_cast<ktxTexture2*>(ktex);
 
+	if(ktex2->supercompressionScheme == KTX_SUPERCOMPRESSION_BASIS)
+	{
+		err = ktxTexture2_TranscodeBasis(ktex2, KTX_TTF_ASTC_4x4_RGBA, 0);
+		if (err != KTX_SUCCESS)
+			throw std::runtime_error(std::string("failed to transcode basis: ") + ktxErrorString(err));
+	}
+
 	auto format = convertFormat(VkFormat(ktex2->vkFormat));
 
 	if (format == gli::FORMAT_UNDEFINED)
@@ -31,7 +38,7 @@ std::unique_ptr<image::IImage> ktx_load(const char* filename)
 	// store data in gli storage to be able to convert it easily
 	auto res = std::make_unique<GliImage>(format, 
 		ktex->numFaces * ktex->numLayers, ktex->numLevels,
-		ktex->baseWidth, ktex->baseHeight);
+		ktex->baseWidth, ktex->baseHeight, ktex->baseDepth);
 
 	//auto ktxSize = ktxTexture_GetSize(ktex);
 	//assert(ktxSize == res->getSize());

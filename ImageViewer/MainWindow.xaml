@@ -14,32 +14,43 @@
         Width="600"
         Icon="Icons/app.png"
         Style="{StaticResource WindowStyle}"
-        x:Name="Window">
+        x:Name="Window"
+        >
 
-<Window.Resources>
-    <ContextMenu x:Key="ClientContextMenu">
-        <MenuItem
-            Header="Pixel Color"
-            Command="{Binding ShowPixelColorCommand}">
-            <MenuItem.Icon>
-                <Image Source="Icons/eyedropper.png"/>
-            </MenuItem.Icon>
+    <Window.Resources>
+        <ContextMenu x:Key="ClientContextMenu">
+            <MenuItem
+                Header="Pixel Color"
+                Command="{Binding ShowPixelColorCommand}">
+                <MenuItem.Icon>
+                    <Image Source="Icons/eyedropper.png"/>
+                </MenuItem.Icon>
+                </MenuItem>
+            <MenuItem
+                Header="Pixel Display"
+                Command="{Binding ShowPixelDisplayCommand}">
+                <MenuItem.Icon>
+                    <Image Source="Icons/displayconfig.png"/>
+                </MenuItem.Icon>
             </MenuItem>
-        <MenuItem
-            Header="Pixel Display"
-            Command="{Binding ShowPixelDisplayCommand}">
-            <MenuItem.Icon>
-                <Image Source="Icons/displayconfig.png"/>
-            </MenuItem.Icon>
-            </MenuItem>
-    </ContextMenu>
-</Window.Resources>
-
+        </ContextMenu>
+    </Window.Resources>
+    <Window.InputBindings>
+    <KeyBinding Modifiers="Control"
+                Key="O"
+                Command="{Binding OpenCommand}"/>
+        <KeyBinding Modifiers="Control"
+                Key="S"
+                Command="{Binding ExportCommand}"/>
+        <KeyBinding Modifiers="Control"
+                Key="I"
+                Command="{Binding ImportCommand}"/>
+    </Window.InputBindings>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="SizeChanged">
             <i:InvokeCommandAction Command="{Binding ResizeCommand}"/>
         </i:EventTrigger>
-    </i:Interaction.Triggers>
+</i:Interaction.Triggers>
 
     <DockPanel>
         <views:MenuBar 
@@ -73,20 +84,24 @@
                     Grid.Column="2"
                     DockPanel.Dock="Left"
                     HorizontalAlignment="Stretch"
-                    
-                    BorderThickness="0 0 0 0"
+                    SelectedIndex="{Binding SelectedTabIndex, FallbackValue=0}"
+                    BorderThickness="0"
                     x:Name="TabControl"   
                 >
-                    <TabItem 
-                        Header="Images"
-                        Foreground="{Binding Equations.TabItemColor}"
-                    >
-                        <views:ImagesTab/>
+              
+                    <TabItem>
+                        <TabItem.Header>
+                            <TextBlock Text="Images"
+                                       Foreground="{Binding Equations.TabItemColor}"/>
+                        </TabItem.Header>
+                        <views:ImagesTab
+                            x:Name="ImagesTab"/>
                     </TabItem>
-                    <TabItem 
-                        Header="Filter"
-                        Foreground="{Binding Filter.TabItemColor}"
-                    >
+                    <TabItem>
+                        <TabItem.Header>
+                            <TextBlock Text="Filter"
+                                       Foreground="{Binding Filter.TabItemColor}"/>
+                        </TabItem.Header>
                         <views:FilterTab/>
                     </TabItem>
                     <TabItem Header="Statistics"

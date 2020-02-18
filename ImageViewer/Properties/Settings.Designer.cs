@@ -12,7 +12,7 @@ namespace ImageViewer.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.2.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.4.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -164,6 +164,126 @@ namespace ImageViewer.Properties {
             }
             set {
                 this["FlipYAxis"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int AlphaBackground {
+            get {
+                return ((int)(this["AlphaBackground"]));
+            }
+            set {
+                this["AlphaBackground"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public float NanRed {
+            get {
+                return ((float)(this["NanRed"]));
+            }
+            set {
+                this["NanRed"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public float NanGreen {
+            get {
+                return ((float)(this["NanGreen"]));
+            }
+            set {
+                this["NanGreen"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float NanBlue {
+            get {
+                return ((float)(this["NanBlue"]));
+            }
+            set {
+                this["NanBlue"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public float ZoomBoxRed {
+            get {
+                return ((float)(this["ZoomBoxRed"]));
+            }
+            set {
+                this["ZoomBoxRed"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float ZoomBoxGreen {
+            get {
+                return ((float)(this["ZoomBoxGreen"]));
+            }
+            set {
+                this["ZoomBoxGreen"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public float ZoomBoxBlue {
+            get {
+                return ((float)(this["ZoomBoxBlue"]));
+            }
+            set {
+                this["ZoomBoxBlue"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        public int ZoomBoxBorder {
+            get {
+                return ((int)(this["ZoomBoxBorder"]));
+            }
+            set {
+                this["ZoomBoxBorder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ExportZoomBoxBorder {
+            get {
+                return ((bool)(this["ExportZoomBoxBorder"]));
+            }
+            set {
+                this["ExportZoomBoxBorder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        public int ExportZoomBoxScale {
+            get {
+                return ((int)(this["ExportZoomBoxScale"]));
+            }
+            set {
+                this["ExportZoomBoxScale"] = value;
             }
         }
     }

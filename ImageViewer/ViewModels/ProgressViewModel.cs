@@ -6,8 +6,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using ImageFramework.Annotations;
 using ImageFramework.Model;
+using ImageViewer.Commands;
+using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 
 namespace ImageViewer.ViewModels
@@ -20,18 +23,8 @@ namespace ImageViewer.ViewModels
         {
             this.models = models;
             this.models.Progress.PropertyChanged += ProgressOnPropertyChanged;
-            //this.models.Export.PropertyChanged += ExportOnPropertyChanged;
+            CancelCommand = new ActionCommand(() => models.Progress.CancelAsync());
         }
-
-        //private void ExportOnPropertyChanged(object sender, PropertyChangedEventArgs args)
-        //{
-        //    switch (args.PropertyName)
-        //    {
-        //        case nameof(Models.Dialog.ExportModel.IsExporting):
-        //            OnPropertyChanged(nameof(NotProcessing));
-        //            break;
-        //    }
-        //}
 
         private void ProgressOnPropertyChanged(object sender, PropertyChangedEventArgs args)
         {
@@ -43,6 +36,14 @@ namespace ImageViewer.ViewModels
                     break;
                 case nameof(ProgressModel.Progress):
                     OnPropertyChanged(nameof(ProgressValue));
+                    break;
+                case nameof(ProgressModel.What):
+                    OnPropertyChanged(nameof(ProgressDescription));
+                    break;
+                case nameof(ProgressModel.LastError):
+                    // TODO log
+                    //if(!String.IsNullOrEmpty(models.Progress.LastError))
+                    //    models.Window.ShowErrorDialog(models.Progress.LastError, "Task failed");
                     break;
             }
         }
@@ -56,6 +57,10 @@ namespace ImageViewer.ViewModels
             // dont allow changes from the ui
             set => OnPropertyChanged(nameof(ProgressValue));
         }
+
+        public string ProgressDescription => models.Progress.What;
+
+        public ICommand CancelCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -21,7 +21,7 @@ namespace ImageFramework.Model
         private readonly MaxDefaultStatsticsShader maxStatsShader = new MaxDefaultStatsticsShader();
         private readonly AvgDefaultStatisticsShader avgStatsShader = new AvgDefaultStatisticsShader();
 
-        internal StatisticsModel GetStatistics(TextureArray2D image, int layer, int mipmap, PixelValueShader pixelValueShader, TextureCache cache)
+        internal StatisticsModel GetStatistics(ITexture image, int layer, int mipmap, PixelValueShader pixelValueShader, TextureCache cache)
         {
             var stats = new StatisticsModel
             {

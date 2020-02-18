@@ -3,7 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ImageFramework.DirectX;
+using ImageFramework.Utility;
+using ImageViewer.Models;
+using SharpDX;
+using SharpDX.Direct3D11;
+using Color = ImageFramework.Utility.Color;
+using Device = ImageFramework.DirectX.Device;
 
 namespace ImageViewer.Controller.TextureViews.Shader
 {
@@ -11,17 +16,89 @@ namespace ImageViewer.Controller.TextureViews.Shader
     {
         private ImageFramework.DirectX.Shader vertex;
         private ImageFramework.DirectX.Shader pixel;
+        protected readonly ModelsEx models;
 
-        protected ViewShader(string vertex, string pixel, string debugName)
+        public struct CommonBufferData
         {
+            public float Multiplier;
+            public int UseAbs;
+            public int UseOverlay;
+#pragma warning disable 169 // never used
+            private int pad0;
+#pragma warning restore 169
+
+            public Color NanColor;
+        }
+
+        protected ViewShader(ModelsEx models, string vertex, string pixel, string debugName)
+        {
+            this.models = models;
             this.vertex = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Vertex, vertex, debugName + "VertexViewShader");
             this.pixel = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Pixel, pixel, debugName + "PixelViewShader");
         }
 
-        protected static string ApplyColorCrop(string texcoord)
+        protected CommonBufferData GetCommonData(ShaderResourceView overlay)
         {
-            return $"if({texcoord}.x < crop.x || {texcoord}.x > crop.y || {texcoord}.y < crop.z || {texcoord}.y > crop.w)\n" +
-                   "color.rgb = min(color.rgb, float3(1.0, 1.0, 1.0)) * float3(0.5, 0.5, 0.5);\n";
+            var res = new CommonBufferData
+            {
+                Multiplier = models.Display.Multiplier,
+                UseAbs = models.Display.DisplayNegative?1:0,
+                NanColor = models.Settings.NaNColor,
+                UseOverlay = overlay == null ? 0 : 1
+            };
+
+            return res;
+        }
+
+        protected static string ApplyOverlay2D(string texcoord, string color)
+        {
+            return $@"
+if(useOverlay) {{
+    float4 ol = overlay.Sample(texSampler, {texcoord});
+    {CalcOverlay(color)}
+}}
+";
+        }
+
+        protected static string ApplyOverlay3D(string texcoord, string color)
+        {
+            return $@"
+if(useOverlay) {{
+    float4 ol = overlay.Sample(texSampler, {texcoord});
+    {CalcOverlay(color)}
+}}
+";
+        }
+
+        protected static string ApplyOverlayCube(string dir, string color)
+        {
+            return $@"
+if(useOverlay) {{
+    float4 ol = overlay.Sample(texSampler, {dir});
+    {CalcOverlay(color)}
+}}
+";
+        }
+
+        private static string CalcOverlay(string color)
+        {
+            // overlay has alpha premultiplied color and alpha channel contains inverse alpha (occlusion)
+            return $@"
+{color}.rgb = ol.rgb + ol.a * {color}.rgb;
+{color}.a = 1.0 - (ol.a * (1.0 - {color}.a));
+";
+        }
+
+        protected static string CommonShaderBufferData()
+        {
+            return @"
+float multiplier;
+bool useAbs;
+bool useOverlay;
+int pad0_;
+
+float4 nancolor;
+";
         }
 
         /// <summary>
@@ -31,8 +108,9 @@ namespace ImageViewer.Controller.TextureViews.Shader
         protected static string ApplyColorTransform()
         {
             return @"
+color.rgb *= multiplier;
 if(useAbs) color.rgb = abs(color.rgb);
-color = toSrgb(color);
+if(any(isnan(color))) color = nancolor;
 ";
         }
 
@@ -48,7 +126,7 @@ color = toSrgb(color);
             dev.Pixel.Set(null);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             vertex?.Dispose();
             pixel?.Dispose();

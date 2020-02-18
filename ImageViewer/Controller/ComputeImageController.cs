@@ -23,6 +23,13 @@ namespace ImageViewer.Controller
             {
                 pipe.PropertyChanged += PipeOnPropertyChanged;
             }
+            models.Progress.TaskCompleted += ProgressOnTaskCompleted;
+        }
+
+        private void ProgressOnTaskCompleted(object sender, TaskCompletedEventArgs args)
+        {
+            // task may be rescheduled 
+            scheduled = false;
         }
 
         private void PipeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -45,6 +52,7 @@ namespace ImageViewer.Controller
                     if(pipe.IsEnabled)
                         ScheduleRecompute();
                     break;
+                
             }
         }
 
@@ -57,22 +65,7 @@ namespace ImageViewer.Controller
 
         public void Execute()
         {
-#pragma warning disable 4014
-            ExecuteAsync();
-#pragma warning restore 4014
-        }
-
-        private async Task ExecuteAsync()
-        {
-            try
-            {
-                var cts = new CancellationTokenSource();
-                await models.ApplyAsync(cts.Token);
-            }
-            finally
-            {
-                scheduled = false;
-            }
+            models.ApplyAsync();
         }
     }
 }

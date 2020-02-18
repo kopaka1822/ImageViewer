@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
@@ -42,27 +43,28 @@ namespace ImageFramework.Model.Shader
         {
             Debug.Assert(latlong.NumLayers == 1);
 
-            var dst = new TextureArray2D(6, 1, resolution, resolution, Format.R32G32B32A32_Float, false);
+            var dst = new TextureArray2D(new LayerMipmapCount(6, 1), new Size3(resolution, resolution), Format.R32G32B32A32_Float, false);
 
             var dev = Device.Get();
-            dev.Vertex.Set(quad.Vertex);
+            quad.Bind(false);
             dev.Pixel.Set(toCube.Pixel);
 
-            dev.Pixel.SetShaderResource(0, latlong.GetSrView(0, 0));
+            dev.Pixel.SetShaderResource(0, latlong.GetSrView(LayerMipmapSlice.Mip0));
             dev.Pixel.SetSampler(0, sampler);
             dev.OutputMerger.SetRenderTargets(null, 
-                dst.GetRtView(0, 0), 
-                dst.GetRtView(1, 0),
-                dst.GetRtView(2, 0),
-                dst.GetRtView(3, 0),
-                dst.GetRtView(4, 0),
-                dst.GetRtView(5, 0));
+                dst.GetRtView(new LayerMipmapSlice(0, 0)), 
+                dst.GetRtView(new LayerMipmapSlice(1, 0)),
+                dst.GetRtView(new LayerMipmapSlice(2, 0)),
+                dst.GetRtView(new LayerMipmapSlice(3, 0)),
+                dst.GetRtView(new LayerMipmapSlice(4, 0)),
+                dst.GetRtView(new LayerMipmapSlice(5, 0)));
             dev.SetViewScissors(resolution, resolution);
             dev.DrawQuad();
 
             dev.Pixel.SetShaderResource(0, null);
             dev.Pixel.SetSampler(0, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            quad.Unbind();
 
             return dst;
         }
@@ -72,21 +74,23 @@ namespace ImageFramework.Model.Shader
         {
             Debug.Assert(cube.NumLayers == 6);
 
-            var dst = new TextureArray2D(1, 1, resolution, Math.Max(resolution / 2, 1), Format.R32G32B32A32_Float, false);
+            var dst = new TextureArray2D(LayerMipmapCount.One, new Size3(resolution, Math.Max(resolution / 2, 1)), Format.R32G32B32A32_Float, false);
 
             var dev = Device.Get();
-            dev.Vertex.Set(quad.Vertex);
+            quad.Bind(false);
             dev.Pixel.Set(toLatLong.Pixel);
 
+            var dim = dst.Size;
             dev.Pixel.SetShaderResource(0, cube.GetCubeView(0));
             dev.Pixel.SetSampler(0, sampler);
-            dev.OutputMerger.SetRenderTargets(dst.GetRtView(0, 0));
-            dev.SetViewScissors(dst.Width, dst.Height);
+            dev.OutputMerger.SetRenderTargets(dst.GetRtView(LayerMipmapSlice.Mip0));
+            dev.SetViewScissors(dim.Width, dim.Height);
             dev.DrawQuad();
 
             dev.Pixel.SetShaderResource(0, null);
             dev.Pixel.SetSampler(0, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            quad.Unbind();
 
             return dst;
         }

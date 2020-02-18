@@ -4,8 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImageViewer.Views" 
-             xmlns:dd="urn:gong-wpf-dragdrop"
+             xmlns:dd="urn:gong-wpf-dragdrop" 
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
+             Background="{StaticResource BackgroundBrush}"
              d:DesignHeight="450" d:DesignWidth="250">
     <ScrollViewer 
         VerticalScrollBarVisibility="Auto">
@@ -16,6 +18,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock 
                         Text="Filter:" 
@@ -32,18 +35,32 @@
                             </Grid.ColumnDefinitions>
                             <Image 
                                 Source="../Icons/tonemap.png"
-                                Margin="0 0 5 0"/>
+                                Margin="{StaticResource DefaultBorderRight}"/>
                             <TextBlock 
                                 Grid.Column="1" 
                                 Text="Add Filter"/>
                         </Grid>
+                    </Button>
+
+                    <Button 
+                        Grid.Column="2"
+                        Margin="0"
+                        Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.HelpCommand}"
+                        HorizontalAlignment="Right"
+                        IsEnabled="{Binding IsVisible}">
+                        <Button.CommandParameter>
+                            <system:String>help/filter_manual.md</system:String>
+                        </Button.CommandParameter>
+                        <Image 
+                            Width="16" Height="16" 
+                            Source="../Icons/help.png"/>
                     </Button>
                 </Grid>
 
                 <ListBox 
                     Height="180"
                     ScrollViewer.VerticalScrollBarVisibility="Visible"
-                    Margin="0 0 0 5"
+                    Margin="{StaticResource DefaultBorderBottom}"
                     ItemsSource="{Binding Filter.AvailableFilter}"
                     SelectedItem="{Binding Filter.SelectedFilter}"
                     dd:DragDrop.IsDragSource="True"
@@ -53,25 +70,26 @@
 
                 <StackPanel 
                     Orientation="Horizontal"
-                    HorizontalAlignment="Right">
+                    HorizontalAlignment="Right"
+                    Margin="{StaticResource DefaultBorderBottom}">
 
                     <Button
                         Content="Apply"
                         Width="80"
                         HorizontalAlignment="Right"
-                        Margin="0 0 5 5"
-                        Command="{Binding Filter.ApplyCommand}"/>
+                        Margin="{StaticResource DefaultBorderRight}"
+                        Command="{Binding Filter.ApplyCommand}"
+                        IsEnabled="{Binding Filter.HasChanges}"/>
 
                     <Button
                         Content="Cancel"
                         Width="80"
                         HorizontalAlignment="Right"
-                        Margin="0 0 0 5"
-                        Command="{Binding Filter.CancelCommand}"/>
+                        Command="{Binding Filter.CancelCommand}"
+                        IsEnabled="{Binding Filter.HasChanges}"/>
                 </StackPanel>
 
-
-                <Separator Height="2"/>
+                <Separator Height="{StaticResource SeparatorHeight}"/>
 
                 <ItemsControl ItemsSource="{Binding Filter.SelectedFilterProperties}"/>
             </StackPanel>

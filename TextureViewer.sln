@@ -22,6 +22,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConsoleTest", "ConsoleTest\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Compressonator", "dependencies\compressonator\Compressonator\VS2015\CompressonatorLib.vcxproj", "{9EE67DB2-4AD8-4B9A-AE58-2E536412033C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "dependencies\libpng\projects\vstudio\zlib\zlib.vcxproj", "{60F89955-91C6-3A36-8000-13C592FEC2DF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "dependencies\libpng\projects\vstudio\libpng\libpng.vcxproj", "{D6973076-9317-4EF2-A0B8-B7A18AC0713E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "png", "png", "{DDFE1395-A67F-4ABF-AE66-CAABC8E0E641}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -120,9 +126,33 @@ Global
 		{9EE67DB2-4AD8-4B9A-AE58-2E536412033C}.Release|x64.Build.0 = Release|x64
 		{9EE67DB2-4AD8-4B9A-AE58-2E536412033C}.Release|x86.ActiveCfg = Release|Win32
 		{9EE67DB2-4AD8-4B9A-AE58-2E536412033C}.Release|x86.Build.0 = Release|Win32
+		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Debug|x64.ActiveCfg = Debug Library|x64
+		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Debug|x64.Build.0 = Debug Library|x64
+		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Debug|x86.ActiveCfg = Debug|Win32
+		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Debug|x86.Build.0 = Debug|Win32
+		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Release|Any CPU.ActiveCfg = Release|Win32
+		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Release|x64.ActiveCfg = Release Library|x64
+		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Release|x64.Build.0 = Release Library|x64
+		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Release|x86.ActiveCfg = Release|Win32
+		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Release|x86.Build.0 = Release|Win32
+		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Debug|x64.ActiveCfg = Debug Library|x64
+		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Debug|x64.Build.0 = Debug Library|x64
+		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Debug|x86.ActiveCfg = Debug|Win32
+		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Debug|x86.Build.0 = Debug|Win32
+		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release|Any CPU.ActiveCfg = Release|Win32
+		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release|x64.ActiveCfg = Release Library|x64
+		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release|x64.Build.0 = Release Library|x64
+		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release|x86.ActiveCfg = Release|Win32
+		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{60F89955-91C6-3A36-8000-13C592FEC2DF} = {DDFE1395-A67F-4ABF-AE66-CAABC8E0E641}
+		{D6973076-9317-4EF2-A0B8-B7A18AC0713E} = {DDFE1395-A67F-4ABF-AE66-CAABC8E0E641}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3985ACF2-47CB-4342-B653-D36F93FD0345}

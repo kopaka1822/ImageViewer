@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.Utility;
 using SharpDX;
 using Point = System.Drawing.Point;
 
@@ -12,29 +13,23 @@ namespace ImageViewer.Controller.TextureViews
 {
     public class EmptyView : ITextureView
     {
-        public void Draw(TextureArray2D texture)
+        public void Draw(int id, ITexture texture)
         {
             Debug.Assert(texture == null);
         }
 
-        public void Dispose()
-        {
+        public void Dispose(){}
 
+        public void OnScroll(float amount, Vector2 mouse) {}
+
+        public void OnDrag(Vector2 diff) {}
+        public void OnDrag2(Vector2 diff) {}
+
+        public Size3 GetTexelPosition(Vector2 mouse)
+        {
+            return Size3.Zero;
         }
 
-        public void OnScroll(float amount, Vector2 mouse)
-        {
-
-        }
-
-        public void OnDrag(Vector2 diff)
-        {
-
-        }
-
-        public Point GetTexelPosition(Vector2 mouse)
-        {
-            return new Point(0, 0);
-        }
+        public void UpdateImage(int id, ITexture texture) { }
     }
 }

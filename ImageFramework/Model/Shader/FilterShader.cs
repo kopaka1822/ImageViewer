@@ -9,25 +9,31 @@ using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.Model.Filter;
 using ImageFramework.Model.Filter.Parameter;
+using ImageFramework.Utility;
+using SharpDX.Direct3D11;
+using Device = ImageFramework.DirectX.Device;
 
 namespace ImageFramework.Model.Shader
 {
     internal class FilterShader : IDisposable
     {
+        private static readonly int TextureBindingStart = 2;
         private readonly FilterModel parent;
         private readonly DirectX.Shader shader;
-        private readonly UploadBuffer<int> paramBuffer;
+        private readonly UploadBuffer paramBuffer;
 
-        public readonly int localSize;
+        private readonly int localSize;
+        private readonly bool is3D;
 
-        public FilterShader(FilterModel parent, string source, int groupSize)
+        public FilterShader(FilterModel parent, string source, int groupSize, FilterLoader.Type kernel, IShaderBuilder builder)
         {
             localSize = groupSize;
             this.parent = parent;
-            shader = new DirectX.Shader(DirectX.Shader.Type.Compute, GetShaderHeader() + "\n#line 1\n" + source, parent.Filename);
+            is3D = builder.Is3D;
+            shader = new DirectX.Shader(DirectX.Shader.Type.Compute, GetShaderHeader(kernel, builder) + "\n#line 1\n" + source, parent.Filename);
             if (parent.Parameters.Count != 0)
             {
-                paramBuffer = new UploadBuffer<int>(parent.Parameters.Count);
+                paramBuffer = new UploadBuffer(4 * parent.Parameters.Count);
                 UpdateParamBuffer();
             }
         }
@@ -39,12 +45,17 @@ namespace ImageFramework.Model.Shader
         /// <param name="src">source texture</param>
         /// <param name="dst">destination texture</param>
         /// <param name="cbuffer">buffer that stores some runtime information</param>
-        /// <param name="iteration">current filter iteration. Should be 0 if not separable. Should be 0 or 1 if separable (x- and y-direction pass)</param>
+        /// <param name="iteration">current filter iteration. Should be 0 if not separable. Should be 0 or 1 if separable (x- and y-direction pass) or 2 for z-direction pass</param>
+        /// <param name="numMipmaps">number of mipmaps to apply the filter on (starting with most detailed mip)</param>
         /// <remarks>make sure to call UpdateParamBuffer() if parameters have changed after the last invocation</remarks>
-        internal void Run(ImagesModel image, TextureArray2D src, TextureArray2D dst, UploadBuffer<LayerLevelFilter> cbuffer, int iteration)
+        internal void Run(ImagesModel image, ITexture src, ITexture dst, UploadBuffer cbuffer, int iteration, int numMipmaps)
         {
-            if (parent.IsSepa) Debug.Assert(iteration == 0 || iteration == 1);
+            if (parent.IsSepa) Debug.Assert(iteration == 0 || iteration == 1 || iteration == 2);
             else Debug.Assert(iteration == 0);
+
+            // compatible textures?
+            Debug.Assert(src.Is3D == is3D);
+            Debug.Assert(dst.Is3D == is3D);
 
             var dev = Device.Get();
             dev.Compute.Set(shader.Compute);
@@ -55,30 +66,33 @@ namespace ImageFramework.Model.Shader
 
             dev.Compute.SetShaderResource(1, src.View);
 
-            for (int curMipmap = 0; curMipmap < image.NumMipmaps; ++curMipmap)
+            for (int curMipmap = 0; curMipmap < numMipmaps; ++curMipmap)
             {
                 // dst texture
                 dev.Compute.SetUnorderedAccessView(0, dst.GetUaView(curMipmap));
-                var width = image.GetWidth(curMipmap);
-                var height = image.GetHeight(curMipmap);
+                var size = image.GetSize(curMipmap);
 
                 for (int curLayer = 0; curLayer < image.NumLayers; ++curLayer)
                 {
                     // src textures
-                    dev.Compute.SetShaderResource(0, src.GetSrView(curLayer, curMipmap));
-                    BindTextureParameters(image, curLayer, curMipmap);
+                    dev.Compute.SetShaderResource(0, src.GetSrView(new LayerMipmapSlice(curLayer, curMipmap)));
+                    BindTextureParameters(image, new LayerMipmapSlice(curLayer, curMipmap));
 
                     cbuffer.SetData(new LayerLevelFilter
                     {
                         Layer = curLayer,
                         Level = curMipmap,
-                        FilterX = iteration,
-                        FilterY = 1 - iteration
+                        FilterX = iteration == 0?1:0,
+                        FilterY = iteration == 1?1:0,
+                        FilterZ = iteration == 2?1:0
                     });
 
                     dev.Compute.SetConstantBuffer(0, cbuffer.Handle);
 
-                    dev.Dispatch(Utility.Utility.DivideRoundUp(width, localSize), Utility.Utility.DivideRoundUp(height, localSize));
+                    dev.Dispatch(
+                        Utility.Utility.DivideRoundUp(size.Width, localSize), 
+                        Utility.Utility.DivideRoundUp(size.Height, localSize),
+                        Utility.Utility.DivideRoundUp(size.Depth, localSize));
                 }
             }
 
@@ -86,6 +100,7 @@ namespace ImageFramework.Model.Shader
             dev.Compute.SetUnorderedAccessView(0, null);
             dev.Compute.SetShaderResource(0, null);
             dev.Compute.SetShaderResource(1, null);
+            UnbindTextureParameters();
         }
 
         /// <summary>
@@ -104,42 +119,91 @@ namespace ImageFramework.Model.Shader
             paramBuffer.SetData(data);
         }
 
-        private void BindTextureParameters(ImagesModel image, int layer, int mipmap)
+        private void BindTextureParameters(ImagesModel image, LayerMipmapSlice lm)
         {
-            var texSlot = 1;
+            var texSlot = TextureBindingStart;
             foreach (var texParam in parent.TextureParameters)
             {
-                Device.Get().Compute.SetShaderResource(texSlot++, image.Images[texParam.Source].Image.GetSrView(layer, mipmap));
+                Device.Get().Compute.SetShaderResource(texSlot++, image.Images[texParam.Source].Image.GetSrView(lm));
             }
         }
 
-        private string GetShaderHeader()
+        private void UnbindTextureParameters()
         {
-            string filterDirectionVar = parent.IsSepa ? "int2 filterDirection;" : "";
+            var texSlot = TextureBindingStart;
+            foreach (var texParam in parent.TextureParameters)
+            {
+                Device.Get().Compute.SetShaderResource(texSlot++, null);
+            }
+        }
+
+        private string GetShaderHeader(FilterLoader.Type kernel, IShaderBuilder builder)
+        {
+            string filterDirectionVar = parent.IsSepa ? "int3 filterDirection;" : "";
 
             return $@"
-RWTexture2DArray<float4> dst_image : register(u0);
-Texture2D<float4> src_image : register(t0);
-Texture2DArray<float4> src_image_ex : register(t1);
+{builder.UavType}  dst_image : register(u0);
+{builder.SrvSingleType} src_image : register(t0);
+{builder.SrvType} src_image_ex : register(t1);
 
 cbuffer LayerLevelBuffer : register(b0) {{
     uint layer;
     uint level;
+    uint2 LayerLevelBuffer_padding_;
     {filterDirectionVar}
 }};
 
-float4 filter(int2 pixel, int2 size);
+// texel helper function
+#if {builder.Is3DInt}
+int3 texel(int3 coord) {{ return coord; }}
+int3 texel(int3 coord, int layer) {{ return coord; }}
+#else
+int2 texel(int3 coord) {{ return coord.xy; }}
+int3 texel(int3 coord, int layer) {{ return int3(coord.xy, layer); }}
+#endif
 
-[numthreads({localSize}, {localSize}, 1)]
+float4 filter{GetKernelDeclaration(kernel)};
+
+[numthreads({localSize}, {localSize}, {(builder.Is3D?localSize:1)})]
 void main(uint3 coord : SV_DISPATCHTHREADID) {{
     
-    uint width, height, elements;
-    dst_image.GetDimensions(width, height, elements);
-    if(coord.x >= width || coord.y >= height) return;    
+    uint width, height, depth;
+    dst_image.GetDimensions(width, height, depth);
+    uint3 dstCoord = coord;
+    uint3 size = int3(width, height, depth);
+    if(coord.x >= width || coord.y >= height) return;
+#if {builder.Is3DInt}
+    if(coord.z >= depth) return;
+#else
+    dstCoord.z = layer;
+    size.z = 1;
+#endif
 
-    dst_image[uint3(coord.x, coord.y, layer)] = filter(int2(coord.xy), int2(width, height));
+#if {(kernel == FilterLoader.Type.Tex2D?1:0)}
+     dst_image[dstCoord] = filter(coord.xy, size.xy);
+#elif {(kernel == FilterLoader.Type.Color ? 1 : 0)}
+    dst_image[dstCoord] = filter(src_image[texel(coord)]);
+#else // dynamic or 3D
+    dst_image[dstCoord] = filter(coord, size);
+#endif
 }}
 " + GetParamBufferDescription(parent.Parameters) + GetTextureParamBindings(parent.TextureParameters);
+        }
+
+        private static string GetKernelDeclaration(FilterLoader.Type kernel)
+        {
+            switch (kernel)
+            {
+                case FilterLoader.Type.Tex2D:
+                    return "(int2 pixel, int2 size)";
+                case FilterLoader.Type.Dynamic:
+                case FilterLoader.Type.Tex3D:
+                    return "(int3 pixel, int3 size)";
+                case FilterLoader.Type.Color:
+                    return "(float4 color)";
+            }
+
+            return "";
         }
 
         private static string GetParamBufferDescription(IReadOnlyList<IFilterParameter> parameters)
@@ -161,7 +225,7 @@ void main(uint3 coord : SV_DISPATCHTHREADID) {{
 
             string res = "";
 
-            var i = 1;
+            var i = TextureBindingStart;
             foreach (var tex in parameters)
             {
                 res += "Texture2D<float4> " + tex.TextureName + $" : register(t{i++});\n";

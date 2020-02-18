@@ -105,7 +105,10 @@ namespace ImageViewer.ViewModels.Filter
 
                 var vm = new TextureFilterParameterViewModel(tex, images);
                 ViewModels.Add(vm);
-                View.Add(new TextureFilterParameterView(vm, enabledBinding));
+                View.Add(new TextureFilterParameterView(enabledBinding)
+                {
+                    DataContext = vm
+                });
 
                 // register on changed callback                
                 vm.Changed += (sender, args) => HasChanged = HasChanges();
@@ -305,11 +308,13 @@ namespace ImageViewer.ViewModels.Filter
 
         public bool HasKeyToInvoke(Key key)
         {
-            return ViewModels.Any(p => p.HasKeyToInvoke(key));
+            return IsVisible && ViewModels.Any(p => p.HasKeyToInvoke(key));
         }
 
         public void InvokeKey(Key key)
         {
+            if (!IsVisible) return;
+
             foreach (var p in ViewModels)
             {
                 p.InvokeKey(key);

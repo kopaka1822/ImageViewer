@@ -23,6 +23,7 @@ namespace ImageViewer.ViewModels
             this.formula = model.Formula;
             this.parent = parent;
             this.images = images;
+            firstImageId = model.FirstImageId;
 
             model.PropertyChanged += ModelOnPropertyChanged;
             images.PropertyChanged += ImagesOnPropertyChanged;
@@ -105,11 +106,25 @@ namespace ImageViewer.ViewModels
 
             var res = model.TestFormula(Formula);
             if (res.Error != null) return res.Error;
+            FirstImageId = res.FirstId;
             if (res.MaxId >= Math.Max(images.NumImages, 1)) return "image id out of bounds";
             return String.Empty;
         }
 
         public string Error => String.Empty;
+
+        private int firstImageId = 0;
+
+        public int FirstImageId
+        {
+            get => firstImageId;
+            set
+            {
+                if (value == firstImageId) return;
+                firstImageId = value;
+                OnPropertyChanged(nameof(FirstImageId));
+            }
+        }
 
         #endregion
 

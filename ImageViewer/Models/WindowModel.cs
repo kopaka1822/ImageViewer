@@ -7,10 +7,10 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
-using ImageViewer.DirectX;
 using Size = System.Drawing.Size;
 
 namespace ImageViewer.Models
@@ -27,6 +27,8 @@ namespace ImageViewer.Models
         public string ExecutionPath { get; }
         public string AssemblyPath { get; }
 
+        public ImageFramework.Utility.Color ThemeColor { get; }
+
         public WindowModel(MainWindow window)
         {
             Window = window;
@@ -36,6 +38,10 @@ namespace ImageViewer.Models
             window.Loaded += WindowOnLoaded;
 
             windowStack.Push(window);
+
+            var bgBrush = (SolidColorBrush)Window.FindResource("BackgroundBrush");
+            var tmpColor = new ImageFramework.Utility.Color(bgBrush.Color.ScR, bgBrush.Color.ScG, bgBrush.Color.ScB, 1.0f);
+            ThemeColor = tmpColor.ToSrgb();
         }
 
         /// <summary>

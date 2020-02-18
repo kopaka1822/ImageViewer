@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="ImageViewer.Views.Display.Single3DView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ImageViewer.Views.Display"
+             xmlns:views="clr-namespace:ImageViewer.Views"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" 
+             d:DesignWidth="300">
+    <Border Padding="5">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <TextBlock Text="Visible Plane: "
+                       Margin="{StaticResource DefaultBorderBotRight}"/>
+            <ComboBox
+                Margin="{StaticResource DefaultBorderBottom}"
+                Grid.Row="0"
+                Grid.Column="1"
+                SelectedItem="{Binding SelectedAxis}"
+                ItemsSource="{Binding AxisList}"
+                ItemTemplate="{StaticResource ListItemView}"/>
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="1"
+                Text="Slice Index: "
+                Margin="{StaticResource DefaultBorderBotRight}"/>
+            <xctk:IntegerUpDown 
+                Grid.Column="1"
+                Grid.Row="1"
+                Minimum="0"
+                Maximum="{Binding FixedAxisSliceMax}"
+                Value="{Binding FixedAxisSlice}"
+                Margin="{StaticResource DefaultBorderBottom}"/>
+        </Grid>
+    </Border>
+</UserControl>

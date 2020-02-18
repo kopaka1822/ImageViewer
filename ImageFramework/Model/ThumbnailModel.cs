@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
+using ImageFramework.Model.Scaling;
 using ImageFramework.Model.Shader;
+using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
@@ -20,13 +22,15 @@ namespace ImageFramework.Model
     public class ThumbnailModel : IDisposable
     {
         private readonly QuadShader quad;
-        private readonly DirectX.Shader convert;
+        private readonly DirectX.Shader convert2D;
+        private readonly DirectX.Shader convert3D;
         private readonly SamplerState sampler;
 
         public ThumbnailModel(QuadShader quad)
         {
             this.quad = quad;
-            convert = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(), "ThumbnailPixelShader");
+            convert2D = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(ShaderBuilder.Builder2D), "ThumbnailPixelShader2D");
+            convert3D = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(ShaderBuilder.Builder3D), "ThumbnailPixelShader3D");
             var samplerDesc = new SamplerStateDescription
             {
                 AddressU = TextureAddressMode.Clamp,
@@ -51,8 +55,8 @@ namespace ImageFramework.Model
         /// <param name="dstFormat">destination texture format</param>
         /// <param name="layer">source layer</param>
         /// <returns>texture with width, height smaller or equal to size. One layer and one mipmap</returns>
-        public TextureArray2D CreateThumbnail(int size, TextureArray2D texture,
-            SharpDX.DXGI.Format dstFormat, int layer)
+        public TextureArray2D CreateThumbnail(int size, ITexture texture,
+            SharpDX.DXGI.Format dstFormat, int layer, ScalingModel scaling)
         {
             Debug.Assert(ImageFormat.IsSupported(dstFormat));
             Debug.Assert(ImageFormat.IsSupported(texture.Format));
@@ -60,28 +64,24 @@ namespace ImageFramework.Model
             // determine dimensions of output texture
             var width = 0;
             var height = 0;
-            if (texture.Width > texture.Height)
+            if (texture.Size.Width > texture.Size.Height)
             {
                 width = size;
-                height = (texture.Height * size) / texture.Width;
+                height = (texture.Size.Height * size) / texture.Size.Width;
             }
             else
             {
                 height = size;
-                width = (texture.Width * size) / texture.Height;
+                width = (texture.Size.Width * size) / texture.Size.Height;
             }
             Debug.Assert(width <= size);
             Debug.Assert(height <= size);
 
-            var res = new TextureArray2D(1, 1, width, height, dstFormat, false);
+            var res = new TextureArray2D(LayerMipmapCount.One, new Size3(width, height), dstFormat, false);
 
-            var dev = Device.Get();
-            dev.Vertex.Set(quad.Vertex);
-            dev.Pixel.Set(convert.Pixel);
-            
             // compute which mipmap has the closest fit
             var mipmap = 0;
-            var curWidth = texture.Width;
+            var curWidth = texture.Size.Width;
             while (curWidth >= width)
             {
                 ++mipmap;
@@ -90,57 +90,65 @@ namespace ImageFramework.Model
             // mipmap just jumped over the optimal size
             mipmap = Math.Max(0, mipmap - 1);
 
-            TextureArray2D tmpTex = null;
+            var dev = Device.Get();
+            ITexture tmpTex = null;
             if (texture.NumMipmaps < mipmap + 1)
             {
                 // generate new texture with mipmaps
-                tmpTex = texture.GenerateMipmapLevels(mipmap + 1);
-                dev.Pixel.SetShaderResource(0, tmpTex.GetSrView(layer, mipmap));
+                tmpTex = texture.CloneWithMipmaps(mipmap + 1);
+                
+                scaling.WriteMipmaps(tmpTex);
+                dev.Pixel.SetShaderResource(0, tmpTex.GetSrView(new LayerMipmapSlice(layer, mipmap)));
             }
             else
             {
-                dev.Pixel.SetShaderResource(0, texture.GetSrView(layer, mipmap));
+                dev.Pixel.SetShaderResource(0, texture.GetSrView(new LayerMipmapSlice(layer, mipmap)));
             }
+
+            quad.Bind(false);
+            if (texture.Is3D) dev.Pixel.Set(convert3D.Pixel);
+            else dev.Pixel.Set(convert2D.Pixel);
 
             dev.Pixel.SetSampler(0, sampler);
 
-            dev.OutputMerger.SetRenderTargets(res.GetRtView(0, 0));
+            dev.OutputMerger.SetRenderTargets(res.GetRtView(LayerMipmapSlice.Mip0));
             dev.SetViewScissors(width, height);
-            dev.DrawQuad();
+            dev.DrawFullscreenTriangle(1);
 
             // remove bindings
             dev.Pixel.SetShaderResource(0, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            quad.Unbind();
 
             tmpTex?.Dispose();
 
             return res;
         }
 
-        private static string GetSource()
+        private static string GetSource(IShaderBuilder builder)
         {
-            return @"
-Texture2D<float4> tex : register(t0);
+            return $@"
+{builder.SrvSingleType} tex : register(t0);
 SamplerState texSampler : register(s0);
 
 struct PixelIn
-{
+{{
     float2 texcoord : TEXCOORD;
     float4 projPos : SV_POSITION;
-};
+}};
 
 float4 main(PixelIn i) : SV_TARGET
-{
-    float4 color = tex.Sample(texSampler, i.texcoord);
+{{
+    float4 color = tex.Sample(texSampler, {(builder.Is3D?"float3(i.texcoord, 0.49)": "i.texcoord")});
     return color;
-}
+}}
 ";
         }
 
         public void Dispose()
         {
-            quad?.Dispose();
-            convert?.Dispose();
+            convert2D?.Dispose();
+            convert3D?.Dispose();
             sampler?.Dispose();
         }
     }

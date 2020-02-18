@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Model;
 using ImageFramework.Model.Shader;
+using ImageFramework.Model.Statistics;
 
 namespace ImageConsole.Commands
 {
@@ -17,10 +18,18 @@ namespace ImageConsole.Commands
             avg
         }
 
+        enum StatType
+        {
+            luminance,
+            luma,
+            avg,
+            lightness
+        }
+
         private readonly ImageConsole.Program program;
 
         public StatisticsCommand(ImageConsole.Program program) 
-            : base("-stats", "[\"min/max/avg\"]", "prints the statistics. Default is avg")
+            : base("-stats", "\"min/max/avg\" \"luminance/luma/avg/lightness\"", "prints the statistic")
         {
             this.program = program;
         }
@@ -29,37 +38,44 @@ namespace ImageConsole.Commands
         {
             var reader = new ParameterReader(arguments);
             var mode = reader.ReadEnum<StatMode>("min/max/avg", StatMode.avg);
+            var type = reader.ReadEnum<StatType>("luminance/luma/avg/lightness", StatType.avg);
             reader.ExpectNoMoreArgs();
 
             model.Apply();
-            var stats = model.GetStatistics(model.Pipelines[0].Image);
-            switch (mode)
+            var stats = model.Stats.GetStatisticsFor(model.Pipelines[0].Image);
+            switch (type)
             {
-                case StatMode.min:
-                    Print(stats.Min, program.ShowProgress);
+                case StatType.luminance:
+                    Print(stats.Luminance, mode);
                     break;
-                case StatMode.max:
-                    Print(stats.Max, program.ShowProgress);
+                case StatType.luma:
+                    Print(stats.Luma, mode);
                     break;
-                case StatMode.avg:
-                    Print(stats.Avg, program.ShowProgress);
+                case StatType.avg:
+                    Print(stats.Average, mode);
                     break;
+                case StatType.lightness:
+                    Print(stats.Lightness, mode);
+                    break;
+                default: throw new Exception("unknown type " + type);
             }
         }
 
-        private void Print(DefaultStatistics statsMin, bool showInfo)
+        private void Print(DefaultStatisticsType s, StatMode mode)
         {
-            if(showInfo)
-                Console.Error.Write("luminance: ");
-            Console.Out.WriteLine(statsMin.Luminance);
-
-            if(showInfo)
-                Console.Error.Write("lightness: ");
-            Console.Out.WriteLine(statsMin.Lightness);
-
-            if(showInfo)
-                Console.Error.Write("average: ");
-            Console.Out.WriteLine(statsMin.Average);
+            switch (mode)
+            {
+                case StatMode.min:
+                    Console.WriteLine(s.Min);
+                    break;
+                case StatMode.max:
+                    Console.WriteLine(s.Max);
+                    break;
+                case StatMode.avg:
+                    Console.WriteLine(s.Avg);
+                    break;
+                default: throw new Exception("unknown mode " + mode);
+            }
         }
     }
 }

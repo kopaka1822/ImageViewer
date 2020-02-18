@@ -14,9 +14,10 @@ EXPORT(int) image_open(const char* filename);
 /// \param format dxgi texture format (must be one of the compatible formats, see Image.h)
 /// \param width width in pixels
 /// \param height height in pixels
+/// \param depth depth in pixels
 /// \param layer number of layers
 /// \param mipmaps number of mipmap levels 
-EXPORT(int) image_allocate(uint32_t format, int width, int height, int layer, int mipmaps);
+EXPORT(int) image_allocate(uint32_t format, int width, int height, int depth, int layer, int mipmaps);
 
 /// \brief releases all resources from the file with the given id
 EXPORT(void) image_release(int id);
@@ -26,7 +27,7 @@ EXPORT(void) image_release(int id);
 EXPORT(void) image_info(int id, uint32_t& format, uint32_t& originalFormat, int& nLayer, int& nMipmaps);
 
 /// \brief retrieve info for one mipmap
-EXPORT(void) image_info_mipmap(int id, int mipmap, int& width, int& height);
+EXPORT(void) image_info_mipmap(int id, int mipmap, int& width, int& height, int& depth);
 
 /// \brief get mipmap bytes
 /// \return mipmap data. Can also be used to write mipmap data
@@ -46,8 +47,17 @@ EXPORT(bool) image_save(int id, const char* filename, const char* extension, uin
 /// \brief retrieves an array with all supported dxgi formats that are available for export with the extension
 EXPORT(const uint32_t*) get_export_formats(const char* extension, int& numFormats);
 
+typedef uint32_t(__stdcall* ProgressCallback)(float, const char*);
+
+/// \brief sets the progress report callback
+EXPORT(void) set_progress_callback(ProgressCallback cb);
+
 /// \brief get last error
 EXPORT(const char*) get_error(int& length);
 
 /// \brief set current error (for internal use only) 
 void set_error(const std::string& str);
+
+/// \brief set current progress (for internal use only)
+/// throws an error if the action should be aborted
+void set_progress(uint32_t progress, const char* description = nullptr);

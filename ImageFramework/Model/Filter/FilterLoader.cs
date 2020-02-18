@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using ImageFramework.Model.Filter.Parameter;
 using SharpDX.DXGI;
@@ -13,22 +14,66 @@ namespace ImageFramework.Model.Filter
 {
     public class FilterLoader
     {
+        public enum Type
+        {
+            Tex2D, // 2d kernel
+            Tex3D, // 3d kernel
+            Color, // single color kernel
+            Dynamic // 2d and 3d kernel
+        }
+
+        public enum TargetType
+        {
+            Tex2D, // targets 2d textures
+            Tex3D // targets 3d textures
+        }
+
         public string ShaderSource { get; private set; } = "";
         public List<IFilterParameter> Parameters { get; } = new List<IFilterParameter>();
+        public TargetType Target { get; }
+        public Type KernelType { get; private set; } = Type.Tex2D;
         public bool IsSepa { get; private set; } = false;
         public string Name { get; private set; }
         public string Description { get; private set; }
         public string Filename { get; }
 
         // work group size per axis => 32 x 32 local threads (maximum)
-        public int GroupSize { get; private set; } = 32;
+        private int groupSize = Int32.MaxValue;
+        public int GroupSize
+        {
+            get
+            {
+                if (groupSize != Int32.MaxValue) return groupSize;
+                if (Target == TargetType.Tex2D) return 32;
+                return 8;
+            }
+            private set
+            {
+                if (value < 1)
+                    throw new Exception($"setting groupsize must be at least 1");
+                if (Target == TargetType.Tex2D)
+                {
+                    if (GroupSize > 32)
+                        throw new Exception($"setting groupsize cannot exceed 32 for 2D textures");
+                }
+                else
+                {
+                    if (GroupSize > 8)
+                        throw new Exception($"setting groupsize cannot exceed 8 for 3D textures");
+                }
+
+                groupSize = value;
+            }
+        }
+
         public List<TextureFilterParameterModel> TextureParameters { get; } = new List<TextureFilterParameterModel>();
 
         private static readonly Regex variableRegex = new Regex(@"[a-zA-Z]([a-zA-Z0-9]*)");
 
-        public FilterLoader(string filename)
+        public FilterLoader(string filename, TargetType target)
         {
-            this.Filename = filename;
+            Filename = filename;
+            Target = target;
             Name = filename;
             Description = "";
             int lineNumber = 1;
@@ -39,9 +84,44 @@ namespace ImageFramework.Model.Filter
 
             try
             {
+                bool insidePre = false; // inside preprocessor block
+                bool maskOut = false; // mask out current preprocessor block
+
                 string line;
                 while ((line = file.ReadLine()) != null)
                 {
+                    // preprocessing with #if2D #if3D
+                    if (line.StartsWith("#if2D"))
+                    {
+                        if(insidePre) throw new Exception("recursive #if2D/#if3D are not supported");
+                        if (Target != TargetType.Tex2D) maskOut = true;
+                        insidePre = true;
+                        continue;
+                    }
+                    if (line.StartsWith("#if3D"))
+                    {
+                        if (insidePre) throw new Exception("recursive #if2D/#if3D are not supported");
+                        if (Target != TargetType.Tex3D) maskOut = true;
+                        insidePre = true;
+                        continue;
+                    }
+
+                    if (insidePre && line.StartsWith("#else"))
+                    {
+                        maskOut = !maskOut;
+                        continue;
+                    }
+
+                    if (insidePre && line.StartsWith("#endif"))
+                    {
+                        maskOut = false;
+                        insidePre = false;
+                        continue;
+                    }
+
+                    if(maskOut) continue;
+
+                    // other preprocessing arguments
                     if (line.StartsWith("#paramprop"))
                     {
                         HandleParamprop(GetParameters(line.Substring("#paramprop".Length)));
@@ -99,6 +179,12 @@ namespace ImageFramework.Model.Filter
             {
                 file.Close();
             }
+
+            // detect if correct type is targeted
+            if(KernelType == Type.Tex3D && Target != TargetType.Tex3D)
+                throw new Exception("This filter can only be used with 3D textures");
+            if(KernelType == Type.Tex2D && Target != TargetType.Tex2D)
+                throw new Exception("This filter can only be used with 2D textures");
         }
 
         private void HandleTexture(string[] pars)
@@ -343,10 +429,25 @@ namespace ImageFramework.Model.Filter
                     break;
                 case "groupsize":
                     GroupSize = int.Parse(wholeString);
-                    if(GroupSize < 1)
-                        throw new Exception($"setting {p[0]} must be at least 1");
-                    if(GroupSize > 32)
-                        throw new Exception($"setting {p[0]} cannot exceed 32");
+                    break;
+                case "type":
+                    switch (wholeString.ToUpper())
+                    {
+                        case "TEX2D":
+                            KernelType = Type.Tex2D;
+                            break;
+                        case "TEX3D":
+                            KernelType = Type.Tex3D;
+                            break;
+                        case "COLOR":
+                            KernelType = Type.Color;
+                            break;
+                        case "DYNAMIC":
+                            KernelType = Type.Dynamic;
+                            break;
+                        default:
+                            throw new Exception("unknown type for settings");
+                    }
                     break;
                 default:
                     throw new Exception("unknown setting " + p[0]);

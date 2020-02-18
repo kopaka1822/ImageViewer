@@ -10,9 +10,12 @@ namespace ImageConsole.Commands.Export
 {
     public class ExportQualityCommand : Command
     {
-        public ExportQualityCommand()
-            : base("-exportquality", "quality", $"sets the quality level for jpg exports. Between {ExportModel.QualityMin} and {ExportModel.QualityMax}")
+        private readonly ExportCommand export;
+
+        public ExportQualityCommand(ExportCommand export)
+            : base("-exportquality", "quality", $"sets the quality level for jpg exports. Between {ExportDescription.QualityMin} and {ExportDescription.QualityMax}")
         {
+            this.export = export;
         }
 
         public override void Execute(List<string> arguments, Models model)
@@ -21,7 +24,7 @@ namespace ImageConsole.Commands.Export
             var q = reader.ReadInt("quality");
             reader.ExpectNoMoreArgs();
 
-            model.Export.Quality = q;
+            export.Quality = q;
         }
     }
 }

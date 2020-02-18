@@ -27,6 +27,8 @@ namespace ImageFramework.DirectX
         public SharpDX.Direct3D11.Device Handle { get; }
         public SharpDX.DXGI.Factory FactoryHandle { get; }
 
+        public bool SupportsDouble { get; }
+
         private static Device instance = new Device();
         private Device()
         {
@@ -34,7 +36,8 @@ namespace ImageFramework.DirectX
 #if DEBUG
             flags |= DeviceCreationFlags.Debug;
 #endif
-            Handle = new SharpDX.Direct3D11.Device(DriverType.Hardware, flags, new FeatureLevel[]{FeatureLevel.Level_11_0});
+            // create 11.1 if possible (disable gpu timeout) but 11.0 is also fine
+            Handle = new SharpDX.Direct3D11.Device(DriverType.Hardware, flags, new FeatureLevel[] { FeatureLevel.Level_11_1, FeatureLevel.Level_11_0 });
 
             // obtain the factory that created the device
             var obj = Handle.QueryInterface<SharpDX.DXGI.Device>();
@@ -43,7 +46,11 @@ namespace ImageFramework.DirectX
             context = Handle.ImmediateContext;
 
             SetDefaults();
+            SupportsDouble = Handle.CheckFeatureSupport(SharpDX.Direct3D11.Feature.ShaderDoubles);
         }
+
+        // it is probably a low end device if feature level 11.1 was not available
+        public bool IsLowEndDevice => Handle.FeatureLevel == FeatureLevel.Level_11_0;
 
         public static Device Get()
         {
@@ -63,32 +70,31 @@ namespace ImageFramework.DirectX
         /// <summary>
         /// copies entire subresource
         /// </summary>
-        public void CopySubresource(Resource src, Resource dst, int srcSubresource, int dstSubresource, int width, int height)
+        public void CopySubresource(Resource src, Resource dst, int srcSubresource, int dstSubresource, Size3 size)
         {
-            context.CopySubresourceRegion(src, srcSubresource, new ResourceRegion(0, 0, 0, width, height, 1), 
+            context.CopySubresourceRegion(src, srcSubresource, new ResourceRegion(0, 0, 0, size.Width, size.Height, size.Depth),
                 dst, dstSubresource);
         }
-
-        public void GenerateMips(ShaderResourceView res)
+        public byte[] GetData(Resource res, int subresource, Size3 size, int pixelByteSize)
         {
-            context.GenerateMips(res);
-        }
-
-        public byte[] GetData(Resource res, int subresource, int width, int height, int pixelByteSize)
-        {
-            var result = new byte[width * height * pixelByteSize];
+            var result = new byte[size.Product * pixelByteSize];
             var data = context.MapSubresource(res, subresource, MapMode.Read, MapFlags.None);
             int srcOffset = 0;
             int dstOffset = 0;
-            int rowSize = width * pixelByteSize;
+            int rowSize = size.Width * pixelByteSize;
+            int sliceOffset = data.SlicePitch - data.RowPitch * size.Height;
             Debug.Assert(rowSize <= data.RowPitch);
 
-            for (int curY = 0; curY < height; ++curY)
+            for (int curZ = 0; curZ < size.Depth; ++curZ)
             {
-                Marshal.Copy(data.DataPointer + srcOffset, result, dstOffset, rowSize);
+                for (int curY = 0; curY < size.Height; ++curY)
+                {
+                    Marshal.Copy(data.DataPointer + srcOffset, result, dstOffset, rowSize);
 
-                srcOffset += data.RowPitch;
-                dstOffset += rowSize;
+                    srcOffset += data.RowPitch;
+                    dstOffset += rowSize;
+                }
+                srcOffset += sliceOffset;
             }
 
             context.UnmapSubresource(res, subresource);
@@ -96,24 +102,31 @@ namespace ImageFramework.DirectX
             return result;
         }
 
-        public void GetData(Texture2D res, int subresource, int width, int height, IntPtr dst, uint size)
+        public void GetData(Resource res, Format format, int subresource, Size3 dim, IntPtr dst, uint size)
         {
-            Debug.Assert(IO.SupportedFormats.Contains(res.Description.Format));
+            Debug.Assert(IO.SupportedFormats.Contains(format) || format == Format.R8_UInt);
             int pixelSize = 4;
-            if (res.Description.Format == Format.R32G32B32A32_Float)
+            if (format == Format.R32G32B32A32_Float)
                 pixelSize = 16;
+            if (format == Format.R8_UInt)
+                pixelSize = 1;
 
             // verify expected size
-            Debug.Assert((uint)(height * width * pixelSize) == size);
+            Debug.Assert((uint)(dim.Product * pixelSize) == size);
 
             var data = context.MapSubresource(res, subresource, MapMode.Read, MapFlags.None);
-            int rowSize = width * pixelSize;
+            int rowSize = dim.Width * pixelSize;
+            int sliceOffset = data.SlicePitch - data.RowPitch * dim.Height;
 
-            for (int curY = 0; curY < height; ++curY)
+            for (int curZ = 0; curZ < dim.Depth; ++curZ)
             {
-                Dll.CopyMemory(dst, data.DataPointer, (uint)rowSize);
-                dst += rowSize;
-                data.DataPointer += data.RowPitch;
+                for (int curY = 0; curY < dim.Height; ++curY)
+                {
+                    Dll.CopyMemory(dst, data.DataPointer, (uint)rowSize);
+                    dst += rowSize;
+                    data.DataPointer += data.RowPitch;
+                }
+                data.DataPointer += sliceOffset;
             }
 
             context.UnmapSubresource(res, subresource);
@@ -136,7 +149,7 @@ namespace ImageFramework.DirectX
                 dst[i] = Marshal.PtrToStructure<T>(data.DataPointer);
                 data.DataPointer += elementSize;
             }
-            
+
             context.UnmapSubresource(b, 0);
         }
 
@@ -145,14 +158,14 @@ namespace ImageFramework.DirectX
         /// Mainly for debug purposes
         /// </summary>
         /// <returns></returns>
-        public unsafe Color[] GetColorData(Texture2D res, int subresource, int width, int height)
+        public unsafe Color[] GetColorData(Resource res, Format format, int subresource, Size3 size)
         {
-            Debug.Assert(IO.SupportedFormats.Contains(res.Description.Format));
+            Debug.Assert(IO.SupportedFormats.Contains(format) || format == Format.R8_UInt);
 
-            if (res.Description.Format == Format.R32G32B32A32_Float)
+            if (format == Format.R32G32B32A32_Float)
             {
-                var tmp = GetData(res, subresource, width, height, 4 * 4);
-                var result = new Color[width * height];
+                var tmp = GetData(res, subresource, size, 4 * 4);
+                var result = new Color[size.Product];
                 fixed (byte* pBuffer = tmp)
                 {
                     for (int i = 0; i < result.Length; i++)
@@ -161,12 +174,28 @@ namespace ImageFramework.DirectX
 
                 return result;
             }
+            else if (format == Format.R8_UInt)
+            {
+                var tmp = GetData(res, subresource, size, 1);
+                var result = new Color[size.Product];
+                fixed (byte* pBuffer = tmp)
+                {
+                    for (int dst = 0, src = 0; dst < result.Length; ++dst, src += 1)
+                    {
+                        result[dst] = new Color((float)(pBuffer[src]), 0.0f, 0.0f);
+                    }
+                }
+                return result;
+
+            }
+
+
             else
             {
-                var tmp = GetData(res, subresource, width, height, 4);
-                var result = new Color[width * height];
-                bool isSigned = res.Description.Format == Format.R8G8B8A8_SNorm;
-                bool isSrgb = res.Description.Format == Format.R8G8B8A8_UNorm_SRgb;
+                var tmp = GetData(res, subresource, size, 4);
+                var result = new Color[size.Product];
+                bool isSigned = format == Format.R8G8B8A8_SNorm;
+                bool isSrgb = format == Format.R8G8B8A8_UNorm_SRgb;
                 fixed (byte* pBuffer = tmp)
                 {
                     for (int dst = 0, src = 0; dst < result.Length; ++dst, src += 4)
@@ -181,12 +210,19 @@ namespace ImageFramework.DirectX
             }
         }
 
+        public static readonly int DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION = 65535;
+
         public void Dispatch(int x, int y, int z = 1)
         {
+            // test agains feature level 11.0 specs
+            Debug.Assert(x <= DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION);
+            Debug.Assert(y <= DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION);
+            Debug.Assert(z <= DISPATCH_MAX_THREAD_GROUPS_PER_DIMENSION);
             context.Dispatch(x, y, z);
         }
 
         public VertexShaderStage Vertex => context.VertexShader;
+        public GeometryShaderStage Geometry => context.GeometryShader;
         public PixelShaderStage Pixel => context.PixelShader;
         public ComputeShaderStage Compute => context.ComputeShader;
         public InputAssemblerStage InputAssembler => context.InputAssembler;
@@ -236,10 +272,18 @@ namespace ImageFramework.DirectX
             return Handle.CheckFormatSupport(f);
         }
 
-        public void DrawQuad()
+        public void DrawQuad(int count = 1)
         {
             context.InputAssembler.InputLayout = null;
-            context.Draw(4, 0);
+            context.Draw(4 * count, 0);
+        }
+
+        public void DrawFullscreenTriangle(int count = 1)
+        {
+            context.InputAssembler.InputLayout = null;
+            InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
+            context.Draw(3 * count, 0);
+            InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
         }
 
         public void UpdateBufferData<T>(Buffer buffer, T data) where T : struct
@@ -252,7 +296,7 @@ namespace ImageFramework.DirectX
             context.UpdateSubresource(data, buffer);
         }
 
-        public void EndQuery(Query query)
+        public void EndQuery(SharpDX.Direct3D11.Query query)
         {
             context.End(query);
         }
@@ -261,9 +305,30 @@ namespace ImageFramework.DirectX
         /// true if the event is completed
         /// </summary>
         /// <param name="query"></param>
-        public bool GetQueryEventData(Query query)
+        public bool GetQueryEventData(SharpDX.Direct3D11.Query query)
         {
-            return context.GetData<int>(query) != 0;
+            return context.GetData<int>(query, AsynchronousFlags.DoNotFlush) != 0;
+        }
+
+        public void Flush()
+        {
+            context.Flush();
+        }
+
+        public void CopyBufferData(Buffer src, Buffer dst, int size, int srcOffset = 0, int dstOffstet = 0)
+        {
+            context.CopySubresourceRegion(src, 0, new ResourceRegion(srcOffset, 0, 0, srcOffset + size, 1, 1),
+                dst, 0, dstOffstet, 0, 0);
+        }
+
+        public void Begin(Asynchronous ass)
+        {
+            context.Begin(ass);
+        }
+
+        public void End(Asynchronous ass)
+        {
+            context.End(ass);
         }
     }
 }

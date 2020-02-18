@@ -65,17 +65,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DirectX\DDSTextureLoader.cs" />
+    <Compile Include="DirectX\Texture3DTests.cs" />
     <Compile Include="DirectX\TextureArray2DTests.cs" />
     <Compile Include="ImageLoader\DllTest.cs" />
     <Compile Include="Model\Filter\FilterLoaderTest.cs" />
+    <Compile Include="Model\Filter\FiltersModelTest.cs" />
     <Compile Include="Model\ImagePipelineTest.cs" />
     <Compile Include="Model\Equation\EquationTest.cs" />
     <Compile Include="Model\Equation\ImageCombineTest.cs" />
     <Compile Include="Model\ExportTest.cs" />
+    <Compile Include="Model\OverlayTest.cs" />
+    <Compile Include="Model\Scaling\DownscalingTest.cs" />
     <Compile Include="Model\Shader\ConvertFormatShaderTest.cs" />
+    <Compile Include="Model\Shader\GaussShaderTest.cs" />
     <Compile Include="Model\Shader\GifShaderTest.cs" />
     <Compile Include="Model\Shader\PixelValueShaderTest.cs" />
+    <Compile Include="Model\Shader\ReduceTest.cs" />
     <Compile Include="Model\Shader\ScaleShaderTest.cs" />
+    <Compile Include="Model\Shader\TransformShaderTest.cs" />
     <Compile Include="Model\StatisticsTest.cs" />
     <Compile Include="Model\ThumbnailTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

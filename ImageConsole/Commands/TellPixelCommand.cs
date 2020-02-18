@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Model;
+using ImageFramework.Utility;
 
 namespace ImageConsole.Commands
 {
@@ -25,7 +26,7 @@ namespace ImageConsole.Commands
             reader.ExpectNoMoreArgs();
 
             model.Apply();
-            var color = model.GetPixelValue(model.Pipelines[0].Image, x, y, layer, mipmap, radius);
+            var color = model.GetPixelValue(model.Pipelines[0].Image, new Size3(x, y, 0), new LayerMipmapSlice(layer, mipmap), radius);
             Console.Out.WriteLine(color.ToDecimalString(true, 5));
             
             color = color.ToSrgb();

@@ -1,5 +1,6 @@
 #setting title, Gamma Correction
 #setting description, Nonlinear operation used to encode and decode luminance or tristimulus values in video or still image systems. Formula: |Factor * V| ^ (1/Gamma).
+#setting type, COLOR
 
 #param Gamma, gamma, float, 1, 0
 #paramprop Gamma, onSubtract, -0.1, add
@@ -15,10 +16,8 @@
 #keybinding Factor, Subtract, 0.5, multiply
 #keybinding Factor, OemMinus, 0.5, multiply
 
-float4 filter(int2 pixelCoord, int2 size)
+float4 filter(float4 color)
 {
-	float4 color = src_image[pixelCoord];
-
 	float3 sgn = sign(color.rgb);
 	color.rgb = abs(color.rgb * factor);
 	const float invGamma = 1.0 / gamma;

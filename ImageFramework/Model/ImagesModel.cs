@@ -2,57 +2,63 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
+using ImageFramework.Model.Scaling;
 using ImageFramework.Model.Shader;
+using ImageFramework.Utility;
+using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+using Texture3D = ImageFramework.DirectX.Texture3D;
 
 namespace ImageFramework.Model
 {
-    /// <summary>
-    /// collection of imported images that will be used in image equations
-    /// </summary>
     public class ImagesModel : INotifyPropertyChanged, IDisposable
-    { 
-        private struct Dimension
-        {
-            public int Width { get; set; }
-            public int Height { get; set; }
-        }
-
-        private Dimension[] dimensions = null;
+    {
         private MitchellNetravaliScaleShader scaleShader;
+
+        private Size3[] dimensions = null;
 
         public class MipmapMismatch : Exception
         {
             public MipmapMismatch(string message) : base(message)
-            {}
+            { }
         }
 
         public class ImageData : IDisposable
         {
-            public TextureArray2D Image { get; private set; }
+            public ITexture Image { get; private set; }
             public int NumMipmaps => Image.NumMipmaps;
             public int NumLayers => Image.NumLayers;
             public bool IsHdr => Image.Format == Format.R32G32B32A32_Float;
             public string Filename { get; }
-            public GliFormat OriginalFormat { get; }
+            // name that will be displayed
+            public string Alias { get; internal set; }
+            public GliFormat OriginalFormat { get; private set; }
 
-            internal ImageData(TextureArray2D image, string filename, GliFormat originalFormat)
+            public DateTime? LastModified { get; }
+
+            internal ImageData(ITexture image, string filename, GliFormat originalFormat)
             {
                 Image = image;
                 Filename = filename;
                 OriginalFormat = originalFormat;
+                Alias = System.IO.Path.GetFileNameWithoutExtension(filename);
+                if (File.Exists(Filename))
+                {
+                    LastModified = File.GetLastWriteTime(Filename);
+                }
             }
 
-            internal void GenerateMipmaps(int levels)
+            internal void GenerateMipmaps(int levels, ScalingModel scaling)
             {
-                var tmp = Image.GenerateMipmapLevels(levels);
+                var tmp = Image.CloneWithMipmaps(levels);
+                scaling.WriteMipmaps(tmp);
                 Image.Dispose();
                 Image = tmp;
             }
@@ -64,77 +70,92 @@ namespace ImageFramework.Model
                 Image = tmp;
             }
 
-
             public void Dispose()
             {
-                Image?.Dispose();
+                Image.Dispose();
             }
 
-            public void Scale(int width, int height, MitchellNetravaliScaleShader scale)
+            public void Scale(Size3 size, MitchellNetravaliScaleShader shader, ScalingModel scaling)
             {
-                var tmp = scale.Run(Image, width, height);
+                var tmp = shader.Run((TextureArray2D) Image, size, scaling);
                 Image.Dispose();
                 Image = tmp;
+            }
+
+            public void Replace(ITexture image, GliFormat originalFormat)
+            {
+                Image.Dispose();
+                Image = image;
+                OriginalFormat = originalFormat;
             }
         }
 
         private readonly List<ImageData> images = new List<ImageData>();
-
-        #region Public Properties
-
         public IReadOnlyList<ImageData> Images { get; }
 
         // this property change will be triggered if the image order changes (and not if the number of images changes)
         public static string ImageOrder = nameof(ImageOrder);
-        public int NumImages => images.Count;
-        public int NumMipmaps => images.Count == 0 ? 0 : images[0].NumMipmaps;
-        public int NumLayers => images.Count == 0 ? 0 : images[0].NumLayers;
+        // this property change will be triggered if an images changed its alias
+        public static string ImageAlias = nameof(ImageAlias);
+
+        public int NumImages => Images.Count;
+        public int NumMipmaps => Images.Count == 0 ? 0 : Images[0].NumMipmaps;
+        public int NumLayers => Images.Count == 0 ? 0 : Images[0].NumLayers;
 
         /// <summary>
         /// true if any image is hdr
         /// </summary>
-        public bool IsHdr => images.Any(imageData => imageData.IsHdr);
+        public bool IsHdr => Images.Any(imageData => imageData.IsHdr);
 
-        /// <summary>
-        /// width for the biggest mipmap (or 0 if no images are present)
-        /// </summary>
-        public int Width => images.Count != 0 ? GetWidth(0) : 0;
-        /// <summary>
-        /// height for the biggest mipmap (or 0 if no images are present)
-        /// </summary>
-        public int Height => images.Count != 0 ? GetHeight(0) : 0;
+        public Type ImageType => Images.Count == 0 ? null : Images[0].Image.GetType();
 
         // helper for many other models
         /// <summary>
         /// previous number of images
         /// </summary>
-        public int PrevNumImages { get; private set; } = 0;
+        public int PrevNumImages { get; protected set; } = 0;
 
-        /// <summary>
-        /// width of the mipmap
-        /// </summary>
-        /// <param name="mipmap"></param>
-        /// <returns></returns>
+        public Size3 Size => Images.Count == 0 ? Size3.Zero : GetSize(0);
+        public bool Is3D => Images.Count != 0 && images[0].Image.Is3D;
+
+        /// size of the mipmap
+        public Size3 GetSize(int mipmap)
+        {
+            Debug.Assert(Images.Count != 0);
+            Debug.Assert(mipmap < NumMipmaps && mipmap >= 0);
+            return dimensions[mipmap];
+        }
+
         public int GetWidth(int mipmap)
         {
-            Debug.Assert(images.Count != 0);
+            Debug.Assert(Images.Count != 0);
             Debug.Assert(mipmap < NumMipmaps && mipmap >= 0);
             return dimensions[mipmap].Width;
         }
 
-        /// <summary>
-        /// height of the mipmap
-        /// </summary>
-        /// <param name="mipmap"></param>
-        /// <returns></returns>
         public int GetHeight(int mipmap)
         {
-            Debug.Assert(images.Count != 0);
+            Debug.Assert(Images.Count != 0);
             Debug.Assert(mipmap < NumMipmaps && mipmap >= 0);
             return dimensions[mipmap].Height;
         }
 
-        #endregion
+        public int GetDepth(int mipmap)
+        {
+            Debug.Assert(Images.Count != 0);
+            Debug.Assert(mipmap < NumMipmaps && mipmap >= 0);
+            return dimensions[mipmap].Depth;
+        }
+
+        /// returns true if the dimension match with the internal images 
+        public bool HasMatchingProperties(ITexture tex)
+        {
+            if (tex.NumLayers != NumLayers) return false;
+            if (tex.NumMipmaps != NumMipmaps) return false;
+            if (tex.Size != Size) return false;
+            if (tex.GetType() != ImageType) return false;
+            return true;
+        }
 
         public ImagesModel(MitchellNetravaliScaleShader scaleShader)
         {
@@ -145,11 +166,11 @@ namespace ImageFramework.Model
         /// <summary>
         /// tries to add the image to the current collection.
         /// </summary>
-        /// <exception cref="MipmapMismatch">will be thrown if everything except the number of mipmaps matches</exception>
+        /// <exception cref="ImagesModel.MipmapMismatch">will be thrown if everything except the number of mipmaps matches</exception>
         /// <exception cref="Exception">will be thrown if the images does not match with the current set of images</exception>
-        public void AddImage(TextureArray2D image, string name, GliFormat originalFormat)
+        public void AddImage(ITexture image, string name, GliFormat originalFormat)
         {
-            if (images.Count == 0) // first image
+            if (Images.Count == 0) // first image
             {
                 InitDimensions(image);
                 images.Add(new ImageData(image, name, originalFormat));
@@ -158,19 +179,12 @@ namespace ImageFramework.Model
                 OnPropertyChanged(nameof(NumLayers));
                 OnPropertyChanged(nameof(NumMipmaps));
                 OnPropertyChanged(nameof(IsHdr));
-                OnPropertyChanged(nameof(Width));
-                OnPropertyChanged(nameof(Height));
+                OnPropertyChanged(nameof(Size));
+                OnPropertyChanged(nameof(ImageType));
             }
             else // test if compatible with previous images
             {
-                if(image.NumLayers != NumLayers)
-                    throw new Exception($"{name}: Inconsistent amount of layers. Expected {NumLayers} got {image.NumLayers}");
-
-                if (image.GetWidth(0) != GetWidth(0) || image.GetHeight(0) != GetHeight(0))
-                    throw new Exception($"{name}: Image resolution mismatch. Expected {GetWidth(0)}x{GetHeight(0)} but got {image.GetWidth(0)}x{image.GetHeight(0)}");
-
-                if (image.NumMipmaps != NumMipmaps)
-                    throw new MipmapMismatch($"{name}: Inconsistent amount of mipmaps. Expected {NumMipmaps} got {image.NumMipmaps}");
+                TestCompability(image, name);
 
                 // remember old properties
                 var isHdr = IsHdr;
@@ -184,16 +198,49 @@ namespace ImageFramework.Model
             }
         }
 
+        /// <summary>
+        /// replaces an existing image. (Name will be kept)
+        /// </summary>
+        /// <param name="idx">replace idx</param>
+        /// <param name="image">new image</param>
+        /// <param name="originalFormat">new format</param>
+        public void ReplaceImage(int idx, ITexture image, GliFormat originalFormat)
+        {
+            Debug.Assert(idx < NumImages);
+            TestCompability(image, images[idx].Filename);
+
+            // remember old properties
+            var isHdr = IsHdr;
+
+            images[idx].Replace(image, originalFormat);
+            OnPropertyChanged(nameof(ImageOrder));
+
+            if (isHdr != IsHdr)
+                OnPropertyChanged(nameof(IsHdr));
+        }
+
+        /// <summary>
+        /// changed alias of the specified image
+        /// </summary>
+        public void RenameImage(int idx, string newAlias)
+        {
+            Debug.Assert(idx < NumImages);
+            images[idx].Alias = newAlias;
+            OnPropertyChanged(nameof(ImageAlias));
+        }
+
         public void Clear()
         {
             PrevNumImages = NumImages;
             Dispose();
+            images.Clear();
 
             // everything was resettet
+            OnPropertyChanged(nameof(NumImages));
             OnPropertyChanged(nameof(NumLayers));
             OnPropertyChanged(nameof(NumMipmaps));
-            OnPropertyChanged(nameof(Width));
-            OnPropertyChanged(nameof(Height));
+            OnPropertyChanged(nameof(Size));
+            OnPropertyChanged(nameof(ImageType));
         }
 
         public void DeleteImage(int imageId)
@@ -218,8 +265,8 @@ namespace ImageFramework.Model
                 // everything was resettet
                 OnPropertyChanged(nameof(NumLayers));
                 OnPropertyChanged(nameof(NumMipmaps));
-                OnPropertyChanged(nameof(Width));
-                OnPropertyChanged(nameof(Height));
+                OnPropertyChanged(nameof(Size));
+                OnPropertyChanged(nameof(ImageType));
             }
         }
 
@@ -246,30 +293,21 @@ namespace ImageFramework.Model
         /// <summary>
         /// generates mipmaps for all images
         /// </summary>
-        public void GenerateMipmaps()
+        public void GenerateMipmaps(ScalingModel scaling)
         {
             Debug.Assert(NumMipmaps == 1);
 
             // compute new mipmap levels
-            var levels = ComputeMaxMipLevels();
+            var levels = Size.MaxMipLevels;
             if (levels == NumMipmaps) return;
 
-            foreach (var image in images)
+            foreach (var image in Images)
             {
-                image.GenerateMipmaps(levels);
+                image.GenerateMipmaps(levels, scaling);
             }
 
             // recalc dimensions array
-            var w = Width;
-            var h = Height;
-            dimensions = new Dimension[levels];
-            for (int i = 0; i < levels; ++i)
-            {
-                dimensions[i].Width = w;
-                dimensions[i].Height = h;
-                w = Math.Max(w / 2, 1);
-                h = Math.Max(h / 2, 1);
-            }
+            InitDimensions(Images[0].Image);
 
             OnPropertyChanged(nameof(NumMipmaps));
         }
@@ -277,16 +315,12 @@ namespace ImageFramework.Model
         public void DeleteMipmaps()
         {
             Debug.Assert(NumMipmaps > 1);
-            foreach (var image in images)
+            foreach (var image in Images)
             {
                 image.DeleteMipmaps();
             }
             // refresh dimensions array
-            var w = Width;
-            var h = Height;
-            dimensions = new Dimension[1];
-            dimensions[0].Width = w;
-            dimensions[0].Height = h;
+            InitDimensions(Images[0].Image);
 
             OnPropertyChanged(nameof(NumMipmaps));
         }
@@ -294,59 +328,63 @@ namespace ImageFramework.Model
         /// <summary>
         /// scales all images to the given dimensions
         /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        public void ScaleImages(int width, int height)
+        public void ScaleImages(Size3 size, ScalingModel scaling)
         {
             if (NumImages == 0) return;
-            if (Width == width && Height == height) return;
+            if (Size == size) return;
+            if (ImageType != typeof(TextureArray2D))
+                throw new Exception("scaling is only supported for 2D images");
+            
             var prevMipmaps = NumMipmaps;
 
             foreach (var imageData in Images)
             {
-                imageData.Scale(width, height, scaleShader);
+                imageData.Scale(size, scaleShader, scaling);
             }
 
             InitDimensions(images[0].Image);
 
-            OnPropertyChanged(nameof(Width));
-            OnPropertyChanged(nameof(Height));
+            OnPropertyChanged(nameof(Size));
             if(prevMipmaps != NumMipmaps)
                 OnPropertyChanged(nameof(NumMipmaps));
         }
 
-        private void InitDimensions(TextureArray2D image)
+        protected void InitDimensions(ITexture image)
         {
-            dimensions = new Dimension[image.NumMipmaps];
+            dimensions = new Size3[image.NumMipmaps];
             for (var i = 0; i < image.NumMipmaps; ++i)
             {
-                dimensions[i] = new Dimension
-                {
-                    Width = image.GetWidth(i),
-                    Height = image.GetHeight(i)
-                };
+                dimensions[i] = image.Size.GetMip(i);
             }
         }
 
         /// <summary>
-        /// computes the maximum amount of mipmap levels for the specified width and height
+        /// tests if the image properties match with the current image configuration
         /// </summary>
-        /// <returns></returns>
-        public static int ComputeMaxMipLevels(int width, int height)
+        private void TestCompability(ITexture image, string name)
         {
-            var resolution = Math.Max(width, height);
-            var maxMip = 1;
-            while ((resolution /= 2) > 0) ++maxMip;
-            return maxMip;
-        }
+            Debug.Assert(NumImages > 0);
+            if (image.GetType() != ImageType)
+                throw new Exception($"{name}: Incompatible with internal texture types. Expected {ImageType.Name} but got {image.GetType().Name}");
 
-        /// <summary>
-        /// computes the maximum amount of mipmap levels for the current width and height
-        /// </summary>
-        /// <returns></returns>
-        private int ComputeMaxMipLevels()
-        {
-            return ComputeMaxMipLevels(Width, Height);
+            if (image.NumLayers != NumLayers)
+                throw new Exception(
+                    $"{name}: Inconsistent amount of layers. Expected {NumLayers} got {image.NumLayers}");
+
+            if (image.Size != Size)
+            {
+                if (Size.Depth > 1)
+                    throw new Exception(
+                        $"{name}: Image resolution mismatch. Expected {Size.X}x{Size.Y}x{Size.Z} but got {image.Size.X}x{image.Size.Y}x{image.Size.Z}");
+
+                throw new Exception(
+                    $"{name}: Image resolution mismatch. Expected {Size.X}x{Size.Y} but got {image.Size.X}x{image.Size.Y}");
+            }
+
+
+            if (image.NumMipmaps != NumMipmaps)
+                throw new ImagesModel.MipmapMismatch(
+                    $"{name}: Inconsistent amount of mipmaps. Expected {NumMipmaps} got {image.NumMipmaps}");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -357,17 +395,18 @@ namespace ImageFramework.Model
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        /// <summary>
-        /// deletes all opengl related data.
-        /// Component should not be used after this
-        /// </summary>
         public void Dispose()
         {
-            foreach (var imageData in images)
+            foreach (var imageData in Images)
             {
                 imageData.Dispose();
             }
-            images.Clear();
+        }
+
+        public ITexture CreateEmptyTexture(Format format, bool createUav)
+        {
+            Debug.Assert(images.Count != 0);
+            return images[0].Image.Create(new LayerMipmapCount(NumLayers, NumMipmaps), Size, format, createUav);
         }
     }
 }

@@ -8,6 +8,7 @@ using ImageFramework.Model;
 using ImageFramework.Model.Export;
 using ImageFramework.Utility;
 using ImageViewer.Models;
+using ImageViewer.Models.Display;
 
 namespace ImageViewer.Controller
 {
@@ -16,23 +17,68 @@ namespace ImageViewer.Controller
     /// </summary>
     public class CropController
     {
+        // overlay that synchronizes export and display model settings with the crop overlay
+        private class CropOverlay : ImageFramework.Model.Overlay.CropOverlay
+        {
+            private readonly ModelsEx models;
+
+            public CropOverlay(ModelsEx models) : base(models)
+            {
+                this.models = models;
+                models.Display.PropertyChanged += DisplayOnPropertyChanged;
+                models.ExportConfig.PropertyChanged += ExportOnPropertyChanged;
+
+                Start = models.ExportConfig.CropStart;
+                End = models.ExportConfig.CropEnd;
+                Layer = models.ExportConfig.Layer;
+                EvaluateIsEnabled();
+            }
+
+            private void ExportOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+            {
+                switch (e.PropertyName)
+                {
+                    case nameof(ExportConfigModel.UseCropping):
+                        EvaluateIsEnabled();
+                        break;
+                    case nameof(ExportConfigModel.CropStart):
+                        Start = models.ExportConfig.CropStart;
+                        break;
+                    case nameof(ExportConfigModel.CropEnd):
+                        End = models.ExportConfig.CropEnd;
+                        break;
+                    case nameof(ExportConfigModel.Layer):
+                        Layer = models.ExportConfig.Layer;
+                        break;
+                }
+
+            }
+
+            private void DisplayOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+            {
+                switch (e.PropertyName)
+                {
+                    case nameof(DisplayModel.IsExporting):
+                    case nameof(DisplayModel.ShowCropRectangle):
+                        EvaluateIsEnabled();
+                        break;
+                }
+            }
+
+            private void EvaluateIsEnabled()
+            {
+                IsEnabled = models.ExportConfig.UseCropping &&
+                            (models.Display.IsExporting || models.Display.ShowCropRectangle);
+            }
+        }
+
         private readonly ModelsEx models;
 
         public CropController(ModelsEx models)
         {
             this.models = models;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
-            this.models.Export.PropertyChanged += ExportOnPropertyChanged;
-        }
-
-        private void ExportOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(ExportModel.Mipmap):
-                    AdjustCroppingRect(false);
-                    break;
-            }
+            this.models.Overlay.Overlays.Add(new CropOverlay(models));
         }
 
         private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -41,44 +87,16 @@ namespace ImageViewer.Controller
             {
                 case nameof(ImagesModel.NumImages):
                     if (models.Images.PrevNumImages == 0)
-                        AdjustCroppingRect(true);
+                        AdjustCroppingRect();
                     break;
             }
         }
 
-        private void AdjustCroppingRect(bool overwrite)
+        private void AdjustCroppingRect()
         {
-            if (models.Images.NumImages == 0)
-                return; // no need to adjust
-
-            var mip = models.Export.Mipmap;
-            if (models.Images.NumMipmaps == 1) // => all mipmaps (-1) is equal to the first mipmap
-                mip = 0;
-
-            // all mipmaps does not support cropping
-            if (mip == -1) return;
-
-            // no valid mipmap set yet
-            if (mip >= models.Images.NumMipmaps) return;
-
-            var maxX = models.Images.GetWidth(mip) - 1;
-            var maxY = models.Images.GetHeight(mip) - 1;
-
-            if (overwrite)
-            {
-                models.Export.CropStartX = 0;
-                models.Export.CropStartY = 0;
-                models.Export.CropEndX = maxX;
-                models.Export.CropEndY = maxX;
-            }
-            else
-            {
-                models.Export.CropStartX = Utility.Clamp(models.Export.CropStartX, 0, maxX);
-                models.Export.CropStartY = Utility.Clamp(models.Export.CropStartY, 0, maxY);
-
-                models.Export.CropEndX = Utility.Clamp(models.Export.CropEndX, models.Export.CropStartX, maxX);
-                models.Export.CropEndY = Utility.Clamp(models.Export.CropEndY, models.Export.CropStartY, maxY);
-            }
+            // reset cropping rect
+            models.ExportConfig.CropStart = Float3.Zero;
+            models.ExportConfig.CropEnd = Float3.One;
         }
     }
 }

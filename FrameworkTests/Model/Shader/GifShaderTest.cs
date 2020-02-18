@@ -27,8 +27,8 @@ namespace FrameworkTests.Model.Shader
             shader.Run(left.GetSrView(0, 0), right.GetSrView(0, 0), dst.GetRtView(0, 0), 
                 1, 2, left.Width, left.Height);
 
-            var dstColors = dst.GetPixelColors(0, 0);
-            var refColors = reference.GetPixelColors(0, 0);
+            var dstColors = dst.GetPixelColors(LayerMipmapSlice.Mip0);
+            var refColors = reference.GetPixelColors(LayerMipmapSlice.Mip0);
             TestData.CompareColors(refColors, dstColors);
         }
 

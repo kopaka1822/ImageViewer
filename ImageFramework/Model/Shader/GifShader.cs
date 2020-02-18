@@ -20,13 +20,13 @@ namespace ImageFramework.Model.Shader
 
         private readonly QuadShader quad;
         private readonly DirectX.Shader pixel;
-        private readonly UploadBuffer<BufferData> cbuffer;
+        private readonly UploadBuffer cbuffer;
 
-        public GifShader(QuadShader quad)
+        public GifShader(QuadShader quad, UploadBuffer upload)
         {
             this.quad = quad;
             pixel = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(), "GifPixelShader");
-            cbuffer = new UploadBuffer<BufferData>(1);
+            cbuffer = upload;
         }
 
         public void Run(ShaderResourceView left, ShaderResourceView right, RenderTargetView dst, int borderSize, int borderLocation, int width, int height)
@@ -34,8 +34,8 @@ namespace ImageFramework.Model.Shader
             Debug.Assert(borderLocation >= 0);
             Debug.Assert(borderLocation < width);
 
+            quad.Bind(false);
             var dev = Device.Get();
-            dev.Vertex.Set(quad.Vertex);
             dev.Pixel.Set(pixel.Pixel);
 
             // update buffer
@@ -57,6 +57,7 @@ namespace ImageFramework.Model.Shader
             dev.Pixel.SetShaderResource(0, null);
             dev.Pixel.SetShaderResource(1, null);
             dev.OutputMerger.SetRenderTargets((RenderTargetView)null);
+            quad.Unbind();
         }
 
         private static string GetSource()

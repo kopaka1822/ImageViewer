@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using ImageFramework.Utility;
 using ImageViewer.ViewModels.Dialog;
 
 namespace ImageViewer.Views.Dialog
@@ -35,9 +36,14 @@ namespace ImageViewer.Views.Dialog
         }
 
 
-        public PixelColorDialog(List<Element> colors)
+        public PixelColorDialog(List<Element> colors, Size3 texel, bool imagesIs3D)
         {
             InitializeComponent();
+
+            Title = $"Pixel Color [{texel.X} {texel.Y}";
+            if (imagesIs3D)
+                Title += " " + texel.Z;
+            Title += "]";
 
             foreach (var color in colors)
             {

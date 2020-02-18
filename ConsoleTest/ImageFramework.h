@@ -24,6 +24,7 @@ namespace ImageFramework
 			float luminance;
 			float lightness;
 			float luma;
+			float avg;
 		};
 
 		struct StatisticModel
@@ -127,19 +128,23 @@ namespace ImageFramework
 
 		Statistic GetStatistic(std::string_view name) const
 		{
+			Statistic stat;
+			stat.luminance = GetSingleStatistic(name, "luminance");
+			stat.lightness = GetSingleStatistic(name, "lightness");
+			stat.luma = GetSingleStatistic(name, "luma");
+			stat.avg = GetSingleStatistic(name, "avg");
+			return stat;
+		}
+
+		float GetSingleStatistic(std::string_view metric, std::string_view name) const
+		{
 			m_in.Write("-stats ");
+			m_in.Write(metric);
+			m_in.Write(" ");
 			m_in.Write(name);
 			m_in.Write("\n");
 
-			const auto luminance = ReadLine();
-			const auto lightness = ReadLine();
-			const auto luma = ReadLine();
-
-			Statistic stat;
-			stat.luminance = GetLastFloat(luminance);
-			stat.lightness = GetLastFloat(lightness);
-			stat.luma = GetLastFloat(luma);
-			return stat;
+			return std::stof(ReadLine());
 		}
 
 		static float GetLastFloat(const std::string& text)
@@ -169,12 +174,23 @@ namespace ImageFramework
 		mutable detail::Pipeline m_in;
 		detail::Pipeline m_out;
 		detail::Pipeline m_err;
+		HANDLE m_jobHandle = nullptr;
 	};
 
 	inline Model::Model(const std::string& consolePath) :
 	m_info({}),
 		m_in(detail::Pipeline::StdIn), m_out(detail::Pipeline::StdOut), m_err(detail::Pipeline::StdOut)
 	{
+		// create job which kills the child if the parent is terminated
+		m_jobHandle = CreateJobObjectA(nullptr, nullptr);
+
+		JOBOBJECT_EXTENDED_LIMIT_INFORMATION jobInfo = {};
+		jobInfo.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+
+		if (!SetInformationJobObject(m_jobHandle, JobObjectExtendedLimitInformation, &jobInfo, sizeof(jobInfo)))
+			throw std::runtime_error("could not set job information for JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE");
+
+		// start ImageConsole.exe process
 		STARTUPINFOA st;
 		ZeroMemory(&st, sizeof(st));
 		st.cb = sizeof(st);
@@ -198,6 +214,10 @@ namespace ImageFramework
 			&st,
 			&m_info
 		)) throw std::runtime_error("could not launch ImageConsole.exe");
+
+		// link image console process with job object
+		if (!AssignProcessToJobObject(m_jobHandle, m_info.hProcess))
+			throw std::runtime_error("could not link imageconsole process with JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE object");
 	}
 
 	inline Model::~Model()
@@ -214,6 +234,7 @@ namespace ImageFramework
 
 		CloseHandle(m_info.hProcess);
 		CloseHandle(m_info.hThread);
+		CloseHandle(m_jobHandle);
 	}
 
 	inline void Model::OpenImage(std::string_view filename)

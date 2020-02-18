@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageFramework.Model.Shader;
+using ImageFramework.Model.Statistics;
 using ImageFramework.Utility;
 using ImageViewer.Properties;
 using ImageViewer.ViewModels;
@@ -22,6 +23,16 @@ namespace ImageViewer.Models
             LinearFloat,
             SrgbDecimal,
             SrgbByte
+        }
+
+        public enum Statistics
+        {
+            Luminance = DefaultStatistics.Types.Luminance,
+            Average = DefaultStatistics.Types.Average,
+            Luma = DefaultStatistics.Types.Luma,
+            Lightness = DefaultStatistics.Types.Lightness,
+            Alpha = DefaultStatistics.Types.Alpha,
+            SSIM
         }
 
         public SettingsModel()
@@ -49,6 +60,9 @@ namespace ImageViewer.Models
                     break;
                 case nameof(Settings.Default.FlipYAxis):
                     OnPropertyChanged(nameof(FlipYAxis));
+                    break;
+                case nameof(Settings.Default.AlphaBackground):
+                    OnPropertyChanged(nameof(AlphaBackground));
                     break;
             }
         }
@@ -101,9 +115,9 @@ namespace ImageViewer.Models
             get => Settings.Default.FilterPath ?? "";
             set => Settings.Default.FilterPath = value;
         }
-        public DefaultStatistics.Values StatisticsChannel
+        public Statistics StatisticsChannel
         {
-            get => (DefaultStatistics.Values) Settings.Default.StatisticsChannel;
+            get => (Statistics) Settings.Default.StatisticsChannel;
             set => Settings.Default.StatisticsChannel = (int) value;
         }
 
@@ -135,10 +149,91 @@ namespace ImageViewer.Models
             }
         }
 
+        public enum AlphaType
+        {
+            Black,
+            White,
+            Checkers,
+            Theme
+        }
+
+        public AlphaType AlphaBackground
+        {
+            get => (AlphaType) Settings.Default.AlphaBackground;
+            set => Settings.Default.AlphaBackground = (int)value;
+        }
+
         public bool FlipYAxis
         {
             get => Settings.Default.FlipYAxis;
             set => Settings.Default.FlipYAxis = value;
+        }
+
+        public Color NaNColor
+        {
+            get => new Color(Settings.Default.NanRed, Settings.Default.NanGreen, Settings.Default.NanBlue);
+            set
+            {
+                // ReSharper disable CompareOfFloatsByEqualityOperator
+                if (Settings.Default.NanRed == value.Red && 
+                    Settings.Default.NanGreen == value.Green && 
+                    Settings.Default.NanBlue == value.Blue) return;
+
+                Settings.Default.NanRed = value.Red;
+                Settings.Default.NanGreen = value.Green;
+                Settings.Default.NanBlue = value.Blue;
+                OnPropertyChanged(nameof(NaNColor));
+            }
+        }
+
+        public Color ZoomBoxColor
+        {
+            get => new Color(Settings.Default.ZoomBoxRed, Settings.Default.ZoomBoxGreen, Settings.Default.ZoomBoxBlue);
+            set
+            {
+                // ReSharper disable CompareOfFloatsByEqualityOperator
+                if (Settings.Default.ZoomBoxRed == value.Red &&
+                    Settings.Default.ZoomBoxGreen == value.Green &&
+                    Settings.Default.ZoomBoxBlue == value.Blue) return;
+
+                Settings.Default.ZoomBoxRed = value.Red;
+                Settings.Default.ZoomBoxGreen = value.Green;
+                Settings.Default.ZoomBoxBlue = value.Blue;
+                OnPropertyChanged(nameof(ZoomBoxColor));
+            }
+        }
+
+        public int ZoomBoxBorder
+        {
+            get => Settings.Default.ZoomBoxBorder;
+            set
+            {
+                if(Settings.Default.ZoomBoxBorder == value) return;
+                Settings.Default.ZoomBoxBorder = value;
+                OnPropertyChanged(nameof(ZoomBoxBorder));
+            }
+        }
+
+        public bool ExportZoomBoxBorder
+        {
+            get => Settings.Default.ExportZoomBoxBorder;
+            set
+            {
+                if(Settings.Default.ExportZoomBoxBorder == value) return;
+                Settings.Default.ExportZoomBoxBorder = value;
+                OnPropertyChanged(nameof(ExportZoomBoxBorder));
+            }
+        }
+
+        public int ExportZoomBoxScale
+        {
+            get => Settings.Default.ExportZoomBoxScale;
+            set
+            {
+                if (Settings.Default.ExportZoomBoxScale == value) return;
+                Settings.Default.ExportZoomBoxScale = value;
+                OnPropertyChanged(nameof(ExportZoomBoxScale));
+            }
         }
 
         public void Save()

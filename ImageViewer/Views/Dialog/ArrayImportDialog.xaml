@@ -11,11 +11,11 @@
         Width="300"
         SizeToContent="Height"
         Icon="../../Icons/import.png"
+        Background="{StaticResource BackgroundBrush}"
         Style="{StaticResource WindowStyle}"
         WindowStartupLocation="CenterOwner">
-    <Border Padding="5">
+    <Border Padding="{StaticResource DefaultBorder}">
         <StackPanel>
-
             <Button 
                 Width="110" 
                 HorizontalAlignment="Right"
@@ -27,7 +27,7 @@
                     </Grid.ColumnDefinitions>
                     <Image 
                         Source="../../Icons/import.png"
-                        Margin="0 0 5 0"/>
+                        Margin="{StaticResource DefaultBorderRight}"/>
                     <TextBlock 
                         Grid.Column="1" 
                         Text="Import Image"/>
@@ -37,7 +37,7 @@
             <ListBox 
                 MinHeight="300"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
-                Margin="0 0 0 5"
+                Margin="{StaticResource DefaultBorderBottom}"
                 ItemsSource="{Binding ListItems}"
                 dd:DragDrop.IsDragSource="True"
                 dd:DragDrop.IsDropTarget="True"
@@ -55,7 +55,7 @@
                             <Button
                                 Width="16"
                                 Height="16"
-                                Margin="0 0 5 0"
+                                Margin="{StaticResource DefaultBorderRight}"
                                 Command="{Binding DeleteCommand}">
                                 <Image Source="../../Icons/cancel.png"/>
                             </Button>
@@ -72,16 +72,15 @@
             <TextBlock 
                 Visibility="{Binding CubeHelpVisibility, FallbackValue=Visible}"
                 Text="For Cubmaps: x+ x- y+ y- z+ z-"
-                Margin="0 0 0 5"/>
+                Margin="{StaticResource DefaultBorderBottom}"/>
 
             <!-- Buttons -->
             <StackPanel 
                 Orientation="Horizontal"
-                HorizontalAlignment="Right"
-                Margin="0 5 0 0">
+                HorizontalAlignment="Right">
                 <Button 
                     Content="_Apply" 
-                    Margin="0 0 10 0" 
+                    Margin="{StaticResource DefaultBorderRight}" 
                     Width="60"
                     Command="{Binding ApplyCommand}"
                 />

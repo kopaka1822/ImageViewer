@@ -1,13 +1,13 @@
 #setting title, Highlighting
 #setting description, Highlights certain colors. Uses RGB average.
+#setting type, COLOR
 
 #param Negative Values (blue), negative, bool, true
 #param Positive Values (red), positive, bool, true
 #param Oversaturated Values (green), grOne, bool, false
 
-float4 filter(int2 pixelCoord, int2 size)
+float4 filter(float4 color)
 {
-	float4 color = src_image[pixelCoord];
 	float average = (color.r + color.g + color.b) / 3.0;
 	if( negative && (average < 0.0) )
 		color = float4(0.0, 0.0, -average, 1.0);

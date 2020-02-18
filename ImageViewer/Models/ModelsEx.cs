@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Model.Overlay;
 using ImageViewer.Controller;
+using ImageViewer.Controller.TextureViews.Shared;
+using ImageViewer.Models.Display;
 
 namespace ImageViewer.Models
 {
@@ -11,10 +14,15 @@ namespace ImageViewer.Models
     {
         public WindowModel Window { get; }
         public DisplayModel Display { get; }
-
         public SettingsModel Settings { get; }
 
+        public TextureViewData ViewData { get; }
+        
+        public BoxOverlay ZoomBox { get; }
+
         public IReadOnlyList<StatisticModel> Statistics { get; }
+
+        public ExportConfigModel ExportConfig { get; }
 
         private readonly ResizeController resizeController;
         private readonly ComputeImageController computeImageController;
@@ -31,11 +39,16 @@ namespace ImageViewer.Models
             Settings = new SettingsModel();
             Window = new WindowModel(window);
             Display = new DisplayModel(this);
+            ExportConfig = new ExportConfigModel();
+            ViewData = new TextureViewData(this);
 
             var stats = new List<StatisticModel>();
             for(int i = 0; i < NumPipelines; ++i)
                 stats.Add(new StatisticModel(this, Display, i));
             Statistics = stats;
+
+            ZoomBox = new BoxOverlay(this);
+            Overlay.Overlays.Add(ZoomBox);
 
             resizeController = new ResizeController(this);
             computeImageController = new ComputeImageController(this);
@@ -47,7 +60,9 @@ namespace ImageViewer.Models
         public override void Dispose()
         {
             Settings?.Save();
+            ViewData?.Dispose();
             paintController?.Dispose();
+            Display?.Dispose();
             base.Dispose();
         }
     }

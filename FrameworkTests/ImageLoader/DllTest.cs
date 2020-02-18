@@ -20,8 +20,8 @@ namespace FrameworkTests.ImageLoader
         {
             Assert.AreEqual(1, image.NumMipmaps);
             Assert.AreEqual(1, image.NumLayers);
-            Assert.AreEqual(3, image.GetWidth(0));
-            Assert.AreEqual(3, image.GetHeight(0));
+            Assert.AreEqual(3, image.GetSize(0).Width);
+            Assert.AreEqual(3, image.GetSize(0).Height);
             Assert.AreEqual(Format.R8G8B8A8_UNorm_SRgb, image.Format.DxgiFormat);
 
             TestData.CompareWithSmall(image, channels);
@@ -31,8 +31,8 @@ namespace FrameworkTests.ImageLoader
         {
             Assert.AreEqual(1, image.NumMipmaps);
             Assert.AreEqual(1, image.NumLayers);
-            Assert.AreEqual(3, image.GetWidth(0));
-            Assert.AreEqual(3, image.GetHeight(0));
+            Assert.AreEqual(3, image.GetSize(0).Width);
+            Assert.AreEqual(3, image.GetSize(0).Height);
             Assert.AreEqual(Format.R32G32B32A32_Float, image.Format.DxgiFormat);
 
             TestData.CompareWithSmall(image, channels);
@@ -94,6 +94,34 @@ namespace FrameworkTests.ImageLoader
             var tex = new TextureArray2D(IO.LoadImage(TestData.Directory + "cubemap.ktx"));
             Assert.AreEqual(6, tex.NumLayers);
             Assert.AreEqual(3, tex.NumMipmaps);
+        }
+
+        [TestMethod]
+        public void LoadKtx2()
+        {
+            var tex = new TextureArray2D(IO.LoadImage(TestData.KtxDirectory + "rgb-mipmap-reference-u.ktx2"));
+            Assert.AreEqual(tex.NumMipmaps, 7);
+            Assert.AreEqual(tex.Size.Width, 64);
+            Assert.AreEqual(tex.Size.Height, 64);
+
+            // test colors
+            Assert.IsTrue(tex.GetPixelColors(LayerMipmapSlice.Mip0)[0].Equals(new Color(1.0f, 0.0f, 0.0f), Color.Channel.Rgb));
+            Assert.IsTrue(tex.GetPixelColors(LayerMipmapSlice.Mip1)[0].Equals(new Color(1.0f, 0.175f, 0.0f), Color.Channel.Rgb));
+            Assert.IsTrue(tex.GetPixelColors(LayerMipmapSlice.Mip2)[0].Equals(new Color(1.0f, 1.0f, 0.0f), Color.Channel.Rgb));
+            Assert.IsTrue(tex.GetPixelColors(LayerMipmapSlice.Mip3)[0].Equals(new Color(0.0f, 1.0f, 0.0f), Color.Channel.Rgb));
+            Assert.IsTrue(tex.GetPixelColors(LayerMipmapSlice.Mip4)[0].Equals(new Color(0.0f, 0.0f, 1.0f), Color.Channel.Rgb));
+            Assert.IsTrue(tex.GetPixelColors(LayerMipmapSlice.Mip5)[0].Equals(new Color(0.0f, 1.0f, 1.0f), Color.Channel.Rgb));
+            Assert.IsTrue(tex.GetPixelColors(LayerMipmapSlice.Mip6)[0].Equals(new Color(1.0f, 0.0f, 1.0f), Color.Channel.Rgb));
+        }
+
+        [TestMethod]
+        public void LoadKtx2BasisU()
+        {
+            var tex = IO.LoadImageTexture(TestData.KtxDirectory + "alpha_simple_basis.ktx2");
+
+            var refTex = IO.LoadImageTexture(TestData.KtxDirectory + "alpha_simple.png");
+
+            TestData.CompareColors(refTex.GetPixelColors(LayerMipmapSlice.Mip0), tex.GetPixelColors(LayerMipmapSlice.Mip0), Color.Channel.Rgba);
         }
     }
 }

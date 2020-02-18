@@ -1,0 +1,78 @@
+﻿<UserControl x:Class="ImageViewer.Views.Statistics.DefaultStatisticView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ImageViewer.Views.Statistics" 
+             xmlns:views="clr-namespace:ImageViewer.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="200"
+             d:DesignWidth="200">
+    <GroupBox
+        Header="{Binding Name, FallbackValue=Equation}"
+        Margin="{StaticResource DefaultBorderBottom}"
+        Padding="{StaticResource DefaultBorderTop}"
+        Visibility="{Binding Visibility}">
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!--  Average -->
+            <TextBlock 
+                Text="Average:"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                Grid.Column="0"
+                Grid.Row="0"/>
+            <views:StatisticTextBox 
+                Text="{Binding Average}"
+                Margin="{StaticResource DefaultBorderBottom}"
+                Grid.Column="1"
+                Grid.Row="0"/>
+
+            <!--  Root Average -->
+            <TextBlock 
+                Text="Root Avg:"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                Grid.Column="0"
+                Grid.Row="1"/>
+            <views:StatisticTextBox 
+                Text="{Binding RootAverage}"
+                Margin="{StaticResource DefaultBorderBottom}"
+                Grid.Column="1"
+                Grid.Row="1"/>
+
+            <!--  Min -->
+            <TextBlock 
+                Text="Min:"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                Grid.Column="0"
+                Grid.Row="2"/>
+            <views:StatisticTextBox 
+                Text="{Binding Min}"
+                Margin="{StaticResource DefaultBorderBottom}"
+                Grid.Column="1"
+                Grid.Row="2"/>
+
+            <!--  Max -->
+            <TextBlock 
+                Text="Max"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                Grid.Column="0"
+                Grid.Row="3"/>
+            <views:StatisticTextBox 
+                Text="{Binding Max}"
+                Margin="{StaticResource DefaultBorderBottom}"
+                Grid.Column="1"
+                Grid.Row="3"/>
+        </Grid>
+    </GroupBox>
+</UserControl>

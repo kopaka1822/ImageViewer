@@ -1,10 +1,15 @@
 ﻿ using System;
 using System.Collections.Generic;
-using System.Linq;
+ using System.Diagnostics;
+ using System.Linq;
  using System.Runtime.InteropServices;
  using System.Text;
-using System.Threading.Tasks;
-using SharpDX.DXGI;
+ using System.Threading;
+ using System.Threading.Tasks;
+ using ImageFramework.DirectX;
+ using ImageFramework.Model;
+ using ImageFramework.Utility;
+ using SharpDX.DXGI;
 
 namespace ImageFramework.ImageLoader
 {
@@ -35,14 +40,59 @@ namespace ImageFramework.ImageLoader
             var res = new Resource(file);
             Dll.image_info(res.Id, out var gliFormat, out var originalFormat, out var nLayer, out var nMipmaps);
 
-            return new Image(res, file, nLayer, nMipmaps, new ImageFormat((GliFormat)gliFormat), (GliFormat)originalFormat);
+            return new Image(res, file, new LayerMipmapCount(nLayer, nMipmaps), new ImageFormat((GliFormat)gliFormat), (GliFormat)originalFormat);
         }
 
-        public static Image CreateImage(ImageFormat format, int width, int height, int layer, int mipmaps)
-        {
-            var res = new Resource((uint)format.GliFormat, width, height, layer, mipmaps);
 
-            return new Image(res, "tmp", layer, mipmaps, format, format.GliFormat);
+        /// <summary>
+        /// loads image into the correct texture type
+        /// </summary>
+        public static ITexture LoadImageTexture(string file, out GliFormat originalFormat)
+        {
+            using (var img = LoadImage(file))
+            {
+                originalFormat = img.OriginalFormat;
+
+                if(img.Is3D) return new Texture3D(img);
+                return new TextureArray2D(img);
+            }
+        }
+
+        /// <inheritdoc cref="LoadImageTexture(string,out ImageFramework.ImageLoader.GliFormat)"/>
+        public static ITexture LoadImageTexture(string file)
+        {
+            return LoadImageTexture(file, out var dummy);
+        }
+
+        public class TexInfo
+        {
+            public ITexture Texture { get; set; }
+            public GliFormat OriginalFormat { get; set; }
+        }
+
+        public static Task<TexInfo> LoadImageTextureAsync(string file, ProgressModel progress)
+        {
+            var task = Task.Run(() =>
+            {
+                var tex = LoadImageTexture(file, out var orig);
+                return new TexInfo
+                {
+                    Texture = tex,
+                    OriginalFormat = orig
+                };
+            });
+
+            var cts = new CancellationTokenSource();
+            progress.AddTask(task, cts);
+
+            return task;
+        }
+
+        public static Image CreateImage(ImageFormat format, Size3 size, LayerMipmapCount lm)
+        {
+            var res = new Resource((uint)format.GliFormat, size, lm);
+
+            return new Image(res, "tmp", lm, format, format.GliFormat);
         }
 
         public static void SaveImage(Image image, string filename, string extension, GliFormat format, int quality = 0)
@@ -65,5 +115,7 @@ namespace ImageFramework.ImageLoader
 
             return res;
         }
+
+        
     }
 }

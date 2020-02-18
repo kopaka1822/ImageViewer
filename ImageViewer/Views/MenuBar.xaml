@@ -16,6 +16,7 @@
             <MenuItem 
                     Header="_Open"
                     Command="{Binding OpenCommand}"
+                    InputGestureText="Ctrl+O"
                   IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
                     <Image Source="../Icons/open.png"/>
@@ -24,46 +25,11 @@
             <MenuItem 
                     Header="_Import"
                     Command="{Binding ImportCommand}"
+                    InputGestureText="Ctrl+I"
                     IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
                     <Image Source="../Icons/import.png"/>
                 </MenuItem.Icon>
-            </MenuItem>
-            <MenuItem
-                    Header="Import Equation Image"
-                    ToolTip="Adds one of the visible equations to the imported images list"
-                    IsEnabled="{Binding Progress.NotProcessing}">
-                <MenuItem.Icon>
-                    <Image Source="../Icons/import.png"/>
-                </MenuItem.Icon>
-                <MenuItem 
-                        Header="Equation 1"
-                        Command="{Binding ImportEquationImageCommand}">
-                    <MenuItem.CommandParameter>
-                        <system:Int32>0</system:Int32>
-                    </MenuItem.CommandParameter>
-                </MenuItem>
-                <MenuItem 
-                        Header="Equation 2"
-                        Command="{Binding ImportEquationImageCommand}">
-                    <MenuItem.CommandParameter>
-                        <system:Int32>1</system:Int32>
-                    </MenuItem.CommandParameter>
-                </MenuItem>
-                <MenuItem 
-                        Header="Equation 3"
-                        Command="{Binding ImportEquationImageCommand}">
-                    <MenuItem.CommandParameter>
-                        <system:Int32>2</system:Int32>
-                    </MenuItem.CommandParameter>
-                </MenuItem>
-                <MenuItem 
-                        Header="Equation 4"
-                        Command="{Binding ImportEquationImageCommand}">
-                    <MenuItem.CommandParameter>
-                        <system:Int32>3</system:Int32>
-                    </MenuItem.CommandParameter>
-                </MenuItem>
             </MenuItem>
             <MenuItem
                 Header="Import as Array"
@@ -77,8 +43,18 @@
             <Separator/>
             <MenuItem 
                     Header="_Export"
+                    InputGestureText="Ctrl+S"
                     Command="{Binding ExportCommand}"
                     IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image Source="../Icons/save.png"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem 
+                Header="Animated Diff (.mp4)"
+                ToolTip="Export video with a side-by-side comparision of two images"
+                Command="{Binding GifExportCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
                     <Image Source="../Icons/save.png"/>
                 </MenuItem.Icon>
@@ -96,15 +72,26 @@
                 IsCheckable="True"
                 IsChecked="{Binding Display.DisplayNegative}"/>
             <MenuItem
-                Header="Flip Y Axis"
-                IsCheckable="True"
-                IsChecked="{Binding Display.FlipYAxis}"/>
+                Header="NaN Color"
+                Command="{Binding SelectNaNColorCommand}">
+                <MenuItem.Icon>
+                    <Border 
+                        Width="16" 
+                        Height="16"
+                        Background="{Binding Display.NaNColor, FallbackValue=Red}"/>
+                </MenuItem.Icon>
+            </MenuItem>
             <MenuItem
                     Header="Show Crop Box"
                     IsCheckable="True"
                     IsChecked="{Binding Display.ShowCropRectangle}"
                     ToolTip="Shows the crop box if cropping is enabled for export"
                     />
+            <Separator/>
+            <MenuItem
+                Header="Flip Y Axis"
+                IsCheckable="True"
+                IsChecked="{Binding Display.FlipYAxis}"/>
             <MenuItem 
                     Header="_Pixel Display"
                     Command="{Binding ShowPixelDisplayCommand}">
@@ -112,9 +99,10 @@
                     <Image Source="../Icons/displayconfig.png"/>
                 </MenuItem.Icon>
             </MenuItem>
-
+            <Separator/>
             <MenuItem
-                Header="_Theme">
+                Header="_Theme"
+                IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem
                     Header="Default"
                     Command="{Binding SetThemeCommand}"
@@ -140,6 +128,26 @@
                     </MenuItem.CommandParameter>
                 </MenuItem>
             </MenuItem>
+            <MenuItem 
+                Header="Alpha Background"
+                ToolTip="Background color when using transparent images">
+                <MenuItem 
+                    Header="White"
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.IsAlphaWhite}"/>
+                <MenuItem 
+                    Header="Black"
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.IsAlphaBlack}"/>
+                <MenuItem 
+                    Header="Checkers"
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.IsAlphaCheckers}"/>
+                <MenuItem 
+                    Header="Theme"
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.IsAlphaTheme}"/>
+            </MenuItem>
         </MenuItem>
         <!--END VIEW-->
 
@@ -158,7 +166,8 @@
             <MenuItem 
                     Header="Generate Mipmaps"
                     Command="{Binding GenerateMipmapsCommand}"
-                    IsEnabled="{Binding Progress.NotProcessing}">
+                    IsEnabled="{Binding Progress.NotProcessing}"
+                    ToolTip="Generates mipmaps with the current mipmap technique.">
                 <MenuItem.Icon>
                     <Image 
                             Source="../Icons/image.png"
@@ -166,6 +175,50 @@
                             Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <MenuItem
+                Header="Mipmap Technique"
+                ToolTip="Technique used for mipmap generation"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem 
+                    Header="Box Filter (Default)"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseBoxFilter}"
+                    ToolTip="All samples are weighted equally."/>
+                <MenuItem 
+                    Header="Triangle Low-Pass"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseTriangleFilter}"
+                    ToolTip="The kernel function looks like a tent (1.0 - abs(x)) and the kernel radius is twice as large."/>
+                <MenuItem 
+                    Header="Lanczos Low-Pass"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseLanzosFilter}"
+                    ToolTip="Samples near the center have a higher weight and the kernel radius is three times bigger. Very similar to Kaiser filter."/>
+                <MenuItem 
+                    Header="Detail Preserving"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseDetailPreserving}"
+                    ToolTip="Details are preserved when downscaling. Based on 'Rapid, Detail-Preserving Image Downscaling'"/>
+                <MenuItem 
+                    Header="Detail Preserving (Stronger)"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseVeryDetailPreserving}"
+                    ToolTip="Details are preserved when downscaling. Based on 'Rapid, Detail-Preserving Image Downscaling'"/>
+                <MenuItem 
+                    Header="Help"
+                    ToolTip="Displays overview of existing mipmap techniques."
+                    Command="{Binding HelpCommand}">
+                    <MenuItem.CommandParameter>
+                        <system:String>help/mipmaps.md</system:String>
+                    </MenuItem.CommandParameter>
+                    <MenuItem.Icon>
+                        <Image 
+                            Source="../Icons/help.png"
+                            Width="16" 
+                            Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                </MenuItem>
             <MenuItem 
                     Header="Delete Mipmaps"
                     Command="{Binding DeleteMipmapsCommand}"
@@ -177,7 +230,53 @@
                             Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
-
+            
+            <Separator/>
+            <MenuItem
+                Header="Add Zoombox"
+                Command="{Binding StartZoomboxCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/image_box.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem
+                Header="Remove Zoombox"
+                Command="{Binding StartZoomboxCommand}"
+                IsEnabled="{Binding ZoomBox.HasBoxes}"
+                ItemsSource="{Binding ZoomBox.Boxes}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/cancel.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+                <MenuItem.ItemTemplate>
+                    <DataTemplate DataType="Border">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Box "
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Id}"
+                                       Margin="{StaticResource DefaultBorderRight}"
+                                       VerticalAlignment="Center"/>
+                            <Border 
+                                Width="16" 
+                                Height="16"
+                                Background="{Binding Brush, FallbackValue=Blue}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </MenuItem.ItemTemplate>
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="MenuItem">
+                        <Setter Property="Header" Value="{Binding}"/>
+                        <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.RemoveZoomboxCommand}"/>
+                        <Setter Property="CommandParameter" Value="{Binding Id}"/>
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+            </MenuItem>
             <Separator/>
             <MenuItem
                 Header="LatLong to Cubemap"
@@ -201,12 +300,26 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
-            <!--<MenuItem 
-                Header="Animated Gif Export"
-                Command="{Binding GifExportCommand}"
+            <MenuItem
+                Header="TextureArray to Texture3D"
+                Command="{Binding ArrayTo3DCommand}"
                 IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
-                    <Image Source="../Icons/save.png"/>
+                    <Image 
+                        Source="../Icons/cube.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <!--<MenuItem
+                Header="Texture3D to TextureArray"
+                Command="{Binding CubemapToLatLongCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/image_layer.png"
+                        Width="16"
+                        Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>-->
         </MenuItem>
@@ -219,21 +332,43 @@
                 <MenuItem.CommandParameter>
                     <system:String>help/about.md</system:String>
                 </MenuItem.CommandParameter>
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/help.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
             </MenuItem>
-                <MenuItem
-                    Header="Equation"
-                    Command="{Binding HelpCommand}">
-                    <MenuItem.CommandParameter>
-                        <system:String>help/equation.md</system:String>
-                    </MenuItem.CommandParameter>
+            <Separator/>
+            <MenuItem
+                Header="Equation"
+                Command="{Binding HelpCommand}">
+                <MenuItem.CommandParameter>
+                    <system:String>help/equation.md</system:String>
+                </MenuItem.CommandParameter>
             </MenuItem>
-                <MenuItem
+            <MenuItem
                     Header="Filter Manual"
                     Command="{Binding HelpCommand}">
                     <MenuItem.CommandParameter>
                         <system:String>help/filter_manual.md</system:String>
                     </MenuItem.CommandParameter>
             </MenuItem>
+            <MenuItem
+                Header="Mipmaps"
+                Command="{Binding HelpCommand}">
+                <MenuItem.CommandParameter>
+                    <system:String>help/mipmaps.md</system:String>
+                </MenuItem.CommandParameter>
             </MenuItem>
+            <Separator/>
+            <MenuItem
+                Header="Statistics"
+                Command="{Binding HelpCommand}">
+                <MenuItem.CommandParameter>
+                    <system:String>help/statistics.md</system:String>
+                </MenuItem.CommandParameter>
+            </MenuItem>
+        </MenuItem>
     </Menu>
 </UserControl>

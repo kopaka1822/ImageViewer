@@ -6,6 +6,7 @@
 #include "../dependencies/stb_image.h"
 #include "../dependencies/stb_image_write.h"
 #include <fstream>
+#include "interface.h"
 
 gli::format getFloatFormat(int numComponents)
 {
@@ -31,6 +32,12 @@ gli::format getSrgbFormat(int numComponents)
 	return gli::FORMAT_UNDEFINED;
 }
 
+// custom function
+void stbi_progress_callback(int height, int y)
+{
+	set_progress(y * 100 / height);
+}
+
 class StbImage final : public image::IImage
 {
 public:
@@ -41,11 +48,25 @@ public:
 		{
 			// load hdr file
 			int nComponents = 0;
-			m_data = reinterpret_cast<stbi_uc*>(stbi_loadf(filename, &m_width, &m_height, &nComponents, 4));
-			if (!m_data)
+			auto tmp = reinterpret_cast<stbi_uc*>(stbi_loadf(filename, &m_width, &m_height, &nComponents, 3));
+			if (!tmp)
 				throw std::exception("error during reading file");
 
-			m_original = getFloatFormat(nComponents);
+			// copy data with additional alpha channel
+			const size_t size = size_t(m_width) * size_t(m_height) * 4 * 4;
+			m_data = reinterpret_cast<stbi_uc*>(stbi__malloc(size));
+			for (auto* src = reinterpret_cast<float*>(tmp), *dst = reinterpret_cast<float*>(m_data), *end = reinterpret_cast<float*>(m_data + size);
+				dst != end; src += 3, dst += 4)
+			{
+				dst[0] = src[0];
+				dst[1] = src[1];
+				dst[2] = src[2];
+				dst[3] = 1.0f;
+			}
+			
+			stbi_image_free(tmp);
+
+			m_original = gli::format::FORMAT_RGB9E5_UFLOAT_PACK32;
 			m_format = gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
 			m_size = m_width * m_height * 4 * 4;
 		}
@@ -72,6 +93,7 @@ public:
 	uint32_t getNumMipmaps() const override { return 1; }
 	uint32_t getWidth(uint32_t mipmap) const override { return m_width; }
 	uint32_t getHeight(uint32_t mipmap) const override { return m_height; }
+	uint32_t getDepth(uint32_t mipmap) const override { return 1; }
 	gli::format getFormat() const override { return m_format; }
 	gli::format getOriginalFormat() const override { return m_original; }
 	uint8_t* getData(uint32_t layer, uint32_t mipmap, uint32_t& size) override
@@ -102,24 +124,58 @@ std::unique_ptr<image::IImage> stb_image_load(const char* filename)
 
 std::vector<uint32_t> stb_image_get_export_formats(const char* extension)
 {
-	auto ext = std::string(extension);
-	if (ext == "bmp" || ext == "jpg")
-		return std::vector<uint32_t>{
-			gli::format::FORMAT_RGB8_SRGB_PACK8,
-			gli::format::FORMAT_R8_SRGB_PACK8
-		};
-	if (ext == "png")
-		return std::vector<uint32_t>{
-			gli::format::FORMAT_RGBA8_SRGB_PACK8,
-			gli::format::FORMAT_RGB8_SRGB_PACK8,
-			gli::format::FORMAT_R8_SRGB_PACK8
-		};
+	const auto ext = std::string(extension);
 	if (ext == "hdr")
+	{
 		return std::vector<uint32_t>{
 			gli::format::FORMAT_RGB32_SFLOAT_PACK32,
-			gli::format::FORMAT_R32_SFLOAT_PACK32
+				gli::format::FORMAT_R32_SFLOAT_PACK32
 		};
-	return {};
+	}
+
+	std::vector<uint32_t> formats;
+	// R8 formats
+	formats.push_back(gli::format::FORMAT_R8_SRGB_PACK8);
+	formats.push_back(gli::format::FORMAT_R8_UNORM_PACK8);
+	formats.push_back(gli::format::FORMAT_R8_SNORM_PACK8);
+
+	// RGB8
+	formats.push_back(gli::format::FORMAT_RGB8_SRGB_PACK8);
+	formats.push_back(gli::format::FORMAT_RGB8_UNORM_PACK8);
+	formats.push_back(gli::format::FORMAT_RGB8_SNORM_PACK8);
+
+	// RGBA8
+	if(ext == "png")
+	{
+		formats.push_back(gli::format::FORMAT_RGBA8_SRGB_PACK8);
+		formats.push_back(gli::format::FORMAT_RGBA8_UNORM_PACK8);
+		formats.push_back(gli::format::FORMAT_RGBA8_SNORM_PACK8);
+	}
+
+	return formats;
+}
+
+int stb_ldr_get_num_components(gli::format format)
+{
+	switch (format)
+	{
+	case gli::FORMAT_R8_SRGB_PACK8:
+	case gli::FORMAT_R8_UNORM_PACK8:
+	case gli::FORMAT_R8_SNORM_PACK8:
+		return 1;
+
+	case gli::FORMAT_RGB8_SRGB_PACK8:
+	case gli::FORMAT_RGB8_UNORM_PACK8:
+	case gli::FORMAT_RGB8_SNORM_PACK8:
+		return 3;
+
+	case gli::FORMAT_RGBA8_SRGB_PACK8:
+	case gli::FORMAT_RGBA8_UNORM_PACK8:
+	case gli::FORMAT_RGBA8_SNORM_PACK8:
+		return 4;
+	}
+
+	throw std::runtime_error("format not supported for png, jpg, bmp");
 }
 
 void stb_save_png(const char* filename, int width, int height, int components, const void* data)

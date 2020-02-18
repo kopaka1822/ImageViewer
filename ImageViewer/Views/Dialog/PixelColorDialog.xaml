@@ -12,13 +12,11 @@
         SizeToContent="Height"
         Style="{StaticResource WindowStyle}"
         WindowStartupLocation="CenterOwner">
-    <Window.Resources>
-        <Thickness x:Key="DefaultMargin" Top="0" Left="0" Right="0" Bottom="2"/>
-    </Window.Resources>
+
     <StackPanel Margin="5">
         <TextBlock 
             Text="Double click box to copy content to clipboard"
-            Margin="0 0 0 5"
+            Margin="{StaticResource DefaultBorderBottom}"
             TextWrapping="Wrap"/>
 
         <StackPanel x:Name="ColorStackPanel"/>
@@ -27,7 +25,7 @@
             Content="OK"
             Width="80"
             HorizontalAlignment="Right"
-            Margin="0 5 0 0"
+            Margin="{StaticResource DefaultBorderTop}"
             Click="OkOnClick"/>
     </StackPanel>
 </Window>

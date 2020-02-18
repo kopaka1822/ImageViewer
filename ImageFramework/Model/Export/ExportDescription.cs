@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
+using ImageFramework.Utility;
 
 namespace ImageFramework.Model.Export
 {
@@ -13,6 +15,10 @@ namespace ImageFramework.Model.Export
         public string Filename { get; }
 
         public string Extension { get; }
+
+        public ITexture Texture { get; }
+
+        public ITexture Overlay { get; set; }
 
         /// <summary>
         /// RGB colors will be multiplied by this value before exporting
@@ -39,47 +45,188 @@ namespace ImageFramework.Model.Export
         {
             get
             {
-                var ldrMode = exportModel.LdrExportMode;
-
-                if (Extension == "ktx" || Extension == "dds")
-                {
-                    ldrMode = GetLdrMode(FileFormat); // overwrite ldr mode
-                }
-
-                if (!FileFormat.IsAtMost8bit())
+                // type bigger than 8 bit => use float staging
+                if(!FileFormat.IsAtMost8bit())
                     return new ImageFormat(GliFormat.RGBA32_SFLOAT);
 
+                // determine staging format based on pixel data type
+                var ldrMode = FileFormat.GetDataType();
                 switch (ldrMode)
                 {
-                    case ExportModel.LdrMode.Srgb:
+                    case PixelDataType.Srgb:
                         return new ImageFormat(GliFormat.RGBA8_SRGB);
-                    case ExportModel.LdrMode.UNorm:
+                    case PixelDataType.UNorm:
                         return new ImageFormat(GliFormat.RGBA8_UNORM);
-                    case ExportModel.LdrMode.SNorm:
+                    case PixelDataType.SNorm:
                         return new ImageFormat(GliFormat.RGBA8_SNORM);
-                    default:
-                        Debug.Assert(false);
-                        break;
+                    default: // all other formats (float, scaled, int) use float staging
+                        return new ImageFormat(GliFormat.RGBA32_SFLOAT);
                 }
-
-                return null;
             }
         }
-        
+
+        private int quality = 100;
+
+        /// <summary>
+        /// image quality for compressed formats and jpg
+        /// Range [1, 100] => [QualityMin, QualityMax]
+        /// </summary>
+        public int Quality
+        {
+            get => quality;
+            set
+            {
+                Debug.Assert(quality <= QualityMax);
+                Debug.Assert(quality >= QualityMin);
+                quality = value;
+            }
+        }
+
+        public static int QualityMin = 1;
+        public static int QualityMax = 100;
+
+        public bool UseCropping { get; set; }
+
+        private Float3 cropStartf = Float3.Zero;
+
+        /// <summary>
+        /// crop start in relative coordinates [0, 1]
+        /// CropStart.ToPixel is the first included pixel
+        /// </summary>
+        public Float3 CropStart
+        {
+            get => cropStartf;
+            set
+            {
+                Debug.Assert((value >= Float3.Zero).AllTrue());
+                Debug.Assert((value <= Float3.One).AllTrue());
+                cropStartf = value;
+            }
+        }
+
+        private Float3 cropEndf = Float3.One;
+
+        /// <summary>
+        /// crop end in relative coordinates [0, 1]
+        /// CropEnd.ToPixel is the last included pixel.
+        /// CropStart == CropEnd => exactly one pixel will be exported
+        /// </summary>
+        public Float3 CropEnd
+        {
+            get => cropEndf;
+            set
+            {
+                Debug.Assert((value >= Float3.Zero).AllTrue());
+                Debug.Assert((value <= Float3.One).AllTrue());
+                cropEndf = value;
+            }
+        }
+
+        private int layer = -1;
+        // layer to export. -1 means all layers
+        public int Layer
+        {
+            get => layer;
+            set
+            {
+                Debug.Assert(layer >= -1);
+                Debug.Assert(layer < Texture.NumLayers);
+                layer = value;
+            }
+        }
+
+        private int mipmap = -1;
+        // mipmap to export. -1 means all mipmaps
+        public int Mipmap
+        {
+            get => mipmap;
+            set
+            {
+                Debug.Assert(mipmap >= -1);
+                Debug.Assert(mipmap < Texture.NumMipmaps);
+                mipmap = value;
+            }
+        }
+
+        public LayerMipmapRange LayerMipmap => new LayerMipmapRange(Layer, Mipmap);
+
+        private int scale = 1;
+
+        /// image can be upscaled with point interpolation
+        public int Scale
+        {
+            get => scale;
+            set
+            {
+                Debug.Assert(scale >= 1);
+                scale = value;
+            }
+        }
 
         internal readonly ExportFormatModel ExportFormat;
-        private readonly ExportModel exportModel;
 
-        public ExportDescription(string filename, string extension, ExportModel model)
+        public ExportDescription(ITexture texture, string filename, string extension)
         {
-            this.exportModel = model;
-            ExportFormat = model.Formats.First(f => f.Extension == extension);
+            Debug.Assert(texture != null);
+            Texture = texture;
+            ExportFormat = GetExportFormat(extension);
             if(ExportFormat == null)
                 throw new Exception("unsupported file extension: " + extension);
 
             Filename = filename;
             Extension = extension;
             fileFormat = ExportFormat.Formats[0];
+        }
+
+        /// <summary>
+        /// verifies if the properties have valid ranges
+        /// </summary>
+        public void Verify()
+        {
+            if(Mipmap >= Texture.NumMipmaps || Mipmap < -1)
+                throw new Exception("export mipmap out of range");
+            if(Layer >= Texture.NumLayers || Layer < -1)
+                throw new Exception("export layer out of range");
+
+            if (Overlay != null)
+            {
+                if (!Texture.HasSameDimensions(Overlay))
+                    throw new Exception("export overlay size mismatch");
+            }
+        }
+
+        public void GetCropRect(out Size3 start, out Size3 end)
+        {
+            var mipDim = Texture.Size.GetMip(Math.Max(Mipmap, 0));
+            start = CropStart.ToPixels(mipDim);
+            end = CropEnd.ToPixels(mipDim);
+
+            if ((start < Size3.Zero).AnyTrue() || (start >= mipDim).AnyTrue())
+                throw new Exception("export crop start out of range: " + start);
+
+            if ((end < Size3.Zero).AnyTrue() || (end >= mipDim).AnyTrue())
+                throw new Exception("export crop end out of range: " + end);
+
+            // end >= max
+            if ((start > end).AnyTrue())
+                throw new Exception("export crop start must be smaller or equal to crop end");
+        }
+
+        /// <summary>
+        /// indicates if the texture must be realigned according to the used format (compressed formats need alignment)
+        /// </summary>
+        public bool RequiresAlignment
+        {
+            get
+            {
+                if (!FileFormat.IsCompressed()) return false;
+                var mipDim = Texture.Size.GetMip(Math.Max(Mipmap, 0));
+                if (mipDim.Width % FileFormat.GetAlignmentX() != 0)
+                    return true;
+                if (mipDim.Height % FileFormat.GetAlignmentY() != 0)
+                    return true;
+                return false;
+            }
         }
 
         /// <summary>
@@ -94,228 +241,31 @@ namespace ImageFramework.Model.Export
             return true;
         }
 
-        private ExportModel.LdrMode GetLdrMode(GliFormat format)
+        private static List<ExportFormatModel> s_exportFormatModels;
+        public static ExportFormatModel GetExportFormat(string extension)
         {
-            switch (format)
+            return Formats.First(f => f.Extension == extension);
+        }
+
+        public static IReadOnlyList<ExportFormatModel> Formats
+        {
+            get
             {
-                case GliFormat.RGBA4_UNORM:
-                case GliFormat.BGRA4_UNORM:
-                case GliFormat.R5G6B5_UNORM:
-                case GliFormat.B5G6R5_UNORM:
-                case GliFormat.RGB5A1_UNORM:
-                case GliFormat.BGR5A1_UNORM:
-                case GliFormat.A1RGB5_UNORM:
-                case GliFormat.R8_UNORM:
-                case GliFormat.RG8_UNORM:
-                case GliFormat.RGB8_UNORM:
-                case GliFormat.BGR8_UNORM:
-                case GliFormat.RGBA8_UNORM:
-                case GliFormat.BGRA8_UNORM:
-                case GliFormat.RGBA8_UNORM_PACK32:
-                case GliFormat.L8_UNORM:
-                case GliFormat.A8_UNORM:
-                case GliFormat.LA8_UNORM:
-                case GliFormat.BGR8_UNORM_PACK32:
-                case GliFormat.RG3B2_UNORM:
-                case GliFormat.RGB10A2_UNORM:
-                case GliFormat.BGR10A2_UNORM:
-                case GliFormat.R16_UNORM:
-                case GliFormat.RG16_UNORM:
-                case GliFormat.RGB16_UNORM:
-                case GliFormat.RGBA16_UNORM:
-                case GliFormat.D16_UNORM:
-                case GliFormat.D24_UNORM_PACK32:
-                case GliFormat.D16_UNORM_S8_UINT_PACK32:
-                case GliFormat.D24_UNORM_S8_UINT:
-                case GliFormat.L16_UNORM:
-                case GliFormat.A16_UNORM:
-                case GliFormat.LA16_UNORM:
-                case GliFormat.RGB_DXT1_UNORM:
-                case GliFormat.RGBA_DXT1_UNORM:
-                case GliFormat.RGBA_DXT3_UNORM:
-                case GliFormat.RGBA_DXT5_UNORM:
-                case GliFormat.R_ATI1N_UNORM:
-                case GliFormat.RG_ATI2N_UNORM:
-                case GliFormat.RGBA_BP_UNORM:
-                case GliFormat.RGB_ETC2_UNORM_BLOCK8:
-                case GliFormat.RGBA_ETC2_UNORM_BLOCK8:
-                case GliFormat.RGBA_ETC2_UNORM_BLOCK16:
-                case GliFormat.R_EAC_UNORM_BLOCK8:
-                case GliFormat.RG_EAC_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_4X4_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_5X4_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_5X5_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_6X5_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_6X6_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X5_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X6_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X8_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X5_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X6_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X8_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X10_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_12X10_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_12X12_UNORM_BLOCK16:
-                case GliFormat.RGB_PVRTC1_8X8_UNORM_BLOCK32:
-                case GliFormat.RGB_PVRTC1_16X8_UNORM_BLOCK32:
-                case GliFormat.RGBA_PVRTC1_8X8_UNORM_BLOCK32:
-                case GliFormat.RGBA_PVRTC1_16X8_UNORM_BLOCK32:
-                case GliFormat.RGBA_PVRTC2_4X4_UNORM_BLOCK8:
-                case GliFormat.RGBA_PVRTC2_8X4_UNORM_BLOCK8:
-                case GliFormat.RGB_ETC_UNORM_BLOCK8:
-                case GliFormat.RGB_ATC_UNORM_BLOCK8:
-                case GliFormat.RGBA_ATCA_UNORM_BLOCK16:
-                case GliFormat.RGBA_ATCI_UNORM_BLOCK16:
-                    return ExportModel.LdrMode.UNorm;
+                if (s_exportFormatModels == null)
+                {
+                    var formats = new List<ExportFormatModel>();
+                    formats.Add(new ExportFormatModel("png"));
+                    formats.Add(new ExportFormatModel("jpg"));
+                    formats.Add(new ExportFormatModel("bmp"));
+                    formats.Add(new ExportFormatModel("hdr"));
+                    formats.Add(new ExportFormatModel("pfm"));
+                    formats.Add(new ExportFormatModel("dds"));
+                    formats.Add(new ExportFormatModel("ktx"));
+                    s_exportFormatModels = formats;
+                }
 
-                case GliFormat.R8_SNORM:
-                case GliFormat.RG8_SNORM:
-                case GliFormat.RGB8_SNORM:
-                case GliFormat.BGR8_SNORM:
-                case GliFormat.RGBA8_SNORM:
-                case GliFormat.BGRA8_SNORM:
-                case GliFormat.RGBA8_SNORM_PACK32:
-                case GliFormat.RGB10A2_SNORM:
-                case GliFormat.BGR10A2_SNORM:
-                case GliFormat.R16_SNORM:
-                case GliFormat.RG16_SNORM:
-                case GliFormat.RGB16_SNORM:
-                case GliFormat.RGBA16_SNORM:
-                case GliFormat.R_ATI1N_SNORM:
-                case GliFormat.RG_ATI2N_SNORM:
-                case GliFormat.R_EAC_SNORM_BLOCK8:
-                case GliFormat.RG_EAC_SNORM_BLOCK16:
-                    return ExportModel.LdrMode.SNorm;
-
-                case GliFormat.R8_SRGB:
-                case GliFormat.RG8_SRGB:
-                case GliFormat.RGB8_SRGB:
-                case GliFormat.BGR8_SRGB:
-                case GliFormat.RGBA8_SRGB:
-                case GliFormat.BGRA8_SRGB:
-                case GliFormat.RGBA8_SRGB_PACK32:
-                case GliFormat.BGR8_SRGB_PACK32:
-                case GliFormat.RGB_DXT1_SRGB:
-                case GliFormat.RGBA_DXT1_SRGB:
-                case GliFormat.RGBA_DXT3_SRGB:
-                case GliFormat.RGBA_DXT5_SRGB:
-                case GliFormat.RGBA_BP_SRGB:
-                case GliFormat.RGB_ETC2_SRGB_BLOCK8:
-                case GliFormat.RGBA_ETC2_SRGB_BLOCK8:
-                case GliFormat.RGBA_ETC2_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_4X4_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_5X4_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_5X5_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_6X5_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_6X6_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X5_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X6_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X8_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X5_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X6_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X8_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X10_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_12X10_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_12X12_SRGB_BLOCK16:
-                case GliFormat.RGB_PVRTC1_8X8_SRGB_BLOCK32:
-                case GliFormat.RGB_PVRTC1_16X8_SRGB_BLOCK32:
-                case GliFormat.RGBA_PVRTC1_8X8_SRGB_BLOCK32:
-                case GliFormat.RGBA_PVRTC1_16X8_SRGB_BLOCK32:
-                case GliFormat.RGBA_PVRTC2_4X4_SRGB_BLOCK8:
-                case GliFormat.RGBA_PVRTC2_8X4_SRGB_BLOCK8:
-                    return ExportModel.LdrMode.Srgb;
-
-                case GliFormat.R8_USCALED:
-                case GliFormat.R8_SSCALED:
-                case GliFormat.R8_UINT:
-                case GliFormat.R8_SINT:
-                case GliFormat.RG8_USCALED:
-                case GliFormat.RG8_SSCALED:
-                case GliFormat.RG8_UINT:
-                case GliFormat.RG8_SINT:
-                case GliFormat.RGB8_USCALED:
-                case GliFormat.RGB8_SSCALED:
-                case GliFormat.RGB8_UINT:
-                case GliFormat.RGB8_SINT:
-                case GliFormat.BGR8_USCALED:
-                case GliFormat.BGR8_SSCALED:
-                case GliFormat.BGR8_UINT:
-                case GliFormat.BGR8_SINT:
-                case GliFormat.RGBA8_USCALED:
-                case GliFormat.RGBA8_SSCALED:
-                case GliFormat.RGBA8_UINT:
-                case GliFormat.RGBA8_SINT:
-                case GliFormat.BGRA8_USCALED:
-                case GliFormat.BGRA8_SSCALED:
-                case GliFormat.BGRA8_UINT:
-                case GliFormat.BGRA8_SINT:
-                case GliFormat.RGBA8_USCALED_PACK32:
-                case GliFormat.RGBA8_SSCALED_PACK32:
-                case GliFormat.RGBA8_UINT_PACK32:
-                case GliFormat.RGBA8_SINT_PACK32:
-                case GliFormat.RGB10A2_USCALED:
-                case GliFormat.RGB10A2_SSCALED:
-                case GliFormat.RGB10A2_UINT:
-                case GliFormat.RGB10A2_SINT:
-                case GliFormat.BGR10A2_USCALED:
-                case GliFormat.BGR10A2_SSCALED:
-                case GliFormat.BGR10A2_UINT:
-                case GliFormat.BGR10A2_SINT:
-                case GliFormat.R16_USCALED:
-                case GliFormat.R16_SSCALED:
-                case GliFormat.R16_UINT:
-                case GliFormat.R16_SINT:
-                case GliFormat.R16_SFLOAT:
-                case GliFormat.RG16_USCALED:
-                case GliFormat.RG16_SSCALED:
-                case GliFormat.RG16_UINT:
-                case GliFormat.RG16_SINT:
-                case GliFormat.RG16_SFLOAT:
-                case GliFormat.RGB16_USCALED:
-                case GliFormat.RGB16_SSCALED:
-                case GliFormat.RGB16_UINT:
-                case GliFormat.RGB16_SINT:
-                case GliFormat.RGB16_SFLOAT:
-                case GliFormat.RGBA16_USCALED:
-                case GliFormat.RGBA16_SSCALED:
-                case GliFormat.RGBA16_UINT:
-                case GliFormat.RGBA16_SINT:
-                case GliFormat.RGBA16_SFLOAT:
-                case GliFormat.R32_UINT:
-                case GliFormat.R32_SINT:
-                case GliFormat.R32_SFLOAT:
-                case GliFormat.RG32_UINT:
-                case GliFormat.RG32_SINT:
-                case GliFormat.RG32_SFLOAT:
-                case GliFormat.RGB32_UINT:
-                case GliFormat.RGB32_SINT:
-                case GliFormat.RGB32_SFLOAT:
-                case GliFormat.RGBA32_UINT:
-                case GliFormat.RGBA32_SINT:
-                case GliFormat.RGBA32_SFLOAT:
-                case GliFormat.R64_UINT:
-                case GliFormat.R64_SINT:
-                case GliFormat.R64_SFLOAT:
-                case GliFormat.RG64_UINT:
-                case GliFormat.RG64_SINT:
-                case GliFormat.RG64_SFLOAT:
-                case GliFormat.RGB64_UINT:
-                case GliFormat.RGB64_SINT:
-                case GliFormat.RGB64_SFLOAT:
-                case GliFormat.RGBA64_UINT:
-                case GliFormat.RGBA64_SINT:
-                case GliFormat.RGBA64_SFLOAT:
-                case GliFormat.RG11B10_UFLOAT:
-                case GliFormat.RGB9E5_UFLOAT:
-                case GliFormat.D32_SFLOAT:
-                case GliFormat.S8_UINT:
-                case GliFormat.D32_SFLOAT_S8_UINT_PACK64:
-                case GliFormat.RGB_BP_UFLOAT:
-                case GliFormat.RGB_BP_SFLOAT:
-                    return ExportModel.LdrMode.Undefined;
+                return s_exportFormatModels;
             }
-
-            return ExportModel.LdrMode.Undefined;
         }
     }
 }

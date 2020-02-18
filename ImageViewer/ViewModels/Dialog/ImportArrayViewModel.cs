@@ -15,6 +15,7 @@ using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageViewer.Commands;
+using ImageViewer.Commands.Helper;
 using ImageViewer.Controller;
 using ImageViewer.Models;
 
@@ -106,8 +107,8 @@ namespace ImageViewer.ViewModels.Dialog
                     if (models.Images.NumImages != 0)
                     {
                         // is it compatible with already imported images
-                        if(img.GetWidth(0) != models.Images.GetWidth(0) || img.GetHeight(0) != models.Images.GetHeight(0))
-                            throw new Exception($"{filename}: Image resolution mismatch. Expected {models.Images.GetWidth(0)}x{models.Images.GetHeight(0)} but got {img.GetWidth(0)}x{img.GetHeight(0)}");
+                        if(img.GetSize(0) != models.Images.GetSize(0))
+                            throw new Exception($"{filename}: Image resolution mismatch. Expected {models.Images.GetWidth(0)}x{models.Images.GetHeight(0)} but got {img.GetSize(0).X}x{img.GetSize(0).Y}");
 
                         if(img.NumMipmaps != models.Images.NumMipmaps)
                             throw new Exception($"{filename}: Inconsistent amount of mipmaps. Expected {models.Images.NumMipmaps} got {img.NumMipmaps}");
@@ -115,11 +116,17 @@ namespace ImageViewer.ViewModels.Dialog
                     else if(ListItems.Count > 0)
                     {
                         var first = ListItems[0].Image;
-                        if(img.GetWidth(0) != first.GetWidth(0) || img.GetHeight(0) != first.GetHeight(0))
-                            throw new Exception($"{filename}: Image resolution mismatch. Expected {first.GetWidth(0)}x{first.GetHeight(0)} but got {img.GetWidth(0)}x{img.GetHeight(0)}");
+                        if(img.GetSize(0) != first.Size)
+                            throw new Exception($"{filename}: Image resolution mismatch. Expected {first.Size.X}x{first.Size.Y} but got {img.GetSize(0).X}x{img.GetSize(0).Y}");
                         
                         if(img.NumMipmaps != first.NumMipmaps)
                             throw new Exception($"{filename}: Inconsistent amount of mipmaps. Expected {first.NumMipmaps} got {img.NumMipmaps}");
+                    }
+                    else
+                    {
+                        // first image
+                        if(img.Is3D)
+                            throw new Exception($"{filename}: Only 2D images are allowed");
                     }
 
                     // import image

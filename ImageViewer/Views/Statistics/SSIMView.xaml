@@ -1,0 +1,209 @@
+﻿<UserControl x:Class="ImageViewer.Views.Statistics.SSIMView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ImageViewer.Views.Statistics"
+             xmlns:views="clr-namespace:ImageViewer.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" 
+             d:DesignWidth="200">
+    <StackPanel>
+        <Separator Margin="{StaticResource DefaultBorderBottom}"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="0"
+                Text="Image 1:"
+                Margin="{StaticResource DefaultBorderBotRight}"/>
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="0"
+                Margin="{StaticResource DefaultBorderBottom}"
+                ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.ImageSources}"
+                ItemTemplate="{StaticResource ListItemView}"
+                SelectedItem="{Binding Image1}"
+                />
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="1"
+                Text="Image 2:"
+                Margin="{StaticResource DefaultBorderBotRight}"/>
+
+            <ComboBox
+                Grid.Column="1"
+                Grid.Row="1"
+                Margin="{StaticResource DefaultBorderBottom}"
+                ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.ImageSources}"
+                ItemTemplate="{StaticResource ListItemView}"
+                SelectedItem="{Binding Image2}"/>
+        </Grid>
+        <Grid
+            IsEnabled="{Binding IsValid, FallbackValue=False}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Luminance -->
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="0"
+                Text="Luminance: "
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"/>
+
+            <views:StatisticTextBox 
+                Text="{Binding Luminance}"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                Grid.Column="1"
+                Grid.Row="0"/>
+
+            <Button 
+                Grid.Column="2"
+                Grid.Row="0"
+                Height="18"
+                Padding="0"
+                Margin="{StaticResource DefaultBorderBottom}"
+                ToolTip="Import this as a new image"
+                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.LuminanceCommand}"
+                CommandParameter="{Binding Id}">
+                <Image 
+                    Width="14"
+                    Height="14" 
+                    Source="../../Icons/import.png"/>
+            </Button>
+
+            <!-- Contrast -->
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="1"
+                Text="Contrast: "
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"/>
+
+            <views:StatisticTextBox 
+                Text="{Binding Contrast}"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                Grid.Column="1"
+                Grid.Row="1"/>
+
+            <Button 
+                Grid.Column="2"
+                Grid.Row="1"
+                Height="18"
+                Padding="0"
+                Margin="{StaticResource DefaultBorderBottom}"
+                ToolTip="Import this as a new image"
+                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.ContrastCommand}"
+                CommandParameter="{Binding Id}">
+                <Image 
+                    Width="14"
+                    Height="14" 
+                    Source="../../Icons/import.png"/>
+            </Button>
+
+            <!-- Structure -->
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="2"
+                Text="Structure: "
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"/>
+
+            <views:StatisticTextBox 
+                Text="{Binding Structure}"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                Grid.Column="1"
+                Grid.Row="2"/>
+
+            <Button 
+                Grid.Column="2"
+                Grid.Row="2"
+                Height="18"
+                Padding="2"
+                Margin="{StaticResource DefaultBorderBottom}"
+                ToolTip="Import this as a new image"
+                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.StructureCommand}"
+                CommandParameter="{Binding Id}">
+                <Image 
+                    Width="14"
+                    Height="14" 
+                    Source="../../Icons/import.png"/>
+            </Button>
+
+            <!-- SSIM -->
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="3"
+                Text="SSIM: "
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"
+                Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.UseMultiscale, Converter={StaticResource CollapsedVisibleConverter}}"/>
+
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="3"
+                Text="MS-SSIM: "
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"
+                ToolTip="Multi-Scale SSIM"
+                Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.UseMultiscale, Converter={StaticResource VisibleCollapsedConverter}, FallbackValue=Collapsed}"/>
+
+
+            <views:StatisticTextBox 
+                Text="{Binding SSIM}"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                Grid.Column="1"
+                Grid.Row="3"/>
+
+            <Button 
+                Grid.Column="2"
+                Grid.Row="3"
+                Height="18"
+                Padding="2"
+                Margin="{StaticResource DefaultBorderBottom}"
+                ToolTip="Import this as a new image"
+                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Statistics.SSIM.SSIMCommand}"
+                CommandParameter="{Binding Id}">
+                <Image 
+                    Width="14"
+                    Height="14" 
+                    Source="../../Icons/import.png"/>
+            </Button>
+
+            <!-- DSSIM -->
+            <TextBlock
+                Grid.Column="0"
+                Grid.Row="4"
+                Text="DSSIM: "
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"/>
+
+            <views:StatisticTextBox 
+                Text="{Binding DSSIM}"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                Grid.Column="1"
+                Grid.Row="4"/>
+        </Grid>
+    </StackPanel>
+</UserControl>

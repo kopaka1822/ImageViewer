@@ -27,9 +27,9 @@ namespace ImageViewer.Views.Dialog
         public ExportDialog(ExportViewModel viewModel)
         {
             this.viewModel = viewModel;
-            DataContext = viewModel;
 
             InitializeComponent();
+            DataContext = viewModel;
         }
 
         private void ButtonCancel_OnClick(object sender, RoutedEventArgs e)
