@@ -423,8 +423,9 @@ namespace ImageViewer.Models.Display
                         }
                         else if(models.Images.ImageType == typeof(Texture3D))
                         {
-                            modes.Insert(0, ViewMode.RayCasting);
-                            modes.Insert(1, ViewMode.ShearWarp);
+                            //modes.Insert(0, ViewMode.RayCasting);
+                            modes.Add(ViewMode.RayCasting);
+                            //modes.Insert(1, ViewMode.ShearWarp);
                         }
 
                         AvailableViews = modes;
