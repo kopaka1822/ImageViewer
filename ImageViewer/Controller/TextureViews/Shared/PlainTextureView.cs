@@ -12,7 +12,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
     public abstract class PlainTextureView : ITextureView
     {
         protected readonly ModelsEx models;
-        private Vector3 translation = Vector3.Zero;
+        protected Vector3 translation = Vector3.Zero;
         private readonly SingleViewShader shader;
 
         public PlainTextureView(ModelsEx models, IShaderBuilder builder)
@@ -45,7 +45,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
             translation.Y *= value;
         }
 
-        public void OnDrag(Vector2 diff)
+        public virtual void OnDrag(Vector2 diff)
         {
             // window to client
             translation.X += diff.X * 2.0f / models.Images.GetWidth(0);

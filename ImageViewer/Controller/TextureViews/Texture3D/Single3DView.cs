@@ -28,6 +28,14 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
                 displayEx.FreeAxis1, displayEx.FreeAxis2, displayEx.FixedAxisSlice);
         }
 
+        public override void OnDrag(Vector2 diff)
+        {
+            // window to client
+            
+            translation.X += diff.X * 2.0f / models.Images.Size[displayEx.FreeAxis1];
+            translation.Y -= diff.Y * 2.0f / models.Images.Size[displayEx.FreeAxis2];
+        }
+
         public override Size3 GetTexelPosition(Vector2 mouse)
         {
             var transMouse = GetDirectXMouseCoordinates(mouse);
