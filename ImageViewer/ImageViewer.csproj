@@ -103,6 +103,7 @@
     <Compile Include="Commands\Import\OpenCommand.cs" />
     <Compile Include="Commands\Tools\RemoveZoomBoxCommand.cs" />
     <Compile Include="Commands\Tools\StartZoomboxCommand.cs" />
+    <Compile Include="Commands\Tools\Tex3DToArrayCommand.cs" />
     <Compile Include="Commands\View\ResizeWindowCommand.cs" />
     <Compile Include="Commands\View\SelectNaNColorCommand.cs" />
     <Compile Include="Commands\View\SetThemeCommand.cs" />
@@ -153,6 +154,7 @@
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ResolutionViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ScaleViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\Tex3DToArrayViewModel.cs" />
     <Compile Include="ViewModels\Display\DisplayViewModel.cs" />
     <Compile Include="ViewModels\Display\RayCastingDisplayViewModel.cs" />
     <Compile Include="ViewModels\Display\Single3DDisplayViewModel.cs" />
@@ -206,6 +208,9 @@
     </Compile>
     <Compile Include="Views\Dialog\ScaleDialog.xaml.cs">
       <DependentUpon>ScaleDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\Tex3DToArrayDialog.xaml.cs">
+      <DependentUpon>Tex3DToArrayDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\ZoomBoxDialog.xaml.cs">
       <DependentUpon>ZoomBoxDialog.xaml</DependentUpon>
@@ -300,6 +305,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialog\ScaleDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\Tex3DToArrayDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

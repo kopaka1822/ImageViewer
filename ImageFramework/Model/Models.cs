@@ -229,6 +229,12 @@ namespace ImageFramework.Model
             return ConvertTo3DShader.ConvertTo3D(texArray);
         }
 
+        public TextureArray2D ConvertTo2DArray(Texture3D tex, int fixedAxis1, int fixedAxis2, int startLayer = 0, int numLayer = -1)
+        {
+            return ConvertTo3DShader.ConvertToArray(tex, fixedAxis1, fixedAxis2, SharedModel.Upload, startLayer,
+                numLayer);
+        }
+
         /// <summary>
         /// exports a pipeline image with the given format and extension.
         /// Apply will be called by this method if required

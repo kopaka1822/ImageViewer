@@ -300,6 +300,8 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+
+            <Separator/>
             <MenuItem
                 Header="TextureArray to Texture3D"
                 Command="{Binding ArrayTo3DCommand}"
@@ -311,9 +313,9 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
-            <!--<MenuItem
+            <MenuItem
                 Header="Texture3D to TextureArray"
-                Command="{Binding CubemapToLatLongCommand}"
+                Command="{Binding Tex3DToArrayCommand}"
                 IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
                     <Image 
@@ -321,7 +323,7 @@
                         Width="16"
                         Height="16"/>
                 </MenuItem.Icon>
-            </MenuItem>-->
+            </MenuItem>
         </MenuItem>
         <!--END TOOLS-->
 

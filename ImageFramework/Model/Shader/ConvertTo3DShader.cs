@@ -47,15 +47,18 @@ namespace ImageFramework.Model.Shader
             return dst;
         }
 
-        public TextureArray2D ConvertToArray(Texture3D src, int fixedAxis1, int fixedAxis2, UploadBuffer cbuffer)
+        public TextureArray2D ConvertToArray(Texture3D src, int fixedAxis1, int fixedAxis2, UploadBuffer cbuffer, int startLayer = 0, int numLayers = -1)
         {
             Debug.Assert(fixedAxis1 >= 0 && fixedAxis1 <= 2);
             Debug.Assert(fixedAxis2 >= 0 && fixedAxis2 <= 2);
             var dim = src.Size;
             var layerAxis = 3 - fixedAxis1 - fixedAxis2;
 
+            if (numLayers < 0)
+                numLayers = dim[layerAxis] - startLayer;
+
             var dst = new TextureArray2D(
-                new LayerMipmapCount(dim[layerAxis], 1), 
+                new LayerMipmapCount(numLayers, 1), 
                 new Size3(dim[fixedAxis1], dim[fixedAxis2]), 
                 Format.R32G32B32A32_Float, false
             );
@@ -74,7 +77,7 @@ namespace ImageFramework.Model.Shader
 
             foreach (var lm in dst.LayerMipmap.Range)
             {
-                data.ZValue = lm.Layer;
+                data.ZValue = lm.Layer + startLayer;
                 cbuffer.SetData(data);
                 dev.Pixel.SetConstantBuffer(0, cbuffer.Handle);
                 dev.OutputMerger.SetRenderTargets(dst.GetRtView(lm));
