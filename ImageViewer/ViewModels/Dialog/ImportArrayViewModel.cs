@@ -145,7 +145,7 @@ namespace ImageViewer.ViewModels.Dialog
             }
             catch (Exception e)
             {
-                models.Window.ShowErrorDialog(e.Message);
+                models.Window.ShowErrorDialog(e);
             }
 
             return false;

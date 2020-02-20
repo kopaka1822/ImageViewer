@@ -52,7 +52,7 @@ namespace ImageViewer.Controller
             catch (Exception e)
             {
                 if(!models.Progress.LastTaskCancelledByUser)
-                    models.Window.ShowErrorDialog(e.Message);
+                    models.Window.ShowErrorDialog(e);
             }
         }
 
@@ -75,12 +75,12 @@ namespace ImageViewer.Controller
                 else
                 {
                     // don't just discard the mipmaps
-                    models.Window.ShowErrorDialog(e.Message);
+                    models.Window.ShowErrorDialog(e);
                 }
             }
             catch (Exception e)
             {
-                models.Window.ShowErrorDialog(e.Message);
+                models.Window.ShowErrorDialog(e);
             }
             finally
             {

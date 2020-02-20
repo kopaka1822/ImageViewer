@@ -86,7 +86,7 @@ struct VertexOut {{
 
 {ConstantBuffer()}
 
-VertexOut main(uint id: SV_VertexID) {{
+VertexOut m ain(uint id: SV_VertexID) {{
     VertexOut o;
     o.texcoord = float2(((id << 1) & 2) / 2, (id & 2) / 2);
     o.projPos = float4(o.texcoord * float2(2, -2) + float2(-1, 1), 0, 1);

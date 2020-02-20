@@ -96,6 +96,8 @@ namespace ImageViewer.Controller
         {
             var dev = Device.Get();
 
+            if (currentView == null) return; // some error occured
+
             var visible = models.GetEnabledPipelines();
 
             var scissorsPos = new Point(mousePosition.X, mousePosition.Y);
@@ -297,7 +299,7 @@ namespace ImageViewer.Controller
                     }
                     catch (Exception err)
                     {
-                        models.Window.ShowErrorDialog(err.Message);
+                        models.Window.ShowErrorDialog(err);
                         currentView = new EmptyView();
                     }
                     break;

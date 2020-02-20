@@ -209,6 +209,9 @@
     <Compile Include="Views\Dialog\ScaleDialog.xaml.cs">
       <DependentUpon>ScaleDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Dialog\ShaderExceptionDialog.xaml.cs">
+      <DependentUpon>ShaderExceptionDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Dialog\Tex3DToArrayDialog.xaml.cs">
       <DependentUpon>Tex3DToArrayDialog.xaml</DependentUpon>
     </Compile>
@@ -305,6 +308,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialog\ScaleDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\ShaderExceptionDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -441,6 +448,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="AvalonEdit">
+      <Version>6.0.1</Version>
+    </PackageReference>
     <PackageReference Include="Expression.Blend.Sdk">
       <Version>1.0.2</Version>
     </PackageReference>

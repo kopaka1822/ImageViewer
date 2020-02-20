@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
+using ImageViewer.Views.Dialog;
 using Size = System.Drawing.Size;
 
 namespace ImageViewer.Models
@@ -99,6 +100,18 @@ namespace ImageViewer.Models
             
             MessageBox.Show(TopmostWindow, message, where, MessageBoxButton.OK, MessageBoxImage.Error);
 #endif
+        }
+
+        public void ShowErrorDialog(Exception exception, string where = "")
+        {
+            if (exception is Shader.CompilationException ce)
+            {
+                var dia = new ShaderExceptionDialog(ce.Error, ce.Code);
+                dia.Title = $"Shader Error in {ce.Name}";
+
+                ShowDialog(dia);
+            }
+            else ShowErrorDialog(exception.Message, where);
         }
 
         public void ShowInfoDialog(string message, string title = "Info")

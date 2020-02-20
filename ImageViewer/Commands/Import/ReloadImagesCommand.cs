@@ -60,7 +60,7 @@ namespace ImageViewer.Commands.Import
                 {
                     if (models.Progress.LastTaskCancelledByUser) return; // user does not want to reload anymore
 
-                    models.Window.ShowErrorDialog(e.Message);
+                    models.Window.ShowErrorDialog(e);
                 }
                 finally
                 {
