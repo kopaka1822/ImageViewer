@@ -4,14 +4,14 @@
 #setting type, dynamic
 
 #param Blur Radius, blur_radius, int, 20, 1
-#param Variance, variance, float, 72.46, 1
+#param Variance, variance, float, 26, 1
 #param Blur Alpha, blur_alpha, bool, false
 
 // Simple Gauss-Kernel. Normalization is not included and must be
 // done by dividing through the weight sum.
 float kernel(int _offset)
 {
-	return exp(- _offset * _offset / variance);
+	return exp(-0.5 * _offset * _offset / variance);
 }
 
 float4 getPixel(int3 pos, int3 size)
