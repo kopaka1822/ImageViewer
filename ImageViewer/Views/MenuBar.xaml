@@ -230,12 +230,13 @@
                             Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
-            
-            <Separator/>
+
+            <Separator Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}"/>
             <MenuItem
                 Header="Add Zoombox"
                 Command="{Binding StartZoomboxCommand}"
-                IsEnabled="{Binding Progress.NotProcessing}">
+                IsEnabled="{Binding Progress.NotProcessing}"
+                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
                 <MenuItem.Icon>
                     <Image 
                         Source="../Icons/image_box.png"
@@ -247,7 +248,8 @@
                 Header="Remove Zoombox"
                 Command="{Binding StartZoomboxCommand}"
                 IsEnabled="{Binding ZoomBox.HasBoxes}"
-                ItemsSource="{Binding ZoomBox.Boxes}">
+                ItemsSource="{Binding ZoomBox.Boxes}"
+                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
                 <MenuItem.Icon>
                     <Image 
                         Source="../Icons/cancel.png"
@@ -277,11 +279,13 @@
                     </Style>
                 </MenuItem.ItemContainerStyle>
             </MenuItem>
-            <Separator/>
+
+            <Separator Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}"/>
             <MenuItem
                 Header="LatLong to Cubemap"
                 Command="{Binding LatLongToCubemapCommand}"
-                IsEnabled="{Binding Progress.NotProcessing}">
+                IsEnabled="{Binding Progress.NotProcessing}"
+                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
                 <MenuItem.Icon>
                     <Image 
                         Source="../Icons/cube.png"
@@ -292,7 +296,8 @@
             <MenuItem
                 Header="Cubemap to LatLong"
                 Command="{Binding CubemapToLatLongCommand}"
-                IsEnabled="{Binding Progress.NotProcessing}">
+                IsEnabled="{Binding Progress.NotProcessing}"
+                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
                 <MenuItem.Icon>
                     <Image 
                         Source="../Icons/image_long.png"
