@@ -166,6 +166,14 @@ static const float2 samplePoints[N_SAMPLES] = {{
     float2(-7.0/16.0, -8.0/16.0)
 }};
 
+float4 getColor(TexcoordT coord)
+{{
+    float4 color = tex.Sample(texSampler, coord);
+    {ApplyColorTransform()}
+    {(builder.Is3D ? ApplyOverlay3D("coord", "color") : ApplyOverlay2D("coord", "color"))}
+    return color;
+}}
+
 float4 main(PixelIn i) : SV_TARGET {{
     float2 maxdxy;
     TexcoordT texcoord = getCoord(i.texcoord, maxdxy);
@@ -174,23 +182,14 @@ float4 main(PixelIn i) : SV_TARGET {{
     TexcoordT dy = ddy(texcoord);
     float4 color = 0.0;
 
-#if {builder.Is3DInt}
-    color = tex.Sample(texSampler, texcoord);
-#else
     if(length(dx) > maxdxy.x * 1.01 || length(dy) > maxdxy.y * 1.01) {{
         // use supersampling for minification
-        [unroll] for(uint si = 0; si < N_SAMPLES; ++si){{
-            float4 c = tex.Sample(texSampler, texcoord + samplePoints[si].x * dx + samplePoints[si].y * dy);
-            if(useAbs) c = abs(c);
-            color += c;
-        }}
+        [unroll] for(uint si = 0; si < N_SAMPLES; ++si)
+            color += getColor(texcoord + samplePoints[si].x * dx + samplePoints[si].y * dy);
+        
         color /= N_SAMPLES;
-    }} else color = tex.Sample(texSampler, texcoord);
-#endif
+    }} else color = getColor(texcoord);
 
-
-    {ApplyColorTransform()}
-    {(builder.Is3D ? ApplyOverlay3D("texcoord", "color"):ApplyOverlay2D("texcoord", "color"))}
     return toSrgb(color);
 }}
 ";
