@@ -32,8 +32,8 @@
                 </MenuItem.Icon>
             </MenuItem>
             <MenuItem
-                Header="Import as Array"
-                ToolTip="Combines multiple images into a single texture array on import"
+                Header="Import as Array/3D"
+                ToolTip="Combines multiple 2D images into a single texture array or 3D texture on import"
                 IsEnabled="{Binding Progress.NotProcessing}"
                 Command="{Binding ImportArrayCommand}">
                 <MenuItem.Icon>

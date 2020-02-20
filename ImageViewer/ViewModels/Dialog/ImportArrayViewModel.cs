@@ -26,12 +26,28 @@ namespace ImageViewer.ViewModels.Dialog
         private readonly ModelsEx models;
         private readonly ImportDialogController importDialog;
 
-        public class ApplyCommandImpl : Command
+        private static string GetPrettyFilename(string fullPath, int numTextures)
+        {
+            if (numTextures != 6) return fullPath;
+
+            var filename = System.IO.Path.GetFileName(fullPath);
+            if (filename == null) return fullPath;
+            if (!filename.StartsWith("x")) return fullPath;
+
+            // use directory name
+            var path = System.IO.Path.GetDirectoryName(fullPath);
+            if (path == null) return fullPath;
+            var actualDir = System.IO.Path.GetFileName(path);
+            if (actualDir.Length != 0) return actualDir;
+            return fullPath;
+        }
+
+        public class Import2DCommand : Command
         {
             private readonly ModelsEx models;
             private readonly ImportArrayViewModel viewModel;
 
-            public ApplyCommandImpl(ModelsEx models, ImportArrayViewModel viewModel)
+            public Import2DCommand(ModelsEx models, ImportArrayViewModel viewModel)
             {
                 this.models = models;
                 this.viewModel = viewModel;
@@ -52,12 +68,81 @@ namespace ImageViewer.ViewModels.Dialog
                 }
 
                 // otherwise the array count must match
-                return (viewModel.ListItems.Count == models.Images.NumLayers);
+                return models.Images.ImageType == typeof(TextureArray2D) && (viewModel.ListItems.Count == models.Images.NumLayers);
             }
 
             public override void Execute()
             {
                 models.Window.TopmostWindow.DialogResult = true;
+
+                var textures = viewModel.GetTextures();
+
+                try
+                {
+                    var res = models.CombineToArray(textures);
+
+                    models.Images.AddImage(res,
+                        GetPrettyFilename(viewModel.ListItems[0].Filename, textures.Count),
+                        viewModel.ListItems[0].Format);
+                }
+                catch (Exception e)
+                {
+                    models.Window.ShowErrorDialog(e);
+                }
+            }
+        }
+
+        public class Import3DCommand : Command
+        {
+            private readonly ModelsEx models;
+            private readonly ImportArrayViewModel viewModel;
+
+            public Import3DCommand(ModelsEx models, ImportArrayViewModel viewModel)
+            {
+                this.models = models;
+                this.viewModel = viewModel;
+                this.viewModel.ListItems.CollectionChanged += ListItemsOnCollectionChanged;
+            }
+
+            private void ListItemsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+            {
+                OnCanExecuteChanged();
+            }
+
+            public override bool CanExecute()
+            {
+                if (viewModel.ListItems.Count == 0) return false;
+
+                // if nothing imported yet => anything counts as long as there is one image
+                if (models.Images.NumImages == 0)
+                {
+                    return true;
+                }
+
+                // otherwise the image type
+                return models.Images.ImageType == typeof(Texture3D) && (viewModel.ListItems.Count == models.Images.Size.Z);
+            }
+
+            public override void Execute()
+            {
+                models.Window.TopmostWindow.DialogResult = true;
+
+                var textures = viewModel.GetTextures();
+
+                try
+                {
+                    var tmpArray = models.CombineToArray(textures);
+                    var res = models.ConvertTo3D(tmpArray);
+                    tmpArray.Dispose();
+
+                    models.Images.AddImage(res,
+                        GetPrettyFilename(viewModel.ListItems[0].Filename, textures.Count),
+                        viewModel.ListItems[0].Format);
+                }
+                catch (Exception e)
+                {
+                    models.Window.ShowErrorDialog(e);
+                }
             }
         }
 
@@ -78,7 +163,8 @@ namespace ImageViewer.ViewModels.Dialog
             this.models = models;
             this.CancelCommand = new ActionCommand(Cancel);
             this.ImportCommand = new ActionCommand(Import);
-            this.ApplyCommand = new ApplyCommandImpl(models, this);
+            this.Apply2DCommand = new Import2DCommand(models, this);
+            this.Apply3DCommand = new Import3DCommand(models, this);
             importDialog = new ImportDialogController(models);
         }
 
@@ -122,12 +208,10 @@ namespace ImageViewer.ViewModels.Dialog
                         if(img.NumMipmaps != first.NumMipmaps)
                             throw new Exception($"{filename}: Inconsistent amount of mipmaps. Expected {first.NumMipmaps} got {img.NumMipmaps}");
                     }
-                    else
-                    {
-                        // first image
-                        if(img.Is3D)
-                            throw new Exception($"{filename}: Only 2D images are allowed");
-                    }
+
+                    // first image
+                    if(img.Is3D)
+                        throw new Exception($"{filename}: Only 2D images are allowed");
 
                     // import image
                     var listItem = new ImageItem
@@ -174,7 +258,8 @@ namespace ImageViewer.ViewModels.Dialog
         }
 
         public ICommand ImportCommand { get; }
-        public ICommand ApplyCommand { get; }
+        public ICommand Apply2DCommand { get; }
+        public ICommand Apply3DCommand { get; }
         public ICommand CancelCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;

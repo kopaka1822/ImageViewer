@@ -221,6 +221,13 @@ namespace ImageFramework.DirectX
             Debug.Assert(Size.Min > 0);
             Debug.Assert(Format != Format.Unknown);
 
+            // check resource limits
+            if(Size.X > Device.MAX_TEXTURE_2D_DIMENSION || Size.Y > Device.MAX_TEXTURE_2D_DIMENSION)
+                throw new Exception($"Texture2D Dimensions may not exceed {Device.MAX_TEXTURE_2D_DIMENSION}x{Device.MAX_TEXTURE_2D_DIMENSION} but were {Size.X}x{Size.Y}");
+
+            if (NumLayers > Device.MAX_TEXTURE_2D_ARRAY_DIMENSION)
+                throw new Exception($"Number of layers may not exceed {Device.MAX_TEXTURE_2D_ARRAY_DIMENSION} but was {NumLayers}");
+
             // render target required for mip map generation
             BindFlags flags = BindFlags.ShaderResource | BindFlags.RenderTarget;
             if (createUav)
