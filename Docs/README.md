@@ -2,15 +2,6 @@
 
 An image viewer for anyone related to computer graphics.
 
-* quick [side-by-side comparison](#Side-By-Side-Comparision-and-Image-Manipulation)
-* [arithmetic image manipulation](equation.md) (image calculator)
-* [image statistics](statistics.md) (MSE, SSIM and more)
-* [layer, mipmap](#Images-with-multiple-mipmaps-and-faces) and [360° views](#Lat-Long-Polar-Images)
-* [lat-long cubemap conversion](#Lat-Long-Cubemap-Conversion)
-* [mipmap generation](mipmaps.md) (including box filter and lanczos)
-* [customisable filter](#Custom-HLSL-Compute-Shader-Filter) in HLSL
-* computations are done in linear color space
-
 ## File Formats
 
 * PNG, JPG, BMP
@@ -36,6 +27,17 @@ Version 3.1 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/ra
 Version 2.1 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/raw/Release/Build/Texture%20Viewer.zip)
 
 [Used Libraries](about.md)
+
+## Features 
+
+* quick [side-by-side comparison](#Side-By-Side-Comparision-and-Image-Manipulation)
+* [arithmetic image manipulation](equation.md) (image calculator)
+* [image statistics](statistics.md) (MSE, SSIM and more)
+* [layer, mipmap](#Images-with-multiple-mipmaps-and-faces) and [360° views](#Lat-Long-Polar-Images)
+* [lat-long cubemap conversion](#Lat-Long-Cubemap-Conversion)
+* [mipmap generation](mipmaps.md) (including box filter and lanczos)
+* [customisable filter](#Custom-HLSL-Compute-Shader-Filter) in HLSL
+* computations are done in linear color space
 
 ## View Modes
 ### Simple Images
