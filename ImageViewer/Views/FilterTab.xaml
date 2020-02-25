@@ -46,8 +46,7 @@
                         Grid.Column="2"
                         Margin="0"
                         Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.HelpCommand}"
-                        HorizontalAlignment="Right"
-                        IsEnabled="{Binding IsVisible}">
+                        HorizontalAlignment="Right">
                         <Button.CommandParameter>
                             <system:String>help/filter_manual.md</system:String>
                         </Button.CommandParameter>
