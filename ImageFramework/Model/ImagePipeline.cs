@@ -119,6 +119,14 @@ namespace ImageFramework.Model
 
         public ITexture Image { get; private set; }
 
+        // ejects image without invoking on property changed (can be used to get ownership of the image before changing the equation)
+        public ITexture EjectImage()
+        {
+            var res = Image;
+            Image = null;
+            return res;
+        }
+
         internal class UpdateImageArgs
         {
             public Models Models;

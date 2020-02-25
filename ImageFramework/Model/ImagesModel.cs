@@ -84,6 +84,8 @@ namespace ImageFramework.Model
 
             public void Replace(ITexture image, GliFormat originalFormat)
             {
+                if (ReferenceEquals(image, Image)) return;
+
                 Image.Dispose();
                 Image = image;
                 OriginalFormat = originalFormat;

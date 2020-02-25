@@ -71,6 +71,7 @@ namespace ImageViewer.ViewModels
             ImportEquationImageCommand = new ImportEquationImageCommand(models);
             ExportCommand = new ExportCommand(models);
             ReloadImagesCommand = new ReloadImagesCommand(models);
+            ReplaceEquationImageCommand = new ReplaceEquationImageCommand(models);
 
             ShowPixelDisplayCommand = new ShowPixelDisplayCommand(models);
             ShowPixelColorCommand = new ShowPixelColorCommand(models);
@@ -170,6 +171,8 @@ namespace ImageViewer.ViewModels
         public ICommand SelectNaNColorCommand { get; }
 
         public ICommand ReloadImagesCommand { get; }
+
+        public ICommand ReplaceEquationImageCommand { get; }
 
         public ICommand StartZoomboxCommand { get; }
 

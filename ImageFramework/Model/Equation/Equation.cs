@@ -15,6 +15,7 @@ namespace ImageFramework.Model.Equation
         private ValueToken finalToken;
         private int firstImageId = -1;
         private int maxImageId = -1;
+        private int minImageId = Int32.MaxValue;
 
         public Equation(string formula)
         {
@@ -40,6 +41,13 @@ namespace ImageFramework.Model.Equation
         /// highest image id that occured in the formula
         /// </summary>
         public int MaxImageId => Math.Max(maxImageId, 0);
+
+        /// <summary>
+        /// lowest image id that occured in the formula.
+        /// </summary>
+        public int MinImageId => minImageId == Int32.MaxValue ? 0 : minImageId;
+
+        public bool HasImageId => firstImageId != -1;
 
         private List<Token.Token> GetToken(string formula)
         {
@@ -122,6 +130,7 @@ namespace ImageFramework.Model.Equation
                     throw new Exception("Invalid Image Range: " + identifier);
                 // update highest image id
                 maxImageId = Math.Max(maxImageId, number);
+                minImageId = Math.Min(minImageId, number);
                 if (firstImageId < 0) // first image that occured in the formula
                     firstImageId = maxImageId;
 
