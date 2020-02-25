@@ -17,7 +17,7 @@ using Device = ImageFramework.DirectX.Device;
 
 namespace ImageViewer.Controller.TextureViews.Texture3D
 {
-    using Texture3D = SharpDX.Direct3D11.Texture3D;
+    using Texture3D = ImageFramework.DirectX.Texture3D;
 
     public class RayCastingView : Texture3DBaseView
     {
@@ -26,7 +26,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         private readonly RayMarchingShader marchingShader;
         private readonly EmptySpaceSkippingShader emptySpaceSkippingShader;
         private RayCastingDisplayModel displayEx;
-        private SpaceSkippingTexture3D[] helpTextures;
+        private Texture3D[] helpTextures;
 
         public RayCastingView(ModelsEx models) : base(models)
         {
@@ -34,7 +34,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             marchingShader = new RayMarchingShader(models);
             emptySpaceSkippingShader = new EmptySpaceSkippingShader();
             displayEx = (RayCastingDisplayModel)models.Display.ExtendedViewData;
-            helpTextures = new SpaceSkippingTexture3D[models.NumPipelines];
+            helpTextures = new Texture3D[models.NumPipelines];
         }
 
         public override void Draw(int id, ITexture texture)
@@ -95,19 +95,14 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             helpTextures[id]?.Dispose();
             if (texture is null) return;
 
-            SpaceSkippingTexture3D tex = new SpaceSkippingTexture3D(texture.Size, texture.NumMipmaps);
+            Texture3D tex = new Texture3D(texture.NumMipmaps, texture.Size, Format.R8_UInt, true, false);
             helpTextures[id] = tex;
-            emptySpaceSkippingShader.Execute(texture.GetSrView(LayerMipmapSlice.Mip0), helpTextures[id], texture.Size);
-
-        }
-
-        public class SpaceSkippingTexture3D : ImageFramework.DirectX.Texture3D
-        {
-            public SpaceSkippingTexture3D(Size3 orgSize, int numMipMaps) : base(numMipMaps, orgSize, Format.R8_UInt, true, false)
+            foreach (var lm in texture.LayerMipmap.Range)
             {
-
+                emptySpaceSkippingShader.Execute(texture, helpTextures[id], lm, models.SharedModel.Upload);
             }
         }
 
+        
     }
 }
