@@ -86,6 +86,7 @@
     </ApplicationDefinition>
     <Compile Include="Commands\AddFilterCommand.cs" />
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
+    <Compile Include="Commands\Export\ExportOverwriteCommand.cs" />
     <Compile Include="Commands\Helper\Command.cs" />
     <Compile Include="Commands\Import\ReloadImagesCommand.cs" />
     <Compile Include="Commands\Import\ReplaceEquationImageCommand.cs" />

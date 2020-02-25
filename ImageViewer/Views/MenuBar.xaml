@@ -50,6 +50,14 @@
                     <Image Source="../Icons/save.png"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <MenuItem
+                Header="{Binding ExportOverwriteCommand.Text, FallbackValue=Overwrite ...}"
+                Command="{Binding ExportOverwriteCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image Source="../Icons/refresh.png"/>
+                </MenuItem.Icon>
+            </MenuItem>
             <MenuItem 
                 Header="Animated Diff (.mp4)"
                 ToolTip="Export video with a side-by-side comparision of two images"

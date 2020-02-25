@@ -70,6 +70,7 @@ namespace ImageViewer.ViewModels
             ImportCommand = new ImportCommand(models);
             ImportEquationImageCommand = new ImportEquationImageCommand(models);
             ExportCommand = new ExportCommand(models);
+            ExportOverwriteCommand = new ExportOverwriteCommand(models);
             ReloadImagesCommand = new ReloadImagesCommand(models);
             ReplaceEquationImageCommand = new ReplaceEquationImageCommand(models);
 
@@ -147,7 +148,7 @@ namespace ImageViewer.ViewModels
         public ICommand ImportEquationImageCommand { get; }
 
         public ICommand ExportCommand { get; }
-
+        public ICommand ExportOverwriteCommand { get; }
         public ICommand ShowPixelDisplayCommand { get; }
 
         public ICommand ShowPixelColorCommand { get; }
