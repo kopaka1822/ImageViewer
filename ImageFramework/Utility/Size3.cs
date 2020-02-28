@@ -189,5 +189,20 @@ namespace ImageFramework.Utility
                 (Z + 0.5f) / size.Z
             );
         }
+
+        public IEnumerator<Size3> GetEnumerator()
+        {
+            for (int z = 0; z < Z; z++)
+            {
+                for (int y = 0; y < Y; y++)
+                {
+                    for (int x = 0; x < X; x++)
+                    {
+                        yield return new Size3(x, y, z);
+                    }
+                }
+            }
+
+        }
     }
 }

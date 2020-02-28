@@ -41,9 +41,9 @@ namespace ImageViewer.Controller.TextureViews.Shader
         {
             var size = orgTex.Size.GetMip(lm.Mipmap);
             var dev = Device.Get();
-            
 
-            initTexShader.Run(orgTex,helpTex,lm,uploadBuffer);
+
+            initTexShader.Run(orgTex, helpTex, lm, uploadBuffer);
 
             Texture3D pong = new Texture3D(helpTex.NumMipmaps, helpTex.Size, Format.R8_UInt, true, false);
 
@@ -51,11 +51,12 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
             dev.Compute.Set(compute.Compute);
 
+            ImageFramework.DirectX.Query.SyncQuery syncQuery = new ImageFramework.DirectX.Query.SyncQuery();
+
             for (int i = 0; i < 127; i++)
             {
-                Console.WriteLine("Iteration:"+i);
 
-                swapTextures(ref readHelpTex, helpTex, pong,lm);
+                swapTextures(ref readHelpTex, helpTex, pong, lm);
 
                 //x-direction
                 uploadBuffer.SetData(new DirBufferData
@@ -67,7 +68,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 dev.Dispatch(Utility.DivideRoundUp(size.X, workgroupSize.X), Utility.DivideRoundUp(size.Y, workgroupSize.Y), Utility.DivideRoundUp(size.Z, workgroupSize.Z));
 
 
-                swapTextures(ref readHelpTex, helpTex, pong,lm);
+                swapTextures(ref readHelpTex, helpTex, pong, lm);
 
                 //y-direction
                 uploadBuffer.SetData(new DirBufferData
@@ -89,13 +90,16 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 dev.Compute.SetConstantBuffer(0, uploadBuffer.Handle);
                 dev.Dispatch(Utility.DivideRoundUp(size.X, workgroupSize.X), Utility.DivideRoundUp(size.Y, workgroupSize.Y), Utility.DivideRoundUp(size.Z, workgroupSize.Z));
 
+#if DEBUG
+                if (i % 8 == 0)
+                {
+                    syncQuery.Set();
+                    syncQuery.WaitForGpu();
+                    Console.WriteLine("Iteration: " + i);
+                }
+#endif
+
             }
-
-           
-
-
-            //DebugTex(helpTex);
-            Console.WriteLine("Fertig");
 
             // unbind
             dev.Compute.SetShaderResource(0, null);
@@ -171,7 +175,7 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
 ";
         }
 
-        
+
 
 
 

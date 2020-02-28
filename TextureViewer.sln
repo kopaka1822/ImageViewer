@@ -28,6 +28,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "dependencies\libp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "png", "png", "{DDFE1395-A67F-4ABF-AE66-CAABC8E0E641}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewerTests", "ViewerTests\ViewerTests.csproj", "{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -146,6 +148,18 @@ Global
 		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release|x64.Build.0 = Release Library|x64
 		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release|x86.ActiveCfg = Release|Win32
 		{D6973076-9317-4EF2-A0B8-B7A18AC0713E}.Release|x86.Build.0 = Release|Win32
+		{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}.Debug|x64.ActiveCfg = Debug|x64
+		{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}.Debug|x64.Build.0 = Debug|x64
+		{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}.Debug|x86.Build.0 = Debug|Any CPU
+		{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}.Release|x64.ActiveCfg = Release|x64
+		{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}.Release|x64.Build.0 = Release|x64
+		{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}.Release|x86.ActiveCfg = Release|Any CPU
+		{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
