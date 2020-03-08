@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
+using ImageFramework.Model.Progress;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using Microsoft.SqlServer.Server;

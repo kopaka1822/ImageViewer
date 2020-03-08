@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using ImageFramework.Model;
+using ImageFramework.Model.Progress;
 using ImageViewer.Models;
 
 namespace ImageViewer.Controller

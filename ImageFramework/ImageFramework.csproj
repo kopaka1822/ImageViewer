@@ -94,6 +94,7 @@
     <Compile Include="ImageLoader\Layer.cs" />
     <Compile Include="ImageLoader\Mipmap.cs" />
     <Compile Include="ImageLoader\Resource.cs" />
+    <Compile Include="Model\Progress\DllProgressAdapter.cs" />
     <Compile Include="Model\Equation\Equation.cs" />
     <Compile Include="Model\Equation\FormulaModel.cs" />
     <Compile Include="Model\Equation\Markov\RuleDoubleSign.cs" />
@@ -135,13 +136,15 @@
     <Compile Include="Model\Equation\Token\ValueToken.cs" />
     <Compile Include="Model\ImagePipeline.cs" />
     <Compile Include="Model\ImagesModel.cs" />
+    <Compile Include="Model\Progress\IProgress.cs" />
     <Compile Include="Model\Models.cs" />
     <Compile Include="Model\Overlay\BoxOverlay.cs" />
     <Compile Include="Model\Overlay\BoxOverlayShader.cs" />
     <Compile Include="Model\Overlay\CropOverlay.cs" />
     <Compile Include="Model\Overlay\IOverlay.cs" />
     <Compile Include="Model\Overlay\OverlayModel.cs" />
-    <Compile Include="Model\ProgressModel.cs" />
+    <Compile Include="Model\Progress\ProgressModel.cs" />
+    <Compile Include="Model\Progress\SubProgress.cs" />
     <Compile Include="Model\Scaling\Down\DetailPreservingShaderCore.cs" />
     <Compile Include="Model\Scaling\Down\DownscalingShaderBase.cs" />
     <Compile Include="Model\Scaling\Down\BoxScalingShader.cs" />
@@ -255,6 +258,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

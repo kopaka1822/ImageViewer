@@ -7,6 +7,7 @@ using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ImageFramework.Model.Progress;
 
 namespace ImageFramework.Model.Export
 {

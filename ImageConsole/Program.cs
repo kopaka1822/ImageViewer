@@ -12,6 +12,7 @@ using ImageConsole.Commands.Filter;
 using ImageConsole.Commands.Image;
 using ImageConsole.Commands.Program;
 using ImageFramework.Model;
+using ImageFramework.Model.Progress;
 
 namespace ImageConsole
 {

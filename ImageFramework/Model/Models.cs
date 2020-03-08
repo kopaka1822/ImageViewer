@@ -14,6 +14,7 @@ using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
 using ImageFramework.Model.Filter;
 using ImageFramework.Model.Overlay;
+using ImageFramework.Model.Progress;
 using ImageFramework.Model.Scaling;
 using ImageFramework.Model.Shader;
 using ImageFramework.Model.Statistics;
