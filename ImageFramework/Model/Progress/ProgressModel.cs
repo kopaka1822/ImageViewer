@@ -32,11 +32,48 @@ namespace ImageFramework.Model.Progress
         private Task currentTask = null;
         private CancellationTokenSource currentTaskCancellation = null;
 
+        // helper class that forwards progress information
+        private class ProgressInterface : IProgress
+        {
+            private readonly ProgressModel parent;
+
+            public ProgressInterface(ProgressModel parent, CancellationToken token)
+            {
+                this.parent = parent;
+                Token = token;
+                Progress = 0.0f;
+                What = "";
+            }
+
+            public void Report(float value) => Progress = value;
+
+            public float Progress
+            {
+                get => parent.Progress;
+                set => parent.Progress = value;
+            }
+            public string What
+            {
+                get => parent.What;
+                set => parent.What = value;
+            }
+            public CancellationToken Token { get; }
+            public IProgress CreateSubProgress(float maxProgress)
+            {
+                return new SubProgress(this, maxProgress);
+            }
+        }
+
         public ProgressModel()
         {
             // set dll progress
             onDllProgress = OnDllProgress;
             Dll.set_progress_callback(onDllProgress);
+        }
+
+        internal IProgress GetProgressInterface(CancellationToken ct)
+        {
+            return new ProgressInterface(this, ct);
         }
 
         private uint OnDllProgress(float prog, string description)
@@ -62,7 +99,7 @@ namespace ImageFramework.Model.Progress
         public float Progress
         {
             get => progress;
-            internal set
+            private set
             {
                 float clamped = Math.Min(Math.Max(value, 0.0f), 1.0f);
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -85,7 +122,7 @@ namespace ImageFramework.Model.Progress
         public string What
         {
             get => what;
-            internal set
+            private set
             {
                 var val = value ?? "";
                 //if (val.Equals(what)) return;

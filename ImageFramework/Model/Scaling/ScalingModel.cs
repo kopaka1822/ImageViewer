@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
+using ImageFramework.Model.Progress;
 using ImageFramework.Model.Scaling.Down;
 using ImageFramework.Utility;
 
@@ -78,7 +79,7 @@ namespace ImageFramework.Model.Scaling
             throw new NotImplementedException();
         }
 
-        internal async Task WriteMipmapsAsync(ITexture tex, CancellationToken ct)
+        internal async Task WriteMipmapsAsync(ITexture tex, IProgress progress)
         {
             Debug.Assert(tex.HasUaViews || tex.HasRtViews);
 
@@ -90,8 +91,8 @@ namespace ImageFramework.Model.Scaling
             if (!tex.HasUaViews) // cannot write directly into texture
                 dstTex = cache.GetTexture(); // get texture from cache with unordered access view
 
-            models.Progress.Progress = 0.0f;
-            models.Progress.What = "Generating Mipmaps";
+            progress.What = "Generating Mipmaps";
+            var curProg = progress.CreateSubProgress(tex.HasUaViews ? 1.0f : 0.9f);
 
             for (int curMip = 1; curMip < tex.LayerMipmap.Mipmaps; ++curMip)
             {
@@ -100,13 +101,16 @@ namespace ImageFramework.Model.Scaling
                 shader.Run(srcMip == 0 ? tex : dstTex, dstTex, srcMip, curMip, hasAlpha, models.SharedModel.Upload, cache);
 
                 models.SharedModel.Sync.Set();
-                await models.SharedModel.Sync.WaitForGpuAsync(ct);
-                models.Progress.Progress = curMip / (float)(tex.LayerMipmap.Mipmaps - 1);
+                await models.SharedModel.Sync.WaitForGpuAsync(progress.Token);
+                
+                curProg.Progress = curMip / (float)(tex.LayerMipmap.Mipmaps - 1);
             }
+
+            curProg.Progress = 1.0f;
 
             if (!tex.HasUaViews) // write back from dstTex to tex
             {
-                models.Progress.What = "Finalizing Mipmaps";
+                progress.What = "Finalizing Mipmaps";
                 for (int curLayer = 0; curLayer < tex.NumLayers; ++curLayer)
                 {
                     for (int curMip = 1; curMip < tex.NumMipmaps; ++curMip)
@@ -114,7 +118,7 @@ namespace ImageFramework.Model.Scaling
                         var lm = new LayerMipmapSlice(curLayer, curMip);
                         models.SharedModel.Convert.CopyLayer(dstTex, lm, tex, lm);
                         models.SharedModel.Sync.Set();
-                        await models.SharedModel.Sync.WaitForGpuAsync(ct);
+                        await models.SharedModel.Sync.WaitForGpuAsync(progress.Token);
                     }
                 }
                 cache.StoreTexture(dstTex);
@@ -124,7 +128,7 @@ namespace ImageFramework.Model.Scaling
         public void WriteMipmaps(ITexture tex)
         {
             var cts = new CancellationTokenSource();
-            models.Progress.AddTask(Task.Run(async () => await WriteMipmapsAsync(tex, cts.Token)), cts);
+            models.Progress.AddTask(Task.Run(async () => await WriteMipmapsAsync(tex, models.Progress.GetProgressInterface(cts.Token))), cts);
             models.Progress.WaitForTask();
             if (!String.IsNullOrEmpty(models.Progress.LastError))
                 throw new Exception(models.Progress.LastError);

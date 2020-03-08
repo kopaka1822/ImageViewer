@@ -21,7 +21,7 @@ namespace ImageFramework.Model.Export
             return File.Exists(Path);
         }
 
-        public static async Task ConvertAsync(GifModel.Config config, ProgressModel progress, CancellationToken ct)
+        internal static async Task ConvertAsync(GifModel.Config config, IProgress progress)
         {
             Debug.Assert(IsAvailable());
 
@@ -63,10 +63,10 @@ namespace ImageFramework.Model.Export
             {
                 await Task.Run(() => p.WaitForExit(100));
 
-                if (ct.IsCancellationRequested && !p.HasExited)
+                if (progress.Token.IsCancellationRequested && !p.HasExited)
                 {
                     p.Kill();
-                    ct.ThrowIfCancellationRequested();
+                    progress.Token.ThrowIfCancellationRequested();
                 }
             }
         }

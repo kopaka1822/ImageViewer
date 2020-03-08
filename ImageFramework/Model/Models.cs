@@ -295,7 +295,7 @@ namespace ImageFramework.Model
         public void ApplyAsync()
         {
             var cts = new CancellationTokenSource();
-            Progress.AddTask(pipelineController.UpdateImagesAsync(cts.Token), cts);
+            Progress.AddTask(pipelineController.UpdateImagesAsync(Progress.GetProgressInterface(cts.Token)), cts);
         }
 
         /// <summary>

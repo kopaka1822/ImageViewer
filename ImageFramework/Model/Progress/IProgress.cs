@@ -9,6 +9,7 @@ namespace ImageFramework.Model.Progress
 {
     interface IProgress : IProgress<float>
     {
+        // progress between 0 and 1
         float Progress { get; set; }
         string What { set; }
 

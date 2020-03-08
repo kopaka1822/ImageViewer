@@ -22,6 +22,7 @@ namespace ImageFramework.Model.Progress
             this.parent = parent;
             this.parentMin = parent.Progress;
             this.parentLength = parentMax - parent.Progress;
+            Progress = 0.0f;
         }
 
         private float progress = 0.0f;
