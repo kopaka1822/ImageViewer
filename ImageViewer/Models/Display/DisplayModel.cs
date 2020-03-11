@@ -19,7 +19,12 @@ using Size = System.Drawing.Size;
 
 namespace ImageViewer.Models.Display
 {
-    public interface IExtendedDisplayModel : IDisposable, INotifyPropertyChanged { }
+    public interface IExtendedDisplayModel : IDisposable, INotifyPropertyChanged
+    {
+        // forces the view mode controller to recompute the texel position
+        event EventHandler ForceTexelRecompute;
+    }
+
     public class DisplayModel : INotifyPropertyChanged, IDisposable
     {
         public enum ViewMode

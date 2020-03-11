@@ -50,5 +50,12 @@ namespace ImageViewer.Models.Display
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public event EventHandler ForceTexelRecompute;
+
+        protected virtual void OnForceTexelRecompute()
+        {
+            ForceTexelRecompute?.Invoke(this, EventArgs.Empty);
+        }
     }
 }

@@ -48,6 +48,8 @@ namespace ImageViewer.Models.Display
                 fixedAxis = Utility.Clamp(value, 0, 2);
                 OnPropertyChanged(nameof(FixedAxis));
                 FixedAxisSlice = FixedAxisSlice; // refresh slice
+
+                OnForceTexelRecompute();
             }
         }
 
@@ -68,6 +70,8 @@ namespace ImageViewer.Models.Display
 
                 fixedAxisSlice = clamped;
                 OnPropertyChanged(nameof(FixedAxisSlice));
+
+                OnForceTexelRecompute();
             }
         }
 
@@ -77,6 +81,13 @@ namespace ImageViewer.Models.Display
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public event EventHandler ForceTexelRecompute;
+
+        protected virtual void OnForceTexelRecompute()
+        {
+            ForceTexelRecompute?.Invoke(this, EventArgs.Empty);
         }
     }
 }
