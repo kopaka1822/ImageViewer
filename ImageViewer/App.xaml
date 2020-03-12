@@ -117,6 +117,9 @@
             <converter:HiddenVisibleConverter x:Key="HiddenVisibleConverter"/>
             <converter:VisibleHiddenConverter x:Key="VisibleHiddenConverter"/>
 
+            <converter:NullCollapsedConverter x:Key="NullCollapsedConverter"/>
+            <converter:NullHiddenConverter x:Key="NullHiddenConverter"/>
+
             <!-- Borders etc. -->
 
             <system:Double x:Key="DefaultBorderValue">5</system:Double>

@@ -53,6 +53,8 @@ namespace ImageFramework.DirectX
             }
         }
 
+        public bool IsDisposed => chain.IsDisposed;
+
         public void Resize(int width, int height)
         {
             Width = width;

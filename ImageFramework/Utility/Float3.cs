@@ -15,6 +15,7 @@ namespace ImageFramework.Utility
         public float Z;
 
         public Float2 XY => new Float2(X, Y);
+        public Float2 YZ => new Float2(Y, Z);
 
         public float this[int key]
         {

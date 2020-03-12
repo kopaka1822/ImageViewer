@@ -183,6 +183,7 @@
     <Compile Include="ViewModels\ViewModels.cs" />
     <Compile Include="ViewModels\ZoomBoxViewModel.cs" />
     <Compile Include="Views\Converter\BoolVisibilityConverter.cs" />
+    <Compile Include="Views\Converter\NullVisibilityConverter.cs" />
     <Compile Include="Views\CustomTextBox.cs" />
     <Compile Include="Views\Dialog\ArrayImportDialog.xaml.cs">
       <DependentUpon>ArrayImportDialog.xaml</DependentUpon>
@@ -225,6 +226,9 @@
     </Compile>
     <Compile Include="Views\Display\Single3DView.xaml.cs">
       <DependentUpon>Single3DView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Display\ZoomBoxToolbar.xaml.cs">
+      <DependentUpon>ZoomBoxToolbar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\FilterTab.xaml.cs">
       <DependentUpon>FilterTab.xaml</DependentUpon>
@@ -330,6 +334,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Display\Single3DView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Display\ZoomBoxToolbar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

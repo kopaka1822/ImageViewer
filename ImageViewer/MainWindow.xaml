@@ -69,11 +69,27 @@
                     <ColumnDefinition Width="200" MaxWidth="{Binding ElementName=Window, Path=ActualWidth}"/>
                 </Grid.ColumnDefinitions>
 
-                <Border
-                    x:Name="BorderHost"
-                    Background="Black"
-                    ContextMenu="{StaticResource ClientContextMenu}"
-                    Focusable="True"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border
+                        Grid.Row="0"
+                        x:Name="OverlayViewHost"
+                        BorderThickness="0 0 0 1"
+                        BorderBrush="{StaticResource BorderBrush}"
+                        Visibility="Collapsed">
+                    </Border>
+                    
+                    <Border
+                        Grid.Row="1"
+                        x:Name="BorderHost"
+                        Background="Black"
+                        ContextMenu="{StaticResource ClientContextMenu}"
+                        Focusable="True"/>
+                </Grid>
+                
 
                 <GridSplitter 
                     Grid.Column="1"

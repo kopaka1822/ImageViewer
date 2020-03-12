@@ -121,7 +121,7 @@ namespace ImageViewer.Controller
         private void OnRepaint()
         {
             scheduledRedraw = false;
-            if (swapChain == null) return;
+            if (swapChain == null || swapChain.IsDisposed) return;
 
             var timerStarted = false;
             swapChain.BeginFrame();
