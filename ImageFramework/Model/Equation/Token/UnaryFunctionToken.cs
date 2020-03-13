@@ -92,10 +92,7 @@ float4 srgbAsSnorm(float4 v)
                 case "acos":
                 case "atan":
                 case "exp":
-                case "log":
                 case "exp2":
-                case "log2":
-                case "sqrt":
                 case "sign":
                 case "floor":
                 case "ceil":
@@ -104,8 +101,17 @@ float4 srgbAsSnorm(float4 v)
                     front = name + "(";
                     end = ")";
                     break;
+
+                case "log":
+                case "log2":
+                case "log10":
+                case "sqrt":
+                    front = name + "Ex(";
+                    end = ")";
+                    break;
+
                 case "normalize":
-                    front = "float4(normalize((";
+                    front = "float4(normalizeEx((";
                     end = ").xyz), 1.0)";
                     break;
                 case "length":

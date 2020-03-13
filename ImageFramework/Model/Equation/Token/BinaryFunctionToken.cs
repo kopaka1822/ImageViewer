@@ -50,7 +50,7 @@ namespace ImageFramework.Model.Equation.Token
                     convertToRgb = true;
                     return true;
                 case "pow":
-                    funcName = "powEx"; // use extended pow
+                    funcName = funcName + "Ex"; // use extended
                     return true;
 
                 // not core but provided by the image viewer

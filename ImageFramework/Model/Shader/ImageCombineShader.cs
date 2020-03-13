@@ -132,6 +132,11 @@ void main(uint3 coord : SV_DISPATCHTHREADID)
                 GetCompareFunction("fbiggereq", ">=") +
                 GetCompareFunction("fsmallereq", "<=") +
                 GetExtendedConstructors() +
+                GetNegativeToNaNFunction("log") + 
+                GetNegativeToNaNFunction("log2") + 
+                GetNegativeToNaNFunction("log10") + 
+                GetNegativeToNaNFunction("sqrt") + 
+                GetNormalizeEx() +
                 Utility.Utility.FromSrgbFunction() +
                 Utility.Utility.ToSrgbFunction() +
                 Utility.Utility.PowExFunction() +
@@ -149,6 +154,29 @@ float4 {name}(float4 a, float4 b){{
       if(a[i] {comparision} b[i])
     res[i] = 1.0;
     return res;
+}}
+";
+        }
+
+        private static string GetNegativeToNaNFunction(string name)
+        {
+            return $@"
+float4 {name}Ex(float4 v) {{
+    float4 r = v;
+    [unroll] for(int i = 0; i < 4; ++i)
+        if(r[i] < 0.0) r[i] = NaNValue;
+        else r[i] = {name}(r[i]);
+    return r;
+}}
+";
+        }
+
+        private static string GetNormalizeEx()
+        {
+            return $@"
+float3 normalizeEx(float3 v) {{
+    if(all(v == 0.0)) return NaNValue;
+    return normalize(v);
 }}
 ";
         }

@@ -182,6 +182,79 @@ namespace FrameworkTests.Model.Equation
             TestFor(models, float.NaN);
         }
 
+        [TestMethod]
+        public void LogFunctionResults()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "pixel.png");
+            var eq = models.Pipelines[0].Alpha;
+            
+
+            eq.Formula = "log2(1)";
+            TestFor(models, 0.0f);
+
+            eq.Formula = "log(1)";
+            TestFor(models, 0.0f);
+
+            eq.Formula = "log10(1)";
+            TestFor(models, 0.0f);
+
+            eq.Formula = "log2(0)";
+            TestFor(models, float.NegativeInfinity);
+
+            eq.Formula = "log(0)";
+            TestFor(models, float.NegativeInfinity);
+
+            eq.Formula = "log10(0)";
+            TestFor(models, float.NegativeInfinity);
+
+            eq.Formula = "log2(-1)";
+            TestFor(models, float.NaN);
+
+            eq.Formula = "log(-1)";
+            TestFor(models, float.NaN);
+
+            eq.Formula = "log10(-1)";
+            TestFor(models, float.NaN);
+        }
+
+        [TestMethod]
+        public void SqrtFunctionResults()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "pixel.png");
+            var eq = models.Pipelines[0].Alpha;
+
+
+            eq.Formula = "sqrt(4)";
+            TestFor(models, 2.0f);
+
+
+            eq.Formula = "sqrt(0)";
+            TestFor(models, 0.0f);
+
+
+            eq.Formula = "sqrt(-1.0)";
+            TestFor(models, float.NaN);
+        }
+
+        [TestMethod]
+        public void NormalizeFunctionResults()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "pixel.png");
+            var eq = models.Pipelines[0].Alpha;
+
+            eq.Formula = "Red(normalize(RGB(1,0,0)))";
+            TestFor(models, 1.0f);
+
+            eq.Formula = "Red(normalize(RGB(-1,0,0)))";
+            TestFor(models, -1.0f);
+
+            eq.Formula = "Red(normalize(0))";
+            TestFor(models, float.NaN);
+        }
+
         // compares average alpha value with given value
         private static void TestFor(Models m, float value, float tolerance = 0.001f)
         {
