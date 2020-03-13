@@ -27,6 +27,7 @@ namespace ImageViewer.Controller.Overlays
         private readonly ModelsEx models;
         private bool isDisposed = false;
         private Float3? firstPoint;
+        private static float? prevRatio = null;
 
         public ZoomBoxOverlay(ModelsEx models) : base(models)
         {
@@ -35,6 +36,12 @@ namespace ImageViewer.Controller.Overlays
             Layer = models.Display.ActiveLayer;
             models.Overlay.Overlays.Add(this);
             models.Display.UserInfo = "Click left to start zoombox";
+
+            if (prevRatio.HasValue)
+            {
+                curRatio = prevRatio.Value;
+                keepRatio = true;
+            }
 
             ToggleRatioCommand = new ActionCommand(() => KeepRatio = !KeepRatio);
             View = new ZoomBoxToolbar
@@ -50,6 +57,8 @@ namespace ImageViewer.Controller.Overlays
 
         private float curRatio = 1.0f;
 
+        public float? LastRatio => keepRatio ? (float?)curRatio : null;
+
         private bool keepRatio = false;
 
         public bool KeepRatio
@@ -57,9 +66,20 @@ namespace ImageViewer.Controller.Overlays
             get => keepRatio;
             set
             {
+                if (!Start.HasValue || !End.HasValue) return;
+
                 keepRatio = value;
+                UpdateRatio();
                 OnPropertyChanged(nameof(KeepRatio));
             }
+        }
+
+        private void UpdateRatio()
+        {
+            if (!Start.HasValue || !End.HasValue) return;
+            if (!keepRatio) return;
+
+            curRatio = (End.Value.X - Start.Value.X) / (End.Value.Y - Start.Value.Y);
         }
 
         public ICommand ToggleRatioCommand { get; }
@@ -159,6 +179,8 @@ namespace ImageViewer.Controller.Overlays
                 }
 
                 OnPropertyChanged(nameof(BoxWidth));
+
+                UpdateRatio();
             }
         }
 
@@ -189,6 +211,8 @@ namespace ImageViewer.Controller.Overlays
                 }
 
                 OnPropertyChanged(nameof(BoxHeight));
+
+                UpdateRatio();
             }
         }
 
@@ -251,10 +275,38 @@ namespace ImageViewer.Controller.Overlays
             return texel.ToCoords(models.Images.GetSize(models.Display.ActiveMipmap));
         }
 
+        // sign function that only returns 1 or -1
+        private float Sign(float x)
+        {
+            return x < 0.0f ? -1.0f : 1.0f;
+        }
+
         private void SetCropRect(Float3 secondPoint)
         {
             Debug.Assert(firstPoint != null);
             var fp = firstPoint.Value;
+            if (keepRatio)
+            {
+                float sdx = secondPoint.X - fp.X;
+                float sdy = secondPoint.Y - fp.Y;
+                float dx = Math.Abs(sdx);
+                float dy = Math.Abs(sdy);
+                float rt = dx / dy;
+                if (dx != 0.0f || dy != 0.0f)
+                {
+                    if (rt > curRatio)
+                    {
+                        secondPoint.Y = fp.Y + Sign(sdy) * dx / curRatio;
+                    }
+                    else if (rt < curRatio)
+                    {
+                        secondPoint.X = fp.X + Sign(sdx) * dy * curRatio;
+                    }
+
+                    var newRt = Math.Abs((fp.X - secondPoint.X) / (fp.Y - secondPoint.Y));
+                    Debug.Assert(Math.Abs(newRt - curRatio) < 0.0001f);
+                }
+            }
             var p1 = new Float3(
                 Math.Min(fp.X, secondPoint.X),
                 Math.Min(fp.Y, secondPoint.Y),
@@ -277,6 +329,7 @@ namespace ImageViewer.Controller.Overlays
             models.Overlay.Overlays.Remove(this);
             base.Dispose();
             models.Display.UserInfo = "";
+            prevRatio = LastRatio;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
