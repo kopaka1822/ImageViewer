@@ -63,6 +63,35 @@ float4 toSrgb(float4 c){
 }";
         }
 
+        // extended pow function that can handle more cases than the default hlsl function
+        public static string PowExFunction()
+        {
+            return @"
+float4 powEx(precise float4 x, precise float4 y) {
+    precise float4 r = 1.0;
+    // handle undefined behaviour
+    [unroll] for(int i = 0; i < 4; ++i) {
+        if(x[i] < 0.0) {
+            if(frac(y[i]) == 0.0) { // adjust for even or odd y, keep for fractional y (will be converted to NaN)
+                x[i] = -x[i];
+                if(uint(trunc(abs(y[i]))) % 2 != 0)
+                    r[i] = -1.0; // negate result for uneven exponent
+            }
+        }
+         
+        r[i] *= pow(abs(x[i]), y[i]);
+
+        // force NaN for x=0 && y=0
+        if(x[i] == 0.0 && y[i] == 0.0) r[i] = NaNValue;
+        // force NaN for fractional y
+        if(x[i] < 0.0) r[i] = NaNValue;
+    }
+
+    return r;
+}
+";
+        }
+
         /// <summary>
         /// srgb function that does not clamp values to 1
         /// </summary>

@@ -18,6 +18,13 @@ namespace ImageFramework.Model.Shader
                 GetShaderSource(colorFormula, alphaFormula, Math.Max(numImages, 1), builder), "ImageCombineShader");
         }
 
+        private struct InfoBuffer
+        {
+            public int Layer;
+            public int Level;
+            public float NaNValue;
+        }
+
         public void Run(ImagesModel images, UploadBuffer constantBuffer, ITexture target, int numMipmaps)
         {
             var dev = Device.Get();
@@ -39,7 +46,12 @@ namespace ImageFramework.Model.Shader
 
                 for (int curLayer = 0; curLayer < images.NumLayers; ++curLayer)
                 {
-                    constantBuffer.SetData(new LayerLevelFilter{Layer = curLayer, Level = curMipmap});
+                    constantBuffer.SetData(new InfoBuffer
+                    {
+                        Layer = curLayer,
+                        Level = curMipmap,
+                        NaNValue = float.NaN
+                    });
                     dev.Compute.SetConstantBuffer(0, constantBuffer.Handle);
                     dev.Dispatch(
                         Utility.Utility.DivideRoundUp(size.Width, builder.LocalSizeX), 
@@ -60,6 +72,7 @@ $@"cbuffer InfoBuffer
 {{
     uint layer;
     uint level;
+    float NaNValue;
 }};
 {GetTextureBindings(numImages, builder)}
 {GetTextureGetters(numImages, builder)}
@@ -121,6 +134,7 @@ void main(uint3 coord : SV_DISPATCHTHREADID)
                 GetExtendedConstructors() +
                 Utility.Utility.FromSrgbFunction() +
                 Utility.Utility.ToSrgbFunction() +
+                Utility.Utility.PowExFunction() +
                 UnaryFunctionToken.GetUnaryHelperFunctions();
         }
 

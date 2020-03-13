@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Model;
 using ImageFramework.Model.Equation;
 using ImageFramework.Model.Shader;
+using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FrameworkTests.Model.Equation
@@ -33,6 +35,8 @@ namespace FrameworkTests.Model.Equation
             TestFormula("1 / 2");
 
             TestFormula("2 ^ 2");
+
+            TestFormula("I0 ^ I0");
         }
 
         [TestMethod]
@@ -128,6 +132,65 @@ namespace FrameworkTests.Model.Equation
             {
                 
             }
+        }
+
+        [TestMethod]
+        public void PowFunctionResults()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "pixel.png");
+            Assert.AreEqual(1, models.Images.Size.X);
+            Assert.AreEqual(1, models.Images.Size.Y);
+
+            var eq = models.Pipelines[0].Alpha;
+
+            // X > 0, Y > 0
+            eq.Formula = "2^2";
+            TestFor(models, 4.0f);
+
+            // X > 0, Y < 0
+            eq.Formula = "2^-2";
+            TestFor(models, 0.25f);
+
+            // X > 0, Y == 0
+            eq.Formula = "12^0";
+            TestFor(models, 1.0f);
+
+
+            // X == 0, Y > 0
+            eq.Formula = "0^1.2";
+            TestFor(models, 0.0f);
+
+            // X == 0, Y < 0
+            eq.Formula = "0^-1.2";
+            TestFor(models, float.PositiveInfinity);
+
+            // X == 0, Y == 0
+            eq.Formula = "0^0";
+            TestFor(models, float.NaN);
+
+            // X < 0, Y even
+            eq.Formula = "(-2)^2";
+            TestFor(models, 4.0f);
+
+            // X < 0, Y odd
+            eq.Formula = "(-2)^3";
+            TestFor(models, -8.0f);
+
+            // X < 0, Y fractional
+            eq.Formula = "(-2)^1.00001";
+            TestFor(models, float.NaN);
+        }
+
+        // compares average alpha value with given value
+        private static void TestFor(Models m, float value, float tolerance = 0.001f)
+        {
+            m.Apply();
+            var val = m.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0)[0].Alpha;
+            if (float.IsNaN(value))
+                Assert.IsTrue(float.IsNaN(val));
+            else
+                Assert.AreEqual(value, val, tolerance);
         }
     }
 }
