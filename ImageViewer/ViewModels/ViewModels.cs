@@ -115,7 +115,9 @@ namespace ImageViewer.ViewModels
             if (e.Handled) return;
             // dont steal text from textboxes (they don't set handled to true...)
             if (e.OriginalSource is TextBox) return;
-            
+
+            if (Display.HasPriorityKeyInvoked(e.Key))
+                return;
 
             if (Filter.HasKeyToInvoke(e.Key))
             {

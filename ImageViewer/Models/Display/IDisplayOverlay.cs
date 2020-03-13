@@ -14,6 +14,8 @@ namespace ImageViewer.Models.Display
         void MouseMove(Size3 texel);
         void MouseClick(MouseButton button, bool down, Size3 texel);
 
+        bool OnKeyDown(Key key);
+
         // additional view that is displayed below the menu bar
         UIElement View { get; }
     }

@@ -268,6 +268,27 @@ namespace ImageViewer.Controller.Overlays
             }
         }
 
+        public bool OnKeyDown(Key key)
+        {
+            switch (key)
+            {
+                case Key.Q: // snap ratio to quad
+                    KeepRatio = true;
+                    var dim = Math.Max(BoxWidth, BoxHeight);
+                    BoxWidth = dim;
+                    BoxHeight = dim;
+                    return true;
+                case Key.R:
+                    KeepRatio = !KeepRatio;
+                    return true;
+                case Key.Escape:
+                    models.Display.ActiveOverlay = null;
+                    return true;
+            }
+
+            return false;
+        }
+
         public UIElement View { get; }
 
         private Float3 GetCurrentCoords(Size3 texel)

@@ -68,8 +68,13 @@
             </StackPanel>
         </StatusBarItem>
         <StatusBarItem
+            HorizontalAlignment="Left"
+            BorderThickness="0 0 1 0">
+            <TextBlock Text="Press Q to force quadratic ratio"/> 
+        </StatusBarItem>
+        <StatusBarItem
             HorizontalAlignment="Left">
-            <TextBlock Text="Bla to snap"/> 
+            <TextBlock Text="Press R to toggle forced ratio"/>
         </StatusBarItem>
     </StatusBar>
 </UserControl>

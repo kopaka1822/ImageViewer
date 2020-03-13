@@ -120,6 +120,12 @@ namespace ImageViewer.ViewModels.Display
             }
         }
 
+        public bool HasPriorityKeyInvoked(Key key)
+        {
+            if (models.Display.ActiveOverlay == null) return false;
+            return models.Display.ActiveOverlay.OnKeyDown(key);
+        }
+
         private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
