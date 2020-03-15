@@ -86,34 +86,34 @@ namespace FrameworkTests.Model.Equation
         [TestMethod]
         public void BinaryFunctionsDefault()
         {
-            TestFormula("min(1, 2)");
-            TestFormula("max(1, 2)");
-            TestFormula("atan2(1, 2)");
-            TestFormula("pow(1, 2)");
-            TestFormula("fmod(1, 2)");
-            TestFormula("step(1, 2)");
+            TestFormula("min(I0, 1)");
+            TestFormula("max(I0, 2)");
+            TestFormula("atan2(I0, 2)");
+            TestFormula("pow(I0, I0)");
+            TestFormula("fmod(I0, I0)");
+            TestFormula("step(I0, I0)");
 
-            TestFormula("dot(1, 2)");
-            TestFormula("cross(1, 2)");
-            TestFormula("distance(1, 2)");
+            TestFormula("dot(I0, 2)");
+            TestFormula("cross(I0, 2)");
+            TestFormula("distance(I0, 2)");
         }
 
         [TestMethod]
         public void BinaryFunctionsExtended()
         {
-            TestFormula("equal(1, 2)");
-            TestFormula("bigger(1, 2)");
-            TestFormula("smaller(1, 2)");
-            TestFormula("smallereq(1, 2)");
-            TestFormula("biggereq(1, 2)");
+            TestFormula("equal(I0, 2)");
+            TestFormula("bigger(I0, 2)");
+            TestFormula("smaller(I0, 2)");
+            TestFormula("smallereq(I0, 2)");
+            TestFormula("biggereq(I0, 2)");
         }
 
         [TestMethod]
         public void TertiaryFunctions()
         {
-            TestFormula("rgb(1, 2, 3)");
-            TestFormula("lerp(1, 2, 0.5)");
-            TestFormula("clamp(1, 2, 3)");
+            TestFormula("rgb(I0, 2, 3)");
+            TestFormula("lerp(1, 2, I0)");
+            TestFormula("clamp(I0, 2, 3)");
         }
 
         public string GetEq(string formula)
