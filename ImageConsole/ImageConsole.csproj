@@ -92,7 +92,8 @@
     <Compile Include="Commands\Image\TellMipmapsCommand.cs" />
     <Compile Include="Commands\Image\TellSizeCommand.cs" />
     <Compile Include="Commands\Program\SilentCommand.cs" />
-    <Compile Include="Commands\StatisticsCommand.cs" />
+    <Compile Include="Commands\Statistics\SSIMCommand.cs" />
+    <Compile Include="Commands\Statistics\StatisticsCommand.cs" />
     <Compile Include="Commands\TellAlphaCommand.cs" />
     <Compile Include="Commands\TellPixelCommand.cs" />
     <Compile Include="ParameterReader.cs" />

@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ImageFramework.Model;
-using ImageFramework.Model.Shader;
 using ImageFramework.Model.Statistics;
 
-namespace ImageConsole.Commands
+namespace ImageConsole.Commands.Statistics
 {
     public class StatisticsCommand : Command
     {
@@ -26,12 +22,9 @@ namespace ImageConsole.Commands
             lightness
         }
 
-        private readonly ImageConsole.Program program;
-
-        public StatisticsCommand(ImageConsole.Program program) 
+        public StatisticsCommand() 
             : base("-stats", "\"min/max/avg\" \"luminance/luma/avg/lightness\"", "prints the statistic")
         {
-            this.program = program;
         }
 
         public override void Execute(List<string> arguments, Models model)
