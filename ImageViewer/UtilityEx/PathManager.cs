@@ -18,7 +18,7 @@ namespace ImageViewer.UtilityEx
             get => directory;
             private set
             {
-                if (value == null) return;
+                if (String.IsNullOrEmpty(value)) return;
                 directory = value;
             }
         }
@@ -30,7 +30,7 @@ namespace ImageViewer.UtilityEx
             get => filename;
             private set
             {
-                if (value == null) return;
+                if (String.IsNullOrEmpty(value)) return;
                 filename = value;
             }
         }
@@ -42,11 +42,28 @@ namespace ImageViewer.UtilityEx
             get => extension;
             set
             {
-                if (value == null) return;
+                if (String.IsNullOrEmpty(value)) return;
                 if (value.StartsWith("."))
                     value = value.Substring(1);
                 extension = value;
             }
+        }
+
+        public string FullPath => $"{Directory}\\{Filename}.{Extension}";
+
+        public PathManager() { }
+
+        public PathManager(string directory, string filename, string extension)
+        {
+            Directory = directory;
+            Filename = filename;
+            Extension = extension;
+        }
+
+        // creates the directory if it does not exist yet
+        public void CreateDirectory()
+        {
+            System.IO.Directory.CreateDirectory(Directory);
         }
 
         /// <summary>
@@ -72,6 +89,14 @@ namespace ImageViewer.UtilityEx
             {
                 Extension = System.IO.Path.GetExtension(fallbackFilename);
             }
+        }
+
+        // sets the directory directly to last filename if not null, otherwise to fallback filename
+        public void UpdateDirectory(string lastFilename, string fallbackFilename)
+        {
+            Directory = lastFilename;
+            if (Directory == null)
+                Directory = fallbackFilename;
         }
 
         /// <summary>

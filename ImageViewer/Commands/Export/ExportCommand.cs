@@ -106,11 +106,6 @@ namespace ImageViewer.Commands.Export
                 return;
 
             path.UpdateFromFilename(sfd.FileName);
-            //exportExtension = System.IO.Path.GetExtension(sfd.FileName).Substring(1);
-            //var exportFilename = System.IO.Path.GetFileNameWithoutExtension(sfd.FileName);
-            //exportDir = System.IO.Path.GetDirectoryName(sfd.FileName);
-            //path.SetDirectory(exportDir);
-
 
             var viewModel = new ExportViewModel(models, path.Extension, exportFormat.Value, sfd.FileName, tex.Is3D, models.Statistics[id].Stats);
             var dia = new ExportDialog(viewModel);

@@ -45,12 +45,12 @@ namespace ImageFramework.Model
 
             public bool IsFile => LastModified != null;
 
-            internal ImageData(ITexture image, string filename, GliFormat originalFormat)
+            internal ImageData(ITexture image, string filename, GliFormat originalFormat, [CanBeNull] string alias)
             {
                 Image = image;
                 Filename = filename;
                 OriginalFormat = originalFormat;
-                Alias = System.IO.Path.GetFileNameWithoutExtension(filename);
+                Alias = alias ?? System.IO.Path.GetFileNameWithoutExtension(filename);
                 if (File.Exists(Filename))
                 {
                     LastModified = File.GetLastWriteTime(Filename);
@@ -172,12 +172,12 @@ namespace ImageFramework.Model
         /// </summary>
         /// <exception cref="ImagesModel.MipmapMismatch">will be thrown if everything except the number of mipmaps matches</exception>
         /// <exception cref="Exception">will be thrown if the images does not match with the current set of images</exception>
-        public void AddImage(ITexture image, string name, GliFormat originalFormat)
+        public void AddImage(ITexture image, string name, GliFormat originalFormat, [CanBeNull] string alias = null)
         {
             if (Images.Count == 0) // first image
             {
                 InitDimensions(image);
-                images.Add(new ImageData(image, name, originalFormat));
+                images.Add(new ImageData(image, name, originalFormat, alias));
                 PrevNumImages = 0;
                 OnPropertyChanged(nameof(NumImages));
                 OnPropertyChanged(nameof(NumLayers));
@@ -193,7 +193,7 @@ namespace ImageFramework.Model
                 // remember old properties
                 var isHdr = IsHdr;
 
-                images.Add(new ImageData(image, name, originalFormat));
+                images.Add(new ImageData(image, name, originalFormat, alias));
                 PrevNumImages = NumImages - 1;
                 OnPropertyChanged(nameof(NumImages));
 
@@ -229,6 +229,7 @@ namespace ImageFramework.Model
         public void RenameImage(int idx, string newAlias)
         {
             Debug.Assert(idx < NumImages);
+            if (images[idx].Alias == newAlias) return;
             images[idx].Alias = newAlias;
             OnPropertyChanged(nameof(ImageAlias));
         }

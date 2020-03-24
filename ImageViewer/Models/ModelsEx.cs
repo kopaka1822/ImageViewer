@@ -26,6 +26,11 @@ namespace ImageViewer.Models
         public ExportConfigModel ExportConfig { get; }
 
         public PathManager ExportPath { get; } = new PathManager();
+        private PathManager viewerConfigPath = null;
+
+        public PathManager ViewerConfigPath => viewerConfigPath ??
+                                               (viewerConfigPath = new PathManager(Window.ExecutionPath + "\\Configs",
+                                                   null, "icfg"));
 
         private readonly ResizeController resizeController;
         private readonly ComputeImageController computeImageController;

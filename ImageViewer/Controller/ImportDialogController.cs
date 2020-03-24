@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms.VisualStyles;
+using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
@@ -40,14 +41,14 @@ namespace ImageViewer.Controller
             return ofd.FileNames;
         }
 
-        public async Task ImportImageAsync(string file)
+        public async Task ImportImageAsync(string file, [CanBeNull] string alias = null)
         {
             try
             {
 
                 var img = await IO.LoadImageTextureAsync(file, models.Progress);
                 
-                ImportTexture(img.Texture, file, img.OriginalFormat);
+                ImportTexture(img.Texture, file, img.OriginalFormat, alias);
             }
             catch (Exception e)
             {
@@ -56,11 +57,11 @@ namespace ImageViewer.Controller
             }
         }
 
-        private void ImportTexture(ITexture tex, string file, GliFormat imgOriginalFormat)
+        private void ImportTexture(ITexture tex, string file, GliFormat imgOriginalFormat, string alias)
         {
             try
             {
-                models.Images.AddImage(tex, file, imgOriginalFormat);
+                models.Images.AddImage(tex, file, imgOriginalFormat, alias);
                 tex = null; // images is now owner
             }
             catch (ImagesModel.MipmapMismatch e)
@@ -70,7 +71,7 @@ namespace ImageViewer.Controller
                 {
                     var tmp = tex.CloneWithMipmaps(models.Images.NumMipmaps);
                     models.Scaling.WriteMipmaps(tmp);
-                    ImportTexture(tmp, file, imgOriginalFormat);
+                    ImportTexture(tmp, file, imgOriginalFormat, alias);
                 }
                 else
                 {

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.ImageLoader;
 using Newtonsoft.Json;
 
 namespace ImageViewer.Models.Settings
@@ -30,6 +31,16 @@ namespace ImageViewer.Models.Settings
             File.WriteAllText(filename, txt);
         }
 
+        public async Task ApplyToModels(ModelsEx models)
+        {
+            
+
+            if (Images != null)
+            {
+                await Images.ApplyToModels(models);
+            }
+        }
+
         public static ViewerConfig LoadFromModels(ModelsEx models, Components c)
         {
             var res = new ViewerConfig();
@@ -42,7 +53,5 @@ namespace ImageViewer.Models.Settings
         }
 
         public ImagesConfig Images { get; set; }
-
-
     }
 }

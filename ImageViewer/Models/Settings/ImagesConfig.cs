@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageViewer.Controller;
 
 namespace ImageViewer.Models.Settings
 {
@@ -29,6 +30,20 @@ namespace ImageViewer.Models.Settings
             }
 
             return res;
+        }
+
+        public async Task ApplyToModels(ModelsEx models)
+        {
+            // clear images
+            models.Images.Clear();
+            var import = new ImportDialogController(models);
+
+            // add images from config
+            foreach (var img in Images)
+            {
+                var lastNum = models.Images.NumImages;
+                await import.ImportImageAsync(img.Filename, img.Alias);
+            }
         }
     }
 }
