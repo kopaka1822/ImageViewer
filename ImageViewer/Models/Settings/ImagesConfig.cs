@@ -41,7 +41,6 @@ namespace ImageViewer.Models.Settings
             // add images from config
             foreach (var img in Images)
             {
-                var lastNum = models.Images.NumImages;
                 await import.ImportImageAsync(img.Filename, img.Alias);
             }
         }

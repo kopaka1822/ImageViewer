@@ -16,6 +16,7 @@ namespace ImageViewer.Models.Settings
         {
             None,
             Images = 1,
+            Equations = 2,
             All = 0xFFFFFFF
         }
 
@@ -27,18 +28,18 @@ namespace ImageViewer.Models.Settings
 
         public void WriteToFile(string filename)
         {
-            var txt = JsonConvert.SerializeObject(this);
+            var txt = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(filename, txt);
         }
 
         public async Task ApplyToModels(ModelsEx models)
         {
-            
-
             if (Images != null)
             {
                 await Images.ApplyToModels(models);
             }
+
+            Equation?.ApplyToModels(models);
         }
 
         public static ViewerConfig LoadFromModels(ModelsEx models, Components c)
@@ -49,9 +50,15 @@ namespace ImageViewer.Models.Settings
                 res.Images = ImagesConfig.LoadFromModels(models);
             }
 
+            if (c.HasFlag(Components.Equations))
+            {
+                res.Equation = EquationConfig.LoadFromModels(models);
+            }
+
             return res;
         }
 
         public ImagesConfig Images { get; set; }
+        public EquationConfig Equation { get; set; }
     }
 }
