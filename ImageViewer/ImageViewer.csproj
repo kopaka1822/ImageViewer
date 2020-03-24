@@ -154,6 +154,7 @@
     <Compile Include="Models\Settings\ViewerConfig.cs" />
     <Compile Include="Models\StatisticModel.cs" />
     <Compile Include="UtilityEx\ColorExtension.cs" />
+    <Compile Include="UtilityEx\PathManager.cs" />
     <Compile Include="ViewModels\Dialog\ExportViewModel.cs" />
     <Compile Include="ViewModels\Dialog\GifExportViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ImportArrayViewModel.cs" />

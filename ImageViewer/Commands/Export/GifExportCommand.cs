@@ -5,6 +5,7 @@ using ImageFramework.Model;
 using ImageFramework.Model.Export;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
+using ImageViewer.UtilityEx;
 using ImageViewer.ViewModels.Dialog;
 using ImageViewer.Views.Dialog;
 using Microsoft.Win32;
@@ -15,10 +16,12 @@ namespace ImageViewer.Commands.Export
     {
         private readonly ModelsEx models;
         private readonly GifExportViewModel viewModel = new GifExportViewModel();
+        private readonly PathManager path;
 
         public GifExportCommand(ModelsEx models)
         {
             this.models = models;
+            this.path = models.ExportPath;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
 
@@ -70,21 +73,19 @@ namespace ImageViewer.Commands.Export
                 models.Window.ShowInfoDialog("Export will ignore image multiplier");
             }
 
-            // export directory fallback
-            var firstImageId = models.Pipelines[ids[0]].Color.FirstImageId;
-            var firstImage = models.Images.Images[firstImageId].Filename;
+            path.InitFromEquations(models);
 
             var sfd = new SaveFileDialog
             {
                 Filter = "MPEG-4 (*.mp4)|*.mp4",
-                InitialDirectory = ExportCommand.GetExportDirectory(firstImage),
-                FileName = System.IO.Path.GetFileNameWithoutExtension(firstImage)
+                InitialDirectory = path.Directory,
+                FileName = path.Directory
             };
 
             if (sfd.ShowDialog(models.Window.TopmostWindow) != true)
                 return;
 
-            ExportCommand.SetExportDirectory(System.IO.Path.GetDirectoryName(sfd.FileName));
+            path.UpdateFromFilename(sfd.FileName, updateExtension: false);
 
             var dia = new GifExportDialog(viewModel);
             if (models.Window.ShowDialog(dia) != true) return;
