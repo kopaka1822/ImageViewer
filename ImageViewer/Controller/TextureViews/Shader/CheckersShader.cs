@@ -32,6 +32,15 @@ namespace ImageViewer.Controller.TextureViews.Shader
             themeColor = new Vector3(models.Window.ThemeColor.Red, models.Window.ThemeColor.Green, models.Window.ThemeColor.Blue);
         }
 
+        // for unit testing
+        public static void CompileShaders()
+        {
+            var s1 = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Vertex, GetVertexSource(), "CheckersVertexShader");
+            var s2 = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Pixel, GetPixelSource(), "CheckersPixelShader");
+            s1.Dispose();
+            s2.Dispose();
+        }
+
         public void Run(Matrix transform)
         {
             var v = models.ViewData;
