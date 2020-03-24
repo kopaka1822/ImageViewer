@@ -6,7 +6,7 @@ using SharpDX.Direct3D11;
 
 namespace ImageFramework.DirectX.Query
 {
-    internal class SyncQuery : IDisposable
+    public class SyncQuery : IDisposable
     {
         private readonly SharpDX.Direct3D11.Query query;
         private bool isActive = false;
