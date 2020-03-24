@@ -41,7 +41,6 @@ namespace ImageFramework.Model.Equation.Token
                 case "min":
                 case "max":
                 case "atan2":
-                case "pow":
                 case "fmod":
                 case "step":
                     return true;
@@ -49,6 +48,9 @@ namespace ImageFramework.Model.Equation.Token
                 case "cross":
                 case "distance":
                     convertToRgb = true;
+                    return true;
+                case "pow":
+                    funcName = funcName + "Ex"; // use extended
                     return true;
 
                 // not core but provided by the image viewer

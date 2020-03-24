@@ -13,6 +13,7 @@ using ImageFramework.DirectX.Query;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.Model.Equation;
 using ImageFramework.Model.Filter;
+using ImageFramework.Model.Progress;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 
@@ -119,21 +120,29 @@ namespace ImageFramework.Model
 
         public ITexture Image { get; private set; }
 
+        // ejects image without invoking on property changed (can be used to get ownership of the image before changing the equation)
+        public ITexture EjectImage()
+        {
+            var res = Image;
+            Image = null;
+            return res;
+        }
+
         internal class UpdateImageArgs
         {
             public Models Models;
             public List<FilterModel> Filters;
         }
 
-        internal async Task UpdateImageAsync(UpdateImageArgs args, CancellationToken ct)
+        internal async Task UpdateImageAsync(UpdateImageArgs args, IProgress progress)
         {
             Debug.Assert(HasChanges);
             Debug.Assert(IsValid);
             Debug.Assert(Color.MaxImageId < args.Models.Images.NumImages);
             Debug.Assert(Alpha.MaxImageId < args.Models.Images.NumImages);
 
-            args.Models.Progress.Progress = 0.0f;
-            args.Models.Progress.What = "resolving equation";
+
+            progress.What = "resolving equation";
 
             if (TryMatchingInputImage(args)) return;
 
@@ -142,17 +151,21 @@ namespace ImageFramework.Model
                 // combine according to color and alpha formula
                 ExecuteImageCombineShader(args);
 
+                var computeFilter = UseFilter && args.Filters.Count != 0;
+                var computeMipmaps = RecomputeMipmaps && args.Models.Images.NumMipmaps > 1;
+
+                var progFilter = computeFilter && computeMipmaps ? progress.CreateSubProgress(0.8f) : progress;
+
                 // next, apply filter
-                if (UseFilter && args.Filters.Count != 0)
+                if (computeFilter)
                 {
-                    await ExecuteFilter(args, ct);
+                    await ExecuteFilter(args, progFilter);
                 }
 
                 // compute mipmaps
-                args.Models.Progress.Progress = 1.0f;
-                if (RecomputeMipmaps && args.Models.Images.NumMipmaps > 1)
+                if (computeMipmaps)
                 {
-                    await args.Models.Scaling.WriteMipmapsAsync(Image, ct);
+                    await args.Models.Scaling.WriteMipmapsAsync(Image, progFilter.CreateSubProgress(1.0f));
                 }
 
                 HasChanges = false;
@@ -204,7 +217,7 @@ namespace ImageFramework.Model
             }
         }
 
-        private async Task ExecuteFilter(UpdateImageArgs args, CancellationToken ct)
+        private async Task ExecuteFilter(UpdateImageArgs args, IProgress progress)
         {
             // get a second texture and swap between source and destination image
             ITexture[] tex = new ITexture[2];
@@ -223,12 +236,12 @@ namespace ImageFramework.Model
 
                     for (int iteration = 0; iteration < filter.NumIterations; ++iteration)
                     {
-                        await DoFilterIterationAsync(args, index, tex[srcIdx], tex[1 - srcIdx], iteration, ct);
+                        await DoFilterIterationAsync(args, index, tex[srcIdx], tex[1 - srcIdx], iteration, progress);
                         srcIdx = 1 - srcIdx;
                     }
                 }
                 // last chance before mipmap generation
-                ct.ThrowIfCancellationRequested();
+                progress.Token.ThrowIfCancellationRequested();
             }
             catch (Exception)
             {
@@ -243,9 +256,9 @@ namespace ImageFramework.Model
         }
 
 
-        private Task DoFilterIterationAsync(UpdateImageArgs args, int index, ITexture src, ITexture dst, int iteration, CancellationToken ct)
+        private Task DoFilterIterationAsync(UpdateImageArgs args, int index, ITexture src, ITexture dst, int iteration, IProgress progress)
         {
-            ct.ThrowIfCancellationRequested();
+            progress.Token.ThrowIfCancellationRequested();
             var filter = args.Filters[index];
 
             // do for all mipmaps if no mipmap re computation is enabled
@@ -254,10 +267,10 @@ namespace ImageFramework.Model
             args.Models.SharedModel.Sync.Set();
 
             var step = 1.0f / args.Filters.Count;
-            args.Models.Progress.Progress = index * step + iteration * step * 0.5f;
-            args.Models.Progress.What = filter.Name;
+            progress.Progress = index * step + iteration * step * 0.5f;
+            progress.What = filter.Name;
 
-            return args.Models.SharedModel.Sync.WaitForGpuAsync(ct);
+            return args.Models.SharedModel.Sync.WaitForGpuAsync(progress.Token);
         }
 
         internal void ResetImage(ITextureCache cache)

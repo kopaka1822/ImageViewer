@@ -1,0 +1,92 @@
+﻿<Window x:Class="ImageViewer.Views.Dialog.Tex3DToArrayDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImageViewer.Views.Dialog"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="3D to 2D Array" 
+        SizeToContent="Height"
+        Width="200"
+        Icon="../../Icons/image_layer.png"
+        Style="{StaticResource WindowStyle}"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+    <Border Padding="{StaticResource DefaultBorder}">
+        <StackPanel>
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <!-- LAYER PLANE -->
+                <TextBlock 
+                    Grid.Column="0"
+                    Grid.Row="0"
+                    Text="Layer Plane:"
+                    Margin="{StaticResource DefaultBorderBotRight}"/>
+                
+                <ComboBox
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    Margin="{StaticResource DefaultBorderBottom}"
+                    SelectedItem="{Binding SelectedAxis}"
+                    ItemsSource="{Binding AxisList}"
+                    ItemTemplate="{StaticResource ListItemView}"/>
+
+                <TextBlock
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    Text="First Slice:"
+                    Margin="{StaticResource DefaultBorderBotRight}"/>
+
+                <xctk:IntegerUpDown 
+                    Grid.Column="1"
+                    Grid.Row="1"
+                    Minimum="0"
+                    Maximum="{Binding NumSlices}"
+                    Value="{Binding FirstSlice}"
+                    Margin="{StaticResource DefaultBorderBottom}"/>
+
+                <TextBlock
+                    Grid.Column="0"
+                    Grid.Row="2"
+                    Text="Last Slice:"
+                    Margin="{StaticResource DefaultBorderBotRight}"/>
+
+                <xctk:IntegerUpDown 
+                    Grid.Column="1"
+                    Grid.Row="2"
+                    Minimum="0"
+                    Maximum="{Binding NumSlices}"
+                    Value="{Binding LastSlice}"
+                    Margin="{StaticResource DefaultBorderBottom}"/>
+            </Grid>
+
+            <!-- Buttons -->
+            <StackPanel 
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                Margin="{StaticResource DefaultBorderTop}">
+                <Button 
+                    Content="_Apply" 
+                    Margin="{StaticResource DefaultBorderRight}" 
+                    IsEnabled="{Binding IsValid}"
+                    Width="60"
+                    Click="Apply_OnClick"
+                />
+                <Button 
+                    Content="_Cancel"
+                    Width="60"
+                    Click="Cancel_OnClick"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

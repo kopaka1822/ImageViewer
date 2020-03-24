@@ -9,14 +9,22 @@
         Title="Array Import" 
         ResizeMode="NoResize"
         Width="300"
-        SizeToContent="Height"
+        Height="400"
         Icon="../../Icons/import.png"
         Background="{StaticResource BackgroundBrush}"
         Style="{StaticResource WindowStyle}"
         WindowStartupLocation="CenterOwner">
     <Border Padding="{StaticResource DefaultBorder}">
-        <StackPanel>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
             <Button 
+                Grid.Row="0"
                 Width="110" 
                 HorizontalAlignment="Right"
                 Command="{Binding ImportCommand}">
@@ -35,7 +43,7 @@
             </Button>
 
             <ListBox 
-                MinHeight="300"
+                Grid.Row="1"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
                 Margin="{StaticResource DefaultBorderBottom}"
                 ItemsSource="{Binding ListItems}"
@@ -70,25 +78,34 @@
             </ListBox>
             
             <TextBlock 
+                Grid.Row="2"
                 Visibility="{Binding CubeHelpVisibility, FallbackValue=Visible}"
                 Text="For Cubmaps: x+ x- y+ y- z+ z-"
                 Margin="{StaticResource DefaultBorderBottom}"/>
 
             <!-- Buttons -->
             <StackPanel 
+                Grid.Row="3"
                 Orientation="Horizontal"
                 HorizontalAlignment="Right">
                 <Button 
-                    Content="_Apply" 
+                    Content="To Texture2DArray" 
                     Margin="{StaticResource DefaultBorderRight}" 
-                    Width="60"
-                    Command="{Binding ApplyCommand}"
+                    Width="110"
+                    Command="{Binding Apply2DCommand}"
+                />
+                <Button 
+                    Content="To Texture3D" 
+                    Margin="{StaticResource DefaultBorderRight}" 
+                    Width="80"
+                    Command="{Binding Apply3DCommand}"
                 />
                 <Button 
                     Content="_Cancel"
                     Width="60"
+                    Margin="0"
                     Command="{Binding CancelCommand}"/>
             </StackPanel>
-        </StackPanel>
+        </Grid>
     </Border>
 </Window>

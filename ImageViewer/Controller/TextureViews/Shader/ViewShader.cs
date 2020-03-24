@@ -105,12 +105,12 @@ float4 nancolor;
         /// adds srgb conversion and conditional abs
         /// </summary>
         /// <returns></returns>
-        protected static string ApplyColorTransform()
+        protected static string ApplyColorTransform(string color = "color")
         {
-            return @"
-color.rgb *= multiplier;
-if(useAbs) color.rgb = abs(color.rgb);
-if(any(isnan(color))) color = nancolor;
+            return $@"
+{color}.rgb *= multiplier;
+if(useAbs) {color}.rgb = abs({color}.rgb);
+if(any(isnan({color}))) {color} = nancolor;
 ";
         }
 

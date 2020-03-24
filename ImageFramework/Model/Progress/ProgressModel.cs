@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 using ImageFramework.Annotations;
 using ImageFramework.ImageLoader;
 
-namespace ImageFramework.Model
+namespace ImageFramework.Model.Progress
 {
     public class TaskCompletedEventArgs : EventArgs
     {
@@ -36,11 +32,48 @@ namespace ImageFramework.Model
         private Task currentTask = null;
         private CancellationTokenSource currentTaskCancellation = null;
 
+        // helper class that forwards progress information
+        private class ProgressInterface : IProgress
+        {
+            private readonly ProgressModel parent;
+
+            public ProgressInterface(ProgressModel parent, CancellationToken token)
+            {
+                this.parent = parent;
+                Token = token;
+                Progress = 0.0f;
+                What = "";
+            }
+
+            public void Report(float value) => Progress = value;
+
+            public float Progress
+            {
+                get => parent.Progress;
+                set => parent.Progress = value;
+            }
+            public string What
+            {
+                get => parent.What;
+                set => parent.What = value;
+            }
+            public CancellationToken Token { get; }
+            public IProgress CreateSubProgress(float maxProgress)
+            {
+                return new SubProgress(this, maxProgress);
+            }
+        }
+
         public ProgressModel()
         {
             // set dll progress
             onDllProgress = OnDllProgress;
             Dll.set_progress_callback(onDllProgress);
+        }
+
+        internal IProgress GetProgressInterface(CancellationToken ct)
+        {
+            return new ProgressInterface(this, ct);
         }
 
         private uint OnDllProgress(float prog, string description)
@@ -66,7 +99,7 @@ namespace ImageFramework.Model
         public float Progress
         {
             get => progress;
-            internal set
+            private set
             {
                 float clamped = Math.Min(Math.Max(value, 0.0f), 1.0f);
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -89,7 +122,7 @@ namespace ImageFramework.Model
         public string What
         {
             get => what;
-            internal set
+            private set
             {
                 var val = value ?? "";
                 //if (val.Equals(what)) return;

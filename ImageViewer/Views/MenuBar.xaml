@@ -32,8 +32,8 @@
                 </MenuItem.Icon>
             </MenuItem>
             <MenuItem
-                Header="Import as Array"
-                ToolTip="Combines multiple images into a single texture array on import"
+                Header="Import as Array/3D"
+                ToolTip="Combines multiple 2D images into a single texture array or 3D texture on import"
                 IsEnabled="{Binding Progress.NotProcessing}"
                 Command="{Binding ImportArrayCommand}">
                 <MenuItem.Icon>
@@ -48,6 +48,14 @@
                     IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
                     <Image Source="../Icons/save.png"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem
+                Header="{Binding ExportOverwriteCommand.Text, FallbackValue=Overwrite ...}"
+                Command="{Binding ExportOverwriteCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image Source="../Icons/refresh.png"/>
                 </MenuItem.Icon>
             </MenuItem>
             <MenuItem 
@@ -230,12 +238,13 @@
                             Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
-            
-            <Separator/>
+
+            <Separator Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}"/>
             <MenuItem
                 Header="Add Zoombox"
                 Command="{Binding StartZoomboxCommand}"
-                IsEnabled="{Binding Progress.NotProcessing}">
+                IsEnabled="{Binding Progress.NotProcessing}"
+                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
                 <MenuItem.Icon>
                     <Image 
                         Source="../Icons/image_box.png"
@@ -247,7 +256,8 @@
                 Header="Remove Zoombox"
                 Command="{Binding StartZoomboxCommand}"
                 IsEnabled="{Binding ZoomBox.HasBoxes}"
-                ItemsSource="{Binding ZoomBox.Boxes}">
+                ItemsSource="{Binding ZoomBox.Boxes}"
+                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
                 <MenuItem.Icon>
                     <Image 
                         Source="../Icons/cancel.png"
@@ -277,11 +287,13 @@
                     </Style>
                 </MenuItem.ItemContainerStyle>
             </MenuItem>
-            <Separator/>
+
+            <Separator Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}"/>
             <MenuItem
                 Header="LatLong to Cubemap"
                 Command="{Binding LatLongToCubemapCommand}"
-                IsEnabled="{Binding Progress.NotProcessing}">
+                IsEnabled="{Binding Progress.NotProcessing}"
+                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
                 <MenuItem.Icon>
                     <Image 
                         Source="../Icons/cube.png"
@@ -292,7 +304,8 @@
             <MenuItem
                 Header="Cubemap to LatLong"
                 Command="{Binding CubemapToLatLongCommand}"
-                IsEnabled="{Binding Progress.NotProcessing}">
+                IsEnabled="{Binding Progress.NotProcessing}"
+                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
                 <MenuItem.Icon>
                     <Image 
                         Source="../Icons/image_long.png"
@@ -300,6 +313,8 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+
+            <Separator/>
             <MenuItem
                 Header="TextureArray to Texture3D"
                 Command="{Binding ArrayTo3DCommand}"
@@ -311,9 +326,9 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
-            <!--<MenuItem
+            <MenuItem
                 Header="Texture3D to TextureArray"
-                Command="{Binding CubemapToLatLongCommand}"
+                Command="{Binding Tex3DToArrayCommand}"
                 IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
                     <Image 
@@ -321,7 +336,7 @@
                         Width="16"
                         Height="16"/>
                 </MenuItem.Icon>
-            </MenuItem>-->
+            </MenuItem>
         </MenuItem>
         <!--END TOOLS-->
 

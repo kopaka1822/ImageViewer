@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using GongSolutions.Wpf.DragDrop;
 using ImageFramework.Annotations;
+using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageViewer.Controller;
 using ImageViewer.Models;
@@ -36,6 +37,12 @@ namespace ImageViewer.ViewModels.Image
                 case nameof(ImagesModel.ImageOrder):
                     RefreshImageList();
                     break;
+                case nameof(ImagesModel.ImageType):
+                    OnPropertyChanged(nameof(Is2D));
+                    OnPropertyChanged(nameof(Is3D));
+                    OnPropertyChanged(nameof(IsEmptyOr2D));
+                    OnPropertyChanged(nameof(IsEmptyOr3D));
+                    break;
             }
         }
 
@@ -56,6 +63,11 @@ namespace ImageViewer.ViewModels.Image
                 return res;
             }
         }
+
+        public bool Is3D => models.Images.ImageType == typeof(Texture3D);
+        public bool Is2D => models.Images.ImageType == typeof(TextureArray2D);
+        public bool IsEmptyOr3D => models.Images.ImageType != typeof(TextureArray2D);
+        public bool IsEmptyOr2D => models.Images.ImageType != typeof(Texture3D);
 
         private void RefreshImageList()
         {

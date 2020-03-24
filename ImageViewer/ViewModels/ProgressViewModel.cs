@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Input;
 using ImageFramework.Annotations;
 using ImageFramework.Model;
+using ImageFramework.Model.Progress;
 using ImageViewer.Commands;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;

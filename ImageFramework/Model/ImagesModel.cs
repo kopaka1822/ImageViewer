@@ -43,6 +43,8 @@ namespace ImageFramework.Model
 
             public DateTime? LastModified { get; }
 
+            public bool IsFile => LastModified != null;
+
             internal ImageData(ITexture image, string filename, GliFormat originalFormat)
             {
                 Image = image;
@@ -84,6 +86,8 @@ namespace ImageFramework.Model
 
             public void Replace(ITexture image, GliFormat originalFormat)
             {
+                if (ReferenceEquals(image, Image)) return;
+
                 Image.Dispose();
                 Image = image;
                 OriginalFormat = originalFormat;

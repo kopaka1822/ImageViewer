@@ -57,4 +57,20 @@ namespace image
 		unsigned char* uval = reinterpret_cast<unsigned char*>(&intval);
 		return uval[0] == 1;
 	}
+
+	template<size_t channelSize>
+	inline void copyRedToGreenBlue(uint8_t* bytes, size_t size)
+	{
+		for(auto end = bytes + size; bytes < end; bytes += 4 * channelSize)
+		{
+			size_t off = channelSize;
+			for(size_t i = 0; i < 2; ++i) // loop for green and blue
+			{
+				for(size_t j = 0 ; j < channelSize; ++j) // loop through channel size
+				{
+					bytes[off++] = bytes[j];
+				}
+			}
+		}
+	}
 }

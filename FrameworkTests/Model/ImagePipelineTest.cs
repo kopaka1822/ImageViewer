@@ -1,4 +1,5 @@
-﻿using FrameworkTests.DirectX;
+﻿using System.Linq;
+using FrameworkTests.DirectX;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
@@ -90,6 +91,9 @@ namespace FrameworkTests.Model
             var model = new Models(1);
             model.AddImageFromFile(TestData.Directory + "sphere.png");
             model.Filter.AddFilter(model.CreateFilter("filter/blur.hlsl"));
+            var variance = model.Filter.Filter[0].Parameters.First(param => param.GetBase().Name == "Variance");
+            Assert.IsNotNull(variance);
+            variance.GetFloatModel().Value = 36.23f;
             model.Apply();
             var colors = model.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0);
 

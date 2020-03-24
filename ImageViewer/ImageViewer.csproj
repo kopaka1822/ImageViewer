@@ -86,8 +86,10 @@
     </ApplicationDefinition>
     <Compile Include="Commands\AddFilterCommand.cs" />
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
+    <Compile Include="Commands\Export\ExportOverwriteCommand.cs" />
     <Compile Include="Commands\Helper\Command.cs" />
     <Compile Include="Commands\Import\ReloadImagesCommand.cs" />
+    <Compile Include="Commands\Import\ReplaceEquationImageCommand.cs" />
     <Compile Include="Commands\Tools\ArrayTo3DCommand.cs" />
     <Compile Include="Commands\Tools\CubemapToLatLongCommand.cs" />
     <Compile Include="Commands\Tools\DeleteMipmapsCommand.cs" />
@@ -103,6 +105,7 @@
     <Compile Include="Commands\Import\OpenCommand.cs" />
     <Compile Include="Commands\Tools\RemoveZoomBoxCommand.cs" />
     <Compile Include="Commands\Tools\StartZoomboxCommand.cs" />
+    <Compile Include="Commands\Tools\Tex3DToArrayCommand.cs" />
     <Compile Include="Commands\View\ResizeWindowCommand.cs" />
     <Compile Include="Commands\View\SelectNaNColorCommand.cs" />
     <Compile Include="Commands\View\SetThemeCommand.cs" />
@@ -153,6 +156,7 @@
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ResolutionViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ScaleViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\Tex3DToArrayViewModel.cs" />
     <Compile Include="ViewModels\Display\DisplayViewModel.cs" />
     <Compile Include="ViewModels\Display\RayCastingDisplayViewModel.cs" />
     <Compile Include="ViewModels\Display\Single3DDisplayViewModel.cs" />
@@ -179,6 +183,7 @@
     <Compile Include="ViewModels\ViewModels.cs" />
     <Compile Include="ViewModels\ZoomBoxViewModel.cs" />
     <Compile Include="Views\Converter\BoolVisibilityConverter.cs" />
+    <Compile Include="Views\Converter\NullVisibilityConverter.cs" />
     <Compile Include="Views\CustomTextBox.cs" />
     <Compile Include="Views\Dialog\ArrayImportDialog.xaml.cs">
       <DependentUpon>ArrayImportDialog.xaml</DependentUpon>
@@ -207,6 +212,12 @@
     <Compile Include="Views\Dialog\ScaleDialog.xaml.cs">
       <DependentUpon>ScaleDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Dialog\ShaderExceptionDialog.xaml.cs">
+      <DependentUpon>ShaderExceptionDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\Tex3DToArrayDialog.xaml.cs">
+      <DependentUpon>Tex3DToArrayDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Dialog\ZoomBoxDialog.xaml.cs">
       <DependentUpon>ZoomBoxDialog.xaml</DependentUpon>
     </Compile>
@@ -215,6 +226,9 @@
     </Compile>
     <Compile Include="Views\Display\Single3DView.xaml.cs">
       <DependentUpon>Single3DView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Display\ZoomBoxToolbar.xaml.cs">
+      <DependentUpon>ZoomBoxToolbar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\FilterTab.xaml.cs">
       <DependentUpon>FilterTab.xaml</DependentUpon>
@@ -303,6 +317,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Dialog\ShaderExceptionDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\Tex3DToArrayDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Dialog\ZoomBoxDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -312,6 +334,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Display\Single3DView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Display\ZoomBoxToolbar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -432,6 +458,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="AvalonEdit">
+      <Version>6.0.1</Version>
+    </PackageReference>
     <PackageReference Include="Expression.Blend.Sdk">
       <Version>1.0.2</Version>
     </PackageReference>

@@ -12,7 +12,7 @@ namespace ImageFramework.Model.Shader
     /// <summary>
     /// transforms all values from an image
     /// </summary>
-    internal class TransformShader : IDisposable
+    public class TransformShader : IDisposable
     {
         private DirectX.Shader shader;
         private DirectX.Shader shader3D;
@@ -55,7 +55,7 @@ namespace ImageFramework.Model.Shader
         private DirectX.Shader Shader => shader ?? (shader = new DirectX.Shader(DirectX.Shader.Type.Compute,
                                              GetSource(new ShaderBuilder2D(pixelTypeIn), new ShaderBuilder2D(pixelTypeOut)), "GaussShader"));
         private DirectX.Shader Shader3D => shader3D ?? (shader3D = new DirectX.Shader(DirectX.Shader.Type.Compute,
-                                               GetSource(new ShaderBuilder3D(pixelTypeIn), new ShaderBuilder2D(pixelTypeOut)), "GaussShader3D"));
+                                               GetSource(new ShaderBuilder3D(pixelTypeIn), new ShaderBuilder3D(pixelTypeOut)), "GaussShader3D"));
 
         internal void CompileShaders()
         {

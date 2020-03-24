@@ -52,6 +52,11 @@ namespace ImageFramework.DirectX
         // it is probably a low end device if feature level 11.1 was not available
         public bool IsLowEndDevice => Handle.FeatureLevel == FeatureLevel.Level_11_0;
 
+        // resource size limits for textures
+        public static readonly int MAX_TEXTURE_2D_DIMENSION = 16384;
+        public static readonly int MAX_TEXTURE_2D_ARRAY_DIMENSION = 2048;
+        public static readonly int MAX_TEXTURE_3D_DIMENSION = 2048;
+
         public static Device Get()
         {
             return instance;

@@ -89,6 +89,8 @@ namespace ImageViewer.ViewModels
             {
                 case nameof(DisplayModel.TexelPosition):
                 case nameof(DisplayModel.TexelRadius):
+                case nameof(DisplayModel.ActiveLayer):
+                case nameof(DisplayModel.ActiveMipmap):
                     RecomputeTexelColor();
                     break;
             }

@@ -31,6 +31,8 @@ public:
 
 	uint8_t* getData() { return reinterpret_cast<uint8_t*>(m_base.data()); }
 	uint32_t getSize() { return uint32_t(m_base.size()); }
+
+	bool requiresGrayscalePostprocess() override;
 protected:
 	gli::texture& m_base;
 	gli::format m_original;

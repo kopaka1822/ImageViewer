@@ -120,6 +120,12 @@ namespace ImageViewer.ViewModels.Display
             }
         }
 
+        public bool HasPriorityKeyInvoked(Key key)
+        {
+            if (models.Display.ActiveOverlay == null) return false;
+            return models.Display.ActiveOverlay.OnKeyDown(key);
+        }
+
         private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -232,6 +238,21 @@ namespace ImageViewer.ViewModels.Display
 
                 case nameof(DisplayModel.UserInfo):
                     OnPropertyChanged(nameof(UserInfo));
+                    break;
+
+                case nameof(DisplayModel.ActiveOverlay):
+                    var host = models.Window.Window.OverlayViewHost;
+                    if (models.Display.ActiveOverlay?.View == null)
+                    {
+                        // remove overlay view
+                        host.Visibility = Visibility.Collapsed;
+                        host.Child = null;
+                    }
+                    else // set overlay view
+                    {
+                        host.Child = models.Display.ActiveOverlay.View;
+                        host.Visibility = Visibility.Visible;
+                    }
                     break;
             }
         }

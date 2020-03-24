@@ -14,6 +14,7 @@ using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
 using ImageFramework.Model.Filter;
 using ImageFramework.Model.Overlay;
+using ImageFramework.Model.Progress;
 using ImageFramework.Model.Scaling;
 using ImageFramework.Model.Shader;
 using ImageFramework.Model.Statistics;
@@ -229,6 +230,12 @@ namespace ImageFramework.Model
             return ConvertTo3DShader.ConvertTo3D(texArray);
         }
 
+        public TextureArray2D ConvertTo2DArray(Texture3D tex, int fixedAxis1, int fixedAxis2, int startLayer = 0, int numLayer = -1)
+        {
+            return ConvertTo3DShader.ConvertToArray(tex, fixedAxis1, fixedAxis2, SharedModel.Upload, startLayer,
+                numLayer);
+        }
+
         /// <summary>
         /// exports a pipeline image with the given format and extension.
         /// Apply will be called by this method if required
@@ -288,7 +295,7 @@ namespace ImageFramework.Model
         public void ApplyAsync()
         {
             var cts = new CancellationTokenSource();
-            Progress.AddTask(pipelineController.UpdateImagesAsync(cts.Token), cts);
+            Progress.AddTask(pipelineController.UpdateImagesAsync(Progress.GetProgressInterface(cts.Token)), cts);
         }
 
         /// <summary>

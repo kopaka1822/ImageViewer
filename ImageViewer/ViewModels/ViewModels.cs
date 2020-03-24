@@ -70,7 +70,9 @@ namespace ImageViewer.ViewModels
             ImportCommand = new ImportCommand(models);
             ImportEquationImageCommand = new ImportEquationImageCommand(models);
             ExportCommand = new ExportCommand(models);
+            ExportOverwriteCommand = new ExportOverwriteCommand(models);
             ReloadImagesCommand = new ReloadImagesCommand(models);
+            ReplaceEquationImageCommand = new ReplaceEquationImageCommand(models);
 
             ShowPixelDisplayCommand = new ShowPixelDisplayCommand(models);
             ShowPixelColorCommand = new ShowPixelColorCommand(models);
@@ -83,6 +85,7 @@ namespace ImageViewer.ViewModels
             LatLongToCubemapCommand = new LatLongToCubemapCommand(models);
             CubemapToLatLongCommand = new CubemapToLatLongCommand(models);
             ArrayTo3DCommand = new ArrayTo3DCommand(models);
+            Tex3DToArrayCommand = new Tex3DToArrayCommand(models);
             SelectNaNColorCommand = new SelectNaNColorCommand(models);
 
             ResizeCommand = new ResizeWindowCommand(models);
@@ -112,7 +115,9 @@ namespace ImageViewer.ViewModels
             if (e.Handled) return;
             // dont steal text from textboxes (they don't set handled to true...)
             if (e.OriginalSource is TextBox) return;
-            
+
+            if (Display.HasPriorityKeyInvoked(e.Key))
+                return;
 
             if (Filter.HasKeyToInvoke(e.Key))
             {
@@ -145,7 +150,7 @@ namespace ImageViewer.ViewModels
         public ICommand ImportEquationImageCommand { get; }
 
         public ICommand ExportCommand { get; }
-
+        public ICommand ExportOverwriteCommand { get; }
         public ICommand ShowPixelDisplayCommand { get; }
 
         public ICommand ShowPixelColorCommand { get; }
@@ -170,11 +175,15 @@ namespace ImageViewer.ViewModels
 
         public ICommand ReloadImagesCommand { get; }
 
+        public ICommand ReplaceEquationImageCommand { get; }
+
         public ICommand StartZoomboxCommand { get; }
 
         public ICommand RemoveZoomboxCommand { get; }
 
         public ICommand ArrayTo3DCommand { get; }
+
+        public ICommand Tex3DToArrayCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

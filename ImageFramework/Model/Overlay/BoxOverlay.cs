@@ -12,6 +12,7 @@ using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using Device = ImageFramework.DirectX.Device;
+using Texture3D = ImageFramework.DirectX.Texture3D;
 
 namespace ImageFramework.Model.Overlay
 {
@@ -38,6 +39,13 @@ namespace ImageFramework.Model.Overlay
                 case nameof(ImagesModel.Size):
                     OnHasChanged();
                     break;
+                case nameof(ImagesModel.ImageType):
+                    // not supported
+                    if (images.ImageType == typeof(Texture3D))
+                        Boxes.Clear();
+                    
+                    break;
+                    
             }
         }
 

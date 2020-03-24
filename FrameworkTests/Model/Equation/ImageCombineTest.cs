@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Model;
 using ImageFramework.Model.Equation;
 using ImageFramework.Model.Shader;
+using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FrameworkTests.Model.Equation
@@ -33,6 +35,8 @@ namespace FrameworkTests.Model.Equation
             TestFormula("1 / 2");
 
             TestFormula("2 ^ 2");
+
+            TestFormula("I0 ^ I0");
         }
 
         [TestMethod]
@@ -82,34 +86,34 @@ namespace FrameworkTests.Model.Equation
         [TestMethod]
         public void BinaryFunctionsDefault()
         {
-            TestFormula("min(1, 2)");
-            TestFormula("max(1, 2)");
-            TestFormula("atan2(1, 2)");
-            TestFormula("pow(1, 2)");
-            TestFormula("fmod(1, 2)");
-            TestFormula("step(1, 2)");
+            TestFormula("min(I0, 1)");
+            TestFormula("max(I0, 2)");
+            TestFormula("atan2(I0, 2)");
+            TestFormula("pow(I0, I0)");
+            TestFormula("fmod(I0, I0)");
+            TestFormula("step(I0, I0)");
 
-            TestFormula("dot(1, 2)");
-            TestFormula("cross(1, 2)");
-            TestFormula("distance(1, 2)");
+            TestFormula("dot(I0, 2)");
+            TestFormula("cross(I0, 2)");
+            TestFormula("distance(I0, 2)");
         }
 
         [TestMethod]
         public void BinaryFunctionsExtended()
         {
-            TestFormula("equal(1, 2)");
-            TestFormula("bigger(1, 2)");
-            TestFormula("smaller(1, 2)");
-            TestFormula("smallereq(1, 2)");
-            TestFormula("biggereq(1, 2)");
+            TestFormula("equal(I0, 2)");
+            TestFormula("bigger(I0, 2)");
+            TestFormula("smaller(I0, 2)");
+            TestFormula("smallereq(I0, 2)");
+            TestFormula("biggereq(I0, 2)");
         }
 
         [TestMethod]
         public void TertiaryFunctions()
         {
-            TestFormula("rgb(1, 2, 3)");
-            TestFormula("lerp(1, 2, 0.5)");
-            TestFormula("clamp(1, 2, 3)");
+            TestFormula("rgb(I0, 2, 3)");
+            TestFormula("lerp(1, 2, I0)");
+            TestFormula("clamp(I0, 2, 3)");
         }
 
         public string GetEq(string formula)
@@ -128,6 +132,138 @@ namespace FrameworkTests.Model.Equation
             {
                 
             }
+        }
+
+        [TestMethod]
+        public void PowFunctionResults()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "pixel.png");
+            Assert.AreEqual(1, models.Images.Size.X);
+            Assert.AreEqual(1, models.Images.Size.Y);
+
+            var eq = models.Pipelines[0].Alpha;
+
+            // X > 0, Y > 0
+            eq.Formula = "2^2";
+            TestFor(models, 4.0f);
+
+            // X > 0, Y < 0
+            eq.Formula = "2^-2";
+            TestFor(models, 0.25f);
+
+            // X > 0, Y == 0
+            eq.Formula = "12^0";
+            TestFor(models, 1.0f);
+
+
+            // X == 0, Y > 0
+            eq.Formula = "0^1.2";
+            TestFor(models, 0.0f);
+
+            // X == 0, Y < 0
+            eq.Formula = "0^-1.2";
+            TestFor(models, float.PositiveInfinity);
+
+            // X == 0, Y == 0
+            eq.Formula = "0^0";
+            TestFor(models, float.NaN);
+
+            // X < 0, Y even
+            eq.Formula = "(-2)^2";
+            TestFor(models, 4.0f);
+
+            // X < 0, Y odd
+            eq.Formula = "(-2)^3";
+            TestFor(models, -8.0f);
+
+            // X < 0, Y fractional
+            eq.Formula = "(-2)^1.00001";
+            TestFor(models, float.NaN);
+        }
+
+        [TestMethod]
+        public void LogFunctionResults()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "pixel.png");
+            var eq = models.Pipelines[0].Alpha;
+            
+
+            eq.Formula = "log2(1)";
+            TestFor(models, 0.0f);
+
+            eq.Formula = "log(1)";
+            TestFor(models, 0.0f);
+
+            eq.Formula = "log10(1)";
+            TestFor(models, 0.0f);
+
+            eq.Formula = "log2(0)";
+            TestFor(models, float.NegativeInfinity);
+
+            eq.Formula = "log(0)";
+            TestFor(models, float.NegativeInfinity);
+
+            eq.Formula = "log10(0)";
+            TestFor(models, float.NegativeInfinity);
+
+            eq.Formula = "log2(-1)";
+            TestFor(models, float.NaN);
+
+            eq.Formula = "log(-1)";
+            TestFor(models, float.NaN);
+
+            eq.Formula = "log10(-1)";
+            TestFor(models, float.NaN);
+        }
+
+        [TestMethod]
+        public void SqrtFunctionResults()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "pixel.png");
+            var eq = models.Pipelines[0].Alpha;
+
+
+            eq.Formula = "sqrt(4)";
+            TestFor(models, 2.0f);
+
+
+            eq.Formula = "sqrt(0)";
+            TestFor(models, 0.0f);
+
+
+            eq.Formula = "sqrt(-1.0)";
+            TestFor(models, float.NaN);
+        }
+
+        [TestMethod]
+        public void NormalizeFunctionResults()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "pixel.png");
+            var eq = models.Pipelines[0].Alpha;
+
+            eq.Formula = "Red(normalize(RGB(1,0,0)))";
+            TestFor(models, 1.0f);
+
+            eq.Formula = "Red(normalize(RGB(-1,0,0)))";
+            TestFor(models, -1.0f);
+
+            eq.Formula = "Red(normalize(0))";
+            TestFor(models, float.NaN);
+        }
+
+        // compares average alpha value with given value
+        private static void TestFor(Models m, float value, float tolerance = 0.001f)
+        {
+            m.Apply();
+            var val = m.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0)[0].Alpha;
+            if (float.IsNaN(value))
+                Assert.IsTrue(float.IsNaN(val));
+            else
+                Assert.AreEqual(value, val, tolerance);
         }
     }
 }

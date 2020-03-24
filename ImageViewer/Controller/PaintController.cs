@@ -121,7 +121,7 @@ namespace ImageViewer.Controller
         private void OnRepaint()
         {
             scheduledRedraw = false;
-            if (swapChain == null) return;
+            if (swapChain == null || swapChain.IsDisposed) return;
 
             var timerStarted = false;
             swapChain.BeginFrame();
@@ -146,7 +146,7 @@ namespace ImageViewer.Controller
             }
             catch (Exception e)
             {
-                models.Window.ShowErrorDialog(e.Message, "during repaint");
+                models.Window.ShowErrorDialog(e, "during repaint");
             }
             finally
             {
@@ -162,7 +162,7 @@ namespace ImageViewer.Controller
                 }
                 catch (SharpDXException e)
                 {
-                    models.Window.ShowErrorDialog(e.Message);
+                    models.Window.ShowErrorDialog(e);
                     models.Window.Window.Close();
                 }
             }

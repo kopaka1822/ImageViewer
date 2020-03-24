@@ -12,6 +12,7 @@ using ImageFramework.DirectX.Structs;
 using ImageFramework.Model;
 using ImageFramework.Model.Equation;
 using ImageFramework.Model.Filter;
+using ImageFramework.Model.Progress;
 using ImageFramework.Model.Scaling;
 using ImageFramework.Utility;
 using SharpDX.Direct3D11;
@@ -98,13 +99,16 @@ namespace ImageFramework.Controller
             }
         }
 
-        public async Task UpdateImagesAsync(CancellationToken ct)
+        public async Task UpdateImagesAsync(IProgress progress)
         {
             var args = new ImagePipeline.UpdateImageArgs
             {
                 Models = models,
                 Filters = null,
             };
+
+            var numCompute = models.Pipelines.Count(pipe => pipe.HasChanges && pipe.IsValid && pipe.IsEnabled);
+            var curCompute = 0;
 
             for (var i = 0; i < models.Pipelines.Count; i++)
             {
@@ -113,7 +117,7 @@ namespace ImageFramework.Controller
                 {
                     args.Filters = pipe.UseFilter ? GetPipeFilters(i) : null;
 
-                    await pipe.UpdateImageAsync(args, ct);
+                    await pipe.UpdateImageAsync(args, progress.CreateSubProgress((++curCompute) / (float)numCompute));
                 }
             }
         }

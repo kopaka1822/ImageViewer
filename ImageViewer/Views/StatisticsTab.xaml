@@ -33,8 +33,7 @@
                         Margin="{StaticResource DefaultBorderBottom}"
                         Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.HelpCommand}"
                         HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        IsEnabled="{Binding IsVisible}">
+                        VerticalAlignment="Center">
                         <Button.CommandParameter>
                             <system:String>help/statistics.md</system:String>
                         </Button.CommandParameter>

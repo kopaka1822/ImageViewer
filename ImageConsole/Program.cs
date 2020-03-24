@@ -11,7 +11,9 @@ using ImageConsole.Commands.Export;
 using ImageConsole.Commands.Filter;
 using ImageConsole.Commands.Image;
 using ImageConsole.Commands.Program;
+using ImageConsole.Commands.Statistics;
 using ImageFramework.Model;
+using ImageFramework.Model.Progress;
 
 namespace ImageConsole
 {
@@ -56,7 +58,8 @@ namespace ImageConsole
             AddCommand(new ExportQualityCommand(export));
 
             AddCommand(new TellPixelCommand());
-            AddCommand(new StatisticsCommand(this));
+            AddCommand(new StatisticsCommand());
+            AddCommand(new SSIMCommand());
             AddCommand(new TellAlphaCommand());
 
             AddCommand(new HelpCommand(commands));

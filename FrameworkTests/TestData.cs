@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FrameworkTests
 {
-    static class TestData
+    public static class TestData
     {
         public static string Directory = "../../FrameworkTests/TestData/";
         public static string KtxDirectory = "../../dependencies/ktx/tests/testimages/";

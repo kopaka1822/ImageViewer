@@ -50,7 +50,7 @@ namespace ImageViewer.Commands
             }
             catch (Exception e)
             {
-                models.Window.ShowErrorDialog(e.Message);
+                models.Window.ShowErrorDialog(e);
             }
         }
     }

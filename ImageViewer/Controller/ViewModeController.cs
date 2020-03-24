@@ -96,6 +96,8 @@ namespace ImageViewer.Controller
         {
             var dev = Device.Get();
 
+            if (currentView == null) return; // some error occured
+
             var visible = models.GetEnabledPipelines();
 
             var scissorsPos = new Point(mousePosition.X, mousePosition.Y);
@@ -256,6 +258,14 @@ namespace ImageViewer.Controller
         {
             switch (e.PropertyName)
             {
+                case nameof(DisplayModel.ActiveMipmap):
+                    // recompute texel position
+                    DispatchRecomputeTexelColor();
+                    break;
+                case nameof(DisplayModel.ExtendedViewData):
+                    if (models.Display.ExtendedViewData == null) return;
+                    models.Display.ExtendedViewData.ForceTexelRecompute += (o, ev) => DispatchRecomputeTexelColor();
+                    break;
                 case nameof(DisplayModel.ActiveView):
                     try
                     {
@@ -297,7 +307,7 @@ namespace ImageViewer.Controller
                     }
                     catch (Exception err)
                     {
-                        models.Window.ShowErrorDialog(err.Message);
+                        models.Window.ShowErrorDialog(err);
                         currentView = new EmptyView();
                     }
                     break;

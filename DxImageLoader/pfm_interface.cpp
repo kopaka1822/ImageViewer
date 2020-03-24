@@ -4,6 +4,7 @@
 #include <memory>
 #include <iostream>
 #include "convert.h"
+#include "interface.h"
 
 using uchar = unsigned char;
 
@@ -95,6 +96,7 @@ std::unique_ptr<image::IImage> pfm_load(const char* filename)
 				offset[2] = fvalue;
 				offset[3] = 1.0f; // alpha
 			}
+			set_progress(i * 100 / height);
 		}
 	}
 	else if (bands == "PF") {    // handle 3-band image
@@ -113,6 +115,7 @@ std::unique_ptr<image::IImage> pfm_load(const char* filename)
 				offset[2] = vfvalue.b;
 				offset[3] = 1.0f; // alpha
 			}
+			set_progress(i * 100 / height);
 		}
 	}
 	else
@@ -151,5 +154,6 @@ void pfm_save(const char* filename, int width, int height, int components, const
 			for (int c = 0; c < components; ++c)
 				file.write(reinterpret_cast<const char*>(&v[c + components * (x + (height - y - 1) * width)]), sizeof(float));
 		}
+		set_progress(y * 100 / height);
 	}
 }

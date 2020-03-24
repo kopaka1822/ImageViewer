@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
+using ImageFramework.Model.Progress;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using Microsoft.SqlServer.Server;
@@ -24,7 +25,7 @@ namespace ImageFramework.Model
     public class GifModel : IDisposable
     {
         private readonly GifShader shader;
-        private readonly ProgressModel progress;
+        private readonly ProgressModel progressModel;
 
         public class Config
         {
@@ -35,9 +36,9 @@ namespace ImageFramework.Model
             public string Filename; // destination filename
         }
 
-        internal GifModel(QuadShader quad, UploadBuffer upload, ProgressModel progress)
+        internal GifModel(QuadShader quad, UploadBuffer upload, ProgressModel progressModel)
         {
-            this.progress = progress;
+            this.progressModel = progressModel;
             shader = new GifShader(quad, upload);
         }
 
@@ -46,24 +47,25 @@ namespace ImageFramework.Model
             Debug.Assert(left != null);
             Debug.Assert(right != null);
             Debug.Assert(left.Size == right.Size);
-            Debug.Assert(!progress.IsProcessing);
+            Debug.Assert(!progressModel.IsProcessing);
 
             var cts = new CancellationTokenSource();
 
-            progress.AddTask(CreateGifAsync(left, right, cfg, cts.Token), cts);
+            progressModel.AddTask(CreateGifAsync(left, right, cfg, progressModel.GetProgressInterface(cts.Token)), cts);
         }
 
-        private async Task CreateGifAsync(TextureArray2D left, TextureArray2D right, Config cfg, CancellationToken ct)
+        private async Task CreateGifAsync(TextureArray2D left, TextureArray2D right, Config cfg, IProgress progress)
         {
             // delay in milliseconds
             var numFrames = cfg.FramesPerSecond * cfg.NumSeconds;
 
             try
             {
-                progress.EnableDllProgress = false;
+                progressModel.EnableDllProgress = false;
                 var leftView = left.GetSrView(LayerMipmapSlice.Mip0);
                 var rightView = right.GetSrView(LayerMipmapSlice.Mip0);
 
+                var curProg = progress.CreateSubProgress(0.9f);
                 // create frames
                 using (var dst = IO.CreateImage(new ImageFormat(Format.R8G8B8A8_UNorm_SRgb), left.Size, LayerMipmapCount.One))
                 {
@@ -88,19 +90,19 @@ namespace ImageFramework.Model
                             // save frame as png
                             frame.CopyPixels(LayerMipmapSlice.Mip0, dstPtr, dstSize);
                             var filename = $"{cfg.TmpFilename}{i:D4}";
-                            await Task.Run(() =>IO.SaveImage(dst, filename, "png", GliFormat.RGBA8_SRGB), ct);
-                            progress.Progress = i / (float)numFrames;
-                            progress.What = "creating frames";
+                            await Task.Run(() =>IO.SaveImage(dst, filename, "png", GliFormat.RGBA8_SRGB), progress.Token);
+                            curProg.Progress = i / (float)numFrames;
+                            curProg.What = "creating frames";
                         }
                     }
                 }
 
                 // convert video
-                await FFMpeg.ConvertAsync(cfg, progress, ct);
+                await FFMpeg.ConvertAsync(cfg, progress.CreateSubProgress(1.0f));
             }
             finally
             {
-                progress.EnableDllProgress = true;
+                progressModel.EnableDllProgress = true;
             }
         }
 

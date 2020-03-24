@@ -103,6 +103,12 @@ namespace ImageFramework.DirectX
             Debug.Assert(Size.Min > 0);
             Debug.Assert(Format != Format.Unknown);
 
+            // check resource limits
+            if (Size.X > Device.MAX_TEXTURE_3D_DIMENSION || 
+                Size.Y > Device.MAX_TEXTURE_3D_DIMENSION || 
+                Size.Z > Device.MAX_TEXTURE_3D_DIMENSION)
+                throw new Exception($"Texture3D Dimensions may not exceed {Device.MAX_TEXTURE_3D_DIMENSION}x{Device.MAX_TEXTURE_3D_DIMENSION}x{Device.MAX_TEXTURE_3D_DIMENSION} but were {Size.X}x{Size.Y}x{Size.Z}");
+
             // render target required for mip map generation
             BindFlags flags = BindFlags.ShaderResource;
             if (createUav)

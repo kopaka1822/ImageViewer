@@ -32,6 +32,8 @@ namespace ImageFramework.Model.Equation
 
                 var oldFirst = FirstImageId;
                 var oldMax = MaxImageId;
+                var oldMin = MinImageId;
+                var imgLast = HasImages;
 
                 var converted = ConvertFormula(value);
                 var changed = !converted.Equals(Converted);
@@ -43,8 +45,13 @@ namespace ImageFramework.Model.Equation
                     OnPropertyChanged(nameof(Converted));
                 if(oldFirst != FirstImageId)
                     OnPropertyChanged(nameof(FirstImageId));
-                if (oldMax != MaxImageId)
+                if(oldMax != MaxImageId)
                     OnPropertyChanged(nameof(MaxImageId));
+                if(oldMin != MinImageId)
+                    OnPropertyChanged(nameof(MinImageId));
+                if(imgLast != HasImages)
+                    OnPropertyChanged(nameof(HasImages));
+
                 OnPropertyChanged(nameof(Formula));
             }
         }
@@ -55,6 +62,12 @@ namespace ImageFramework.Model.Equation
         // the highest image id that was used in the equation
         public int MaxImageId { get; private set; }
 
+        // the lowest id that was used in this equation
+        public int MinImageId { get; private set; }
+
+        // indicates if any images were used in the formula
+        public bool HasImages { get; private set; }
+
         // the converted formula
         public string Converted { get; private set; }
 
@@ -64,6 +77,10 @@ namespace ImageFramework.Model.Equation
             public string Error;
             /// max image id
             public int MaxId;
+            // min image id
+            public int MinId;
+            // indicates if images were used in the formula
+            public bool HasImages;
             // id of the first used image
             public int FirstId;
         }
@@ -83,7 +100,9 @@ namespace ImageFramework.Model.Equation
                 return new TestResults
                 {
                     MaxId = eq.MaxImageId,
-                    FirstId = eq.FirstImageId
+                    FirstId = eq.FirstImageId,
+                    MinId = eq.MinImageId,
+                    HasImages = eq.HasImageId
                 };
             }
             catch (Exception e)
@@ -107,6 +126,8 @@ namespace ImageFramework.Model.Equation
             var res = eq.GetHlslExpression();
             FirstImageId = eq.FirstImageId;
             MaxImageId = eq.MaxImageId;
+            MinImageId = eq.MinImageId;
+            HasImages = eq.HasImageId;
             return res;
         }
 

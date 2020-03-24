@@ -5,6 +5,11 @@
 #param Min Value, minVal, float, 1
 #param Max Value, maxVal, float, 1
 
+#keybinding Max Value, Add, 1, add
+#keybinding Max Value, OemPlus, 1, add
+#keybinding Max Value, Subtract, -1, add
+#keybinding Max Value, OemMinus, -1, add
+
 float4 filter(float4 incolor)
 {
 	float valueScaled = max(0,min(1,(incolor.x - minVal) / (maxVal - minVal)));

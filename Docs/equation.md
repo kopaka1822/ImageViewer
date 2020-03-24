@@ -20,38 +20,39 @@ color.a = ("A_Equation").a;
 Most of the HLSL functions may be used as well:
 
 * **abs**(value)
-* **sin**(value)
-* **cos**(value)
-* **tan**(value)
-* **asin**(value)
 * **acos**(value)
-* **atan**(value)
-* **exp**(value)
-* **log**(value)
-* **exp2**(value)
-* **log2**(value)
-* **sqrt**(value)
-* **sign**(value)
-* **floor**(value)
-* **ceil**(value)
-* **frac**(value)
-* **trunc**(value)
-* **normalize**(value)*
-* **length**(value)*
 * **all**(value)
 * **any**(value)
-* **radians**(value)
-* **min**(value1, value2)
-* **max**(value1, value2)
-* **pow**(value1, value2)
+* **asin**(value)
+* **atan**(value)
 * **atan2**(value1, value2)
-* **fmod**(value1, value2)
-* **step**(value1, value2)
-* **cross**(value1, value2)*
-* **dot**(value1, value2)*
-* **distance**(value1, value2)*
-* **lerp**(value1, value2, factor)
+* **ceil**(value)
 * **clamp**(value, min, max)
+* **cos**(value)
+* **cross**(value1, value2)*
+* **distance**(value1, value2)*
+* **dot**(value1, value2)*
+* **exp**(value)
+* **exp2**(value)
+* **floor**(value)
+* **fmod**(value1, value2)
+* **frac**(value)
+* **length**(value)*
+* **lerp**(value1, value2, factor)
+* [**log**](#Log)(value)
+* [**log10**](#Log)(value)
+* [**log2**](#Log)(value)
+* **max**(value1, value2)
+* **min**(value1, value2)
+* [**normalize**](#Normalize)(value)*
+* [**pow**](#Pow)(value1, value2)
+* **radians**(value)
+* **sign**(value)
+* **sin**(value)
+* [**sqrt**](#Sqrt)(value)
+* **step**(value1, value2)
+* **tan**(value)
+* **trunc**(value)
 
 Additionaly you can use:
 
@@ -95,3 +96,48 @@ evaluates to:
 color.rgb = 0.5;
 color.a = I1.r; // == float4(I1.r, I1.r, I1.r, I1.r).a
 ```
+
+# Specialized Function Implementations
+
+## Log
+
+**log**(value), **log10**(value), **log2**(value)
+
+|value|Result
+|-|-
+|<0|NaN
+|0|-infinity
+|>0|log*(value)
+
+## Normalize
+**normalize**({r,g,b,a})
+
+|value|Result
+|-|-
+|{0, 0, 0, a}|{NaN, NaN, NaN, a}
+|else|{normalize({r, g, b})), a}
+
+## Pow
+
+**pow**(X, Y) special cases:
+
+|X|Y|Result
+|-|-|-
+|<0|even| pow(-X, Y)
+|<0|odd| -pow(-X, Y)
+|<0|other| NaN
+|=0|<0| infinity
+|=0|=0| NaN
+|=0|>0| 0
+|>0|<0| 1/pow(X,-Y)
+|>0|=0| 1
+|>0|>0| pow(X,Y)
+
+## Sqrt
+
+**sqrt**(value)
+
+|value|Result
+|-|-
+|<0|NaN
+|>=0|sqrt(value)

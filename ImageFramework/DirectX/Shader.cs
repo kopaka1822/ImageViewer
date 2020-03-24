@@ -12,6 +12,56 @@ namespace ImageFramework.DirectX
 {
     public class Shader : IDisposable
     {
+        public class CompilationException : Exception
+        {
+            public CompilationException(string debugName, string code, string error)
+                : base($"{debugName} compilation failed: {error}\nsource:\n{AddLineNumbers(code)}")
+            {
+                this.Name = debugName;
+                this.FullCode = code;
+                this.Error = error;
+            }
+
+            public string Name { get; }
+            public string FullCode { get; }
+            public string Error { get; }
+
+            public string Code
+            {
+                get
+                {
+                    string err = FullCode;
+                    var idx = err.LastIndexOf("#line 1", StringComparison.Ordinal);
+                    if (idx < 0) return err; // no special line stuff
+                    idx = err.IndexOf('\n', idx);
+                    if (idx < 0) return err;
+
+                    return err.Substring(idx + 1);
+                }
+            }
+
+            private static string AddLineNumbers(string source)
+            {
+                int curLine = 1;
+                var r = new StringReader(source);
+                string line;
+                var res = "";
+
+                while ((line = r.ReadLine()) != null)
+                {
+                    if (line.StartsWith("#line 1"))
+                        curLine = 0;
+
+                    if (!String.IsNullOrWhiteSpace(line))
+                        res += $"{curLine}: {line}\n";
+
+                    ++curLine;
+                }
+
+                return res;
+            }
+        }
+
         public enum Type
         {
             Vertex,
@@ -112,34 +162,13 @@ namespace ImageFramework.DirectX
             }
             catch (Exception e)
             {
-                throw new Exception($"{debugName} compilation failed: {e.Message}\nsource:\n{AddLineNumbers(source)}");
+                throw new CompilationException(debugName, source, e.Message);
             }
         }
 
         public Shader(Type type, string source, string debugName)
         : this(type, source, debugName, out var tmp, false)
         {}
-
-        private string AddLineNumbers(string source)
-        {
-            int curLine = 1;
-            var r = new StringReader(source);
-            string line;
-            var res = "";
-
-            while ((line = r.ReadLine()) != null)
-            {
-                if (line.StartsWith("#line 1"))
-                    curLine = 0;
-
-                if(!String.IsNullOrWhiteSpace(line))
-                    res += $"{curLine}: {line}\n";
-
-                ++curLine;
-            }
-
-            return res;
-        }
 
         private static string GetProfile(Type t)
         {
