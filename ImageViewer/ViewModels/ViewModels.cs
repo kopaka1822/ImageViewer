@@ -73,6 +73,8 @@ namespace ImageViewer.ViewModels
             ExportOverwriteCommand = new ExportOverwriteCommand(models);
             ReloadImagesCommand = new ReloadImagesCommand(models);
             ReplaceEquationImageCommand = new ReplaceEquationImageCommand(models);
+            ExportConfigCommand = new ExportConfigCommand(models);
+            ImportConfigCommand = new ImportConfigCommand(models);
 
             ShowPixelDisplayCommand = new ShowPixelDisplayCommand(models);
             ShowPixelColorCommand = new ShowPixelColorCommand(models);
@@ -184,6 +186,10 @@ namespace ImageViewer.ViewModels
         public ICommand ArrayTo3DCommand { get; }
 
         public ICommand Tex3DToArrayCommand { get; }
+
+        public ICommand ExportConfigCommand { get; }
+
+        public ICommand ImportConfigCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
