@@ -77,5 +77,11 @@ namespace ImageFramework.Model.Filter.Parameter
         {
             return Value ? 1 : 0;
         }
+
+        public override string StringValue
+        {
+            get => Value.ToString();
+            set => Value = bool.Parse(value);
+        }
     }
 }

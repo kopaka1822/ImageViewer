@@ -83,5 +83,11 @@ namespace ImageFramework.Model.Filter.Parameter
         {
             return Value;
         }
+
+        public override string StringValue
+        {
+            get => Value.ToString();
+            set => Value = int.Parse(value);
+        }
     }
 }

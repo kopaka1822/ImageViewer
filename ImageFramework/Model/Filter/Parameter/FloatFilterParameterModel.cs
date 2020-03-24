@@ -93,5 +93,11 @@ namespace ImageFramework.Model.Filter.Parameter
 
             return res;
         }
+
+        public override string StringValue
+        {
+            get => Value.ToString(Models.Culture);
+            set => Value = float.Parse(value);
+        }
     }
 }
