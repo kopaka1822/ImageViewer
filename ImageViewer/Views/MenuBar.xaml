@@ -70,7 +70,7 @@
                 Command="{Binding ImportConfigCommand}"
                 IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
-                    <Image Source="../Icons/import.png"/>
+                    <Image Source="../Icons/open_config.png"/>
                 </MenuItem.Icon>
             </MenuItem>
             <MenuItem 
@@ -78,7 +78,7 @@
                 Command="{Binding ExportConfigCommand}"
                 IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
-                    <Image Source="../Icons/save.png"/>
+                    <Image Source="../Icons/save_config.png"/>
                 </MenuItem.Icon>
             </MenuItem>
             <Separator/>
