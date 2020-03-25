@@ -66,7 +66,7 @@
 
             <!-- Image Config -->
             <MenuItem 
-                Header="Import Image Config"
+                Header="Load Image Config"
                 Command="{Binding ImportConfigCommand}"
                 IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
@@ -74,7 +74,7 @@
                 </MenuItem.Icon>
             </MenuItem>
             <MenuItem 
-                Header="Export Image Config"
+                Header="Save Image Config"
                 Command="{Binding ExportConfigCommand}"
                 IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>

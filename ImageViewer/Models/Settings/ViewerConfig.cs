@@ -15,8 +15,10 @@ namespace ImageViewer.Models.Settings
         public enum Components
         {
             None,
-            Images = 1,
-            Equations = 2,
+            Images = 1 << 0,
+            Equations = 1 << 1,
+            Display = 1 << 2,
+            Export = 1 << 3,
             All = 0xFFFFFFF
         }
 
@@ -40,6 +42,8 @@ namespace ImageViewer.Models.Settings
             }
 
             Equation?.ApplyToModels(models);
+            Display?.ApplyToModels(models);
+            Export?.ApplyToModels(models);
         }
 
         public static ViewerConfig LoadFromModels(ModelsEx models, Components c)
@@ -55,10 +59,23 @@ namespace ImageViewer.Models.Settings
                 res.Equation = EquationConfig.LoadFromModels(models);
             }
 
+            if (c.HasFlag(Components.Display))
+            {
+                res.Display = DisplayConfig.LoadFromModels(models);
+            }
+
+            if (c.HasFlag(Components.Export))
+            {
+                res.Export = ExportConfig.LoadFromModels(models);
+            }
+
             return res;
         }
 
         public ImagesConfig Images { get; set; }
         public EquationConfig Equation { get; set; }
+        public DisplayConfig Display { get; set; }
+
+        public ExportConfig Export { get; set; }
     }
 }
