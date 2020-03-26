@@ -120,6 +120,8 @@
             <converter:NullCollapsedConverter x:Key="NullCollapsedConverter"/>
             <converter:NullHiddenConverter x:Key="NullHiddenConverter"/>
 
+            <converter:BoolIntConverter x:Key="BoolIntConverter"/>
+
             <!-- Borders etc. -->
 
             <system:Double x:Key="DefaultBorderValue">5</system:Double>

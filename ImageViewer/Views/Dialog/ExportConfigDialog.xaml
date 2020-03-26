@@ -1,0 +1,118 @@
+﻿<Window x:Class="ImageViewer.Views.Dialog.ExportConfigDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImageViewer.Views.Dialog"
+        mc:Ignorable="d"
+        Title="Image Config" 
+        Width="400"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Icon="../../Icons/save_config.png"
+        Style="{StaticResource WindowStyle}">
+    <StackPanel Margin="{StaticResource DefaultBorder}">
+        <StackPanel Orientation="Horizontal">
+            <CheckBox
+                IsChecked="{Binding UseImages}"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"/>
+            <TextBlock
+                Text="export images and "
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"/>
+            <ComboBox
+                Margin="{StaticResource DefaultBorderBotRight}"
+                SelectedIndex="{Binding AddToImages, Converter={StaticResource BoolIntConverter}, FallbackValue=0}"
+                Width="100"
+                IsEnabled="{Binding UseImages}">
+                <ComboBoxItem Content="replace with"/>
+                <ComboBoxItem Content="add to"/>
+            </ComboBox>
+            <TextBlock
+                Text="images on load"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"/>
+
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal">
+            <CheckBox
+                IsChecked="{Binding UseEquation}"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"/>
+
+            <TextBlock
+                Text="export equations"
+                Margin="{StaticResource DefaultBorderBotRight}"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal">
+            <CheckBox
+                IsChecked="{Binding UseFilter}"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"/>
+            <TextBlock
+                Text="export filter and "
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"/>
+            <ComboBox
+                Margin="{StaticResource DefaultBorderBotRight}"
+                SelectedIndex="{Binding AddToFilter, Converter={StaticResource BoolIntConverter}, FallbackValue=1}"
+                Width="100"
+                IsEnabled="{Binding UseFilter}">
+                <ComboBoxItem Content="replace with"/>
+                <ComboBoxItem Content="add to"/>
+            </ComboBox>
+            <TextBlock
+                Text="filter on load"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"/>
+
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal">
+            <CheckBox
+                IsChecked="{Binding UseExport}"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"/>
+
+            <TextBlock
+                Text="export crop rectangle and zoom boxes"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal">
+            <CheckBox
+                IsChecked="{Binding UseDisplay}"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"/>
+
+            <TextBlock
+                Text="export display settings (pixel display, alpha color, etc.)"
+                Margin="{StaticResource DefaultBorderBotRight}"
+                VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <Grid HorizontalAlignment="Right">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button 
+                Content="_Export" 
+                Margin="{StaticResource DefaultBorderRight}"
+                Width="60"
+                Click="ButtonExport_OnClick"
+                IsEnabled="{Binding IsValid}"
+            />
+            <Button 
+                Grid.Column="1" 
+                Content="_Cancel" 
+                Width="60"
+                Click="ButtonCancel_OnClick"/>
+        </Grid>
+    </StackPanel>
+</Window>
