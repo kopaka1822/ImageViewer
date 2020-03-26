@@ -41,6 +41,9 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
+        public ViewerConfig.ImportMode ImageImportMode =>
+            AddToImages ? ViewerConfig.ImportMode.Add : ViewerConfig.ImportMode.Replace;
+
         private bool useEquation = defaultUse;
 
         public bool UseEquation
@@ -81,6 +84,9 @@ namespace ImageViewer.ViewModels.Dialog
                 OnPropertyChanged(nameof(AddToFilter));
             }
         }
+
+        public ViewerConfig.ImportMode FilterImportMode =>
+            AddToFilter ? ViewerConfig.ImportMode.Add : ViewerConfig.ImportMode.Replace;
 
         private bool useExport = defaultUse;
 

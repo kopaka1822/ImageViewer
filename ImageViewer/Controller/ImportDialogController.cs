@@ -9,6 +9,7 @@ using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
 using ImageViewer.Models;
+using ImageViewer.Models.Settings;
 
 namespace ImageViewer.Controller
 {
@@ -45,7 +46,6 @@ namespace ImageViewer.Controller
         {
             try
             {
-
                 var img = await IO.LoadImageTextureAsync(file, models.Progress);
                 
                 ImportTexture(img.Texture, file, img.OriginalFormat, alias);

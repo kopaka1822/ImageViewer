@@ -17,6 +17,8 @@ namespace ImageViewer.Models.Settings
 
         public List<ImageData> Images { get; set; } = new List<ImageData>();
 
+        public ViewerConfig.ImportMode ImportMode { get; set; }
+
         public static ImagesConfig LoadFromModels(ModelsEx models)
         {
             var res = new ImagesConfig();
@@ -35,7 +37,9 @@ namespace ImageViewer.Models.Settings
         public async Task ApplyToModels(ModelsEx models)
         {
             // clear images
-            models.Images.Clear();
+            if(ImportMode == ViewerConfig.ImportMode.Replace)
+                models.Images.Clear();
+
             var import = new ImportDialogController(models);
 
             // add images from config

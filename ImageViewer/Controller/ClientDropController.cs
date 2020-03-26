@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using ImageViewer.Models;
+using ImageViewer.Models.Settings;
 
 namespace ImageViewer.Controller
 {
@@ -29,13 +30,19 @@ namespace ImageViewer.Controller
 
         private async void DxHostOnDrop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (!e.Data.GetDataPresent(DataFormats.FileDrop)) return;
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                if (files != null)
-                    foreach (var file in files)
-                        await import.ImportImageAsync(file);
+            if (files == null) return;
+            
+            foreach (var file in files)
+            {
+                if (file.EndsWith(".icfg"))
+                {
+                    var cfg = ViewerConfig.LoadFromFile(file);
+                    await cfg.ApplyToModels(models);
+                }
+                else await import.ImportImageAsync(file);
             }
         }
     }

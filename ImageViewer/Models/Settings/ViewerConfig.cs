@@ -23,6 +23,12 @@ namespace ImageViewer.Models.Settings
             All = 0xFFFFFFF
         }
 
+        public enum ImportMode
+        {
+            Replace, // replace with previous
+            Add // add to previous
+        }
+
         public static ViewerConfig LoadFromFile(string filename)
         {
             var txt = File.ReadAllText(filename);
@@ -51,6 +57,7 @@ namespace ImageViewer.Models.Settings
             }
 
             Equation?.ApplyToModels(models);
+            Filter?.ApplyToModels(models);
             Display?.ApplyToModels(models);
             Export?.ApplyToModels(models);
         }
@@ -87,7 +94,6 @@ namespace ImageViewer.Models.Settings
         }
 
         public int? Version { get; set; }
-
         public ImagesConfig Images { get; set; }
         public EquationConfig Equation { get; set; }
         public FilterConfig Filter { get; set; }

@@ -27,6 +27,8 @@ namespace ImageViewer.Models.Settings
 
         public List<Filter> Filters { get; } = new List<Filter>();
 
+        public ViewerConfig.ImportMode ImportMode { get; set; }
+
         public static FilterConfig LoadFromModels(ModelsEx models)
         {
             var res = new FilterConfig();
@@ -46,7 +48,12 @@ namespace ImageViewer.Models.Settings
 
         public void ApplyToModels(ModelsEx models)
         {
-            models.Filter.Clear();
+            var filters = new List<FilterModel>();
+            if (ImportMode == ViewerConfig.ImportMode.Add)
+            {
+                filters.AddRange(models.Filter.Filter);
+            }
+
             foreach (var filter in Filters)
             {
                 var model = models.CreateFilter(filter.Filename);
@@ -62,8 +69,10 @@ namespace ImageViewer.Models.Settings
                     SetFilterParameter(model, fp.Name, fp.Value);
                 }
 
-                models.Filter.AddFilter(model);
+                filters.Add(model);
             }
+
+            models.Filter.SetFilter(filters);
         }
 
         private static List<FilterParameter> GetFilterParameters(FilterModel filter)
@@ -74,7 +83,7 @@ namespace ImageViewer.Models.Settings
             {
                 res.Add(new FilterParameter
                 {
-                    Name = fp.GetBase().Name,
+                    Name = fp.GetBase().VariableName,
                     Value = fp.GetBase().StringValue
                 });
             }
@@ -83,7 +92,7 @@ namespace ImageViewer.Models.Settings
             {
                 res.Add(new FilterParameter
                 {
-                    Name = tp.Name,
+                    Name = TexParamPrefix + tp.TextureName,
                     Value = tp.Source.ToString()
                 });
             }
@@ -104,20 +113,29 @@ namespace ImageViewer.Models.Settings
 
         private static void SetFilterParameter(FilterModel model, string name, string value)
         {
-            foreach (var fp in model.Parameters)
+            if (!name.StartsWith(TexParamPrefix))
             {
-                if (fp.GetBase().Name != name) continue;
+                foreach (var fp in model.Parameters)
+                {
+                    if (fp.GetBase().VariableName != name) continue;
 
-                fp.GetBase().StringValue = value;
-                return;
+                    fp.GetBase().StringValue = value;
+                    return;
+                }
             }
-
-            foreach (var tp in model.TextureParameters)
+            else
             {
-                if (tp.Name != name) continue;
+                var noPrefix = name.Substring(TexParamPrefix.Length);
+                foreach (var tp in model.TextureParameters)
+                {
+                    if (tp.TextureName != noPrefix) continue;
 
-                tp.Source = int.Parse(value);
+                    tp.Source = int.Parse(value);
+                    return;
+                }
             }
         }
+
+        private static readonly string TexParamPrefix = "__texture__";
     }
 }

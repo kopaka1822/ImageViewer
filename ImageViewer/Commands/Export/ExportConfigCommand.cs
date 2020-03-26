@@ -54,6 +54,10 @@ namespace ImageViewer.Commands.Export
             try
             {
                 var cfg = ViewerConfig.LoadFromModels(models, viewModel.UsedComponents);
+                if(cfg.Images != null)
+                    cfg.Images.ImportMode = viewModel.ImageImportMode;
+                if (cfg.Filter != null)
+                    cfg.Filter.ImportMode = viewModel.FilterImportMode;
 
                 path.UpdateFromFilename(sfd.FileName);
 
