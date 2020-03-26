@@ -46,7 +46,7 @@ namespace ImageViewer.Commands.Import
             }
             catch (Exception e)
             {
-                models.Window.ShowErrorDialog(e.Message, "Could not load config");
+                models.Window.ShowErrorDialog(e, "Could not load config");
             }
         }
     }

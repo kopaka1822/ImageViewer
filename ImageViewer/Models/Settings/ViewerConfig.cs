@@ -19,17 +19,26 @@ namespace ImageViewer.Models.Settings
             Equations = 1 << 1,
             Display = 1 << 2,
             Export = 1 << 3,
+            Filter = 1 << 4,
             All = 0xFFFFFFF
         }
 
         public static ViewerConfig LoadFromFile(string filename)
         {
             var txt = File.ReadAllText(filename);
-            return JsonConvert.DeserializeObject<ViewerConfig>(txt);
+            var res = JsonConvert.DeserializeObject<ViewerConfig>(txt);
+            if(!res.Version.HasValue)
+                throw new Exception("version property missing");
+
+            if(res.Version.Value > CurrentVersion)
+                throw new Exception("config version not supported (too high)");
+
+            return res;
         }
 
         public void WriteToFile(string filename)
         {
+            Version = CurrentVersion;
             var txt = JsonConvert.SerializeObject(this, Formatting.Indented);
             File.WriteAllText(filename, txt);
         }
@@ -59,6 +68,11 @@ namespace ImageViewer.Models.Settings
                 res.Equation = EquationConfig.LoadFromModels(models);
             }
 
+            if (c.HasFlag(Components.Filter))
+            {
+                res.Filter = FilterConfig.LoadFromModels(models);
+            }
+
             if (c.HasFlag(Components.Display))
             {
                 res.Display = DisplayConfig.LoadFromModels(models);
@@ -72,10 +86,16 @@ namespace ImageViewer.Models.Settings
             return res;
         }
 
+        public int? Version { get; set; }
+
         public ImagesConfig Images { get; set; }
         public EquationConfig Equation { get; set; }
+        public FilterConfig Filter { get; set; }
         public DisplayConfig Display { get; set; }
 
         public ExportConfig Export { get; set; }
+
+        private static readonly int CurrentVersion = 1;
+
     }
 }

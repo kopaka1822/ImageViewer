@@ -21,6 +21,8 @@ namespace ImageViewer.Models.Settings
 
         public bool UseCropping { get; set; }
 
+        public ZoomBoxConfig ZoomBox { get; set; } = new ZoomBoxConfig();
+
         public static ExportConfig LoadFromModels(ModelsEx models)
         {
             var res = new ExportConfig();
@@ -32,6 +34,7 @@ namespace ImageViewer.Models.Settings
             res.CropEndY = models.ExportConfig.CropEnd.Y;
             res.CropEndZ = models.ExportConfig.CropEnd.Z;
             res.UseCropping = models.ExportConfig.UseCropping;
+            res.ZoomBox = ZoomBoxConfig.LoadFromModels(models);
 
             return res;
         }
@@ -42,7 +45,7 @@ namespace ImageViewer.Models.Settings
             models.ExportConfig.CropStart = new Float3(CropStartX, CropStartY, CropStartZ);
             models.ExportConfig.CropEnd = new Float3(CropEndX, CropEndY, CropEndZ);
             models.ExportConfig.UseCropping = UseCropping;
-            
+            ZoomBox?.ApplyToModels(models);
         }
     }
 }

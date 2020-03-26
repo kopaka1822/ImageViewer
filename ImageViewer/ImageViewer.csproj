@@ -152,8 +152,10 @@
     <Compile Include="Models\Settings\DisplayConfig.cs" />
     <Compile Include="Models\Settings\EquationConfig.cs" />
     <Compile Include="Models\Settings\ExportConfig.cs" />
+    <Compile Include="Models\Settings\FilterConfig.cs" />
     <Compile Include="Models\Settings\ImagesConfig.cs" />
     <Compile Include="Models\Settings\ViewerConfig.cs" />
+    <Compile Include="Models\Settings\ZoomBoxConfig.cs" />
     <Compile Include="Models\StatisticModel.cs" />
     <Compile Include="UtilityEx\ColorExtension.cs" />
     <Compile Include="UtilityEx\PathManager.cs" />

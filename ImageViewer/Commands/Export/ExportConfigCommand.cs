@@ -40,11 +40,18 @@ namespace ImageViewer.Commands.Export
             if (sfd.ShowDialog(models.Window.TopmostWindow) != true)
                 return;
 
-            var cfg = ViewerConfig.LoadFromModels(models, ViewerConfig.Components.All);
+            try
+            {
+                var cfg = ViewerConfig.LoadFromModels(models, ViewerConfig.Components.All);
 
-            path.UpdateFromFilename(sfd.FileName);
+                path.UpdateFromFilename(sfd.FileName);
 
-            cfg.WriteToFile(path.FullPath);
+                cfg.WriteToFile(path.FullPath);
+            }
+            catch(Exception e)
+            {
+                models.Window.ShowErrorDialog(e, "Could not save config");
+            }
         }
     }
 }
