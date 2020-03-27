@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Model;
 using ImageFramework.Model.Equation.Token;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -34,6 +35,13 @@ namespace FrameworkTests.Model.Equation
             Assert.AreEqual(2, GetMaxImage("I1 + I2"));
             Assert.AreEqual(3, GetMaxImage("I3 + I2"));
             Assert.AreEqual(0, GetMaxImage("1"));
+        }
+
+        [TestMethod]
+        public void ScientificNotation()
+        {
+            AssertSuccess("1e10");
+            AssertSuccess("1e-10");
         }
 
         [TestMethod]
@@ -86,6 +94,17 @@ namespace FrameworkTests.Model.Equation
             var hlsl2 = eq2.GetHlslExpression();
 
             Assert.AreEqual(hlsl2, hlsl);
+        }
+
+        [TestMethod]
+        public void Constants()
+        {
+            AssertEquals("PI", $"f4({((float)Math.PI).ToString(Models.Culture)})");
+            AssertEquals("e", $"f4({((float)Math.E).ToString(Models.Culture)})");
+
+            AssertSuccess("infinity");
+            AssertSuccess("nan");
+            AssertSuccess("float_max");
         }
 
         // equation should fail

@@ -16,6 +16,19 @@ namespace ImageFramework.Model.Equation
         private int firstImageId = -1;
         private int maxImageId = -1;
         private int minImageId = Int32.MaxValue;
+        private static readonly float EpsilonValue = float.Epsilon;
+        private static readonly Dictionary<string, float> Constants = new Dictionary<string, float>
+        {
+            {"pi", (float)Math.PI },
+            {"e", (float)Math.E },
+            {"inf", float.PositiveInfinity },
+            {"infinity", float.PositiveInfinity },
+            {"float_max", float.MaxValue },
+            {"fmax", float.MaxValue },
+            {"eps", EpsilonValue },
+            {"epsilon", EpsilonValue },
+            {"nan", float.NaN },
+        };
 
         public Equation(string formula)
         {
@@ -60,8 +73,6 @@ namespace ImageFramework.Model.Equation
                 bool finishCurrent = true;
                 switch (c)
                 {
-                    case ' ':
-                        break;
                     case '^':
                         nextToken = new SingleCharToken(Token.Token.Type.Operation1, '^');
                         break;
@@ -75,6 +86,17 @@ namespace ImageFramework.Model.Equation
                         nextToken = new SingleCharToken(Token.Token.Type.Operation3, '+');
                         break;
                     case '-':
+                        if (current.Length >= 2)
+                        {
+                            // allow - for scientific notation (1e-10)
+                            if (char.ToLower(current[current.Length - 1]) == 'e' &&
+                                char.IsNumber(current[current.Length - 2]))
+                            {
+                                current += '-';
+                                finishCurrent = false;
+                                break;
+                            }
+                        }
                         nextToken = new SingleCharToken(Token.Token.Type.Operation3, '-');
                         break;
                     case ',':
@@ -96,6 +118,8 @@ namespace ImageFramework.Model.Equation
                         nextToken = new SingleCharToken(Token.Token.Type.BracketClose, ')');
                         break;
                     default:
+                        if (char.IsWhiteSpace(c)) break;
+
                         current += c;
                         finishCurrent = false;
                         break;
@@ -120,27 +144,41 @@ namespace ImageFramework.Model.Equation
         private Token.Token MakeTokenFromString(string identifier)
         {
             Debug.Assert(identifier.Length > 0);
-            if (identifier.StartsWith("I"))
+            if (char.IsLetter(identifier[0]))
             {
-                // image identifier
-                int number;
-                if (!Int32.TryParse(identifier.Substring(1), NumberStyles.Integer, Models.Culture, out number))
-                    throw new Exception($"Invalid Image Identifier: {identifier}");
-                if (number < 0)
-                    throw new Exception("Invalid Image Range: " + identifier);
-                // update highest image id
-                maxImageId = Math.Max(maxImageId, number);
-                minImageId = Math.Min(minImageId, number);
-                if (firstImageId < 0) // first image that occured in the formula
-                    firstImageId = maxImageId;
+                // handle variable
+                var lower = identifier.ToLower(Models.Culture);
+                if (lower.Length > 1 && lower[0] == 'i' && char.IsNumber(lower[1]))
+                {
+                    // image identifier
+                    int number;
+                    if (!Int32.TryParse(identifier.Substring(1), NumberStyles.Integer, Models.Culture, out number))
+                        throw new Exception($"Invalid Image Identifier: {identifier}");
+                    if (number < 0)
+                        throw new Exception($"Invalid Image Range: {identifier}");
+                    // update highest image id
+                    maxImageId = Math.Max(maxImageId, number);
+                    minImageId = Math.Min(minImageId, number);
+                    if (firstImageId < 0) // first image that occured in the formula
+                        firstImageId = maxImageId;
 
-                return new ImageToken(number);
+                    return new ImageToken(number);
+                }
+
+                // constant?
+                if(!Constants.TryGetValue(lower, out var value))
+                    throw new Exception($"Unknown Identifier: {identifier}");
+
+                return new ConstantToken(value);
             }
-
-            double value;
-            if (!Double.TryParse(identifier, NumberStyles.Float, Models.Culture, out value))
-                throw new Exception($"Invalid Number: {identifier}");
-            return new NumberToken((float)value);
+            else
+            {
+                // handle digit
+                double value;
+                if (!Double.TryParse(identifier, NumberStyles.Float, Models.Culture, out value))
+                    throw new Exception($"Invalid Number: {identifier}");
+                return new NumberToken((float)value);
+            }
         }
 
         private void Compile(List<Token.Token> tokens)

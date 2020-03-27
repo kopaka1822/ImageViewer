@@ -4,7 +4,7 @@
 
 Image Equations determine how the image will look like before any filter was applied.
 
-The default image equation `I0` references the pixels from the first image. More images can be referenced with `I1`, `I2` and so on. Images can be combined with following operators: `* + - / ^`. Numerical constants can be used as well. The image color of each pixel is evaluated as follows:
+The default image equation `I0` references the pixels from the first image. More images can be referenced with `I1`, `I2` and so on. Images can be combined with following operators: `* + - / ^`. Numerical constants and some [predefined constants](#Constants) can be used as well. The image color of each pixel is evaluated as follows:
 
 ```c++
 color.rgb = ("RGB_Equation").rgb;
@@ -97,13 +97,25 @@ color.rgb = 0.5;
 color.a = I1.r; // == float4(I1.r, I1.r, I1.r, I1.r).a
 ```
 
+# Constants
+
+The following (case insensitive) constants can be used:
+
+|Identifier|Result
+|-|-
+|pi|3.14159274
+|e|2.71828175
+|infinity/inf|infinity
+|float_max/fmax|3.40282347E+38
+|nan|NaN
+
 # Specialized Function Implementations
 
 ## Log
 
 **log**(value), **log10**(value), **log2**(value)
 
-|value|Result
+|Value|Result
 |-|-
 |<0|NaN
 |0|-infinity
@@ -112,7 +124,7 @@ color.a = I1.r; // == float4(I1.r, I1.r, I1.r, I1.r).a
 ## Normalize
 **normalize**({r,g,b,a})
 
-|value|Result
+|Value|Result
 |-|-
 |{0, 0, 0, a}|{NaN, NaN, NaN, a}
 |else|{normalize({r, g, b})), a}
@@ -137,7 +149,7 @@ color.a = I1.r; // == float4(I1.r, I1.r, I1.r, I1.r).a
 
 **sqrt**(value)
 
-|value|Result
+|Value|Result
 |-|-
 |<0|NaN
 |>=0|sqrt(value)
