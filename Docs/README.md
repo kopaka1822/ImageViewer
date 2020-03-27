@@ -17,6 +17,7 @@ System Requirements:
 - x64 bit
 - .Net 4.6.1
 - DirextX 11 compatible graphics card
+- [Microsoft Visual C++ Redistributable for Visual Studio 2019](https://aka.ms/vs/16/release/vc_redist.x64.exe)
 
 Version 3.3.1 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/raw/Release/Build/ImageViewer3_3_1.zip)
 
