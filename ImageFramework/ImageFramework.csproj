@@ -68,9 +68,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controller\PipelineController.cs" />
+    <Compile Include="DirectX\ByteImageData.cs" />
     <Compile Include="DirectX\Device.cs" />
     <Compile Include="DirectX\DownloadBuffer.cs" />
     <Compile Include="DirectX\GpuBuffer.cs" />
+    <Compile Include="DirectX\ImageData.cs" />
     <Compile Include="DirectX\Query\AdvancedGpuTimer.cs" />
     <Compile Include="DirectX\Query\GpuTimer.cs" />
     <Compile Include="DirectX\ITexture.cs" />
@@ -91,8 +93,6 @@
     <Compile Include="ImageLoader\Image.cs" />
     <Compile Include="ImageLoader\ImageFormat.cs" />
     <Compile Include="ImageLoader\IO.cs" />
-    <Compile Include="ImageLoader\Layer.cs" />
-    <Compile Include="ImageLoader\Mipmap.cs" />
     <Compile Include="ImageLoader\Resource.cs" />
     <Compile Include="Model\Equation\Token\ConstantToken.cs" />
     <Compile Include="Model\Progress\DllProgressAdapter.cs" />

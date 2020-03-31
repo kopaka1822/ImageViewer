@@ -26,7 +26,9 @@ namespace ImageViewer.Controller.TextureViews.Shader
         private struct DirBufferData
         {
             public Int3 dir;
+#pragma warning disable 169
             private int padding;
+#pragma warning restore 169
             public Size3 dim;
         }
 

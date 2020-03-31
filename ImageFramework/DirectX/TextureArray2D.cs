@@ -32,9 +32,9 @@ namespace ImageFramework.DirectX
             CreateTextureViews(createUav);
         }
 
-        public TextureArray2D(ImageLoader.Image image)
+        public TextureArray2D(ImageData image)
         {
-            Size = image.GetSize(0);
+            Size = image.Size;
             Debug.Assert(Size.Depth == 1);
             LayerMipmap = image.LayerMipmap;
             Format = image.Format.DxgiFormat;
@@ -42,11 +42,11 @@ namespace ImageFramework.DirectX
             var data = new DataRectangle[LayerMipmap.Layers * LayerMipmap.Mipmaps];
             foreach (var lm in LayerMipmap.Range)
             {
-                var mip = image.Layers[lm.Layer].Mipmaps[lm.Mipmap];
+                var mip = image.GetMipmap(lm);
                 var idx = GetSubresourceIndex(lm);
                 data[idx].DataPointer = mip.Bytes;
                 // The distance (in bytes) from the beginning of one line of a texture to the next line.
-                data[idx].Pitch = (int)(mip.Size / mip.Height);
+                data[idx].Pitch = (int)(mip.ByteSize / mip.Size.Height);
             }
 
             handle = new Texture2D(Device.Get().Handle, CreateTextureDescription(false), data);

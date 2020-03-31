@@ -29,9 +29,9 @@ namespace ImageFramework.DirectX
             CreateTextureViews(createUav, createRt);
         }
 
-        public Texture3D(ImageLoader.Image image, int layer = 0)
+        public Texture3D(ImageData image, int layer = 0)
         {
-            Size = image.GetSize(0);
+            Size = image.Size;
             LayerMipmap = image.LayerMipmap;
             Format = image.Format.DxgiFormat;
 
@@ -39,11 +39,11 @@ namespace ImageFramework.DirectX
 
             for (int curMipmap = 0; curMipmap < LayerMipmap.Mipmaps; ++curMipmap)
             {
-                var mip = image.Layers[layer].Mipmaps[curMipmap];
+                var mip = image.GetMipmap(new LayerMipmapSlice(layer, curMipmap));
                 var idx = curMipmap;
                 data[idx].DataPointer = mip.Bytes;
-                data[idx].SlicePitch = (int)(mip.Size / mip.Depth);
-                data[idx].RowPitch = data[idx].SlicePitch / mip.Height;
+                data[idx].SlicePitch = (int)(mip.ByteSize / mip.Size.Depth);
+                data[idx].RowPitch = data[idx].SlicePitch / mip.Size.Height;
             }
 
             handle = new SharpDX.Direct3D11.Texture3D(Device.Get().Handle, CreateTextureDescription(false,true), data);

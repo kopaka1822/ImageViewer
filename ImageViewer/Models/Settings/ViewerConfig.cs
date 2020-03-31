@@ -38,6 +38,8 @@ namespace ImageViewer.Models.Settings
 
             if(res.Version.Value > CurrentVersion)
                 throw new Exception("config version not supported (too high)");
+            if(res.Version.Value < 2 && res.Images != null)
+                throw new Exception("images in current config version not supported");
 
             return res;
         }
@@ -101,7 +103,7 @@ namespace ImageViewer.Models.Settings
 
         public ExportConfig Export { get; set; }
 
-        private static readonly int CurrentVersion = 1;
+        private static readonly int CurrentVersion = 2;
 
     }
 }

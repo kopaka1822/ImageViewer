@@ -69,8 +69,9 @@ namespace ImageFramework.Model
                 // create frames
                 using (var dst = IO.CreateImage(new ImageFormat(Format.R8G8B8A8_UNorm_SRgb), left.Size, LayerMipmapCount.One))
                 {
-                    var dstPtr = dst.Layers[0].Mipmaps[0].Bytes;
-                    var dstSize = dst.Layers[0].Mipmaps[0].Size;
+                    var dstMip = dst.GetMipmap(LayerMipmapSlice.Mip0);
+                    var dstPtr = dstMip.Bytes;
+                    var dstSize = dstMip.ByteSize;
 
                     // render frames into texture
                     using (var frame = new TextureArray2D(LayerMipmapCount.One, left.Size,

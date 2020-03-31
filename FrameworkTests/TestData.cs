@@ -24,7 +24,7 @@ namespace FrameworkTests
             new Color(1.0f, 1.0f, 1.0f, 0.5f),new Color(1.0f, 1.0f, 1.0f, 0.5f),new Color(1.0f, 1.0f, 1.0f, 0.5f)
         };
 
-        public static void CompareWithSmall(Image image, Color.Channel channels)
+        public static void CompareWithSmall(DllImageData image, Color.Channel channels)
         {
             var tex = new TextureArray2D(image);
             var colors = tex.GetPixelColors(LayerMipmapSlice.Mip0);

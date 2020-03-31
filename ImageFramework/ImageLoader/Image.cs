@@ -1,52 +1,52 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.DirectX;
 using ImageFramework.Utility;
 
 namespace ImageFramework.ImageLoader
 {
-    public class Image : IDisposable
+    public class DllImageData : ImageData, IDisposable
     {
-        // image format
-        public ImageFormat Format { get; }
         // format of the source image (can be different form current format)
         public GliFormat OriginalFormat { get; }
-        public List<Layer> Layers { get; }
         public string Filename { get; }
 
         // link to the dll resource id
         public Resource Resource { get; }
 
-        public Image(Resource resource, string filename, LayerMipmapCount lm, ImageFormat format, GliFormat originalFormat)
+        public DllImageData(Resource resource, string filename, LayerMipmapCount lm, ImageFormat format, GliFormat originalFormat)
+        : base(format, lm, GetSize(resource))
         {
             Resource = resource;
             Filename = filename;
-            Format = format;
             OriginalFormat = originalFormat;
-            // load relevant information
-
-            Layers = new List<Layer>(lm.Layers);
-            for (var curLayer = 0; curLayer < lm.Layers; ++curLayer)
-            {
-                Layers.Add(new Layer(resource, curLayer, lm.Mipmaps));
-            }
         }
 
-        public Size3 GetSize(int mipmap)
+        private static Size3 GetSize(Resource res)
         {
-            if (Layers.Count > 0 && (uint)mipmap < Layers[0].Mipmaps.Count)
-                return new Size3(Layers[0].Mipmaps[mipmap].Width, Layers[0].Mipmaps[mipmap].Height, Layers[0].Mipmaps[mipmap].Depth);
-            return Size3.Zero;
+            Dll.image_info_mipmap(res.Id, 0, out var width, out var height, out var depth);
+            return new Size3(width, height, depth);
         }
 
-        public LayerMipmapCount LayerMipmap => new LayerMipmapCount(NumLayers, NumMipmaps);
+        public override MipInfo GetMipmap(LayerMipmapSlice lm)
+        {
+            var res = new MipInfo();
+            Dll.image_info_mipmap(Resource.Id, lm.Mipmap, out res.Size.X, out res.Size.Y, out res.Size.Z);
+#if DEBUG
+            var expected = Size.GetMip(lm.Mipmap);
+            Debug.Assert(expected.Width == res.Size.Width);
+            Debug.Assert(expected.Height == res.Size.Height);
+            Debug.Assert(expected.Depth == res.Size.Depth);
+#endif
 
-        public int NumMipmaps => Layers.Count > 0 ? Layers[0].Mipmaps.Count : 0;
-        public int NumLayers => Layers.Count;
+            res.Bytes = Dll.image_get_mipmap(Resource.Id, lm.Layer, lm.Mipmap, out res.ByteSize);
 
-        public bool Is3D => NumMipmaps > 0 && Layers[0].Mipmaps[0].Depth > 1;
+            return res;
+        }
 
         public void Dispose()
         {

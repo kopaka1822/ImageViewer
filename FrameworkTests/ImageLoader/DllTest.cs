@@ -16,23 +16,23 @@ namespace FrameworkTests.ImageLoader
     [TestClass]
     public class DllTest
     {
-        private void VerifySmallLdr(Image image, Color.Channel channels)
+        private void VerifySmallLdr(DllImageData image, Color.Channel channels)
         {
-            Assert.AreEqual(1, image.NumMipmaps);
-            Assert.AreEqual(1, image.NumLayers);
-            Assert.AreEqual(3, image.GetSize(0).Width);
-            Assert.AreEqual(3, image.GetSize(0).Height);
+            Assert.AreEqual(1, image.LayerMipmap.Mipmaps);
+            Assert.AreEqual(1, image.LayerMipmap.Layers);
+            Assert.AreEqual(3, image.Size.Width);
+            Assert.AreEqual(3, image.Size.Height);
             Assert.AreEqual(Format.R8G8B8A8_UNorm_SRgb, image.Format.DxgiFormat);
 
             TestData.CompareWithSmall(image, channels);
         }
 
-        public void VerifySmallHdr(Image image, Color.Channel channels)
+        public void VerifySmallHdr(DllImageData image, Color.Channel channels)
         {
-            Assert.AreEqual(1, image.NumMipmaps);
-            Assert.AreEqual(1, image.NumLayers);
-            Assert.AreEqual(3, image.GetSize(0).Width);
-            Assert.AreEqual(3, image.GetSize(0).Height);
+            Assert.AreEqual(1, image.LayerMipmap.Mipmaps);
+            Assert.AreEqual(1, image.LayerMipmap.Layers);
+            Assert.AreEqual(3, image.Size.Width);
+            Assert.AreEqual(3, image.Size.Height);
             Assert.AreEqual(Format.R32G32B32A32_Float, image.Format.DxgiFormat);
 
             TestData.CompareWithSmall(image, channels);
