@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -57,21 +58,16 @@ namespace ImageViewer.Models.Settings
                 {
                     Debug.Assert(img.Image.Format == Format.R32G32B32A32_Float);
 
-                    // save as base 64 encoded string
-                    var bytes = "";
-                    foreach (var lm in img.Image.LayerMipmap.Range)
-                    {
-                        // byte size
-                        uint size = (uint) img.Image.Size.GetMip(lm.Mipmap).Product * 4u * 4u;
-                        var data = img.Image.GetBytes(lm, size);
+                    // fill byte array
+                    var bytes = img.Image.GetBytes(4u * 4u);
+                    bytes = Compression.Compress(bytes, CompressionLevel.Fastest);
 
-                        bytes += System.Convert.ToBase64String(data);
-                    }
-                    
+                    var base64 = System.Convert.ToBase64String(bytes);
+
                     res.Images.Add(new ImageData
                     {
                         DataIsFilename = false,
-                        Data = bytes,
+                        Data = base64,
                         Alias = img.Alias
                     });
                 }
@@ -99,6 +95,7 @@ namespace ImageViewer.Models.Settings
                 {
                     // load base 64 bytes
                     var bytes = System.Convert.FromBase64String(img.Data);
+                    bytes = Compression.Decompress(bytes);
                     var bi = new ByteImageData(bytes, layerMipmaps, imgSize, new ImageFormat(Format.R32G32B32A32_Float));
                     ITexture tex = null;
                     if (bi.Is3D) tex = new Texture3D(bi);

@@ -82,6 +82,31 @@ namespace ImageFramework.DirectX
             return res;
         }
 
+        public unsafe byte[] GetBytes(uint pixelSize)
+        {
+            uint size = 0;
+            for (int mip = 0; mip < LayerMipmap.Mipmaps; ++mip)
+            {
+                size += (uint) (LayerMipmap.Layers * Size.GetMip(mip).Product) * pixelSize;
+            }
+
+            byte[] res = new byte[size];
+            uint offset = 0;
+            fixed (byte* ptr = res)
+            {
+                foreach (var lm in LayerMipmap.Range)
+                {
+                    var mipSize = (uint)Size.GetMip(lm.Mipmap).Product * pixelSize;
+                    CopyPixels(lm, new IntPtr(ptr + offset), mipSize);
+                    offset += mipSize;
+                }
+            }
+
+            Debug.Assert(offset == size);
+
+            return res;
+        }
+
         public void CopyPixels(LayerMipmapSlice lm, IntPtr destination, uint size)
         {
             // create staging texture

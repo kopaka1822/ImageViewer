@@ -32,7 +32,13 @@ namespace ImageFramework.DirectX
         UnorderedAccessView GetUaView(int mipmap);
 
         Color[] GetPixelColors(LayerMipmapSlice lm);
+
+        // gets bytes from the specified slice
         unsafe byte[] GetBytes(LayerMipmapSlice lm, uint size);
+
+        // gets all bytes
+        unsafe byte[] GetBytes(uint pixelSize);
+
         void CopyPixels(LayerMipmapSlice lm, IntPtr destination, uint size);
 
         /// <summary>
