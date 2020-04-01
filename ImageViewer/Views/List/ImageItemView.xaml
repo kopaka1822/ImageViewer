@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImageViewer.Views.List"
              xmlns:views="clr-namespace:ImageViewer.Views"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="20" 
              d:DesignWidth="150"
@@ -12,9 +13,36 @@
              DataContextChanged="OnDataContextChanged">
     <UserControl.ContextMenu>
         <ContextMenu>
+            <MenuItem Header="To Equation 1"
+                      Command="{Binding ReplaceEquationCommand}">
+                <MenuItem.CommandParameter>
+                    <system:Int32>0</system:Int32>
+                </MenuItem.CommandParameter>
+            </MenuItem>
+            <MenuItem Header="To Equation 2"
+                      Command="{Binding ReplaceEquationCommand}">
+                <MenuItem.CommandParameter>
+                    <system:Int32>1</system:Int32>
+                </MenuItem.CommandParameter>
+            </MenuItem>
+            <MenuItem Header="To Equation 3"
+                      Command="{Binding ReplaceEquationCommand}">
+                <MenuItem.CommandParameter>
+                    <system:Int32>2</system:Int32>
+                </MenuItem.CommandParameter>
+            </MenuItem>
+            <MenuItem Header="To Equation 4"
+                      Command="{Binding ReplaceEquationCommand}">
+                <MenuItem.CommandParameter>
+                    <system:Int32>3</system:Int32>
+                </MenuItem.CommandParameter>
+            </MenuItem>
+
+            <Separator/>
             <MenuItem Header="Rename"
                       Command="{Binding RenameCommand}"
                       InputGestureText="Double Click"/>
+
         </ContextMenu>
     </UserControl.ContextMenu>
 

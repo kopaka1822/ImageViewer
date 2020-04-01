@@ -76,7 +76,7 @@ namespace FrameworkTests.Model
             var model = new Models(1);
             model.AddImageFromFile(TestData.Directory + "checkers.dds");
             model.Apply();
-
+            
             model.Export.Export(new ExportDescription(model.Pipelines[0].Image, ExportDir + "cropped", "dds")
             {
                 FileFormat = GliFormat.RGBA8_SRGB,

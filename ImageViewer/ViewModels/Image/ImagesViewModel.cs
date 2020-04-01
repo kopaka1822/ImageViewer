@@ -74,7 +74,7 @@ namespace ImageViewer.ViewModels.Image
             ImageListItems.Clear();
             for (var i = 0; i < models.Images.NumImages; ++i)
             {
-                var item = new ImageItemViewModel(models.Images, i);
+                var item = new ImageItemViewModel(models, i);
                 ImageListItems.Add(item);
             }
 
