@@ -125,6 +125,7 @@
     <Compile Include="Controller\TextureViews\Shader\RayMarchingShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\RayCastingShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\ShearWarpShader.cs" />
+    <Compile Include="Controller\TextureViews\Shader\Sphere3DShader.cs" />
     <Compile Include="Controller\TextureViews\Texture2D\CubeCrossTextureView.cs" />
     <Compile Include="Controller\TextureViews\Texture2D\CubeTextureView.cs" />
     <Compile Include="Controller\TextureViews\EmptyView.cs" />
@@ -147,6 +148,9 @@
     <Compile Include="Models\Display\IDisplayOverlay.cs" />
     <Compile Include="Models\Display\RayCastingDisplayModel.cs" />
     <Compile Include="Models\Display\Single3DDisplayModel.cs" />
+    <Compile Include="Models\Drawing\CapsuleShader.cs" />
+    <Compile Include="Models\Drawing\CircleShader.cs" />
+    <Compile Include="Models\Drawing\DrawingModel.cs" />
     <Compile Include="Models\ExportConfigModel.cs" />
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Models\Settings\DisplayConfig.cs" />
@@ -554,5 +558,6 @@
     <Resource Include="Icons\open_config.png" />
     <Resource Include="Icons\save_config.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -62,5 +62,11 @@ namespace ViewerTests
         {
             var sv = new SingleViewShader(null, ShaderBuilder.Builder3D);
         }
+
+        [TestMethod]
+        public void Sphere3DCompile()
+        {
+            var s = new Sphere3DShader();
+        }
     }
 }

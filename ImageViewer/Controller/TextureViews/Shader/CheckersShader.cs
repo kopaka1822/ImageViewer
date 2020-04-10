@@ -80,7 +80,7 @@ VertexOut main(uint id: SV_VertexID) {{
     o.projPos = float4(texcoord * float2(2, -2) + float2(-1, 1), 0, 1);
     o.projPos = mul(transform, o.projPos);
     return o;
-}};
+}}
 ";
         }
 
