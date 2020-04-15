@@ -145,6 +145,7 @@
     <Compile Include="Controller\TextureViews\Shared\TextureViewData.cs" />
     <Compile Include="Controller\TextureViews\Texture3D\Texture3DBaseView.cs" />
     <Compile Include="Controller\ViewModeController.cs" />
+    <Compile Include="DirectX\SwapChain.cs" />
     <Compile Include="Models\Display\IDisplayOverlay.cs" />
     <Compile Include="Models\Display\RayCastingDisplayModel.cs" />
     <Compile Include="Models\Display\Single3DDisplayModel.cs" />
