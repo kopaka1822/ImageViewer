@@ -29,6 +29,8 @@ namespace ImageFramework.DirectX
 
         public bool SupportsDouble { get; }
 
+        public event EventHandler DeviceDispose;
+
         private static Device instance = new Device();
         private Device()
         {
@@ -60,6 +62,7 @@ namespace ImageFramework.DirectX
 
         public static Device Get()
         {
+            Debug.Assert(instance != null);
             return instance;
         }
 
@@ -238,8 +241,10 @@ namespace ImageFramework.DirectX
 
         public void Dispose()
         {
+            OnDeviceDispose();
             context?.Dispose();
             Handle?.Dispose();
+            instance = null;
         }
 
         private void SetDefaults()
@@ -335,6 +340,11 @@ namespace ImageFramework.DirectX
         public void End(Asynchronous ass)
         {
             context.End(ass);
+        }
+
+        protected virtual void OnDeviceDispose()
+        {
+            DeviceDispose?.Invoke(this, EventArgs.Empty);
         }
     }
 }

@@ -28,12 +28,6 @@ namespace FrameworkTests.Model.Shader
             shader = models.SharedModel.Convert;
         }
 
-        [TestCleanup]
-        public void Cleanup()
-        {
-            models?.Dispose();
-        }
-
         [TestMethod]
         public void ConvertFromSrgb()
         {

@@ -348,6 +348,9 @@ namespace ImageFramework.Model
             }
             pixelValueShader?.Dispose();
             SharedModel?.Dispose();
+
+            // finally, destroy directx resources
+            Device.Get().Dispose();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

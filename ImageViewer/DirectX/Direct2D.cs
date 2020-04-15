@@ -16,7 +16,7 @@ namespace ImageViewer.DirectX
 {
     public class Direct2D : IDisposable
     {
-        private class Core : IDisposable
+        private class Core
         {
             public Factory Factory { get; }
             public float DpiX { get; }
@@ -41,12 +41,10 @@ namespace ImageViewer.DirectX
                 DpiX = Factory.DesktopDpi.Width;
                 DpiY = Factory.DesktopDpi.Height;
 
+                ImageFramework.DirectX.Device.Get().DeviceDispose += (sender, args) => Dispose();
                 //Context.BeginDraw();
             }
-
-
-
-            public void Dispose()
+            private void Dispose()
             {
                 //Context?.Dispose();
                 //Handle?.Dispose();
