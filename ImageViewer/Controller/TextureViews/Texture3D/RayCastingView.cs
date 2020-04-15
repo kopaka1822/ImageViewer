@@ -13,6 +13,7 @@ using ImageViewer.Models.Display;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+using Color = ImageFramework.Utility.Color;
 using Device = ImageFramework.DirectX.Device;
 
 namespace ImageViewer.Controller.TextureViews.Texture3D
@@ -59,10 +60,14 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
 
             dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
 
-            var draw = models.Window.SwapChain.Draw;
+            /*using (var draw = models.Window.SwapChain.Draw.Begin())
+            {
+                draw.FillRectangle(Float2.Zero, new Float2(100.0f), Colors.Red);
 
+                draw.FillCircle(new Float2(50.0f), 50.0f, Colors.Green);
 
-            
+                draw.Line(Float2.Zero, new Float2(100.0f), 10.0f, Colors.Blue, false);
+            }*/
         }
 
         private Matrix GetWorldToImage()

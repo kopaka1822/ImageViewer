@@ -52,49 +52,49 @@ namespace FrameworkTests
         public static void TestCheckersLevel0(Color[] colors)
         {
             Assert.AreEqual(4 * 4, colors.Length);
-            Assert.IsTrue(colors[0].Equals(Color.Black, Color.Channel.Rgb));
-            Assert.IsTrue(colors[1].Equals(Color.Black, Color.Channel.Rgb));
-            Assert.IsTrue(colors[2].Equals(Color.White, Color.Channel.Rgb));
-            Assert.IsTrue(colors[3].Equals(Color.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[0].Equals(Colors.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[1].Equals(Colors.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[2].Equals(Colors.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[3].Equals(Colors.White, Color.Channel.Rgb));
 
-            Assert.IsTrue(colors[4].Equals(Color.Black, Color.Channel.Rgb));
-            Assert.IsTrue(colors[5].Equals(Color.Black, Color.Channel.Rgb));
-            Assert.IsTrue(colors[6].Equals(Color.White, Color.Channel.Rgb));
-            Assert.IsTrue(colors[7].Equals(Color.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[4].Equals(Colors.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[5].Equals(Colors.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[6].Equals(Colors.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[7].Equals(Colors.White, Color.Channel.Rgb));
 
-            Assert.IsTrue(colors[8].Equals(Color.White, Color.Channel.Rgb));
-            Assert.IsTrue(colors[9].Equals(Color.White, Color.Channel.Rgb));
-            Assert.IsTrue(colors[10].Equals(Color.Black, Color.Channel.Rgb));
-            Assert.IsTrue(colors[11].Equals(Color.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[8].Equals(Colors.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[9].Equals(Colors.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[10].Equals(Colors.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[11].Equals(Colors.Black, Color.Channel.Rgb));
 
-            Assert.IsTrue(colors[12].Equals(Color.White, Color.Channel.Rgb));
-            Assert.IsTrue(colors[13].Equals(Color.White, Color.Channel.Rgb));
-            Assert.IsTrue(colors[14].Equals(Color.Black, Color.Channel.Rgb));
-            Assert.IsTrue(colors[15].Equals(Color.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[12].Equals(Colors.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[13].Equals(Colors.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[14].Equals(Colors.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[15].Equals(Colors.Black, Color.Channel.Rgb));
         }
 
         public static void TestCheckersLevel0Inverted(Color[] colors)
         {
             Assert.AreEqual(4 * 4, colors.Length);
-            Assert.IsTrue(colors[0].Equals(Color.White, Color.Channel.Rgb));
-            Assert.IsTrue(colors[1].Equals(Color.White, Color.Channel.Rgb));
-            Assert.IsTrue(colors[2].Equals(Color.Black, Color.Channel.Rgb));
-            Assert.IsTrue(colors[3].Equals(Color.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[0].Equals(Colors.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[1].Equals(Colors.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[2].Equals(Colors.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[3].Equals(Colors.Black, Color.Channel.Rgb));
 
-            Assert.IsTrue(colors[4].Equals(Color.White, Color.Channel.Rgb));
-            Assert.IsTrue(colors[5].Equals(Color.White, Color.Channel.Rgb));
-            Assert.IsTrue(colors[6].Equals(Color.Black, Color.Channel.Rgb));
-            Assert.IsTrue(colors[7].Equals(Color.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[4].Equals(Colors.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[5].Equals(Colors.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[6].Equals(Colors.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[7].Equals(Colors.Black, Color.Channel.Rgb));
 
-            Assert.IsTrue(colors[8].Equals(Color.Black, Color.Channel.Rgb));
-            Assert.IsTrue(colors[9].Equals(Color.Black, Color.Channel.Rgb));
-            Assert.IsTrue(colors[10].Equals(Color.White, Color.Channel.Rgb));
-            Assert.IsTrue(colors[11].Equals(Color.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[8].Equals(Colors.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[9].Equals(Colors.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[10].Equals(Colors.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[11].Equals(Colors.White, Color.Channel.Rgb));
 
-            Assert.IsTrue(colors[12].Equals(Color.Black, Color.Channel.Rgb));
-            Assert.IsTrue(colors[13].Equals(Color.Black, Color.Channel.Rgb));
-            Assert.IsTrue(colors[14].Equals(Color.White, Color.Channel.Rgb));
-            Assert.IsTrue(colors[15].Equals(Color.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[12].Equals(Colors.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[13].Equals(Colors.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[14].Equals(Colors.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[15].Equals(Colors.White, Color.Channel.Rgb));
         }
 
         public static void TestCheckers3DLevel0(Color[] colors)
@@ -109,19 +109,19 @@ namespace FrameworkTests
         public static void TestCheckersLevel1(Color[] colors)
         {
             Assert.AreEqual(2 * 2, colors.Length);
-            Assert.IsTrue(colors[0].Equals(Color.Black, Color.Channel.Rgb));
-            Assert.IsTrue(colors[1].Equals(Color.White, Color.Channel.Rgb));
-            Assert.IsTrue(colors[2].Equals(Color.White, Color.Channel.Rgb));
-            Assert.IsTrue(colors[3].Equals(Color.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[0].Equals(Colors.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[1].Equals(Colors.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[2].Equals(Colors.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[3].Equals(Colors.Black, Color.Channel.Rgb));
         }
 
         public static void TestCheckersLevel1Inverted(Color[] colors)
         {
             Assert.AreEqual(2 * 2, colors.Length);
-            Assert.IsTrue(colors[0].Equals(Color.White, Color.Channel.Rgb));
-            Assert.IsTrue(colors[1].Equals(Color.Black, Color.Channel.Rgb));
-            Assert.IsTrue(colors[2].Equals(Color.Black, Color.Channel.Rgb));
-            Assert.IsTrue(colors[3].Equals(Color.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[0].Equals(Colors.White, Color.Channel.Rgb));
+            Assert.IsTrue(colors[1].Equals(Colors.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[2].Equals(Colors.Black, Color.Channel.Rgb));
+            Assert.IsTrue(colors[3].Equals(Colors.White, Color.Channel.Rgb));
         }
 
         public static void TestCheckers3DLevel1(Color[] colors)

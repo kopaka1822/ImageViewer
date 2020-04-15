@@ -210,7 +210,7 @@ namespace ImageViewer.ViewModels
 
         public FormulaViewModel Alpha { get; }
 
-        private Color texelColor = ImageFramework.Utility.Color.Black;
+        private Color texelColor = ImageFramework.Utility.Colors.Black;
         public string TexelColor
         {
             get

@@ -110,8 +110,8 @@ namespace FrameworkTests.Model.Shader
             Assert.AreEqual(2, newTex.Size.Height);
 
             // black remains the same
-            Assert.IsTrue(Color.Black.Equals(colors[0], Color.Channel.Rgba));
-            Assert.IsTrue(Color.Black.Equals(colors[3], Color.Channel.Rgba));
+            Assert.IsTrue(Colors.Black.Equals(colors[0], Color.Channel.Rgba));
+            Assert.IsTrue(Colors.Black.Equals(colors[3], Color.Channel.Rgba));
 
             // white changes to gray
             var gray = new Color(0.5f, 0.5f, 0.5f, 1.0f).ToSrgb();
