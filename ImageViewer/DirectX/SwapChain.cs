@@ -16,9 +16,21 @@ namespace ImageViewer.DirectX
         private readonly int bufferCount = 2;
         private readonly SwapChainFlags flags = SwapChainFlags.None;
         private RenderTargetView curView;
+        private Texture2D curTarget;
+        private Direct2D curDraw;
 
         public int Width { get; private set; }
         public int Height { get; private set; }
+
+        // retrieves current direct2D draw surface
+        public Direct2D Draw
+        {
+            get
+            {
+                Debug.Assert(curTarget != null);
+                return curDraw ?? (curDraw = new Direct2D(curTarget));
+            }
+        }
 
         public SwapChain(IntPtr hwnd, int width, int height)
         {
@@ -65,11 +77,10 @@ namespace ImageViewer.DirectX
         public void BeginFrame()
         {
             Debug.Assert(curView == null);
+            Debug.Assert(curTarget == null);
 
-            using (var backBuffer = chain.GetBackBuffer<Texture2D>(0))
-            {
-                curView = new RenderTargetView(ImageFramework.DirectX.Device.Get().Handle, backBuffer);
-            }
+            curTarget = chain.GetBackBuffer<Texture2D>(0);
+            curView = new RenderTargetView(ImageFramework.DirectX.Device.Get().Handle, curTarget);
         }
 
         public void EndFrame()
@@ -77,6 +88,10 @@ namespace ImageViewer.DirectX
             chain.Present(1, PresentFlags.None);
             curView?.Dispose();
             curView = null;
+            curDraw?.Dispose();
+            curDraw = null;
+            curTarget?.Dispose();
+            curTarget = null;
         }
 
         public void Dispose()

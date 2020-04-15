@@ -32,7 +32,8 @@ namespace ImageFramework.DirectX
         private static Device instance = new Device();
         private Device()
         {
-            DeviceCreationFlags flags = DeviceCreationFlags.DisableGpuTimeout;
+            DeviceCreationFlags flags = DeviceCreationFlags.DisableGpuTimeout
+                 | DeviceCreationFlags.BgraSupport;
 #if DEBUG
             flags |= DeviceCreationFlags.Debug;
 #endif

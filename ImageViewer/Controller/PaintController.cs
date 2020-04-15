@@ -28,7 +28,6 @@ namespace ImageViewer.Controller
     {
         private readonly ModelsEx models;
         private readonly ViewModeController viewMode;
-        private SwapChain swapChain = null;
         private bool scheduledRedraw = false;
         private RawColor4 clearColor;
         private readonly AdvancedGpuTimer gpuTimer;
@@ -51,8 +50,6 @@ namespace ImageViewer.Controller
             {
                 pipe.PropertyChanged += PipeOnPropertyChanged;
             }
-
-            models.Window.Window.Loaded += WindowOnLoaded;
 
             // clear color
             var col = models.Window.ThemeColor;
@@ -94,15 +91,6 @@ namespace ImageViewer.Controller
             }
         }
 
-        private void WindowOnLoaded(object sender, RoutedEventArgs e)
-        {
-            var adapter = new SwapChainAdapter(models.Window.Window.BorderHost);
-            models.Window.Window.BorderHost.Child = adapter;
-            swapChain = adapter.SwapChain;
-
-            swapChain.Resize(models.Window.ClientSize.Width, models.Window.ClientSize.Height);
-        }
-
         /// <summary>
         /// the frame will be redrawn as soon as possible
         /// </summary>
@@ -121,6 +109,7 @@ namespace ImageViewer.Controller
         private void OnRepaint()
         {
             scheduledRedraw = false;
+            var swapChain = models.Window.SwapChain;
             if (swapChain == null || swapChain.IsDisposed) return;
 
             var timerStarted = false;
@@ -199,7 +188,6 @@ namespace ImageViewer.Controller
         public void Dispose()
         {
             viewMode?.Dispose();
-            swapChain?.Dispose();
             gpuTimer?.Dispose();
         }
     }

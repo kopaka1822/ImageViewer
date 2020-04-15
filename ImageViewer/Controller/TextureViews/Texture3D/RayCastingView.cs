@@ -58,6 +58,11 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             }
 
             dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
+
+            var draw = models.Window.SwapChain.Draw;
+
+
+            
         }
 
         private Matrix GetWorldToImage()

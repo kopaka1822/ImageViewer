@@ -71,6 +71,7 @@ namespace ImageViewer.Models
             ViewData?.Dispose();
             paintController?.Dispose();
             Display?.Dispose();
+            Window?.Dispose();
             base.Dispose();
         }
     }
