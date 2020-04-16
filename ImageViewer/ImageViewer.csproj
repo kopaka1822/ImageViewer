@@ -150,9 +150,6 @@
     <Compile Include="Models\Display\IDisplayOverlay.cs" />
     <Compile Include="Models\Display\RayCastingDisplayModel.cs" />
     <Compile Include="Models\Display\Single3DDisplayModel.cs" />
-    <Compile Include="Models\Drawing\CapsuleShader.cs" />
-    <Compile Include="Models\Drawing\CircleShader.cs" />
-    <Compile Include="Models\Drawing\DrawingModel.cs" />
     <Compile Include="Models\ExportConfigModel.cs" />
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Models\Settings\DisplayConfig.cs" />
