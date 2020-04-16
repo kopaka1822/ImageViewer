@@ -105,6 +105,23 @@ namespace ImageViewer.DirectX
                     round ? Direct2D.core.RoundStroke : Direct2D.core.HardStroke);
             }
 
+            /// <summary>
+            /// transforms the screen space coordinates into a canonical coordinate system [-1, 1] with y up
+            /// </summary>
+            /// <param name="start">screen space start</param>
+            /// <param name="end">screen space end</param>
+            /// <returns>canonical transform</returns>
+            public Transform SetCanonical(Float2 start, Float2 end)
+            {
+                RawMatrix3x2 t = new RawMatrix3x2(
+                    (end.X - start.X) * 0.5f, 0.0f, // column 1
+                    0.0f, -(end.Y - start.Y) * 0.5f, // column 2
+                    (end.X - start.X) * 0.5f + start.X, (end.Y - start.Y) * 0.5f + start.Y // column 3
+                );
+
+                return new Transform(parent, t);
+            }
+
             public void Dispose()
             {
                 parent.target.EndDraw();
@@ -161,5 +178,25 @@ namespace ImageViewer.DirectX
             }
             target?.Dispose();
         }
+
+        // utility classes
+        public class Transform : IDisposable
+        {
+            private readonly Direct2D parent;
+            private readonly RawMatrix3x2 original;
+
+            public Transform(Direct2D parent, RawMatrix3x2 transform)
+            {
+                this.parent = parent;
+                original = parent.target.Transform;
+                parent.target.Transform = transform;
+            }
+
+            public void Dispose()
+            {
+                parent.target.Transform = original;
+            }
+        }
+
     }
 }

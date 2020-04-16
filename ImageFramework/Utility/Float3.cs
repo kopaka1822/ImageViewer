@@ -116,6 +116,11 @@ namespace ImageFramework.Utility
             return new Float3(left.X - right.X, left.Y - right.Y, left.Z - right.Z);
         }
 
+        public static Float3 operator -(Float3 v)
+        {
+            return new Float3(-v.X, -v.Y, -v.Z);
+        }
+
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;

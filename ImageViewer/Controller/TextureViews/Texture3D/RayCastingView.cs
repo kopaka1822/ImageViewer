@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Utility;
+using ImageViewer.Controller.TextureViews.Overlays;
 using ImageViewer.Controller.TextureViews.Shader;
 using ImageViewer.Controller.TextureViews.Shared;
 using ImageViewer.Models;
@@ -28,6 +29,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         private readonly EmptySpaceSkippingShader emptySpaceSkippingShader;
         private RayCastingDisplayModel displayEx;
         private Texture3D[] helpTextures;
+
 
         public RayCastingView(ModelsEx models) : base(models)
         {
@@ -60,14 +62,21 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
 
             dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
 
-            /*using (var draw = models.Window.SwapChain.Draw.Begin())
+            using (var draw = models.Window.SwapChain.Draw.Begin())
             {
-                draw.FillRectangle(Float2.Zero, new Float2(100.0f), Colors.Red);
-
-                draw.FillCircle(new Float2(50.0f), 50.0f, Colors.Green);
-
-                draw.Line(Float2.Zero, new Float2(100.0f), 10.0f, Colors.Blue, false);
-            }*/
+                using (var t = draw.SetCanonical(new Float2(20.0f), new Float2(220.0f)))
+                {
+                    var rot = GetRotation();
+                    Sphere3DOverlay.Draw(draw,
+                          /*new Float3(rot.M11, rot.M12, rot.M13), 
+                          new Float3(rot.M21, rot.M22, rot.M23), 
+                          new Float3(rot.M31, rot.M32, rot.M33)*/
+                          new Float3(rot.M11, rot.M21, rot.M31),
+                          new Float3(rot.M12, rot.M22, rot.M32),
+                          new Float3(rot.M13, rot.M23, rot.M33)
+                    );
+                }
+            }
         }
 
         private Matrix GetWorldToImage()
