@@ -23,9 +23,14 @@ namespace ImageViewer.Controller.TextureViews.Overlays
         {
             draw.FillCircle(Float2.Zero, 1.0f, new Color(0.5f));
 
-            // z and y is reversed in this viewer
+            // flip y
             y = -y;
             z = -z;
+            x = -x;
+
+            x.X = -x.X;
+            y.X = -y.X;
+            z.X = -z.X;
 
             var draws = new List<Drawable>
             {

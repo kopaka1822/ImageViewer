@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -292,7 +293,8 @@ namespace ImageViewer.Controller
                                 currentView = new RayCastingView(models);
                                 break;
                             case DisplayModel.ViewMode.ShearWarp:
-                                currentView = new ShearWarpView(models);
+                                Debug.Assert(false);
+                                //currentView = new ShearWarpView(models);
                                 break;
                             default:
                                 currentView = new EmptyView();

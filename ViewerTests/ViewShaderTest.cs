@@ -36,7 +36,7 @@ namespace ViewerTests
         [TestMethod]
         public void RayCastingCompile()
         {
-            var ray = new RayCastingShader(null);
+            var ray = new SmoothVolumeShader(null);
         }
 
         [TestMethod]

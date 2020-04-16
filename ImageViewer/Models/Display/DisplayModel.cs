@@ -261,6 +261,8 @@ namespace ImageViewer.Models.Display
             }
         }
 
+        public float ClientAspectRatioScalar => clientAspectRatio.M11;
+
         private int activeLayer = 0;
         public int ActiveLayer
         {
