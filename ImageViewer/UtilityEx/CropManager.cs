@@ -86,11 +86,24 @@ namespace ImageViewer.UtilityEx
                 this.size = models.Images.Size;
                 this.models = models;
                 parent.PropertyChanged += ParentOnPropertyChanged;
+                models.Settings.PropertyChanged += SettingsOnPropertyChanged;
+            }
+
+            private void SettingsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+            {
+                switch (e.PropertyName)
+                {
+                    case nameof(SettingsModel.FlipYAxis):
+                        OnPropertyChanged(nameof(CropStartY));
+                        OnPropertyChanged(nameof(CropEndY));
+                        break;
+                }
             }
 
             public void Dispose()
             {
                 parent.PropertyChanged -= ParentOnPropertyChanged;
+                models.Settings.PropertyChanged -= SettingsOnPropertyChanged;
             }
 
             private void ParentOnPropertyChanged(object sender, PropertyChangedEventArgs e)

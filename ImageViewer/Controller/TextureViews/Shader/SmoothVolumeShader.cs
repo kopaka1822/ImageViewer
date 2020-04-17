@@ -103,7 +103,7 @@ float4 main(PixelIn i) : SV_TARGET {{
     float3 ray = unitRay / stepsize;
 
     float3 pos;    
-    if(!getIntersection(origin, ray, fsize, pos)) return color;
+    if(!getIntersection(origin, ray, pos)) return color;
 
     // convert from pixel coordinates to texel ([0, 1])
     float3 invSize = 1 / fsize;    
@@ -115,7 +115,7 @@ float4 main(PixelIn i) : SV_TARGET {{
         //skip empty space
         pos += max(int(emptySpaceTex[clamp(int3(pos), 0, size-1)]) - 1, 0) * unitRay;
 
-        if(!isInside(pos, fsize)) break;
+        if(!isInside(pos)) break;
 
         float4 s = tex.SampleLevel(texSampler, pos * invSize, 0);
 

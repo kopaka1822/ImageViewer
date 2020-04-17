@@ -42,6 +42,21 @@ namespace ImageViewer.Models.Display
             }
         }
 
+        private bool useCropping = false;
+
+        public bool UseCropping
+        {
+            get => useCropping;
+            set
+            {
+                if (value == useCropping) return;
+                useCropping = value;
+                OnPropertyChanged(nameof(UseCropping));
+            }
+        }
+
+
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 

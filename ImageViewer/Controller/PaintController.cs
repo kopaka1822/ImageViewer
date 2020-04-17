@@ -41,6 +41,7 @@ namespace ImageViewer.Controller
             models.Display.PropertyChanged += DisplayOnPropertyChanged;
             models.Window.PropertyChanged += WindowOnPropertyChanged;
             models.Overlay.PropertyChanged += OverlayOnPropertyChanged;
+            models.ExportConfig.PropertyChanged += ExportConfigOnPropertyChanged;
 
             // client mouse events
             models.Window.Window.BorderHost.PreviewMouseMove += (sender, e) => ScheduleRedraw();
@@ -57,6 +58,20 @@ namespace ImageViewer.Controller
             clearColor.G = col.Green;
             clearColor.B = col.Blue;
             clearColor.A = 1.0f;
+        }
+
+        private void ExportConfigOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ExportConfigModel.CropStart):
+                case nameof(ExportConfigModel.CropEnd):
+                case nameof(ExportConfigModel.UseCropping):
+                case nameof(ExportConfigModel.Layer):
+                case nameof(ExportConfigModel.Mipmap):
+                    ScheduleRedraw();
+                    break;
+            }
         }
 
         private void OverlayOnPropertyChanged(object sender, PropertyChangedEventArgs e)

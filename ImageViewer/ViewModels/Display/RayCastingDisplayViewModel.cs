@@ -70,6 +70,9 @@ namespace ImageViewer.ViewModels.Display
                 case nameof(RayCastingDisplayModel.FlatShading):
                     OnPropertyChanged(nameof(FlatShading));
                     break;
+                case nameof(RayCastingDisplayModel.UseCropping):
+                    OnPropertyChanged(nameof(UseCropping));
+                    break;
             }
         }
 
@@ -81,17 +84,10 @@ namespace ImageViewer.ViewModels.Display
 
         public bool FlatIsEnabled => !models.Display.LinearInterpolation;
 
-        private bool useCropping = false;
-
         public bool UseCropping
         {
-            get => useCropping;
-            set
-            {
-                if (value == useCropping) return;
-                useCropping = value;
-                OnPropertyChanged(nameof(UseCropping));
-            }
+            get => displayViewEx.UseCropping;
+            set => displayViewEx.UseCropping = value;
         }
 
         public CropManager.ViewModel Crop { get; private set; }

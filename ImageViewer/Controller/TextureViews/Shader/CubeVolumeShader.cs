@@ -107,7 +107,7 @@ float4 main(PixelIn i) : SV_TARGET {{
     float3 ray = normalize(i.rayDir);    
 
     float3 pos;    
-    if(!getIntersection(origin, ray, fsize, pos)) return color;
+    if(!getIntersection(origin, ray, pos)) return color;
     
     int3 dirSign; 
     dirSign.x = ray.x < 0.0f ? -1 : 1;
@@ -138,13 +138,13 @@ float4 main(PixelIn i) : SV_TARGET {{
 
     float diffuse = 1;
     if(useFlatShading){{
-        if(pos.x == fsize.x || pos.x == 0){{
+        if(intPos.x == cubeStart.x || intPos.x == cubeEnd.x){{
          diffuse = absRay.x;
         }}
-        if(pos.y == fsize.y || pos.y == 0){{
+        if(intPos.y == cubeStart.y || intPos.y == cubeEnd.y){{
          diffuse = absRay.y;
         }}
-        if(pos.z == fsize.z || pos.z == 0){{
+        if(intPos.z == cubeStart.z || intPos.z == cubeEnd.z){{
          diffuse = absRay.z;
         }}
     }}
@@ -183,7 +183,7 @@ float4 main(PixelIn i) : SV_TARGET {{
             }}    
         }}
 
-    }} while(isInside(intPos, size) && color.a > 0.0);
+    }} while(isInside(intPos) && color.a > 0.0);
 
 
     {ApplyColorTransform()}
