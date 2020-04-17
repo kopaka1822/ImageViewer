@@ -123,9 +123,10 @@
     <Compile Include="Controller\PaintController.cs" />
     <Compile Include="Controller\TextureViews\Overlays\Sphere3DOverlay.cs" />
     <Compile Include="Controller\TextureViews\Shader\EmptySpaceSkippingShader.cs" />
-    <Compile Include="Controller\TextureViews\Shader\RayMarchingShader.cs" />
+    <Compile Include="Controller\TextureViews\Shader\CubeVolumeShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\SmoothVolumeShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\ShearWarpShader.cs" />
+    <Compile Include="Controller\TextureViews\Shader\VolumeShader.cs" />
     <Compile Include="Controller\TextureViews\Texture2D\CubeCrossTextureView.cs" />
     <Compile Include="Controller\TextureViews\Texture2D\CubeTextureView.cs" />
     <Compile Include="Controller\TextureViews\EmptyView.cs" />

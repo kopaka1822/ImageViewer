@@ -14,20 +14,12 @@ using Device = ImageFramework.DirectX.Device;
 
 namespace ImageViewer.Controller.TextureViews.Shader
 {
-    public class SmoothVolumeShader : ViewShader
+    public class SmoothVolumeShader : VolumeShader
     {
-        struct BufferData
-        {
-            public CommonBufferData Common;
-            public Matrix Transform;
-            public Vector3 Origin;
-            public float Aspect; // aspect ratio
-        }
-
         private readonly SamplerState sampler;
 
         public SmoothVolumeShader(ModelsEx models) 
-            : base(models, GetVertexSource(), GetPixelSource(), "SmoothVolumeShader")
+            : base(models, GetPixelSource(), "SmoothVolumeShader")
         {
             sampler = new SamplerState(Device.Get().Handle, new SamplerStateDescription
             {
@@ -57,17 +49,8 @@ namespace ImageViewer.Controller.TextureViews.Shader
         /// <param name="emptySpaceTex"></param>
         public void Run(Matrix transform, float screenAspect, ShaderResourceView texture, ShaderResourceView emptySpaceTex)
         {
-            var zero = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
-            Vector4.Transform(ref zero, ref transform, out var origin);
-            
             var v = models.ViewData;
-            v.Buffer.SetData(new BufferData
-            {
-                Common = GetCommonData(null),
-                Transform = transform,
-                Origin = new Vector3(origin.X, origin.Y, origin.Z),
-                Aspect = screenAspect
-            });
+            v.Buffer.SetData(GetCommonData(transform, screenAspect));
 
             var dev = Device.Get();
             BindShader(dev);
@@ -87,42 +70,6 @@ namespace ImageViewer.Controller.TextureViews.Shader
             UnbindShader(dev);
         }
 
-        private static string ConstantBuffer()
-        {
-            return $@"
-cbuffer InfoBuffer : register(b0) {{
-    {CommonShaderBufferData()}
-    matrix transform; // camera rotation
-    float3 origin; // camera origin
-    float aspect;
-}};
-";
-        }
-
-        private static string GetVertexSource()
-        {
-            return $@"
-struct VertexOut {{
-    float4 projPos : SV_POSITION;
-    float3 rayDir : RAYDIR;
-}};
-
-{ConstantBuffer()}
-
-VertexOut main(uint id : SV_VertexID) {{
-    VertexOut o;
-    float2 canonical = float2(((id << 1) & 2) / 2, (id & 2) / 2);
-    canonical = canonical * float2(2, -2) + float2(-1, 1);
-
-    o.projPos = float4(canonical, 0, 1);
-
-    o.rayDir = mul((float3x3)(transform), normalize(float3(canonical.x * aspect, -canonical.y, 1.0)));    
-
-    return o;
-}}
-";
-        }
-
         private static string GetPixelSource()
         {
             return $@"
@@ -130,77 +77,14 @@ Texture3D<float4> tex : register(t0);
 Texture3D<uint> emptySpaceTex : register(t1);
 SamplerState texSampler : register(s0);
 
-{ConstantBuffer()}
+cbuffer InfoBuffer : register(b0) {{
+    {CommonShaderBufferData()}
+}};
 {Utility.ToSrgbFunction()}
 
-struct PixelIn {{
-    float4 projPos : SV_POSITION;
-    float3 rayDir : RAYDIR;
-}};
+{PixelInStruct()}
 
-bool isInside(float3 pos, float3 size) {{
-    [unroll] for(int i = 0; i < 3; ++i) {{
-        if(pos[i] < 0.0 || pos[i] > size[i]) return false;
-    }}
-    return true;
-}}
-
-bool getIntersection(float3 origin, float3 dir, float3 size, out float3 intersect) {{
-    intersect = origin;
-    
-    const int RIGHT = 0;
-    const int LEFT = 1;
-    const int MIDDLE = 2;
-    int3 quadrant = 0;
-    float3 candidatePlane = 0;
-    bool inside = true;
-    
-    // find candidate planes
-    [unroll] for(int i = 0; i < 3; ++i) {{
-        if(origin[i] < 0.0) {{
-            quadrant[i] = LEFT;
-            candidatePlane[i] = 0.0;
-            inside = false;
-        }} else if(origin[i] > size[i]) {{
-            quadrant[i] = RIGHT;    
-            candidatePlane[i] = size[i];
-            inside = false;
-        }}
-        else quadrant[i] = MIDDLE;
-    }}
-
-    if(inside) return true;
-
-    // calculate t distances to candidate planes
-    float3 maxT = -1.0;
-    [unroll] for(i = 0; i < 3; ++i) {{
-        if(quadrant[i] != MIDDLE && dir[i] != 0.0)
-            maxT[i] = (candidatePlane[i]-origin[i]) / dir[i];
-    }}
-
-    // get largest maxT for final choice of intersection
-    int whichPlane = 0;
-    float maxTPlane = maxT[0];
-    [unroll] for(i = 1; i < 3; ++i) {{
-        if(maxTPlane < maxT[i]){{
-            whichPlane = i;
-            maxTPlane = maxT[i];
-        }}
-    }}
-    
-    // check final candidate actually inside box
-    if(maxTPlane < 0.0) return false;
-    
-    [unroll] for(i = 0; i < 3; ++i) {{
-        if(i != whichPlane) {{
-            intersect[i] =  origin[i] + maxTPlane * dir[i];
-            if(intersect[i] < 0.0 || intersect[i] > size[i]) return false;
-        }} else 
-            intersect[i] = candidatePlane[i];
-    }}
-
-    return true;
-}}
+{CommonShaderFunctions()}
 
 float4 main(PixelIn i) : SV_TARGET {{
     float4 color = 0.0;

@@ -42,7 +42,7 @@ namespace ViewerTests
         [TestMethod]
         public void RayMarchingCompile()
         {
-            var ray = new RayMarchingShader(null);
+            var ray = new CubeVolumeShader(null);
         }
 
         [TestMethod]

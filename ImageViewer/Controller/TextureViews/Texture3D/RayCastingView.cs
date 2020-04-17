@@ -25,7 +25,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
     {
 
         private readonly SmoothVolumeShader smooth;
-        //private readonly RayMarchingShader marchingShader;
+        private readonly CubeVolumeShader cube;
         private readonly EmptySpaceSkippingShader emptySpaceSkippingShader;
         private RayCastingDisplayModel displayEx;
         private Texture3D[] helpTextures;
@@ -34,7 +34,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         public RayCastingView(ModelsEx models) : base(models)
         {
             smooth = new SmoothVolumeShader(models);
-            //marchingShader = new RayMarchingShader(models);
+            cube = new CubeVolumeShader(models);
             emptySpaceSkippingShader = new EmptySpaceSkippingShader();
             displayEx = (RayCastingDisplayModel)models.Display.ExtendedViewData;
             helpTextures = new Texture3D[models.NumPipelines];
@@ -48,17 +48,17 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
 
             var dev = Device.Get();
             dev.OutputMerger.BlendState = models.ViewData.AlphaDarkenState;
-
-            //if (models.Display.LinearInterpolation)
+            
+            if (models.Display.LinearInterpolation)
             {
                 smooth.Run(GetWorldToImage(), models.Display.ClientAspectRatioScalar, 
                 texture.GetSrView(models.Display.ActiveLayerMipmap), helpTextures[id].GetSrView(models.Display.ActiveMipmap));
             }
-            /*else
+            else
             {
-                marchingShader.Run(models.Display.ClientAspectRatio, GetWorldToImage(), CalcFarplane(),
+                cube.Run(GetWorldToImage(), models.Display.ClientAspectRatioScalar,
                 displayEx.FlatShading, texture.GetSrView(models.Display.ActiveLayerMipmap), helpTextures[id].GetSrView(models.Display.ActiveMipmap));
-            }*/
+            }
 
             dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
 
@@ -70,9 +70,6 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
 
 
                     Sphere3DOverlay.Draw(draw,
-                          /*new Float3(rot.M11, rot.M12, rot.M13), 
-                          new Float3(rot.M21, rot.M22, rot.M23), 
-                          new Float3(rot.M31, rot.M32, rot.M33)*/
                           new Float3(rot.M11, rot.M21, rot.M31),
                           new Float3(rot.M12, rot.M22, rot.M32),
                           new Float3(rot.M13, rot.M23, rot.M33)
@@ -90,15 +87,6 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
                 Matrix.Translation(center.X, center.Y, center.Z) * // to cube center
                 GetRotation() * // rotate
                 Matrix.Translation(size.X * 0.5f, size.Y * 0.5f, size.Z * 0.5f); // to cube origin
-
-            /*float aspectX = models.Images.Size.X / (float)models.Images.Size.Y;
-            float aspectZ = models.Images.Size.Z / (float)models.Images.Size.Y;
-
-            return
-                Matrix.Translation(-cubeOffsetX, -cubeOffsetY, -GetCubeCenter()) * // translate cube center to origin
-                GetRotation() * // undo rotation
-                Matrix.Scaling(0.5f * aspectX, 0.5f, 0.5f * aspectZ) * // scale to [-0.5, 0.5]
-                Matrix.Translation(0.5f, 0.5f, 0.5f); // move to [0, 1]*/
         }
 
         public override Size3 GetTexelPosition(Vector2 mouse)
@@ -109,7 +97,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         public override void Dispose()
         {
             smooth?.Dispose();
-            //marchingShader?.Dispose();
+            cube?.Dispose();
             emptySpaceSkippingShader?.Dispose();
             foreach (var tex in helpTextures)
             {
