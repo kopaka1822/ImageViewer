@@ -31,12 +31,12 @@ namespace ImageViewer.Controller.TextureViews.Shader
         {
             sampler = new SamplerState(Device.Get().Handle, new SamplerStateDescription
             {
-                //AddressU = TextureAddressMode.Border,
-                //AddressV = TextureAddressMode.Border,
-                //AddressW = TextureAddressMode.Border,
-                AddressU = TextureAddressMode.Clamp,
-                AddressV = TextureAddressMode.Clamp,
-                AddressW = TextureAddressMode.Clamp,
+                AddressU = TextureAddressMode.Border,
+                AddressV = TextureAddressMode.Border,
+                AddressW = TextureAddressMode.Border,
+                //AddressU = TextureAddressMode.Clamp,
+                //AddressV = TextureAddressMode.Clamp,
+                //AddressW = TextureAddressMode.Clamp,
                 Filter = Filter.MinMagMipLinear,
                 BorderColor = new RawColor4(0.0f, 0.0f, 0.0f, 0.0f),
             });
@@ -138,9 +138,9 @@ struct PixelIn {{
     float3 rayDir : RAYDIR;
 }};
 
-bool isInside(float3 pos) {{
+bool isInside(float3 pos, float3 size) {{
     [unroll] for(int i = 0; i < 3; ++i) {{
-        if(pos[i] < 0.0 || pos[i] > 1.0) return false;
+        if(pos[i] < 0.0 || pos[i] > size[i]) return false;
     }}
     return true;
 }}
@@ -206,37 +206,42 @@ float4 main(PixelIn i) : SV_TARGET {{
     float4 color = 0.0;
     color.a = 1.0; // transmittance
 
-    uint width, height, depth;
+    int width, height, depth;
     tex.GetDimensions(width, height, depth);
-    uint3 size = uint3(width, height, depth);
+    int3 size = uint3(width, height, depth);
     float3 fsize = float3(size);    
 
     // the height of the cube is 2.0 in world space. Width and Depth depend on aspect of height
     const float stepsize = 4.0;
-    float3 ray = normalize(i.rayDir) / stepsize;
+    const float invStepsize = 1.0 / stepsize;
+
+    float3 unitRay = normalize(i.rayDir);
+    float3 ray = unitRay / stepsize;
 
     float3 pos;    
     if(!getIntersection(origin, ray, fsize, pos)) return color;
 
     // convert from pixel coordinates to texel ([0, 1])
     float3 invSize = 1 / fsize;    
-
+    
+    float skipped = 0.0;
     [loop] do{{
         float3 pos2 = float3(pos.xy,1-pos.z);
 
         //skip empty space
-        //pos += max(emptySpaceTex[min(size-1,size*pos2)] ,0) * unDividedRay;
+        pos += max(int(emptySpaceTex[clamp(int3(pos), 0, size-1)]) - 1, 0) * unitRay;
 
-       
+        if(!isInside(pos, fsize)) break;
+
         float4 s = tex.SampleLevel(texSampler, pos * invSize, 0);
 
-        float invAlpha = pow(max(1.0 - s.a, 0.0), 1.0 / stepsize);
+        float invAlpha = pow(max(1.0 - s.a, 0.0), invStepsize);
         float alpha = 1.0 - invAlpha;
         color.rgb += color.a * alpha * s.rgb;
         color.a *= invAlpha;
         
         pos += ray;
-    }} while(isInside(pos) && color.a > 0.0);
+    }} while(color.a > 0.0);
    
     {ApplyColorTransform()}
     return toSrgb(color);
