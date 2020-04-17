@@ -124,6 +124,23 @@ namespace ImageViewer.Models.Display
                 OnPropertyChanged(nameof(Zoom));
             }
         }
+
+        /// <summary>
+        /// sets the next best zoom point that is smaller or equal to the desired value
+        /// </summary>
+        /// <param name="desired"></param>
+        public void SetClosestZoomPoint(float desired)
+        {
+            var best = desired;
+            foreach (var z in ZOOM_POINTS)
+            {
+                if (z > desired) break;
+                best = z;
+            }
+
+            Zoom = best;
+        }
+
         public void IncreaseZoom()
         {
             // Get the first number larger than zoom
