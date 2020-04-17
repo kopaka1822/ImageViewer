@@ -4,9 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImageViewer.Views.Display"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="300">
-    <Border Padding="5">
+             d:DesignHeight="450" d:DesignWidth="200">
+    <StackPanel Margin="5">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -26,5 +27,69 @@
                 IsEnabled="{Binding FlatIsEnabled}"
                 Margin="{StaticResource DefaultBorderBottom}"/>
         </Grid>
-    </Border>
+
+        <!-- Slice -->
+        <GroupBox Margin="{StaticResource DefaultBorderBottom}"
+                          Padding="{StaticResource DefaultBorderTop}">
+            <GroupBox.Header>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Slice:" Margin="{StaticResource DefaultBorderRight}" HorizontalAlignment="Center"/>
+                    <CheckBox 
+                                HorizontalAlignment="Center"
+                                IsChecked="{Binding UseCropping}"/>
+                </StackPanel>
+            </GroupBox.Header>
+            <StackPanel 
+                HorizontalAlignment="Center"
+                Visibility="{Binding UseCropping, Converter={StaticResource VisibleCollapsedConverter}}">
+                <StackPanel 
+                            Orientation="Horizontal"
+                            Margin="{StaticResource DefaultBorderBottom}">
+                    <TextBlock Text="X from:" Margin="{StaticResource DefaultBorderRight}"/>
+                    <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="{StaticResource DefaultBorderRight}"
+                                Value="{Binding CropStartX}"/>
+                    <TextBlock Text="to:" Margin="{StaticResource DefaultBorderRight}"/>
+                    <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Value="{Binding CropEndX}"/>
+                </StackPanel>
+                <StackPanel
+                            Orientation="Horizontal"
+                            Margin="{StaticResource DefaultBorderBottom}">
+                    <TextBlock Text="Y from:" Margin="{StaticResource DefaultBorderRight}"/>
+                    <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="{StaticResource DefaultBorderRight}"
+                                Value="{Binding CropStartY}"/>
+                    <TextBlock Text="to:" Margin="{StaticResource DefaultBorderRight}"/>
+                    <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="{StaticResource DefaultBorderRight}"
+                                Value="{Binding CropEndY}"/>
+                </StackPanel>
+                <StackPanel
+                            Visibility="{Binding ZCropVisibility}"
+                            Orientation="Horizontal">
+                    <TextBlock Text="Z from:" Margin="{StaticResource DefaultBorderRight}"/>
+                    <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="{StaticResource DefaultBorderRight}"
+                                Value="{Binding CropStartZ}"/>
+                    <TextBlock Text="to:" Margin="{StaticResource DefaultBorderRight}"/>
+                    <xctk:IntegerUpDown
+                                Width="80"
+                                IsEnabled="{Binding UseCropping}"
+                                Value="{Binding CropEndZ}"/>
+                </StackPanel>
+            </StackPanel>
+
+        </GroupBox>
+    </StackPanel>
 </UserControl>

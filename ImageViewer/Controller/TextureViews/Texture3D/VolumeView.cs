@@ -71,8 +71,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
                     Sphere3DOverlay.Draw(draw,
                           new Float3(rot.M11, rot.M21, rot.M31),
                           new Float3(rot.M12, rot.M22, rot.M32),
-                          new Float3(rot.M13, rot.M23, rot.M33)
-                    );
+                          new Float3(rot.M13, rot.M23, rot.M33), models.Settings.FlipYAxis);
                 }
             }
         }

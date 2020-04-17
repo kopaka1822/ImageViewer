@@ -90,6 +90,10 @@ cbuffer InfoBuffer : register(b0) {{
 
 {CommonShaderFunctions()}
 
+float getFlatShading(float factor) {{
+    return 0.7 + 0.3 * factor;
+}}
+
 float4 main(PixelIn i) : SV_TARGET {{
     float4 color = 0.0;
     color.a = 1.0; // transmittance    
@@ -127,6 +131,11 @@ float4 main(PixelIn i) : SV_TARGET {{
     //float3 distance = voxelPos - rayPos;
 
     //dot(normal,absDir) for first intersection with bounding box
+    // adjust values for flat shading
+    absRay.x = getFlatShading(absRay.x);
+    absRay.y = getFlatShading(absRay.y);
+    absRay.z = getFlatShading(absRay.z);
+
     float diffuse = 1;
     if(useFlatShading){{
         if(pos.x == fsize.x || pos.x == 0){{

@@ -19,11 +19,12 @@ namespace ImageViewer.Controller.TextureViews.Overlays
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="z"></param>
-        public static void Draw(Direct2D.Context draw, Float3 x, Float3 y, Float3 z)
+        /// <param name="flipY"></param>
+        public static void Draw(Direct2D.Context draw, Float3 x, Float3 y, Float3 z, bool flipY)
         {
             draw.FillCircle(Float2.Zero, 1.0f, new Color(0.5f));
 
-            // flip y
+            // do some coordinate shuffling because of weird coordinate systems
             y = -y;
             z = -z;
             x = -x;
@@ -31,6 +32,8 @@ namespace ImageViewer.Controller.TextureViews.Overlays
             x.X = -x.X;
             y.X = -y.X;
             z.X = -z.X;
+
+            if (flipY) y = -y;
 
             var draws = new List<Drawable>
             {
@@ -77,9 +80,12 @@ namespace ImageViewer.Controller.TextureViews.Overlays
 
             public void Draw(Direct2D.Context draw)
             {
+                float labelThreshold = -0.05f;
+                var lineColor = new Color(color.Red * 0.7f, color.Green * 0.7f, color.Blue * 0.7f);
+
                 var center = vector.XY * radius;
-                if (label != null)
-                    draw.Line(Float2.Zero, center, stroke, color);
+                if (label != null && vector.Z >= labelThreshold)
+                    draw.Line(Float2.Zero, center, stroke, lineColor);
                 
                 draw.FillCircle(center, circleRadius, color);
 
@@ -107,6 +113,9 @@ namespace ImageViewer.Controller.TextureViews.Overlays
                         draw.Line(bl, br, textStroke, Colors.Black);
                         break;
                 }
+
+                if (label != null && vector.Z <= labelThreshold)
+                    draw.Line(Float2.Zero, center, stroke, lineColor);
             }
 
             public int CompareTo(Drawable other)
