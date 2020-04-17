@@ -69,8 +69,18 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         // texture cube center in camera coordinate system
         protected Float3 GetCubeCenter()
         {
-            // TODO divide cube map by mipmap dimension
-            return new Float3(-cubeOffsetX, -cubeOffsetY, -0.5f * (models.Window.ClientSize.Height / models.Display.Zoom + models.Images.GetDepth(0)));
+            var size = models.Images.Size;
+            var curSize = size.GetMip(models.Display.ActiveMipmap);
+
+            var scaleX = (float)curSize.X / size.X;
+            var scaleY = (float) curSize.Y / size.Y;
+            var scaleZ = (float) curSize.Z / size.Z;
+
+            // distance from camera to the start of the cube
+            float fp = 0.5f * models.Window.ClientSize.Height / models.Display.Zoom * scaleY;
+
+
+            return new Float3(-cubeOffsetX * scaleX, -cubeOffsetY * scaleY, -fp - 0.5f * curSize.Z);
         }
 
         public abstract void Dispose();

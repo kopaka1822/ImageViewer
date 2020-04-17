@@ -140,7 +140,6 @@ float4 main(PixelIn i) : SV_TARGET {{
         }}
     }}
 
-    float skipped = 0.0;
     [loop] do{{
 
         float4 s = tex[intPos];
@@ -150,8 +149,7 @@ float4 main(PixelIn i) : SV_TARGET {{
         color.rgb += color.a * s.a * s.rgb * diffuse;
         color.a *= 1 - s.a;
 
-        int numIterations = max(emptySpaceTex[intPos], 1);
-        skipped += numIterations - 1;        
+        int numIterations = max(emptySpaceTex[intPos], 1);      
 
         while(numIterations-- != 0) {{
             if(distance.x < distance.y || distance.z < distance.y) {{
@@ -180,7 +178,6 @@ float4 main(PixelIn i) : SV_TARGET {{
 
 
     {ApplyColorTransform()}
-    color.r += skipped;
     return toSrgb(color);
 }}
 ";

@@ -34,7 +34,7 @@ namespace ImageViewer.Models.Display
             CubeMap,
             Polar,
             CubeCrossView,
-            RayCasting,
+            Volume,
             ShearWarp
         }
 
@@ -77,7 +77,7 @@ namespace ImageViewer.Models.Display
                 {
                     extendedView = new Single3DDisplayModel(models, this);
                 }
-                else if (ActiveView == ViewMode.RayCasting)
+                else if (ActiveView == ViewMode.Volume)
                 {
                     extendedView = new RayCastingDisplayModel(models, this);
                 }
@@ -430,9 +430,7 @@ namespace ImageViewer.Models.Display
                         }
                         else if(models.Images.ImageType == typeof(Texture3D))
                         {
-                            //modes.Insert(0, ViewMode.RayCasting);
-                            modes.Add(ViewMode.RayCasting);
-                            //modes.Insert(1, ViewMode.ShearWarp);
+                            modes.Insert(0, ViewMode.Volume);
                         }
 
                         AvailableViews = modes;
@@ -491,7 +489,7 @@ namespace ImageViewer.Models.Display
             switch (vm)
             {
                 case DisplayModel.ViewMode.CubeCrossView:
-                case DisplayModel.ViewMode.RayCasting:
+                case DisplayModel.ViewMode.Volume:
                 case DisplayModel.ViewMode.ShearWarp:
                 case DisplayModel.ViewMode.Single:
                 case DisplayModel.ViewMode.Empty:

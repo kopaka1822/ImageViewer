@@ -289,8 +289,8 @@ namespace ImageViewer.Controller
                             case DisplayModel.ViewMode.CubeCrossView:
                                 currentView = new CubeCrossTextureView(models);
                                 break;
-                            case DisplayModel.ViewMode.RayCasting:
-                                currentView = new RayCastingView(models);
+                            case DisplayModel.ViewMode.Volume:
+                                currentView = new VolumeView(models);
                                 break;
                             case DisplayModel.ViewMode.ShearWarp:
                                 Debug.Assert(false);

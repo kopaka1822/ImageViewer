@@ -18,7 +18,7 @@ using ImageViewer.ViewModels.Display;
 namespace ImageViewer.Views.Display
 {
     /// <summary>
-    /// Interaction logic for RayCastingView.xaml
+    /// Interaction logic for VolumeView.xaml
     /// </summary>
     public partial class RayCastingView : UserControl, IDisposable
     {
