@@ -50,12 +50,12 @@
                                 Width="80"
                                 IsEnabled="{Binding UseCropping}"
                                 Margin="{StaticResource DefaultBorderRight}"
-                                Value="{Binding CropStartX}"/>
+                                Value="{Binding Crop.CropStartX}"/>
                     <TextBlock Text="to:" Margin="{StaticResource DefaultBorderRight}"/>
                     <xctk:IntegerUpDown
                                 Width="80"
                                 IsEnabled="{Binding UseCropping}"
-                                Value="{Binding CropEndX}"/>
+                                Value="{Binding Crop.CropEndX}"/>
                 </StackPanel>
                 <StackPanel
                             Orientation="Horizontal"
@@ -65,13 +65,13 @@
                                 Width="80"
                                 IsEnabled="{Binding UseCropping}"
                                 Margin="{StaticResource DefaultBorderRight}"
-                                Value="{Binding CropStartY}"/>
+                                Value="{Binding Crop.CropStartY}"/>
                     <TextBlock Text="to:" Margin="{StaticResource DefaultBorderRight}"/>
                     <xctk:IntegerUpDown
                                 Width="80"
                                 IsEnabled="{Binding UseCropping}"
                                 Margin="{StaticResource DefaultBorderRight}"
-                                Value="{Binding CropEndY}"/>
+                                Value="{Binding Crop.CropEndY}"/>
                 </StackPanel>
                 <StackPanel
                             Visibility="{Binding ZCropVisibility}"
@@ -81,12 +81,12 @@
                                 Width="80"
                                 IsEnabled="{Binding UseCropping}"
                                 Margin="{StaticResource DefaultBorderRight}"
-                                Value="{Binding CropStartZ}"/>
+                                Value="{Binding Crop.CropStartZ}"/>
                     <TextBlock Text="to:" Margin="{StaticResource DefaultBorderRight}"/>
                     <xctk:IntegerUpDown
                                 Width="80"
                                 IsEnabled="{Binding UseCropping}"
-                                Value="{Binding CropEndZ}"/>
+                                Value="{Binding Crop.CropEndZ}"/>
                 </StackPanel>
             </StackPanel>
 

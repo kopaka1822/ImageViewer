@@ -6,8 +6,10 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Annotations;
+using ImageFramework.Model;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
+using ImageViewer.UtilityEx;
 
 namespace ImageViewer.ViewModels.Display
 {
@@ -23,11 +25,29 @@ namespace ImageViewer.ViewModels.Display
 
             displayViewEx.PropertyChanged += DisplayViewExOnPropertyChanged;
             models.Display.PropertyChanged += DisplayOnPropertyChanged;
+            models.Images.PropertyChanged += ImagesOnPropertyChanged;
+            Crop = models.ExportConfig.GetViewModel(models);
+            Crop.Mipmap = models.Display.ActiveMipmap;
+        }
+
+        private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ImagesModel.Size):
+                    // refresh crop thing
+                    Crop.Dispose();
+                    Crop = models.ExportConfig.GetViewModel(models);
+                    OnPropertyChanged(nameof(Crop));
+                    break;
+            }
         }
 
         public void Dispose()
         {
+            Crop.Dispose();
             models.Display.PropertyChanged -= DisplayOnPropertyChanged;
+            models.Images.PropertyChanged -= ImagesOnPropertyChanged;
         }
 
         private void DisplayOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -36,6 +56,9 @@ namespace ImageViewer.ViewModels.Display
             {
                 case nameof(DisplayModel.LinearInterpolation):
                     OnPropertyChanged(nameof(FlatIsEnabled));
+                    break;
+                case nameof(DisplayModel.ActiveMipmap):
+                    Crop.Mipmap = models.Display.ActiveMipmap;
                     break;
             }
         }
@@ -70,6 +93,8 @@ namespace ImageViewer.ViewModels.Display
                 OnPropertyChanged(nameof(UseCropping));
             }
         }
+
+        public CropManager.ViewModel Crop { get; private set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

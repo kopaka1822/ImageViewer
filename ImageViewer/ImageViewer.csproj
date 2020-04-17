@@ -162,6 +162,7 @@
     <Compile Include="Models\Settings\ZoomBoxConfig.cs" />
     <Compile Include="Models\StatisticModel.cs" />
     <Compile Include="UtilityEx\ColorExtension.cs" />
+    <Compile Include="UtilityEx\CropManager.cs" />
     <Compile Include="UtilityEx\PathManager.cs" />
     <Compile Include="ViewModels\Dialog\ExportConfigViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ExportViewModel.cs" />
