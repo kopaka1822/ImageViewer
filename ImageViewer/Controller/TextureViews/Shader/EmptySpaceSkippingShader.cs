@@ -111,6 +111,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
             endShader.Run(pong, helpTex, lm, uploadBuffer);
             pong?.Dispose();
+            syncQuery?.Dispose();
         }
 
         private void swapTextures(ref bool readHelpTex, ITexture helpTex, ITexture pong, LayerMipmapSlice lm)

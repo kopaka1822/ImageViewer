@@ -122,6 +122,7 @@
     <Compile Include="Controller\Overlays\ZoomBoxOverlay.cs" />
     <Compile Include="Controller\PaintController.cs" />
     <Compile Include="Controller\TextureViews\Overlays\Sphere3DOverlay.cs" />
+    <Compile Include="Controller\TextureViews\Shader\CubeSkippingShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\EmptySpaceSkippingShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\CubeVolumeShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\SmoothVolumeShader.cs" />
