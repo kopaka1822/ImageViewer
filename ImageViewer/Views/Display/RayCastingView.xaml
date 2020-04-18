@@ -74,7 +74,6 @@
                                 Value="{Binding Crop.CropEndY}"/>
                 </StackPanel>
                 <StackPanel
-                            Visibility="{Binding ZCropVisibility}"
                             Orientation="Horizontal">
                     <TextBlock Text="Z from:" Margin="{StaticResource DefaultBorderRight}"/>
                     <xctk:IntegerUpDown
