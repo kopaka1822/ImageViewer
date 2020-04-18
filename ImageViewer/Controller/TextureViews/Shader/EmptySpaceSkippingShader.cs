@@ -17,7 +17,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
     {
         private readonly ImageFramework.DirectX.Shader compute;
         private static readonly Size3 workgroupSize = new Size3(8, 8, 8);
-        private TransformShader initTexShader = new ImageFramework.Model.Shader.TransformShader("return value.a > 0 ? 0 : 255", "float4", "uint");
+        private TransformShader initTexShader = new ImageFramework.Model.Shader.TransformShader("return value.a > 0 ? 0 : 128", "float4", "uint");
         private TransformShader endShader = new ImageFramework.Model.Shader.TransformShader("return value & 127", "uint", "uint");
 
 
@@ -28,9 +28,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
         private struct DirBufferData
         {
             public Int3 dir;
-#pragma warning disable 169
-            private int padding;
-#pragma warning restore 169
+            public int iteration;
             public Size3 dim;
         }
 
@@ -58,17 +56,18 @@ namespace ImageViewer.Controller.TextureViews.Shader
             dev.Compute.Set(compute.Compute);
 
             ImageFramework.DirectX.Query.SyncQuery syncQuery = new ImageFramework.DirectX.Query.SyncQuery();
-
+            //var watch = new Stopwatch();
+            //watch.Start();
             for (int i = 0; i < 127; i++)
             {
                 BindAndSwapTextures(ref dstTex, ref tmpTex, lm);
-                Dispatch(new Int3(1, 0, 0), size, uploadBuffer);
+                Dispatch(new Int3(1, 0, 0), i, size, uploadBuffer);
 
                 BindAndSwapTextures(ref dstTex, ref tmpTex, lm);
-                Dispatch(new Int3(0, 1, 0), size, uploadBuffer);
+                Dispatch(new Int3(0, 1, 0), i, size, uploadBuffer);
 
                 BindAndSwapTextures(ref dstTex, ref tmpTex, lm);
-                Dispatch(new Int3(0, 0, 1), size, uploadBuffer);
+                Dispatch(new Int3(0, 0, 1), i, size, uploadBuffer);
 
 #if DEBUG
                 if (i % 8 == 0)
@@ -80,6 +79,13 @@ namespace ImageViewer.Controller.TextureViews.Shader
 #endif
             }
 
+
+            /*syncQuery.Set();
+            syncQuery.WaitForGpu();
+            watch.Stop();
+
+            Console.WriteLine($"Time: {watch.ElapsedMilliseconds}ms");
+            */
             // unbind
             dev.Compute.SetShaderResource(0, null);
             dev.Compute.SetUnorderedAccessView(0, null);
@@ -111,13 +117,14 @@ namespace ImageViewer.Controller.TextureViews.Shader
             dstTex = tmp;
         }
 
-        private void Dispatch(Int3 direction, Size3 size, UploadBuffer uploadBuffer)
+        private void Dispatch(Int3 direction, int iteration, Size3 size, UploadBuffer uploadBuffer)
         {
             var dev = Device.Get();
             uploadBuffer.SetData(new DirBufferData
             {
                 dir = direction,
-                dim = size
+                dim = size,
+                iteration = iteration
             });
             dev.Compute.SetConstantBuffer(0, uploadBuffer.Handle);
             dev.Dispatch(Utility.DivideRoundUp(size.X, workgroupSize.X), Utility.DivideRoundUp(size.Y, workgroupSize.Y), Utility.DivideRoundUp(size.Z, workgroupSize.Z));
@@ -129,33 +136,37 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
 cbuffer DirBuffer : register(b0){{
     int3 dir;
-    int padding;
+    uint iteration;
     uint3 dim;
 }};
 
-Texture3D<uint> CurrentRead: register(t0);
-RWTexture3D<uint> CurrentWrite: register(u0);
+Texture3D<uint> in_tex : register(t0);
+RWTexture3D<uint> out_tex : register(u0);
 
 
 {NumThreads()}
 void main(uint3 dispatchThreadID : SV_DispatchThreadID)
 {{
-
-    if(CurrentRead[dispatchThreadID] == 0)
-        return;
+    uint curValue = in_tex[dispatchThreadID];
+    if(curValue == 0) return;
+    if(curValue & 127 < iteration) return;
  
     uint3 sample1Point = dispatchThreadID + dir;
     uint3 sample2Point = dispatchThreadID - dir;
 
-    uint sample1 = 127, sample2 = 127;
+    uint sample1 = iteration, sample2 = iteration;
 
-    if( all(sample1Point < dim) && all(sample1Point >= 0) ){{
-        sample1 = CurrentRead[sample1Point] & 127;
+    [flatten] if(all(sample1Point < dim) && all(sample1Point >= 0)){{
+        sample1 = in_tex[sample1Point] & 127;
     }}
-    if( all(sample2Point < dim) && all(sample2Point >= 0 ) ){{
-        sample2 = CurrentRead[sample2Point] & 127;
+    [flatten] if(all(sample2Point < dim) && all(sample2Point >= 0 )){{
+        sample2 = in_tex[sample2Point] & 127;
     }}
-    CurrentWrite[dispatchThreadID] = min ( min(CurrentRead[dispatchThreadID] & 127, min(sample1,sample2) ) + dir.z , 127 ) | 128 ;
+
+    uint value = min(min(curValue & 127, min(sample1,sample2)) + dir.z, 127);
+    
+    //if(value != 127) // already written
+        out_tex[dispatchThreadID] = value | 128 ;
 }}
 
 ";
