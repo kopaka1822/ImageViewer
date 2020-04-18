@@ -30,6 +30,15 @@ namespace ImageViewer.UtilityEx
                 if (value == cropStartf) return;
                 cropStartf = value;
                 OnPropertyChanged(nameof(CropStart));
+
+                if ((cropStartf > cropEndf).AnyTrue())
+                {
+                    CropEnd = new Float3(
+                        Math.Max(cropStartf.X, cropEndf.X),
+                        Math.Max(cropStartf.Y, cropEndf.Y),
+                        Math.Max(cropStartf.Z, cropEndf.Z)
+                    );
+                }
             }
         }
 
@@ -50,6 +59,15 @@ namespace ImageViewer.UtilityEx
                 if (value == cropEndf) return;
                 cropEndf = value;
                 OnPropertyChanged(nameof(CropEnd));
+
+                if ((cropEndf < cropStartf).AnyTrue())
+                {
+                    CropStart = new Float3(
+                        Math.Min(cropStartf.X, cropEndf.X),
+                        Math.Min(cropStartf.Y, cropEndf.Y),
+                        Math.Min(cropStartf.Z, cropEndf.Z)
+                    );
+                }
             }
         }
 
