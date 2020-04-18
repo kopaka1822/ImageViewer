@@ -12,6 +12,7 @@ using ImageViewer.Controller.TextureViews.Shared;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
 using SharpDX;
+using SharpDX.Direct2D1;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Color = ImageFramework.Utility.Color;
@@ -29,7 +30,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         private readonly CubeSkippingShader cubeSkippingShader;
         private RayCastingDisplayModel displayEx;
 
-        private Texture3D[] helpTextures;
+        private HelpTextureData[] helpTextures;
         private ITextureCache textureCache;
 
         public VolumeView(ModelsEx models) : base(models)
@@ -39,7 +40,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             emptySpaceSkippingShader = new EmptySpaceSkippingShader();
             cubeSkippingShader = new CubeSkippingShader();
             displayEx = (RayCastingDisplayModel)models.Display.ExtendedViewData;
-            helpTextures = new Texture3D[models.NumPipelines];
+            helpTextures = new HelpTextureData[models.NumPipelines];
             textureCache = new ImageModelTextureCache(models.Images, Format.R8_UInt, true, false);
         }
 
@@ -55,12 +56,12 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             if (models.Display.LinearInterpolation)
             {
                 smooth.Run(GetWorldToImage(), models.Display.ClientAspectRatioScalar, 
-                texture.GetSrView(models.Display.ActiveLayerMipmap), helpTextures[id].GetSrView(models.Display.ActiveMipmap));
+                texture.GetSrView(models.Display.ActiveLayerMipmap), helpTextures[id].GetView(models.Display.ActiveMipmap));
             }
             else
             {
                 cube.Run(GetWorldToImage(), models.Display.ClientAspectRatioScalar,
-                displayEx.FlatShading, texture.GetSrView(models.Display.ActiveLayerMipmap), helpTextures[id].GetSrView(models.Display.ActiveMipmap));
+                displayEx.FlatShading, texture.GetSrView(models.Display.ActiveLayerMipmap), helpTextures[id].GetView(models.Display.ActiveMipmap));
             }
 
             dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
@@ -102,47 +103,79 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             cube?.Dispose();
             emptySpaceSkippingShader?.Dispose();
             cubeSkippingShader?.Dispose();
-            textureCache.Dispose();
             foreach (var tex in helpTextures)
             {
                 tex?.Dispose();
             }
+
+            textureCache.Dispose();
         }
+
 
         public override void UpdateImage(int id, ITexture texture)
         {
             base.UpdateImage(id, texture);
 
             if(helpTextures[id] != null)
-                textureCache.StoreTexture(helpTextures[id]);
+                helpTextures[id].Dispose();
             helpTextures[id] = null;
             if (texture is null) return;
 
-            //Texture3D tex = new Texture3D(texture.NumMipmaps, texture.Size, Format.R8_UInt, true, false);
-            helpTextures[id] = (Texture3D)textureCache.GetTexture();
-            var tmpTex = textureCache.GetTexture();
-            foreach (var lm in texture.LayerMipmap.Range)
-            {
-                emptySpaceSkippingShader.Run(texture, helpTextures[id], tmpTex, lm, models.SharedModel.Upload);
-            }
-            textureCache.StoreTexture(tmpTex);
+            helpTextures[id] = new HelpTextureData(this, texture);
         }
 
-        /*private class HelpTextureData : IDisposable
+        private class HelpTextureData : IDisposable
         {
             private readonly VolumeView parent;
             private readonly Texture3D texture;
+            private readonly ITexture srcTexture;
+            private bool useLinearInterpolation;
+            private readonly List<int> computedMips = new List<int>();
 
             public HelpTextureData(VolumeView parent, ITexture src)
             {
                 this.parent = parent;
-                
+                this.srcTexture = src;
+                useLinearInterpolation = parent.models.Display.LinearInterpolation;
+                texture = (Texture3D)parent.textureCache.GetTexture();
+            }
+
+            /// <summary>
+            /// returns view of the mipmap (will be computed if not already computed)
+            /// </summary>
+            public ShaderResourceView GetView(int mipmap)
+            {
+                if (useLinearInterpolation != parent.models.Display.LinearInterpolation)
+                {
+                    // reset data
+                    computedMips.Clear();
+                    useLinearInterpolation = parent.models.Display.LinearInterpolation;
+                }
+
+                if (computedMips.Contains(mipmap)) return texture.GetSrView(mipmap);
+
+                // execute shader
+                var tmpTex = parent.textureCache.GetTexture();
+
+                if (useLinearInterpolation)
+                {
+                    parent.emptySpaceSkippingShader.Run(srcTexture, texture, tmpTex, new LayerMipmapSlice(0, mipmap), parent.models.SharedModel.Upload);
+                }
+                else
+                {
+                    parent.cubeSkippingShader.Run(srcTexture, texture, tmpTex, new LayerMipmapSlice(0, mipmap), parent.models.SharedModel.Upload);
+                }
+
+                parent.textureCache.StoreTexture(tmpTex);
+                computedMips.Add(mipmap);
+
+                return texture.GetSrView(mipmap);
             }
 
             public void Dispose()
             {
-
+                parent.textureCache.StoreTexture(texture);
             }
-        }*/
+        }
     }
 }

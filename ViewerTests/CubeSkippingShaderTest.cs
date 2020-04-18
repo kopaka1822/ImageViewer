@@ -44,9 +44,10 @@ namespace ViewerTests
         {
             var img = IO.LoadImageTexture(TestData.Directory + filename);
             var helpTex = new Texture3D(img.NumMipmaps, img.Size, Format.R8_UInt, true, false);
+            var tmpTex = new Texture3D(img.NumMipmaps, img.Size, Format.R8_UInt, true, false);
 
             var s = new CubeSkippingShader();
-            s.Run(img, helpTex, LayerMipmapSlice.Mip0, new UploadBuffer(256));
+            s.Run(img, helpTex, tmpTex, LayerMipmapSlice.Mip0, new UploadBuffer(256));
             var shaderColors = helpTex.GetPixelColors(LayerMipmapSlice.Mip0);
             var shaderValues = new int[img.Size.Product];
 

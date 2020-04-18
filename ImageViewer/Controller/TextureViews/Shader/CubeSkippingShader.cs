@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,16 +32,15 @@ namespace ImageViewer.Controller.TextureViews.Shader
             compute = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Compute, GetSource(), "CubeSkippingShader");
         }
 
-        public void Run(ITexture src, ITexture dst, LayerMipmapSlice lm, UploadBuffer upload)
+        public void Run(ITexture src, ITexture dst, ITexture tmpTex, LayerMipmapSlice lm, UploadBuffer upload)
         {
             var size = src.Size.GetMip(lm.Mipmap);
             var dev = Device.Get();
+            // debugging
+            var originalDst = dst;
 
             initTexShader.Run(src, dst, lm, upload);
-
-            // pong texture
-            ITexture pong = new ImageFramework.DirectX.Texture3D(dst.NumMipmaps, dst.Size, Format.R8_UInt, true, false);
-
+            initTexShader.Run(src, tmpTex, lm, upload);
 
             dev.Compute.Set(compute.Compute);
             upload.SetData(size);
@@ -52,7 +52,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
             {
                 // bind textures
                 dev.Compute.SetShaderResource(0, dst.GetSrView(lm));
-                dev.Compute.SetUnorderedAccessView(0, pong.GetUaView(lm.Mipmap));
+                dev.Compute.SetUnorderedAccessView(0, tmpTex.GetUaView(lm.Mipmap));
 
                 // execute
                 dev.Dispatch(
@@ -66,8 +66,8 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 dev.Compute.SetUnorderedAccessView(0, null);
 
                 // swap textures
-                var tmp = pong;
-                pong = dst;
+                var tmp = tmpTex;
+                tmpTex = dst;
                 dst = tmp;
 
 #if DEBUG
@@ -82,7 +82,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
             dev.Compute.Set(null);
 
-            pong?.Dispose();
+            Debug.Assert(ReferenceEquals(originalDst, dst));
             syncQuery?.Dispose();
         }
 
