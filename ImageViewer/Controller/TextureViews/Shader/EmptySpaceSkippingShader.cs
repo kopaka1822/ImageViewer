@@ -3,6 +3,7 @@ using ImageFramework.Utility;
 using SharpDX;
 using SharpDX.Direct3D11;
 using System;
+using ImageFramework.Model.Shader;
 using ImageViewer.Controller.TextureViews.Texture3D;
 using SharpDX.DXGI;
 
@@ -15,8 +16,8 @@ namespace ImageViewer.Controller.TextureViews.Shader
     {
         private readonly ImageFramework.DirectX.Shader compute;
         private static readonly Size3 workgroupSize = new Size3(8, 8, 8);
-        private ImageFramework.Model.Shader.TransformShader initTexShader = new ImageFramework.Model.Shader.TransformShader("return value.a > 0 ? 0 : 255", "float4", "uint");
-        private ImageFramework.Model.Shader.TransformShader endShader = new ImageFramework.Model.Shader.TransformShader("return value & 127", "uint", "uint");
+        private TransformShader initTexShader = new ImageFramework.Model.Shader.TransformShader("return value.a > 0 ? 0 : 255", "float4", "uint");
+        private TransformShader endShader = new ImageFramework.Model.Shader.TransformShader("return value & 127", "uint", "uint");
 
 
         public EmptySpaceSkippingShader()
@@ -48,6 +49,8 @@ namespace ImageViewer.Controller.TextureViews.Shader
             initTexShader.Run(orgTex, helpTex, lm, uploadBuffer);
 
             Texture3D pong = new Texture3D(helpTex.NumMipmaps, helpTex.Size, Format.R8_UInt, true, false);
+            // it seems that pong is not always cleared to 0 in the beginning => clear pong as well
+            initTexShader.Run(orgTex, pong, lm, uploadBuffer);
 
             bool readHelpTex = false;
 

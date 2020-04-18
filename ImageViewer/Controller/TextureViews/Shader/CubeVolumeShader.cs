@@ -125,13 +125,13 @@ float4 main(PixelIn i) : SV_TARGET {{
 
     float diffuse = 1;
     if(useFlatShading){{
-        if(intPos.x == cubeStart.x || intPos.x == cubeEnd.x - 1){{
+        if(pos.x == fcubeStart.x || pos.x == fcubeEnd.x){{
          diffuse = absRay.x;
         }}
-        if(intPos.y == cubeStart.y || intPos.y == cubeEnd.y - 1){{
+        if(pos.y == fcubeStart.y || pos.y == fcubeEnd.y){{
          diffuse = absRay.y;
         }}
-        if(intPos.z == cubeStart.z || intPos.z == cubeEnd.z - 1){{
+        if(pos.z == fcubeStart.z || pos.z == fcubeEnd.z){{
          diffuse = absRay.z;
         }}
     }}
