@@ -98,12 +98,6 @@ float4 main(PixelIn i) : SV_TARGET {{
     float4 color = 0.0;
     color.a = 1.0; // transmittance    
 
-    uint width, height, depth;
-    tex.GetDimensions(width, height, depth);
-    int3 size = uint3(width,height, depth);
-    float3 fsize = float3(size);    
-
-    // transform ray to image space
     float3 ray = normalize(i.rayDir);    
 
     float3 pos;    
@@ -114,7 +108,7 @@ float4 main(PixelIn i) : SV_TARGET {{
     dirSign.y = ray.y < 0.0f ? -1 : 1;
     dirSign.z = ray.z < 0.0f ? -1 : 1;
 
-    int3 intPos = clamp(int3(pos), 0, size - 1);
+    int3 intPos = clamp(int3(pos), cubeStart, cubeEnd - 1);
     float3 absRay = abs(ray);
     float3 projLength = 1.0 / (absRay + 0.00001);
     float3 distance = pos - intPos;
@@ -124,13 +118,6 @@ float4 main(PixelIn i) : SV_TARGET {{
     if(dirSign.z == 1) distance.z = 1-distance.z;
     distance *= projLength;
 
-    //float3 voxelPos = pos * (float3(textureDimension) - 0.00001);
-    //uint3 rayPos = uint3(voxelPos); 
-    //float3 absDir = abs(ray);
-    //float3 projLength = 1.0 / (absDir + 0.00001);
-    //float3 distance = voxelPos - rayPos;
-
-    //dot(normal,absDir) for first intersection with bounding box
     // adjust values for flat shading
     absRay.x = getFlatShading(absRay.x);
     absRay.y = getFlatShading(absRay.y);
@@ -138,27 +125,31 @@ float4 main(PixelIn i) : SV_TARGET {{
 
     float diffuse = 1;
     if(useFlatShading){{
-        if(intPos.x == cubeStart.x || intPos.x == cubeEnd.x){{
+        if(intPos.x == cubeStart.x || intPos.x == cubeEnd.x - 1){{
          diffuse = absRay.x;
         }}
-        if(intPos.y == cubeStart.y || intPos.y == cubeEnd.y){{
+        if(intPos.y == cubeStart.y || intPos.y == cubeEnd.y - 1){{
          diffuse = absRay.y;
         }}
-        if(intPos.z == cubeStart.z || intPos.z == cubeEnd.z){{
+        if(intPos.z == cubeStart.z || intPos.z == cubeEnd.z - 1){{
          diffuse = absRay.z;
         }}
     }}
 
     [loop] do{{
+        int skipValue = emptySpaceTex[intPos];
 
-        float4 s = tex[intPos];
-        if(!useFlatShading){{
-           diffuse = 1;
+        if(skipValue == 0) {{
+            // this block can be shaded
+            float4 s = tex[intPos];
+            if(!useFlatShading){{
+               diffuse = 1;
+            }}
+            color.rgb += color.a * s.a * s.rgb * diffuse;
+            color.a *= 1 - s.a;
         }}
-        color.rgb += color.a * s.a * s.rgb * diffuse;
-        color.a *= 1 - s.a;
 
-        int numIterations = max(emptySpaceTex[intPos], 1);      
+        int numIterations = max(skipValue, 1);      
 
         while(numIterations-- != 0) {{
             if(distance.x < distance.y || distance.z < distance.y) {{
