@@ -20,16 +20,16 @@ namespace ImageFramework.DirectX
         private readonly Texture2D handle;
         private ShaderResourceView[] cubeViews;
 
-        public TextureArray2D(LayerMipmapCount lm, Size3 size, Format format, bool createUav)
+        public TextureArray2D(LayerMipmapCount lm, Size3 size, Format format, bool createUav, bool createRtv = true)
         {
             Debug.Assert(size.Depth == 1);
             Size = size;
             LayerMipmap = lm;
             this.Format = format;
            
-            handle = new SharpDX.Direct3D11.Texture2D(Device.Get().Handle, CreateTextureDescription(createUav));
+            handle = new SharpDX.Direct3D11.Texture2D(Device.Get().Handle, CreateTextureDescription(createUav, createRtv));
 
-            CreateTextureViews(createUav);
+            CreateTextureViews(createUav, createRtv);
         }
 
         public TextureArray2D(ImageData image)
@@ -49,9 +49,9 @@ namespace ImageFramework.DirectX
                 data[idx].Pitch = (int)(mip.ByteSize / mip.Size.Height);
             }
 
-            handle = new Texture2D(Device.Get().Handle, CreateTextureDescription(false), data);
+            handle = new Texture2D(Device.Get().Handle, CreateTextureDescription(false, true), data);
 
-            CreateTextureViews(false);
+            CreateTextureViews(false, true);
         }
 
         public ShaderResourceView GetCubeView(int mipmap)
@@ -95,9 +95,9 @@ namespace ImageFramework.DirectX
             return staging;
         }
 
-        public override TextureArray2D CreateT(LayerMipmapCount lm, Size3 size, Format format, bool createUav)
+        public override TextureArray2D CreateT(LayerMipmapCount lm, Size3 size, Format format, bool createUav, bool createRtv)
         {
-            return new TextureArray2D(lm, size, format, createUav);
+            return new TextureArray2D(lm, size, format, createUav, createRtv);
         }
 
         protected override SharpDX.Direct3D11.Resource GetHandle()
@@ -118,7 +118,7 @@ namespace ImageFramework.DirectX
             base.Dispose();
         }
 
-        private void CreateTextureViews(bool createUav)
+        private void CreateTextureViews(bool createUav, bool createRtv)
         {
             Debug.Assert(handle != null);
 
@@ -159,7 +159,9 @@ namespace ImageFramework.DirectX
 
             // single slice views
             views = new ShaderResourceView[LayerMipmap.Layers * LayerMipmap.Mipmaps];
-            rtViews = new RenderTargetView[LayerMipmap.Layers * LayerMipmap.Mipmaps];
+            if(createRtv)
+                rtViews = new RenderTargetView[LayerMipmap.Layers * LayerMipmap.Mipmaps];
+
             foreach (var lm in LayerMipmap.Range)
             {
                 var desc = new ShaderResourceViewDescription
@@ -177,19 +179,22 @@ namespace ImageFramework.DirectX
 
                 views[GetSubresourceIndex(lm)] = new ShaderResourceView(Device.Get().Handle, handle, desc);
 
-                var rtDesc = new RenderTargetViewDescription
+                if(createRtv)
                 {
-                    Dimension = RenderTargetViewDimension.Texture2DArray,
-                    Format = Format,
-                    Texture2DArray = new RenderTargetViewDescription.Texture2DArrayResource
+                    var rtDesc = new RenderTargetViewDescription
                     {
-                        ArraySize = 1,
-                        FirstArraySlice = lm.Layer,
-                        MipSlice = lm.Mipmap
-                    }
-                };
+                        Dimension = RenderTargetViewDimension.Texture2DArray,
+                        Format = Format,
+                        Texture2DArray = new RenderTargetViewDescription.Texture2DArrayResource
+                        {
+                            ArraySize = 1,
+                            FirstArraySlice = lm.Layer,
+                            MipSlice = lm.Mipmap
+                        }
+                    };
 
-                rtViews[GetSubresourceIndex(lm)] = new RenderTargetView(Device.Get().Handle, handle, rtDesc);
+                    rtViews[GetSubresourceIndex(lm)] = new RenderTargetView(Device.Get().Handle, handle, rtDesc);
+                }
             }
 
             if (createUav)
@@ -214,7 +219,7 @@ namespace ImageFramework.DirectX
             }
         }
 
-        private Texture2DDescription CreateTextureDescription(bool createUav)
+        private Texture2DDescription CreateTextureDescription(bool createUav, bool createRtv)
         {
             Debug.Assert(NumLayers > 0);
             Debug.Assert(NumMipmaps > 0);
@@ -229,7 +234,9 @@ namespace ImageFramework.DirectX
                 throw new Exception($"Number of layers may not exceed {Device.MAX_TEXTURE_2D_ARRAY_DIMENSION} but was {NumLayers}");
 
             // render target required for mip map generation
-            BindFlags flags = BindFlags.ShaderResource | BindFlags.RenderTarget;
+            BindFlags flags = BindFlags.ShaderResource;
+            if (createRtv)
+                flags |= BindFlags.RenderTarget;
             if (createUav)
                 flags |= BindFlags.UnorderedAccess;
 

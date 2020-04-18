@@ -50,10 +50,10 @@ namespace ImageFramework.DirectX
             CreateTextureViews(false,true);
         }
 
-        public override Texture3D CreateT(LayerMipmapCount lm, Size3 size, Format format, bool createUav)
+        public override Texture3D CreateT(LayerMipmapCount lm, Size3 size, Format format, bool createUav, bool createRtv)
         {
             Debug.Assert(lm.Layers == 1);
-            return new Texture3D(lm.Mipmaps, size, format, createUav);
+            return new Texture3D(lm.Mipmaps, size, format, createUav, createRtv);
         }
 
         protected override Resource GetHandle()

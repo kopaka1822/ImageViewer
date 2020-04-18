@@ -3,6 +3,7 @@ using ImageFramework.Utility;
 using SharpDX;
 using SharpDX.Direct3D11;
 using System;
+using System.Diagnostics;
 using ImageFramework.Model.Shader;
 using ImageViewer.Controller.TextureViews.Texture3D;
 using SharpDX.DXGI;
@@ -40,19 +41,19 @@ namespace ImageViewer.Controller.TextureViews.Shader
         }
 
 
-        public void Execute(ITexture orgTex, ITexture helpTex, LayerMipmapSlice lm, UploadBuffer uploadBuffer)
+        public void Run(ITexture orgTex, ITexture dstTex, ITexture tmpTex, LayerMipmapSlice lm, UploadBuffer uploadBuffer)
         {
+            Debug.Assert(dstTex.Format == Format.R8_UInt);
+            Debug.Assert(tmpTex.Format == Format.R8_UInt);
+
             var size = orgTex.Size.GetMip(lm.Mipmap);
             var dev = Device.Get();
 
+            // remember for debugging
+            var originalDst = dstTex;
 
-            initTexShader.Run(orgTex, helpTex, lm, uploadBuffer);
-
-            Texture3D pong = new Texture3D(helpTex.NumMipmaps, helpTex.Size, Format.R8_UInt, true, false);
-            // it seems that pong is not always cleared to 0 in the beginning => clear pong as well
-            initTexShader.Run(orgTex, pong, lm, uploadBuffer);
-
-            bool readHelpTex = false;
+            initTexShader.Run(orgTex, dstTex, lm, uploadBuffer);
+            initTexShader.Run(orgTex, tmpTex, lm, uploadBuffer);
 
             dev.Compute.Set(compute.Compute);
 
@@ -60,40 +61,14 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
             for (int i = 0; i < 127; i++)
             {
+                BindAndSwapTextures(ref dstTex, ref tmpTex, lm);
+                Dispatch(new Int3(1, 0, 0), size, uploadBuffer);
 
-                swapTextures(ref readHelpTex, helpTex, pong, lm);
+                BindAndSwapTextures(ref dstTex, ref tmpTex, lm);
+                Dispatch(new Int3(0, 1, 0), size, uploadBuffer);
 
-                //x-direction
-                uploadBuffer.SetData(new DirBufferData
-                {
-                    dir = new Int3(1, 0, 0),
-                    dim = size
-                });
-                dev.Compute.SetConstantBuffer(0, uploadBuffer.Handle);
-                dev.Dispatch(Utility.DivideRoundUp(size.X, workgroupSize.X), Utility.DivideRoundUp(size.Y, workgroupSize.Y), Utility.DivideRoundUp(size.Z, workgroupSize.Z));
-
-
-                swapTextures(ref readHelpTex, helpTex, pong, lm);
-
-                //y-direction
-                uploadBuffer.SetData(new DirBufferData
-                {
-                    dir = new Int3(0, 1, 0),
-                    dim = size
-                });
-                dev.Compute.SetConstantBuffer(0, uploadBuffer.Handle);
-                dev.Dispatch(Utility.DivideRoundUp(size.X, workgroupSize.X), Utility.DivideRoundUp(size.Y, workgroupSize.Y), Utility.DivideRoundUp(size.Z, workgroupSize.Z));
-
-                swapTextures(ref readHelpTex, helpTex, pong, lm);
-
-                //z-direction
-                uploadBuffer.SetData(new DirBufferData
-                {
-                    dir = new Int3(0, 0, 1),
-                    dim = size
-                });
-                dev.Compute.SetConstantBuffer(0, uploadBuffer.Handle);
-                dev.Dispatch(Utility.DivideRoundUp(size.X, workgroupSize.X), Utility.DivideRoundUp(size.Y, workgroupSize.Y), Utility.DivideRoundUp(size.Z, workgroupSize.Z));
+                BindAndSwapTextures(ref dstTex, ref tmpTex, lm);
+                Dispatch(new Int3(0, 0, 1), size, uploadBuffer);
 
 #if DEBUG
                 if (i % 8 == 0)
@@ -103,7 +78,6 @@ namespace ImageViewer.Controller.TextureViews.Shader
                     Console.WriteLine("Iteration: " + i);
                 }
 #endif
-
             }
 
             // unbind
@@ -111,36 +85,42 @@ namespace ImageViewer.Controller.TextureViews.Shader
             dev.Compute.SetUnorderedAccessView(0, null);
             dev.Compute.Set(null);
 
-
-            endShader.Run(pong, helpTex, lm, uploadBuffer);
-            pong?.Dispose();
+            Debug.Assert(ReferenceEquals(originalDst, tmpTex));
+            endShader.Run(dstTex, tmpTex, lm, uploadBuffer);
             syncQuery?.Dispose();
         }
 
-        private void swapTextures(ref bool readHelpTex, ITexture helpTex, ITexture pong, LayerMipmapSlice lm)
+        /// <summary>
+        /// binds dstTex as source and tmpTex as destination and then swaps the references.
+        /// => after rendering, dst tex will be the texture with the result
+        /// </summary>
+        /// <param name="dstTex"></param>
+        /// <param name="tmpTex"></param>
+        /// <param name="lm"></param>
+        private void BindAndSwapTextures(ref ITexture dstTex, ref ITexture tmpTex, LayerMipmapSlice lm)
         {
             var dev = Device.Get();
-            if (readHelpTex)
+            dev.Compute.SetShaderResource(0, null);
+            dev.Compute.SetUnorderedAccessView(0, null);
+
+            dev.Compute.SetShaderResource(0, dstTex.GetSrView(lm));
+            dev.Compute.SetUnorderedAccessView(0, tmpTex.GetUaView(lm.Mipmap));
+
+            var tmp = tmpTex;
+            tmpTex = dstTex;
+            dstTex = tmp;
+        }
+
+        private void Dispatch(Int3 direction, Size3 size, UploadBuffer uploadBuffer)
+        {
+            var dev = Device.Get();
+            uploadBuffer.SetData(new DirBufferData
             {
-                readHelpTex = false;
-
-                dev.Compute.SetShaderResource(0, null);
-                dev.Compute.SetUnorderedAccessView(0, null);
-
-                dev.Compute.SetShaderResource(0, pong.GetSrView(lm));
-                dev.Compute.SetUnorderedAccessView(0, helpTex.GetUaView(lm.Mipmap));
-
-            }
-            else
-            {
-                readHelpTex = true;
-
-                dev.Compute.SetShaderResource(0, null);
-                dev.Compute.SetUnorderedAccessView(0, null);
-
-                dev.Compute.SetShaderResource(0, helpTex.GetSrView(lm));
-                dev.Compute.SetUnorderedAccessView(0, pong.GetUaView(lm.Mipmap));
-            }
+                dir = direction,
+                dim = size
+            });
+            dev.Compute.SetConstantBuffer(0, uploadBuffer.Handle);
+            dev.Dispatch(Utility.DivideRoundUp(size.X, workgroupSize.X), Utility.DivideRoundUp(size.Y, workgroupSize.Y), Utility.DivideRoundUp(size.Z, workgroupSize.Z));
         }
 
         private static string GetMinComputeSource()

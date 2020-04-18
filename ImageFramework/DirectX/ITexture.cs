@@ -51,7 +51,7 @@ namespace ImageFramework.DirectX
         /// </summary>
         ITexture CloneWithoutMipmaps(int mipmap = 0);
 
-        ITexture Create(LayerMipmapCount lm, Size3 size, Format format, bool createUav);
+        ITexture Create(LayerMipmapCount lm, Size3 size, Format format, bool createUav, bool createRtv = true);
 
         ITexture Clone();
 

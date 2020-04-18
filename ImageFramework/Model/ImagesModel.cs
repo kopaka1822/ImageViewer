@@ -408,10 +408,10 @@ namespace ImageFramework.Model
             }
         }
 
-        public ITexture CreateEmptyTexture(Format format, bool createUav)
+        public ITexture CreateEmptyTexture(Format format, bool createUav, bool createRtv = true)
         {
             Debug.Assert(images.Count != 0);
-            return images[0].Image.Create(new LayerMipmapCount(NumLayers, NumMipmaps), Size, format, createUav);
+            return images[0].Image.Create(new LayerMipmapCount(NumLayers, NumMipmaps), Size, format, createUav, createRtv);
         }
     }
 }

@@ -20,11 +20,13 @@ namespace ImageFramework.Utility
         private readonly ImagesModel images;
         private readonly Format format;
         private readonly bool createUav;
+        private readonly bool createRtv;
 
-        public ImageModelTextureCache(ImagesModel images, Format format = Format.R32G32B32A32_Float, bool createUav = true)
+        public ImageModelTextureCache(ImagesModel images, Format format = Format.R32G32B32A32_Float, bool createUav = true, bool createRtv = true)
         {
             this.images = images;
             this.createUav = createUav;
+            this.createRtv = createRtv;
             this.format = format;
             images.PropertyChanged += ImagesOnPropertyChanged;
         }
@@ -34,7 +36,7 @@ namespace ImageFramework.Utility
             if (textures.Count > 0) return textures.Pop();
 
             // make new texture with the current configuration
-            return images.CreateEmptyTexture(format, createUav);
+            return images.CreateEmptyTexture(format, createUav, createRtv);
         }
 
         public void StoreTexture(ITexture tex)
@@ -82,6 +84,7 @@ namespace ImageFramework.Utility
         public void Dispose()
         {
             Clear();
+            images.PropertyChanged -= ImagesOnPropertyChanged;
         }
 
         // event that will be called if the texture properties have changed

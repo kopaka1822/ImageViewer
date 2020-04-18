@@ -26,17 +26,21 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         private readonly SmoothVolumeShader smooth;
         private readonly CubeVolumeShader cube;
         private readonly EmptySpaceSkippingShader emptySpaceSkippingShader;
+        private readonly CubeSkippingShader cubeSkippingShader;
         private RayCastingDisplayModel displayEx;
-        private Texture3D[] helpTextures;
 
+        private Texture3D[] helpTextures;
+        private ITextureCache textureCache;
 
         public VolumeView(ModelsEx models) : base(models)
         {
             smooth = new SmoothVolumeShader(models);
             cube = new CubeVolumeShader(models);
             emptySpaceSkippingShader = new EmptySpaceSkippingShader();
+            cubeSkippingShader = new CubeSkippingShader();
             displayEx = (RayCastingDisplayModel)models.Display.ExtendedViewData;
             helpTextures = new Texture3D[models.NumPipelines];
+            textureCache = new ImageModelTextureCache(models.Images, Format.R8_UInt, true, false);
         }
 
         public override void Draw(int id, ITexture texture)
@@ -97,6 +101,8 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             smooth?.Dispose();
             cube?.Dispose();
             emptySpaceSkippingShader?.Dispose();
+            cubeSkippingShader?.Dispose();
+            textureCache.Dispose();
             foreach (var tex in helpTextures)
             {
                 tex?.Dispose();
@@ -107,17 +113,36 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         {
             base.UpdateImage(id, texture);
 
-            helpTextures[id]?.Dispose();
+            if(helpTextures[id] != null)
+                textureCache.StoreTexture(helpTextures[id]);
+            helpTextures[id] = null;
             if (texture is null) return;
 
-            Texture3D tex = new Texture3D(texture.NumMipmaps, texture.Size, Format.R8_UInt, true, false);
-            helpTextures[id] = tex;
+            //Texture3D tex = new Texture3D(texture.NumMipmaps, texture.Size, Format.R8_UInt, true, false);
+            helpTextures[id] = (Texture3D)textureCache.GetTexture();
+            var tmpTex = textureCache.GetTexture();
             foreach (var lm in texture.LayerMipmap.Range)
             {
-                emptySpaceSkippingShader.Execute(texture, helpTextures[id], lm, models.SharedModel.Upload);
+                emptySpaceSkippingShader.Run(texture, helpTextures[id], tmpTex, lm, models.SharedModel.Upload);
             }
+            textureCache.StoreTexture(tmpTex);
         }
 
-        
+        /*private class HelpTextureData : IDisposable
+        {
+            private readonly VolumeView parent;
+            private readonly Texture3D texture;
+
+            public HelpTextureData(VolumeView parent, ITexture src)
+            {
+                this.parent = parent;
+                
+            }
+
+            public void Dispose()
+            {
+
+            }
+        }*/
     }
 }
