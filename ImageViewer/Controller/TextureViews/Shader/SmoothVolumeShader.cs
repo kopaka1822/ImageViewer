@@ -47,10 +47,10 @@ namespace ImageViewer.Controller.TextureViews.Shader
         /// <param name="screenAspect">screen aspect ratio</param>
         /// <param name="texture"></param>
         /// <param name="emptySpaceTex"></param>
-        public void Run(Matrix transform, float screenAspect, ShaderResourceView texture, ShaderResourceView emptySpaceTex)
+        public void Run(Matrix transform, ShaderResourceView texture, ShaderResourceView emptySpaceTex)
         {
             var v = models.ViewData;
-            v.Buffer.SetData(GetCommonData(transform, screenAspect));
+            v.Buffer.SetData(GetCommonData(transform, models.Display.ClientAspectRatioScalar));
 
             var dev = Device.Get();
             BindShader(dev);

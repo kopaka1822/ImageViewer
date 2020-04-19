@@ -101,6 +101,25 @@ VertexOut main(uint id : SV_VertexID) {{
 ";
         }
 
+        protected Float3 GetRayDirFromCanonical(Matrix transform, Vector2 canonical)
+        {
+            var src = new Vector3(canonical.X * models.Display.ClientAspectRatioScalar, canonical.Y, 1.0f);
+            src.Normalize();
+
+            // convert matrix to 3x3
+            var mat = new Matrix3x3(
+                transform.M11, transform.M12, transform.M13, 
+                transform.M21, transform.M22, transform.M23, 
+                transform.M31, transform.M32, transform.M33
+            );
+
+            Vector3.Transform(ref src, ref mat, out var res);
+
+            // to be sure
+            res.Normalize();
+            return new Float3(res.X, res.Y, res.Z);
+        }
+
         protected static string PixelInStruct()
         {
             return @"

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
@@ -16,41 +17,41 @@ namespace ImageViewer.Controller.TextureViews.Shader
 {
     public class CubeVolumeShader : VolumeShader
     {
-        struct BufferData
+        private struct BufferData
         {
             public CommonBufferData Common;
             public int UseFlatShading;
         }
 
-        private readonly SamplerState sampler;
+        private struct CoordBufferData
+        {
+            public CommonBufferData Common;
+            public Float3 Ray;
+        }
 
-        public CubeVolumeShader(ModelsEx models) 
+        private readonly ImageFramework.DirectX.Shader coordShader;
+        private readonly GpuBuffer coordDstBuffer;
+
+        public CubeVolumeShader(ModelsEx models)
             : base(models, GetPixelSource(), "CubeVolumeShader")
         {
-            sampler = new SamplerState(Device.Get().Handle, new SamplerStateDescription
-            {
-                AddressU = TextureAddressMode.Border,
-                AddressV = TextureAddressMode.Border,
-                AddressW = TextureAddressMode.Border,
-                Filter = Filter.MinMagMipPoint,
-                BorderColor = new RawColor4(0.0f, 0.0f, 0.0f, 0.0f),
-            });
+            coordDstBuffer = new GpuBuffer(Marshal.SizeOf(typeof(Size3)), 1);
+            coordShader = new ImageFramework.DirectX.Shader(ImageFramework.DirectX.Shader.Type.Compute, GetComputeSource(), "CubeCoordShader");
         }
 
         public override void Dispose()
         {
-            sampler?.Dispose();
+            coordDstBuffer.Dispose();
+            coordShader.Dispose();
             base.Dispose();
         }
 
-
-        public void Run(Matrix transform, float screenAspect,
-            bool useFlatShading,ShaderResourceView texture, ShaderResourceView emptySpaceTex)
+        public void Run(Matrix transform, bool useFlatShading, ShaderResourceView texture, ShaderResourceView emptySpaceTex)
         {
             var v = models.ViewData;
             v.Buffer.SetData(new BufferData
             {
-                Common = GetCommonData(transform, screenAspect),
+                Common = GetCommonData(transform, models.Display.ClientAspectRatioScalar),
                 UseFlatShading = useFlatShading ? 1 : 0
             });
 
@@ -62,7 +63,6 @@ namespace ImageViewer.Controller.TextureViews.Shader
 
             dev.Pixel.SetShaderResource(0, texture);
             dev.Pixel.SetShaderResource(1, emptySpaceTex);
-            dev.Pixel.SetSampler(0, sampler);
 
             dev.DrawQuad();
 
@@ -72,12 +72,39 @@ namespace ImageViewer.Controller.TextureViews.Shader
             UnbindShader(dev);
         }
 
+        public Size3 GetIntersection(Matrix transform, Vector2 mousePos, ShaderResourceView emptySpaceTex)
+        {
+            // transform mousePos to ray direction
+            var v = models.ViewData;
+            v.Buffer.SetData(new CoordBufferData
+            {
+                Common = GetCommonData(transform, models.Display.ClientAspectRatioScalar),
+                Ray = GetRayDirFromCanonical(transform, mousePos),
+            });
+
+            var dev = Device.Get();
+            dev.Compute.Set(coordShader.Compute);
+            dev.Compute.SetConstantBuffer(0, v.Buffer.Handle);
+            dev.Compute.SetShaderResource(0, emptySpaceTex);
+            dev.Compute.SetUnorderedAccessView(0, coordDstBuffer.View);
+
+            dev.Dispatch(1, 1);
+
+            // unbind
+            dev.Compute.SetShaderResource(0, null);
+            dev.Compute.SetUnorderedAccessView(0, null);
+
+            // obtain data
+            var read = models.SharedModel.Download;
+            read.CopyFrom(coordDstBuffer, Marshal.SizeOf(typeof(Size3)));
+            return read.GetData<Size3>();
+        }
+
         private static string GetPixelSource()
         {
             return $@"
 Texture3D<float4> tex : register(t0);
 Texture3D<uint> emptySpaceTex : register(t1);
-SamplerState texSampler : register(s0);
 
 cbuffer InfoBuffer : register(b0) {{
     {CommonShaderBufferData()}
@@ -179,6 +206,84 @@ float4 main(PixelIn i) : SV_TARGET {{
 
     {ApplyColorTransform()}
     return toSrgb(color);
+}}
+";
+        }
+
+        // determines the position of the first intersection
+        private string GetComputeSource()
+        {
+            return $@"
+Texture3D<uint> emptySpaceTex : register(t0);
+RWStructuredBuffer<int3> out_buffer : register(u0);
+
+cbuffer InfoBuffer : register(b0) {{
+    {CommonShaderBufferData()}
+    float3 ray;
+}};
+
+{CommonShaderFunctions()}
+
+[numthreads(1, 1, 1)]
+void main(){{
+    float3 pos;    
+    if(!getIntersection(origin, ray, pos)) {{
+        // no intersection at all!
+        out_buffer[0] = -1;
+        return;
+    }}
+
+    int3 dirSign; 
+    dirSign.x = ray.x < 0.0f ? -1 : 1;
+    dirSign.y = ray.y < 0.0f ? -1 : 1;
+    dirSign.z = ray.z < 0.0f ? -1 : 1;
+
+    int3 intPos = clamp(int3(pos), cubeStart, cubeEnd - 1);
+    float3 absRay = abs(ray);
+    float3 projLength = 1.0 / (absRay + 0.00001);
+    float3 distance = pos - intPos;
+
+    if(dirSign.x == 1) distance.x = 1-distance.x;
+    if(dirSign.y == 1) distance.y = 1-distance.y;
+    if(dirSign.z == 1) distance.z = 1-distance.z;
+    distance *= projLength;
+
+    // remember intPos in case we wont have any intersection
+    out_buffer[0] = intPos;
+
+    [loop] do{{
+        int skipValue = emptySpaceTex[intPos];
+
+        if(skipValue == 0) {{
+            // this block can be shaded
+            out_buffer[0] = intPos; // finished!
+            return;
+        }}
+
+        int numIterations = max(skipValue, 1);      
+
+        while(numIterations-- != 0) {{
+            if(distance.x < distance.y || distance.z < distance.y) {{
+                if(distance.x < distance.z){{
+                    intPos.x += dirSign.x;
+                    distance.yz -= distance.x;
+                    distance.x = projLength.x;
+                }}    
+                else{{
+                    intPos.z += dirSign.z;
+                    distance.xy -= distance.z;
+                    distance.z = projLength.z;
+                }}    
+            }}
+            else{{
+                intPos.y += dirSign.y;
+                distance.xz -= distance.y;
+                distance.y = projLength.y;
+            }}    
+        }}
+
+    }} while(isInside(intPos));
+    // no intersection along the ray...
 }}
 ";
         }

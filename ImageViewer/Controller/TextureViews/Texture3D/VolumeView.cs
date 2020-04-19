@@ -55,12 +55,12 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             
             if (models.Display.LinearInterpolation)
             {
-                smooth.Run(GetWorldToImage(), models.Display.ClientAspectRatioScalar, 
+                smooth.Run(GetWorldToImage(),
                 texture.GetSrView(models.Display.ActiveLayerMipmap), helpTextures[id].GetView(models.Display.ActiveMipmap));
             }
             else
             {
-                cube.Run(GetWorldToImage(), models.Display.ClientAspectRatioScalar,
+                cube.Run(GetWorldToImage(),
                 displayEx.FlatShading, texture.GetSrView(models.Display.ActiveLayerMipmap), helpTextures[id].GetView(models.Display.ActiveMipmap));
             }
 
@@ -94,7 +94,20 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
 
         public override Size3 GetTexelPosition(Vector2 mouse)
         {
-            return new Size3(0, 0, 0);
+            // find first valid image
+            foreach (var tex in helpTextures)
+            {
+                if(tex == null) continue;
+
+                // found valid texture
+                var res = cube.GetIntersection(GetWorldToImage(), mouse, tex.GetView(models.Display.ActiveMipmap));
+                if(res.X < 0) // no intersection at all (what to do?)
+                    continue;
+
+                return res;
+            }
+            
+            return Size3.Zero;
         }
 
         public override void Dispose()
