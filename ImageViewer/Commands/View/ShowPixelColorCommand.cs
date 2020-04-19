@@ -46,6 +46,14 @@ namespace ImageViewer.Commands.View
 
         public override void Execute()
         {
+            if (!models.Display.PrevTexelPosition.HasValue)
+            {
+                models.Window.ShowInfoDialog("No pixel selected");
+                return;
+            }
+
+            var tp = models.Display.PrevTexelPosition.Value;
+
             var colors = new List<PixelColorDialog.Element>();
             for (int i = 0; i < models.NumPipelines; ++i)
             {
@@ -54,7 +62,7 @@ namespace ImageViewer.Commands.View
                     var tex = models.Pipelines[i].Image;
                     if(tex == null) continue;
 
-                    var color = models.GetPixelValue(tex, new Size3(models.Display.PrevTexelPosition.X, models.Display.PrevTexelPosition.Y, 0),
+                    var color = models.GetPixelValue(tex, new Size3(tp.X, tp.Y, tp.Z),
                         models.Display.ActiveLayerMipmap, models.Display.TexelRadius);
 
                     colors.Add(new PixelColorDialog.Element(color, i, models.Statistics[i].Stats.HasAlpha));
@@ -63,7 +71,7 @@ namespace ImageViewer.Commands.View
 
             if (colors.Count > 0)
             {
-                var dia = new PixelColorDialog(colors, models.Display.PrevTexelPosition, models.Images.Is3D);
+                var dia = new PixelColorDialog(colors, tp, models.Images.Is3D);
                 models.Window.ShowDialog(dia);
             }
         }

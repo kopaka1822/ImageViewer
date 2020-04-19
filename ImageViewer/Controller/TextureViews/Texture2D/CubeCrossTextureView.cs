@@ -38,7 +38,7 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
             DrawLayer(Matrix.Translation(4.0f, 0.0f, 0.0f), texture.GetSrView(lm), models.Overlay.Overlay?.GetSrView(lm));
         }
 
-        public override Size3 GetTexelPosition(Vector2 mouse)
+        public override Size3? GetTexelPosition(Vector2 mouse)
         {
             var transMouse = GetDirectXMouseCoordinates(mouse);
 

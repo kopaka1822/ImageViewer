@@ -500,9 +500,12 @@ namespace ImageViewer.ViewModels.Display
         {
             get
             {
-                var res = models.Display.TexelPosition.X + ", " + GetTexelPositionY();
+                if (!models.Display.TexelPosition.HasValue) return "X";
+                var tp = models.Display.TexelPosition.Value;
+
+                var res = tp.X + ", " + GetTexelPositionY(tp.Y);
                 if (models.Images.ImageType == typeof(Texture3D))
-                    res += ", " + models.Display.TexelPosition.Z;
+                    res += ", " + tp.Z;
                 return res;
             }
         }
@@ -550,11 +553,11 @@ namespace ImageViewer.ViewModels.Display
         /// <summary>
         /// respects flipping of texel coordinate
         /// </summary>
-        private int GetTexelPositionY()
+        private int GetTexelPositionY(int value)
         {
-            if (!models.Settings.FlipYAxis) return models.Display.TexelPosition.Y;
+            if (!models.Settings.FlipYAxis) return value;
             if (models.Images.NumImages == 0) return 0;
-            return models.Images.GetHeight(models.Display.ActiveMipmap) - models.Display.TexelPosition.Y - 1;
+            return models.Images.GetHeight(models.Display.ActiveMipmap) - value - 1;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

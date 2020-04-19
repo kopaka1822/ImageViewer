@@ -92,7 +92,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
                 Matrix.Translation(size.X * 0.5f, size.Y * 0.5f, size.Z * 0.5f); // to cube origin
         }
 
-        public override Size3 GetTexelPosition(Vector2 mouse)
+        public override Size3? GetTexelPosition(Vector2 mouse)
         {
             // find first valid image
             foreach (var tex in helpTextures)
@@ -107,7 +107,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
                 return res;
             }
             
-            return Size3.Zero;
+            return null;
         }
 
         public override void Dispose()

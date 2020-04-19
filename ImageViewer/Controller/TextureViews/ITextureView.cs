@@ -17,7 +17,7 @@ namespace ImageViewer.Controller.TextureViews
         void OnDrag(Vector2 diff);
 
         void OnDrag2(Vector2 diff);
-        Size3 GetTexelPosition(Vector2 mouse);
+        Size3? GetTexelPosition(Vector2 mouse);
 
         /// indicates that a pipeline image was changed.
         /// assume that initially all textures are null.

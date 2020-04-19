@@ -40,7 +40,7 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
             dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
         }
 
-        public override Size3 GetTexelPosition(Vector2 mouse)
+        public override Size3? GetTexelPosition(Vector2 mouse)
         {
             // calculate farplane
             var viewDir = new Vector4(mouse.X, -mouse.Y, CalcFarplane(), 0.0f);

@@ -102,7 +102,8 @@ namespace ImageViewer.Models.Display
                 if(ReferenceEquals(value, activeOverlay)) return;
                 activeOverlay?.Dispose();
                 activeOverlay = value;
-                activeOverlay?.MouseMove(TexelPosition);
+                if(TexelPosition.HasValue)
+                    activeOverlay?.MouseMove(TexelPosition.Value);
                 OnPropertyChanged(nameof(ActiveOverlay));
             }
         }
@@ -378,21 +379,22 @@ namespace ImageViewer.Models.Display
         }
 
         // previous mouse position on the texture (should be used for context menu things because the texel)
-        public Size3 PrevTexelPosition { get; private set; } = Size3.Zero;
+        public Size3? PrevTexelPosition { get; private set; } = null;
 
-        private Size3 texelPosition = Size3.Zero;
+        private Size3? texelPosition = null;
         // the mouse position on the texture
-        public Size3 TexelPosition
+        public Size3? TexelPosition
         {
             get => texelPosition;
             set
             {
                 PrevTexelPosition = texelPosition;
-                if (value.Equals(texelPosition)) return;
+                if (Equals(value, texelPosition)) return;
                 texelPosition = value;
                 OnPropertyChanged(nameof(TexelPosition));
 
-                ActiveOverlay?.MouseMove(texelPosition);
+                if(texelPosition.HasValue)
+                    ActiveOverlay?.MouseMove(texelPosition.Value);
             }
         }
 

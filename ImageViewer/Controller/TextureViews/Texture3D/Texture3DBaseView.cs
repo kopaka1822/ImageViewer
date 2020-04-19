@@ -63,7 +63,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             cubeOffsetY += diff.Y / models.Display.Zoom;
         }
 
-        public abstract Size3 GetTexelPosition(Vector2 mouse);
+        public abstract Size3? GetTexelPosition(Vector2 mouse);
         public virtual void UpdateImage(int id, ITexture texture) {}
 
         // texture cube center in camera coordinate system

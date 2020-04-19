@@ -57,7 +57,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
             OnDrag(diff);
         }
 
-        public abstract Size3 GetTexelPosition(Vector2 mouse);
+        public abstract Size3? GetTexelPosition(Vector2 mouse);
         public void UpdateImage(int id, ITexture texture)
         {
             

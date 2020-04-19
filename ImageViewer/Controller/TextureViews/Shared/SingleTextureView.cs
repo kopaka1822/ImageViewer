@@ -22,7 +22,7 @@ namespace ImageViewer.Controller.TextureViews.Shared
                        models.Overlay.Overlay?.GetSrView(models.Display.ActiveLayerMipmap));
         }
 
-        public override Size3 GetTexelPosition(Vector2 mouse)
+        public override Size3? GetTexelPosition(Vector2 mouse)
         {
             var transMouse = GetDirectXMouseCoordinates(mouse);
 

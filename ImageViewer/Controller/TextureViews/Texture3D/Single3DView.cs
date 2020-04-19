@@ -36,7 +36,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             translation.Y -= diff.Y * 2.0f / models.Images.Size[displayEx.FreeAxis2];
         }
 
-        public override Size3 GetTexelPosition(Vector2 mouse)
+        public override Size3? GetTexelPosition(Vector2 mouse)
         {
             var transMouse = GetDirectXMouseCoordinates(mouse);
 

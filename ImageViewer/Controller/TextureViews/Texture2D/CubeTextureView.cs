@@ -45,7 +45,7 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
             dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;
         }
 
-        public override Size3 GetTexelPosition(Vector2 mouse)
+        public override Size3? GetTexelPosition(Vector2 mouse)
         {
             // left handed coordinate system
             var transform = GetTransform();

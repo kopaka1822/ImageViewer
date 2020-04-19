@@ -227,9 +227,9 @@ cbuffer InfoBuffer : register(b0) {{
 [numthreads(1, 1, 1)]
 void main(){{
     float3 pos;    
+    out_buffer[0] = -1;
     if(!getIntersection(origin, ray, pos)) {{
-        // no intersection at all!
-        out_buffer[0] = -1;
+        // no intersection at all!    
         return;
     }}
 
@@ -247,9 +247,6 @@ void main(){{
     if(dirSign.y == 1) distance.y = 1-distance.y;
     if(dirSign.z == 1) distance.z = 1-distance.z;
     distance *= projLength;
-
-    // remember intPos in case we wont have any intersection
-    out_buffer[0] = intPos;
 
     [loop] do{{
         int skipValue = emptySpaceTex[intPos];
