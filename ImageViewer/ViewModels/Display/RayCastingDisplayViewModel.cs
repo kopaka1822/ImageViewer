@@ -73,6 +73,12 @@ namespace ImageViewer.ViewModels.Display
                 case nameof(RayCastingDisplayModel.UseCropping):
                     OnPropertyChanged(nameof(UseCropping));
                     break;
+                case nameof(RayCastingDisplayModel.SelfShadowing):
+                    OnPropertyChanged(nameof(SelfShadowing));
+                    break;
+                case nameof(RayCastingDisplayModel.AlphaIsCoverage):
+                    OnPropertyChanged(nameof(AlphaIsCoverage));
+                    break;
             }
         }
 
@@ -88,6 +94,18 @@ namespace ImageViewer.ViewModels.Display
         {
             get => displayViewEx.UseCropping;
             set => displayViewEx.UseCropping = value;
+        }
+
+        public bool SelfShadowing
+        {
+            get => displayViewEx.SelfShadowing;
+            set => displayViewEx.SelfShadowing = value;
+        }
+
+        public bool AlphaIsCoverage
+        {
+            get => displayViewEx.AlphaIsCoverage;
+            set => displayViewEx.AlphaIsCoverage = value;
         }
 
         public CropManager.ViewModel Crop { get; private set; }

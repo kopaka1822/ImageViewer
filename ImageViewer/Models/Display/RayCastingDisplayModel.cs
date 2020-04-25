@@ -55,8 +55,31 @@ namespace ImageViewer.Models.Display
             }
         }
 
+        private bool selfShadowing = false;
 
+        public bool SelfShadowing
+        {
+            get => selfShadowing;
+            set
+            {
+                if (value == selfShadowing) return;
+                selfShadowing = value;
+                OnPropertyChanged(nameof(SelfShadowing));
+            }
+        }
 
+        private bool alphaIsCoverage = false;
+
+        public bool AlphaIsCoverage
+        {
+            get => alphaIsCoverage;
+            set
+            {
+                if (value == alphaIsCoverage) return;
+                alphaIsCoverage = value;
+                OnPropertyChanged(nameof(AlphaIsCoverage));
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

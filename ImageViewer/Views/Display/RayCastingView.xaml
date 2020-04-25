@@ -5,8 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImageViewer.Views.Display"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="200">
+    <UserControl.Resources>
+        <system:String x:Key="AlphaCoverageTooltip">Alpha can be interpreted as coverage (material with holes in it) or as opacity (shine through). By default, opacity will be assumed</system:String>
+    </UserControl.Resources>
     <StackPanel Margin="5">
         <Grid>
             <Grid.ColumnDefinitions>
@@ -15,16 +19,47 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <TextBlock 
+                Grid.Row="0"
+                Grid.Column="0"
                 Text="Flat Shading: "
                 Margin="{StaticResource DefaultBorderBotRight}"/>
             <CheckBox
+                Grid.Row="0"
                 Grid.Column="1"
                 VerticalAlignment="Center"
                 IsChecked="{Binding FlatShading}"
                 IsEnabled="{Binding FlatIsEnabled}"
+                Margin="{StaticResource DefaultBorderBottom}"/>
+
+            <TextBlock 
+                Grid.Row="1"
+                Grid.Column="0"
+                Text="Self Shadowing: "
+                Margin="{StaticResource DefaultBorderBotRight}"/>
+            <CheckBox
+                Grid.Row="1"
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                IsChecked="{Binding SelfShadowing}"
+                Margin="{StaticResource DefaultBorderBottom}"/>
+
+            <TextBlock 
+                Grid.Row="2"
+                Grid.Column="0"
+                Text="Alpha Is Coverage: "
+                ToolTip="{StaticResource AlphaCoverageTooltip}"
+                Margin="{StaticResource DefaultBorderBotRight}"/>
+            <CheckBox
+                Grid.Row="2"
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                IsChecked="{Binding AlphaIsCoverage}"
+                ToolTip="{StaticResource AlphaCoverageTooltip}"
                 Margin="{StaticResource DefaultBorderBottom}"/>
         </Grid>
 
