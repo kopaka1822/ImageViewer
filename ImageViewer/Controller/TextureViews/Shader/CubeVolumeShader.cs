@@ -122,13 +122,15 @@ float getFlatShading(float factor) {{
 }}
 
 float4 main(PixelIn i) : SV_TARGET {{
-    float4 color = 0.0;
-    color.a = 1.0; // transmittance    
+    // color
+    float3 c = 0.0;
+    // transmittance
+    float3 t = 1.0;
 
     float3 ray = normalize(i.rayDir);    
 
     float3 pos;    
-    if(!getIntersection(origin, ray, pos)) return color;
+    if(!getIntersection(origin, ray, pos)) return float4(0, 0, 0, 1);
     
     int3 dirSign; 
     dirSign.x = ray.x < 0.0f ? -1 : 1;
@@ -172,8 +174,8 @@ float4 main(PixelIn i) : SV_TARGET {{
             if(!useFlatShading){{
                diffuse = 1;
             }}
-            color.rgb += color.a * s.a * s.rgb * diffuse;
-            color.a *= 1 - s.a;
+            c += calcColor(s, t) * diffuse;
+            t *= getTransmittance(s);
         }}
 
         int numIterations = max(skipValue, 1);      
@@ -201,9 +203,9 @@ float4 main(PixelIn i) : SV_TARGET {{
             }}    
         }}
 
-    }} while(isInside(intPos) && color.a > 0.0);
+    }} while(isInside(intPos) && dot(t, 1) > 0.01);
 
-
+    float4 color = float4(c, dot(t, 1.0 / 3.0));
     {ApplyColorTransform()}
     return toSrgb(color);
 }}

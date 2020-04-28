@@ -21,13 +21,9 @@ namespace ImageViewer.Controller.TextureViews.Shader
             public Vector3 Origin; // ray origin in image space
             public float Aspect; // aspect ratio
             public Size3 CubeStart;
-#pragma warning disable 169
-            private int padding0;
-#pragma warning restore 169
+            public bool SelfShadowing;
             public Size3 CubeEnd;
-#pragma warning disable 169
-            private int padding1;
-#pragma warning restore 169
+            public bool AlphaIsCoverage;
         }
 
         protected VolumeShader(ModelsEx models, string pixelSource, string debugName)
@@ -57,7 +53,9 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 Aspect = screenAspect,
                 Origin = new Vector3(origin.X, origin.Y, origin.Z),
                 CubeStart = cubeStart,
-                CubeEnd = cubeEnd
+                CubeEnd = cubeEnd,
+                SelfShadowing = displayExt.SelfShadowing,
+                AlphaIsCoverage = displayExt.AlphaIsCoverage
             };
         }
 
@@ -68,9 +66,9 @@ matrix transform; // camera rotation
 float3 origin; // camera origin
 float aspect;
 int3 cubeStart;
-int pad10_;
+bool selfShadowing;
 int3 cubeEnd;
-int pad11_;
+bool alphaIsCoverage;
     ";
         }
 
@@ -133,6 +131,24 @@ struct PixelIn {
         protected static string CommonShaderFunctions()
         {
             return @"
+// illumination stuff
+float3 getTransmittance(float4 sample) {
+    if(alphaIsCoverage)
+       return 1.0 - sample.a;
+    // opacity => blocks specific color channels
+    return sample.rgb * (1.0 - sample.a);
+}
+
+float3 calcColor(float4 sample, float3 transmittance)
+{
+    float3 res = transmittance * sample.a * sample.rgb;
+    // assume light source is the camera with light = 1. 
+    // apply transmittance two times (occlusion from light and back to camera)
+    if(selfShadowing) res *= transmittance;
+    return res;
+}
+
+// intersection stuff
 static const float3 fcubeStart = float3(cubeStart);
 static const float3 fcubeEnd = float3(cubeEnd);
 

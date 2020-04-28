@@ -17,21 +17,41 @@ namespace ImageViewer.Controller.TextureViews.Shader
     public class SmoothVolumeShader : VolumeShader
     {
         private readonly SamplerState sampler;
+        //private readonly SamplerState maxSampler;
+        //private readonly SamplerState minSampler;
 
         public SmoothVolumeShader(ModelsEx models) 
             : base(models, GetPixelSource(), "SmoothVolumeShader")
         {
+            var clamp = TextureAddressMode.Clamp;
+
             sampler = new SamplerState(Device.Get().Handle, new SamplerStateDescription
             {
-                AddressU = TextureAddressMode.Border,
-                AddressV = TextureAddressMode.Border,
-                AddressW = TextureAddressMode.Border,
-                //AddressU = TextureAddressMode.Clamp,
-                //AddressV = TextureAddressMode.Clamp,
-                //AddressW = TextureAddressMode.Clamp,
+                //AddressU = TextureAddressMode.Border,
+                //AddressV = TextureAddressMode.Border,
+                //AddressW = TextureAddressMode.Border,
+                AddressU = clamp,
+                AddressV = clamp,
+                AddressW = clamp,
                 Filter = Filter.MinMagMipLinear,
                 BorderColor = new RawColor4(0.0f, 0.0f, 0.0f, 0.0f),
             });
+
+            /*maxSampler = new SamplerState(Device.Get().Handle, new SamplerStateDescription
+            {
+                AddressU = clamp,
+                AddressV = clamp,
+                AddressW = clamp,
+                Filter = Filter.MaximumMinMagMipLinear
+            });
+
+            minSampler = new SamplerState(Device.Get().Handle, new SamplerStateDescription
+            {
+                AddressU = clamp,
+                AddressV = clamp,
+                AddressW = clamp,
+                Filter = Filter.MinimumMinMagMipLinear
+            });*/
         }
 
         public override void Dispose()
@@ -76,6 +96,8 @@ namespace ImageViewer.Controller.TextureViews.Shader
 Texture3D<float4> tex : register(t0);
 Texture3D<uint> emptySpaceTex : register(t1);
 SamplerState texSampler : register(s0);
+SamplerState maxSampler : register(s1);
+SamplerState minSampler : register(s2);
 
 cbuffer InfoBuffer : register(b0) {{
     {CommonShaderBufferData()}
@@ -87,15 +109,16 @@ cbuffer InfoBuffer : register(b0) {{
 {CommonShaderFunctions()}
 
 float4 main(PixelIn i) : SV_TARGET {{
-    float4 color = 0.0;
-    color.a = 1.0; // transmittance
+    // color
+    float3 c = 0.0;
+    // transmittance
+    float3 t = 1.0;
 
     int width, height, depth;
     tex.GetDimensions(width, height, depth);
     int3 size = uint3(width, height, depth);
     float3 fsize = float3(size);    
 
-    // the height of the cube is 2.0 in world space. Width and Depth depend on aspect of height
     const float stepsize = 4.0;
     const float invStepsize = 1.0 / stepsize;
 
@@ -103,30 +126,29 @@ float4 main(PixelIn i) : SV_TARGET {{
     float3 ray = unitRay / stepsize;
 
     float3 pos;    
-    if(!getIntersection(origin, ray, pos)) return color;
+    if(!getIntersection(origin, ray, pos)) return float4(0, 0, 0, 1);
 
     // convert from pixel coordinates to texel ([0, 1])
     float3 invSize = 1 / fsize;    
     
     float skipped = 0.0;
     [loop] do{{
-        float3 pos2 = float3(pos.xy,1-pos.z);
+        // determine empty space
+        int skipValue = int(emptySpaceTex[clamp(int3(pos), 0, size-1)]);
+        if(skipValue <= 1) {{
+            float4 s = tex.SampleLevel(texSampler, pos * invSize, 0);
+            // adjust alpha based on stepsize        
+            s.a = 1.0 - pow(max(1.0 - s.a, 0.0), invStepsize);
+            c += calcColor(s, t);
 
-        //skip empty space
-        pos += max(int(emptySpaceTex[clamp(int3(pos), 0, size-1)]) - 1, 0) * unitRay;
-
-        if(!isInside(pos)) break;
-
-        float4 s = tex.SampleLevel(texSampler, pos * invSize, 0);
-
-        float invAlpha = pow(max(1.0 - s.a, 0.0), invStepsize);
-        float alpha = 1.0 - invAlpha;
-        color.rgb += color.a * alpha * s.rgb;
-        color.a *= invAlpha;
-        
-        pos += ray;
-    }} while(color.a > 0.0);
+            t *= 1.0 - s.a;   
+            pos += ray; // increase by stepsize
+        }} else {{
+            pos += (skipValue - 1) * unitRay;
+        }}
+    }} while(isInside(pos) && dot(t, 1) > 0.01);
    
+    float4 color = float4(c, dot(t, 1.0 / 3.0));
     {ApplyColorTransform()}
     return toSrgb(color);
 }}

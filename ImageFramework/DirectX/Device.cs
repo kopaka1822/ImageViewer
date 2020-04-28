@@ -28,6 +28,7 @@ namespace ImageFramework.DirectX
         public SharpDX.DXGI.Factory FactoryHandle { get; }
 
         public bool SupportsDouble { get; }
+        public bool SupportMinMaxFiltering { get; }
 
         public event EventHandler DeviceDispose;
 
@@ -47,9 +48,10 @@ namespace ImageFramework.DirectX
             var adapter = obj.Adapter;
             FactoryHandle = adapter.GetParent<SharpDX.DXGI.Factory>();
             context = Handle.ImmediateContext;
-
+            
             SetDefaults();
             SupportsDouble = Handle.CheckFeatureSupport(SharpDX.Direct3D11.Feature.ShaderDoubles);
+            SupportMinMaxFiltering = Handle.CheckD3D112Feature().MinMaxFiltering;
         }
 
         // it is probably a low end device if feature level 11.1 was not available

@@ -39,27 +39,28 @@
             <TextBlock 
                 Grid.Row="1"
                 Grid.Column="0"
-                Text="Self Shadowing: "
+                Text="Alpha Is Coverage: "
+                ToolTip="{StaticResource AlphaCoverageTooltip}"
                 Margin="{StaticResource DefaultBorderBotRight}"/>
             <CheckBox
                 Grid.Row="1"
                 Grid.Column="1"
                 VerticalAlignment="Center"
-                IsChecked="{Binding SelfShadowing}"
+                IsChecked="{Binding AlphaIsCoverage}"
+                IsEnabled="{Binding FlatIsEnabled}"
+                ToolTip="{StaticResource AlphaCoverageTooltip}"
                 Margin="{StaticResource DefaultBorderBottom}"/>
 
             <TextBlock 
                 Grid.Row="2"
                 Grid.Column="0"
-                Text="Alpha Is Coverage: "
-                ToolTip="{StaticResource AlphaCoverageTooltip}"
+                Text="Self Shadowing: "
                 Margin="{StaticResource DefaultBorderBotRight}"/>
             <CheckBox
                 Grid.Row="2"
                 Grid.Column="1"
                 VerticalAlignment="Center"
-                IsChecked="{Binding AlphaIsCoverage}"
-                ToolTip="{StaticResource AlphaCoverageTooltip}"
+                IsChecked="{Binding SelfShadowing}"
                 Margin="{StaticResource DefaultBorderBottom}"/>
         </Grid>
 

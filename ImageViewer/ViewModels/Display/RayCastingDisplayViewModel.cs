@@ -56,6 +56,8 @@ namespace ImageViewer.ViewModels.Display
             {
                 case nameof(DisplayModel.LinearInterpolation):
                     OnPropertyChanged(nameof(FlatIsEnabled));
+                    OnPropertyChanged(nameof(FlatShading));
+                    OnPropertyChanged(nameof(AlphaIsCoverage));
                     break;
                 case nameof(DisplayModel.ActiveMipmap):
                     Crop.Mipmap = models.Display.ActiveMipmap;
@@ -84,7 +86,7 @@ namespace ImageViewer.ViewModels.Display
 
         public bool FlatShading
         {
-            get => displayViewEx.FlatShading;
+            get => !models.Display.LinearInterpolation && displayViewEx.FlatShading;
             set => displayViewEx.FlatShading = value;
         }
 
@@ -104,7 +106,7 @@ namespace ImageViewer.ViewModels.Display
 
         public bool AlphaIsCoverage
         {
-            get => displayViewEx.AlphaIsCoverage;
+            get => models.Display.LinearInterpolation || displayViewEx.AlphaIsCoverage;
             set => displayViewEx.AlphaIsCoverage = value;
         }
 
