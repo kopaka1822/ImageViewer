@@ -58,6 +58,7 @@ namespace ImageViewer.ViewModels.Display
                     OnPropertyChanged(nameof(FlatIsEnabled));
                     OnPropertyChanged(nameof(FlatShading));
                     OnPropertyChanged(nameof(AlphaIsCoverage));
+                    OnPropertyChanged(nameof(HideInternals));
                     break;
                 case nameof(DisplayModel.ActiveMipmap):
                     Crop.Mipmap = models.Display.ActiveMipmap;
@@ -80,6 +81,9 @@ namespace ImageViewer.ViewModels.Display
                     break;
                 case nameof(RayCastingDisplayModel.AlphaIsCoverage):
                     OnPropertyChanged(nameof(AlphaIsCoverage));
+                    break;
+                case nameof(RayCastingDisplayModel.HideInternals):
+                    OnPropertyChanged(nameof(HideInternals));
                     break;
             }
         }
@@ -108,6 +112,12 @@ namespace ImageViewer.ViewModels.Display
         {
             get => models.Display.LinearInterpolation || displayViewEx.AlphaIsCoverage;
             set => displayViewEx.AlphaIsCoverage = value;
+        }
+
+        public bool HideInternals
+        {
+            get => !models.Display.LinearInterpolation && displayViewEx.HideInternals;
+            set => displayViewEx.HideInternals = value;
         }
 
         public CropManager.ViewModel Crop { get; private set; }

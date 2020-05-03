@@ -118,7 +118,7 @@ cbuffer InfoBuffer : register(b0) {{
 {CommonShaderFunctions()}
 
 float getFlatShading(float factor) {{
-    return 0.7 + 0.3 * factor;
+    return 0.5 + 0.5 * factor;
 }}
 
 float4 main(PixelIn i) : SV_TARGET {{
@@ -165,17 +165,28 @@ float4 main(PixelIn i) : SV_TARGET {{
         }}
     }}
 
+    // hide internal data
+    bool lastInside = false;
+    float4 lastSample = 0;
+
     [loop] do{{
         int skipValue = emptySpaceTex[intPos];
+        if(!useFlatShading){{
+            diffuse = 1;
+        }}
 
         if(skipValue == 0) {{
             // this block can be shaded
-            float4 s = tex[intPos];
-            if(!useFlatShading){{
-               diffuse = 1;
+            lastSample = tex[intPos];
+            if(!hideInside || !lastInside) {{
+                c += calcColor(lastSample, t) * diffuse;
+                t *= getTransmittance(lastSample);
             }}
-            c += calcColor(s, t) * diffuse;
-            t *= getTransmittance(s);
+            lastInside = true;
+        }} else if(hideInside && lastInside) {{
+            c += calcColor(lastSample, t) * diffuse;
+            t *= getTransmittance(lastSample);
+            lastInside = false;
         }}
 
         int numIterations = max(skipValue, 1);      
@@ -205,6 +216,11 @@ float4 main(PixelIn i) : SV_TARGET {{
 
     }} while(isInside(intPos) && dot(t, 1) > 0.01);
 
+    if(hideInside && lastInside) {{
+        c += calcColor(lastSample, t) * diffuse;
+        t *= getTransmittance(lastSample);
+    }}
+       
     float4 color = float4(c, dot(t, 1.0 / 3.0));
     {ApplyColorTransform()}
     return toSrgb(color);

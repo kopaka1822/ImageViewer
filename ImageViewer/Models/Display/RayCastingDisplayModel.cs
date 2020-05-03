@@ -81,6 +81,18 @@ namespace ImageViewer.Models.Display
             }
         }
 
+        private bool hideInternals = false;
+        public bool HideInternals
+        {
+            get => hideInternals;
+            set
+            {
+                if (value == hideInternals) return;
+                hideInternals = value;
+                OnPropertyChanged(nameof(HideInternals));
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

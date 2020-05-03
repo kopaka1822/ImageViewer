@@ -8,6 +8,7 @@ using ImageViewer.Models;
 using ImageViewer.Models.Display;
 using SharpDX;
 using SharpDX.Direct3D11;
+using SharpDX.Mathematics.Interop;
 
 namespace ImageViewer.Controller.TextureViews.Shader
 {
@@ -21,9 +22,11 @@ namespace ImageViewer.Controller.TextureViews.Shader
             public Vector3 Origin; // ray origin in image space
             public float Aspect; // aspect ratio
             public Size3 CubeStart;
-            public bool SelfShadowing;
+            public RawBool SelfShadowing;
             public Size3 CubeEnd;
-            public bool AlphaIsCoverage;
+            public RawBool AlphaIsCoverage;
+            public Vector3 Padding0;
+            public RawBool HideInternals;
         }
 
         protected VolumeShader(ModelsEx models, string pixelSource, string debugName)
@@ -55,7 +58,8 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 CubeStart = cubeStart,
                 CubeEnd = cubeEnd,
                 SelfShadowing = displayExt.SelfShadowing,
-                AlphaIsCoverage = displayExt.AlphaIsCoverage
+                AlphaIsCoverage = displayExt.AlphaIsCoverage,
+                HideInternals = displayExt.HideInternals
             };
         }
 
@@ -69,6 +73,8 @@ int3 cubeStart;
 bool selfShadowing;
 int3 cubeEnd;
 bool alphaIsCoverage;
+int3 _padding10;
+bool hideInside;
     ";
         }
 

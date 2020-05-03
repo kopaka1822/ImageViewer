@@ -21,6 +21,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <TextBlock 
@@ -39,11 +40,24 @@
             <TextBlock 
                 Grid.Row="1"
                 Grid.Column="0"
+                Text="Hide Internals: "
+                Margin="{StaticResource DefaultBorderBotRight}"/>
+            <CheckBox
+                Grid.Row="1"
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                IsChecked="{Binding HideInternals}"
+                IsEnabled="{Binding FlatIsEnabled}"
+                Margin="{StaticResource DefaultBorderBottom}"/>
+
+            <TextBlock 
+                Grid.Row="2"
+                Grid.Column="0"
                 Text="Alpha Is Coverage: "
                 ToolTip="{StaticResource AlphaCoverageTooltip}"
                 Margin="{StaticResource DefaultBorderBotRight}"/>
             <CheckBox
-                Grid.Row="1"
+                Grid.Row="2"
                 Grid.Column="1"
                 VerticalAlignment="Center"
                 IsChecked="{Binding AlphaIsCoverage}"
@@ -52,12 +66,12 @@
                 Margin="{StaticResource DefaultBorderBottom}"/>
 
             <TextBlock 
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.Column="0"
                 Text="Self Shadowing: "
                 Margin="{StaticResource DefaultBorderBotRight}"/>
             <CheckBox
-                Grid.Row="2"
+                Grid.Row="3"
                 Grid.Column="1"
                 VerticalAlignment="Center"
                 IsChecked="{Binding SelfShadowing}"
