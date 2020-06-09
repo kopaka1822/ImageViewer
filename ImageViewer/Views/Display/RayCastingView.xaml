@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="200">
     <UserControl.Resources>
-        <system:String x:Key="AlphaCoverageTooltip">Alpha can be interpreted as coverage (material with holes in it) or as opacity (shine through). By default, opacity will be assumed</system:String>
+        <system:String x:Key="AlphaCoverageTooltip">Alpha can be interpreted as coverage (material with holes in it) or as opacity (shine through). By default, coverage will be assumed</system:String>
     </UserControl.Resources>
     <StackPanel Margin="5">
         <Grid>

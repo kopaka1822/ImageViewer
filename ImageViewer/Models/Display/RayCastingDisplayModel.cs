@@ -68,7 +68,7 @@ namespace ImageViewer.Models.Display
             }
         }
 
-        private bool alphaIsCoverage = false;
+        private bool alphaIsCoverage = true;
 
         public bool AlphaIsCoverage
         {
