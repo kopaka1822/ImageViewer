@@ -27,14 +27,13 @@
             <TextBlock 
                 Grid.Row="0"
                 Grid.Column="0"
-                Text="Flat Shading: "
+                Text="Shading: "
                 Margin="{StaticResource DefaultBorderBotRight}"/>
             <CheckBox
                 Grid.Row="0"
                 Grid.Column="1"
                 VerticalAlignment="Center"
-                IsChecked="{Binding FlatShading}"
-                IsEnabled="{Binding FlatIsEnabled}"
+                IsChecked="{Binding Shading}"
                 Margin="{StaticResource DefaultBorderBottom}"/>
 
             <TextBlock 
@@ -65,7 +64,7 @@
                 ToolTip="{StaticResource AlphaCoverageTooltip}"
                 Margin="{StaticResource DefaultBorderBottom}"/>
 
-            <TextBlock 
+            <!--<TextBlock 
                 Grid.Row="3"
                 Grid.Column="0"
                 Text="Self Shadowing: "
@@ -75,7 +74,7 @@
                 Grid.Column="1"
                 VerticalAlignment="Center"
                 IsChecked="{Binding SelfShadowing}"
-                Margin="{StaticResource DefaultBorderBottom}"/>
+                Margin="{StaticResource DefaultBorderBottom}"/>-->
         </Grid>
 
         <!-- Slice -->

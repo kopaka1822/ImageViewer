@@ -57,7 +57,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 Origin = new Vector3(origin.X, origin.Y, origin.Z),
                 CubeStart = cubeStart,
                 CubeEnd = cubeEnd,
-                SelfShadowing = displayExt.SelfShadowing,
+                SelfShadowing = displayExt.Shading,
                 AlphaIsCoverage = displayExt.AlphaIsCoverage,
                 HideInternals = displayExt.HideInternals
             };

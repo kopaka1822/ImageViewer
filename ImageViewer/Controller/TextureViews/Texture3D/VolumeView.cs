@@ -61,7 +61,7 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             else
             {
                 cube.Run(GetWorldToImage(),
-                displayEx.FlatShading, texture.GetSrView(models.Display.ActiveLayerMipmap), helpTextures[id].GetView(models.Display.ActiveMipmap));
+                displayEx.Shading, texture.GetSrView(models.Display.ActiveLayerMipmap), helpTextures[id].GetView(models.Display.ActiveMipmap));
             }
 
             dev.OutputMerger.BlendState = models.ViewData.DefaultBlendState;

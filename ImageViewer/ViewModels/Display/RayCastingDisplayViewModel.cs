@@ -55,8 +55,6 @@ namespace ImageViewer.ViewModels.Display
             switch (e.PropertyName)
             {
                 case nameof(DisplayModel.LinearInterpolation):
-                    OnPropertyChanged(nameof(FlatIsEnabled));
-                    OnPropertyChanged(nameof(FlatShading));
                     OnPropertyChanged(nameof(AlphaIsCoverage));
                     OnPropertyChanged(nameof(HideInternals));
                     break;
@@ -70,14 +68,11 @@ namespace ImageViewer.ViewModels.Display
         {
             switch (e.PropertyName)
             {
-                case nameof(RayCastingDisplayModel.FlatShading):
-                    OnPropertyChanged(nameof(FlatShading));
+                case nameof(RayCastingDisplayModel.Shading):
+                    OnPropertyChanged(nameof(Shading));
                     break;
                 case nameof(RayCastingDisplayModel.UseCropping):
                     OnPropertyChanged(nameof(UseCropping));
-                    break;
-                case nameof(RayCastingDisplayModel.SelfShadowing):
-                    OnPropertyChanged(nameof(SelfShadowing));
                     break;
                 case nameof(RayCastingDisplayModel.AlphaIsCoverage):
                     OnPropertyChanged(nameof(AlphaIsCoverage));
@@ -88,24 +83,16 @@ namespace ImageViewer.ViewModels.Display
             }
         }
 
-        public bool FlatShading
+        public bool Shading
         {
-            get => !models.Display.LinearInterpolation && displayViewEx.FlatShading;
-            set => displayViewEx.FlatShading = value;
+            get => displayViewEx.Shading;
+            set => displayViewEx.Shading = value;
         }
-
-        public bool FlatIsEnabled => !models.Display.LinearInterpolation;
 
         public bool UseCropping
         {
             get => displayViewEx.UseCropping;
             set => displayViewEx.UseCropping = value;
-        }
-
-        public bool SelfShadowing
-        {
-            get => displayViewEx.SelfShadowing;
-            set => displayViewEx.SelfShadowing = value;
         }
 
         public bool AlphaIsCoverage

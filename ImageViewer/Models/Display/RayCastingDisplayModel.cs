@@ -29,16 +29,16 @@ namespace ImageViewer.Models.Display
 
         
 
-        private bool flatShading = false;
+        private bool shading = false;
 
-        public bool FlatShading
+        public bool Shading
         {
-            get => flatShading;
+            get => shading;
             set
             {
-                if (value == flatShading) return;
-                flatShading = value;
-                OnPropertyChanged(nameof(FlatShading));
+                if (value == shading) return;
+                shading = value;
+                OnPropertyChanged(nameof(Shading));
             }
         }
 
@@ -52,19 +52,6 @@ namespace ImageViewer.Models.Display
                 if (value == useCropping) return;
                 useCropping = value;
                 OnPropertyChanged(nameof(UseCropping));
-            }
-        }
-
-        private bool selfShadowing = false;
-
-        public bool SelfShadowing
-        {
-            get => selfShadowing;
-            set
-            {
-                if (value == selfShadowing) return;
-                selfShadowing = value;
-                OnPropertyChanged(nameof(SelfShadowing));
             }
         }
 
