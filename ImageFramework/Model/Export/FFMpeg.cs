@@ -41,9 +41,11 @@ namespace ImageFramework.Model.Export
             progress.What = "converting";
 
             // progress reports
+            string errors = "";
             p.ErrorDataReceived += (sender, args) =>
             {
                 if(args.Data == null) return;
+                Console.Error.WriteLine("FFMPEG: " + args.Data);
 
                 if (args.Data.StartsWith("frame="))
                 {
@@ -51,6 +53,11 @@ namespace ImageFramework.Model.Export
                     {
                         progress.Progress = frame / (float) numFrames;
                     }
+                } 
+                else if(args.Data.StartsWith("error", StringComparison.OrdinalIgnoreCase))
+                {
+                    errors += args.Data;
+                    errors += "\n";
                 }
             };
 
@@ -69,6 +76,9 @@ namespace ImageFramework.Model.Export
                     progress.Token.ThrowIfCancellationRequested();
                 }
             }
+
+            if(!String.IsNullOrEmpty(errors))
+                throw new Exception(errors);
         }
     }
 }

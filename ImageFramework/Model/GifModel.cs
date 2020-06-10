@@ -67,7 +67,8 @@ namespace ImageFramework.Model
 
                 var curProg = progress.CreateSubProgress(0.9f);
                 // create frames
-                using (var dst = IO.CreateImage(new ImageFormat(Format.R8G8B8A8_UNorm_SRgb), left.Size, LayerMipmapCount.One))
+                using (var dst = IO.CreateImage(new ImageFormat(Format.R8G8B8A8_UNorm_SRgb), left.Size,
+                    LayerMipmapCount.One))
                 {
                     var dstMip = dst.GetMipmap(LayerMipmapSlice.Mip0);
                     var dstPtr = dstMip.Bytes;
@@ -81,8 +82,8 @@ namespace ImageFramework.Model
 
                         for (int i = 0; i < numFrames; ++i)
                         {
-                            float t = (float)i / (numFrames);
-                            int borderPos = (int)(t * frame.Size.Width);
+                            float t = (float) i / (numFrames);
+                            int borderPos = (int) (t * frame.Size.Width);
 
                             // render frame
                             shader.Run(leftView, rightView, frameView, cfg.SliderWidth, borderPos,
@@ -91,8 +92,9 @@ namespace ImageFramework.Model
                             // save frame as png
                             frame.CopyPixels(LayerMipmapSlice.Mip0, dstPtr, dstSize);
                             var filename = $"{cfg.TmpFilename}{i:D4}";
-                            await Task.Run(() =>IO.SaveImage(dst, filename, "png", GliFormat.RGBA8_SRGB), progress.Token);
-                            curProg.Progress = i / (float)numFrames;
+                            await Task.Run(() => IO.SaveImage(dst, filename, "png", GliFormat.RGBA8_SRGB),
+                                progress.Token);
+                            curProg.Progress = i / (float) numFrames;
                             curProg.What = "creating frames";
                         }
                     }

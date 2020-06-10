@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.IO;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
@@ -40,7 +41,7 @@ namespace ImageViewer.Commands.Export
             return models.Images.NumImages > 0;
         }
 
-        public override void Execute()
+        public override async void Execute()
         {
             if (models.NumEnabled != 2)
             {
@@ -106,6 +107,13 @@ namespace ImageViewer.Commands.Export
                 SliderWidth = viewModel.SliderSize,
                 NumSeconds = viewModel.TotalSeconds
             });
+
+            await models.Progress.WaitForTaskAsync();
+
+            if (!String.IsNullOrEmpty(models.Progress.LastError))
+            {
+                models.Window.ShowErrorDialog(models.Progress.LastError);
+            }
         }
     }
 }
