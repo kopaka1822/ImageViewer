@@ -136,7 +136,7 @@ namespace ImageViewer.UtilityEx
                 firstImageId = pipe.Alpha.FirstImageId;
 
             if (firstImageId >= models.Images.NumImages) return false;
-            if (!models.Images.Images[firstImageId].IsFile) return false;
+            if (String.IsNullOrEmpty(models.Images.Images[firstImageId].Filename)) return false;
 
             var firstImageName = models.Images.Images[firstImageId].Filename;
             InitFromFilename(firstImageName);

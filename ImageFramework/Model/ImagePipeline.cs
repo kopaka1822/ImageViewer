@@ -128,6 +128,16 @@ namespace ImageFramework.Model
             return res;
         }
 
+        /// <summary>
+        /// returns the first image id that occurs in the color or alpha formula
+        /// </summary>
+        public int GetFirstImageId()
+        {
+            if (Color.HasImages)
+                return Color.FirstImageId;
+            return Alpha.FirstImageId;
+        }
+
         internal class UpdateImageArgs
         {
             public Models Models;

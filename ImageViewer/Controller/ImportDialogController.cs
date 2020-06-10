@@ -61,7 +61,7 @@ namespace ImageViewer.Controller
         {
             try
             {
-                models.Images.AddImage(tex, file, imgOriginalFormat, alias);
+                models.Images.AddImage(tex, true, file, imgOriginalFormat, alias);
                 tex = null; // images is now owner
             }
             catch (ImagesModel.MipmapMismatch e)

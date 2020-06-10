@@ -18,7 +18,7 @@ namespace ImageViewer.Models.Settings
     {
         public class ImageData
         {
-            public bool DataIsFilename { get; set; } // otherwise
+            public string Filename { get; set; }
             public string Data { get; set; }
             public string Alias { get; set; }
         }
@@ -49,8 +49,8 @@ namespace ImageViewer.Models.Settings
                 {
                     res.Images.Add(new ImageData
                     {
-                        DataIsFilename = true,
-                        Data = img.Filename,
+                        Filename = img.Filename,
+                        Data = null,
                         Alias = img.Alias
                     });
                 }
@@ -66,7 +66,7 @@ namespace ImageViewer.Models.Settings
 
                     res.Images.Add(new ImageData
                     {
-                        DataIsFilename = false,
+                        Filename = img.Filename,
                         Data = base64,
                         Alias = img.Alias
                     });
@@ -89,8 +89,8 @@ namespace ImageViewer.Models.Settings
             // add images from config
             foreach (var img in Images)
             {
-                if(img.DataIsFilename)
-                    await import.ImportImageAsync(img.Data, img.Alias);
+                if(img.Data == null)
+                    await import.ImportImageAsync(img.Filename, img.Alias);
                 else
                 {
                     // load base 64 bytes
@@ -103,7 +103,7 @@ namespace ImageViewer.Models.Settings
 
                     try
                     {
-                        models.Images.AddImage(tex, "imported", GliFormat.RGBA32_SFLOAT, img.Alias);
+                        models.Images.AddImage(tex, false, img.Filename, GliFormat.RGBA32_SFLOAT, img.Alias);
                     }
                     catch (Exception e)
                     {

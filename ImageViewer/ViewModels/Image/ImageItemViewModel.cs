@@ -28,7 +28,7 @@ namespace ImageViewer.ViewModels.Image
             Prefix = $"I{id} - ";
             ToolTip = imgData.Filename + "\n" + imgData.OriginalFormat;
 
-            if (imgData.Alias.StartsWith("__imported"))
+            if (String.IsNullOrEmpty(imgData.Alias))
             {
                 imageName = "";
                 images.RenameImage(id, "");

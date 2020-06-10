@@ -82,6 +82,7 @@ namespace ImageViewer.ViewModels.Dialog
                     var res = models.CombineToArray(textures);
 
                     models.Images.AddImage(res,
+                        false,
                         GetPrettyFilename(viewModel.ListItems[0].Filename, textures.Count),
                         viewModel.ListItems[0].Format);
                 }
@@ -136,6 +137,7 @@ namespace ImageViewer.ViewModels.Dialog
                     tmpArray.Dispose();
 
                     models.Images.AddImage(res,
+                        false,
                         GetPrettyFilename(viewModel.ListItems[0].Filename, textures.Count),
                         viewModel.ListItems[0].Format);
                 }

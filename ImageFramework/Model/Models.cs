@@ -183,7 +183,7 @@ namespace ImageFramework.Model
             var tex = IO.LoadImageTexture(filename, out var originalFormat);
             try
             {
-                Images.AddImage(tex, filename, originalFormat);
+                Images.AddImage(tex, true, filename, originalFormat);
             }
             catch (Exception)
             {

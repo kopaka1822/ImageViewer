@@ -52,12 +52,13 @@ namespace ImageViewer.Commands.Tools
             var firstImage = models.Images.Images[models.Pipelines[pipeId].Color.FirstImageId];
             var texName = firstImage.Filename;
             var origFormat = firstImage.OriginalFormat;
+            var texAlias = firstImage.Alias;
 
             var tex = models.ConvertTo3D((TextureArray2D) srcTex);
 
             // clear all images
             models.Reset();
-            models.Images.AddImage(tex, texName, origFormat);
+            models.Images.AddImage(tex, false, texName, origFormat, texAlias);
         }
     }
 }

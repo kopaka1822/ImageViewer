@@ -173,7 +173,7 @@ namespace ImageViewer.Commands.Export
         private static string GetFilter(string preferred, bool is3D)
         {
             string pref = null;
-            if(!is3D || Is3DFilter(preferred))
+            if(preferred != null && (!is3D || Is3DFilter(preferred)))
                 filter.TryGetValue(preferred, out pref);
 
             var res = "";

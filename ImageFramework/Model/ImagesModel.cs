@@ -45,13 +45,18 @@ namespace ImageFramework.Model
 
             public bool IsFile => LastModified != null;
 
-            internal ImageData(ITexture image, string filename, GliFormat originalFormat, [CanBeNull] string alias)
+            /// <param name="image">valid texture</param>
+            /// <param name="isFile">indicates if the texture was loaded from a file</param>
+            /// <param name="filename">original filename or proposed filename (when not directly imported)</param>
+            /// <param name="alias">display name</param>
+            /// <param name="originalFormat">original internal format</param>
+            internal ImageData(ITexture image, bool isFile, [CanBeNull] string filename, [CanBeNull] string alias, GliFormat originalFormat)
             {
                 Image = image;
-                Filename = filename;
+                Filename = filename ?? "";
                 OriginalFormat = originalFormat;
-                Alias = alias ?? System.IO.Path.GetFileNameWithoutExtension(filename);
-                if (File.Exists(Filename))
+                Alias = alias ?? System.IO.Path.GetFileNameWithoutExtension(Filename);
+                if (isFile && File.Exists(Filename))
                 {
                     LastModified = File.GetLastWriteTime(Filename);
                 }
@@ -170,14 +175,19 @@ namespace ImageFramework.Model
         /// <summary>
         /// tries to add the image to the current collection.
         /// </summary>
+        /// <param name="image">valid texture</param>
+        /// <param name="isFile">indicates if the texture was loaded from a file</param>
+        /// <param name="filename">original filename or proposed filename (when not directly imported)</param>
+        /// <param name="originalFormat">original internal format</param>
+        /// <param name="alias">display name (if null this will be determined from the filename)</param>
         /// <exception cref="ImagesModel.MipmapMismatch">will be thrown if everything except the number of mipmaps matches</exception>
         /// <exception cref="Exception">will be thrown if the images does not match with the current set of images</exception>
-        public void AddImage(ITexture image, string name, GliFormat originalFormat, [CanBeNull] string alias = null)
+        public void AddImage(ITexture image, bool isFile, [CanBeNull] string filename, GliFormat originalFormat, [CanBeNull] string alias = null)
         {
             if (Images.Count == 0) // first image
             {
                 InitDimensions(image);
-                images.Add(new ImageData(image, name, originalFormat, alias));
+                images.Add(new ImageData(image, isFile, filename, alias, originalFormat));
                 PrevNumImages = 0;
                 OnPropertyChanged(nameof(NumImages));
                 OnPropertyChanged(nameof(NumLayers));
@@ -188,12 +198,12 @@ namespace ImageFramework.Model
             }
             else // test if compatible with previous images
             {
-                TestCompability(image, name);
+                TestCompability(image, (alias ?? filename) ?? "");
 
                 // remember old properties
                 var isHdr = IsHdr;
 
-                images.Add(new ImageData(image, name, originalFormat, alias));
+                images.Add(new ImageData(image, isFile, filename, alias, originalFormat));
                 PrevNumImages = NumImages - 1;
                 OnPropertyChanged(nameof(NumImages));
 

@@ -154,7 +154,7 @@ namespace FrameworkTests.Model
         {
             var model = new Models(1);
             var orig = IO.LoadImageTexture(TestData.Directory + "checkers3d.dds", out var format);
-            model.Images.AddImage(orig, "tsts", format);
+            model.Images.AddImage(orig, true, TestData.Directory + "checkers3d.dds", format);
             model.Apply();
             
 
@@ -176,7 +176,7 @@ namespace FrameworkTests.Model
         {
             var model = new Models(1);
             var orig = IO.LoadImageTexture(TestData.Directory + "checkers3d.dds", out var format);
-            model.Images.AddImage(orig, "tsts", format);
+            model.Images.AddImage(orig, true, TestData.Directory + "checkers3d.dds", format);
             model.Apply();
 
             model.Export.Export(new ExportDescription(model.Pipelines[0].Image, ExportDir + "tmp3d", "dds")
