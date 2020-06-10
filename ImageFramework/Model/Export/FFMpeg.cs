@@ -25,6 +25,9 @@ namespace ImageFramework.Model.Export
         {
             Debug.Assert(IsAvailable());
 
+            string startArgs =
+                $"-framerate {config.FramesPerSecond} -i \"{config.TmpFilename}%4d.png\" -c:v libx264 -preset veryslow -crf 1 -pix_fmt yuv420p -frames:v {config.FramesPerSecond * config.NumSeconds} -r {config.FramesPerSecond} \"{config.Filename}\"";
+
             var p = new Process
             {
                 StartInfo =
@@ -34,7 +37,7 @@ namespace ImageFramework.Model.Export
                     CreateNoWindow = true,
                     RedirectStandardError = true,
                     FileName = Path,
-                    Arguments = $"-framerate {config.FramesPerSecond} -i \"{config.TmpFilename}%4d.png\" -c:v libx264 -preset veryslow -crf 1 -pix_fmt yuv420p -frames:v {config.FramesPerSecond * config.NumSeconds} -r {config.FramesPerSecond} \"{config.Filename}\""
+                    Arguments = startArgs
                 }
             };
             var numFrames = config.NumSeconds * config.FramesPerSecond;

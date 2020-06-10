@@ -34,6 +34,14 @@ namespace ImageFramework.Model
             public int SliderWidth = 3;
             public string TmpFilename; // filename without extension (frames will be save in BaseFilename000 - BaseFilenameXXX)
             public string Filename; // destination filename
+            public int Width;
+            public int Height;
+
+            public void VerifyConfig()
+            {
+                if(Width % 2 != 0 || Height % 2 != 0)
+                    throw new Exception("Image width and height have to be a multiple of 2");
+            }
         }
 
         internal GifModel(QuadShader quad, UploadBuffer upload, ProgressModel progressModel)

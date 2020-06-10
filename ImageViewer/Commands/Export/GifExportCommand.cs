@@ -99,14 +99,28 @@ namespace ImageViewer.Commands.Export
             // delete old file if it existed (otherwise ffmpeg will hang)
             System.IO.File.Delete(sfd.FileName);
 
-            models.Gif.CreateGif((TextureArray2D)img1, (TextureArray2D)img2, new GifModel.Config
+            GifModel.Config config = new GifModel.Config
             {
                 Filename = sfd.FileName,
                 TmpFilename = tmpName,
                 FramesPerSecond = viewModel.FramesPerSecond,
                 SliderWidth = viewModel.SliderSize,
-                NumSeconds = viewModel.TotalSeconds
-            });
+                NumSeconds = viewModel.TotalSeconds,
+                Width = img1.Size.Width,
+                Height = img1.Size.Height
+            };
+
+            try
+            {
+                config.VerifyConfig();
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e);
+                return;
+            }
+
+            models.Gif.CreateGif((TextureArray2D)img1, (TextureArray2D)img2, config);
 
             await models.Progress.WaitForTaskAsync();
 
