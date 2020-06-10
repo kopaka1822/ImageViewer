@@ -49,6 +49,7 @@ namespace ImageViewer.Commands.Export
             // is a file?
             var imgId = pipe.GetFirstImageId();
             if (!models.Images.Images[imgId].IsFile) return false;
+            if (String.IsNullOrEmpty(models.Images.Images[imgId].Filename)) return false;
 
             return true;
         }

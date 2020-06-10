@@ -26,7 +26,9 @@ namespace ImageViewer.ViewModels.Image
             var imgData = images.Images[id];
 
             Prefix = $"I{id} - ";
-            ToolTip = imgData.Filename + "\n" + imgData.OriginalFormat;
+            ToolTip = imgData.OriginalFormat.ToString();
+            if (!String.IsNullOrEmpty(imgData.Filename))
+                ToolTip = imgData.Filename + "\n" + ToolTip;
 
             if (String.IsNullOrEmpty(imgData.Alias))
             {

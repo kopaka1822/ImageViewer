@@ -96,7 +96,7 @@ namespace ImageViewer.ViewModels.Filter
             {
                 AvailableTextures.Add(new ListItemViewModel<int>
                 {
-                    Name = $"I{i} - {System.IO.Path.GetFileNameWithoutExtension(images.Images[i].Filename)}",
+                    Name = $"I{i} - {images.Images[i].Alias}",
                     Cargo = i
                 });
             }

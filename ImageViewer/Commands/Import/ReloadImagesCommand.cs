@@ -42,6 +42,7 @@ namespace ImageViewer.Commands.Import
             {
                 var img = models.Images.Images[index];
                 if (img.LastModified == null) continue;
+                if (!File.Exists(img.Filename)) continue;
 
                 var lastModify = File.GetLastWriteTime(img.Filename);
 

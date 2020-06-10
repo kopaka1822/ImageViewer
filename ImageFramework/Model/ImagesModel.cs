@@ -55,7 +55,7 @@ namespace ImageFramework.Model
                 Image = image;
                 Filename = filename ?? "";
                 OriginalFormat = originalFormat;
-                Alias = alias ?? System.IO.Path.GetFileNameWithoutExtension(Filename);
+                Alias = (alias ?? System.IO.Path.GetFileNameWithoutExtension(Filename)) ?? "";
                 if (isFile && File.Exists(Filename))
                 {
                     LastModified = File.GetLastWriteTime(Filename);
