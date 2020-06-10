@@ -162,6 +162,7 @@
     <Compile Include="Model\Shader\ImageCombineShader.cs" />
     <Compile Include="Model\Shader\IShaderBuilder.cs" />
     <Compile Include="Model\Shader\MitchellNetravaliScaleShader.cs" />
+    <Compile Include="Model\Shader\PaddingShader.cs" />
     <Compile Include="Model\Shader\PixelValueShader.cs" />
     <Compile Include="Model\Shader\QuadShader.cs" />
     <Compile Include="Model\Shader\ConvertFormatShader.cs" />

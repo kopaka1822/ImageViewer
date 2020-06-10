@@ -45,7 +45,7 @@ namespace ImageViewer.Commands.Tools
 
             if(models.Window.ShowDialog(dia) != true) return;
 
-            // TODO padding
+            models.Images.PadImages(vm.LeftPad, vm.RightPad, vm.SelectedFill.Cargo, models);
         }
     }
 }

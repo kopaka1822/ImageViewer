@@ -41,7 +41,7 @@ namespace ImageFramework.Model
             public string Alias { get; internal set; }
             public GliFormat OriginalFormat { get; private set; }
 
-            public DateTime? LastModified { get; }
+            public DateTime? LastModified { get; private set; }
 
             public bool IsFile => LastModified != null;
 
@@ -85,6 +85,16 @@ namespace ImageFramework.Model
             public void Scale(Size3 size, MitchellNetravaliScaleShader shader, ScalingModel scaling)
             {
                 var tmp = shader.Run((TextureArray2D) Image, size, scaling);
+                LastModified = null;
+                Image.Dispose();
+                Image = tmp;
+            }
+
+            public void Pad(Size3 leftPad, Size3 rightPad, PaddingShader.FillMode fill, Models models)
+            {
+                var tmp = models.SharedModel.Padding.Run(Image, leftPad, rightPad, fill, models.Scaling,
+                    models.SharedModel);
+                LastModified = null;
                 Image.Dispose();
                 Image = tmp;
             }
@@ -355,6 +365,25 @@ namespace ImageFramework.Model
             foreach (var imageData in Images)
             {
                 imageData.Scale(size, scaleShader, scaling);
+            }
+
+            InitDimensions(images[0].Image);
+
+            OnPropertyChanged(nameof(Size));
+            if(prevMipmaps != NumMipmaps)
+                OnPropertyChanged(nameof(NumMipmaps));
+        }
+
+        public void PadImages(Size3 leftPad, Size3 rightPad, PaddingShader.FillMode fill, Models models)
+        {
+            if (NumImages == 0) return;
+            if (leftPad == Size3.Zero && rightPad == Size3.Zero) return;
+
+            var prevMipmaps = NumMipmaps;
+
+            foreach (var imageData in Images)
+            {
+                imageData.Pad(leftPad, rightPad, fill, models);
             }
 
             InitDimensions(images[0].Image);

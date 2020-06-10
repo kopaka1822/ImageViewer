@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Windows.Documents;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
+using ImageFramework.Model.Shader;
+using ImageFramework.Utility;
 
 namespace ImageViewer.ViewModels.Dialog
 {
@@ -135,21 +137,24 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
+        public Size3 LeftPad => new Size3(Left, Top, Front);
+        public Size3 RightPad => new Size3(Right, Bottom, Back);
+
         public PaddingViewModel(ImageFramework.Model.Models models)
         {
             this.models = models;
             SelectedFill = AvailableFills[0];
         }
 
-        public List<ListItemViewModel<int>> AvailableFills { get; } = new List<ListItemViewModel<int>>
+        public List<ListItemViewModel<PaddingShader.FillMode>> AvailableFills { get; } = new List<ListItemViewModel<PaddingShader.FillMode>>
         {
-            new ListItemViewModel<int>{Cargo = 0, Name = "Black", ToolTip = ""},
-            new ListItemViewModel<int>{Cargo = 1, Name = "White", ToolTip = ""},
-            new ListItemViewModel<int>{Cargo = 0, Name = "Transparent", ToolTip = ""},
-            new ListItemViewModel<int>{Cargo = 0, Name = "Clamp", ToolTip = "Use nearest pixel color from image"},
+            new ListItemViewModel<PaddingShader.FillMode>{Cargo = PaddingShader.FillMode.Black, Name = "Black", ToolTip = ""},
+            new ListItemViewModel<PaddingShader.FillMode>{Cargo = PaddingShader.FillMode.White, Name = "White", ToolTip = ""},
+            new ListItemViewModel<PaddingShader.FillMode>{Cargo = PaddingShader.FillMode.Transparent, Name = "Transparent", ToolTip = ""},
+            new ListItemViewModel<PaddingShader.FillMode>{Cargo = PaddingShader.FillMode.Clamp, Name = "Clamp", ToolTip = "Use nearest pixel color from image"},
         };
 
-        public ListItemViewModel<int> SelectedFill { get; set; }
+        public ListItemViewModel<PaddingShader.FillMode> SelectedFill { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -63,6 +63,13 @@ namespace ImageFramework.Utility
             Z = yz.Y;
         }
 
+        public Float3(Size3 sz)
+        {
+            X = sz.X;
+            Y = sz.Y;
+            Z = sz.Z;
+        }
+
         public static readonly Float3 Zero = new Float3();
         public static readonly Float3 One = new Float3(1.0f);
 
@@ -114,6 +121,16 @@ namespace ImageFramework.Utility
         public static Float3 operator -(Float3 left, Float3 right)
         {
             return new Float3(left.X - right.X, left.Y - right.Y, left.Z - right.Z);
+        }
+
+        public static Float3 operator *(Float3 left, Float3 right)
+        {
+            return new Float3(left.X * right.X, left.Y * right.Y, left.Z * right.Z);
+        }
+
+        public static Float3 operator /(Float3 left, Float3 right)
+        {
+            return new Float3(left.X / right.X, left.Y / right.Y, left.Z / right.Z);
         }
 
         public static Float3 operator -(Float3 v)
