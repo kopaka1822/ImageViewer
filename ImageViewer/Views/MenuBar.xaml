@@ -195,6 +195,16 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <MenuItem Header="Padding"
+                      Command="{Binding ShowPaddingCommand}"
+                      IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/padding.png"
+                        Width="16" 
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
             <Separator/>
             <MenuItem 
                     Header="Generate Mipmaps"

@@ -1,0 +1,135 @@
+﻿<Window x:Class="ImageViewer.Views.Dialog.PaddingDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImageViewer.Views.Dialog"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="Padding" 
+        Width="200"
+        SizeToContent="Height"
+        Icon="../../Icons/padding.png"
+        Style="{StaticResource WindowStyle}"
+        WindowStartupLocation="CenterOwner">
+    <Border Padding="5">
+        <StackPanel>
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Resolution:"/>
+                <TextBlock 
+                    Grid.Column="1"
+                    Text="{Binding Resolution, FallbackValue=800x600}"/>
+            </Grid>
+
+            <!--Width-->
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Left:"/>
+                <xctk:IntegerUpDown Grid.Column="1"  
+                                    Minimum="0"
+                                    Value="{Binding Left}"/>
+            </Grid>
+
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Right:"/>
+                <xctk:IntegerUpDown Grid.Column="1"  
+                                    Minimum="0"
+                                    Value="{Binding Right}"/>
+            </Grid>
+
+            <!--Height-->
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Top:"/>
+                <xctk:IntegerUpDown Grid.Column="1"  
+                                    Minimum="0"
+                                    Value="{Binding Top}"/>
+            </Grid>
+
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Bottom:"/>
+                <xctk:IntegerUpDown Grid.Column="1"  
+                                    Minimum="0"
+                                    Value="{Binding Bottom}"/>
+            </Grid>
+
+            <!--Depth-->
+            <Grid 
+                Margin="{StaticResource DefaultBorderBottom}"
+                Visibility="{Binding Is3D, Converter={StaticResource VisibleCollapsedConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Front:"/>
+                <xctk:IntegerUpDown Grid.Column="1"  
+                                    Minimum="0"
+                                    Value="{Binding Front}"/>
+            </Grid>
+
+            <Grid 
+                Margin="{StaticResource DefaultBorderBottom}"
+                Visibility="{Binding Is3D, Converter={StaticResource VisibleCollapsedConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Back:"/>
+                <xctk:IntegerUpDown Grid.Column="1"  
+                                    Minimum="0"
+                                    Value="{Binding Back}"/>
+            </Grid>
+
+            <!-- Fill Color -->
+            <Grid 
+                Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Fill:"/>
+                <ComboBox
+                    Grid.Column="1"
+                    ItemsSource="{Binding AvailableFills}"
+                    SelectedItem="{Binding SelectedFill}"
+                    ItemTemplate="{StaticResource ListItemView}"/>
+            </Grid>
+
+            <!-- Buttons -->
+            <StackPanel 
+                Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                Margin="{StaticResource DefaultBorderTop}">
+                <Button 
+                    Content="_Apply" 
+                    Margin="{StaticResource DefaultBorderRight}" 
+                    IsEnabled="{Binding IsValid}"
+                    Width="60"
+                    Click="Apply_OnClick"
+                />
+                <Button 
+                    Content="_Cancel"
+                    Width="60"
+                    Click="Cancel_OnClick"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

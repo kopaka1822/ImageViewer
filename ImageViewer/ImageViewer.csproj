@@ -106,6 +106,7 @@
     <Compile Include="Commands\Tools\LatLongToCubemapCommand.cs" />
     <Compile Include="Commands\Import\OpenCommand.cs" />
     <Compile Include="Commands\Tools\RemoveZoomBoxCommand.cs" />
+    <Compile Include="Commands\Tools\ShowPaddingCommand.cs" />
     <Compile Include="Commands\Tools\StartZoomboxCommand.cs" />
     <Compile Include="Commands\Tools\Tex3DToArrayCommand.cs" />
     <Compile Include="Commands\View\ResizeWindowCommand.cs" />
@@ -169,6 +170,7 @@
     <Compile Include="ViewModels\Dialog\ExportViewModel.cs" />
     <Compile Include="ViewModels\Dialog\GifExportViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ImportArrayViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\PaddingViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelColorViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ResolutionViewModel.cs" />
@@ -220,6 +222,9 @@
     </Compile>
     <Compile Include="Views\Dialog\HelpDialog.xaml.cs">
       <DependentUpon>HelpDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\PaddingDialog.xaml.cs">
+      <DependentUpon>PaddingDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\PixelColorDialog.xaml.cs">
       <DependentUpon>PixelColorDialog.xaml</DependentUpon>
@@ -323,6 +328,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialog\HelpDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\PaddingDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -563,6 +572,8 @@
     <Resource Include="Icons\open_config.png" />
     <Resource Include="Icons\save_config.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Icons\padding.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

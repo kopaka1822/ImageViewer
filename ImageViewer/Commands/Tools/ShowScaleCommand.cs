@@ -21,8 +21,13 @@ namespace ImageViewer.Commands.Tools
 
         private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if(e.PropertyName == nameof(ImagesModel.NumImages))
-                OnCanExecuteChanged();
+            switch (e.PropertyName)
+            {
+                case nameof(ImagesModel.NumImages):
+                case nameof(ImagesModel.ImageType):
+                    OnCanExecuteChanged();
+                    break;
+            }
         }
 
         public override bool CanExecute()
