@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -116,17 +117,30 @@ namespace ImageFramework.Model
                         var filename = $"{cfg.TmpFilename}{i:D4}";
 
                         // write to file
-                        tasks[idx] = Task.Run(() => IO.SaveImage(images[idx], filename, "png", GliFormat.RGBA8_SRGB), progress.Token);
-                        
+                        tasks[idx] = Task.Run(() =>
+                        {
+                            try
+                            {
+                                IO.SaveImage(images[idx], filename, "png", GliFormat.RGBA8_SRGB);
+                            }
+                            catch (Exception)
+                            {
+                                // ignored (probably cancelled by user)
+                            }
+                        }, progress.Token);
+
                         curProg.Progress = i / (float) numFrames;
                         curProg.What = "creating frames";
+
+                        progress.Token.ThrowIfCancellationRequested();
                     }
                 }
 
                 // wait for tasks to finish
-                foreach (var task in tasks)
+                for (var i = 0; i < tasks.Length; i++)
                 {
-                    if (task != null) await task;
+                    if (tasks[i] != null) await tasks[i];
+                    tasks[i] = null;
                 }
 
                 // convert video

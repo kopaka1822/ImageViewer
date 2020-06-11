@@ -18,6 +18,7 @@ namespace ImageViewer.Commands.Export
         private readonly ModelsEx models;
         private readonly GifExportViewModel viewModel = new GifExportViewModel();
         private readonly PathManager path;
+        private bool askForVideo = true;
 
         public GifExportCommand(ModelsEx models)
         {
@@ -57,7 +58,14 @@ namespace ImageViewer.Commands.Export
 
             if (!FFMpeg.IsAvailable())
             {
-                models.Window.ShowErrorDialog("ffmpeg is required for this feature. Please download the ffmpeg binaries and place them in the ImageViewer root directory");
+                if (models.Window.ShowYesNoDialog("ffmpeg is required for this feature. " +
+                                                  "Please download the ffmpeg binaries and place them in the ImageViewer root directory. " +
+                                                  "Open ffmpeg download page and ImageViewer root?", "download ffmpeg?"))
+                {
+                    var root = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    if (root != null) System.Diagnostics.Process.Start(root);
+                    System.Diagnostics.Process.Start("https://www.ffmpeg.org/download.html");
+                }
                 return;
             }
 
@@ -80,7 +88,7 @@ namespace ImageViewer.Commands.Export
             {
                 Filter = "MPEG-4 (*.mp4)|*.mp4",
                 InitialDirectory = path.Directory,
-                FileName = path.Directory
+                FileName = path.Filename
             };
 
             if (sfd.ShowDialog(models.Window.TopmostWindow) != true)
@@ -112,9 +120,19 @@ namespace ImageViewer.Commands.Export
 
             await models.Progress.WaitForTaskAsync();
 
+            if (models.Progress.LastTaskCancelledByUser) return;
+
             if (!String.IsNullOrEmpty(models.Progress.LastError))
             {
                 models.Window.ShowErrorDialog(models.Progress.LastError);
+            }
+            else if(askForVideo)
+            {
+                askForVideo = models.Window.ShowYesNoDialog("Open video?", "Finished exporting");
+                if(askForVideo)
+                {
+                    System.Diagnostics.Process.Start(config.Filename);
+                }
             }
         }
     }

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ImageViewer.Views.Dialog"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
-        Title="Gif Export"
+        Title="Mp4 Export"
         Width="300"
         SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
@@ -22,10 +22,13 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Frames Per Second:"/>
-                <xctk:IntegerUpDown Grid.Column="1"  
-                                    Minimum="1"
-                                    Maximum="60"
-                                    Value="{Binding FramesPerSecond}"/>
+
+                <ComboBox
+                    Grid.Column="1"
+                    SelectedIndex="{Binding SelectedFps, FallbackValue=1}">
+                    <ComboBoxItem>30</ComboBoxItem>
+                    <ComboBoxItem>60</ComboBoxItem>
+                </ComboBox>
             </Grid>
 
             <Grid Margin="0 0 0 5">
@@ -36,7 +39,7 @@
                 <TextBlock Text="Total Seconds:"/>
                 <xctk:IntegerUpDown Grid.Column="1"  
                                     Minimum="1"
-                                    Maximum="16384"
+                                    Maximum="120"
                                     Value="{Binding TotalSeconds}"/>
             </Grid>
 
@@ -48,7 +51,7 @@
                 <TextBlock Text="Slider Size:"/>
                 <xctk:IntegerUpDown Grid.Column="1"  
                                     Minimum="0"
-                                    Maximum="1000"
+                                    Maximum="1024"
                                     Value="{Binding SliderSize}"/>
             </Grid>
 

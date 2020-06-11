@@ -8,7 +8,9 @@ namespace ImageViewer.ViewModels.Dialog
 {
     public class GifExportViewModel
     {
-        public int FramesPerSecond { get; set; } = 60;
+        public int FramesPerSecond => SelectedFps == 0 ? 30 : 60;
+
+        public int SelectedFps { get; set; } = 1;
 
         public int TotalSeconds { get; set; } = 3;
 

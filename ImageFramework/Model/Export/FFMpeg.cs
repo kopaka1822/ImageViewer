@@ -52,7 +52,9 @@ namespace ImageFramework.Model.Export
 
                 if (args.Data.StartsWith("frame="))
                 {
-                    if (int.TryParse(args.Data.Substring("frame=".Length), out var frame))
+                    var substr = args.Data.Substring("frame=".Length);
+                    substr = substr.TrimStart().Split(' ')[0];
+                    if (int.TryParse(substr, out var frame))
                     {
                         progress.Progress = frame / (float) numFrames;
                     }
