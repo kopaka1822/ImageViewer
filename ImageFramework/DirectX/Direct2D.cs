@@ -115,11 +115,14 @@ namespace ImageFramework.DirectX
                     round ? Direct2D.core.RoundStroke : Direct2D.core.HardStroke);
             }
 
-            public void Text(Float2 start, Float2 end, float size, Color color, string text)
+            public void Text(Float2 start, Float2 end, float size, Color color, string text, TextAlignment alignment = TextAlignment.Leading)
             {
+                var font = parent.GetFont(size);
+                font.TextAlignment = alignment;
+                
                 parent.target.DrawText(
                     text, 
-                    parent.GetFont(size), 
+                    font, 
                     new RawRectangleF(start.X, start.Y, end.X, end.Y),
                     parent.GetBrush(color)
                 );
@@ -210,8 +213,13 @@ namespace ImageFramework.DirectX
         {
             if (fonts.TryGetValue(size, out var res))
                 return res;
-            
-            res = new TextFormat(core.WriteFactory, "Verdana", FontWeight.Normal, FontStyle.Normal, size);
+
+            res = new TextFormat(core.WriteFactory, "Verdana", FontWeight.Normal, FontStyle.Normal, size)
+            {
+                WordWrapping = WordWrapping.Wrap, 
+                ParagraphAlignment = ParagraphAlignment.Near
+            };
+            // set some defaults
             fonts.Add(size, res);
 
             return res;

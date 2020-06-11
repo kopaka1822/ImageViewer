@@ -15,6 +15,7 @@ using ImageFramework.Model.Progress;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using Microsoft.SqlServer.Server;
+using SharpDX.DirectWrite;
 using Format = SharpDX.DXGI.Format;
 
 namespace ImageFramework.Model
@@ -35,6 +36,8 @@ namespace ImageFramework.Model
             public int SliderWidth = 3;
             public string TmpFilename; // filename without extension (frames will be save in BaseFilename000 - BaseFilenameXXX)
             public string Filename; // destination filename
+            public string Label1; // name of the first image
+            public string Label2; // name of the second image
         }
 
         internal GifModel(ProgressModel progressModel)
@@ -88,51 +91,64 @@ namespace ImageFramework.Model
                 for (int i = 0; i < numTasks; ++i)
                     images[i] = IO.CreateImage(new ImageFormat(Format.R8G8B8A8_UNorm_SRgb), left.Size,
                         LayerMipmapCount.One);
+                int textSize = left.Size.Y / 18;
+                float padding = textSize / 4.0f;
 
                 // render frames into texture
                 using (var frame = new TextureArray2D(LayerMipmapCount.One, left.Size,
                     Format.R8G8B8A8_UNorm_SRgb, false))
                 {
                     var frameView = frame.GetRtView(LayerMipmapSlice.Mip0);
-
-                    for (int i = 0; i < numFrames; ++i)
+                    using (var d2d = new Direct2D(frame))
                     {
-                        float t = (float) i / (numFrames);
-                        int borderPos = (int) (t * frame.Size.Width);
-                        int idx = i % numTasks;
-
-                        // render frame
-                        shader.Run(leftView, rightView, frameView, cfg.SliderWidth, borderPos,
-                            frame.Size.Width, frame.Size.Height, shared.QuadShader, shared.Upload);
-
-                        // copy frame from gpu to cpu
-                        var dstMip = images[idx].GetMipmap(LayerMipmapSlice.Mip0);
-                        var dstPtr = dstMip.Bytes;
-                        var dstSize = dstMip.ByteSize;
-
-                        // wait for previous task to finish before writing it to the file
-                        if(tasks[idx] != null) await tasks[idx];
-
-                        frame.CopyPixels(LayerMipmapSlice.Mip0, dstPtr, dstSize);
-                        var filename = $"{cfg.TmpFilename}{i:D4}";
-
-                        // write to file
-                        tasks[idx] = Task.Run(() =>
+                        for (int i = 0; i < numFrames; ++i)
                         {
-                            try
-                            {
-                                IO.SaveImage(images[idx], filename, "png", GliFormat.RGBA8_SRGB);
-                            }
-                            catch (Exception)
-                            {
-                                // ignored (probably cancelled by user)
-                            }
-                        }, progress.Token);
+                            float t = (float)i / (numFrames);
+                            int borderPos = (int)(t * frame.Size.Width);
+                            int idx = i % numTasks;
 
-                        curProg.Progress = i / (float) numFrames;
-                        curProg.What = "creating frames";
+                            // render frame
+                            shader.Run(leftView, rightView, frameView, cfg.SliderWidth, borderPos,
+                                frame.Size.Width, frame.Size.Height, shared.QuadShader, shared.Upload);
 
-                        progress.Token.ThrowIfCancellationRequested();
+                            // add text
+                            using (var c = d2d.Begin())
+                            {
+                                var halfX = left.Size.X / 2;
+                                c.Text(new Float2(padding), new Float2(halfX - padding, left.Size.Y - padding), textSize, Colors.White, cfg.Label1);
+
+                                c.Text(new Float2(halfX + padding, padding), new Float2(left.Size.X - padding, left.Size.Y - padding), textSize, Colors.White, cfg.Label2, TextAlignment.Trailing);
+                            }
+
+                            // copy frame from gpu to cpu
+                            var dstMip = images[idx].GetMipmap(LayerMipmapSlice.Mip0);
+                            var dstPtr = dstMip.Bytes;
+                            var dstSize = dstMip.ByteSize;
+
+                            // wait for previous task to finish before writing it to the file
+                            if (tasks[idx] != null) await tasks[idx];
+
+                            frame.CopyPixels(LayerMipmapSlice.Mip0, dstPtr, dstSize);
+                            var filename = $"{cfg.TmpFilename}{i:D4}";
+
+                            // write to file
+                            tasks[idx] = Task.Run(() =>
+                            {
+                                try
+                                {
+                                    IO.SaveImage(images[idx], filename, "png", GliFormat.RGBA8_SRGB);
+                                }
+                                catch (Exception)
+                                {
+                                    // ignored (probably cancelled by user)
+                                }
+                            }, progress.Token);
+
+                            curProg.Progress = i / (float)numFrames;
+                            curProg.What = "creating frames";
+
+                            progress.Token.ThrowIfCancellationRequested();
+                        }
                     }
                 }
 

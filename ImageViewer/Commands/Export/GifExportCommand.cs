@@ -114,6 +114,8 @@ namespace ImageViewer.Commands.Export
                 FramesPerSecond = viewModel.FramesPerSecond,
                 SliderWidth = viewModel.SliderSize,
                 NumSeconds = viewModel.TotalSeconds,
+                Label1 = "Image1",
+                Label2 = "Image2"
             };
 
             models.Gif.CreateGif((TextureArray2D)img1, (TextureArray2D)img2, config, models.SharedModel);
