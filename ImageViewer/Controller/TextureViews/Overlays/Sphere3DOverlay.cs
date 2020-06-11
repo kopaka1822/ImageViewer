@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Documents;
 using ImageFramework.Annotations;
+using ImageFramework.DirectX;
 using ImageFramework.Utility;
 using ImageViewer.DirectX;
 
