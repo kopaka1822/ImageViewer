@@ -66,10 +66,22 @@ namespace ImageFramework.Model.Shader
             Clamp
         }
 
-        public ITexture Run(ITexture src, Size3 leftPad, Size3 rightPad, FillMode fill, ScalingModel scaling, SharedModel shared)
+        /// <summary>
+        /// adds pixels to the image edges
+        /// </summary>
+        /// <param name="src">source image</param>
+        /// <param name="leftPad">padding on the left/top/front side</param>
+        /// <param name="rightPad">padding on the right/bot/back side</param>
+        /// <param name="fill">padding fill mode</param>
+        /// <param name="scaling">used for regenerating mipmaps</param>
+        /// <param name="shared"></param>
+        /// <param name="keepMipmaps">if set to false, no mipmaps will be generated</param>
+        /// <returns>same as source with added padding (amount of mipmaps might change, format remains)</returns>
+        public ITexture Run(ITexture src, Size3 leftPad, Size3 rightPad, FillMode fill, ScalingModel scaling, SharedModel shared, bool keepMipmaps = true)
         {
             Size3 dstSize = leftPad + rightPad + src.Size;
             int nMipmaps = src.NumMipmaps > 1 ? dstSize.MaxMipLevels : 1;
+            if (!keepMipmaps) nMipmaps = 1;
 
             var dst = src.Create(new LayerMipmapCount(src.NumLayers, nMipmaps), dstSize, src.Format, src.HasUaViews,
                 true);

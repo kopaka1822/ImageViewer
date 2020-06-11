@@ -74,38 +74,54 @@ namespace ImageFramework.Model
                 var rightView = right.GetSrView(LayerMipmapSlice.Mip0);
 
                 var curProg = progress.CreateSubProgress(0.9f);
-                // create frames
-                using (var dst = IO.CreateImage(new ImageFormat(Format.R8G8B8A8_UNorm_SRgb), left.Size,
-                    LayerMipmapCount.One))
+
+                // prepare parallel processing
+                var numTasks = Environment.ProcessorCount;
+                var tasks = new Task[numTasks];
+                var images = new DllImageData[numTasks];
+                for (int i = 0; i < numTasks; ++i)
+                    images[i] = IO.CreateImage(new ImageFormat(Format.R8G8B8A8_UNorm_SRgb), left.Size,
+                        LayerMipmapCount.One);
+
+                // render frames into texture
+                using (var frame = new TextureArray2D(LayerMipmapCount.One, left.Size,
+                    Format.R8G8B8A8_UNorm_SRgb, false))
                 {
-                    var dstMip = dst.GetMipmap(LayerMipmapSlice.Mip0);
-                    var dstPtr = dstMip.Bytes;
-                    var dstSize = dstMip.ByteSize;
+                    var frameView = frame.GetRtView(LayerMipmapSlice.Mip0);
 
-                    // render frames into texture
-                    using (var frame = new TextureArray2D(LayerMipmapCount.One, left.Size,
-                        Format.R8G8B8A8_UNorm_SRgb, false))
+                    for (int i = 0; i < numFrames; ++i)
                     {
-                        var frameView = frame.GetRtView(LayerMipmapSlice.Mip0);
+                        float t = (float) i / (numFrames);
+                        int borderPos = (int) (t * frame.Size.Width);
+                        int idx = i % numTasks;
 
-                        for (int i = 0; i < numFrames; ++i)
-                        {
-                            float t = (float) i / (numFrames);
-                            int borderPos = (int) (t * frame.Size.Width);
+                        // render frame
+                        shader.Run(leftView, rightView, frameView, cfg.SliderWidth, borderPos,
+                            frame.Size.Width, frame.Size.Height);
 
-                            // render frame
-                            shader.Run(leftView, rightView, frameView, cfg.SliderWidth, borderPos,
-                                frame.Size.Width, frame.Size.Height);
+                        // copy frame from gpu to cpu
+                        var dstMip = images[idx].GetMipmap(LayerMipmapSlice.Mip0);
+                        var dstPtr = dstMip.Bytes;
+                        var dstSize = dstMip.ByteSize;
 
-                            // save frame as png
-                            frame.CopyPixels(LayerMipmapSlice.Mip0, dstPtr, dstSize);
-                            var filename = $"{cfg.TmpFilename}{i:D4}";
-                            await Task.Run(() => IO.SaveImage(dst, filename, "png", GliFormat.RGBA8_SRGB),
-                                progress.Token);
-                            curProg.Progress = i / (float) numFrames;
-                            curProg.What = "creating frames";
-                        }
+                        // wait for previous task to finish before writing it to the file
+                        if(tasks[idx] != null) await tasks[idx];
+
+                        frame.CopyPixels(LayerMipmapSlice.Mip0, dstPtr, dstSize);
+                        var filename = $"{cfg.TmpFilename}{i:D4}";
+
+                        // write to file
+                        tasks[idx] = Task.Run(() => IO.SaveImage(images[idx], filename, "png", GliFormat.RGBA8_SRGB), progress.Token);
+                        
+                        curProg.Progress = i / (float) numFrames;
+                        curProg.What = "creating frames";
                     }
+                }
+
+                // wait for tasks to finish
+                foreach (var task in tasks)
+                {
+                    if (task != null) await task;
                 }
 
                 // convert video
