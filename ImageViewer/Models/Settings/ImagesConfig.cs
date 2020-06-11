@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Utility;
@@ -21,6 +22,8 @@ namespace ImageViewer.Models.Settings
             public string Filename { get; set; }
             public string Data { get; set; }
             public string Alias { get; set; }
+
+            public GliFormat? Format { get; set; }
         }
 
         public List<ImageData> Images { get; set; } = new List<ImageData>();
@@ -56,10 +59,10 @@ namespace ImageViewer.Models.Settings
                 }
                 else
                 {
-                    Debug.Assert(img.Image.Format == Format.R32G32B32A32_Float);
+                    var fmt = new ImageFormat(img.Image.Format);
 
                     // fill byte array
-                    var bytes = img.Image.GetBytes(4u * 4u);
+                    var bytes = img.Image.GetBytes(fmt.PixelSize);
                     bytes = Compression.Compress(bytes, CompressionLevel.Fastest);
 
                     var base64 = System.Convert.ToBase64String(bytes);
@@ -68,7 +71,8 @@ namespace ImageViewer.Models.Settings
                     {
                         Filename = img.Filename,
                         Data = base64,
-                        Alias = img.Alias
+                        Alias = img.Alias,
+                        Format = fmt.GliFormat
                     });
                 }
             }
@@ -93,17 +97,20 @@ namespace ImageViewer.Models.Settings
                     await import.ImportImageAsync(img.Filename, img.Alias);
                 else
                 {
+                    Debug.Assert(img.Format != null);
+                    var fmt = new ImageFormat(img.Format.Value);
+
                     // load base 64 bytes
                     var bytes = System.Convert.FromBase64String(img.Data);
                     bytes = Compression.Decompress(bytes);
-                    var bi = new ByteImageData(bytes, layerMipmaps, imgSize, new ImageFormat(Format.R32G32B32A32_Float));
+                    var bi = new ByteImageData(bytes, layerMipmaps, imgSize, fmt);
                     ITexture tex = null;
                     if (bi.Is3D) tex = new Texture3D(bi);
                     else tex = new TextureArray2D(bi);
 
                     try
                     {
-                        models.Images.AddImage(tex, false, img.Filename, GliFormat.RGBA32_SFLOAT, img.Alias);
+                        models.Images.AddImage(tex, false, img.Filename, fmt.GliFormat, img.Alias);
                     }
                     catch (Exception e)
                     {
