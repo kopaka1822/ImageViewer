@@ -56,5 +56,101 @@ namespace FrameworkTests.Model.Scaling
             Assert.IsTrue(origColors[7].Equals(newColors[10]));
             Assert.IsTrue(origColors[8].Equals(newColors[11]));
         }
+
+        [TestMethod]
+        public void BottomPadClamp()
+        {
+            var models = new Models(1);
+            var t = IO.LoadImageTexture(TestData.Directory + "small.pfm");
+
+            var res = models.SharedModel.Padding.Run(t, Size3.Zero, new Size3(0, 1, 0), PaddingShader.FillMode.Clamp,
+                models.Scaling, models.SharedModel);
+
+            Assert.AreEqual(3, res.Size.Width);
+            Assert.AreEqual(4, res.Size.Height);
+
+            var origColors = t.GetPixelColors(LayerMipmapSlice.Mip0);
+            var newColors = res.GetPixelColors(LayerMipmapSlice.Mip0);
+
+            // test old data
+            for (int i = 0; i < 3 * 3; ++i)
+            {
+                Assert.IsTrue(origColors[i].Equals(newColors[i]));
+            }
+
+            // last row should be equal
+            var origStart = 2 * 3;
+            var newStart = 3 * 3;
+            for (int i = 0; i < 3; ++i)
+            {
+                Assert.IsTrue(origColors[origStart + i].Equals(newColors[newStart + i]));
+            }
+        }
+
+        [TestMethod]
+        public void TopBotPadWhite()
+        {
+            var models = new Models(1);
+            var t = IO.LoadImageTexture(TestData.Directory + "small.pfm");
+
+            var res = models.SharedModel.Padding.Run(t, new Size3(0, 1, 0), new Size3(0, 3, 0), PaddingShader.FillMode.White,
+                models.Scaling, models.SharedModel);
+
+            Assert.AreEqual(3, res.Size.Width);
+            Assert.AreEqual(7, res.Size.Height);
+
+            var origColors = t.GetPixelColors(LayerMipmapSlice.Mip0);
+            var newColors = res.GetPixelColors(LayerMipmapSlice.Mip0);
+
+            // test old data
+            var newOffset = 3;
+            for (int i = 0; i < 3 * 3; ++i)
+            {
+                Assert.IsTrue(origColors[i].Equals(newColors[newOffset + i]));
+            }
+
+            // start should be white
+            for (int i = 0; i < 3; ++i)
+            {
+                Assert.IsTrue(Colors.White.Equals(newColors[i]));
+            }
+
+            // end should be white
+            newOffset = 4 * 3;
+            for (int i = 0; i < 3 * 3; ++i)
+            {
+                Assert.IsTrue(Colors.White.Equals(newColors[newOffset + i]));
+            }
+        }
+
+        [TestMethod]
+        public void BackPadTransparent()
+        {
+            var models = new Models(1);
+            var t = IO.LoadImageTexture(TestData.Directory + "checkers3D.dds");
+
+            var res = models.SharedModel.Padding.Run(t, Size3.Zero, new Size3(0, 0, 1), PaddingShader.FillMode.Transparent,
+                models.Scaling, models.SharedModel);
+
+            Assert.AreEqual(4, res.Size.Width);
+            Assert.AreEqual(4, res.Size.Height);
+            Assert.AreEqual(5, res.Size.Depth);
+
+            var origColors = t.GetPixelColors(LayerMipmapSlice.Mip0);
+            var newColors = res.GetPixelColors(LayerMipmapSlice.Mip0);
+
+            // test old data
+            for (int i = 0; i < 4 * 4 * 4; ++i)
+            {
+                Assert.IsTrue(origColors[i].Equals(newColors[i]));
+            }
+
+            // last slice should be transparent
+            var newOffset = 4 * 4 * 4;
+            for (int i = 0; i < 4 * 4; ++i)
+            {
+                Assert.IsTrue(Colors.Transparent.Equals(newColors[newOffset + i]));
+            }
+        }
     }
 }
