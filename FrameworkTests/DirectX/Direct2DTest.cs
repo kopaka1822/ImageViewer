@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
+using ImageFramework.Model;
+using ImageFramework.Model.Export;
 using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDX.DXGI;
@@ -31,6 +33,25 @@ namespace FrameworkTests.DirectX
             var colors = img.GetPixelColors(LayerMipmapSlice.Mip0);
 
             TestData.TestCheckersLevel0(colors);
+        }
+
+        [TestMethod]
+        public void DrawText()
+        {
+            var img = new TextureArray2D(LayerMipmapCount.One, new Size3(16, 16), Format.R8G8B8A8_UNorm_SRgb, false);
+            var d2d = new Direct2D(img);
+            using (var c = d2d.Begin())
+            {
+                c.Clear(Colors.White);
+                c.Text(Float2.Zero, new Float2(16.0f, 16.0f), 16.0f, Colors.Black, "a!");
+            }
+
+            // compare with reference
+            var orig = IO.LoadImageTexture(TestData.Directory + "a.png");
+            var origColors = orig.GetPixelColors(LayerMipmapSlice.Mip0);
+            var newColors = img.GetPixelColors(LayerMipmapSlice.Mip0);
+                
+            TestData.CompareColors(origColors, newColors);
         }
     }
 }

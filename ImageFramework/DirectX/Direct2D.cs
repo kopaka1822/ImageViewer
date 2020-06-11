@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using ImageFramework.Utility;
 using SharpDX.Direct2D1;
 using SharpDX.Direct3D11;
+using SharpDX.DirectWrite;
 using SharpDX.DXGI;
 using SharpDX.Mathematics.Interop;
 using AlphaMode = SharpDX.Direct2D1.AlphaMode;
 using Factory = SharpDX.Direct2D1.Factory;
+using FactoryType = SharpDX.Direct2D1.FactoryType;
 
 namespace ImageFramework.DirectX
 {
@@ -18,11 +20,14 @@ namespace ImageFramework.DirectX
         private class Core
         {
             public Factory Factory { get; }
+            public SharpDX.DirectWrite.Factory WriteFactory { get; }
             public SharpDX.Direct2D1.Device Handle { get; }
             public SharpDX.Direct2D1.DeviceContext Context { get; }
 
             public StrokeStyle RoundStroke { get; }
             public StrokeStyle HardStroke { get; }
+
+            public TextFormat DefaultText { get; }
 
             public Core()
             {
@@ -39,6 +44,8 @@ namespace ImageFramework.DirectX
                     Handle = new SharpDX.Direct2D1.Device(factory, dxgiDevice);
                     Context = new SharpDX.Direct2D1.DeviceContext(Handle, DeviceContextOptions.None);
                 }
+
+                WriteFactory = new SharpDX.DirectWrite.Factory(SharpDX.DirectWrite.FactoryType.Shared);
 
                 RoundStroke = new StrokeStyle(Factory, new StrokeStyleProperties
                 {
@@ -57,6 +64,8 @@ namespace ImageFramework.DirectX
             {
                 RoundStroke?.Dispose();
                 HardStroke?.Dispose();
+                DefaultText?.Dispose();
+                WriteFactory?.Dispose();
                 Context?.Dispose();
                 Handle?.Dispose();
                 Factory?.Dispose();
@@ -106,6 +115,16 @@ namespace ImageFramework.DirectX
                     round ? Direct2D.core.RoundStroke : Direct2D.core.HardStroke);
             }
 
+            public void Text(Float2 start, Float2 end, float size, Color color, string text)
+            {
+                parent.target.DrawText(
+                    text, 
+                    parent.GetFont(size), 
+                    new RawRectangleF(start.X, start.Y, end.X, end.Y),
+                    parent.GetBrush(color)
+                );
+            }
+
             /// <summary>
             /// transforms the screen space coordinates into a canonical coordinate system [-1, 1] with y up
             /// </summary>
@@ -131,7 +150,8 @@ namespace ImageFramework.DirectX
 
         private readonly SharpDX.Direct2D1.RenderTarget target;
         private readonly Dictionary<Color, SolidColorBrush> brushes = new Dictionary<Color, SolidColorBrush>();
-        
+        private readonly Dictionary<float, TextFormat> fonts = new Dictionary<float, TextFormat>();
+
         private static Core core;
 
         // indicates if the given format is a supported render target
@@ -156,8 +176,8 @@ namespace ImageFramework.DirectX
             {
                 target = new RenderTarget(core.Factory, surface, new RenderTargetProperties
                 {
-                    DpiX = 0.0f, // use default dpi
-                    DpiY = 0.0f,
+                    DpiX = 96.0f, // use default dpi
+                    DpiY = 96.0f,
                     MinLevel = FeatureLevel.Level_10,
                     PixelFormat = new PixelFormat
                     {
@@ -186,11 +206,26 @@ namespace ImageFramework.DirectX
             return res;
         }
 
+        private TextFormat GetFont(float size)
+        {
+            if (fonts.TryGetValue(size, out var res))
+                return res;
+            
+            res = new TextFormat(core.WriteFactory, "Verdana", FontWeight.Normal, FontStyle.Normal, size);
+            fonts.Add(size, res);
+
+            return res;
+        }
+
         public void Dispose()
         {
             foreach (var brush in brushes)
             {
                 brush.Value.Dispose();
+            }
+            foreach (var font in fonts)
+            {
+                font.Value.Dispose();
             }
             target?.Dispose();
         }
