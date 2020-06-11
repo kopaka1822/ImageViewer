@@ -51,7 +51,7 @@ namespace ImageFramework.Model
         public event EventHandler SoftReset;
 
         private GifModel gif = null;
-        public GifModel Gif => gif ?? (gif = new GifModel(SharedModel.QuadShader, SharedModel.Upload, Progress));
+        public GifModel Gif => gif ?? (gif = new GifModel(Progress));
 
         public ProgressModel Progress { get; }
 

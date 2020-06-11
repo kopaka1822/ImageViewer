@@ -106,21 +106,9 @@ namespace ImageViewer.Commands.Export
                 FramesPerSecond = viewModel.FramesPerSecond,
                 SliderWidth = viewModel.SliderSize,
                 NumSeconds = viewModel.TotalSeconds,
-                Width = img1.Size.Width,
-                Height = img1.Size.Height
             };
 
-            try
-            {
-                config.VerifyConfig();
-            }
-            catch (Exception e)
-            {
-                models.Window.ShowErrorDialog(e);
-                return;
-            }
-
-            models.Gif.CreateGif((TextureArray2D)img1, (TextureArray2D)img2, config);
+            models.Gif.CreateGif((TextureArray2D)img1, (TextureArray2D)img2, config, models.SharedModel);
 
             await models.Progress.WaitForTaskAsync();
 

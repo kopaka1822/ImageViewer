@@ -34,23 +34,15 @@ namespace ImageFramework.Model
             public int SliderWidth = 3;
             public string TmpFilename; // filename without extension (frames will be save in BaseFilename000 - BaseFilenameXXX)
             public string Filename; // destination filename
-            public int Width;
-            public int Height;
-
-            public void VerifyConfig()
-            {
-                if(Width % 2 != 0 || Height % 2 != 0)
-                    throw new Exception("Image width and height have to be a multiple of 2");
-            }
         }
 
-        internal GifModel(QuadShader quad, UploadBuffer upload, ProgressModel progressModel)
+        internal GifModel(ProgressModel progressModel)
         {
             this.progressModel = progressModel;
-            shader = new GifShader(quad, upload);
+            shader = new GifShader();
         }
 
-        public void CreateGif(TextureArray2D left, TextureArray2D right, Config cfg)
+        public void CreateGif(TextureArray2D left, TextureArray2D right, Config cfg, SharedModel shared)
         {
             Debug.Assert(left != null);
             Debug.Assert(right != null);
@@ -59,13 +51,26 @@ namespace ImageFramework.Model
 
             var cts = new CancellationTokenSource();
 
-            progressModel.AddTask(CreateGifAsync(left, right, cfg, progressModel.GetProgressInterface(cts.Token)), cts);
+            progressModel.AddTask(CreateGifAsync(left, right, cfg, progressModel.GetProgressInterface(cts.Token), shared), cts);
         }
 
-        private async Task CreateGifAsync(TextureArray2D left, TextureArray2D right, Config cfg, IProgress progress)
+        private async Task CreateGifAsync(TextureArray2D left, TextureArray2D right, Config cfg, IProgress progress, SharedModel shared)
         {
             // delay in milliseconds
             var numFrames = cfg.FramesPerSecond * cfg.NumSeconds;
+         
+            // size compatible?
+            bool disposeImages = false;
+            if ((left.Size.Width % 2) != 0 || (left.Size.Height % 2) != 0)
+            {
+                disposeImages = true;
+                var pad = Size3.Zero;
+                pad.X = left.Size.Width % 2;
+                pad.Y = left.Size.Height % 2;
+                left = (TextureArray2D)shared.Padding.Run(left, Size3.Zero, pad, PaddingShader.FillMode.Clamp, null, shared, false);
+                right = (TextureArray2D)shared.Padding.Run(right, Size3.Zero, pad, PaddingShader.FillMode.Clamp, null, shared, false);
+                Debug.Assert(left.Size.Width % 2 == 0 && left.Size.Height % 2 == 0);
+            }
 
             try
             {
@@ -97,7 +102,7 @@ namespace ImageFramework.Model
 
                         // render frame
                         shader.Run(leftView, rightView, frameView, cfg.SliderWidth, borderPos,
-                            frame.Size.Width, frame.Size.Height);
+                            frame.Size.Width, frame.Size.Height, shared.QuadShader, shared.Upload);
 
                         // copy frame from gpu to cpu
                         var dstMip = images[idx].GetMipmap(LayerMipmapSlice.Mip0);
@@ -130,6 +135,12 @@ namespace ImageFramework.Model
             finally
             {
                 progressModel.EnableDllProgress = true;
+
+                if(disposeImages)
+                {
+                    left.Dispose();
+                    right.Dispose();
+                }
             }
         }
 

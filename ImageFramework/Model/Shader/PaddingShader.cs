@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -73,7 +74,7 @@ namespace ImageFramework.Model.Shader
         /// <param name="leftPad">padding on the left/top/front side</param>
         /// <param name="rightPad">padding on the right/bot/back side</param>
         /// <param name="fill">padding fill mode</param>
-        /// <param name="scaling">used for regenerating mipmaps</param>
+        /// <param name="scaling">used for regenerating mipmaps (may be null if no mipmaps need to be generated)</param>
         /// <param name="shared"></param>
         /// <param name="keepMipmaps">if set to false, no mipmaps will be generated</param>
         /// <returns>same as source with added padding (amount of mipmaps might change, format remains)</returns>
@@ -117,6 +118,7 @@ namespace ImageFramework.Model.Shader
 
             if (dst.NumMipmaps > 1)
             {
+                Debug.Assert(scaling != null);
                 scaling.WriteMipmaps(dst);
             }
 

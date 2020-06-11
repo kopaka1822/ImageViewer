@@ -18,18 +18,14 @@ namespace ImageFramework.Model.Shader
             public int BorderSize;
         }
 
-        private readonly QuadShader quad;
         private readonly DirectX.Shader pixel;
-        private readonly UploadBuffer cbuffer;
 
-        public GifShader(QuadShader quad, UploadBuffer upload)
+        public GifShader()
         {
-            this.quad = quad;
             pixel = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetSource(), "GifPixelShader");
-            cbuffer = upload;
         }
 
-        public void Run(ShaderResourceView left, ShaderResourceView right, RenderTargetView dst, int borderSize, int borderLocation, int width, int height)
+        public void Run(ShaderResourceView left, ShaderResourceView right, RenderTargetView dst, int borderSize, int borderLocation, int width, int height, QuadShader quad, UploadBuffer cbuffer)
         {
             Debug.Assert(borderLocation >= 0);
             Debug.Assert(borderLocation < width);
