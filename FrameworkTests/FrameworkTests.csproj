@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DirectX\DDSTextureLoader.cs" />
+    <Compile Include="DirectX\Direct2DTest.cs" />
     <Compile Include="DirectX\Texture3DTests.cs" />
     <Compile Include="DirectX\TextureArray2DTests.cs" />
     <Compile Include="ImageLoader\DllTest.cs" />

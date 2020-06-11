@@ -20,6 +20,8 @@ namespace ImageFramework.DirectX
         private readonly Texture2D handle;
         private ShaderResourceView[] cubeViews;
 
+        internal Texture2D Handle => handle;
+
         public TextureArray2D(LayerMipmapCount lm, Size3 size, Format format, bool createUav, bool createRtv = true)
         {
             Debug.Assert(size.Depth == 1);

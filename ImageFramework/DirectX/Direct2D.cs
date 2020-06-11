@@ -18,18 +18,27 @@ namespace ImageFramework.DirectX
         private class Core
         {
             public Factory Factory { get; }
+            public SharpDX.Direct2D1.Device Handle { get; }
+            public SharpDX.Direct2D1.DeviceContext Context { get; }
 
             public StrokeStyle RoundStroke { get; }
             public StrokeStyle HardStroke { get; }
 
             public Core()
             {
+                using (var dxgiDevice =
+                    ImageFramework.DirectX.Device.Get().Handle.QueryInterface<SharpDX.DXGI.Device>())
+                {
 #if DEBUG
-                var debugLevel = DebugLevel.Information;
+                    var debugLevel = DebugLevel.Information;
 #else
                 var debugLevel = DebugLevel.None;
 #endif
-                Factory = new SharpDX.Direct2D1.Factory1(FactoryType.MultiThreaded, debugLevel);
+                    var factory = new SharpDX.Direct2D1.Factory1(FactoryType.MultiThreaded, debugLevel);
+                    Factory = factory;
+                    Handle = new SharpDX.Direct2D1.Device(factory, dxgiDevice);
+                    Context = new SharpDX.Direct2D1.DeviceContext(Handle, DeviceContextOptions.None);
+                }
 
                 RoundStroke = new StrokeStyle(Factory, new StrokeStyleProperties
                 {
@@ -48,6 +57,8 @@ namespace ImageFramework.DirectX
             {
                 RoundStroke?.Dispose();
                 HardStroke?.Dispose();
+                Context?.Dispose();
+                Handle?.Dispose();
                 Factory?.Dispose();
             }
         }
@@ -62,6 +73,11 @@ namespace ImageFramework.DirectX
                 this.parent = parent;
                 Device.Get().Flush();
                 parent.target.BeginDraw();
+            }
+
+            public void Clear(Color color)
+            {
+                parent.target.Clear(new RawColor4(color.Red, color.Green, color.Blue, color.Alpha));
             }
 
             public void FillRectangle(Float2 start, Float2 end, Color color)
@@ -115,11 +131,26 @@ namespace ImageFramework.DirectX
 
         private readonly SharpDX.Direct2D1.RenderTarget target;
         private readonly Dictionary<Color, SolidColorBrush> brushes = new Dictionary<Color, SolidColorBrush>();
+        
         private static Core core;
+
+        // indicates if the given format is a supported render target
+        public static bool IsSupported(Format format)
+        {
+            if(core == null) core = new Core();
+            return core.Context.IsDxgiFormatSupported(format);
+        }
+
+        public Direct2D(TextureArray2D texture) : this(texture.Handle) {}
 
         public Direct2D(Texture2D buffer)
         {
             if (core == null) core = new Core();
+
+            var format = buffer.Description.Format;
+
+            if (!core.Context.IsDxgiFormatSupported(format))
+                throw new Exception("Format " + format + " not supported for direct2D rendertarget");
 
             using (var surface = buffer.QueryInterface<SharpDX.DXGI.Surface>())
             {
@@ -130,7 +161,7 @@ namespace ImageFramework.DirectX
                     MinLevel = FeatureLevel.Level_10,
                     PixelFormat = new PixelFormat
                     {
-                        Format = buffer.Description.Format,
+                        Format = format,
                         AlphaMode = AlphaMode.Ignore
                     },
                     Type = RenderTargetType.Hardware,
@@ -182,6 +213,5 @@ namespace ImageFramework.DirectX
                 parent.target.Transform = original;
             }
         }
-
     }
 }
