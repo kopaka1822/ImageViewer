@@ -57,6 +57,7 @@ namespace ImageViewer.ViewModels.Display
                 case nameof(DisplayModel.LinearInterpolation):
                     OnPropertyChanged(nameof(AlphaIsCoverage));
                     OnPropertyChanged(nameof(HideInternals));
+                    OnPropertyChanged(nameof(NoInterpolation));
                     break;
                 case nameof(DisplayModel.ActiveMipmap):
                     Crop.Mipmap = models.Display.ActiveMipmap;
@@ -106,6 +107,8 @@ namespace ImageViewer.ViewModels.Display
             get => !models.Display.LinearInterpolation && displayViewEx.HideInternals;
             set => displayViewEx.HideInternals = value;
         }
+
+        public bool NoInterpolation => !models.Display.LinearInterpolation;
 
         public CropManager.ViewModel Crop { get; private set; }
 

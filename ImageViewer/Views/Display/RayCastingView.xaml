@@ -45,8 +45,8 @@
                 Grid.Row="1"
                 Grid.Column="1"
                 VerticalAlignment="Center"
+                IsEnabled="{Binding NoInterpolation}"
                 IsChecked="{Binding HideInternals}"
-                IsEnabled="{Binding FlatIsEnabled}"
                 Margin="{StaticResource DefaultBorderBottom}"/>
 
             <TextBlock 
@@ -60,7 +60,7 @@
                 Grid.Column="1"
                 VerticalAlignment="Center"
                 IsChecked="{Binding AlphaIsCoverage}"
-                IsEnabled="{Binding FlatIsEnabled}"
+                IsEnabled="{Binding NoInterpolation}"
                 ToolTip="{StaticResource AlphaCoverageTooltip}"
                 Margin="{StaticResource DefaultBorderBottom}"/>
 
