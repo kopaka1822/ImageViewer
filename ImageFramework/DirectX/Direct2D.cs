@@ -145,6 +145,12 @@ namespace ImageFramework.DirectX
                 return new Transform(parent, t);
             }
 
+            public Clip Clip(Float2 start, Float2 end)
+            {
+                parent.target.PushAxisAlignedClip(new RawRectangleF(start.X, start.Y, end.X, end.Y), AntialiasMode.Aliased);
+                return new Clip(parent.target);
+            }
+
             public void Dispose()
             {
                 parent.target.EndDraw();
@@ -239,6 +245,8 @@ namespace ImageFramework.DirectX
         }
 
         // utility classes
+
+        // undo transform when out of scope
         public class Transform : IDisposable
         {
             private readonly Direct2D parent;
@@ -254,6 +262,22 @@ namespace ImageFramework.DirectX
             public void Dispose()
             {
                 parent.target.Transform = original;
+            }
+        }
+
+        // undo clip when out of scope
+        public class Clip : IDisposable
+        {
+            private readonly RenderTarget parent;
+
+            public Clip(RenderTarget parent)
+            {
+                this.parent = parent;
+            }
+
+            public void Dispose()
+            {
+                parent.PopAxisAlignedClip();
             }
         }
     }
