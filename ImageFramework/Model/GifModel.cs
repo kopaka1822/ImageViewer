@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Export;
@@ -38,6 +39,9 @@ namespace ImageFramework.Model
             public string Filename; // destination filename
             public string Label1; // name of the first image
             public string Label2; // name of the second image
+            public TextureArray2D Left; // left image
+            public TextureArray2D Right; // right image
+            [CanBeNull] public TextureArray2D Overlay; // optional overlay texture
         }
 
         internal GifModel(ProgressModel progressModel)
@@ -46,23 +50,30 @@ namespace ImageFramework.Model
             shader = new GifShader();
         }
 
-        public void CreateGif(TextureArray2D left, TextureArray2D right, Config cfg, SharedModel shared)
+        public void CreateGif(Config cfg, SharedModel shared)
         {
-            Debug.Assert(left != null);
-            Debug.Assert(right != null);
-            Debug.Assert(left.Size == right.Size);
+            Debug.Assert(cfg.Left != null);
+            Debug.Assert(cfg.Right != null);
+            Debug.Assert(cfg.Left.Size == cfg.Right.Size);
             Debug.Assert(!progressModel.IsProcessing);
+            if (cfg.Overlay != null)
+            {
+                Debug.Assert(cfg.Left.Size == cfg.Overlay.Size);
+            }
 
             var cts = new CancellationTokenSource();
 
-            progressModel.AddTask(CreateGifAsync(left, right, cfg, progressModel.GetProgressInterface(cts.Token), shared), cts);
+            progressModel.AddTask(CreateGifAsync(cfg, progressModel.GetProgressInterface(cts.Token), shared), cts);
         }
 
-        private async Task CreateGifAsync(TextureArray2D left, TextureArray2D right, Config cfg, IProgress progress, SharedModel shared)
+        private async Task CreateGifAsync(Config cfg, IProgress progress, SharedModel shared)
         {
             // delay in milliseconds
             var numFrames = cfg.FramesPerSecond * cfg.NumSeconds;
-         
+            var left = cfg.Left;
+            var right = cfg.Right;
+            var overlay = cfg.Overlay;
+
             // size compatible?
             bool disposeImages = false;
             if ((left.Size.Width % 2) != 0 || (left.Size.Height % 2) != 0)
@@ -73,6 +84,10 @@ namespace ImageFramework.Model
                 pad.Y = left.Size.Height % 2;
                 left = (TextureArray2D)shared.Padding.Run(left, Size3.Zero, pad, PaddingShader.FillMode.Clamp, null, shared, false);
                 right = (TextureArray2D)shared.Padding.Run(right, Size3.Zero, pad, PaddingShader.FillMode.Clamp, null, shared, false);
+                if (overlay != null)
+                    overlay = (TextureArray2D) shared.Padding.Run(overlay, Size3.Zero, pad,
+                        PaddingShader.FillMode.Transparent, null, shared, false);
+
                 Debug.Assert(left.Size.Width % 2 == 0 && left.Size.Height % 2 == 0);
             }
 
@@ -81,6 +96,7 @@ namespace ImageFramework.Model
                 progressModel.EnableDllProgress = false;
                 var leftView = left.GetSrView(LayerMipmapSlice.Mip0);
                 var rightView = right.GetSrView(LayerMipmapSlice.Mip0);
+                var overlayView = overlay?.GetSrView(LayerMipmapSlice.Mip0);
 
                 var curProg = progress.CreateSubProgress(0.9f);
 
@@ -108,7 +124,7 @@ namespace ImageFramework.Model
                             int idx = i % numTasks;
 
                             // render frame
-                            shader.Run(leftView, rightView, frameView, cfg.SliderWidth, borderPos,
+                            shader.Run(leftView, rightView, overlayView, frameView, cfg.SliderWidth, borderPos,
                                 frame.Size.Width, frame.Size.Height, shared.QuadShader, shared.Upload);
 
                             // add text
@@ -176,6 +192,7 @@ namespace ImageFramework.Model
                 {
                     left.Dispose();
                     right.Dispose();
+                    overlay?.Dispose();
                 }
             }
         }

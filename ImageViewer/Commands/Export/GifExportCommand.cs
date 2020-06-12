@@ -116,10 +116,13 @@ namespace ImageViewer.Commands.Export
                 SliderWidth = viewModel.SliderSize,
                 NumSeconds = viewModel.TotalSeconds,
                 Label1 = viewModel.Title1,
-                Label2 = viewModel.Title2
+                Label2 = viewModel.Title2,
+                Left = (TextureArray2D)img1,
+                Right = (TextureArray2D)img2,
+                Overlay = (TextureArray2D)models.Overlay.Overlay
             };
 
-            models.Gif.CreateGif((TextureArray2D)img1, (TextureArray2D)img2, config, models.SharedModel);
+            models.Gif.CreateGif(config, models.SharedModel);
 
             await models.Progress.WaitForTaskAsync();
 
