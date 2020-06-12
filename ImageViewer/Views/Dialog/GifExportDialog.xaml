@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ImageViewer.Views.Dialog"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:views="clr-namespace:ImageViewer.Views"
         mc:Ignorable="d"
         Title="Mp4 Export"
         Width="300"
@@ -13,12 +15,40 @@
         ResizeMode="NoResize"
         Icon="../../Icons/app.png"
         Style="{StaticResource WindowStyle}">
+    <Window.Resources>
+        <GridLength x:Key="Width">110</GridLength>
+    </Window.Resources>
     <Border Padding="5">
         <StackPanel>
 
-            <Grid Margin="0 0 0 5">
+            <!-- Title 1 -->
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="{StaticResource Width}"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Title Left:"/>
+                <views:CustomTextBox 
+                    Grid.Column="1"
+                    Text="{Binding Title1}"/>
+            </Grid>
+
+            <!-- Title 2 -->
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource Width}"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Title Right:"/>
+                <views:CustomTextBox  
+                    Grid.Column="1"
+                    Text="{Binding Title2}"/>
+            </Grid>
+
+            <!-- FPS -->
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource Width}"/>
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Frames Per Second:"/>
@@ -31,9 +61,10 @@
                 </ComboBox>
             </Grid>
 
-            <Grid Margin="0 0 0 5">
+            <!-- TOTAL SECONDS -->
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="{StaticResource Width}"/>
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Total Seconds:"/>
@@ -43,9 +74,10 @@
                                     Value="{Binding TotalSeconds}"/>
             </Grid>
 
-            <Grid Margin="0 0 0 5">
+            <!-- SLIDER SIZE -->
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="110"/>
+                    <ColumnDefinition Width="{StaticResource Width}"/>
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Slider Size:"/>
@@ -59,10 +91,10 @@
             <StackPanel 
                 Orientation="Horizontal"
                 HorizontalAlignment="Right"
-                Margin="0 10 0 0">
+                Margin="{StaticResource DefaultBorderTop}">
                 <Button 
                     Content="_Apply" 
-                    Margin="0 0 10 0" 
+                    Margin="{StaticResource DefaultBorderRight}" 
                     Width="60"
                     Click="Apply_OnClick"
                 />

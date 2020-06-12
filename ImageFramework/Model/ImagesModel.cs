@@ -452,5 +452,14 @@ namespace ImageFramework.Model
             Debug.Assert(images.Count != 0);
             return images[0].Image.Create(new LayerMipmapCount(NumLayers, NumMipmaps), Size, format, createUav, createRtv);
         }
+
+        /// <summary>
+        /// returns image alias or empty string if id is invalid
+        /// </summary>
+        public string GetImageAlias(int id)
+        {
+            if (id < 0 || id >= NumImages) return "";
+            return Images[id].Alias;
+        }
     }
 }
