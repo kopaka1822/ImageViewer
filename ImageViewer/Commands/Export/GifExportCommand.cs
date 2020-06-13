@@ -126,6 +126,16 @@ namespace ImageViewer.Commands.Export
 
             await models.Progress.WaitForTaskAsync();
 
+            // delete tmp directory
+            try
+            {
+                System.IO.Directory.Delete(tmpDir, true);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
             if (models.Progress.LastTaskCancelledByUser) return;
 
             if (!String.IsNullOrEmpty(models.Progress.LastError))

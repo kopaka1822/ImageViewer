@@ -119,8 +119,8 @@ namespace ImageFramework.Model
                     {
                         for (int i = 0; i < numFrames; ++i)
                         {
-                            float t = (float)i / (numFrames);
-                            int borderPos = (int)(t * frame.Size.Width);
+                            float t = (float)i / (numFrames - 1);
+                            int borderPos = (int)(t * (frame.Size.Width - 1));
                             int idx = i % numTasks;
 
                             // render frame
