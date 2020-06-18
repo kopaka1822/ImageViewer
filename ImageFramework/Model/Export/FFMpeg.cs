@@ -26,7 +26,7 @@ namespace ImageFramework.Model.Export
             Debug.Assert(IsAvailable());
 
             string startArgs =
-                $"-framerate {config.FramesPerSecond} -i \"{config.TmpFilename}%4d.png\" -c:v libx264 -preset veryslow -crf 16 -pix_fmt yuv420p -frames:v {config.FramesPerSecond * config.NumSeconds} -r {config.FramesPerSecond} \"{config.Filename}\"";
+                $"-framerate {config.FramesPerSecond} -i \"{config.TmpFilename}%4d.png\" -c:v libx264 -preset veryslow -crf 12 -pix_fmt yuv420p -frames:v {config.FramesPerSecond * config.NumSeconds} -r {config.FramesPerSecond} \"{config.Filename}\"";
 
             var p = new Process
             {

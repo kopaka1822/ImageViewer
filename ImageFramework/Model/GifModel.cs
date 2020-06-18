@@ -130,16 +130,11 @@ namespace ImageFramework.Model
                             // add text
                             using (var c = d2d.Begin())
                             {
-                                var halfX = left.Size.X / 2;
-                                using (var clip = c.Clip(Float2.Zero, new Float2(borderPos - cfg.SliderWidth / 2.0f, left.Size.Y)))
-                                {
-                                    c.Text(new Float2(padding), new Float2(halfX - padding, left.Size.Y - padding), textSize, Colors.White, cfg.Label1);
-                                }
+                                c.Text(new Float2(padding), new Float2(left.Size.X - padding, left.Size.Y - padding),
+                                    textSize, Colors.White, cfg.Label1, TextAlignment.Leading);
 
-                                using (var clip = c.Clip(new Float2(borderPos + cfg.SliderWidth / 2.0f, 0.0f), new Float2(left.Size.X, left.Size.Y)))
-                                {
-                                    c.Text(new Float2(halfX + padding, padding), new Float2(left.Size.X - padding, left.Size.Y - padding), textSize, Colors.White, cfg.Label2, TextAlignment.Trailing);
-                                }
+                                c.Text(new Float2(padding), new Float2(left.Size.X - padding, left.Size.Y - padding), textSize,
+                                        Colors.White, cfg.Label2, TextAlignment.Trailing);
                             }
 
                             // copy frame from gpu to cpu
