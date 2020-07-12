@@ -40,6 +40,7 @@ Version 2.1 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/ra
 * [lat-long cubemap conversion](#Lat-Long-Cubemap-Conversion)
 * [mipmap generation](mipmaps.md) (including box filter and lanczos)
 * [customisable filter](#Custom-HLSL-Compute-Shader-Filter) in HLSL
+* [3D textures](#3D-Textures)
 * computations are done in linear color space
 
 ## View Modes
@@ -101,3 +102,13 @@ float4 filter(int2 pixelCoord, int2 size)
 ```
 
 The detailed filter guide can be found [here](filter_manual.md).
+
+## 3D Textures
+
+3D textures can be displayed as well and are supported by the majority of image viewer features (export, custom filtering, mipmap generation and more). Simple flat shading and transparency rendering is also supported to help visualize certain datasets.
+
+![](img/volume_view.jpg)
+
+Additionally, one can explore the insides of a 3D texture by using the "Slice" feature:
+
+![](img/volume_slice.jpg)
