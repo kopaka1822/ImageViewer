@@ -180,10 +180,9 @@
     <CopyFileToFolders Include="..\Docs\img\mip_compare.png">
       <Filter>Docs\img</Filter>
     </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Docs\statistics.md">
+    <CopyFileToFolders Include="..\Docs\statistics.md" />
+    <CopyFileToFolders Include="..\Docs\volumetric.md">
       <Filter>Docs</Filter>
-    </None>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>

@@ -40,7 +40,7 @@ Version 2.1 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/ra
 * [lat-long cubemap conversion](#Lat-Long-Cubemap-Conversion)
 * [mipmap generation](mipmaps.md) (including box filter and lanczos)
 * [customisable filter](#Custom-HLSL-Compute-Shader-Filter) in HLSL
-* [3D textures](#3D-Textures)
+* [3D (volumetric) textures](#3D-Textures)
 * computations are done in linear color space
 
 ## View Modes

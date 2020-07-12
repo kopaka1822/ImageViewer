@@ -405,18 +405,26 @@
                     </MenuItem.CommandParameter>
             </MenuItem>
             <MenuItem
+                Header="Statistics"
+                Command="{Binding HelpCommand}">
+                <MenuItem.CommandParameter>
+                    <system:String>help/statistics.md</system:String>
+                </MenuItem.CommandParameter>
+            </MenuItem>
+            
+            <Separator/>
+            <MenuItem
                 Header="Mipmaps"
                 Command="{Binding HelpCommand}">
                 <MenuItem.CommandParameter>
                     <system:String>help/mipmaps.md</system:String>
                 </MenuItem.CommandParameter>
             </MenuItem>
-            <Separator/>
             <MenuItem
-                Header="Statistics"
+                Header="3D Textures"
                 Command="{Binding HelpCommand}">
                 <MenuItem.CommandParameter>
-                    <system:String>help/statistics.md</system:String>
+                    <system:String>help/volumetric.md</system:String>
                 </MenuItem.CommandParameter>
             </MenuItem>
         </MenuItem>
