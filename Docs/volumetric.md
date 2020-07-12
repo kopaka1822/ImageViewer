@@ -8,9 +8,20 @@ After opening a 3D texture, they will be displayed in the "Volume" view (see sta
 
 The volume view provides the following display options:
 * Shading: Enables simple flat shading
+
+![](img/volume_shading.jpg)
+
 * Hide Internals (for Transparency):  Hides the insides of transparent areas so that only the hull is visible
+
+![](img/volume_internals.jpg)
+
 * Alpha Is Coverage (for Transparency): When disabled, assumes that light loses colored instead of monochrome intensity when shinging through colored surfaces.
+
+![](img/volume_coverage.jpg)
+
 * Slice: Configures the range of displayed slices (cuts through the volume)
+
+![](img/volume_slice.jpg)
 
 ### Issues with Linear Interpolation
 When enabling linear interpolation, a ray marching algorithm is used to determine the color. Possible Issues:

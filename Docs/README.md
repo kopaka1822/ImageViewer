@@ -112,3 +112,5 @@ The detailed filter guide can be found [here](filter_manual.md).
 Additionally, one can explore the insides of a 3D texture by using the "Slice" feature:
 
 ![](img/volume_slice.jpg)
+
+For more on 3D textures see [here](volumetric.md).
