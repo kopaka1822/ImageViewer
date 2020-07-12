@@ -43,7 +43,8 @@ namespace ImageViewer.Commands.Import
 
             tex = tex.Clone();
 
-            models.Images.AddImage(tex, $"__imported Eq{parameter + 1} " + DateTime.Now.ToString("HH-mm"), GliFormat.RGBA32_SFLOAT);
+            var proposedFilename = models.Images.Images[models.Pipelines[parameter].GetFirstImageId()].Filename;
+            models.Images.AddImage(tex, false, proposedFilename, GliFormat.RGBA32_SFLOAT, $"Eq{parameter + 1} {DateTime.Now:HH:mm}");
         }
     }
 }

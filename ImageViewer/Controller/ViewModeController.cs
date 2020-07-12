@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -78,12 +79,6 @@ namespace ImageViewer.Controller
         {
             recomputeScheduled = false;
 
-            models.Display.TexelPosition = currentView.GetTexelPosition(
-                ConvertToCanonical(new Vector2(mousePosition.X, mousePosition.Y)));
-        }
-
-        private void UpdateTexelPosition()
-        {
             models.Display.TexelPosition = currentView.GetTexelPosition(
                 ConvertToCanonical(new Vector2(mousePosition.X, mousePosition.Y)));
         }
@@ -203,7 +198,8 @@ namespace ImageViewer.Controller
                 
             mousePosition = new Point((int)e.GetPosition(dxHost).X, (int)e.GetPosition(dxHost).Y);
 
-            models.Display.ActiveOverlay?.MouseClick(e.ChangedButton, false, models.Display.TexelPosition);
+            if(models.Display.TexelPosition.HasValue)
+                models.Display.ActiveOverlay?.MouseClick(e.ChangedButton, false, models.Display.TexelPosition.Value);
         }
 
         private void DxHostOnMouseDown(object sender, MouseButtonEventArgs e)
@@ -230,7 +226,8 @@ namespace ImageViewer.Controller
                 else fixedMousePosition = null;
             }
 
-            models.Display.ActiveOverlay?.MouseClick(e.ChangedButton, true, models.Display.TexelPosition);
+            if (models.Display.TexelPosition.HasValue)
+                models.Display.ActiveOverlay?.MouseClick(e.ChangedButton, true, models.Display.TexelPosition.Value);
         }
 
         private void DxHostOnMouseWheel(object sender, MouseWheelEventArgs e)
@@ -288,11 +285,12 @@ namespace ImageViewer.Controller
                             case DisplayModel.ViewMode.CubeCrossView:
                                 currentView = new CubeCrossTextureView(models);
                                 break;
-                            case DisplayModel.ViewMode.RayCasting:
-                                currentView = new RayCastingView(models);
+                            case DisplayModel.ViewMode.Volume:
+                                currentView = new VolumeView(models);
                                 break;
                             case DisplayModel.ViewMode.ShearWarp:
-                                currentView = new ShearWarpView(models);
+                                Debug.Assert(false);
+                                //currentView = new ShearWarpView(models);
                                 break;
                             default:
                                 currentView = new EmptyView();

@@ -55,6 +55,7 @@ namespace ImageViewer.Commands.Tools
             var firstImage = models.Images.Images[models.Pipelines[pipeId].Color.FirstImageId];
             var texName = firstImage.Filename;
             var origFormat = firstImage.OriginalFormat;
+            var texAlias = firstImage.Alias;
 
             var vm = new Tex3DToArrayViewModel(srcTex.Size);
             if (models.Display.ExtendedViewData is Single3DDisplayModel displayEx)
@@ -73,7 +74,7 @@ namespace ImageViewer.Commands.Tools
 
             // clear all textures
             models.Reset();
-            models.Images.AddImage(tex, texName, origFormat);
+            models.Images.AddImage(tex, false, texName, origFormat, texAlias);
         }
     }
 }

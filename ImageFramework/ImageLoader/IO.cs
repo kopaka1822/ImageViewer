@@ -36,12 +36,12 @@ namespace ImageFramework.ImageLoader
         /// </summary>
         /// <param name="file">filename</param>
         /// <returns></returns>
-        public static Image LoadImage(string file)
+        public static DllImageData LoadImage(string file)
         {
             var res = new Resource(file);
             Dll.image_info(res.Id, out var gliFormat, out var originalFormat, out var nLayer, out var nMipmaps);
 
-            return new Image(res, file, new LayerMipmapCount(nLayer, nMipmaps), new ImageFormat((GliFormat)gliFormat), (GliFormat)originalFormat);
+            return new DllImageData(res, file, new LayerMipmapCount(nLayer, nMipmaps), new ImageFormat((GliFormat)gliFormat), (GliFormat)originalFormat);
         }
 
 
@@ -89,14 +89,14 @@ namespace ImageFramework.ImageLoader
             return task;
         }
 
-        public static Image CreateImage(ImageFormat format, Size3 size, LayerMipmapCount lm)
+        public static DllImageData CreateImage(ImageFormat format, Size3 size, LayerMipmapCount lm)
         {
             var res = new Resource((uint)format.GliFormat, size, lm);
 
-            return new Image(res, "tmp", lm, format, format.GliFormat);
+            return new DllImageData(res, "tmp", lm, format, format.GliFormat);
         }
 
-        public static void SaveImage(Image image, string filename, string extension, GliFormat format, int quality = 0)
+        public static void SaveImage(DllImageData image, string filename, string extension, GliFormat format, int quality = 0)
         {
             if(!Dll.image_save(image.Resource.Id, filename, extension, (uint) format, quality))
                 throw new Exception(Dll.GetError());

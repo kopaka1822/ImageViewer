@@ -34,15 +34,15 @@ namespace ViewerTests
         }
 
         [TestMethod]
-        public void RayCastingCompile()
+        public void SmoothVolumeCompile()
         {
-            var ray = new RayCastingShader(null);
+            var ray = new SmoothVolumeShader(null);
         }
 
         [TestMethod]
-        public void RayMarchingCompile()
+        public void CubeVolumeCompile()
         {
-            var ray = new RayMarchingShader(null);
+            var ray = new CubeVolumeShader(null);
         }
 
         [TestMethod]

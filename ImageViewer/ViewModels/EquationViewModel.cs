@@ -210,7 +210,7 @@ namespace ImageViewer.ViewModels
 
         public FormulaViewModel Alpha { get; }
 
-        private Color texelColor = ImageFramework.Utility.Color.Black;
+        private Color texelColor = ImageFramework.Utility.Colors.Black;
         public string TexelColor
         {
             get
@@ -242,10 +242,18 @@ namespace ImageViewer.ViewModels
             var texture = model.Image;
             if (texture == null) return;
 
-            var color = models.GetPixelValue(texture, models.Display.TexelPosition,
-                models.Display.ActiveLayerMipmap, models.Display.TexelRadius);
+            if (models.Display.TexelPosition.HasValue)
+            {
+                var color = models.GetPixelValue(texture, models.Display.TexelPosition.Value,
+                    models.Display.ActiveLayerMipmap, models.Display.TexelRadius);
 
-            texelColor = color;
+                texelColor = color;
+            }
+            else
+            {
+                texelColor = Colors.Transparent;
+            }
+
             OnPropertyChanged(nameof(TexelColor));
         }
 

@@ -16,6 +16,7 @@ using ImageFramework.DirectX;
 using ImageViewer.Controller;
 using ImageViewer.DirectX;
 using ImageViewer.Models;
+using ImageViewer.Models.Settings;
 using SharpDX.Direct3D11;
 using Device = ImageFramework.DirectX.Device;
 
@@ -61,10 +62,22 @@ namespace ImageViewer
 
         private async void LoadStartupArgsAsync()
         {
-            var import = new ImportDialogController(models);
-            foreach (var arg in App.StartupArgs)
+            try
             {
-                await import.ImportImageAsync(arg);
+                var import = new ImportDialogController(models);
+                foreach (var arg in App.StartupArgs)
+                {
+                    if (arg.EndsWith(".icfg"))
+                    {
+                        var cfg = ViewerConfig.LoadFromFile(arg);
+                        await cfg.ApplyToModels(models);
+                    }
+                    else await import.ImportImageAsync(arg);
+                }
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e);
             }
         }
 

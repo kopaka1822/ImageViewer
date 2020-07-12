@@ -12,25 +12,11 @@ namespace FrameworkTests.Model.Filter
     [TestClass]
     public class FiltersModelTest
     {
-        private Models models;
-        private FiltersModel filters;
-
-        [TestInitialize]
-        public void Init()
-        {
-            models = new Models(1);
-            filters = models.Filter;
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            models.Dispose();
-        }
-
         [TestMethod]
         public void Retarget()
         {
+            var models = new Models(1);
+            var filters = models.Filter;
             // add filter (will be added as 2D)
             Assert.AreEqual(FilterLoader.TargetType.Tex2D, filters.CurrentTarget);
 
@@ -69,6 +55,9 @@ namespace FrameworkTests.Model.Filter
         [TestMethod]
         public void RetargetError()
         {
+            var models = new Models(1);
+            var filters = models.Filter;
+
             // add filter that cannot be retargeted
             // add filter (will be added as 2D)
             Assert.AreEqual(FilterLoader.TargetType.Tex2D, filters.CurrentTarget);

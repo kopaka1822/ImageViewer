@@ -11,12 +11,13 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
+using ImageViewer.DirectX;
 using ImageViewer.Views.Dialog;
 using Size = System.Drawing.Size;
 
 namespace ImageViewer.Models
 {
-    public class WindowModel : INotifyPropertyChanged
+    public class WindowModel : INotifyPropertyChanged, IDisposable
     {
         public MainWindow Window { get; }
 
@@ -30,6 +31,7 @@ namespace ImageViewer.Models
 
         public ImageFramework.Utility.Color ThemeColor { get; }
 
+        public SwapChain SwapChain { get; private set; } = null;
         public WindowModel(MainWindow window)
         {
             Window = window;
@@ -75,6 +77,13 @@ namespace ImageViewer.Models
                 );
                 OnPropertyChanged(nameof(ClientSize));
             };
+
+            var adapter = new SwapChainAdapter(Window.BorderHost);
+            Window.BorderHost.Child = adapter;
+            SwapChain = adapter.SwapChain;
+
+            SwapChain.Resize(ClientSize.Width, ClientSize.Height);
+            OnPropertyChanged(nameof(SwapChain));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -123,6 +132,11 @@ namespace ImageViewer.Models
         {
             return MessageBox.Show(TopmostWindow, message, title, MessageBoxButton.YesNo, MessageBoxImage.Question,
                        MessageBoxResult.Yes) == MessageBoxResult.Yes;
+        }
+
+        public void Dispose()
+        {
+            SwapChain?.Dispose();
         }
     }
 }

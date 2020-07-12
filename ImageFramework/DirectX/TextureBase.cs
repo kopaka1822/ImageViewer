@@ -82,6 +82,31 @@ namespace ImageFramework.DirectX
             return res;
         }
 
+        public unsafe byte[] GetBytes(uint pixelSize)
+        {
+            uint size = 0;
+            for (int mip = 0; mip < LayerMipmap.Mipmaps; ++mip)
+            {
+                size += (uint) (LayerMipmap.Layers * Size.GetMip(mip).Product) * pixelSize;
+            }
+
+            byte[] res = new byte[size];
+            uint offset = 0;
+            fixed (byte* ptr = res)
+            {
+                foreach (var lm in LayerMipmap.Range)
+                {
+                    var mipSize = (uint)Size.GetMip(lm.Mipmap).Product * pixelSize;
+                    CopyPixels(lm, new IntPtr(ptr + offset), mipSize);
+                    offset += mipSize;
+                }
+            }
+
+            Debug.Assert(offset == size);
+
+            return res;
+        }
+
         public void CopyPixels(LayerMipmapSlice lm, IntPtr destination, uint size)
         {
             // create staging texture
@@ -94,7 +119,7 @@ namespace ImageFramework.DirectX
 
         public ITexture CloneWithMipmaps(int nLevels)
         {
-            var newTex = CreateT(new LayerMipmapCount(LayerMipmap.Layers, nLevels), Size, Format, uaViews != null);
+            var newTex = CreateT(new LayerMipmapCount(LayerMipmap.Layers, nLevels), Size, Format, uaViews != null, rtViews != null);
 
             // copy all layers
             for (int curLayer = 0; curLayer < LayerMipmap.Layers; ++curLayer)
@@ -120,7 +145,7 @@ namespace ImageFramework.DirectX
         public T CloneWithoutMipmapsT(int mipmap = 0)
         {
             var newTex = CreateT(new LayerMipmapCount(LayerMipmap.Layers, 1), Size.GetMip(mipmap), Format,
-                uaViews != null);
+                uaViews != null, rtViews != null);
 
             for (int curLayer = 0; curLayer < LayerMipmap.Layers; ++curLayer)
             {
@@ -148,19 +173,19 @@ namespace ImageFramework.DirectX
 
         public T CloneT()
         {
-            var newTex = CreateT(LayerMipmap, Size, Format, uaViews != null);
+            var newTex = CreateT(LayerMipmap, Size, Format, uaViews != null, rtViews != null);
 
             Device.Get().CopyResource(GetHandle(), newTex.GetHandle());
             return newTex;
         }
 
-        public ITexture Create(LayerMipmapCount lm, Size3 size, Format format, bool createUav)
+        public ITexture Create(LayerMipmapCount lm, Size3 size, Format format, bool createUav, bool createRtv)
         {
-            return CreateT(lm, size, format, createUav);
+            return CreateT(lm, size, format, createUav, createRtv);
         }
 
         public abstract T CreateT(LayerMipmapCount lm, Size3 size, Format format,
-            bool createUav);
+            bool createUav, bool createRtv);
 
         protected abstract Resource GetHandle();
 

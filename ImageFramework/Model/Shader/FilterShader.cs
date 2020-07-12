@@ -187,7 +187,7 @@ void main(uint3 coord : SV_DISPATCHTHREADID) {{
     dst_image[dstCoord] = filter(coord, size);
 #endif
 }}
-" + GetParamBufferDescription(parent.Parameters) + GetTextureParamBindings(parent.TextureParameters);
+" + GetParamBufferDescription(parent.Parameters) + GetTextureParamBindings(parent.TextureParameters, builder);
         }
 
         private static string GetKernelDeclaration(FilterLoader.Type kernel)
@@ -219,7 +219,7 @@ void main(uint3 coord : SV_DISPATCHTHREADID) {{
             return res + "};\n";
         }
 
-        private static string GetTextureParamBindings(IReadOnlyList<TextureFilterParameterModel> parameters)
+        private static string GetTextureParamBindings(IReadOnlyList<TextureFilterParameterModel> parameters, IShaderBuilder builder)
         {
             if (parameters.Count == 0) return "";
 
@@ -228,7 +228,7 @@ void main(uint3 coord : SV_DISPATCHTHREADID) {{
             var i = TextureBindingStart;
             foreach (var tex in parameters)
             {
-                res += "Texture2D<float4> " + tex.TextureName + $" : register(t{i++});\n";
+                res += $"{builder.SrvSingleType} {tex.TextureName} : register(t{i++});\n";
             }
 
             return res;

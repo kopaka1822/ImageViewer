@@ -15,6 +15,7 @@ using ImageFramework.Model.Export;
 using ImageFramework.Model.Statistics;
 using ImageFramework.Utility;
 using ImageViewer.Models;
+using ImageViewer.UtilityEx;
 using ImageViewer.Views;
 
 namespace ImageViewer.ViewModels.Dialog
@@ -38,6 +39,7 @@ namespace ImageViewer.ViewModels.Dialog
             this.filename = filename;
             this.is3D = is3D;
             this.usedFormat = ExportDescription.GetExportFormat(extension);
+            this.Crop = models.ExportConfig.GetViewModel(models);
             models.Display.IsExporting = true;
 
             // init layers
@@ -150,10 +152,12 @@ namespace ImageViewer.ViewModels.Dialog
             models.ExportConfig.PropertyChanged += ExportConfigOnPropertyChanged;
             models.Settings.PropertyChanged += SettingsOnPropertyChanged;
 
+            // cropping adjustments
+            Crop.Mipmap = selectedMipmap.Cargo;
             if (models.ExportConfig.CropEnd == Float3.Zero)
             {
                 // assume cropping was not set
-                SetMaxCropping();
+                models.ExportConfig.SetMaxCropping();
             }
         }
 
@@ -181,20 +185,11 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
-        private void SetMaxCropping()
-        {
-            CropStartX = 0;
-            CropStartY = 0;
-            CropStartZ = 0;
-            CropEndX = CropMaxX;
-            CropEndY = CropMaxY;
-            CropEndZ = CropMaxZ;
-        }
-
         public void Dispose()
         {
             models.ExportConfig.PropertyChanged -= ExportConfigOnPropertyChanged;
             models.Settings.PropertyChanged -= SettingsOnPropertyChanged;
+            Crop.Dispose();
             models.Display.IsExporting = false;
         }
 
@@ -208,12 +203,6 @@ namespace ImageViewer.ViewModels.Dialog
                     break;
                 case nameof(ExportConfigModel.CropStart):
                 case nameof(ExportConfigModel.CropEnd):
-                    OnPropertyChanged(nameof(CropStartX));
-                    OnPropertyChanged(nameof(CropStartY));
-                    OnPropertyChanged(nameof(CropStartZ));
-                    OnPropertyChanged(nameof(CropEndX));
-                    OnPropertyChanged(nameof(CropEndY));
-                    OnPropertyChanged(nameof(CropEndZ));
                     OnPropertyChanged(nameof(IsValid));
                     break;
                 case nameof(ExportConfigModel.Layer):
@@ -233,17 +222,8 @@ namespace ImageViewer.ViewModels.Dialog
                     else
                         selectedMipmap = AvailableMipmaps[models.ExportConfig.Mipmap];
                     OnPropertyChanged(nameof(SelectedMipmap));
-
-                    OnPropertyChanged(nameof(CropStartX));
-                    OnPropertyChanged(nameof(CropStartY));
-                    OnPropertyChanged(nameof(CropStartZ));
-                    OnPropertyChanged(nameof(CropEndX));
-                    OnPropertyChanged(nameof(CropEndY));
-                    OnPropertyChanged(nameof(CropEndZ));
-
-                    OnPropertyChanged(nameof(CropMaxX));
-                    OnPropertyChanged(nameof(CropMaxY));
-                    OnPropertyChanged(nameof(CropMaxZ));
+                    
+                    Crop.Mipmap = selectedMipmap.Cargo;
 
                     // preview mipmap
                     models.Display.ActiveMipmap = Math.Max(models.ExportConfig.Mipmap, 0);
@@ -251,7 +231,7 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
-        public bool IsValid => !UseCropping || (CropStartX <= CropEndX && CropStartY <= CropEndY);
+        public bool IsValid => !UseCropping || (Crop.CropStartX <= Crop.CropEndX && Crop.CropStartY <= Crop.CropEndY);
 
         public string Filename
         {
@@ -427,125 +407,7 @@ namespace ImageViewer.ViewModels.Dialog
             set => models.ExportConfig.UseCropping = value;
         }
 
-        private Size3 curDim => models.Images.Size.GetMip(Math.Max(selectedMipmap.Cargo, 0));
-
-        public int CropMinX => 0;
-        public int CropMaxX => models.Images.GetWidth(Math.Max(selectedMipmap.Cargo, 0)) - 1;
-        public int CropMinY => 0;
-        public int CropMaxY => models.Images.GetHeight(Math.Max(selectedMipmap.Cargo, 0)) - 1;
-
-        public int CropMinZ => 0;
-        public int CropMaxZ => models.Images.GetDepth(Math.Max(selectedMipmap.Cargo, 0)) - 1;
-
-        public int CropStartX
-        {
-            get => models.ExportConfig.CropStart.ToPixels(curDim).X;
-            set
-            {
-                var clamped = Utility.Clamp(value, CropMinX, CropMaxX);
-                SetCropStart(clamped, 0);
-
-                if(clamped != value) OnPropertyChanged(nameof(CropStartX));
-                CropEndX = CropEndX; // maybe adjust this value
-            }
-        }
-
-        public int CropStartY
-        {
-            get => models.Settings.FlipYAxis ? FlipY(models.ExportConfig.CropEnd.ToPixels(curDim).Y) : models.ExportConfig.CropStart.ToPixels(curDim).Y;
-            set
-            {
-                var clamped = Utility.Clamp(value, CropMinY, CropMaxY);
-                if (models.Settings.FlipYAxis)
-                {
-                    // set crop end y
-                    SetCropEnd(FlipY(clamped), 1);
-                }
-                else
-                {
-                    // set crop start y
-                    SetCropStart(clamped, 1);
-                }
-
-                if (clamped != value) OnPropertyChanged(nameof(CropStartY));
-            }
-        }
-
-        public int CropStartZ
-        {
-            get => models.ExportConfig.CropStart.ToPixels(curDim).Z;
-            set
-            {
-                var clamped = Utility.Clamp(value, CropMinZ, CropMaxZ);
-                SetCropStart(clamped, 2);
-
-                if (clamped != value) OnPropertyChanged(nameof(CropStartZ));
-                CropEndZ = CropEndZ; // maybe adjust this value
-            }
-        }
-
-        public int CropEndX
-        {
-            get => models.ExportConfig.CropEnd.ToPixels(curDim).X;
-            set
-            {
-                var clamped = Utility.Clamp(value, CropMinX, CropMaxX);
-                SetCropEnd(clamped, 0);
-
-                if (clamped != value) OnPropertyChanged(nameof(CropEndX));
-            }
-        }
-
-        public int CropEndY
-        {
-            get => models.Settings.FlipYAxis ? FlipY(models.ExportConfig.CropStart.ToPixels(curDim).Y) :  models.ExportConfig.CropEnd.ToPixels(curDim).Y;
-            set
-            {
-                var clamped = Utility.Clamp(value, CropMinY, CropMaxY);
-                if (models.Settings.FlipYAxis)
-                {
-                    // set crop start y
-                    SetCropStart(FlipY(clamped), 1);
-                }
-                else
-                {
-                    SetCropEnd(clamped, 1);
-                }
-
-                if(clamped != value) OnPropertyChanged(nameof(CropEndY));
-            }
-        }
-
-        public int CropEndZ
-        {
-            get => models.ExportConfig.CropEnd.ToPixels(curDim).Z;
-            set
-            {
-                var clamped = Utility.Clamp(value, CropMinZ, CropMaxZ);
-                SetCropEnd(clamped, 2);
-
-                if (clamped != value) OnPropertyChanged(nameof(CropEndZ));
-            }
-        }
-
-        private int FlipY(int value)
-        {
-            return CropMaxY - value;
-        }
-
-        private void SetCropStart(int v, int axis)
-        {
-            var res = models.ExportConfig.CropStart;
-            res[axis] = (v + 0.5f) / curDim[axis];
-            models.ExportConfig.CropStart = res;
-        }
-
-        private void SetCropEnd(int v, int axis)
-        {
-            var res = models.ExportConfig.CropEnd;
-            res[axis] = (v + 0.5f) / curDim[axis];
-            models.ExportConfig.CropEnd = res;
-        }
+        public CropManager.ViewModel Crop { get; }
 
         #endregion
 

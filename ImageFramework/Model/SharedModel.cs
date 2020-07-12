@@ -20,6 +20,8 @@ namespace ImageFramework.Model
         public UploadBuffer Upload { get; }
         public DownloadBuffer Download { get; }
 
+        private PaddingShader padding = null;
+        public PaddingShader Padding => padding ?? (padding = new PaddingShader());
         internal SyncQuery Sync { get; }
 
         public SharedModel()
@@ -38,6 +40,7 @@ namespace ImageFramework.Model
             QuadShader?.Dispose();
             Upload?.Dispose();
             Sync?.Dispose();
+            padding?.Dispose();
         }
     }
 }

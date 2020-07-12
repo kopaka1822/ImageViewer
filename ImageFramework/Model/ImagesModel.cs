@@ -41,17 +41,22 @@ namespace ImageFramework.Model
             public string Alias { get; internal set; }
             public GliFormat OriginalFormat { get; private set; }
 
-            public DateTime? LastModified { get; }
+            public DateTime? LastModified { get; private set; }
 
             public bool IsFile => LastModified != null;
 
-            internal ImageData(ITexture image, string filename, GliFormat originalFormat)
+            /// <param name="image">valid texture</param>
+            /// <param name="isFile">indicates if the texture was loaded from a file</param>
+            /// <param name="filename">original filename or proposed filename (when not directly imported)</param>
+            /// <param name="alias">display name</param>
+            /// <param name="originalFormat">original internal format</param>
+            internal ImageData(ITexture image, bool isFile, [CanBeNull] string filename, [CanBeNull] string alias, GliFormat originalFormat)
             {
                 Image = image;
-                Filename = filename;
+                Filename = filename ?? "";
                 OriginalFormat = originalFormat;
-                Alias = System.IO.Path.GetFileNameWithoutExtension(filename);
-                if (File.Exists(Filename))
+                Alias = (alias ?? System.IO.Path.GetFileNameWithoutExtension(Filename)) ?? "";
+                if (isFile && File.Exists(Filename))
                 {
                     LastModified = File.GetLastWriteTime(Filename);
                 }
@@ -80,6 +85,16 @@ namespace ImageFramework.Model
             public void Scale(Size3 size, MitchellNetravaliScaleShader shader, ScalingModel scaling)
             {
                 var tmp = shader.Run((TextureArray2D) Image, size, scaling);
+                LastModified = null;
+                Image.Dispose();
+                Image = tmp;
+            }
+
+            public void Pad(Size3 leftPad, Size3 rightPad, PaddingShader.FillMode fill, Models models)
+            {
+                var tmp = models.SharedModel.Padding.Run(Image, leftPad, rightPad, fill, models.Scaling,
+                    models.SharedModel);
+                LastModified = null;
                 Image.Dispose();
                 Image = tmp;
             }
@@ -170,14 +185,19 @@ namespace ImageFramework.Model
         /// <summary>
         /// tries to add the image to the current collection.
         /// </summary>
+        /// <param name="image">valid texture</param>
+        /// <param name="isFile">indicates if the texture was loaded from a file</param>
+        /// <param name="filename">original filename or proposed filename (when not directly imported)</param>
+        /// <param name="originalFormat">original internal format</param>
+        /// <param name="alias">display name (if null this will be determined from the filename)</param>
         /// <exception cref="ImagesModel.MipmapMismatch">will be thrown if everything except the number of mipmaps matches</exception>
         /// <exception cref="Exception">will be thrown if the images does not match with the current set of images</exception>
-        public void AddImage(ITexture image, string name, GliFormat originalFormat)
+        public void AddImage(ITexture image, bool isFile, [CanBeNull] string filename, GliFormat originalFormat, [CanBeNull] string alias = null)
         {
             if (Images.Count == 0) // first image
             {
                 InitDimensions(image);
-                images.Add(new ImageData(image, name, originalFormat));
+                images.Add(new ImageData(image, isFile, filename, alias, originalFormat));
                 PrevNumImages = 0;
                 OnPropertyChanged(nameof(NumImages));
                 OnPropertyChanged(nameof(NumLayers));
@@ -188,12 +208,12 @@ namespace ImageFramework.Model
             }
             else // test if compatible with previous images
             {
-                TestCompability(image, name);
+                TestCompability(image, (alias ?? filename) ?? "");
 
                 // remember old properties
                 var isHdr = IsHdr;
 
-                images.Add(new ImageData(image, name, originalFormat));
+                images.Add(new ImageData(image, isFile, filename, alias, originalFormat));
                 PrevNumImages = NumImages - 1;
                 OnPropertyChanged(nameof(NumImages));
 
@@ -229,6 +249,7 @@ namespace ImageFramework.Model
         public void RenameImage(int idx, string newAlias)
         {
             Debug.Assert(idx < NumImages);
+            if (images[idx].Alias == newAlias) return;
             images[idx].Alias = newAlias;
             OnPropertyChanged(nameof(ImageAlias));
         }
@@ -353,6 +374,25 @@ namespace ImageFramework.Model
                 OnPropertyChanged(nameof(NumMipmaps));
         }
 
+        public void PadImages(Size3 leftPad, Size3 rightPad, PaddingShader.FillMode fill, Models models)
+        {
+            if (NumImages == 0) return;
+            if (leftPad == Size3.Zero && rightPad == Size3.Zero) return;
+
+            var prevMipmaps = NumMipmaps;
+
+            foreach (var imageData in Images)
+            {
+                imageData.Pad(leftPad, rightPad, fill, models);
+            }
+
+            InitDimensions(images[0].Image);
+
+            OnPropertyChanged(nameof(Size));
+            if(prevMipmaps != NumMipmaps)
+                OnPropertyChanged(nameof(NumMipmaps));
+        }
+
         protected void InitDimensions(ITexture image)
         {
             dimensions = new Size3[image.NumMipmaps];
@@ -407,10 +447,19 @@ namespace ImageFramework.Model
             }
         }
 
-        public ITexture CreateEmptyTexture(Format format, bool createUav)
+        public ITexture CreateEmptyTexture(Format format, bool createUav, bool createRtv = true)
         {
             Debug.Assert(images.Count != 0);
-            return images[0].Image.Create(new LayerMipmapCount(NumLayers, NumMipmaps), Size, format, createUav);
+            return images[0].Image.Create(new LayerMipmapCount(NumLayers, NumMipmaps), Size, format, createUav, createRtv);
+        }
+
+        /// <summary>
+        /// returns image alias or empty string if id is invalid
+        /// </summary>
+        public string GetImageAlias(int id)
+        {
+            if (id < 0 || id >= NumImages) return "";
+            return Images[id].Alias;
         }
     }
 }

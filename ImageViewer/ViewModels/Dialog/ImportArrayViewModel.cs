@@ -82,6 +82,7 @@ namespace ImageViewer.ViewModels.Dialog
                     var res = models.CombineToArray(textures);
 
                     models.Images.AddImage(res,
+                        false,
                         GetPrettyFilename(viewModel.ListItems[0].Filename, textures.Count),
                         viewModel.ListItems[0].Format);
                 }
@@ -136,6 +137,7 @@ namespace ImageViewer.ViewModels.Dialog
                     tmpArray.Dispose();
 
                     models.Images.AddImage(res,
+                        false,
                         GetPrettyFilename(viewModel.ListItems[0].Filename, textures.Count),
                         viewModel.ListItems[0].Format);
                 }
@@ -187,26 +189,26 @@ namespace ImageViewer.ViewModels.Dialog
                 {
                     // test if compatible
 
-                    if (img.NumLayers != 1)
+                    if (img.LayerMipmap.Layers != 1)
                         throw new Exception($"{filename}: Only single layer images are supported");
 
                     if (models.Images.NumImages != 0)
                     {
                         // is it compatible with already imported images
-                        if(img.GetSize(0) != models.Images.GetSize(0))
-                            throw new Exception($"{filename}: Image resolution mismatch. Expected {models.Images.GetWidth(0)}x{models.Images.GetHeight(0)} but got {img.GetSize(0).X}x{img.GetSize(0).Y}");
+                        if(img.Size != models.Images.GetSize(0))
+                            throw new Exception($"{filename}: Image resolution mismatch. Expected {models.Images.GetWidth(0)}x{models.Images.GetHeight(0)} but got {img.Size.X}x{img.Size.Y}");
 
-                        if(img.NumMipmaps != models.Images.NumMipmaps)
-                            throw new Exception($"{filename}: Inconsistent amount of mipmaps. Expected {models.Images.NumMipmaps} got {img.NumMipmaps}");
+                        if(img.LayerMipmap.Mipmaps != models.Images.NumMipmaps)
+                            throw new Exception($"{filename}: Inconsistent amount of mipmaps. Expected {models.Images.NumMipmaps} got {img.LayerMipmap.Mipmaps}");
                     }
                     else if(ListItems.Count > 0)
                     {
                         var first = ListItems[0].Image;
-                        if(img.GetSize(0) != first.Size)
-                            throw new Exception($"{filename}: Image resolution mismatch. Expected {first.Size.X}x{first.Size.Y} but got {img.GetSize(0).X}x{img.GetSize(0).Y}");
+                        if(img.Size != first.Size)
+                            throw new Exception($"{filename}: Image resolution mismatch. Expected {first.Size.X}x{first.Size.Y} but got {img.Size.X}x{img.Size.Y}");
                         
-                        if(img.NumMipmaps != first.NumMipmaps)
-                            throw new Exception($"{filename}: Inconsistent amount of mipmaps. Expected {first.NumMipmaps} got {img.NumMipmaps}");
+                        if(img.LayerMipmap.Mipmaps != first.NumMipmaps)
+                            throw new Exception($"{filename}: Inconsistent amount of mipmaps. Expected {first.NumMipmaps} got {img.LayerMipmap.Mipmaps}");
                     }
 
                     // first image

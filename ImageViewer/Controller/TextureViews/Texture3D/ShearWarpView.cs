@@ -12,7 +12,7 @@ using SharpDX;
 
 namespace ImageViewer.Controller.TextureViews.Texture3D
 {
-    public class ShearWarpView : Texture3DBaseView
+    /*public class ShearWarpView : Texture3DBaseView
     {
         private readonly ShearWarpShader shader;
 
@@ -62,5 +62,5 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
         {
             return Matrix.Scaling(-1.0f, -1.0f, 1.0f);
         }
-    }
+    }*/
 }

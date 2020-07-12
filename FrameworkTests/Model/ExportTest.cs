@@ -76,7 +76,7 @@ namespace FrameworkTests.Model
             var model = new Models(1);
             model.AddImageFromFile(TestData.Directory + "checkers.dds");
             model.Apply();
-
+            
             model.Export.Export(new ExportDescription(model.Pipelines[0].Image, ExportDir + "cropped", "dds")
             {
                 FileFormat = GliFormat.RGBA8_SRGB,
@@ -113,15 +113,15 @@ namespace FrameworkTests.Model
             var colors = newTex.GetPixelColors(0);
 
             Assert.AreEqual(2 * 2 * 2, colors.Length);
-            Assert.IsTrue(Color.White.Equals(colors[0], Color.Channel.Rgb));
-            Assert.IsTrue(Color.Black.Equals(colors[1], Color.Channel.Rgb));
-            Assert.IsTrue(Color.White.Equals(colors[2], Color.Channel.Rgb));
-            Assert.IsTrue(Color.Black.Equals(colors[3], Color.Channel.Rgb));
+            Assert.IsTrue(Colors.White.Equals(colors[0], Color.Channel.Rgb));
+            Assert.IsTrue(Colors.Black.Equals(colors[1], Color.Channel.Rgb));
+            Assert.IsTrue(Colors.White.Equals(colors[2], Color.Channel.Rgb));
+            Assert.IsTrue(Colors.Black.Equals(colors[3], Color.Channel.Rgb));
 
-            Assert.IsTrue(Color.White.Equals(colors[4], Color.Channel.Rgb));
-            Assert.IsTrue(Color.Black.Equals(colors[5], Color.Channel.Rgb));
-            Assert.IsTrue(Color.White.Equals(colors[6], Color.Channel.Rgb));
-            Assert.IsTrue(Color.Black.Equals(colors[7], Color.Channel.Rgb));
+            Assert.IsTrue(Colors.White.Equals(colors[4], Color.Channel.Rgb));
+            Assert.IsTrue(Colors.Black.Equals(colors[5], Color.Channel.Rgb));
+            Assert.IsTrue(Colors.White.Equals(colors[6], Color.Channel.Rgb));
+            Assert.IsTrue(Colors.Black.Equals(colors[7], Color.Channel.Rgb));
         }
 
         [TestMethod]
@@ -154,7 +154,7 @@ namespace FrameworkTests.Model
         {
             var model = new Models(1);
             var orig = IO.LoadImageTexture(TestData.Directory + "checkers3d.dds", out var format);
-            model.Images.AddImage(orig, "tsts", format);
+            model.Images.AddImage(orig, true, TestData.Directory + "checkers3d.dds", format);
             model.Apply();
             
 
@@ -176,7 +176,7 @@ namespace FrameworkTests.Model
         {
             var model = new Models(1);
             var orig = IO.LoadImageTexture(TestData.Directory + "checkers3d.dds", out var format);
-            model.Images.AddImage(orig, "tsts", format);
+            model.Images.AddImage(orig, true, TestData.Directory + "checkers3d.dds", format);
             model.Apply();
 
             model.Export.Export(new ExportDescription(model.Pipelines[0].Image, ExportDir + "tmp3d", "dds")

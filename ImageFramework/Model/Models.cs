@@ -51,7 +51,7 @@ namespace ImageFramework.Model
         public event EventHandler SoftReset;
 
         private GifModel gif = null;
-        public GifModel Gif => gif ?? (gif = new GifModel(SharedModel.QuadShader, SharedModel.Upload, Progress));
+        public GifModel Gif => gif ?? (gif = new GifModel(Progress));
 
         public ProgressModel Progress { get; }
 
@@ -183,7 +183,7 @@ namespace ImageFramework.Model
             var tex = IO.LoadImageTexture(filename, out var originalFormat);
             try
             {
-                Images.AddImage(tex, filename, originalFormat);
+                Images.AddImage(tex, true, filename, originalFormat);
             }
             catch (Exception)
             {
@@ -348,6 +348,9 @@ namespace ImageFramework.Model
             }
             pixelValueShader?.Dispose();
             SharedModel?.Dispose();
+
+            // finally, destroy directx resources
+            Device.Get().Dispose();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

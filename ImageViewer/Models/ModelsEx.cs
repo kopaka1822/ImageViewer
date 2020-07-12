@@ -7,6 +7,7 @@ using ImageFramework.Model.Overlay;
 using ImageViewer.Controller;
 using ImageViewer.Controller.TextureViews.Shared;
 using ImageViewer.Models.Display;
+using ImageViewer.UtilityEx;
 
 namespace ImageViewer.Models
 {
@@ -23,6 +24,13 @@ namespace ImageViewer.Models
         public IReadOnlyList<StatisticModel> Statistics { get; }
 
         public ExportConfigModel ExportConfig { get; }
+
+        public PathManager ExportPath { get; } = new PathManager();
+        private PathManager viewerConfigPath = null;
+
+        public PathManager ViewerConfigPath => viewerConfigPath ??
+                                               (viewerConfigPath = new PathManager(Window.ExecutionPath + "\\Configs",
+                                                   null, "icfg"));
 
         private readonly ResizeController resizeController;
         private readonly ComputeImageController computeImageController;
@@ -63,6 +71,7 @@ namespace ImageViewer.Models
             ViewData?.Dispose();
             paintController?.Dispose();
             Display?.Dispose();
+            Window?.Dispose();
             base.Dispose();
         }
     }

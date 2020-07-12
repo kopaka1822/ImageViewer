@@ -12,7 +12,7 @@ namespace ImageFramework.Model.Filter.Parameter
     /// <summary>
     /// filter parameter information which is not dependent from the parameter type
     /// </summary>
-    public class FilterParameterModelBase : INotifyPropertyChanged
+    public abstract class FilterParameterModelBase : INotifyPropertyChanged
     {
         public FilterParameterModelBase(string name, string variableName)
         {
@@ -24,6 +24,9 @@ namespace ImageFramework.Model.Filter.Parameter
         public string Name { get; }
         /// name within the shader
         public string VariableName { get; }
+
+        public abstract string StringValue { get; set; }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 

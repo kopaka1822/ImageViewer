@@ -13,34 +13,33 @@ namespace ViewerTests
     public class EmptySpaceShaderTest
     {
         [TestMethod]
-        public void Checkers3DTest()
+        public void Checkers3D()
         {
             TestEmptySpaceGeneration("checkers3d.dds");
         }
 
         [TestMethod]
-        public void LongZAxisTest()
+        public void LongZAxis()
         {
             TestEmptySpaceGeneration("long_z_axis.ktx");
         }
 
         [TestMethod]
-        public void IslandTest()
+        public void Island()
         {
             TestEmptySpaceGeneration("islands.ktx");
         }
 
 
 
-        private void TestEmptySpaceGeneration(String filename)
+        private void TestEmptySpaceGeneration(string filename)
         {
-            var models = new ImageFramework.Model.Models(1);
-
             var img = IO.LoadImageTexture(TestData.Directory + filename);
             var helpTex = new Texture3D(img.NumMipmaps, img.Size, Format.R8_UInt, true, false);
+            var tmpTex = new Texture3D(img.NumMipmaps, img.Size, Format.R8_UInt, true, false);
 
             var s = new EmptySpaceSkippingShader();
-            s.Execute(img, helpTex, LayerMipmapSlice.Mip0, new UploadBuffer(256));
+            s.Run(img, helpTex, tmpTex, LayerMipmapSlice.Mip0, new UploadBuffer(256));
 
 
             var shaderResultColors = helpTex.GetPixelColors(LayerMipmapSlice.Mip0);
@@ -51,23 +50,18 @@ namespace ViewerTests
                 shaderValues[i] = (int)(shaderResultColors[i].Red + 0.5);
             }
 
-
-            int[] expectedValues = calcEmptySpace(ref img);
-
-
+            int[] expectedValues = CalcEmptySpace(img);
 
             for (int i = 0; i < shaderValues.Length; i++)
             {
                 Assert.AreEqual(expectedValues[i], shaderValues[i]);
             }
-
         }
 
 
-        private int[] calcEmptySpace(ref ITexture inputTex)
+        private int[] CalcEmptySpace(ITexture inputTex)
         {
             var origColors = inputTex.GetPixelColors(LayerMipmapSlice.Mip0);
-            var expectedColors = new Color[origColors.Length];
             Size3 size = inputTex.Size;
 
             int[] ping = new int[origColors.Length];

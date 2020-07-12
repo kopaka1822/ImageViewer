@@ -20,10 +20,6 @@ namespace ImageFramework.Utility
             Rgba = R | G | B | A
         }
 
-        public static readonly Color Black = new Color(0.0f, 0.0f, 0.0f, 1.0f);
-        public static readonly Color White = new Color(1.0f, 1.0f, 1.0f, 1.0f);
-        public static readonly Color Transparent = new Color(0.0f, 0.0f, 0.0f, 0.0f);
-
         public Color(float red, float green, float blue, float alpha = 1.0f)
         {
             Red = red;
@@ -267,5 +263,15 @@ namespace ImageFramework.Utility
                 res.Alpha *= scalar;
             return res;
         }
+    }
+
+    public static class Colors
+    {
+        public static readonly Color Black = new Color(0.0f, 0.0f, 0.0f, 1.0f);
+        public static readonly Color Red = new Color(1.0f, 0.0f, 0.0f, 1.0f);
+        public static readonly Color Green = new Color(0.0f, 1.0f, 0.0f, 1.0f);
+        public static readonly Color Blue = new Color(0.0f, 0.0f, 1.0f, 1.0f);
+        public static readonly Color White = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+        public static readonly Color Transparent = new Color(0.0f, 0.0f, 0.0f, 0.0f);
     }
 }

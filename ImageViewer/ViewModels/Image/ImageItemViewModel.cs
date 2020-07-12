@@ -9,23 +9,28 @@ using System.Windows.Input;
 using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageViewer.Commands.Helper;
+using ImageViewer.Models;
 
 namespace ImageViewer.ViewModels.Image
 {
     public class ImageItemViewModel : INotifyPropertyChanged
     {
+        private readonly ModelsEx models;
         private readonly ImagesModel images;
 
-        public ImageItemViewModel(ImagesModel images, int id)
+        public ImageItemViewModel(ModelsEx models, int id)
         {
-            this.images = images;
             this.Id = id;
+            this.models = models;
+            this.images = models.Images;
             var imgData = images.Images[id];
 
             Prefix = $"I{id} - ";
-            ToolTip = imgData.Filename + "\n" + imgData.OriginalFormat;
+            ToolTip = imgData.OriginalFormat.ToString();
+            if (!String.IsNullOrEmpty(imgData.Filename))
+                ToolTip = imgData.Filename + "\n" + ToolTip;
 
-            if (imgData.Alias.StartsWith("__imported"))
+            if (String.IsNullOrEmpty(imgData.Alias))
             {
                 imageName = "";
                 images.RenameImage(id, "");
@@ -35,6 +40,7 @@ namespace ImageViewer.ViewModels.Image
 
             RenameCommand = new ActionCommand(OnRename);
             DeleteCommand = new ActionCommand(() => images.DeleteImage(id));
+            ReplaceEquationCommand = new ActionCommand<int>(OnReplaceWithEquation);
         }
 
         public int Id { get; }
@@ -76,9 +82,18 @@ namespace ImageViewer.ViewModels.Image
             IsRenaming = true;
         }
 
+        private void OnReplaceWithEquation(int equation)
+        {
+            models.Pipelines[equation].Color.Formula = "I" + Id;
+            models.Pipelines[equation].Alpha.Formula = "I" + Id;
+            models.Pipelines[equation].IsEnabled = true;
+        }
+
         public ICommand RenameCommand { get; }
 
         public ICommand DeleteCommand { get; }
+
+        public ICommand ReplaceEquationCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -34,8 +34,12 @@ namespace ImageViewer.ViewModels.Image
                     RefreshImageList();
                     OnPropertyChanged(nameof(WindowTitle));
                     break;
+                case nameof(ImagesModel.ImageAlias):
+                    OnPropertyChanged(nameof(WindowTitle));
+                    break;
                 case nameof(ImagesModel.ImageOrder):
                     RefreshImageList();
+                    OnPropertyChanged(nameof(WindowTitle));
                     break;
                 case nameof(ImagesModel.ImageType):
                     OnPropertyChanged(nameof(Is2D));
@@ -53,7 +57,7 @@ namespace ImageViewer.ViewModels.Image
             get
             {
                 if (this.models.Images.NumImages == 0) return "Texture Viewer " + versionString;
-                var res = System.IO.Path.GetFileNameWithoutExtension(models.Images.Images[0].Filename);
+                var res = models.Images.Images[0].Alias;
 
                 if (this.models.Images.NumImages > 1)
                 {
@@ -74,7 +78,7 @@ namespace ImageViewer.ViewModels.Image
             ImageListItems.Clear();
             for (var i = 0; i < models.Images.NumImages; ++i)
             {
-                var item = new ImageItemViewModel(models.Images, i);
+                var item = new ImageItemViewModel(models, i);
                 ImageListItems.Add(item);
             }
 

@@ -44,8 +44,8 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
 
         public void OnDrag(Vector2 diff)
         {
-            yaw += (float)diff.X * 0.01f * models.Display.Aperture;
-            pitch += (float)diff.Y * 0.01f * models.Display.Aperture;
+            yaw += (float)diff.X * 0.01f;
+            pitch -= (float)diff.Y * 0.01f;
             rotation = Matrix.RotationYawPitchRoll(yaw, pitch, 0.0f);
         }
 
@@ -54,25 +54,33 @@ namespace ImageViewer.Controller.TextureViews.Texture3D
             return rotation;
         }
 
-        protected float CalcFarplane()
-        {
-            // distance from camera. ray direction in the edges will be vec3(+-1, +-1, farplane)
-            return (float)(1.0 / Math.Tan(models.Display.Aperture / 2.0));
-        }
-
         public void OnDrag2(Vector2 diff)
         {
             float aspectX = models.Window.ClientSize.Width / (float)models.Window.ClientSize.Height;
-            cubeOffsetX += 4.0f * diff.X / models.Display.Zoom / models.Window.ClientSize.Width * aspectX;
-            cubeOffsetY -= 4.0f * diff.Y / models.Display.Zoom / models.Window.ClientSize.Height;
+            //cubeOffsetX += 4.0f * diff.X / models.Display.Zoom / models.Window.ClientSize.Width * aspectX;
+            //cubeOffsetY -= 4.0f * diff.Y / models.Display.Zoom / models.Window.ClientSize.Height;
+            cubeOffsetX += diff.X / models.Display.Zoom;
+            cubeOffsetY += diff.Y / models.Display.Zoom;
         }
 
-        public abstract Size3 GetTexelPosition(Vector2 mouse);
+        public abstract Size3? GetTexelPosition(Vector2 mouse);
         public virtual void UpdateImage(int id, ITexture texture) {}
 
-        protected float GetCubeCenter()
+        // texture cube center in camera coordinate system
+        protected Float3 GetCubeCenter()
         {
-            return 1.0f / models.Display.Zoom * 2.0f;
+            var size = models.Images.Size;
+            var curSize = size.GetMip(models.Display.ActiveMipmap);
+
+            var scaleX = (float)curSize.X / size.X;
+            var scaleY = (float) curSize.Y / size.Y;
+            var scaleZ = (float) curSize.Z / size.Z;
+
+            // distance from camera to the start of the cube
+            float fp = 0.5f * models.Window.ClientSize.Height / models.Display.Zoom * scaleY;
+
+
+            return new Float3(-cubeOffsetX * scaleX, -cubeOffsetY * scaleY, -fp - 0.5f * curSize.Z);
         }
 
         public abstract void Dispose();

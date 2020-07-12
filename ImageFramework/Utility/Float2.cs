@@ -42,6 +42,8 @@ namespace ImageFramework.Utility
         }
 
         public static readonly Float2 Zero = new Float2();
+        public static readonly Float2 One = new Float2(1.0f);
+        public static readonly Float2 NegOne = new Float2(-1.0f);
 
         public override string ToString()
         {
@@ -71,6 +73,16 @@ namespace ImageFramework.Utility
         public static Float2 operator *(Float2 left, Float2 right)
         {
             return new Float2(left.X * right.X, left.Y * right.Y);
+        }
+
+        public static Float2 operator *(Float2 left, float right)
+        {
+            return new Float2(left.X * right, left.Y * right);
+        }
+
+        public static Float2 operator *(float left, Float2 right)
+        {
+            return new Float2(left * right.X, left * right.Y);
         }
 
         public static Float2 operator /(Float2 left, Float2 right)

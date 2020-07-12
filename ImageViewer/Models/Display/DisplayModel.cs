@@ -34,7 +34,7 @@ namespace ImageViewer.Models.Display
             CubeMap,
             Polar,
             CubeCrossView,
-            RayCasting,
+            Volume,
             ShearWarp
         }
 
@@ -77,7 +77,7 @@ namespace ImageViewer.Models.Display
                 {
                     extendedView = new Single3DDisplayModel(models, this);
                 }
-                else if (ActiveView == ViewMode.RayCasting)
+                else if (ActiveView == ViewMode.Volume)
                 {
                     extendedView = new RayCastingDisplayModel(models, this);
                 }
@@ -102,7 +102,8 @@ namespace ImageViewer.Models.Display
                 if(ReferenceEquals(value, activeOverlay)) return;
                 activeOverlay?.Dispose();
                 activeOverlay = value;
-                activeOverlay?.MouseMove(TexelPosition);
+                if(TexelPosition.HasValue)
+                    activeOverlay?.MouseMove(TexelPosition.Value);
                 OnPropertyChanged(nameof(ActiveOverlay));
             }
         }
@@ -124,6 +125,23 @@ namespace ImageViewer.Models.Display
                 OnPropertyChanged(nameof(Zoom));
             }
         }
+
+        /// <summary>
+        /// sets the next best zoom point that is smaller or equal to the desired value
+        /// </summary>
+        /// <param name="desired"></param>
+        public void SetClosestZoomPoint(float desired)
+        {
+            var best = desired;
+            foreach (var z in ZOOM_POINTS)
+            {
+                if (z > desired) break;
+                best = z;
+            }
+
+            Zoom = best;
+        }
+
         public void IncreaseZoom()
         {
             // Get the first number larger than zoom
@@ -261,6 +279,8 @@ namespace ImageViewer.Models.Display
             }
         }
 
+        public float ClientAspectRatioScalar => clientAspectRatio.M11;
+
         private int activeLayer = 0;
         public int ActiveLayer
         {
@@ -359,21 +379,22 @@ namespace ImageViewer.Models.Display
         }
 
         // previous mouse position on the texture (should be used for context menu things because the texel)
-        public Size3 PrevTexelPosition { get; private set; } = Size3.Zero;
+        public Size3? PrevTexelPosition { get; private set; } = null;
 
-        private Size3 texelPosition = Size3.Zero;
+        private Size3? texelPosition = null;
         // the mouse position on the texture
-        public Size3 TexelPosition
+        public Size3? TexelPosition
         {
             get => texelPosition;
             set
             {
                 PrevTexelPosition = texelPosition;
-                if (value.Equals(texelPosition)) return;
+                if (Equals(value, texelPosition)) return;
                 texelPosition = value;
                 OnPropertyChanged(nameof(TexelPosition));
 
-                ActiveOverlay?.MouseMove(texelPosition);
+                if(texelPosition.HasValue)
+                    ActiveOverlay?.MouseMove(texelPosition.Value);
             }
         }
 
@@ -428,9 +449,7 @@ namespace ImageViewer.Models.Display
                         }
                         else if(models.Images.ImageType == typeof(Texture3D))
                         {
-                            //modes.Insert(0, ViewMode.RayCasting);
-                            modes.Add(ViewMode.RayCasting);
-                            //modes.Insert(1, ViewMode.ShearWarp);
+                            modes.Insert(0, ViewMode.Volume);
                         }
 
                         AvailableViews = modes;
@@ -489,7 +508,7 @@ namespace ImageViewer.Models.Display
             switch (vm)
             {
                 case DisplayModel.ViewMode.CubeCrossView:
-                case DisplayModel.ViewMode.RayCasting:
+                case DisplayModel.ViewMode.Volume:
                 case DisplayModel.ViewMode.ShearWarp:
                 case DisplayModel.ViewMode.Single:
                 case DisplayModel.ViewMode.Empty:

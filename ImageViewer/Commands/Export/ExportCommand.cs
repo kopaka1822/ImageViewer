@@ -7,6 +7,7 @@ using ImageFramework.Model.Export;
 using ImageFramework.Utility;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
+using ImageViewer.UtilityEx;
 using ImageViewer.ViewModels.Dialog;
 using ImageViewer.Views.Dialog;
 using Microsoft.Win32;
@@ -16,34 +17,16 @@ namespace ImageViewer.Commands.Export
     public class ExportCommand : Command
     {
         private readonly ModelsEx models;
-        private static string s_exportDirectory = null;
-        private string exportExtension = null;
         private GliFormat? exportFormat = null;
+        private readonly PathManager path;
 
         public ExportCommand(ModelsEx models)
         {
             this.models = models;
+            path = models.ExportPath;
             this.models.PropertyChanged += ModelsOnPropertyChanged;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
-
-        public static string GetExportDirectory(string fallbackFilename)
-        {
-            // set or keep export directory
-            if (s_exportDirectory == null)
-            {
-                s_exportDirectory = System.IO.Path.GetDirectoryName(fallbackFilename);
-            }
-
-            return s_exportDirectory;
-        }
-
-        public static void SetExportDirectory(string directory)
-        {
-            if (directory != null)
-                s_exportDirectory = directory;
-        }
-
 
         private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -97,52 +80,39 @@ namespace ImageViewer.Commands.Export
                 }
             }
 
+            if (path.InitFromEquations(models))
+            {
+                // open save file dialog
+                Debug.Assert(path.Directory != null);
+                Debug.Assert(path.Filename != null);
+            }
+
             // set proposed filename
             var firstImageId = models.Pipelines[id].Color.FirstImageId;
-            var firstImage = models.Images.Images[firstImageId].Filename;
-            var proposedFilename = System.IO.Path.GetFileNameWithoutExtension(firstImage);
-            
-            // set or keep export directory
-            var exportDirectory = GetExportDirectory(firstImage);
-
-            if (exportExtension == null)
-            {
-                exportExtension = System.IO.Path.GetExtension(firstImage);
-                if (exportExtension != null && exportExtension.StartsWith("."))
-                    exportExtension = exportExtension.Substring(1);
-            }
 
             if (exportFormat == null)
             {
                 exportFormat = models.Images.Images[firstImageId].OriginalFormat;
             }
 
-            // open save file dialog
-            Debug.Assert(exportDirectory != null);
-            Debug.Assert(proposedFilename != null);
-
             var sfd = new SaveFileDialog
             {
-                Filter = GetFilter(exportExtension, tex.Is3D),
-                InitialDirectory = exportDirectory,
-                FileName = proposedFilename
+                Filter = GetFilter(path.Extension, tex.Is3D),
+                InitialDirectory = path.Directory,
+                FileName = path.Filename
             };
 
             if (sfd.ShowDialog(models.Window.TopmostWindow) != true)
                 return;
 
-            exportExtension = System.IO.Path.GetExtension(sfd.FileName).Substring(1);
-            var exportFilename = System.IO.Path.GetFileNameWithoutExtension(sfd.FileName);
-            exportDirectory = System.IO.Path.GetDirectoryName(sfd.FileName);
-            SetExportDirectory(exportDirectory);
+            path.UpdateFromFilename(sfd.FileName);
 
-            
-            var viewModel = new ExportViewModel(models, exportExtension, exportFormat.Value, sfd.FileName, tex.Is3D, models.Statistics[id].Stats);
+            var viewModel = new ExportViewModel(models, path.Extension, exportFormat.Value, sfd.FileName, tex.Is3D, models.Statistics[id].Stats);
             var dia = new ExportDialog(viewModel);
 
             if (models.Window.ShowDialog(dia) != true) return;
 
-            var desc = new ExportDescription(tex, exportDirectory + "/" + exportFilename, exportExtension)
+            var desc = new ExportDescription(tex, path.Directory + "/" + path.Filename, path.Extension)
             {
                 Multiplier = multiplier,
                 Mipmap = models.ExportConfig.Mipmap,
@@ -163,8 +133,8 @@ namespace ImageViewer.Commands.Export
                 for (int i = 0; i < models.ZoomBox.Boxes.Count; ++i)
                 {
                     var box = models.ZoomBox.Boxes[i];
-                    var zdesc = new ExportDescription(tex, $"{exportDirectory}/{exportFilename}_zoom{i}",
-                        exportExtension)
+                    var zdesc = new ExportDescription(tex, $"{path.Directory}/{path.Filename}_zoom{i}",
+                        path.Extension)
                     {
                         Multiplier = multiplier,
                         Mipmap = models.ExportConfig.Mipmap,
@@ -203,7 +173,7 @@ namespace ImageViewer.Commands.Export
         private static string GetFilter(string preferred, bool is3D)
         {
             string pref = null;
-            if(!is3D || Is3DFilter(preferred))
+            if(preferred != null && (!is3D || Is3DFilter(preferred)))
                 filter.TryGetValue(preferred, out pref);
 
             var res = "";

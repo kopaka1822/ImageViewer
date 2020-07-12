@@ -25,9 +25,9 @@ namespace ImageViewer.Controller.TextureViews
         public void OnDrag(Vector2 diff) {}
         public void OnDrag2(Vector2 diff) {}
 
-        public Size3 GetTexelPosition(Vector2 mouse)
+        public Size3? GetTexelPosition(Vector2 mouse)
         {
-            return Size3.Zero;
+            return null;
         }
 
         public void UpdateImage(int id, ITexture texture) { }

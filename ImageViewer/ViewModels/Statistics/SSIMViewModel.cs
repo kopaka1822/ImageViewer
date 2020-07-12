@@ -184,7 +184,7 @@ namespace ImageViewer.ViewModels.Statistics
             var i2 = GetImage(image2);
             var tex = models.Images.CreateEmptyTexture(Format.R32G32B32A32_Float, true);
             models.SSIM.GetLuminanceTexture(i1, i2, tex, parent.Settings);
-            models.Images.AddImage(tex, "__importedLuminance", GliFormat.RGBA32_SFLOAT);
+            models.Images.AddImage(tex, false, null, GliFormat.RGBA32_SFLOAT);
         }
 
         public void ImportContrast()
@@ -194,7 +194,7 @@ namespace ImageViewer.ViewModels.Statistics
             var i2 = GetImage(image2);
             var tex = models.Images.CreateEmptyTexture(Format.R32G32B32A32_Float, true);
             models.SSIM.GetContrastTexture(i1, i2, tex, parent.Settings);
-            models.Images.AddImage(tex, "__importedLuminance", GliFormat.RGBA32_SFLOAT);
+            models.Images.AddImage(tex, false, null, GliFormat.RGBA32_SFLOAT);
         }
 
         public void ImportStructure()
@@ -204,7 +204,7 @@ namespace ImageViewer.ViewModels.Statistics
             var i2 = GetImage(image2);
             var tex = models.Images.CreateEmptyTexture(Format.R32G32B32A32_Float, true);
             models.SSIM.GetStructureTexture(i1, i2, tex, parent.Settings);
-            models.Images.AddImage(tex, "__importedLuminance", GliFormat.RGBA32_SFLOAT);
+            models.Images.AddImage(tex, false, null, GliFormat.RGBA32_SFLOAT);
         }
 
         public void ImportSSIM()
@@ -214,7 +214,7 @@ namespace ImageViewer.ViewModels.Statistics
             var i2 = GetImage(image2);
             var tex = models.Images.CreateEmptyTexture(Format.R32G32B32A32_Float, true);
             models.SSIM.GetSSIMTexture(i1, i2, tex, parent.Settings);
-            models.Images.AddImage(tex, "__importedLuminance", GliFormat.RGBA32_SFLOAT);
+            models.Images.AddImage(tex, false, null, GliFormat.RGBA32_SFLOAT);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

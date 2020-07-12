@@ -47,8 +47,9 @@ namespace ImageViewer.Commands.Export
             // is computed?
             if (pipe.Image == null) return false;
             // is a file?
-            var imgId = GetFirstImageId(pipe);
+            var imgId = pipe.GetFirstImageId();
             if (!models.Images.Images[imgId].IsFile) return false;
+            if (String.IsNullOrEmpty(models.Images.Images[imgId].Filename)) return false;
 
             return true;
         }
@@ -59,7 +60,7 @@ namespace ImageViewer.Commands.Export
             {
                 if (!CanExecute()) return "Overwrite ...";
 
-                var imgId = GetFirstImageId(models.Pipelines[models.GetFirstEnabledPipeline()]);
+                var imgId = models.Pipelines[models.GetFirstEnabledPipeline()].GetFirstImageId();
                 var filename = Path.GetFileName(models.Images.Images[imgId].Filename);
                 return $"Overwrite {filename}";
             }
@@ -85,7 +86,7 @@ namespace ImageViewer.Commands.Export
             }
 
             // set proposed filename
-            var firstImageId = GetFirstImageId(pipe);
+            var firstImageId = pipe.GetFirstImageId();
             var filename = models.Images.Images[firstImageId].Filename;
             var format = models.Images.Images[firstImageId].OriginalFormat;
             var ext = Path.GetExtension(filename);
@@ -102,13 +103,6 @@ namespace ImageViewer.Commands.Export
             desc.TrySetFormat(format);
 
             models.Export.ExportAsync(desc);
-        }
-
-        private int GetFirstImageId(ImagePipeline pipe)
-        {
-            if(pipe.Color.HasImages)
-                return pipe.Color.FirstImageId;
-            return pipe.Alpha.FirstImageId;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

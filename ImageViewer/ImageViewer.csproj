@@ -86,8 +86,10 @@
     </ApplicationDefinition>
     <Compile Include="Commands\AddFilterCommand.cs" />
     <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
+    <Compile Include="Commands\Export\ExportConfigCommand.cs" />
     <Compile Include="Commands\Export\ExportOverwriteCommand.cs" />
     <Compile Include="Commands\Helper\Command.cs" />
+    <Compile Include="Commands\Import\ImportConfigCommand.cs" />
     <Compile Include="Commands\Import\ReloadImagesCommand.cs" />
     <Compile Include="Commands\Import\ReplaceEquationImageCommand.cs" />
     <Compile Include="Commands\Tools\ArrayTo3DCommand.cs" />
@@ -104,6 +106,7 @@
     <Compile Include="Commands\Tools\LatLongToCubemapCommand.cs" />
     <Compile Include="Commands\Import\OpenCommand.cs" />
     <Compile Include="Commands\Tools\RemoveZoomBoxCommand.cs" />
+    <Compile Include="Commands\Tools\ShowPaddingCommand.cs" />
     <Compile Include="Commands\Tools\StartZoomboxCommand.cs" />
     <Compile Include="Commands\Tools\Tex3DToArrayCommand.cs" />
     <Compile Include="Commands\View\ResizeWindowCommand.cs" />
@@ -119,10 +122,13 @@
     <Compile Include="Controller\ImportDialogController.cs" />
     <Compile Include="Controller\Overlays\ZoomBoxOverlay.cs" />
     <Compile Include="Controller\PaintController.cs" />
+    <Compile Include="Controller\TextureViews\Overlays\Sphere3DOverlay.cs" />
+    <Compile Include="Controller\TextureViews\Shader\CubeSkippingShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\EmptySpaceSkippingShader.cs" />
-    <Compile Include="Controller\TextureViews\Shader\RayMarchingShader.cs" />
-    <Compile Include="Controller\TextureViews\Shader\RayCastingShader.cs" />
+    <Compile Include="Controller\TextureViews\Shader\CubeVolumeShader.cs" />
+    <Compile Include="Controller\TextureViews\Shader\SmoothVolumeShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\ShearWarpShader.cs" />
+    <Compile Include="Controller\TextureViews\Shader\VolumeShader.cs" />
     <Compile Include="Controller\TextureViews\Texture2D\CubeCrossTextureView.cs" />
     <Compile Include="Controller\TextureViews\Texture2D\CubeTextureView.cs" />
     <Compile Include="Controller\TextureViews\EmptyView.cs" />
@@ -135,23 +141,35 @@
     <Compile Include="Controller\TextureViews\Shader\PolarViewShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\SingleViewShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\ViewShader.cs" />
-    <Compile Include="Controller\TextureViews\Texture3D\RayCastingView.cs" />
+    <Compile Include="Controller\TextureViews\Texture3D\VolumeView.cs" />
     <Compile Include="Controller\TextureViews\Texture3D\ShearWarpView.cs" />
     <Compile Include="Controller\TextureViews\Texture3D\Single3DView.cs" />
     <Compile Include="Controller\TextureViews\Shared\SingleTextureView.cs" />
     <Compile Include="Controller\TextureViews\Shared\TextureViewData.cs" />
     <Compile Include="Controller\TextureViews\Texture3D\Texture3DBaseView.cs" />
     <Compile Include="Controller\ViewModeController.cs" />
+    <Compile Include="DirectX\SwapChain.cs" />
     <Compile Include="Models\Display\IDisplayOverlay.cs" />
     <Compile Include="Models\Display\RayCastingDisplayModel.cs" />
     <Compile Include="Models\Display\Single3DDisplayModel.cs" />
     <Compile Include="Models\ExportConfigModel.cs" />
     <Compile Include="Models\SettingsModel.cs" />
+    <Compile Include="Models\Settings\DisplayConfig.cs" />
+    <Compile Include="Models\Settings\EquationConfig.cs" />
+    <Compile Include="Models\Settings\ExportConfig.cs" />
+    <Compile Include="Models\Settings\FilterConfig.cs" />
+    <Compile Include="Models\Settings\ImagesConfig.cs" />
+    <Compile Include="Models\Settings\ViewerConfig.cs" />
+    <Compile Include="Models\Settings\ZoomBoxConfig.cs" />
     <Compile Include="Models\StatisticModel.cs" />
     <Compile Include="UtilityEx\ColorExtension.cs" />
+    <Compile Include="UtilityEx\CropManager.cs" />
+    <Compile Include="UtilityEx\PathManager.cs" />
+    <Compile Include="ViewModels\Dialog\ExportConfigViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ExportViewModel.cs" />
     <Compile Include="ViewModels\Dialog\GifExportViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ImportArrayViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\PaddingViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelColorViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ResolutionViewModel.cs" />
@@ -182,6 +200,7 @@
     <Compile Include="ViewModels\Statistics\StatisticViewModel.cs" />
     <Compile Include="ViewModels\ViewModels.cs" />
     <Compile Include="ViewModels\ZoomBoxViewModel.cs" />
+    <Compile Include="Views\Converter\BoolIntConverter.cs" />
     <Compile Include="Views\Converter\BoolVisibilityConverter.cs" />
     <Compile Include="Views\Converter\NullVisibilityConverter.cs" />
     <Compile Include="Views\CustomTextBox.cs" />
@@ -191,6 +210,9 @@
     <Compile Include="Views\Dialog\ColorPickerDialog.xaml.cs">
       <DependentUpon>ColorPickerDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Dialog\ExportConfigDialog.xaml.cs">
+      <DependentUpon>ExportConfigDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Dialog\ExportDialog.xaml.cs">
       <DependentUpon>ExportDialog.xaml</DependentUpon>
     </Compile>
@@ -199,6 +221,9 @@
     </Compile>
     <Compile Include="Views\Dialog\HelpDialog.xaml.cs">
       <DependentUpon>HelpDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\PaddingDialog.xaml.cs">
+      <DependentUpon>PaddingDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\PixelColorDialog.xaml.cs">
       <DependentUpon>PixelColorDialog.xaml</DependentUpon>
@@ -289,6 +314,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\Dialog\ExportConfigDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Dialog\ExportDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -298,6 +327,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialog\HelpDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\PaddingDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -473,6 +506,9 @@
     <PackageReference Include="Markdig">
       <Version>0.18.1</Version>
     </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>12.0.3</Version>
+    </PackageReference>
     <PackageReference Include="SharpDX.Direct3D11">
       <Version>4.2.0</Version>
     </PackageReference>
@@ -527,6 +563,13 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\image_box.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\open_config.png" />
+    <Resource Include="Icons\save_config.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\padding.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

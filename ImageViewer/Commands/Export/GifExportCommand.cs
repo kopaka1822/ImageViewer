@@ -1,10 +1,12 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.IO;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
+using ImageViewer.UtilityEx;
 using ImageViewer.ViewModels.Dialog;
 using ImageViewer.Views.Dialog;
 using Microsoft.Win32;
@@ -15,10 +17,13 @@ namespace ImageViewer.Commands.Export
     {
         private readonly ModelsEx models;
         private readonly GifExportViewModel viewModel = new GifExportViewModel();
+        private readonly PathManager path;
+        private bool askForVideo = true;
 
         public GifExportCommand(ModelsEx models)
         {
             this.models = models;
+            this.path = models.ExportPath;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
 
@@ -37,7 +42,7 @@ namespace ImageViewer.Commands.Export
             return models.Images.NumImages > 0;
         }
 
-        public override void Execute()
+        public override async void Execute()
         {
             if (models.NumEnabled != 2)
             {
@@ -53,7 +58,14 @@ namespace ImageViewer.Commands.Export
 
             if (!FFMpeg.IsAvailable())
             {
-                models.Window.ShowErrorDialog("ffmpeg is required for this feature. Please download the ffmpeg binaries and place them in the ImageViewer root directory");
+                if (models.Window.ShowYesNoDialog("ffmpeg is required for this feature. " +
+                                                  "Please download the ffmpeg binaries and place them in the ImageViewer root directory. " +
+                                                  "Open ffmpeg download page and ImageViewer root?", "download ffmpeg?"))
+                {
+                    var root = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    if (root != null) System.Diagnostics.Process.Start(root);
+                    System.Diagnostics.Process.Start("https://www.ffmpeg.org/download.html");
+                }
                 return;
             }
 
@@ -70,22 +82,21 @@ namespace ImageViewer.Commands.Export
                 models.Window.ShowInfoDialog("Export will ignore image multiplier");
             }
 
-            // export directory fallback
-            var firstImageId = models.Pipelines[ids[0]].Color.FirstImageId;
-            var firstImage = models.Images.Images[firstImageId].Filename;
+            path.InitFromEquations(models);
 
             var sfd = new SaveFileDialog
             {
                 Filter = "MPEG-4 (*.mp4)|*.mp4",
-                InitialDirectory = ExportCommand.GetExportDirectory(firstImage),
-                FileName = System.IO.Path.GetFileNameWithoutExtension(firstImage)
+                InitialDirectory = path.Directory,
+                FileName = path.Filename
             };
 
             if (sfd.ShowDialog(models.Window.TopmostWindow) != true)
                 return;
 
-            ExportCommand.SetExportDirectory(System.IO.Path.GetDirectoryName(sfd.FileName));
+            path.UpdateFromFilename(sfd.FileName, updateExtension: false);
 
+            viewModel.InitTitles(models);
             var dia = new GifExportDialog(viewModel);
             if (models.Window.ShowDialog(dia) != true) return;
             
@@ -97,14 +108,48 @@ namespace ImageViewer.Commands.Export
             // delete old file if it existed (otherwise ffmpeg will hang)
             System.IO.File.Delete(sfd.FileName);
 
-            models.Gif.CreateGif((TextureArray2D)img1, (TextureArray2D)img2, new GifModel.Config
+            GifModel.Config config = new GifModel.Config
             {
                 Filename = sfd.FileName,
                 TmpFilename = tmpName,
                 FramesPerSecond = viewModel.FramesPerSecond,
                 SliderWidth = viewModel.SliderSize,
-                NumSeconds = viewModel.TotalSeconds
-            });
+                NumSeconds = viewModel.TotalSeconds,
+                Label1 = viewModel.Title1,
+                Label2 = viewModel.Title2,
+                Left = (TextureArray2D)img1,
+                Right = (TextureArray2D)img2,
+                Overlay = (TextureArray2D)models.Overlay.Overlay
+            };
+
+            models.Gif.CreateGif(config, models.SharedModel);
+
+            await models.Progress.WaitForTaskAsync();
+
+            // delete tmp directory
+            try
+            {
+                System.IO.Directory.Delete(tmpDir, true);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
+            if (models.Progress.LastTaskCancelledByUser) return;
+
+            if (!String.IsNullOrEmpty(models.Progress.LastError))
+            {
+                models.Window.ShowErrorDialog(models.Progress.LastError);
+            }
+            else if(askForVideo)
+            {
+                askForVideo = models.Window.ShowYesNoDialog("Open video?", "Finished exporting");
+                if(askForVideo)
+                {
+                    System.Diagnostics.Process.Start(config.Filename);
+                }
+            }
         }
     }
 }

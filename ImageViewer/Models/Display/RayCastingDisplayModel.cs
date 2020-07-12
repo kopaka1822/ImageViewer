@@ -29,19 +29,56 @@ namespace ImageViewer.Models.Display
 
         
 
-        private bool flatShading = false;
+        private bool shading = false;
 
-        public bool FlatShading
+        public bool Shading
         {
-            get => flatShading;
+            get => shading;
             set
             {
-                if (value == flatShading) return;
-                flatShading = value;
-                OnPropertyChanged(nameof(FlatShading));
+                if (value == shading) return;
+                shading = value;
+                OnPropertyChanged(nameof(Shading));
             }
         }
 
+        private bool useCropping = false;
+
+        public bool UseCropping
+        {
+            get => useCropping;
+            set
+            {
+                if (value == useCropping) return;
+                useCropping = value;
+                OnPropertyChanged(nameof(UseCropping));
+            }
+        }
+
+        private bool alphaIsCoverage = true;
+
+        public bool AlphaIsCoverage
+        {
+            get => alphaIsCoverage;
+            set
+            {
+                if (value == alphaIsCoverage) return;
+                alphaIsCoverage = value;
+                OnPropertyChanged(nameof(AlphaIsCoverage));
+            }
+        }
+
+        private bool hideInternals = false;
+        public bool HideInternals
+        {
+            get => hideInternals;
+            set
+            {
+                if (value == hideInternals) return;
+                hideInternals = value;
+                OnPropertyChanged(nameof(HideInternals));
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

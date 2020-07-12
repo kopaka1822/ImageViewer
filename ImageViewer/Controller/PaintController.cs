@@ -28,7 +28,6 @@ namespace ImageViewer.Controller
     {
         private readonly ModelsEx models;
         private readonly ViewModeController viewMode;
-        private SwapChain swapChain = null;
         private bool scheduledRedraw = false;
         private RawColor4 clearColor;
         private readonly AdvancedGpuTimer gpuTimer;
@@ -42,6 +41,7 @@ namespace ImageViewer.Controller
             models.Display.PropertyChanged += DisplayOnPropertyChanged;
             models.Window.PropertyChanged += WindowOnPropertyChanged;
             models.Overlay.PropertyChanged += OverlayOnPropertyChanged;
+            models.ExportConfig.PropertyChanged += ExportConfigOnPropertyChanged;
 
             // client mouse events
             models.Window.Window.BorderHost.PreviewMouseMove += (sender, e) => ScheduleRedraw();
@@ -52,14 +52,26 @@ namespace ImageViewer.Controller
                 pipe.PropertyChanged += PipeOnPropertyChanged;
             }
 
-            models.Window.Window.Loaded += WindowOnLoaded;
-
             // clear color
             var col = models.Window.ThemeColor;
             clearColor.R = col.Red;
             clearColor.G = col.Green;
             clearColor.B = col.Blue;
             clearColor.A = 1.0f;
+        }
+
+        private void ExportConfigOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ExportConfigModel.CropStart):
+                case nameof(ExportConfigModel.CropEnd):
+                case nameof(ExportConfigModel.UseCropping):
+                case nameof(ExportConfigModel.Layer):
+                case nameof(ExportConfigModel.Mipmap):
+                    ScheduleRedraw();
+                    break;
+            }
         }
 
         private void OverlayOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -94,15 +106,6 @@ namespace ImageViewer.Controller
             }
         }
 
-        private void WindowOnLoaded(object sender, RoutedEventArgs e)
-        {
-            var adapter = new SwapChainAdapter(models.Window.Window.BorderHost);
-            models.Window.Window.BorderHost.Child = adapter;
-            swapChain = adapter.SwapChain;
-
-            swapChain.Resize(models.Window.ClientSize.Width, models.Window.ClientSize.Height);
-        }
-
         /// <summary>
         /// the frame will be redrawn as soon as possible
         /// </summary>
@@ -121,6 +124,7 @@ namespace ImageViewer.Controller
         private void OnRepaint()
         {
             scheduledRedraw = false;
+            var swapChain = models.Window.SwapChain;
             if (swapChain == null || swapChain.IsDisposed) return;
 
             var timerStarted = false;
@@ -199,7 +203,6 @@ namespace ImageViewer.Controller
         public void Dispose()
         {
             viewMode?.Dispose();
-            swapChain?.Dispose();
             gpuTimer?.Dispose();
         }
     }

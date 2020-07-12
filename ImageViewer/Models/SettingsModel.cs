@@ -38,30 +38,30 @@ namespace ImageViewer.Models
         public SettingsModel()
         {
             // required if assembly version changes
-            if (Settings.Default.UpdateSettings)
+            if (Properties.Settings.Default.UpdateSettings)
             {
-                Settings.Default.Upgrade();
-                Settings.Default.UpdateSettings = false;
+                Properties.Settings.Default.Upgrade();
+                Properties.Settings.Default.UpdateSettings = false;
                 Save();
             }
-            
-            Settings.Default.PropertyChanged += DefaultOnPropertyChanged;
+
+            Properties.Settings.Default.PropertyChanged += DefaultOnPropertyChanged;
         }
 
         private void DefaultOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
-                case nameof(Settings.Default.TexelDisplayMode):
+                case nameof(Properties.Settings.Default.TexelDisplayMode):
                     OnPropertyChanged(nameof(TexelDisplay));
                     break;
-                case nameof(Settings.Default.TexelDecimalCount):
+                case nameof(Properties.Settings.Default.TexelDecimalCount):
                     OnPropertyChanged(nameof(TexelDecimalPlaces));
                     break;
-                case nameof(Settings.Default.FlipYAxis):
+                case nameof(Properties.Settings.Default.FlipYAxis):
                     OnPropertyChanged(nameof(FlipYAxis));
                     break;
-                case nameof(Settings.Default.AlphaBackground):
+                case nameof(Properties.Settings.Default.AlphaBackground):
                     OnPropertyChanged(nameof(AlphaBackground));
                     break;
             }
@@ -69,56 +69,56 @@ namespace ImageViewer.Models
 
         public int WindowWidth
         {
-            get => Settings.Default.WindowWidth;
+            get => Properties.Settings.Default.WindowWidth;
             set
             {
                 if(value > 0)
-                    Settings.Default.WindowWidth = value;
+                    Properties.Settings.Default.WindowWidth = value;
             } 
         }
 
         public int WindowHeight
         {
-            get => Settings.Default.WindowHeight;
+            get => Properties.Settings.Default.WindowHeight;
             set
             {
                 if (value > 0)
-                    Settings.Default.WindowHeight = value;
+                    Properties.Settings.Default.WindowHeight = value;
             }
         }
 
         public bool IsMaximized
         {
-            get => Settings.Default.IsMaximized;
-            set => Settings.Default.IsMaximized = value;
+            get => Properties.Settings.Default.IsMaximized;
+            set => Properties.Settings.Default.IsMaximized = value;
         }
 
         public ThemeDictionary.Themes Theme
         {
-            get => (ThemeDictionary.Themes)Settings.Default.Theme;
+            get => (ThemeDictionary.Themes)Properties.Settings.Default.Theme;
             set
             {
                 if (value < 0 || value >= ThemeDictionary.Themes.Size) return;
                 if (value == Theme) return;
-                Settings.Default.Theme = (int)value;
+                Properties.Settings.Default.Theme = (int)value;
             }
         }
 
         public string ImagePath
         {
-            get => Settings.Default.ImagePath ?? "";
-            set => Settings.Default.ImagePath = value;
+            get => Properties.Settings.Default.ImagePath ?? "";
+            set => Properties.Settings.Default.ImagePath = value;
         }
 
         public string FilterPath
         {
-            get => Settings.Default.FilterPath ?? "";
-            set => Settings.Default.FilterPath = value;
+            get => Properties.Settings.Default.FilterPath ?? "";
+            set => Properties.Settings.Default.FilterPath = value;
         }
         public Statistics StatisticsChannel
         {
-            get => (Statistics) Settings.Default.StatisticsChannel;
-            set => Settings.Default.StatisticsChannel = (int) value;
+            get => (Statistics)Properties.Settings.Default.StatisticsChannel;
+            set => Properties.Settings.Default.StatisticsChannel = (int) value;
         }
 
         /// <summary>
@@ -126,14 +126,14 @@ namespace ImageViewer.Models
         /// </summary>
         public int LastQuality
         {
-            get => Settings.Default.LastQuality;
-            set => Settings.Default.LastQuality = value;
+            get => Properties.Settings.Default.LastQuality;
+            set => Properties.Settings.Default.LastQuality = value;
         }
 
         public TexelDisplayMode TexelDisplay
         {
-            get => (TexelDisplayMode)Settings.Default.TexelDisplayMode;
-            set => Settings.Default.TexelDisplayMode = (int) value;
+            get => (TexelDisplayMode)Properties.Settings.Default.TexelDisplayMode;
+            set => Properties.Settings.Default.TexelDisplayMode = (int) value;
         }
 
         public int MinTexelDecimalPlaces { get; } = 2;
@@ -141,11 +141,11 @@ namespace ImageViewer.Models
 
         public int TexelDecimalPlaces
         {
-            get => Settings.Default.TexelDecimalCount;
+            get => Properties.Settings.Default.TexelDecimalCount;
             set
             {
                 var clamp = Utility.Clamp(value, MinTexelDecimalPlaces, MaxTexelDecimalPlaces);
-                Settings.Default.TexelDecimalCount = clamp;
+                Properties.Settings.Default.TexelDecimalCount = clamp;
             }
         }
 
@@ -159,86 +159,86 @@ namespace ImageViewer.Models
 
         public AlphaType AlphaBackground
         {
-            get => (AlphaType) Settings.Default.AlphaBackground;
-            set => Settings.Default.AlphaBackground = (int)value;
+            get => (AlphaType)Properties.Settings.Default.AlphaBackground;
+            set => Properties.Settings.Default.AlphaBackground = (int)value;
         }
 
         public bool FlipYAxis
         {
-            get => Settings.Default.FlipYAxis;
-            set => Settings.Default.FlipYAxis = value;
+            get => Properties.Settings.Default.FlipYAxis;
+            set => Properties.Settings.Default.FlipYAxis = value;
         }
 
         public Color NaNColor
         {
-            get => new Color(Settings.Default.NanRed, Settings.Default.NanGreen, Settings.Default.NanBlue);
+            get => new Color(Properties.Settings.Default.NanRed, Properties.Settings.Default.NanGreen, Properties.Settings.Default.NanBlue);
             set
             {
                 // ReSharper disable CompareOfFloatsByEqualityOperator
-                if (Settings.Default.NanRed == value.Red && 
-                    Settings.Default.NanGreen == value.Green && 
-                    Settings.Default.NanBlue == value.Blue) return;
+                if (Properties.Settings.Default.NanRed == value.Red &&
+                    Properties.Settings.Default.NanGreen == value.Green &&
+                    Properties.Settings.Default.NanBlue == value.Blue) return;
 
-                Settings.Default.NanRed = value.Red;
-                Settings.Default.NanGreen = value.Green;
-                Settings.Default.NanBlue = value.Blue;
+                Properties.Settings.Default.NanRed = value.Red;
+                Properties.Settings.Default.NanGreen = value.Green;
+                Properties.Settings.Default.NanBlue = value.Blue;
                 OnPropertyChanged(nameof(NaNColor));
             }
         }
 
         public Color ZoomBoxColor
         {
-            get => new Color(Settings.Default.ZoomBoxRed, Settings.Default.ZoomBoxGreen, Settings.Default.ZoomBoxBlue);
+            get => new Color(Properties.Settings.Default.ZoomBoxRed, Properties.Settings.Default.ZoomBoxGreen, Properties.Settings.Default.ZoomBoxBlue);
             set
             {
                 // ReSharper disable CompareOfFloatsByEqualityOperator
-                if (Settings.Default.ZoomBoxRed == value.Red &&
-                    Settings.Default.ZoomBoxGreen == value.Green &&
-                    Settings.Default.ZoomBoxBlue == value.Blue) return;
+                if (Properties.Settings.Default.ZoomBoxRed == value.Red &&
+                    Properties.Settings.Default.ZoomBoxGreen == value.Green &&
+                    Properties.Settings.Default.ZoomBoxBlue == value.Blue) return;
 
-                Settings.Default.ZoomBoxRed = value.Red;
-                Settings.Default.ZoomBoxGreen = value.Green;
-                Settings.Default.ZoomBoxBlue = value.Blue;
+                Properties.Settings.Default.ZoomBoxRed = value.Red;
+                Properties.Settings.Default.ZoomBoxGreen = value.Green;
+                Properties.Settings.Default.ZoomBoxBlue = value.Blue;
                 OnPropertyChanged(nameof(ZoomBoxColor));
             }
         }
 
         public int ZoomBoxBorder
         {
-            get => Settings.Default.ZoomBoxBorder;
+            get => Properties.Settings.Default.ZoomBoxBorder;
             set
             {
-                if(Settings.Default.ZoomBoxBorder == value) return;
-                Settings.Default.ZoomBoxBorder = value;
+                if(Properties.Settings.Default.ZoomBoxBorder == value) return;
+                Properties.Settings.Default.ZoomBoxBorder = value;
                 OnPropertyChanged(nameof(ZoomBoxBorder));
             }
         }
 
         public bool ExportZoomBoxBorder
         {
-            get => Settings.Default.ExportZoomBoxBorder;
+            get => Properties.Settings.Default.ExportZoomBoxBorder;
             set
             {
-                if(Settings.Default.ExportZoomBoxBorder == value) return;
-                Settings.Default.ExportZoomBoxBorder = value;
+                if(Properties.Settings.Default.ExportZoomBoxBorder == value) return;
+                Properties.Settings.Default.ExportZoomBoxBorder = value;
                 OnPropertyChanged(nameof(ExportZoomBoxBorder));
             }
         }
 
         public int ExportZoomBoxScale
         {
-            get => Settings.Default.ExportZoomBoxScale;
+            get => Properties.Settings.Default.ExportZoomBoxScale;
             set
             {
-                if (Settings.Default.ExportZoomBoxScale == value) return;
-                Settings.Default.ExportZoomBoxScale = value;
+                if (Properties.Settings.Default.ExportZoomBoxScale == value) return;
+                Properties.Settings.Default.ExportZoomBoxScale = value;
                 OnPropertyChanged(nameof(ExportZoomBoxScale));
             }
         }
 
         public void Save()
         {
-            Settings.Default.Save();
+            Properties.Settings.Default.Save();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

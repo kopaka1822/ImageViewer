@@ -180,10 +180,21 @@
     <CopyFileToFolders Include="..\Docs\img\mip_compare.png">
       <Filter>Docs\img</Filter>
     </CopyFileToFolders>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Docs\statistics.md">
+    <CopyFileToFolders Include="..\Docs\statistics.md" />
+    <CopyFileToFolders Include="..\Docs\volumetric.md">
       <Filter>Docs</Filter>
-    </None>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\volume_coverage.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\volume_internals.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\volume_shading.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\volume_slice.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>

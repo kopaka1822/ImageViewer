@@ -4,9 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ImageViewer.Views.Display"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="300">
-    <Border Padding="5">
+             d:DesignHeight="450" d:DesignWidth="200">
+    <UserControl.Resources>
+        <system:String x:Key="AlphaCoverageTooltip">Alpha can be interpreted as coverage (material with holes in it) or as opacity (shine through). By default, coverage will be assumed</system:String>
+    </UserControl.Resources>
+    <StackPanel Margin="5">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -14,17 +19,125 @@
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <TextBlock 
-                Text="Flat Shading: "
+                Grid.Row="0"
+                Grid.Column="0"
+                Text="Shading: "
                 Margin="{StaticResource DefaultBorderBotRight}"/>
             <CheckBox
+                Grid.Row="0"
                 Grid.Column="1"
                 VerticalAlignment="Center"
-                IsChecked="{Binding FlatShading}"
-                IsEnabled="{Binding FlatIsEnabled}"
+                IsChecked="{Binding Shading}"
                 Margin="{StaticResource DefaultBorderBottom}"/>
+
+            <TextBlock 
+                Grid.Row="1"
+                Grid.Column="0"
+                Text="Hide Internals: "
+                Margin="{StaticResource DefaultBorderBotRight}"/>
+            <CheckBox
+                Grid.Row="1"
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                IsEnabled="{Binding NoInterpolation}"
+                IsChecked="{Binding HideInternals}"
+                Margin="{StaticResource DefaultBorderBottom}"/>
+
+            <TextBlock 
+                Grid.Row="2"
+                Grid.Column="0"
+                Text="Alpha Is Coverage: "
+                ToolTip="{StaticResource AlphaCoverageTooltip}"
+                Margin="{StaticResource DefaultBorderBotRight}"/>
+            <CheckBox
+                Grid.Row="2"
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                IsChecked="{Binding AlphaIsCoverage}"
+                IsEnabled="{Binding NoInterpolation}"
+                ToolTip="{StaticResource AlphaCoverageTooltip}"
+                Margin="{StaticResource DefaultBorderBottom}"/>
+
+            <!--<TextBlock 
+                Grid.Row="3"
+                Grid.Column="0"
+                Text="Self Shadowing: "
+                Margin="{StaticResource DefaultBorderBotRight}"/>
+            <CheckBox
+                Grid.Row="3"
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                IsChecked="{Binding SelfShadowing}"
+                Margin="{StaticResource DefaultBorderBottom}"/>-->
         </Grid>
-    </Border>
+
+        <!-- Slice -->
+        <GroupBox Margin="{StaticResource DefaultBorderBottom}"
+                          Padding="{StaticResource DefaultBorderTop}">
+            <GroupBox.Header>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Slice:" Margin="{StaticResource DefaultBorderRight}" HorizontalAlignment="Center"/>
+                    <CheckBox 
+                                HorizontalAlignment="Center"
+                                IsChecked="{Binding UseCropping}"/>
+                </StackPanel>
+            </GroupBox.Header>
+            <StackPanel 
+                HorizontalAlignment="Center"
+                Visibility="{Binding UseCropping, Converter={StaticResource VisibleCollapsedConverter}}">
+                <StackPanel 
+                            Orientation="Horizontal"
+                            Margin="{StaticResource DefaultBorderBottom}">
+                    <TextBlock Text="X from:" Margin="{StaticResource DefaultBorderRight}"/>
+                    <xctk:IntegerUpDown
+                                Width="50"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="{StaticResource DefaultBorderRight}"
+                                Value="{Binding Crop.CropStartX}"/>
+                    <TextBlock Text="to:" Margin="{StaticResource DefaultBorderRight}"/>
+                    <xctk:IntegerUpDown
+                                Width="50"
+                                IsEnabled="{Binding UseCropping}"
+                                Value="{Binding Crop.CropEndX}"/>
+                </StackPanel>
+                <StackPanel
+                            Orientation="Horizontal"
+                            Margin="{StaticResource DefaultBorderBottom}">
+                    <TextBlock Text="Y from:" Margin="{StaticResource DefaultBorderRight}"/>
+                    <xctk:IntegerUpDown
+                                Width="50"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="{StaticResource DefaultBorderRight}"
+                                Value="{Binding Crop.CropStartY}"/>
+                    <TextBlock Text="to:" Margin="{StaticResource DefaultBorderRight}"/>
+                    <xctk:IntegerUpDown
+                                Width="50"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="{StaticResource DefaultBorderRight}"
+                                Value="{Binding Crop.CropEndY}"/>
+                </StackPanel>
+                <StackPanel
+                            Orientation="Horizontal">
+                    <TextBlock Text="Z from:" Margin="{StaticResource DefaultBorderRight}"/>
+                    <xctk:IntegerUpDown
+                                Width="50"
+                                IsEnabled="{Binding UseCropping}"
+                                Margin="{StaticResource DefaultBorderRight}"
+                                Value="{Binding Crop.CropStartZ}"/>
+                    <TextBlock Text="to:" Margin="{StaticResource DefaultBorderRight}"/>
+                    <xctk:IntegerUpDown
+                                Width="50"
+                                IsEnabled="{Binding UseCropping}"
+                                Value="{Binding Crop.CropEndZ}"/>
+                </StackPanel>
+            </StackPanel>
+
+        </GroupBox>
+    </StackPanel>
 </UserControl>
