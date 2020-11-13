@@ -135,5 +135,27 @@ namespace ImageFramework.Model.Overlay
             shader?.Dispose();
             positionBuffer?.Dispose();
         }
+
+        // used for animated diff export:
+        // contains x start and end regions
+        public List<Float2> GetXRepeatRange()
+        {
+            if (Boxes.Count == 0) return null;
+
+            var list = new List<Float2>();
+            foreach (var box in Boxes)
+            {
+                list.Add(new Float2
+                {
+                    X = box.Start.X,
+                    Y = box.End.X
+                });
+            }
+
+            // sort lists (based on box.End.X)
+            list.Sort((left, right) => left.Y.CompareTo(right.Y));
+
+            return list;
+        }
     }
 }

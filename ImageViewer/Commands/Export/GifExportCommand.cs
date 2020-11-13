@@ -103,7 +103,6 @@ namespace ImageViewer.Commands.Export
             // get tmp directory
             var tmpDir = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(Path.GetTempFileName()));
             System.IO.Directory.CreateDirectory(tmpDir);
-            var tmpName = tmpDir + "\\frame";
 
             // delete old file if it existed (otherwise ffmpeg will hang)
             System.IO.File.Delete(sfd.FileName);
@@ -111,7 +110,7 @@ namespace ImageViewer.Commands.Export
             GifModel.Config config = new GifModel.Config
             {
                 Filename = sfd.FileName,
-                TmpFilename = tmpName,
+                TmpDirectory = tmpDir,
                 FramesPerSecond = viewModel.FramesPerSecond,
                 SliderWidth = viewModel.SliderSize,
                 NumSeconds = viewModel.TotalSeconds,
@@ -119,7 +118,8 @@ namespace ImageViewer.Commands.Export
                 Label2 = viewModel.Title2,
                 Left = (TextureArray2D)img1,
                 Right = (TextureArray2D)img2,
-                Overlay = (TextureArray2D)models.Overlay.Overlay
+                Overlay = (TextureArray2D)models.Overlay.Overlay,
+                RepeatRange = models.ZoomBox.GetXRepeatRange()
             };
 
             models.Gif.CreateGif(config, models.SharedModel);

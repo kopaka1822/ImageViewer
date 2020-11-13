@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -35,13 +36,15 @@ namespace ImageFramework.Model
             public int FramesPerSecond = 30;
             public int NumSeconds = 6;
             public int SliderWidth = 3;
-            public string TmpFilename; // filename without extension (frames will be save in BaseFilename000 - BaseFilenameXXX)
+            public string TmpDirectory; // filename without extension (frames will be save in BaseFilename000 - BaseFilenameXXX)
             public string Filename; // destination filename
             public string Label1; // name of the first image
             public string Label2; // name of the second image
             public TextureArray2D Left; // left image
             public TextureArray2D Right; // right image
             [CanBeNull] public TextureArray2D Overlay; // optional overlay texture
+            [CanBeNull] public List<Float2> RepeatRange; // optional (sorted) range of segments that should be repeated
+            public int RepeatRangeCount = 2; // how often are the repeat ranges repeated
         }
 
         internal GifModel(ProgressModel progressModel)
@@ -146,7 +149,7 @@ namespace ImageFramework.Model
                             if (tasks[idx] != null) await tasks[idx];
 
                             frame.CopyPixels(LayerMipmapSlice.Mip0, dstPtr, dstSize);
-                            var filename = $"{cfg.TmpFilename}{i:D4}";
+                            var filename = $"{cfg.TmpDirectory}\\frame{i:D4}";
 
                             // write to file
                             tasks[idx] = Task.Run(() =>
@@ -169,6 +172,8 @@ namespace ImageFramework.Model
                     }
                 }
 
+                var totalFrames = WriteFileList(cfg);
+
                 // wait for tasks to finish
                 for (var i = 0; i < tasks.Length; i++)
                 {
@@ -176,8 +181,9 @@ namespace ImageFramework.Model
                     tasks[i] = null;
                 }
 
+
                 // convert video
-                await FFMpeg.ConvertAsync(cfg, progress.CreateSubProgress(1.0f));
+                await FFMpeg.ConvertAsync(cfg, progress.CreateSubProgress(1.0f), totalFrames);
             }
             finally
             {
@@ -190,6 +196,58 @@ namespace ImageFramework.Model
                     overlay?.Dispose();
                 }
             }
+        }
+
+        private int WriteFileList(Config cfg)
+        {
+            var numFrames = cfg.FramesPerSecond * cfg.NumSeconds;
+
+            // convert repeat range to frame indices
+            var frameRepeat = new Queue<Size2>();
+            if (cfg.RepeatRange != null)
+            {
+                foreach (var float2 in cfg.RepeatRange)
+                {
+                    frameRepeat.Enqueue(new Size2
+                    {
+                        X = Utility.Utility.Clamp((int)Math.Ceiling(float2.X * (numFrames - 1)), 0, numFrames - 1),
+                        Y = Utility.Utility.Clamp((int)Math.Floor(float2.Y * (numFrames - 1)), 0, numFrames - 1),
+                    });
+                }
+            }
+
+            // create file list
+            var curFiles = new StringBuilder();
+            int totalFrames = 0;
+            for (int i = 0; i < numFrames; ++i)
+            {
+                curFiles.AppendLine($"file '{cfg.TmpDirectory}\\frame{i:D4}.png'");
+                ++totalFrames;
+
+                if (frameRepeat.Count > 0 && frameRepeat.Peek().Y == i)
+                {
+                    var cur = frameRepeat.Dequeue();
+                    // repeat the specified segment
+                    for (int rep = 0; rep < cfg.RepeatRangeCount; ++rep)
+                    {
+                        // backwards
+                        for (int j = cur.Y - 1; j > cur.X; --j)
+                        {
+                            curFiles.AppendLine($"file '{cfg.TmpDirectory}\\frame{j:D4}.png'");
+                            ++totalFrames;
+                        }
+                        // forwards
+                        for (int j = cur.X; j <= cur.Y; ++j)
+                        {
+                            curFiles.AppendLine($"file '{cfg.TmpDirectory}\\frame{j:D4}.png'");
+                            ++totalFrames;
+                        }
+                    }
+                }
+            }
+            File.WriteAllText($"{cfg.TmpDirectory}\\files.txt", curFiles.ToString());
+
+            return totalFrames;
         }
 
         public void Dispose()

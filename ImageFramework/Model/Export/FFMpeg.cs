@@ -21,12 +21,12 @@ namespace ImageFramework.Model.Export
             return File.Exists(Path);
         }
 
-        internal static async Task ConvertAsync(GifModel.Config config, IProgress progress)
+        internal static async Task ConvertAsync(GifModel.Config config, IProgress progress, int numFrames)
         {
             Debug.Assert(IsAvailable());
 
             string startArgs =
-                $"-framerate {config.FramesPerSecond} -i \"{config.TmpFilename}%4d.png\" -c:v libx264 -preset veryslow -crf 12 -pix_fmt yuv420p -frames:v {config.FramesPerSecond * config.NumSeconds} -r {config.FramesPerSecond} \"{config.Filename}\"";
+                $"-r {config.FramesPerSecond} -f concat -safe 0 -i \"{config.TmpDirectory}\\files.txt\" -c:v libx264 -preset veryslow -crf 12 -vf \"fps={config.FramesPerSecond},format=yuv420p\" \"{config.Filename}\"";
 
             var p = new Process
             {
@@ -40,7 +40,6 @@ namespace ImageFramework.Model.Export
                     Arguments = startArgs
                 }
             };
-            var numFrames = config.NumSeconds * config.FramesPerSecond;
             progress.What = "converting";
 
             // progress reports
