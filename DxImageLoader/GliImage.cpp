@@ -2,6 +2,7 @@
 #include "GliImage.h"
 #include "compress_interface.h"
 #include "interface.h"
+#include <stdexcept>
 
 bool is_grayscale(gli::format f);
 
