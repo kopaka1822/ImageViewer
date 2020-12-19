@@ -273,7 +273,7 @@ namespace ImageFramework.Model
 
             // do for all mipmaps if no mipmap re computation is enabled
             var nMipmaps = RecomputeMipmaps ? 1 : args.Models.Images.NumMipmaps;
-            filter.Shader.Run(args.Models.Images, src, dst, args.Models.SharedModel.Upload, iteration, nMipmaps);
+            filter.Shader.Run(args.Models.Images, src, dst, args.Models.SharedModel, iteration, nMipmaps);
             args.Models.SharedModel.Sync.Set();
 
             var step = 1.0f / args.Filters.Count;

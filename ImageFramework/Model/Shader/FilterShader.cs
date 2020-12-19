@@ -44,11 +44,11 @@ namespace ImageFramework.Model.Shader
         /// <param name="image">original images (might be used for texture bindings)</param>
         /// <param name="src">source texture</param>
         /// <param name="dst">destination texture</param>
-        /// <param name="cbuffer">buffer that stores some runtime information</param>
+        /// <param name="shared">common utilities</param>
         /// <param name="iteration">current filter iteration. Should be 0 if not separable. Should be 0 or 1 if separable (x- and y-direction pass) or 2 for z-direction pass</param>
         /// <param name="numMipmaps">number of mipmaps to apply the filter on (starting with most detailed mip)</param>
         /// <remarks>make sure to call UpdateParamBuffer() if parameters have changed after the last invocation</remarks>
-        internal void Run(ImagesModel image, ITexture src, ITexture dst, UploadBuffer cbuffer, int iteration, int numMipmaps)
+        internal void Run(ImagesModel image, ITexture src, ITexture dst, SharedModel shared, int iteration, int numMipmaps)
         {
             if (parent.IsSepa) Debug.Assert(iteration == 0 || iteration == 1 || iteration == 2);
             else Debug.Assert(iteration == 0);
@@ -65,6 +65,8 @@ namespace ImageFramework.Model.Shader
                 dev.Compute.SetConstantBuffer(1, paramBuffer.Handle);
 
             dev.Compute.SetShaderResource(1, src.View);
+            dev.Compute.SetSampler(0, shared.LinearSampler);
+            dev.Compute.SetSampler(1, shared.PointSampler);
 
             for (int curMipmap = 0; curMipmap < numMipmaps; ++curMipmap)
             {
@@ -78,7 +80,7 @@ namespace ImageFramework.Model.Shader
                     dev.Compute.SetShaderResource(0, src.GetSrView(new LayerMipmapSlice(curLayer, curMipmap)));
                     BindTextureParameters(image, new LayerMipmapSlice(curLayer, curMipmap));
 
-                    cbuffer.SetData(new LayerLevelFilter
+                    shared.Upload.SetData(new LayerLevelFilter
                     {
                         Layer = curLayer,
                         Level = curMipmap,
@@ -87,7 +89,7 @@ namespace ImageFramework.Model.Shader
                         FilterZ = iteration == 2?1:0
                     });
 
-                    dev.Compute.SetConstantBuffer(0, cbuffer.Handle);
+                    dev.Compute.SetConstantBuffer(0, shared.Upload.Handle);
 
                     dev.Dispatch(
                         Utility.Utility.DivideRoundUp(size.Width, localSize), 
@@ -145,6 +147,9 @@ namespace ImageFramework.Model.Shader
 {builder.UavType}  dst_image : register(u0);
 {builder.SrvSingleType} src_image : register(t0);
 {builder.SrvType} src_image_ex : register(t1);
+
+SamplerState linearSampler : register(s0);
+SamplerState pointSampler : register(s1);
 
 cbuffer LayerLevelBuffer : register(b0) {{
     uint layer;
