@@ -83,6 +83,7 @@ void main(uint3 coord : SV_DISPATCHTHREADID)
 {{
     uint width, height, depth, numLvl;
     texture0.GetDimensions(level, width, height, depth, numLvl);
+    const float3 fcoord = (coord + 0.5) / float3(width, height, depth);
     if(!{builder.Is3DString}) coord.z = layer;
 
     if(coord.x >= width || coord.y >= height) return;

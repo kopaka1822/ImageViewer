@@ -209,6 +209,7 @@ namespace ImageFramework.Model.Equation
         {
             List<MarkovRule> rules = new List<MarkovRule>();
 
+            rules.Add(new IntrinsicFunctionRule());
             rules.Add(new UnaryFunctionRule());
             rules.Add(new BinaryFunctionRule());
             rules.Add(new TertiaryFunctionRule());

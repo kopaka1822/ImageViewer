@@ -40,6 +40,16 @@ namespace FrameworkTests.Model.Equation
         }
 
         [TestMethod]
+        public void IntrinsicFunctions()
+        {
+            TestFormula("pos()");
+            TestFormula("cpos()");
+            TestFormula("ipos()");
+            TestFormula("size()");
+            TestFormula("layer()");
+        }
+
+        [TestMethod]
         public void UnaryFunctionsDefault()
         {
             TestFormula("abs(I0)");
@@ -68,6 +78,16 @@ namespace FrameworkTests.Model.Equation
             TestFormula("red(I0)");
             TestFormula("green(I0)");
             TestFormula("blue(I0)");
+
+            TestFormula("a(I0)");
+            TestFormula("r(I0)");
+            TestFormula("g(I0)");
+            TestFormula("b(I0)");
+
+            TestFormula("x(I0)");
+            TestFormula("y(I0)");
+            TestFormula("z(I0)");
+            TestFormula("w(I0)");
 
             TestFormula("tosrgb(I0)");
             TestFormula("fromsrgb(I0)");

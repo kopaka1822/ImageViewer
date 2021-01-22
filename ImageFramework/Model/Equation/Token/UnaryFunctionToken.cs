@@ -53,18 +53,26 @@ float4 srgbAsSnorm(float4 v)
             switch (name)
             {
                 // image viewer extensions
+                case "w":
+                case "a":
                 case "alpha":
                     front = "(";
                     end = ").aaaa";
                     break;
+                case "x":
+                case "r":
                 case "red":
                     front = "(";
                     end = ").rrrr";
                     break;
+                case "y":
+                case "g":
                 case "green":
                     front = "(";
                     end = ").gggg";
                     break;
+                case "z":
+                case "b":
                 case "blue":
                     front = "(";
                     end = ").bbbb";
