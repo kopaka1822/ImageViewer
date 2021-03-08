@@ -85,10 +85,10 @@ namespace ImageFramework.Model.Overlay
 
         public override bool HasWork => Arrows.Count != 0;
 
-        // transform [0, 1] to [-1, 1]
-        private static float ToCanonical(float texcoord)
+        // transform [0, PixelSize] to [-1, 1]
+        private static float ToCanonical(float texcoord, float invPixelSize)
         {
-            return texcoord * 2.0f - 1.0f;
+            return (texcoord * invPixelSize) * 2.0f - 1.0f;
         }
 
         private void UpdateData(int mipmap)
@@ -104,53 +104,61 @@ namespace ImageFramework.Model.Overlay
             // fill buffer
             var data = new float[floatCount];
             var dim = images.Size.GetMip(mipmap);
-            var pixelDim = Size2.Zero.ToCoords(dim.XY); // size of a single pixel in float coordinates
-            var widthScale = Math.Max(pixelDim.X, pixelDim.Y);
+            
+            // draw in pixel coordinates
+            var pixelSize = new Float2(dim.X, dim.Y);
+            var invPixelSize = new Float2(1.0f / pixelSize.X, 1.0f / pixelSize.Y);
 
             for (var i = 0; i < Arrows.Count; ++i)
             {
-                var a = Arrows[i];
-                var width = Math.Max(a.Width >> mipmap, 1);
+                // start in pixel coordinates
+                var pixelStart = Arrows[i].Start * pixelSize;
+                // end in pixel coordinates
+                var pixelEnd = Arrows[i].End * pixelSize;
+
+                // width in pixels
+                var width = Math.Max(Arrows[i].Width >> mipmap, 1);
                 var off = i * 2 * 9;
 
-                var dir = (a.End - a.Start).Normalize();
+                var dir = (pixelEnd - pixelStart).Normalize();
                 var tangent = dir.RotateCCW();
 
                 // arrow quad:
-                float halfWidth = width * 0.5f * widthScale;
-                var start1 = a.Start + tangent * halfWidth;
-                var start2 = a.Start - tangent * halfWidth;
+                float halfWidth = width * 0.5f;
+                var start1 = pixelStart + tangent * halfWidth;
+                var start2 = pixelStart - tangent * halfWidth;
 
-                var end1 = a.End + tangent * halfWidth - dir * halfWidth;
-                var end2 = a.End - tangent * halfWidth - dir * halfWidth;
+                var end1 = pixelEnd + tangent * halfWidth - dir * width;
+                var end2 = pixelEnd - tangent * halfWidth - dir * width;
 
                 // 1st triangle
-                data[off + 0] = ToCanonical(start1.X);
-                data[off + 1] = ToCanonical(start1.Y);
-                data[off + 2] = ToCanonical(end1.X);
-                data[off + 3] = ToCanonical(end1.Y);
-                data[off + 4] = ToCanonical(end2.X);
-                data[off + 5] = ToCanonical(end2.Y);
+                data[off + 0] = ToCanonical(start1.X, invPixelSize.X);
+                data[off + 1] = ToCanonical(start1.Y, invPixelSize.Y);
+                data[off + 2] = ToCanonical(end1.X, invPixelSize.X);
+                data[off + 3] = ToCanonical(end1.Y, invPixelSize.Y);
+                data[off + 4] = ToCanonical(end2.X, invPixelSize.X);
+                data[off + 5] = ToCanonical(end2.Y, invPixelSize.Y);
                 // 2nd triangle
-                data[off + 6] = ToCanonical(start1.X);
-                data[off + 7] = ToCanonical(start1.Y);
-                data[off + 8] = ToCanonical(end2.X);
-                data[off + 9] = ToCanonical(end2.Y);
-                data[off + 10] = ToCanonical(start2.X);
-                data[off + 11] = ToCanonical(start2.Y);
+                data[off + 6] = ToCanonical(start1.X, invPixelSize.X);
+                data[off + 7] = ToCanonical(start1.Y, invPixelSize.Y);
+                data[off + 8] = ToCanonical(end2.X, invPixelSize.X);
+                data[off + 9] = ToCanonical(end2.Y, invPixelSize.Y);
+                data[off + 10] = ToCanonical(start2.X, invPixelSize.X);
+                data[off + 11] = ToCanonical(start2.Y, invPixelSize.Y);
 
                 // arrow head
-                float headScale = 2.0f * width * widthScale;
-                var head = a.End;
-                var left = a.End - dir * headScale + tangent * headScale;
-                var right = a.End - dir * headScale - tangent * headScale;
+                float headScaleUp = 8.0f * width;
+                float headScaleSide = 4.0f * width;
+                var head = pixelEnd;
+                var left = pixelEnd - dir * headScaleUp + tangent * headScaleSide;
+                var right = pixelEnd - dir * headScaleUp - tangent * headScaleSide;
 
-                data[off + 12] = ToCanonical(head.X);
-                data[off + 13] = ToCanonical(head.Y);
-                data[off + 14] = ToCanonical(right.X);
-                data[off + 15] = ToCanonical(right.Y);
-                data[off + 16] = ToCanonical(left.X);
-                data[off + 17] = ToCanonical(left.Y);
+                data[off + 12] = ToCanonical(head.X, invPixelSize.X);
+                data[off + 13] = ToCanonical(head.Y, invPixelSize.Y);
+                data[off + 14] = ToCanonical(right.X, invPixelSize.X);
+                data[off + 15] = ToCanonical(right.Y, invPixelSize.Y);
+                data[off + 16] = ToCanonical(left.X, invPixelSize.X);
+                data[off + 17] = ToCanonical(left.Y, invPixelSize.Y);
             }
 
             // upload buffer

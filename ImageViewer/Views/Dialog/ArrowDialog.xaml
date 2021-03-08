@@ -23,19 +23,6 @@
             Margin="{StaticResource DefaultBorderBottom}">
         </xctk:ColorPicker>
 
-        <!-- Width -->
-        <Grid Margin="{StaticResource DefaultBorderBottom}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="90"/>
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <TextBlock Text="Stroke Width:"/>
-            <xctk:IntegerUpDown Grid.Column="1"  
-                                   Minimum="1"
-                                   Maximum="100"
-                                   x:Name="BorderSizeBox"/>
-        </Grid>
-
         <!-- Buttons -->
         <StackPanel 
             Orientation="Horizontal"

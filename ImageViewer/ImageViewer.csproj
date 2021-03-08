@@ -253,6 +253,9 @@
     <Compile Include="Views\Dialog\ZoomBoxDialog.xaml.cs">
       <DependentUpon>ZoomBoxDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Display\ArrowsToolbar.xaml.cs">
+      <DependentUpon>ArrowsToolbar.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Display\RayCastingView.xaml.cs">
       <DependentUpon>RayCastingView.xaml</DependentUpon>
     </Compile>
@@ -370,6 +373,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialog\ZoomBoxDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Display\ArrowsToolbar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -20,15 +20,13 @@ namespace ImageViewer.Views.Dialog
     public partial class ArrowDialog : Window
     {
         private readonly ImageFramework.Utility.Color initialColor;
-        private readonly int initialStrokeWidth;
-        public ArrowDialog(ImageFramework.Utility.Color color, int strokeWidth)
+
+        public ArrowDialog(ImageFramework.Utility.Color color)
         {
             this.initialColor = color;
-            initialStrokeWidth = strokeWidth;
             InitializeComponent();
 
             ColorPicker.SelectedColor = System.Windows.Media.Color.FromScRgb(1.0f, color.Red, color.Green, color.Blue);
-            BorderSizeBox.Value = strokeWidth;
         }
 
         public ImageFramework.Utility.Color Color
@@ -41,8 +39,6 @@ namespace ImageViewer.Views.Dialog
                 return new ImageFramework.Utility.Color(c.ScR, c.ScG, c.ScB, 1.0f);
             }
         }
-
-        public int StrokeWidth => BorderSizeBox.Value ?? initialStrokeWidth;
 
         private void Apply_OnClick(object sender, RoutedEventArgs e)
         {
