@@ -103,19 +103,20 @@ namespace ImageFramework.Model.Overlay
             for (var i = 0; i < Boxes.Count; i++)
             {
                 var box = Boxes[i];
+                var off = i * 2 * 4;
 
                 // top left
-                data[i * 8] = ToCanonical(box.Start.X - offset.X);
-                data[i * 8 + 1] = ToCanonical(box.Start.Y - offset.Y);
+                data[off] = ToCanonical(box.Start.X - offset.X);
+                data[off + 1] = ToCanonical(box.Start.Y - offset.Y);
                 // top right
-                data[i * 8 + 2] = ToCanonical(box.End.X + offset.X);
-                data[i * 8 + 3] = ToCanonical(box.Start.Y - offset.Y);
+                data[off + 2] = ToCanonical(box.End.X + offset.X);
+                data[off + 3] = ToCanonical(box.Start.Y - offset.Y);
                 // bot left
-                data[i * 8 + 4] = ToCanonical(box.Start.X - offset.X);
-                data[i * 8 + 5] = ToCanonical(box.End.Y + offset.Y);
+                data[off + 4] = ToCanonical(box.Start.X - offset.X);
+                data[off + 5] = ToCanonical(box.End.Y + offset.Y);
                 // bot right
-                data[i * 8 + 6] = ToCanonical(box.End.X + offset.X);
-                data[i * 8 + 7] = ToCanonical(box.End.Y + offset.Y);
+                data[off + 6] = ToCanonical(box.End.X + offset.X);
+                data[off + 7] = ToCanonical(box.End.Y + offset.Y);
             }
 
             // upload buffer

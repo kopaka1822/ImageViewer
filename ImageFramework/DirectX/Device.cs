@@ -240,6 +240,7 @@ namespace ImageFramework.DirectX
         public OutputMergerStage OutputMerger => context.OutputMerger;
         public RasterizerStage Rasterizer => context.Rasterizer;
         public DeviceContext ContextHandle => context;
+        public PrimitiveTopology DefaultTopology => PrimitiveTopology.TriangleStrip;
 
         public void Dispose()
         {
@@ -251,7 +252,7 @@ namespace ImageFramework.DirectX
 
         private void SetDefaults()
         {
-            InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
+            InputAssembler.PrimitiveTopology = DefaultTopology;
 
             var desc = new RasterizerStateDescription
             {
@@ -296,7 +297,7 @@ namespace ImageFramework.DirectX
             context.InputAssembler.InputLayout = null;
             InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
             context.Draw(3 * count, 0);
-            InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
+            InputAssembler.PrimitiveTopology = DefaultTopology;
         }
 
         public void UpdateBufferData<T>(Buffer buffer, T data) where T : struct

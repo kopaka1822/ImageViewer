@@ -200,7 +200,14 @@ namespace ImageViewer.Models
                 Properties.Settings.Default.ZoomBoxGreen = value.Green;
                 Properties.Settings.Default.ZoomBoxBlue = value.Blue;
                 OnPropertyChanged(nameof(ZoomBoxColor));
+                OnPropertyChanged(nameof(ArrowColor));
             }
+        }
+
+        public Color ArrowColor // for now shared with zoom box
+        {
+            get => ZoomBoxColor;
+            set => ZoomBoxColor = value;
         }
 
         public int ZoomBoxBorder
@@ -211,7 +218,14 @@ namespace ImageViewer.Models
                 if(Properties.Settings.Default.ZoomBoxBorder == value) return;
                 Properties.Settings.Default.ZoomBoxBorder = value;
                 OnPropertyChanged(nameof(ZoomBoxBorder));
+                OnPropertyChanged(nameof(ArrowWidth));
             }
+        }
+
+        public int ArrowWidth // for now shared with zoom box
+        {
+            get => ZoomBoxBorder;
+            set => ZoomBoxBorder = value;
         }
 
         public bool ExportZoomBoxBorder

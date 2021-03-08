@@ -105,8 +105,10 @@
     <Compile Include="Commands\Import\ImportEquationImageCommand.cs" />
     <Compile Include="Commands\Tools\LatLongToCubemapCommand.cs" />
     <Compile Include="Commands\Import\OpenCommand.cs" />
+    <Compile Include="Commands\Tools\RemoveArrowCommand.cs" />
     <Compile Include="Commands\Tools\RemoveZoomBoxCommand.cs" />
     <Compile Include="Commands\Tools\ShowPaddingCommand.cs" />
+    <Compile Include="Commands\Tools\StartArrowCommand.cs" />
     <Compile Include="Commands\Tools\StartZoomboxCommand.cs" />
     <Compile Include="Commands\Tools\Tex3DToArrayCommand.cs" />
     <Compile Include="Commands\View\ResizeWindowCommand.cs" />
@@ -120,6 +122,7 @@
     <Compile Include="Controller\ComputeImageController.cs" />
     <Compile Include="Controller\CropController.cs" />
     <Compile Include="Controller\ImportDialogController.cs" />
+    <Compile Include="Controller\Overlays\AddArrowOverlay.cs" />
     <Compile Include="Controller\Overlays\ZoomBoxOverlay.cs" />
     <Compile Include="Controller\PaintController.cs" />
     <Compile Include="Controller\TextureViews\Overlays\Sphere3DOverlay.cs" />
@@ -198,14 +201,18 @@
     <Compile Include="ViewModels\Statistics\SSIMViewModel.cs" />
     <Compile Include="ViewModels\Statistics\StatisticsViewModel.cs" />
     <Compile Include="ViewModels\Statistics\StatisticViewModel.cs" />
+    <Compile Include="ViewModels\Tools\ArrowsViewModel.cs" />
     <Compile Include="ViewModels\ViewModels.cs" />
-    <Compile Include="ViewModels\ZoomBoxViewModel.cs" />
+    <Compile Include="ViewModels\Tools\ZoomBoxViewModel.cs" />
     <Compile Include="Views\Converter\BoolIntConverter.cs" />
     <Compile Include="Views\Converter\BoolVisibilityConverter.cs" />
     <Compile Include="Views\Converter\NullVisibilityConverter.cs" />
     <Compile Include="Views\CustomTextBox.cs" />
     <Compile Include="Views\Dialog\ArrayImportDialog.xaml.cs">
       <DependentUpon>ArrayImportDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\ArrowDialog.xaml.cs">
+      <DependentUpon>ArrowDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\ColorPickerDialog.xaml.cs">
       <DependentUpon>ColorPickerDialog.xaml</DependentUpon>
@@ -307,6 +314,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\Dialog\ArrayImportDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\ArrowDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -571,5 +582,9 @@
   <ItemGroup>
     <Resource Include="Icons\padding.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\arrow_right.png" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
