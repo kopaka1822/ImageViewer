@@ -57,6 +57,42 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void TestArrowOverlay()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "arrow_overlay.png");
+
+            var arrows = new ArrowOverlay(models);
+            models.Overlay.Overlays.Add(arrows);
+
+            Assert.IsNull(models.Overlay.Overlay);
+            Assert.IsFalse(arrows.HasWork);
+
+            var dim = models.Images.Size;
+            arrows.Arrows.Add(new ArrowOverlay.Arrow
+            {
+                Start = new Size2(1, 2).ToCoords(dim.XY),
+                End = new Size2(24, 24).ToCoords(dim.XY),
+                Width = 2,
+                Color = new Color(1.0f, 0.0f, 0.0f)
+            });
+
+            Assert.IsTrue(arrows.HasWork);
+            Assert.IsNotNull(models.Overlay.Overlay);
+
+            models.Export.Export(new ExportDescription(models.Overlay.Overlay, ExportTest.ExportDir + "overlay_arrow_tmp", "png")
+            {
+                FileFormat = GliFormat.RGBA8_SRGB
+            });
+
+            var reference = IO.LoadImageTexture(TestData.Directory + "arrow_overlay.png");
+            var refColors = reference.GetPixelColors(LayerMipmapSlice.Mip0);
+            var actualColors = models.Overlay.Overlay.GetPixelColors(LayerMipmapSlice.Mip0);
+
+            TestData.CompareColors(refColors, actualColors, Color.Channel.Rgba, 0.0f);
+        }
+
+        [TestMethod]
         public void ExportOverlayed()
         {
             var models = new Models(1);
