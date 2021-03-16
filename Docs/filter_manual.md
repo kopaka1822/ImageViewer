@@ -52,7 +52,7 @@ The syntax is:
 
 *Variable Name*: Name of the shader variable.
 
-*Type*: type of the variable. Valid types are: int, float, bool.
+*Type*: type of the variable. Valid types are: int, float, bool, enum (see below at example).
 
 *DefaultValue*: Initial value of the variable.
 
@@ -80,6 +80,14 @@ Additional properties can be specified via:
 `#paramprop Gamma, onAdd, 2.0, multiply`
 
 `float a = pow(0.5, gma); // variable usage`
+
+***Enum Example:***
+
+`#param Type, type, enum {A; B; C}, A`
+
+`if(type == 0) ... // enum usage (A == 0, B == 1, C == 2)`
+
+Note: Do not put '`,`' inside the enum brackets, only '`;`' to separate
 
 ---
 

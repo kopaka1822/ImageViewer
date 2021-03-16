@@ -10,6 +10,7 @@ namespace ImageFramework.Model.Filter.Parameter
     {
         Float,
         Int,
-        Bool
+        Bool,
+        Enum
     }
 }

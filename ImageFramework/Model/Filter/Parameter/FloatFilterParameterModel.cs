@@ -61,6 +61,11 @@ namespace ImageFramework.Model.Filter.Parameter
             return ParameterType.Float;
         }
 
+        public string GetShaderParameterType()
+        {
+            return "float";
+        }
+
         public FilterParameterModelBase GetBase()
         {
             return this;

@@ -106,6 +106,7 @@ namespace ImageFramework.Model.Filter
                             pdst.GetFloatModel().Value = psrc.GetFloatModel().Value;
                             break;
                         case ParameterType.Int:
+                        case ParameterType.Enum:
                             pdst.GetIntModel().Value = psrc.GetIntModel().Value;
                             break;
                         case ParameterType.Bool:

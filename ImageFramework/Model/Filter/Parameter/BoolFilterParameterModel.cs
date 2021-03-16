@@ -53,6 +53,11 @@ namespace ImageFramework.Model.Filter.Parameter
             return ParameterType.Bool;
         }
 
+        public string GetShaderParameterType()
+        {
+            return "bool";
+        }
+
         public FilterParameterModelBase GetBase()
         {
             return this;

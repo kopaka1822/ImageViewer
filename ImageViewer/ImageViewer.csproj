@@ -186,6 +186,7 @@
     <Compile Include="ViewModels\EquationViewModel.cs" />
     <Compile Include="ViewModels\FiltersViewModel.cs" />
     <Compile Include="ViewModels\Filter\BoolFilterParameterViewModel.cs" />
+    <Compile Include="ViewModels\Filter\EnumFilterParameterViewModel.cs" />
     <Compile Include="ViewModels\Filter\FilterParametersViewModel.cs" />
     <Compile Include="ViewModels\Filter\FilterParameterViewModelBase.cs" />
     <Compile Include="ViewModels\Filter\FloatFilterParameterViewModel.cs" />
@@ -270,6 +271,9 @@
       <DependentUpon>FilterTab.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Filter\BoolFilterParameterView.cs" />
+    <Compile Include="Views\Filter\EnumFilterParameterView.xaml.cs">
+      <DependentUpon>EnumFilterParameterView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Filter\FilterListBoxItem.cs" />
     <Compile Include="Views\Filter\FloatFilterParameterView.cs" />
     <Compile Include="Views\Filter\IntFilterParameterView.cs" />
@@ -394,6 +398,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\FilterTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Filter\EnumFilterParameterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

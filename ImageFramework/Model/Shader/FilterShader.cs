@@ -217,7 +217,7 @@ void main(uint3 coord : SV_DISPATCHTHREADID) {{
             string res = "cbuffer FilterParamBuffer : register(b1) {\n";
             foreach (var filterParameter in parameters)
             {
-                res += "   " + filterParameter.GetParamterType().ToString().ToLower() + " " +
+                res += "   " + filterParameter.GetShaderParameterType() + " " +
                        filterParameter.GetBase().VariableName + ";\n";
             }
 
