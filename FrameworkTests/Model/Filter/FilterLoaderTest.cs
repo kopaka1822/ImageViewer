@@ -95,6 +95,24 @@ namespace FrameworkTests.Model.Filter
             TestFilter("heightToNormal.hlsl", FilterLoader.TargetType.Tex2D);
         }
 
+        [TestMethod]
+        public void Bilateral()
+        {
+            TestFilter("bilateral.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
+        [TestMethod]
+        public void GuidedBilateral()
+        {
+            TestFilter("guided_bilateral.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
+        [TestMethod]
+        public void Divergent()
+        {
+            TestFilter("divergent.hlsl");
+        }
+
         private void TestFilter(string name)
         {
             TestFilter(name, FilterLoader.TargetType.Tex2D);

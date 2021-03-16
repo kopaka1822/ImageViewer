@@ -35,7 +35,7 @@ float4 filter(int3 pixelCoord, int3 size)
 	}
 	
 	if(blur_alpha)
-		alpha = pixelSum.a;
+		alpha = pixelSum.a / weightSum;
 
 	return float4(pixelSum.rgb / weightSum, alpha);
 }
