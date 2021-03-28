@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "ktx_interface.h"
-#define KTX_OPENGL
+
 #include "../dependencies/ktx/include/ktx.h"
 #include <stdexcept>
 #include <algorithm>
