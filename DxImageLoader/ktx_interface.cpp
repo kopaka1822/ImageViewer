@@ -23,13 +23,13 @@ std::unique_ptr<image::IImage> ktx_load(const char* filename)
 
 	ktxTexture2* ktex2 = reinterpret_cast<ktxTexture2*>(ktex);
 
-	if(ktex2->supercompressionScheme == KTX_SUPERCOMPRESSION_BASIS)
+	if(ktxTexture2_NeedsTranscoding(ktex2))
 	{
 		err = ktxTexture2_TranscodeBasis(ktex2, KTX_TTF_ASTC_4x4_RGBA, 0);
 		if (err != KTX_SUCCESS)
-			throw std::runtime_error(std::string("failed to transcode basis: ") + ktxErrorString(err));
+			throw std::runtime_error(std::string("failed to transcode file: ") + ktxErrorString(err));
 	}
-
+	
 	auto format = convertFormat(VkFormat(ktex2->vkFormat));
 
 	if (format == gli::FORMAT_UNDEFINED)
@@ -74,7 +74,6 @@ std::unique_ptr<image::IImage> ktx_load(const char* filename)
 	}
 
 	if(ktex->orientation.y == KTX_ORIENT_Y_UP)
-
 		res->flip();
 	
 	return res;
@@ -204,7 +203,7 @@ gli::format convertFormat(VkFormat format)
 	{VK_FORMAT_R64G64B64A64_UINT, gli::FORMAT_RGBA64_UINT_PACK64 },  
 	{VK_FORMAT_R64G64B64A64_SINT, gli::FORMAT_RGBA64_SINT_PACK64 },  
 	{VK_FORMAT_R64G64B64A64_SFLOAT, gli::FORMAT_RGB64_SFLOAT_PACK64 },  
-	//{VK_FORMAT_B10G11R11_UFLOAT_PACK32, gli::FORMAT_ },  
+	{VK_FORMAT_B10G11R11_UFLOAT_PACK32, gli::FORMAT_RG11B10_UFLOAT_PACK32 },  
 	//{VK_FORMAT_E5B9G9R9_UFLOAT_PACK32, gli::FORMAT_ },  
 	{VK_FORMAT_D16_UNORM, gli::FORMAT_D16_UNORM_PACK16 },  
 	{VK_FORMAT_X8_D24_UNORM_PACK32, gli::FORMAT_D24_UNORM_PACK32 },  
