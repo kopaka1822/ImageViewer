@@ -113,6 +113,12 @@ namespace FrameworkTests.Model.Filter
             TestFilter("divergent.hlsl");
         }
 
+        [TestMethod]
+        public void Dithering()
+        {
+            TestFilter("dithering.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
         private void TestFilter(string name)
         {
             TestFilter(name, FilterLoader.TargetType.Tex2D);
