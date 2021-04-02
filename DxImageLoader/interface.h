@@ -23,7 +23,7 @@ EXPORT(int) image_allocate(uint32_t format, int width, int height, int depth, in
 EXPORT(void) image_release(int id);
 
 /// \brief retrieves image info
-/// \brief format internal texture format, will be one of the compatible formats from Image.h
+/// format internal texture format, will be one of the compatible formats from Image.h
 EXPORT(void) image_info(int id, uint32_t& format, uint32_t& originalFormat, int& nLayer, int& nMipmaps);
 
 /// \brief retrieve info for one mipmap

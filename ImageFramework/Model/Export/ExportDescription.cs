@@ -261,6 +261,7 @@ namespace ImageFramework.Model.Export
                     formats.Add(new ExportFormatModel("pfm"));
                     formats.Add(new ExportFormatModel("dds"));
                     formats.Add(new ExportFormatModel("ktx"));
+                    formats.Add(new ExportFormatModel("ktx2"));
                     s_exportFormatModels = formats;
                 }
 

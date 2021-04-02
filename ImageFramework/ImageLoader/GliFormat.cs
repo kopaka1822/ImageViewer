@@ -616,6 +616,7 @@ namespace ImageFramework.ImageLoader
         {
             switch (format)
             {
+                case GliFormat.RG4_UNORM:
                 case GliFormat.RGBA4_UNORM:
                 case GliFormat.BGRA4_UNORM:
                 case GliFormat.R5G6B5_UNORM:

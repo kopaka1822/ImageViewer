@@ -189,10 +189,8 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSourc
 		return CMP_FORMAT_ETC_RGB;
 
 	case gli::format::FORMAT_RGB_ETC2_SRGB_BLOCK8:
-		if (isSource) exInfo.swizzleRGB = true;
 		return CMP_FORMAT_ETC2_SRGB;
 	case gli::format::FORMAT_RGB_ETC2_UNORM_BLOCK8:
-		if (isSource) exInfo.swizzleRGB = true;
 		return CMP_FORMAT_ETC2_RGB;
 	case gli::format::FORMAT_RGBA_ETC2_SRGB_BLOCK8:
 		if (isSource) exInfo.swizzleRGB = true;
@@ -259,8 +257,10 @@ void copy_level(uint8_t* srcDat, uint8_t* dstDat, uint32_t width, uint32_t heigh
 	dstTex.nBlockDepth = dstInfo.bz;
 	if (dstInfo.isCompressed) dstTex.dwDataSize = CMP_CalculateBufferSize(&dstTex);
 	else dstTex.dwDataSize = dstTex.dwPitch * dstTex.dwHeight;
-	//dst.bytes.resize(dstTex.dwDataSize);
-	assert(dstSize >= dstTex.dwDataSize);
+	//assert(dstSize >= dstTex.dwDataSize);
+	if(dstSize < dstTex.dwDataSize)
+		throw std::runtime_error("compression error: the expected data size does not match the suggested data size by compressonator");
+	
 	dstTex.pData = dstDat;
 
 	// set compress options

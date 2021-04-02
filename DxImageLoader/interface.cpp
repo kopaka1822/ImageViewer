@@ -66,7 +66,7 @@ int image_open(const char* filename)
 		}
 		else if(hasEnding(fname, ".ktx2"))
 		{
-			res = ktx_load(filename);
+			res = ktx2_load(filename);
 		}
 		else if (hasEnding(fname, ".dds") || hasEnding(fname, ".ktx"))
 		{
@@ -200,6 +200,8 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 			gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*it->second), gli::format(format), false, quality);
 		else if (ext == "ktx")
 			gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*it->second), gli::format(format), true, quality);
+		else if (ext == "ktx2")
+			ktx2_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*it->second), gli::format(format), quality);
 		else if (ext == "pfm" || ext == "hdr")
 		{
 			assertSingleLayerMip(*it->second);
@@ -287,6 +289,7 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 		s_exportFormats["jpg"] = stb_image_get_export_formats("jpg");
 		s_exportFormats["png"] = png_get_export_formats();
 		s_exportFormats["bmp"] = stb_image_get_export_formats("bmp");
+		s_exportFormats["ktx2"] = ktx2_get_export_formats();
 	}
 	auto it = s_exportFormats.find(extension);
 	if(it == s_exportFormats.end())

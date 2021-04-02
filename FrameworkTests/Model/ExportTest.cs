@@ -377,6 +377,37 @@ namespace FrameworkTests.Model
             TryExportAllFormatsAndCompareGray("ktx");
         }
 
+        [TestMethod]
+        public void ExportKtx2()
+        {
+            CompareAfterExport(TestData.Directory + "small.ktx", ExportDir + "small", "ktx2", GliFormat.RGBA32_SFLOAT, Color.Channel.Rgba);
+        }
+
+
+        [TestMethod]
+        public void ExportCompressedKtx2()
+        {
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "ktx2", GliFormat.RGBA_DXT1_SRGB);
+        }
+
+        [TestMethod]
+        public void ExportAllUncompressedKtx2()
+        {
+            TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "ktx2", FormatFilter.Uncompressed);
+        }
+
+        [TestMethod]
+        public void ExportAllCompressedKtx2()
+        {
+            TryExportAllFormats(TestData.Directory + "small_scaled.png", ExportDir + "tmp", "ktx2", FormatFilter.Compressed);
+        }
+
+        [TestMethod]
+        public void GrayTestAllKtx2()
+        {
+            TryExportAllFormatsAndCompareGray("ktx2");
+        }
+
         /// <summary>
         /// tests if all dds formats actually run on gpu
         /// </summary>
@@ -700,7 +731,7 @@ namespace FrameworkTests.Model
                 }
                 catch (Exception e)
                 {
-                    errors += $"{format.ToString()}: {e.Message}\n";
+                    errors += $"{i}: {format.ToString()}: {e.Message}\n";
                     ++numErrors;
                 }
             }
