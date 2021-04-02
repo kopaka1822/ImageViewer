@@ -414,6 +414,12 @@ namespace FrameworkTests.Model
             CompareAfterExport(TestData.Directory + "small.pfm", ExportDir + "tmp", "ktx2", GliFormat.RGBA32_SFLOAT, Color.Channel.Rgb, 0.01f, 50);
         }
 
+        [TestMethod]
+        public void ExportKtx2Checkers3D()
+        {
+            CompareAfterExport(TestData.Directory + "checkers3d.dds", ExportDir + "tmp", "ktx2", GliFormat.RGBA8_SRGB, Color.Channel.Rgb, 0.0f);
+        }
+
         /// <summary>
         /// tests if all dds formats actually run on gpu
         /// </summary>
@@ -590,14 +596,22 @@ namespace FrameworkTests.Model
             var model = new Models(1);
             model.AddImageFromFile(inputImage);
             model.Apply();
-            var origTex = (TextureArray2D)model.Pipelines[0].Image;
+            var origTex = model.Pipelines[0].Image;
 
             model.Export.Export(new ExportDescription(origTex, outputImage, outputExtension)
             {
                 FileFormat = format,
                 Quality = quality
             });
-            var expTex = new TextureArray2D(IO.LoadImage(outputImage + "." + outputExtension));
+            ITexture expTex;
+            if (model.Pipelines[0].Image is Texture3D)
+            {
+                expTex = new Texture3D(IO.LoadImage(outputImage + "." + outputExtension));
+            }
+            else
+            {
+                expTex = new TextureArray2D(IO.LoadImage(outputImage + "." + outputExtension));
+            }
 
             foreach (var lm in origTex.LayerMipmap.Range)
             {

@@ -51,10 +51,24 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 			{
 				uint32_t byteSize;
 				const uint8_t* data = image.getData(layer * i.numFaces + face, level, byteSize);
+				auto curDepth = image.getDepth(level);
 				
-				err = ktxTexture_SetImageFromMemory(ktxTexture(ktex), level, layer, face, data, byteSize);
-				if (err != KTX_SUCCESS)
-					throw std::runtime_error(std::string("could not set image data: ") + ktxErrorString(err));
+				if(curDepth == 1)
+				{
+					err = ktxTexture_SetImageFromMemory(ktxTexture(ktex), level, layer, face, data, byteSize);
+					if (err != KTX_SUCCESS)
+						throw std::runtime_error(std::string("could not set image data: ") + ktxErrorString(err));
+				}
+				else // for multiple depth slices => split as if it has multiple faces
+				{
+					auto sliceSize = byteSize / curDepth;
+					for(uint32_t z = 0; z < curDepth; ++z)
+					{
+						err = ktxTexture_SetImageFromMemory(ktxTexture(ktex), level, layer, z, data + z * sliceSize, sliceSize);
+						if (err != KTX_SUCCESS)
+							throw std::runtime_error(std::string("could not set image data: ") + ktxErrorString(err));
+					}
+				}
 			}
 		}
 	}
@@ -117,6 +131,7 @@ std::unique_ptr<image::IImage> ktx2_load(const char* filename)
 				ktxTexture_GetImageOffset(ktex, ktx_uint32_t(mip), ktx_uint32_t(srcLayer), ktx_uint32_t(srcFace), &offset);
 				//ktex2->vtbl->GetImageOffset(ktex, mip, srcLayer, srcFace, &offset);
 				auto ktxLvlSize = ktxTexture_GetImageSize(ktex, ktx_uint32_t(mip));
+				ktxLvlSize *= res->getDepth(mip); // is not multiplied with depth layer
 				uint32_t size;
 				auto dstData = res->getData(dstLayer, mip, size);
 				if(ktxLvlSize != size)
