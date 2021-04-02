@@ -408,6 +408,12 @@ namespace FrameworkTests.Model
             TryExportAllFormatsAndCompareGray("ktx2");
         }
 
+        [TestMethod]
+        public void ExportKtx2Quality()
+        {
+            CompareAfterExport(TestData.Directory + "small.pfm", ExportDir + "tmp", "ktx2", GliFormat.RGBA32_SFLOAT, Color.Channel.Rgb, 0.01f, 50);
+        }
+
         /// <summary>
         /// tests if all dds formats actually run on gpu
         /// </summary>
@@ -579,7 +585,7 @@ namespace FrameworkTests.Model
             Assert.AreEqual(model.Images.NumMipmaps, tex2D.Description.MipLevels);
         }
 
-        private void CompareAfterExport(string inputImage, string outputImage, string outputExtension, GliFormat format, Color.Channel channels = Color.Channel.Rgb, float tolerance = 0.01f)
+        private void CompareAfterExport(string inputImage, string outputImage, string outputExtension, GliFormat format, Color.Channel channels = Color.Channel.Rgb, float tolerance = 0.01f, int quality = 100)
         {
             var model = new Models(1);
             model.AddImageFromFile(inputImage);
@@ -589,7 +595,7 @@ namespace FrameworkTests.Model
             model.Export.Export(new ExportDescription(origTex, outputImage, outputExtension)
             {
                 FileFormat = format,
-                Quality = 100
+                Quality = quality
             });
             var expTex = new TextureArray2D(IO.LoadImage(outputImage + "." + outputExtension));
 

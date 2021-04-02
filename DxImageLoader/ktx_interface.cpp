@@ -30,7 +30,7 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 	i.baseHeight = image.getHeight(0);
 	i.baseDepth = image.getDepth(0);
 	if(i.baseDepth > 1) i.numDimensions = 3;
-	else if(i.baseHeight > 1) i.numDimensions = 2;
+	else if(i.baseHeight > 1 || quality < 100) i.numDimensions = 2;
 	else i.numDimensions = 1;
 	i.numLevels = image.getNumMipmaps();
 	i.numLayers = image.getNumNonFaceLayers();
@@ -60,14 +60,13 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 	}
 
 	// optionally compress
-	/*if(quality != 100)
+	if(quality < 100)
 	{
 		// optional if compression
-		err = ktxTexture2_CompressBasis(ktex, (quality * 255) / 100);
+		err = ktxTexture2_CompressBasis(ktex, std::max((quality * 254) / 99 + 1, 1)); // scale quality [0, 99] between [1, 255]
 		if (err != KTX_SUCCESS)
 			throw std::runtime_error(std::string("failed to compress ktx texture: ") + ktxErrorString(err));
-	}*/
-	
+	}
 	
 	ktxTexture_WriteToNamedFile(ktxTexture(ktex), filename);
 	ktxTexture_Destroy(ktxTexture(ktex));
