@@ -409,9 +409,9 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
-        public void ExportKtx2Quality()
+        public void GrayTestAllKtx2WithQuality()
         {
-            CompareAfterExport(TestData.Directory + "small.pfm", ExportDir + "tmp", "ktx2", GliFormat.RGBA32_SFLOAT, Color.Channel.Rgb, 0.01f, 50);
+            TryExportAllFormatsAndCompareGray("ktx2", false, 50);
         }
 
         [TestMethod]
@@ -680,7 +680,7 @@ namespace FrameworkTests.Model
             return false;
         }
 
-        private void TryExportAllFormatsAndCompareGray(string outputExtension, bool onlySrgb = false)
+        private void TryExportAllFormatsAndCompareGray(string outputExtension, bool onlySrgb = false, int quality = 100)
         {
             var model = new Models(2);
             model.AddImageFromFile(TestData.Directory + "gray.png");
@@ -698,6 +698,7 @@ namespace FrameworkTests.Model
             foreach (var format in eFmt.Formats)
             {
                 if(onlySrgb && format.GetDataType() != PixelDataType.Srgb) continue;
+                if(quality < 100 && !eFmt.SupportsQuality(format)) continue;
                 try
                 {
                     int numTries = 0;
@@ -705,9 +706,9 @@ namespace FrameworkTests.Model
                     try
                     {
                         var integerPrecision = IsIntegerPrecisionFormat(format);
-                        var desc = new ExportDescription(tex, ExportDir + "gray" + ++i, outputExtension);
+                        var desc = new ExportDescription(tex, ExportDir + "gray" + i, outputExtension);
                         desc.FileFormat = format;
-                        desc.Quality = 100;
+                        desc.Quality = quality;
                         if (integerPrecision)
                             desc.Multiplier = 100.0f;
 
@@ -747,17 +748,18 @@ namespace FrameworkTests.Model
                         ++numTries;
                         if (numTries > 3) throw;
                     }
-                    
+
                 }
                 catch (Exception e)
                 {
                     errors += $"{i}: {format.ToString()}: {e.Message}\n";
                     ++numErrors;
                 }
+                ++i;
             }
 
             if(errors.Length > 0)
-                throw new Exception($"gray comparision failed for {numErrors}/{eFmt.Formats.Count} formats:\n" + errors);
+                throw new Exception($"gray comparision failed for {numErrors}/{i} formats:\n" + errors);
         }
 
         

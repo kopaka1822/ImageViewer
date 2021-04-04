@@ -174,7 +174,6 @@
     <CopyFileToFolders Include="..\Docs\img\mip_compare.png">
       <Filter>Docs\img</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\Docs\statistics.md" />
     <CopyFileToFolders Include="..\Docs\volumetric.md">
       <Filter>Docs</Filter>
     </CopyFileToFolders>
@@ -192,6 +191,9 @@
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\dependencies\lib\ktx.dll">
       <Filter>dll</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\statistics.md">
+      <Filter>Docs</Filter>
     </CopyFileToFolders>
   </ItemGroup>
 </Project>

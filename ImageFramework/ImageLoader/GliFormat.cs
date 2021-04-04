@@ -631,6 +631,11 @@ namespace ImageFramework.ImageLoader
             return false;
         }
 
+        public static bool Is8Bit(this GliFormat format)
+        {
+            return !IsLessThan8Bit(format) && IsAtMost8bit(format);
+        }
+
         // some formats don't work for texture3D targets
         public static bool IsExcludedFrom3DExport(this GliFormat format)
         {

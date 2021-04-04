@@ -21,5 +21,25 @@ namespace ImageFramework.Model.Export
 
             Extension = extension;
         }
+
+        public bool SupportsQuality(GliFormat format)
+        {
+            switch (Extension)
+            {
+                case "jpg": return true;
+                case "ktx":
+                case "dds":
+                    return format.IsCompressed();
+                case "ktx2":
+                    return format.IsCompressed(); // TODO support the supercompressed stuff later on
+                    // if (!format.IsCompressed() && !format.Is8Bit()) return false;
+                    // var type = format.GetDataType();
+                    // if (type == PixelDataType.UInt || type == PixelDataType.SInt) return false;
+                    // if (type == PixelDataType.UScaled || type == PixelDataType.SScaled) return false;
+                    // if (type == PixelDataType.SNorm) return false;
+                    // return true;
+                default: return false;
+            }
+        }
     }
 }

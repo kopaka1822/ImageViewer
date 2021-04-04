@@ -73,8 +73,8 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 		}
 	}
 
-	// optionally compress
-	if(quality < 100)
+	// optionally compress (if it was not already compressed)
+	if(!is_compressed(format) && quality < 100)
 	{
 		// optional if compression
 		err = ktxTexture2_CompressBasis(ktex, std::max((quality * 254) / 99 + 1, 1)); // scale quality [0, 99] between [1, 255]

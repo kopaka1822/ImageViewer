@@ -138,17 +138,7 @@ namespace ImageViewer.ViewModels.Dialog
             Debug.Assert(SelectedFormat != null);
 
             // enable quality
-            if (extension == "jpg")
-            {
-                hasQualityValue = true;
-                nonSrgbExportWarnings = true;
-            }
-            else if (extension == "bmp")
-            {
-                nonSrgbExportWarnings = true;
-            }
-            else SetKtxDdsQuality();
-
+            hasQualityValue = usedFormat.SupportsQuality(SelectedFormat.Cargo);
             models.ExportConfig.PropertyChanged += ExportConfigOnPropertyChanged;
             models.Settings.PropertyChanged += SettingsOnPropertyChanged;
 
@@ -174,14 +164,6 @@ namespace ImageViewer.ViewModels.Dialog
                 case nameof(SettingsModel.ExportZoomBoxScale):
                     OnPropertyChanged(nameof(ZoomBoxScale));
                     break;
-            }
-        }
-
-        private void SetKtxDdsQuality()
-        {
-            if (extension == "ktx" || extension == "dds")
-            {
-                HasQualityValue = SelectedFormat.Cargo.IsCompressed();
             }
         }
 
@@ -356,7 +338,7 @@ namespace ImageViewer.ViewModels.Dialog
                 OnPropertyChanged(nameof(SelectedFormat));
                 OnPropertyChanged(nameof(Description));
                 OnPropertyChanged(nameof(Warning));
-                SetKtxDdsQuality();
+                HasQualityValue = usedFormat.SupportsQuality(value.Cargo);
             }
         }
 
