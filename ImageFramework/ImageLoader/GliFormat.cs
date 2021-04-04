@@ -11,7 +11,7 @@ namespace ImageFramework.ImageLoader
     {
         UNDEFINED = 0,
 
-        FORMAT_FIRST, RG4_UNORM = FORMAT_FIRST,
+        RG4_UNORM,
         RGBA4_UNORM,
         BGRA4_UNORM,
         R5G6B5_UNORM,
@@ -984,7 +984,7 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.R_EAC_UNORM_BLOCK8:
                 case GliFormat.R_EAC_SNORM_BLOCK8:
                 case GliFormat.RG_EAC_UNORM_BLOCK16:
-                case GliFormat.RG_EAC_SNORM_BLOCK16:
+                case GliFormat.RG_EAC_SNORM_BLOCK16:*/
                 case GliFormat.RGBA_ASTC_4X4_UNORM_BLOCK16:
                 case GliFormat.RGBA_ASTC_4X4_SRGB_BLOCK16:
                 case GliFormat.RGBA_ASTC_5X4_UNORM_BLOCK16:
@@ -1013,7 +1013,8 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.RGBA_ASTC_12X10_SRGB_BLOCK16:
                 case GliFormat.RGBA_ASTC_12X12_UNORM_BLOCK16:
                 case GliFormat.RGBA_ASTC_12X12_SRGB_BLOCK16:
-                case GliFormat.RGB_PVRTC1_8X8_UNORM_BLOCK32:
+                    return "Adaptive Scalable Texture Compression (lossy block-based)";
+                /*case GliFormat.RGB_PVRTC1_8X8_UNORM_BLOCK32:
                 case GliFormat.RGB_PVRTC1_8X8_SRGB_BLOCK32:
                 case GliFormat.RGB_PVRTC1_16X8_UNORM_BLOCK32:
                 case GliFormat.RGB_PVRTC1_16X8_SRGB_BLOCK32:
@@ -1039,6 +1040,7 @@ namespace ImageFramework.ImageLoader
         {
             switch (format)
             {
+                case GliFormat.RG4_UNORM:
                 case GliFormat.RGBA4_UNORM:
                 case GliFormat.BGRA4_UNORM:
                 case GliFormat.R5G6B5_UNORM:

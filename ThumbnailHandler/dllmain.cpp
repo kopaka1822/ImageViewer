@@ -102,6 +102,7 @@ STDAPI DllRegisterServer(void)
 		// Register the thumbnail handler.
 		RegisterShellExtThumbnailHandler(L".dds", CLSID_ThumbnailProvider);
 		RegisterShellExtThumbnailHandler(L".ktx", CLSID_ThumbnailProvider);
+		RegisterShellExtThumbnailHandler(L".ktx2", CLSID_ThumbnailProvider);
 		RegisterShellExtThumbnailHandler(L".pfm", CLSID_ThumbnailProvider);
 		RegisterShellExtThumbnailHandler(L".hdr", CLSID_ThumbnailProvider);	
 		RegisterShellExtThumbnailHandler(L".exr", CLSID_ThumbnailProvider);	
@@ -150,6 +151,7 @@ STDAPI DllUnregisterServer(void)
 		// Unregister the thumbnail handler.
 		UnregisterShellExtThumbnailHandler(L".dds");
 		UnregisterShellExtThumbnailHandler(L".ktx");
+		UnregisterShellExtThumbnailHandler(L".ktx2");
 		UnregisterShellExtThumbnailHandler(L".pfm");
 		UnregisterShellExtThumbnailHandler(L".hdr");
 		UnregisterShellExtThumbnailHandler(L".exr");
