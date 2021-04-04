@@ -120,7 +120,8 @@ namespace ImageViewer.Commands.Export
                 UseCropping = models.ExportConfig.UseCropping,
                 CropStart = models.ExportConfig.CropStart,
                 CropEnd = models.ExportConfig.CropEnd,
-                Overlay = models.Overlay.Overlay
+                Overlay = models.Overlay.Overlay,
+                Quality = models.Settings.LastQuality
             };
             desc.TrySetFormat(viewModel.SelectedFormatValue);
             exportFormat = desc.FileFormat;
@@ -143,7 +144,8 @@ namespace ImageViewer.Commands.Export
                         CropStart = new Float3(box.Start, 0.0f),
                         CropEnd = new Float3(box.End, 1.0f),
                         Overlay = viewModel.ZoomBorders ? models.Overlay.Overlay : null,
-                        Scale = viewModel.ZoomBoxScale
+                        Scale = viewModel.ZoomBoxScale,
+                        Quality = models.Settings.LastQuality
                     };
                     zdesc.TrySetFormat(viewModel.SelectedFormatValue);
 
