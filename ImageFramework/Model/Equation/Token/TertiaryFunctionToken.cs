@@ -33,5 +33,16 @@ namespace ImageFramework.Model.Equation.Token
             }
             throw new Exception("invalid string as function name: " + funcName);
         }
+
+        public override float ToFloat()
+        {
+            switch (funcName)
+            {
+                case "min": return Math.Min(value1.ToFloat(), Math.Min(value2.ToFloat(), value3.ToFloat()));
+                case "max": return Math.Max(value1.ToFloat(), Math.Max(value2.ToFloat(), value3.ToFloat()));
+            }
+
+            throw new Exception("invalid string as function name: " + funcName);
+        }
     }
 }

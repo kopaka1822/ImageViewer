@@ -1,4 +1,6 @@
-﻿namespace ImageFramework.Model.Equation.Token
+﻿using System;
+
+namespace ImageFramework.Model.Equation.Token
 {
     internal class ImageToken : ValueToken
     {
@@ -12,6 +14,11 @@
         public override string ToHlsl()
         {
             return $"GetTexture{Id.ToString(Models.Culture)}(coord)";
+        }
+
+        public override float ToFloat()
+        {
+            throw new NotImplementedException();
         }
     }
 }

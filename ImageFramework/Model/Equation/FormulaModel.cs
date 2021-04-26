@@ -94,7 +94,7 @@ namespace ImageFramework.Model.Equation
         {
             try
             {
-                var eq = new Equation(f);
+                var eq = new HlslEquation(f);
                 eq.GetHlslExpression();
 
                 return new TestResults
@@ -122,7 +122,7 @@ namespace ImageFramework.Model.Equation
         /// <exception cref="Exception">on conversion failure</exception>
         private string ConvertFormula(string f)
         {
-            var eq = new Equation(f);
+            var eq = new HlslEquation(f);
             var res = eq.GetHlslExpression();
             FirstImageId = eq.FirstImageId;
             MaxImageId = eq.MaxImageId;

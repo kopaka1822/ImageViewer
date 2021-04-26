@@ -6,6 +6,10 @@
         {
         }
 
+        // for hlsl formula conversion
         public abstract string ToHlsl();
+
+        // for direct formula conversion
+        public abstract float ToFloat();
     }
 }

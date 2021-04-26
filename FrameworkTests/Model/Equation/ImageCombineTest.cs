@@ -138,7 +138,7 @@ namespace FrameworkTests.Model.Equation
 
         public string GetEq(string formula)
         {
-            var eq = new ImageFramework.Model.Equation.Equation(formula);
+            var eq = new ImageFramework.Model.Equation.HlslEquation(formula);
             return eq.GetHlslExpression();
         }
 

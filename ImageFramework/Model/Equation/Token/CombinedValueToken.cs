@@ -1,4 +1,6 @@
-﻿namespace ImageFramework.Model.Equation.Token
+﻿using System;
+
+namespace ImageFramework.Model.Equation.Token
 {
     internal class CombinedValueToken : ValueToken
     {
@@ -23,6 +25,24 @@
             }
             // + - * / is easy
             return $"({left.ToHlsl()} {operat.Symbol} {right.ToHlsl()})";
+        }
+
+        public override float ToFloat()
+        {
+            if (operat.Symbol == '^')
+            {
+                return (float) Math.Pow(left.ToFloat(), right.ToFloat());
+            }
+
+            // + - * / is easy
+            switch (operat.Symbol)
+            {
+                case '+': return left.ToFloat() + right.ToFloat();
+                case '-': return left.ToFloat() + right.ToFloat();
+                case '*': return left.ToFloat() + right.ToFloat();
+                case '/': return left.ToFloat() / right.ToFloat();
+            }
+            throw new Exception("unknown operator: " + operat.Symbol);
         }
     }
 }

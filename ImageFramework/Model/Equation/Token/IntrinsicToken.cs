@@ -23,6 +23,11 @@ namespace ImageFramework.Model.Equation.Token
             return res;
         }
 
+        public override float ToFloat()
+        {
+            throw new NotImplementedException();
+        }
+
         private static bool GetIntrinsicFunction(string name, out string res)
         {
             switch (name)

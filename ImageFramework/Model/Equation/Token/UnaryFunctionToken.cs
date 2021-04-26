@@ -21,6 +21,19 @@ namespace ImageFramework.Model.Equation.Token
             return start + value.ToHlsl() + end;
         }
 
+        public override float ToFloat()
+        {
+            switch (funcName)
+            {
+                case "sqrt": return (float)Math.Sqrt(value.ToFloat());
+                case "abs": return Math.Abs(value.ToFloat());
+                case "floor": return (float)Math.Floor(value.ToFloat());
+                case "ceil": return (float)Math.Ceiling(value.ToFloat());
+            }
+
+            throw new Exception("invalid string as function name: " + funcName);
+        }
+
         public static string GetUnaryHelperFunctions()
         {
             return @"

@@ -10,7 +10,7 @@ using ImageFramework.Model.Equation.Token;
 
 namespace ImageFramework.Model.Equation
 {
-    public class Equation
+    public class HlslEquation
     {
         private ValueToken finalToken;
         private int firstImageId = -1;
@@ -30,7 +30,7 @@ namespace ImageFramework.Model.Equation
             {"nan", float.NaN },
         };
 
-        public Equation(string formula)
+        public HlslEquation(string formula)
         {
             // resolve to token
             var tokens = GetToken(formula);
