@@ -94,6 +94,7 @@
     <Compile Include="ImageLoader\ImageFormat.cs" />
     <Compile Include="ImageLoader\IO.cs" />
     <Compile Include="ImageLoader\Resource.cs" />
+    <Compile Include="Model\Equation\Equation.cs" />
     <Compile Include="Model\Equation\FloatEquation.cs" />
     <Compile Include="Model\Equation\Markov\IntrinsicFunctionRule.cs" />
     <Compile Include="Model\Equation\Token\ConstantToken.cs" />

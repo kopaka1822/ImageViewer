@@ -38,8 +38,8 @@ namespace ImageFramework.Model.Equation.Token
             switch (operat.Symbol)
             {
                 case '+': return left.ToFloat() + right.ToFloat();
-                case '-': return left.ToFloat() + right.ToFloat();
-                case '*': return left.ToFloat() + right.ToFloat();
+                case '-': return left.ToFloat() - right.ToFloat();
+                case '*': return left.ToFloat() * right.ToFloat();
                 case '/': return left.ToFloat() / right.ToFloat();
             }
             throw new Exception("unknown operator: " + operat.Symbol);

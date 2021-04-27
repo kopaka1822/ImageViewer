@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Model;
+using ImageFramework.Model.Equation;
 using ImageFramework.Model.Equation.Token;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -105,6 +106,23 @@ namespace FrameworkTests.Model.Equation
             AssertSuccess("infinity");
             AssertSuccess("nan");
             AssertSuccess("float_max");
+        }
+
+        [TestMethod]
+        public void FloatEquationTest()
+        {
+            // simple
+            var eq = new FloatEquation("3 + 4 * 2");
+            Assert.AreEqual(3.0f + 4.0f * 2.0f, eq.GetFloatExpression(0, 0, 0), 0.01f);
+            
+            // with parameters
+            eq = new FloatEquation("max(width, height) + 1");
+            Assert.AreEqual(3.0f + 1.0f, eq.GetFloatExpression(3, 1, 1), 0.01f);
+            Assert.AreEqual(4.0f + 1.0f, eq.GetFloatExpression(3, 4, 1), 0.01f);
+
+            // invalid syntax
+            Assert.ThrowsException<Exception>(() => new FloatEquation("1 + w"));
+            Assert.ThrowsException<Exception>(() => new FloatEquation("width**2"));
         }
 
         // equation should fail
