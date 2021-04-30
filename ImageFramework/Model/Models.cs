@@ -106,7 +106,7 @@ namespace ImageFramework.Model
             Images = new ImagesModel(SharedModel.ScaleShader);
             TextureCache = new ImageModelTextureCache(Images);
 
-            Filter = new FiltersModel(Images);
+            Filter = new FiltersModel(Images, SharedModel);
             Progress = new ProgressModel();
 
             for (int i = 0; i < numPipelines; ++i)
@@ -157,7 +157,7 @@ namespace ImageFramework.Model
         {
             var loader = new FilterLoader(filename, Filter.CurrentTarget);
             
-            return new FilterModel(loader, NumPipelines);
+            return new FilterModel(loader, SharedModel, NumPipelines);
         }
        
         /// <inheritdoc cref="PixelValueShader.Run"/>

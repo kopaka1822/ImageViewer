@@ -18,10 +18,6 @@ Sets the title of the shader that will be displayed in the filter list
 
 Sets the description of the shader that will be displayed in the filter tab
 
-**#setting** sepa, *true/false*
-
-Specifies if the shader is a seperatable shader. If sepa is set to true, the shader will be executed one time for each dimension (2 or 3 times). In the first run, the variable `int3 filterDirection` will be set to `int3(1,0, 0)`. In the second run, the variable will be set to `int3(0,1,0)`. If we are processing a 3D image, the variable will be set to `int3(0,0,1)` in the third run. The default value is false.
-
 **#setting** type, *filter type*
 
 Specifies what kind of filter function is provided. List of types and resulting filter functions:
@@ -34,6 +30,14 @@ Specifies what kind of filter function is provided. List of types and resulting 
 |DYNAMIC        | `float4 filter(int3 pixel, int3 size)`| 2D,3D
 
 refer to [*Writing DYNAMIC filter*](#Writing-DYNAMIC-filter) for a detailed explanation on DYNAMIC
+
+**#setting** sepa, *true/false*
+
+Specifies if the shader is a seperatable shader. If sepa is set to true, the shader will be executed one time for each dimension (2 or 3 times). In the first run, the (global) variable `int3 filterDirection` will be set to `int3(1,0,0)`. In the second run, the variable will be set to `int3(0,1,0)`. If we are processing a 3D image, the variable will be set to `int3(0,0,1)` in the third run. The default value is false.
+
+**#setting** iterations, *true/false*
+
+If set to true, the shader will be dispatched multiple times. The (global) variable `int iteration` contains the number of the current iteration. The function `abort_iterations()` can be called to stop the shader after the current iteration. This setting can not be used together with the sepa setting. The default value is false.
 
 **#setting** groupsize, size
 

@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using ImageFramework.Annotations;
+using ImageFramework.Model.Equation;
 using ImageFramework.Model.Filter.Parameter;
 using SharpDX.DXGI;
 
@@ -33,6 +35,7 @@ namespace ImageFramework.Model.Filter
         public TargetType Target { get; }
         public Type KernelType { get; private set; } = Type.Tex2D;
         public bool IsSepa { get; private set; } = false;
+        public bool Iterations { get; private set; } = false;
         public string Name { get; private set; }
         public string Description { get; private set; }
         public string Filename { get; }
@@ -184,6 +187,9 @@ namespace ImageFramework.Model.Filter
                 throw new Exception("This filter can only be used with 3D textures");
             if(KernelType == Type.Tex2D && Target != TargetType.Tex2D)
                 throw new Exception("This filter can only be used with 2D textures");
+            //this cant be used together due to ambigouities
+            if(IsSepa && Iterations)
+                throw new Exception("sepa and iteration settings cannot be used together");
         }
 
         private void HandleTexture(string[] pars)
@@ -445,7 +451,10 @@ namespace ImageFramework.Model.Filter
             switch (p[0].ToLower())
             {
                 case "sepa":
-                    IsSepa = p[1].ToLower().Equals("true");
+                    IsSepa = ParseBool(p[1]);
+                    break;
+                case "iterations":
+                    Iterations = ParseBool(p[1]);
                     break;
                 case "title":
                     Name = wholeString;
@@ -478,6 +487,14 @@ namespace ImageFramework.Model.Filter
                 default:
                     throw new Exception("unknown setting " + p[0]);
             }
+        }
+
+        private static bool ParseBool(string value)
+        {
+            value = value.ToLower();
+            if (value == "true") return true;
+            if (value == "false") return false;
+            throw new Exception("#setting bool value needs to be either true of false");
         }
 
         private static string[] GetParameters(string s, char split = ',')

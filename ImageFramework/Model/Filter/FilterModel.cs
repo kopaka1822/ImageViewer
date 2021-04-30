@@ -22,14 +22,20 @@ namespace ImageFramework.Model.Filter
         public IReadOnlyList<TextureFilterParameterModel> TextureParameters { get; }
 
         /// <summary>
-        /// separable filter that will be invoked twice with x- and y-direction
+        /// separable filter that will be invoked twice with x- and y-direction (or thrice for 3D)
         /// </summary>
         public bool IsSepa { get; }
+
+        /// <summary>
+        /// repeast shader invocations until the filter kernel calls "abort_iterations"
+        /// </summary>
+        public bool DoIterations { get; }
 
         public int NumIterations
         {
             get
             {
+                if (DoIterations) return int.MaxValue;
                 if (!IsSepa) return 1;
                 if (Target == FilterLoader.TargetType.Tex2D) return 2;
                 return 3; // target 3d
@@ -62,12 +68,13 @@ namespace ImageFramework.Model.Filter
         /// <summary>
         /// will be called internally by Models
         /// </summary>
-        internal FilterModel(FilterLoader loader, int numPipelines)
+        internal FilterModel(FilterLoader loader, SharedModel shared, int numPipelines)
         {
             Parameters = loader.Parameters;
             TextureParameters = loader.TextureParameters;
             Target = loader.Target;
             IsSepa = loader.IsSepa;
+            DoIterations = loader.Iterations;
             Name = loader.Name;
             Description = loader.Description;
             Filename = loader.Filename;
@@ -76,15 +83,15 @@ namespace ImageFramework.Model.Filter
                 isPipelineEnabled[i] = true;
 
             Shader = new FilterShader(this, loader.ShaderSource, loader.GroupSize, loader.KernelType, 
-                loader.Target==FilterLoader.TargetType.Tex2D?ShaderBuilder.Builder2D:ShaderBuilder.Builder3D);
+                loader.Target==FilterLoader.TargetType.Tex2D?ShaderBuilder.Builder2D:ShaderBuilder.Builder3D, shared);
         }
 
         // tries to create the same filter with a different target
-        internal FilterModel Retarget(FilterLoader.TargetType currentTarget)
+        internal FilterModel Retarget(FilterLoader.TargetType newTarget, SharedModel shared)
         {
-            var loader = new FilterLoader(Filename, currentTarget);
+            var loader = new FilterLoader(Filename, newTarget);
 
-            var res = new FilterModel(loader, NumPipelines);
+            var res = new FilterModel(loader, shared, NumPipelines);
 
             // try to match parameters
             res.IsEnabled = IsEnabled;

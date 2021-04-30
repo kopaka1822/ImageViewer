@@ -20,8 +20,21 @@ namespace ImageFramework.Model
         public MitchellNetravaliScaleShader ScaleShader { get; }
         public QuadShader QuadShader { get; } = new QuadShader();
         public ConvertFormatShader Convert { get; }
+        
+        /// <summary>
+        /// 256 bytes CPU to GPU buffer
+        /// </summary>
         public UploadBuffer Upload { get; }
+        
+        /// <summary>
+        /// 256 bytes GPU to CPU buffer
+        /// </summary>
         public DownloadBuffer Download { get; }
+        
+        /// <summary>
+        /// 256 byte GPU staging buffer with a 4byte per element structure (up to 64 elements)
+        /// </summary>
+        //public GpuBuffer Gpu4ByteBuffer { get; }
 
         private PaddingShader padding = null;
         public PaddingShader Padding => padding ?? (padding = new PaddingShader());
@@ -34,6 +47,7 @@ namespace ImageFramework.Model
         {
             Upload = new UploadBuffer(256); // big enough for 4 matrix4
             Download = new DownloadBuffer(256);
+            //Gpu4ByteBuffer = new GpuBuffer(4, 64); // 64 byte structured with 4 byte elements
             ScaleShader = new MitchellNetravaliScaleShader(QuadShader, Upload);
             Convert = new ConvertFormatShader(QuadShader, Upload);
             Sync = new SyncQuery();
@@ -67,6 +81,8 @@ namespace ImageFramework.Model
             ScaleShader?.Dispose();
             QuadShader?.Dispose();
             Upload?.Dispose();
+            Download?.Dispose();
+            //Gpu4ByteBuffer?.Dispose();
             Sync?.Dispose();
             padding?.Dispose();
             LinearSampler?.Dispose();
