@@ -31,13 +31,15 @@ namespace ImageFramework.Model.Export
                 case "dds":
                     return format.IsCompressed();
                 case "ktx2":
-                    return format.IsCompressed(); // TODO support the supercompressed stuff later on
+                    if (format.IsCompressed()) return true; // compressed formats support compression quality level
+                    if (!format.Is8Bit()) return false; // only 8 bit per pixel formats
+                    //return format.IsCompressed(); // TODO support the supercompressed stuff later on
                     // if (!format.IsCompressed() && !format.Is8Bit()) return false;
-                    // var type = format.GetDataType();
-                    // if (type == PixelDataType.UInt || type == PixelDataType.SInt) return false;
-                    // if (type == PixelDataType.UScaled || type == PixelDataType.SScaled) return false;
-                    // if (type == PixelDataType.SNorm) return false;
-                    // return true;
+                    var type = format.GetDataType();
+                    if (type == PixelDataType.UInt || type == PixelDataType.SInt) return false;
+                    if (type == PixelDataType.UScaled || type == PixelDataType.SScaled) return false;
+                    if (type == PixelDataType.SNorm) return false;
+                    return true; // UNorm, Srgb, UFloat, SFloat
                 default: return false;
             }
         }

@@ -344,7 +344,29 @@ namespace ImageViewer.ViewModels.Dialog
 
         public GliFormat SelectedFormatValue => selectedFormat.Cargo;
 
-        public string Description => selectedFormat.Cargo.GetDescription();
+        public string Description => GetExtendedDescription(selectedFormat.Cargo);
+
+        private string GetExtendedDescription(GliFormat format)
+        {
+            var desc = format.GetDescription();
+
+            if (extension == "ktx2" && !format.IsCompressed() && usedFormat.SupportsQuality(format)) // clarify about compression
+            {
+                string outputFormat = "UASTC";
+                string compression = "Zstandard";
+                if (format.GetDataType() == PixelDataType.Srgb)
+                {
+                    outputFormat = "ETC1S";
+                    compression = "BasisLZ";
+                }
+
+                if (!String.IsNullOrEmpty(desc)) desc += ".\n";
+                desc +=
+                    $"Choosing a Quality below 100 will perform a block compression to {outputFormat} with an additional supercompression via {compression}.";
+            }
+
+            return desc;
+        }
 
         public string Warning
         {

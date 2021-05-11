@@ -7,7 +7,10 @@
 #include "VkFormat.h"
 #include <unordered_map>
 #include <string>
+#include <thread>
+
 #include "GliImage.h"
+#include "interface.h"
 
 gli::format convertFormat(VkFormat format);
 VkFormat convertFormat(gli::format);
@@ -76,8 +79,24 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 	// optionally compress (if it was not already compressed)
 	if(!is_compressed(format) && quality < 100)
 	{
+		set_progress(0, "basis compression");
+		ktxBasisParams params = {};
+		params.structSize = sizeof(params);
+		params.threadCount = std::thread::hardware_concurrency();
+		params.compressionLevel = KTX_ETC1S_DEFAULT_COMPRESSION_LEVEL;
+		params.qualityLevel = std::max((quality * 254) / 99 + 1, 1); // scale quality [0, 99] between [1, 255]
+		// params.normalMap // TODO add this later?
+
+	    // select uastc for everything that is not color (here: for everyhing that is not SRGB)
+		if(!gli::is_srgb(format))
+		{
+		    params.uastc = KTX_TRUE;
+			params.uastcFlags = KTX_PACK_UASTC_MAX_LEVEL; // maximum supported quality
+			params.uastcRDO = KTX_TRUE; // Enable Rate Distortion Optimization (RDO) post-processing.
+		}
+
 		// optional if compression
-		err = ktxTexture2_CompressBasis(ktex, std::max((quality * 254) / 99 + 1, 1)); // scale quality [0, 99] between [1, 255]
+		err = ktxTexture2_CompressBasisEx(ktex, &params);
 		if (err != KTX_SUCCESS)
 			throw std::runtime_error(std::string("failed to compress ktx texture: ") + ktxErrorString(err));
 	}
@@ -98,21 +117,37 @@ std::unique_ptr<image::IImage> ktx2_load(const char* filename)
 
 	ktxTexture2* ktex2 = reinterpret_cast<ktxTexture2*>(ktex);
 
-	if(ktxTexture2_NeedsTranscoding(ktex2))
+	gli::format format = gli::FORMAT_UNDEFINED;
+	gli::format originalFormat = format;
+	if(ktxTexture2_NeedsTranscoding(ktex2)) // transcode from compressed format
 	{
-		err = ktxTexture2_TranscodeBasis(ktex2, KTX_TTF_ASTC_4x4_RGBA, 0);
+		const auto compressionSheme = ktex2->supercompressionScheme;
+		auto numComponents = ktxTexture2_GetNumComponents(ktex2);
+		// do transcoding
+		err = ktxTexture2_TranscodeBasis(ktex2, KTX_TTF_RGBA32, 0);
 		if (err != KTX_SUCCESS)
 			throw std::runtime_error(std::string("failed to transcode file: ") + ktxErrorString(err));
+		// set format and (previous) original format
+		format = convertFormat(VkFormat(ktex2->vkFormat));
+		if(compressionSheme == KTX_SS_BASIS_LZ) // ETC1S
+            switch (numComponents)
+            {
+            case 1: // should not happen (no matching srgb format)
+			case 2: // should not happen
+			case 3: originalFormat = gli::FORMAT_RGB_ETC2_SRGB_BLOCK8; break;
+			case 4: originalFormat = gli::FORMAT_RGBA_ETC2_SRGB_BLOCK8; break;
+            }
+		else // UASTC
+			originalFormat = gli::FORMAT_RGBA_ASTC_4X4_UNORM_BLOCK16; // astc has only rgba formats in the enum
 	}
-	
-	auto format = convertFormat(VkFormat(ktex2->vkFormat));
+	else format = originalFormat = convertFormat(VkFormat(ktex2->vkFormat)); // no transcoding needed => read format directly
 
 	if (format == gli::FORMAT_UNDEFINED)
 		throw std::runtime_error("could not interpret format id " + std::to_string(ktex2->vkFormat));
 
 	// store data in gli storage to be able to convert it easily
-	auto res = std::make_unique<GliImage>(format, 
-		ktex->numFaces * ktex->numLayers, ktex->numLevels,
+	auto res = std::make_unique<GliImage>(format, originalFormat,
+	    ktex->numLayers, ktex->numFaces, ktex->numLevels, 
 		ktex->baseWidth, ktex->baseHeight, ktex->baseDepth);
 
 	//auto ktxSize = ktxTexture_GetSize(ktex);

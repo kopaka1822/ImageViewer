@@ -70,10 +70,11 @@ namespace ImageFramework.Model.Export
         /// <summary>
         /// image quality for compressed formats and jpg
         /// Range [1, 100] => [QualityMin, QualityMax]
+        /// Defaults to QualityMax if the format does not support quality
         /// </summary>
         public int Quality
         {
-            get => quality;
+            get => ExportFormat.SupportsQuality(FileFormat) ? quality : QualityMax;
             set
             {
                 Debug.Assert(quality <= QualityMax);
