@@ -39,6 +39,10 @@ namespace ImageFramework.Model.Export
                     if (type == PixelDataType.UInt || type == PixelDataType.SInt) return false;
                     if (type == PixelDataType.UScaled || type == PixelDataType.SScaled) return false;
                     if (type == PixelDataType.SNorm) return false;
+
+                    // special case formats that the exporter exports to RA instead of RG
+                    if (format == GliFormat.RG8_UNORM || format == GliFormat.RG8_SRGB) return false;
+
                     return true; // UNorm, Srgb, UFloat, SFloat
                 default: return false;
             }
