@@ -289,6 +289,7 @@ namespace ImageViewer.ViewModels.Dialog
                 }
 
                 OnPropertyChanged(nameof(AvailableFormats));
+                OnPropertyChanged(nameof(EnableFormat));
                 SelectedFormat = allFormats[bestFit];
                 
                 OnPropertyChanged(nameof(SelectedDataType));
