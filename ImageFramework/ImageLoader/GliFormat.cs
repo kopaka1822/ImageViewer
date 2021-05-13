@@ -259,7 +259,9 @@ namespace ImageFramework.ImageLoader
         AR8_SRGB,
         ARGB8_SRGB,
         ABGR8_SRGB,
-        RA16_UNORM
+        RA16_UNORM,
+
+        RGB8E8_UFLOAT // hdr extension
     };
 
     public enum PixelDataType
@@ -680,7 +682,9 @@ namespace ImageFramework.ImageLoader
             switch (format)
             {
                 case GliFormat.RGB9E5_UFLOAT:
-                    return "Three partial-precision floating-point numbers encoded into a single 32-bit value all sharing the same 5-bit exponent. There is no sign bit, and there is a shared 5-bit biased (15) exponent and a 9-bit mantissa for each channel";
+                    return "Three partial-precision floating-point numbers encoded into a single 32-bit value all sharing the same 5-bit exponent. There is no sign bit, and an each channel has a 9-bit mantissa";
+                case GliFormat.RGB8E8_UFLOAT:
+                    return "Three partial-precision floating-point numbers encoded into a single 32-bit value all sharing the same 8-bit exponent. There is no sign bit, and an each channel has an 8-bit mantissa";
 
                 case GliFormat.RGB_DXT1_UNORM:
                 case GliFormat.RGB_DXT1_SRGB:
@@ -714,16 +718,19 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.RGBA_BP_SRGB:
                     return "Three color channels (4 to 7 bits per channel) with 0 to 8 bits of alpha (BC7)";
 
-                /*case GliFormat.RGB_ETC2_UNORM_BLOCK8:
+                case GliFormat.RGB_ETC2_UNORM_BLOCK8:
                 case GliFormat.RGB_ETC2_SRGB_BLOCK8:
                 case GliFormat.RGBA_ETC2_UNORM_BLOCK8:
                 case GliFormat.RGBA_ETC2_SRGB_BLOCK8:
                 case GliFormat.RGBA_ETC2_UNORM_BLOCK16:
                 case GliFormat.RGBA_ETC2_SRGB_BLOCK16:
+                case GliFormat.RGB_ETC_UNORM_BLOCK8:
                 case GliFormat.R_EAC_UNORM_BLOCK8:
                 case GliFormat.R_EAC_SNORM_BLOCK8:
                 case GliFormat.RG_EAC_UNORM_BLOCK16:
-                case GliFormat.RG_EAC_SNORM_BLOCK16:*/
+                case GliFormat.RG_EAC_SNORM_BLOCK16:
+                    return "Ericsson Texture Compression (lossy block-based)";
+
                 case GliFormat.RGBA_ASTC_4X4_UNORM_BLOCK16:
                 case GliFormat.RGBA_ASTC_4X4_SRGB_BLOCK16:
                 case GliFormat.RGBA_ASTC_5X4_UNORM_BLOCK16:
@@ -753,7 +760,8 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.RGBA_ASTC_12X12_UNORM_BLOCK16:
                 case GliFormat.RGBA_ASTC_12X12_SRGB_BLOCK16:
                     return "Adaptive Scalable Texture Compression (lossy block-based)";
-                /*case GliFormat.RGB_PVRTC1_8X8_UNORM_BLOCK32:
+
+                case GliFormat.RGB_PVRTC1_8X8_UNORM_BLOCK32:
                 case GliFormat.RGB_PVRTC1_8X8_SRGB_BLOCK32:
                 case GliFormat.RGB_PVRTC1_16X8_UNORM_BLOCK32:
                 case GliFormat.RGB_PVRTC1_16X8_SRGB_BLOCK32:
@@ -765,11 +773,14 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.RGBA_PVRTC2_4X4_SRGB_BLOCK8:
                 case GliFormat.RGBA_PVRTC2_8X4_UNORM_BLOCK8:
                 case GliFormat.RGBA_PVRTC2_8X4_SRGB_BLOCK8:
-                case GliFormat.RGB_ETC_UNORM_BLOCK8:
+                    return "PowerVR Texture Compression (lossy block-based)";
+                
                 case GliFormat.RGB_ATC_UNORM_BLOCK8:
+                    return "AMD compression format for RGB textures";
                 case GliFormat.RGBA_ATCA_UNORM_BLOCK16:
+                    return "AMD compression format for RGBA textures using explicit alpha encoding";
                 case GliFormat.RGBA_ATCI_UNORM_BLOCK16:
-                    break;*/
+                    return "AMD compression format for RGBA textures using interpolated alpha encoding";
             }
 
             return "";
@@ -1010,6 +1021,7 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.RG11B10_UFLOAT:
                 case GliFormat.RGB9E5_UFLOAT:
                 case GliFormat.RGB_BP_UFLOAT:
+                case GliFormat.RGB8E8_UFLOAT:
                     return PixelDataType.UFloat;
                 default:
                     return PixelDataType.Undefined;
@@ -1128,6 +1140,7 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.BGR8_UNORM_PACK32:
                 case GliFormat.BGR8_SRGB_PACK32:
                 case GliFormat.RG3B2_UNORM:
+                case GliFormat.RGB8E8_UFLOAT:
                     return Color.Channel.Rgb;
 
                 case GliFormat.RGBA4_UNORM:

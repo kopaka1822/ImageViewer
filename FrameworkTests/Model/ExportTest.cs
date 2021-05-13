@@ -282,7 +282,7 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void ExportHdr()
         {
-            CompareAfterExport(TestData.Directory + "small.hdr", ExportDir + "small", "hdr", GliFormat.RGB32_SFLOAT);
+            CompareAfterExport(TestData.Directory + "small.hdr", ExportDir + "small", "hdr", GliFormat.RGB8E8_UFLOAT);
         }
 
         [TestMethod]

@@ -215,7 +215,7 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 			int nComponents = 0;
 
 			// only 2 possible formats
-			if (format == gli::FORMAT_RGB32_SFLOAT_PACK32)
+			if (format == gli::FORMAT_RGB32_SFLOAT_PACK32 || format == gli::FORMAT_RGB8E8_UFLOAT_PACK32)
 			{
 				image::changeStride(mip, mipSize, 16, 12);
 				nComponents = 3;
