@@ -845,10 +845,10 @@ std::vector<uint32_t> ktx2_get_export_formats()
 	gli::FORMAT_RGBA_ASTC_12X12_SRGB_BLOCK16,
 	// compressed and not yet supported
 	//gli::FORMAT_RGB_PVRTC1_8X8_UNORM_BLOCK32,
-	gli::FORMAT_A8_UNORM_PACK8,
-	gli::FORMAT_LA8_UNORM_PACK8,
-	gli::FORMAT_A16_UNORM_PACK16,
-	gli::FORMAT_LA16_UNORM_PACK16,
+	//gli::FORMAT_A8_UNORM_PACK8,
+	//gli::FORMAT_LA8_UNORM_PACK8,
+	//gli::FORMAT_A16_UNORM_PACK16,
+	//gli::FORMAT_LA16_UNORM_PACK16,
 	// can not set image data
 	//gli::FORMAT_BGR8_UNORM_PACK32,
 	//gli::FORMAT_BGR8_SRGB_PACK32,

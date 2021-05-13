@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -40,7 +41,8 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void ExportJpg()
         {
-            CompareAfterExport(TestData.Directory + "small.bmp", ExportDir + "small", "jpg", GliFormat.RGB8_SRGB, Color.Channel.Rgb, 0.1f);
+            CompareAfterExport(TestData.Directory + "small.bmp", ExportDir + "small", "jpg", GliFormat.RGB8_SRGB,
+                Color.Channel.Rgb, 0.1f);
         }
 
         [TestMethod]
@@ -76,7 +78,7 @@ namespace FrameworkTests.Model
             var model = new Models(1);
             model.AddImageFromFile(TestData.Directory + "checkers.dds");
             model.Apply();
-            
+
             model.Export.Export(new ExportDescription(model.Pipelines[0].Image, ExportDir + "cropped", "dds")
             {
                 FileFormat = GliFormat.RGBA8_SRGB,
@@ -96,7 +98,7 @@ namespace FrameworkTests.Model
             var model = new Models(1);
             model.AddImageFromFile(TestData.Directory + "checkers3d.dds");
             model.Apply();
-            
+
             TestData.TestCheckers3DLevel0(model.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0));
 
             model.Export.Export(new ExportDescription(model.Pipelines[0].Image, ExportDir + "cropped", "dds")
@@ -106,7 +108,7 @@ namespace FrameworkTests.Model
                 UseCropping = true,
                 CropStart = new Size3(1, 0, 2).ToCoords(model.Images.Size),
                 CropEnd = new Size3(2, 1, 3).ToCoords(model.Images.Size)
-        });
+            });
 
             var newTex = new Texture3D(IO.LoadImage(ExportDir + "cropped.dds"));
 
@@ -156,7 +158,7 @@ namespace FrameworkTests.Model
             var orig = IO.LoadImageTexture(TestData.Directory + "checkers3d.dds", out var format);
             model.Images.AddImage(orig, true, TestData.Directory + "checkers3d.dds", format);
             model.Apply();
-            
+
 
             model.ExportPipelineImage(ExportDir + "tmp3d", "dds", format);
 
@@ -166,9 +168,12 @@ namespace FrameworkTests.Model
             Assert.AreEqual(orig.NumLayers, newTex.NumLayers);
             Assert.AreEqual(orig.NumMipmaps, newTex.NumMipmaps);
 
-            TestData.CompareColors(orig.GetPixelColors(LayerMipmapSlice.Mip0), newTex.GetPixelColors(LayerMipmapSlice.Mip0));
-            TestData.CompareColors(orig.GetPixelColors(LayerMipmapSlice.Mip1), newTex.GetPixelColors(LayerMipmapSlice.Mip1));
-            TestData.CompareColors(orig.GetPixelColors(LayerMipmapSlice.Mip2), newTex.GetPixelColors(LayerMipmapSlice.Mip2));
+            TestData.CompareColors(orig.GetPixelColors(LayerMipmapSlice.Mip0),
+                newTex.GetPixelColors(LayerMipmapSlice.Mip0));
+            TestData.CompareColors(orig.GetPixelColors(LayerMipmapSlice.Mip1),
+                newTex.GetPixelColors(LayerMipmapSlice.Mip1));
+            TestData.CompareColors(orig.GetPixelColors(LayerMipmapSlice.Mip2),
+                newTex.GetPixelColors(LayerMipmapSlice.Mip2));
         }
 
         [TestMethod]
@@ -191,9 +196,10 @@ namespace FrameworkTests.Model
             Assert.AreEqual(orig.NumLayers, newTex.NumLayers);
             Assert.AreEqual(1, newTex.NumMipmaps);
 
-            TestData.CompareColors(orig.GetPixelColors(LayerMipmapSlice.Mip0), newTex.GetPixelColors(LayerMipmapSlice.Mip0));
+            TestData.CompareColors(orig.GetPixelColors(LayerMipmapSlice.Mip0),
+                newTex.GetPixelColors(LayerMipmapSlice.Mip0));
         }
-        
+
 
         [TestMethod]
         public void ExportAllJpg()
@@ -205,6 +211,12 @@ namespace FrameworkTests.Model
         public void GrayTestAllJpg()
         {
             TryExportAllFormatsAndCompareGray("jpg", true);
+        }
+
+        [TestMethod]
+        public void ColorTestAllJpg()
+        {
+            TryExportAllFormatsAndCompareColor("jpg", true);
         }
 
         [TestMethod]
@@ -220,6 +232,12 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void ColorTestAllPng()
+        {
+            TryExportAllFormatsAndCompareColor("png");
+        }
+
+        [TestMethod]
         public void ExportAllBmp()
         {
             TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "bmp");
@@ -229,6 +247,12 @@ namespace FrameworkTests.Model
         public void GrayTestAllBmp()
         {
             TryExportAllFormatsAndCompareGray("bmp", true);
+        }
+
+        [TestMethod]
+        public void ColorTestAllBmp()
+        {
+            TryExportAllFormatsAndCompareColor("bmp", true);
         }
 
         [TestMethod]
@@ -250,6 +274,12 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void ColorTestAllPfm()
+        {
+            TryExportAllFormatsAndCompareColor("pfm");
+        }
+
+        [TestMethod]
         public void ExportHdr()
         {
             CompareAfterExport(TestData.Directory + "small.hdr", ExportDir + "small", "hdr", GliFormat.RGB32_SFLOAT);
@@ -268,6 +298,12 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void ColorTestAllHdr()
+        {
+            TryExportAllFormatsAndCompareColor("hdr");
+        }
+
+        [TestMethod]
         public void ExportDds()
         {
             CompareAfterExport(TestData.Directory + "small.pfm", ExportDir + "small", "dds", GliFormat.RGBA8_SRGB);
@@ -276,56 +312,71 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void ExportCompressedDds()
         {
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_DXT1_SRGB);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds",
+                GliFormat.RGBA_DXT1_SRGB);
         }
 
         [TestMethod]
         public void Dxt1()
         {
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_DXT1_SRGB);
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_DXT1_UNORM);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds",
+                GliFormat.RGBA_DXT1_SRGB);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds",
+                GliFormat.RGBA_DXT1_UNORM);
         }
 
         [TestMethod]
         public void Dxt3()
         {
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_DXT3_SRGB);
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_DXT3_UNORM);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds",
+                GliFormat.RGBA_DXT3_SRGB);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds",
+                GliFormat.RGBA_DXT3_UNORM);
         }
 
         [TestMethod]
         public void Dxt5()
         {
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_DXT5_SRGB);
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_DXT5_UNORM);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds",
+                GliFormat.RGBA_DXT5_SRGB);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds",
+                GliFormat.RGBA_DXT5_UNORM);
         }
 
         [TestMethod]
         public void Atin1()
         {
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.R_ATI1N_UNORM, Color.Channel.R);
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.R_ATI1N_SNORM, Color.Channel.R);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds",
+                GliFormat.R_ATI1N_UNORM, Color.Channel.R);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds",
+                GliFormat.R_ATI1N_SNORM, Color.Channel.R);
         }
 
         [TestMethod]
         public void Atin2()
         {
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RG_ATI2N_UNORM, Color.Channel.R | Color.Channel.G);
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RG_ATI2N_SNORM, Color.Channel.R | Color.Channel.G);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds",
+                GliFormat.RG_ATI2N_UNORM, Color.Channel.R | Color.Channel.G);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds",
+                GliFormat.RG_ATI2N_SNORM, Color.Channel.R | Color.Channel.G);
         }
 
         [TestMethod]
         public void BC6()
         {
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGB_BP_UFLOAT);
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGB_BP_SFLOAT);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds",
+                GliFormat.RGB_BP_UFLOAT);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds",
+                GliFormat.RGB_BP_SFLOAT);
         }
 
         [TestMethod]
         public void BC7()
         {
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_BP_SRGB);
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds", GliFormat.RGBA_BP_UNORM);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds",
+                GliFormat.RGBA_BP_SRGB);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "dds",
+                GliFormat.RGBA_BP_UNORM);
         }
 
         [TestMethod]
@@ -337,7 +388,8 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void ExportAllCompressedDds()
         {
-            TryExportAllFormats(TestData.Directory + "small_scaled.png", ExportDir + "tmp", "dds", FormatFilter.Compressed);
+            TryExportAllFormats(TestData.Directory + "small_scaled.png", ExportDir + "tmp", "dds",
+                FormatFilter.Compressed);
         }
 
         [TestMethod]
@@ -347,16 +399,30 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void ColorTestAllDds()
+        {
+            TryExportAllFormatsAndCompareColor("dds");
+        }
+
+        [TestMethod]
+        public void ColorTestAllCompressedDds()
+        {
+            TryExportAllFormatsAndCompareColor("dds", false, 50);
+        }
+
+        [TestMethod]
         public void ExportKtx()
         {
-            CompareAfterExport(TestData.Directory + "small.ktx", ExportDir + "small", "ktx", GliFormat.RGBA32_SFLOAT, Color.Channel.Rgba);
+            CompareAfterExport(TestData.Directory + "small.ktx", ExportDir + "small", "ktx", GliFormat.RGBA32_SFLOAT,
+                Color.Channel.Rgba);
         }
 
 
         [TestMethod]
         public void ExportCompressedKtx()
         {
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "ktx", GliFormat.RGBA_DXT1_SRGB);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "ktx",
+                GliFormat.RGBA_DXT1_SRGB);
         }
 
         [TestMethod]
@@ -368,7 +434,8 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void ExportAllCompressedKtx()
         {
-            TryExportAllFormats(TestData.Directory + "small_scaled.png", ExportDir + "tmp", "ktx", FormatFilter.Compressed);
+            TryExportAllFormats(TestData.Directory + "small_scaled.png", ExportDir + "tmp", "ktx",
+                FormatFilter.Compressed);
         }
 
         [TestMethod]
@@ -378,16 +445,30 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void ColorTestAllKtx()
+        {
+            TryExportAllFormatsAndCompareColor("ktx");
+        }
+
+        [TestMethod]
+        public void ColorTestAllCompressedKtx()
+        {
+            TryExportAllFormatsAndCompareColor("ktx", false, 50);
+        }
+
+        [TestMethod]
         public void ExportKtx2()
         {
-            CompareAfterExport(TestData.Directory + "small.ktx", ExportDir + "small", "ktx2", GliFormat.RGBA32_SFLOAT, Color.Channel.Rgba);
+            CompareAfterExport(TestData.Directory + "small.ktx", ExportDir + "small", "ktx2", GliFormat.RGBA32_SFLOAT,
+                Color.Channel.Rgba);
         }
 
 
         [TestMethod]
         public void ExportCompressedKtx2()
         {
-            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "ktx2", GliFormat.RGBA_DXT1_SRGB);
+            CompareAfterExport(TestData.Directory + "small_scaled.png", ExportDir + "small", "ktx2",
+                GliFormat.RGBA_DXT1_SRGB);
         }
 
         [TestMethod]
@@ -399,7 +480,8 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void ExportAllCompressedKtx2()
         {
-            TryExportAllFormats(TestData.Directory + "small_scaled.png", ExportDir + "tmp", "ktx2", FormatFilter.Compressed);
+            TryExportAllFormats(TestData.Directory + "small_scaled.png", ExportDir + "tmp", "ktx2",
+                FormatFilter.Compressed);
         }
 
         [TestMethod]
@@ -407,6 +489,19 @@ namespace FrameworkTests.Model
         {
             TryExportAllFormatsAndCompareGray("ktx2");
         }
+
+        [TestMethod]
+        public void ColorTestAllKtx2()
+        {
+            TryExportAllFormatsAndCompareColor("ktx2");
+        }
+
+        [TestMethod]
+        public void ColorTestAllCompressedKtx2()
+        {
+            TryExportAllFormatsAndCompareColor("ktx2", false, 50);
+        }
+
 
         [TestMethod]
         public void GrayTestAllKtx2WithQuality()
@@ -417,7 +512,8 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void ExportKtx2Checkers3D()
         {
-            CompareAfterExport(TestData.Directory + "checkers3d.dds", ExportDir + "tmp", "ktx2", GliFormat.RGBA8_SRGB, Color.Channel.Rgb, 0.0f);
+            CompareAfterExport(TestData.Directory + "checkers3d.dds", ExportDir + "tmp", "ktx2", GliFormat.RGBA8_SRGB,
+                Color.Channel.Rgb, 0.0f);
         }
 
         /// <summary>
@@ -429,14 +525,14 @@ namespace FrameworkTests.Model
             var model = new Models(1);
             model.AddImageFromFile(TestData.Directory + "small_scaled.png");
             model.Apply();
-            var origTex = (TextureArray2D)model.Pipelines[0].Image;
+            var origTex = (TextureArray2D) model.Pipelines[0].Image;
             // normal colors
             var origColors = origTex.GetPixelColors(LayerMipmapSlice.Mip0);
-            
+
             // colors multiplied by 100 for integer precision formats
             model.Pipelines[0].Color.Formula = "I0 * 100";
             model.Apply();
-            var integerTex = (TextureArray2D)model.Pipelines[0].Image;
+            var integerTex = (TextureArray2D) model.Pipelines[0].Image;
             var origColors100 = integerTex.GetPixelColors(LayerMipmapSlice.Mip0);
 
             Color[] newColors = null;
@@ -458,14 +554,17 @@ namespace FrameworkTests.Model
                     {
                         desc.Multiplier = 100.0f;
                     }
+
                     model.Export.Export(desc);
 
                     // load with directx dds loader
-                    DDSTextureLoader.CreateDDSTextureFromFile(Device.Get().Handle, Device.Get().ContextHandle, ExportDir + "tmp.dds",
+                    DDSTextureLoader.CreateDDSTextureFromFile(Device.Get().Handle, Device.Get().ContextHandle,
+                        ExportDir + "tmp.dds",
                         out var resource, out var resourceView, 0, out var alphaMode);
 
                     // convert to obtain color data
-                    using (var newTex = model.SharedModel.Convert.ConvertFromRaw(resourceView, origTex.Size, Format.R32G32B32A32_Float, isIntegerPrecision))
+                    using (var newTex = model.SharedModel.Convert.ConvertFromRaw(resourceView, origTex.Size,
+                        Format.R32G32B32A32_Float, isIntegerPrecision))
                     {
                         resourceView.Dispose();
                         resource.Dispose();
@@ -490,7 +589,8 @@ namespace FrameworkTests.Model
             }
 
             if (errors.Length > 0)
-                throw new Exception($"directX compability failed for {numErrors}/{eFmt.Formats.Count} formats:\n" + errors);
+                throw new Exception($"directX compability failed for {numErrors}/{eFmt.Formats.Count} formats:\n" +
+                                    errors);
         }
 
         /// <summary>
@@ -502,14 +602,14 @@ namespace FrameworkTests.Model
             var model = new Models(1);
             model.AddImageFromFile(TestData.Directory + "checkers3d.dds");
             model.Apply();
-            var origTex = (Texture3D)model.Pipelines[0].Image;
+            var origTex = (Texture3D) model.Pipelines[0].Image;
             var origColors = origTex.GetPixelColors(LayerMipmapSlice.Mip0);
             Color[] newColors = null;
 
             // colors multiplied by 100 for integer precision formats
             model.Pipelines[0].Color.Formula = "I0 * 100";
             model.Apply();
-            var integerTex = (Texture3D)model.Pipelines[0].Image;
+            var integerTex = (Texture3D) model.Pipelines[0].Image;
             var origColors100 = integerTex.GetPixelColors(LayerMipmapSlice.Mip0);
 
             var eFmt = ExportDescription.GetExportFormat("dds");
@@ -533,18 +633,20 @@ namespace FrameworkTests.Model
                     model.Export.Export(desc);
 
                     // load with directx dds loader
-                    DDSTextureLoader.CreateDDSTextureFromFile(Device.Get().Handle, Device.Get().ContextHandle, ExportDir + "tmp.dds",
+                    DDSTextureLoader.CreateDDSTextureFromFile(Device.Get().Handle, Device.Get().ContextHandle,
+                        ExportDir + "tmp.dds",
                         out var resource, out var resourceView, 0, out var alphaMode);
 
                     // convert to obtain color data
-                    using (var newTex = model.SharedModel.Convert.ConvertFromRaw3D(resourceView, origTex.Size, Format.R32G32B32A32_Float, isIntegerPrecision))
+                    using (var newTex = model.SharedModel.Convert.ConvertFromRaw3D(resourceView, origTex.Size,
+                        Format.R32G32B32A32_Float, isIntegerPrecision))
                     {
                         resourceView.Dispose();
                         resource.Dispose();
 
                         newColors = newTex.GetPixelColors(LayerMipmapSlice.Mip0);
                         // only compare with red channel since some formats only store red
-                        if(isIntegerPrecision)
+                        if (isIntegerPrecision)
                             TestData.CompareColors(origColors100, newColors, Color.Channel.R, 1.0f);
                         else
                             TestData.CompareColors(origColors, newColors, Color.Channel.R, 0.1f);
@@ -579,7 +681,8 @@ namespace FrameworkTests.Model
             model.Export.Export(desc);
 
             // try loading with dds loader
-            DDSTextureLoader.CreateDDSTextureFromFile(Device.Get().Handle, Device.Get().ContextHandle, ExportDir + "tmp.dds",
+            DDSTextureLoader.CreateDDSTextureFromFile(Device.Get().Handle, Device.Get().ContextHandle,
+                ExportDir + "tmp.dds",
                 out var resource, out var resourceView, 0, out var alphaMode);
 
             Assert.AreEqual(ResourceDimension.Texture2D, resource.Dimension);
@@ -591,7 +694,14 @@ namespace FrameworkTests.Model
             Assert.AreEqual(model.Images.NumMipmaps, tex2D.Description.MipLevels);
         }
 
-        private void CompareAfterExport(string inputImage, string outputImage, string outputExtension, GliFormat format, Color.Channel channels = Color.Channel.Rgb, float tolerance = 0.01f, int quality = 100)
+        [TestMethod]
+        public void GliOverflowTest() // test various dds/ktx formats for correct overflow handling
+        {
+            throw new NotImplementedException();
+        }
+
+        private void CompareAfterExport(string inputImage, string outputImage, string outputExtension, GliFormat format,
+            Color.Channel channels = Color.Channel.Rgb, float tolerance = 0.01f, int quality = 100)
         {
             var model = new Models(1);
             model.AddImageFromFile(inputImage);
@@ -630,12 +740,13 @@ namespace FrameworkTests.Model
             All = 0xFFFFFFF
         }
 
-        private void TryExportAllFormats(string inputImage, string outputImage, string outputExtension, FormatFilter filter = FormatFilter.All)
+        private void TryExportAllFormats(string inputImage, string outputImage, string outputExtension,
+            FormatFilter filter = FormatFilter.All)
         {
             var model = new Models(1);
             model.AddImageFromFile(inputImage);
             model.Apply();
-            var tex = (TextureArray2D)model.Pipelines[0].Image;
+            var tex = (TextureArray2D) model.Pipelines[0].Image;
 
             var eFmt = ExportDescription.GetExportFormat(outputExtension);
             string errors = "";
@@ -647,7 +758,7 @@ namespace FrameworkTests.Model
                 {
                     if ((FormatFilter.Compressed & filter) == 0) continue;
                 }
-                else if((FormatFilter.Uncompressed & filter) == 0) continue;       
+                else if ((FormatFilter.Uncompressed & filter) == 0) continue;
 
                 try
                 {
@@ -685,7 +796,7 @@ namespace FrameworkTests.Model
             var model = new Models(2);
             model.AddImageFromFile(TestData.Directory + "gray.png");
             model.Apply();
-            var tex = (TextureArray2D)model.Pipelines[0].Image;
+            var tex = (TextureArray2D) model.Pipelines[0].Image;
 
             var eFmt = ExportDescription.GetExportFormat(outputExtension);
 
@@ -697,57 +808,59 @@ namespace FrameworkTests.Model
             var i = 0;
             foreach (var format in eFmt.Formats)
             {
-                if(onlySrgb && format.GetDataType() != PixelDataType.Srgb) continue;
-                if(quality < 100 && !eFmt.SupportsQuality(format)) continue;
+                if (onlySrgb && format.GetDataType() != PixelDataType.Srgb) continue;
+                if (quality < 100 && !eFmt.SupportsQuality(format)) continue;
                 try
                 {
                     int numTries = 0;
-                    while(true)
-                    try
-                    {
-                        var integerPrecision = IsIntegerPrecisionFormat(format);
-                        var desc = new ExportDescription(tex, ExportDir + "gray" + i, outputExtension);
-                        desc.FileFormat = format;
-                        desc.Quality = quality;
-                        if (integerPrecision)
-                            desc.Multiplier = 100.0f;
-
-                        model.Export.Export(desc);
-                        Thread.Sleep(1);
-
-                        // load and compare gray tone
-                        using (var newTex = new TextureArray2D(IO.LoadImage($"{ExportDir}gray{i}.{outputExtension}")))
+                    while (true)
+                        try
                         {
-                            Assert.AreEqual(8, newTex.Size.Width);
-                            Assert.AreEqual(4, newTex.Size.Height);
-                            colors = newTex.GetPixelColors(LayerMipmapSlice.Mip0);
-                            // compare last texel
-                            var grayColor = colors[lastTexel];
-
-                            float tolerance = 0.01f;
-                            if (format.IsLessThan8Bit())
-                                tolerance = 0.1f;
-
-                            // some formats don't write to red
-                            // ReSharper disable once CompareOfFloatsByEqualityOperator
-                            //if(grayColor.Red != 0.0f) Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
+                            var integerPrecision = IsIntegerPrecisionFormat(format);
+                            var desc = new ExportDescription(tex, ExportDir + "gray" + i, outputExtension);
+                            desc.FileFormat = format;
+                            desc.Quality = quality;
                             if (integerPrecision)
+                                desc.Multiplier = 100.0f;
+
+                            model.Export.Export(desc);
+                            Thread.Sleep(1);
+
+                            // load and compare gray tone
+                            using (var newTex =
+                                new TextureArray2D(IO.LoadImage($"{ExportDir}gray{i}.{outputExtension}")))
                             {
-                                Assert.AreEqual(TestData.Gray * 100.0f, grayColor.Red, 1.0f);
+                                Assert.AreEqual(8, newTex.Size.Width);
+                                Assert.AreEqual(4, newTex.Size.Height);
+                                colors = newTex.GetPixelColors(LayerMipmapSlice.Mip0);
+                                // compare last texel
+                                var grayColor = colors[lastTexel];
+
+                                float tolerance = 0.01f;
+                                if (format.IsLessThan8Bit())
+                                    tolerance = 0.1f;
+
+                                // some formats don't write to red
+                                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                                //if(grayColor.Red != 0.0f) Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
+                                if (integerPrecision)
+                                {
+                                    Assert.AreEqual(TestData.Gray * 100.0f, grayColor.Red, 1.0f);
+                                }
+                                else
+                                {
+                                    Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
+                                }
+
+                                //else Assert.AreEqual(TestData.Gray, grayColor.Green, tolerance);
+                                break;
                             }
-                            else
-                            {
-                                Assert.AreEqual(TestData.Gray, grayColor.Red, tolerance);
-                            }
-                            //else Assert.AreEqual(TestData.Gray, grayColor.Green, tolerance);
-                            break;
                         }
-                    }
-                    catch (Exception)
-                    {
-                        ++numTries;
-                        if (numTries > 3) throw;
-                    }
+                        catch (Exception)
+                        {
+                            ++numTries;
+                            if (numTries > 3) throw;
+                        }
 
                 }
                 catch (Exception e)
@@ -755,13 +868,153 @@ namespace FrameworkTests.Model
                     errors += $"{i}: {format.ToString()}: {e.Message}\n";
                     ++numErrors;
                 }
+
                 ++i;
             }
 
-            if(errors.Length > 0)
+            if (errors.Length > 0)
                 throw new Exception($"gray comparision failed for {numErrors}/{i} formats:\n" + errors);
         }
 
-        
+        /// <summary>
+        /// test all image formats against a color palette.
+        /// </summary>
+        /// <param name="outputExtension"></param>
+        /// <param name="onlySrgb"></param>
+        /// <param name="quality">if 100, only uncompressed formats will be tested against "color_palette.dds", otherwise only compressed formats will be tested against "compressed_palette.dds"</param>
+        private void TryExportAllFormatsAndCompareColor(string outputExtension, bool onlySrgb = false, int quality = 100)
+        {
+            var model = new Models(2);
+            if(quality == 100) model.AddImageFromFile(TestData.Directory + "color_palette.dds");
+            else Assert.Fail("need to implement for compressed");
+            model.Apply();
+            var tex = (TextureArray2D) model.Pipelines[0].Image;
+
+            var eFmt = ExportDescription.GetExportFormat(outputExtension);
+
+            string errors = "";
+            int numErrors = 0;
+
+            var refColors = model.Pipelines[0].Image.GetPixelColors(LayerMipmapSlice.Mip0);
+            Color[] colors = null;
+            var i = 0;
+            foreach (var format in eFmt.Formats)
+            {
+                if (onlySrgb && format.GetDataType() != PixelDataType.Srgb) continue;
+                if (quality == 100 && format.IsCompressed()) continue; // skip compressed formats for quality < 100 pass
+                if (quality < 100 && !eFmt.SupportsQuality(format)) continue; // quality only relevant for quality supporting formats
+                try
+                {
+                    int numTries = 0;
+                    while (true)
+                        try
+                        {
+                            var integerPrecision = IsIntegerPrecisionFormat(format);
+                            var desc = new ExportDescription(tex, ExportDir + "color" + i, outputExtension);
+                            desc.FileFormat = format;
+                            desc.Quality = quality;
+                            if (integerPrecision)
+                                desc.Multiplier = 50.0f;
+
+                            model.Export.Export(desc);
+                            Thread.Sleep(1);
+
+                            // load and compare colors
+                            using (var newTex =
+                                new TextureArray2D(IO.LoadImage($"{ExportDir}color{i}.{outputExtension}")))
+                            {
+                                Assert.AreEqual(4, newTex.Size.Width);
+                                Assert.AreEqual(4, newTex.Size.Height);
+                                colors = newTex.GetPixelColors(LayerMipmapSlice.Mip0);
+
+                                float tolerance = GetSpecializedTolerance(format); 
+
+                                // compare colors
+                                for (uint pixel = 0; pixel < 16; ++pixel)
+                                {
+                                    var expectedColor = refColors[pixel];
+                                    var originalColor = expectedColor;
+                                    var actualColor = colors[pixel];
+
+                                    // modify expected color according to format informations
+                                    if (integerPrecision)
+                                        expectedColor = new Color(expectedColor.Red * desc.Multiplier, expectedColor.Green * desc.Multiplier, expectedColor.Blue * desc.Multiplier, (float)Math.Floor(expectedColor.Alpha));
+
+                                    // mask out unused channels
+                                    var channels = format.GetChannels();
+                                    if ((channels & Color.Channel.A) == 0) expectedColor.Alpha = 1.0f; // expect default 1
+                                    if ((channels & Color.Channel.Rgb) == 0) // only alpha => expect rgb black
+                                        expectedColor.Red = expectedColor.Green = expectedColor.Blue = 0.0f;
+                                    else if ((channels & Color.Channel.Rgb) == Color.Channel.R) // only red channel => expect grayscale conversion 
+                                        expectedColor.Green = expectedColor.Blue = expectedColor.Red; // assign red to all
+                                    else // one or two channels are missing => zero out
+                                    {
+                                        if ((channels & Color.Channel.R) == 0) expectedColor.Red = 0.0f;
+                                        if ((channels & Color.Channel.G) == 0) expectedColor.Green = 0.0f;
+                                        if ((channels & Color.Channel.B) == 0) expectedColor.Blue = 0.0f;
+                                    }
+
+                                    // correct ranges
+                                    if (!format.GetDataType().IsSigned()) // clamp to 0
+                                        expectedColor = new Color(Math.Max(expectedColor.Red, 0.0f), Math.Max(expectedColor.Green, 0.0f), Math.Max(expectedColor.Blue, 0.0f), Math.Max(expectedColor.Alpha, 0.0f));
+                                    if (format.GetDataType().IsNormed()) // clamp to at most 1
+                                        expectedColor = new Color(Math.Min(expectedColor.Red, 1.0f), Math.Min(expectedColor.Green, 1.0f), Math.Min(expectedColor.Blue, 1.0f), Math.Min(expectedColor.Alpha, 1.0f));
+
+                                    if (!expectedColor.Equals(actualColor, Color.Channel.Rgba, tolerance))
+                                    {
+                                        throw new Exception($"Expected {expectedColor} but got {actualColor} with tolerance {tolerance} and original color {originalColor}");
+                                    }
+                                }
+
+                                break;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            ++numTries;
+                            if (numTries > 3) throw;
+                        }
+
+                }
+                catch (Exception e)
+                {
+                    errors += $"{i}: {format.ToString()}: {e.Message}\n";
+                    ++numErrors;
+                }
+
+                ++i;
+            }
+
+            if (errors.Length > 0)
+                throw new Exception($"color comparision failed for {numErrors}/{i} formats:\n" + errors);
+        }
+
+        /// <summary>
+        /// returns pixel format dependent tolerance (0.01 for most formats, 0.1 for most that are less than 8 bit and even higher for some specific ones)
+        /// </summary>
+        /// <param name="format"></param>
+        /// <returns></returns>
+        float GetSpecializedTolerance(GliFormat format)
+        {
+            float tolerance = 0.01f;
+            if (format.IsLessThan8Bit())
+                tolerance = 0.1f;
+
+            // some formats are hardly compressed
+            switch (format)
+            {
+                case GliFormat.RG3B2_UNORM: return 0.3f;
+                case GliFormat.BGR10A2_SNORM:
+                case GliFormat.A1RGB5_UNORM:
+                case GliFormat.BGR5A1_UNORM:
+                case GliFormat.RGB5A1_UNORM: return 0.33f; // because of alpha
+                case GliFormat.RGB10A2_SSCALED:
+                case GliFormat.RGB10A2_SINT:
+                case GliFormat.BGR10A2_SSCALED:
+                case GliFormat.BGR10A2_SINT: return 1.0f; // because of 1 bit alpha (cant represent 2)
+            }
+
+            return tolerance;
+        }
     }
 }

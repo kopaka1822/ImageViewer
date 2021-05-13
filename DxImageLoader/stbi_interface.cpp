@@ -129,7 +129,7 @@ std::vector<uint32_t> stb_image_get_export_formats(const char* extension)
 	{
 		return std::vector<uint32_t>{
 			gli::format::FORMAT_RGB32_SFLOAT_PACK32,
-				gli::format::FORMAT_R32_SFLOAT_PACK32
+			gli::format::FORMAT_R32_SFLOAT_PACK32
 		};
 	}
 

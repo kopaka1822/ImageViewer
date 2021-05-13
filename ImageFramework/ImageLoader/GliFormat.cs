@@ -251,7 +251,7 @@ namespace ImageFramework.ImageLoader
         BGR8_UNORM_PACK32,
         BGR8_SRGB_PACK32,
 
-        RG3B2_UNORM, LAST = RG3B2_UNORM,
+        RG3B2_UNORM,
 
         // extensions from libpng
         RA8_SRGB,
@@ -662,6 +662,12 @@ namespace ImageFramework.ImageLoader
         {
             var channels = format.GetChannels();
             return (channels & Color.Channel.Rgb) == Color.Channel.Rgb;
+        }
+
+        public static bool IsGrayscale(this GliFormat format)
+        {
+            var channels = format.GetChannels();
+            return channels == Color.Channel.R || channels == Color.Channel.Ra;
         }
 
         /// <summary>
@@ -1275,6 +1281,20 @@ namespace ImageFramework.ImageLoader
             return false;
         }
 
+        // indicates if the formats values are at most between -1 and 1 (SNorm, UNorm, Srgb)
+        public static bool IsNormed(this PixelDataType type)
+        {
+            switch (type)
+            {
+                case PixelDataType.UNorm:
+                case PixelDataType.Srgb:
+                case PixelDataType.SNorm:
+                    return true;
+            }
+
+            return false;
+        }
+
         public static string GetDescription(this PixelDataType type)
         {
             switch (type)
@@ -1291,9 +1311,9 @@ namespace ImageFramework.ImageLoader
                 case PixelDataType.UInt:
                     return "Unsigned integer";
                 case PixelDataType.SScaled:
-                    return "Signed integer interpreted as floating point";
+                    return "Signed integer interpreted as floating point format";
                 case PixelDataType.UScaled:
-                    return "Unsigned integer interpreted as floating point";
+                    return "Unsigned integer interpreted as floating point format";
                 case PixelDataType.SFloat:
                     return "Signed floating point";
                 case PixelDataType.UFloat:

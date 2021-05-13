@@ -229,8 +229,8 @@ std::vector<uint32_t> ktx_get_export_formats()
 			gli::FORMAT_BGR10A2_SSCALED_PACK32,
 			gli::FORMAT_BGR10A2_UINT_PACK32,
 			gli::FORMAT_BGR10A2_SINT_PACK32,
-			gli::format::FORMAT_A8_UNORM_PACK8,
-			gli::format::FORMAT_A16_UNORM_PACK16,
+			//gli::format::FORMAT_A8_UNORM_PACK8,
+			//gli::format::FORMAT_A16_UNORM_PACK16,
 			gli::format::FORMAT_BGR8_UNORM_PACK32,
 			gli::format::FORMAT_BGR8_SRGB_PACK32,
 
