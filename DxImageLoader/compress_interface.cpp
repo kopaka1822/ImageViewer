@@ -12,6 +12,7 @@ struct ExFormatInfo
 	bool useDxt1Alpha = false;
 	bool isCompressed = true;
 	bool swizzleRGB = false;
+	uint8_t overwriteAlpha = 0; // value to overwrite alpha (0 means no overwrite)
 	CMP_BYTE bx = 4;
 	CMP_BYTE by = 4;
 	CMP_BYTE bz = 1;
@@ -156,15 +157,21 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSourc
 		return CMP_FORMAT_DXT5;
 
 	case gli::format::FORMAT_R_ATI1N_UNORM_BLOCK8: // BC 4
+		exInfo.swizzleRGB = true;
+		if (isSource) exInfo.overwriteAlpha = 255;
+		return CMP_FORMAT_ATI1N;
 	case gli::format::FORMAT_R_ATI1N_SNORM_BLOCK8:
 		exInfo.swizzleRGB = true;
+		if (isSource) exInfo.overwriteAlpha = 127;
 		return CMP_FORMAT_ATI1N;
 
 	case gli::format::FORMAT_RG_ATI2N_UNORM_BLOCK16: // BC 5
+		if (isSource) exInfo.swizzleRGB = true;
+		if (isSource) exInfo.overwriteAlpha = 255;
+		return CMP_FORMAT_ATI2N_XY;
 	case gli::format::FORMAT_RG_ATI2N_SNORM_BLOCK16:
 		if (isSource) exInfo.swizzleRGB = true;
-		//exInfo.swizzleRGB = true;
-		//return CMP_FORMAT_ATI2N;
+		if (isSource) exInfo.overwriteAlpha = 127; // signed 1
 		return CMP_FORMAT_ATI2N_XY;
 
 	case gli::format::FORMAT_RGB_BP_UFLOAT_BLOCK16: // BC 6
@@ -226,6 +233,16 @@ void swizzleMipmap(uint8_t* data, uint32_t size, CMP_FORMAT format)
 	}
 }
 
+void overwriteAlpha(uint8_t* data, uint32_t size, CMP_FORMAT format, uint8_t /*overwrite*/ value)
+{
+	assert(format == CMP_FORMAT_RGBA_8888);
+
+	for(auto i = data + 3, end = data + size; i < end; i += 4)
+	{
+	    *i = value;
+	}
+}
+
 void copy_level(uint8_t* srcDat, uint8_t* dstDat, uint32_t width, uint32_t height, uint32_t srcSize, uint32_t dstSize,
 	CMP_FORMAT srcFormat, CMP_FORMAT dstFormat, 
 	const ExFormatInfo& srcInfo, const ExFormatInfo& dstInfo, float quality, CompressInfo& curCompressInfo)
@@ -283,6 +300,9 @@ void copy_level(uint8_t* srcDat, uint8_t* dstDat, uint32_t width, uint32_t heigh
 
 	if (!dstInfo.isCompressed && (srcInfo.swizzleRGB || dstInfo.swizzleRGB))
 		swizzleMipmap(dstDat, dstSize, dstFormat);
+
+	if (!dstInfo.isCompressed && srcInfo.overwriteAlpha)
+	    overwriteAlpha(dstDat, dstSize, dstFormat, srcInfo.overwriteAlpha);
 }
 
 void compressonator_convert_image(image::IImage& src, image::IImage& dst, int quality)
