@@ -695,9 +695,97 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
-        public void GliOverflowTest() // test various dds/ktx formats for correct overflow handling
+        public void OverflowTestGli() // test various dds/ktx formats for correct overflow handling
         {
-            throw new NotImplementedException();
+            Color c;
+            // general test if the test function works
+            c = GetExportedTexel(new Color(0.5f), GliFormat.R8_UNORM, ExportDir + "unorm0", "ktx");
+            Assert.AreEqual(0.5f, c.Red, 0.01f);
+
+            // unorm should be between [0, 1]
+            c = GetExportedTexel(new Color(1.1f), GliFormat.R8_UNORM, ExportDir + "unorm1", "ktx");
+            Assert.AreEqual(1.0f, c.Red);
+            c = GetExportedTexel(new Color(-0.1f), GliFormat.R8_UNORM, ExportDir + "unorm2", "ktx");
+            Assert.AreEqual(0.0f, c.Red);
+
+            // snorm should be between [-1, 1]
+            c = GetExportedTexel(new Color(1.1f), GliFormat.R8_SNORM, ExportDir + "snorm1", "ktx");
+            Assert.AreEqual(1.0f, c.Red);
+            c = GetExportedTexel(new Color(-1.1f), GliFormat.R8_SNORM, ExportDir + "snorm2", "ktx");
+            Assert.AreEqual(-1.0f, c.Red);
+
+            // integer textures should not overflow (for 8 bit signed: [-128, 127])
+            c = GetExportedTexel(new Color(130.0f), GliFormat.R8_SINT, ExportDir + "sint1", "ktx");
+            Assert.AreEqual(127.0f, c.Red);
+            c = GetExportedTexel(new Color(-130.0f), GliFormat.R8_SINT, ExportDir + "sint2", "ktx");
+            Assert.AreEqual(-128.0f, c.Red);
+
+            // integer textures should not overflow (for 8 bit unsigned: [0, 255])
+            c = GetExportedTexel(new Color(-1.0f), GliFormat.R8_UINT, ExportDir + "uint1", "ktx");
+            Assert.AreEqual(0.0f, c.Red);
+            c = GetExportedTexel(new Color(256.0f), GliFormat.R8_UINT, ExportDir + "uint2", "ktx");
+            Assert.AreEqual(255.0f, c.Red);
+
+            // 32 bit float textures may represent any number (e.g. infinity without clamp)
+            c = GetExportedTexel(new Color(float.PositiveInfinity), GliFormat.R32_SFLOAT, ExportDir + "float1", "ktx");
+            Assert.AreEqual(float.PositiveInfinity, c.Red);
+            c = GetExportedTexel(new Color(float.NegativeInfinity), GliFormat.R32_SFLOAT, ExportDir + "float2", "ktx");
+            Assert.AreEqual(float.NegativeInfinity, c.Red);
+            // NaN should be kept NaN
+            c = GetExportedTexel(new Color(float.NaN), GliFormat.R32_SFLOAT, ExportDir + "float3", "ktx");
+            Assert.IsTrue(float.IsNaN(c.Red));
+
+            // 16 bit float test
+            c = GetExportedTexel(new Color(float.PositiveInfinity), GliFormat.R16_SFLOAT, ExportDir + "hfloat1", "ktx");
+            Assert.AreEqual(float.PositiveInfinity, c.Red);
+            c = GetExportedTexel(new Color(float.NegativeInfinity), GliFormat.R16_SFLOAT, ExportDir + "hfloat2", "ktx");
+            Assert.AreEqual(float.NegativeInfinity, c.Red);
+            // NaN should be kept NaN
+            c = GetExportedTexel(new Color(float.NaN), GliFormat.R16_SFLOAT, ExportDir + "hfloat3", "ktx");
+            Assert.IsTrue(float.IsNaN(c.Red));
+            // numbers that exceed the max should go to infinity probably
+            c = GetExportedTexel(new Color(65504.0f), GliFormat.R16_SFLOAT, ExportDir + "hfloat4", "ktx");
+            Assert.AreEqual(65504.0f, c.Red); // max representable
+            c = GetExportedTexel(new Color(65504.0f * 2.0f), GliFormat.R16_SFLOAT, ExportDir + "hfloat5", "ktx");
+            Assert.AreEqual(float.PositiveInfinity, c.Red); // no longer representable
+
+            // unsigned float RGB9E5 should be clamped to 0 but cant represent infinity (only till 65408)
+            c = GetExportedTexel(new Color(float.PositiveInfinity), GliFormat.RGB9E5_UFLOAT, ExportDir + "ufloat1", "ktx");
+            Assert.AreEqual(65408.0f, c.Red); // max value according to spec: 65408
+            c = GetExportedTexel(new Color(float.NegativeInfinity), GliFormat.RGB9E5_UFLOAT, ExportDir + "ufloat2", "ktx");
+            Assert.AreEqual(0.0f, c.Red);
+            c = GetExportedTexel(new Color(float.NaN), GliFormat.RGB9E5_UFLOAT, ExportDir + "ufloat2", "ktx");
+            Assert.AreEqual(0.0f, c.Red);
+
+            // TODO put this format into a sparate test
+            // unsigned float RG11B10_UFLOAT test (supports infinity and nan)
+            c = GetExportedTexel(new Color(float.PositiveInfinity), GliFormat.RG11B10_UFLOAT, ExportDir + "u11float1", "ktx");
+            Assert.AreEqual(float.PositiveInfinity, c.Red);
+            c = GetExportedTexel(new Color(float.NegativeInfinity), GliFormat.RG11B10_UFLOAT, ExportDir + "u11float1", "ktx");
+            Assert.AreEqual(0.0f, c.Red);
+        }
+
+        private Color GetExportedTexel(Color inputTexel, GliFormat exportedFormat, string outputImage, string outputExtension)
+        {
+            var model = new Models(1);
+
+            var tex = new TextureArray2D(new Color[1]{inputTexel}, Size3.One);
+
+
+            model.Images.AddImage(tex, false, null, GliFormat.RGBA32_SFLOAT);
+            model.Apply();
+
+            model.Export.Export(new ExportDescription(tex, outputImage, outputExtension)
+            {
+                FileFormat = exportedFormat,
+                Quality = 100
+            });
+
+            var importedTex = new TextureArray2D(IO.LoadImage(outputImage + "." + outputExtension));
+            Assert.AreEqual(importedTex.Size.Width, 1);
+            Assert.AreEqual(importedTex.Size.Height, 1);
+            
+            return importedTex.GetPixelColors(LayerMipmapSlice.Layer0)[0];
         }
 
         private void CompareAfterExport(string inputImage, string outputImage, string outputExtension, GliFormat format,

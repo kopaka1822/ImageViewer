@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.ImageLoader;
@@ -165,6 +166,7 @@ namespace ImageFramework.Model.Shader
             if(texture.Is3D) dev.Pixel.Set(convert3D.Pixel);
             else dev.Pixel.Set(convert2D.Pixel);
 
+            Debug.Assert(texture.View != null);
             dev.Pixel.SetShaderResource(0, texture.View);
             if(overlay != null)
                 dev.Pixel.SetShaderResource(1, overlay.View);

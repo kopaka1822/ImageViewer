@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,6 +55,34 @@ namespace ImageFramework.DirectX
             handle = new Texture2D(Device.Get().Handle, CreateTextureDescription(false, true), data);
 
             CreateTextureViews(false, true);
+        }
+
+        /// <summary>
+        /// creates a 2d texture from an array of colors
+        /// </summary>
+        /// <param name="colors">colors in x-major order</param>
+        /// <param name="size">size in pixels</param>
+        public TextureArray2D(Color[] colors, Size3 size, bool createUav = false, bool createRtv = true)
+        {
+            Size = size;
+            Debug.Assert(Size.Depth == 1);
+            Debug.Assert(Size.X * Size.Y == colors.Length);
+            LayerMipmap = LayerMipmapCount.One;
+            Format = Format.R32G32B32A32_Float;
+
+            var colorsHandle = GCHandle.Alloc(colors, GCHandleType.Pinned);
+
+            var data = new DataRectangle
+            {
+                DataPointer = colorsHandle.AddrOfPinnedObject(),
+                Pitch = size.X * 4 * 4 // 4 floats with 4 byte each
+            };
+            
+            handle = new Texture2D(Device.Get().Handle, CreateTextureDescription(false, true), data);
+
+            colorsHandle.Free();
+
+            CreateTextureViews(createUav, createRtv);
         }
 
         public ShaderResourceView GetCubeView(int mipmap)

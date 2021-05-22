@@ -682,10 +682,13 @@ namespace ImageFramework.ImageLoader
             switch (format)
             {
                 case GliFormat.RGB9E5_UFLOAT:
-                    return "Three partial-precision floating-point numbers encoded into a single 32-bit value all sharing the same 5-bit exponent. There is no sign bit, and an each channel has a 9-bit mantissa";
+                    return "Three partial-precision floating-point numbers encoded into a single 32-bit value all sharing the same 5-bit exponent. There is no sign bit, and an each channel has a 9-bit mantissa. Infinity and NaN are not supported. The maximum representable value is 65408";
                 case GliFormat.RGB8E8_UFLOAT:
-                    return "Three partial-precision floating-point numbers encoded into a single 32-bit value all sharing the same 8-bit exponent. There is no sign bit, and an each channel has an 8-bit mantissa";
-
+                    // exact max value: 169476569462576773795235400185743933440 ~ 1.69e38
+                    return "Three partial-precision floating-point numbers encoded into a single 32-bit value all sharing the same 8-bit exponent. There is no sign bit, and an each channel has an 8-bit mantissa. Infinity and NaN are not supported. The maximum representable value is 1.69e38";
+                case GliFormat.RG11B10_UFLOAT:
+                    return "Three partial-precision floating-point numbers encoded into a single 32-bit value with 5-6 bit Mantissa and 5-bit Exponent. There is no sign bit, Infinity and NaN are supported. The maximum representable values are 65024 and 64512";
+                    
                 case GliFormat.RGB_DXT1_UNORM:
                 case GliFormat.RGB_DXT1_SRGB:
                     return "Three color channels (5 bits:6 bits:5 bits) (BC1)";
