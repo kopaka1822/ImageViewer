@@ -695,6 +695,41 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void RG11B10FloatTest()
+        {
+            // infinity
+            var c = GetExportedTexelFromDDSLoader(new Color(float.PositiveInfinity), GliFormat.RG11B10_UFLOAT, ExportDir + "u11float1");
+            Assert.AreEqual(float.PositiveInfinity, c.Red);
+            Assert.AreEqual(float.PositiveInfinity, c.Green);
+            Assert.AreEqual(float.PositiveInfinity, c.Blue);
+            // negative infinity
+            c = GetExportedTexelFromDDSLoader(new Color(float.NegativeInfinity), GliFormat.RG11B10_UFLOAT, ExportDir + "u11float1");
+            Assert.AreEqual(0.0f, c.Red); // clamp to zero in this case
+            Assert.AreEqual(0.0f, c.Green); // clamp to zero in this case
+            Assert.AreEqual(0.0f, c.Blue); // clamp to zero in this case
+            // negative values
+            c = GetExportedTexelFromDDSLoader(new Color(-1.0f), GliFormat.RG11B10_UFLOAT, ExportDir + "u11float1");
+            Assert.AreEqual(0.0f, c.Red); // clamp to zero in this case
+            Assert.AreEqual(0.0f, c.Green); // clamp to zero in this case
+            Assert.AreEqual(0.0f, c.Blue); // clamp to zero in this case
+            // NaN
+            c = GetExportedTexelFromDDSLoader(new Color(float.NaN), GliFormat.RG11B10_UFLOAT, ExportDir + "u11float1");
+            Assert.IsTrue(float.IsNaN(c.Red));
+            Assert.IsTrue(float.IsNaN(c.Green));
+            Assert.IsTrue(float.IsNaN(c.Blue));
+            //  biggest representable
+            c = GetExportedTexelFromDDSLoader(new Color(65024.0f, 65024.0f, 64512.0f), GliFormat.RG11B10_UFLOAT, ExportDir + "u11float1");
+            Assert.AreEqual(65024.0f, c.Red);
+            Assert.AreEqual(65024.0f, c.Green);
+            Assert.AreEqual(64512.0f, c.Blue);
+            // bigger than biggest should go to infinity
+            c = GetExportedTexelFromDDSLoader(new Color(65024.0f * 2.0f, 65024.0f * 2.0f, 64512.0f * 2.0f), GliFormat.RG11B10_UFLOAT, ExportDir + "u11float1");
+            Assert.AreEqual(float.PositiveInfinity, c.Red);
+            Assert.AreEqual(float.PositiveInfinity, c.Green);
+            Assert.AreEqual(float.PositiveInfinity, c.Blue);
+        }
+
+        [TestMethod]
         public void OverflowTestGli() // test various dds/ktx formats for correct overflow handling
         {
             Color c;
@@ -756,13 +791,6 @@ namespace FrameworkTests.Model
             Assert.AreEqual(0.0f, c.Red);
             c = GetExportedTexel(new Color(float.NaN), GliFormat.RGB9E5_UFLOAT, ExportDir + "ufloat2", "ktx");
             Assert.AreEqual(0.0f, c.Red);
-
-            // TODO put this format into a sparate test
-            // unsigned float RG11B10_UFLOAT test (supports infinity and nan)
-            c = GetExportedTexel(new Color(float.PositiveInfinity), GliFormat.RG11B10_UFLOAT, ExportDir + "u11float1", "ktx");
-            Assert.AreEqual(float.PositiveInfinity, c.Red);
-            c = GetExportedTexel(new Color(float.NegativeInfinity), GliFormat.RG11B10_UFLOAT, ExportDir + "u11float1", "ktx");
-            Assert.AreEqual(0.0f, c.Red);
         }
 
         private Color GetExportedTexel(Color inputTexel, GliFormat exportedFormat, string outputImage, string outputExtension)
@@ -786,6 +814,53 @@ namespace FrameworkTests.Model
             Assert.AreEqual(importedTex.Size.Height, 1);
             
             return importedTex.GetPixelColors(LayerMipmapSlice.Layer0)[0];
+        }
+
+        private Color GetExportedTexelFromDDSLoader(Color inputTexel, GliFormat exportedFormat, string outputImage)
+        {
+            var model = new Models(1);
+
+            var tex = new TextureArray2D(new Color[1] { inputTexel }, Size3.One);
+
+
+            model.Images.AddImage(tex, false, null, GliFormat.RGBA32_SFLOAT);
+            model.Apply();
+
+            model.Export.Export(new ExportDescription(tex, outputImage, "dds")
+            {
+                FileFormat = exportedFormat,
+                Quality = 100
+            });
+
+            // first import with local loader
+            var importedTex = new TextureArray2D(IO.LoadImage(outputImage + "." + "dds"));
+            Assert.AreEqual(importedTex.Size.Width, 1);
+            Assert.AreEqual(importedTex.Size.Height, 1);
+            var importedColor = importedTex.GetPixelColors(LayerMipmapSlice.Mip0)[0];
+
+            // then import from dds loader
+            DDSTextureLoader.CreateDDSTextureFromFile(Device.Get().Handle, Device.Get().ContextHandle,
+                outputImage + "." + "dds",
+                out var resource, out var resourceView, 0, out var alphaMode);
+
+            // convert to obtain color data
+            using (var ddsTex = model.SharedModel.Convert.ConvertFromRaw(resourceView, importedTex.Size,
+                Format.R32G32B32A32_Float, IsIntegerPrecisionFormat(exportedFormat)))
+            {
+                resourceView.Dispose();
+                resource.Dispose();
+
+                var ddsColors = ddsTex.GetPixelColors(LayerMipmapSlice.Mip0);
+                var ddsColor = ddsColors[0];
+
+                // make sure that our importer interprets data the same ways as DirectX
+                Assert.AreEqual(ddsColor.Red, importedColor.Red);
+                Assert.AreEqual(ddsColor.Green, importedColor.Green);
+                Assert.AreEqual(ddsColor.Blue, importedColor.Blue);
+                Assert.AreEqual(ddsColor.Alpha, importedColor.Alpha);
+
+                return ddsColor;
+            }
         }
 
         private void CompareAfterExport(string inputImage, string outputImage, string outputExtension, GliFormat format,
