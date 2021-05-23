@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "compress_interface.h"
 
-#include "../dependencies/compressonator/Compressonator/Header/Compressonator.h"
+#include "../dependencies/compressonator/cmp_compressonatorlib/compressonator.h"
 #include <thread>
 #include <stdexcept>
 #include "interface.h"
@@ -28,9 +28,12 @@ struct CompressInfo
 	size_t numSteps; // total number of steps
 };
 
+static CompressInfo s_currentCompressInfo;
+
 bool cmp_feedback_proc(float fProgress, CMP_DWORD_PTR pUser1, CMP_DWORD_PTR pUser2)
 {
-	const CompressInfo* info = reinterpret_cast<CompressInfo*>(pUser1);
+	//const CompressInfo* info = reinterpret_cast<CompressInfo*>(pUser1);
+	const CompressInfo* info = &s_currentCompressInfo; // they removed the user parameter passing...
 	const char* desc = "compressing";
 	if (!info->isCompress) desc = "decompressing";
 
@@ -38,7 +41,7 @@ bool cmp_feedback_proc(float fProgress, CMP_DWORD_PTR pUser1, CMP_DWORD_PTR pUse
 	{
 		set_progress(uint32_t((info->curSteps + size_t(fProgress * 0.01f * float(info->curStepWeight))) / info->numSteps), desc);
 	}
-	catch (const std::exception& e)
+	catch (const std::exception&)
 	{
 		return true;
 	}
@@ -55,8 +58,6 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSourc
 	case gli::format::FORMAT_RGBA8_SNORM_PACK8:
 		exInfo.isCompressed = false;
 		exInfo.widthMultiplier = 4;
-		//if (isSource) return CMP_FORMAT_ARGB_8888; // for some reason channels get swizzled
-		//if (!isSource) return CMP_FORMAT_BGRA_8888;
 		return CMP_FORMAT_RGBA_8888;
 	case gli::format::FORMAT_RGBA32_SFLOAT_PACK32:
 		exInfo.isCompressed = false;
@@ -137,40 +138,32 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSourc
 
 	case gli::format::FORMAT_RGB_DXT1_UNORM_BLOCK8: // BC 1
 	case gli::format::FORMAT_RGB_DXT1_SRGB_BLOCK8:
-		if (isSource) exInfo.swizzleRGB = true;
 		return CMP_FORMAT_DXT1;
 
 	case gli::format::FORMAT_RGBA_DXT1_UNORM_BLOCK8: // BC 1
 	case gli::format::FORMAT_RGBA_DXT1_SRGB_BLOCK8:
 		exInfo.useDxt1Alpha = true;
-		if (isSource) exInfo.swizzleRGB = true;
 		return CMP_FORMAT_DXT1;
 
 	case gli::format::FORMAT_RGBA_DXT3_SRGB_BLOCK16: // BC 2
 	case gli::format::FORMAT_RGBA_DXT3_UNORM_BLOCK16:
-		if (isSource) exInfo.swizzleRGB = true;
 		return CMP_FORMAT_DXT3;
 
 	case gli::format::FORMAT_RGBA_DXT5_SRGB_BLOCK16: // BC 3
 	case gli::format::FORMAT_RGBA_DXT5_UNORM_BLOCK16:
-		if (isSource) exInfo.swizzleRGB = true;
 		return CMP_FORMAT_DXT5;
 
 	case gli::format::FORMAT_R_ATI1N_UNORM_BLOCK8: // BC 4
-		exInfo.swizzleRGB = true;
 		if (isSource) exInfo.overwriteAlpha = 255;
 		return CMP_FORMAT_ATI1N;
 	case gli::format::FORMAT_R_ATI1N_SNORM_BLOCK8:
-		exInfo.swizzleRGB = true;
 		if (isSource) exInfo.overwriteAlpha = 127;
 		return CMP_FORMAT_ATI1N;
 
 	case gli::format::FORMAT_RG_ATI2N_UNORM_BLOCK16: // BC 5
-		if (isSource) exInfo.swizzleRGB = true;
 		if (isSource) exInfo.overwriteAlpha = 255;
 		return CMP_FORMAT_ATI2N_XY;
 	case gli::format::FORMAT_RG_ATI2N_SNORM_BLOCK16:
-		if (isSource) exInfo.swizzleRGB = true;
 		if (isSource) exInfo.overwriteAlpha = 127; // signed 1
 		return CMP_FORMAT_ATI2N_XY;
 
@@ -259,6 +252,8 @@ void copy_level(uint8_t* srcDat, uint8_t* dstDat, uint32_t width, uint32_t heigh
 	srcTex.nBlockWidth = srcInfo.bx;
 	srcTex.nBlockHeight = srcInfo.by;
 	srcTex.nBlockDepth = srcInfo.bz;
+	srcTex.pMipSet = nullptr;
+	srcTex.transcodeFormat = CMP_FORMAT_Unknown; // only used if format == CMP_FORMAT_BASIS
 	if (!srcInfo.isCompressed && (srcInfo.swizzleRGB || dstInfo.swizzleRGB))
 		swizzleMipmap(srcDat, srcSize, srcFormat);
 
@@ -272,6 +267,8 @@ void copy_level(uint8_t* srcDat, uint8_t* dstDat, uint32_t width, uint32_t heigh
 	dstTex.nBlockWidth = dstInfo.bx;
 	dstTex.nBlockHeight = dstInfo.by;
 	dstTex.nBlockDepth = dstInfo.bz;
+	srcTex.pMipSet = nullptr;
+	srcTex.transcodeFormat = CMP_FORMAT_Unknown; // only used if format == CMP_FORMAT_BASIS
 	if (dstInfo.isCompressed) dstTex.dwDataSize = CMP_CalculateBufferSize(&dstTex);
 	else dstTex.dwDataSize = dstTex.dwPitch * dstTex.dwHeight;
 	//assert(dstSize >= dstTex.dwDataSize);
@@ -288,13 +285,16 @@ void copy_level(uint8_t* srcDat, uint8_t* dstDat, uint32_t width, uint32_t heigh
 	options.dwnumThreads = CMP_DWORD(nThreads);
 	options.bDXT1UseAlpha = srcInfo.useDxt1Alpha || dstInfo.useDxt1Alpha;
 	options.nAlphaThreshold = 127;
-	options.bUseGPUCompress = true;
+	options.bUseCGCompress = true;
 	options.bUseGPUDecompress = true;
-	options.nComputeWith = CMP_Compute_type::Compute_OPENCL;
+	options.nEncodeWith = CMP_Compute_type::CMP_GPU_DXC;
 	options.nGPUDecode = CMP_GPUDecode::GPUDecode_DIRECTX;
-
+	options.SourceFormat = srcTex.format;
+	options.DestFormat = dstTex.format;
+	
 	// compress texture
-	auto status = CMP_ConvertTexture(&srcTex, &dstTex, &options, cmp_feedback_proc, reinterpret_cast<size_t>(&curCompressInfo), 0);
+	s_currentCompressInfo = curCompressInfo; // set static compress info since they removed the user parameter...
+	auto status = CMP_ConvertTexture(&srcTex, &dstTex, &options, cmp_feedback_proc);
 	if (status != CMP_OK)
 		throw std::runtime_error("texture compression failed");
 

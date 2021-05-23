@@ -205,8 +205,8 @@
     <ClCompile Include="stbi_interface.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\dependencies\compressonator\Compressonator\VS2015\CompressonatorLib.vcxproj">
-      <Project>{9ee67db2-4ad8-4b9a-ae58-2e536412033c}</Project>
+    <ProjectReference Include="..\dependencies\compressonator\vs2017\cmp_compressonatorlib.vcxproj">
+      <Project>{9849f082-7283-47de-9db0-8d7dc647cd43}</Project>
     </ProjectReference>
     <ProjectReference Include="..\dependencies\libpng\projects\vstudio\libpng\libpng.vcxproj">
       <Project>{d6973076-9317-4ef2-a0b8-b7a18ac0713e}</Project>
