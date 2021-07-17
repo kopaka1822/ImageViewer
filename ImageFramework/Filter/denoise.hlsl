@@ -1,11 +1,13 @@
 #setting title, Bilateral Denoise
-#setting description, A bilateral gaussian blur (non-seperated).
+#setting description, A bilateral gaussian blur (non-separated). Smaller Variance values result in sharper but more noisy results. High variance might overblur the result.
 
 #param Blur Radius, BLUR_RADIUS, int, 4, 1, 8
-#param Variance, VARIANCE, float, 15.0, 0.5, 50.0
-#param Color Variance, COLOR_VARIANCE, float, 0.1, 0.0001, 2.0
-#paramprop Variance, onAdd, 0.5, add
-#paramprop Variance, onSubtract, -0.5, add
+#param Distance Variance, VARIANCE, float, 15.0, 0.5, 50.0
+#param Color Variance, COLOR_VARIANCE, float, 0.05, 0.0001, 2.0
+#paramprop Distance Variance, onAdd, 2.0, multiply
+#paramprop Distance Variance, onSubtract, 0.5, multiply
+#paramprop Color Variance, onAdd, 2.0, multiply
+#paramprop Color Variance, onSubtract, 0.5, multiply
 
 // Simple Gauss-Kernel. Normalization is not included and must be
 // done by dividing through the weight sum.
@@ -35,7 +37,7 @@ float4 filter(int2 pixelCoord, int2 size)
 		float d = sqrt(x*x + y*y);
 		float3 colorDiff = (color - centerColor);
 		float colorDist = length(colorDiff);
-		colorDist /= dot(color, threeInv) + dot(centerColor, threeInv);
+		colorDist /= (abs(dot(color, threeInv) + dot(centerColor, threeInv)) + 0.0001); // add small offset to avoid dividing by zero
 		//float colorAvg = dot(color, threeInv);
 		//float colorDist = max(colorAvg / centerAvg, centerAvg / colorAvg);
 		//float colorDist = abs(colorAvg - centerAvg);
