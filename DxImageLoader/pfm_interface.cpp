@@ -61,6 +61,7 @@ std::unique_ptr<image::IImage> pfm_load(const char* filename)
 	int littleEndianFile = (scalef < 0);
 	int littleEndianMachine = image::littleendian();
 	int needSwap = (littleEndianFile != littleEndianMachine);
+	float absScale = std::abs(scalef);
 
 	// skip SINGLE newline character after reading third arg
 	char c = file.get();
@@ -91,6 +92,7 @@ std::unique_ptr<image::IImage> pfm_load(const char* filename)
 					swapBytes(&fvalue);
 				}
 				auto offset = data + ((height - i - 1) * width + j) * 4;
+				fvalue *= absScale; // apply scale
 				offset[0] = fvalue; // grayscale => repeat on each channel
 				offset[1] = fvalue;
 				offset[2] = fvalue;
@@ -110,9 +112,9 @@ std::unique_ptr<image::IImage> pfm_load(const char* filename)
 					swapBytes(&vfvalue.b);
 				}
 				auto offset = data + ((height - i - 1) * width + j) * 4;
-				offset[0] = vfvalue.r;
-				offset[1] = vfvalue.g;
-				offset[2] = vfvalue.b;
+				offset[0] = vfvalue.r * absScale;
+				offset[1] = vfvalue.g * absScale;
+				offset[2] = vfvalue.b * absScale;
 				offset[3] = 1.0f; // alpha
 			}
 			set_progress(i * 100 / height);
