@@ -22,6 +22,7 @@ static uint32_t s_last_progress = -1;
 
 // key = extension (e.g. png), value = DXGI formats
 static std::map<std::string, std::vector<uint32_t>> s_exportFormats;
+static std::map<std::string, int> s_globalParameteri;
 
 bool hasEnding(std::string const& fullString, std::string const& ending) {
 	if (fullString.length() >= ending.length()) {
@@ -300,6 +301,39 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 
 	numFormats = int(it->second.size());
 	return it->second.data();
+}
+
+bool get_global_parameter_i(const char* name, int& results)
+{
+	if (s_globalParameteri.empty())
+	{
+		// insert default values
+		set_global_parameter_i("normalmap", 0);
+		set_global_parameter_i("uastc srgb", 0);
+	}
+
+	auto it = s_globalParameteri.find(name);
+	if (it == s_globalParameteri.end())
+	{
+	    set_error("could not find global parameter: " + std::string(name));
+		return false;
+	}
+
+	results = it->second;
+	return true;
+}
+
+int get_global_parameter_i(const char* name)
+{
+	int res = 0;
+	if(get_global_parameter_i(name, res)) return res;
+
+	throw std::runtime_error(s_error);
+}
+
+void set_global_parameter_i(const char* name, int value)
+{
+	s_globalParameteri[name] = value;
 }
 
 void set_progress_callback(ProgressCallback cb)

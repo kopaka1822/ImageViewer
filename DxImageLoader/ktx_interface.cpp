@@ -85,14 +85,17 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 		params.threadCount = std::thread::hardware_concurrency();
 		params.compressionLevel = KTX_ETC1S_DEFAULT_COMPRESSION_LEVEL;
 		params.qualityLevel = std::max((quality * 254) / 99 + 1, 1); // scale quality [0, 99] between [1, 255]
-		// params.normalMap // TODO add this later?
+		params.normalMap = KTX_FALSE;
+		if (!gli::is_srgb(format)) // only valid for linear textures
+	        params.normalMap = get_global_parameter_i("normalmap") ? KTX_TRUE : KTX_FALSE;
 
 	    // select uastc for everything that is not color (here: for everyhing that is not SRGB)
-		if(!gli::is_srgb(format))
+		// unless the "uastc srgb" flag is set => then use usastc as well
+		if(!gli::is_srgb(format) || get_global_parameter_i("uastc srgb"))
 		{
 		    params.uastc = KTX_TRUE;
 			params.uastcFlags = KTX_PACK_UASTC_MAX_LEVEL; // maximum supported quality
-			params.uastcRDO = KTX_TRUE; // Enable Rate Distortion Optimization (RDO) post-processing.
+			params.uastcRDO = params.normalMap ? KTX_FALSE : KTX_TRUE;
 		}
 
 		// optional if compression
