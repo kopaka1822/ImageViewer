@@ -33,6 +33,10 @@ Version 2.1 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/ra
 
 [Used Libraries](about.md)
 
+## Build
+
+If you want to build and debug the Image Viewer, follow the instructions [here](build.md).
+
 ## Features 
 
 * quick [side-by-side comparison](#Side-By-Side-Comparision-and-Image-Manipulation)
