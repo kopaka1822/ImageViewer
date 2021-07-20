@@ -56,10 +56,10 @@ Most of the HLSL functions may be used as well:
 
 Additionaly you can use:
 
-* **red**(v) - return v.rrrr
-* **green**(v) - returns v.gggg
-* **blue**(v) - returns v.bbbb
-* **alpha**(v) - returns v.aaaa
+* **red**(v), **r(v)**, **x(v)** - returns v.rrrr
+* **green**(v), **g(v)**, **y(v)** - returns v.gggg
+* **blue**(v), **b(v)**, **z(v)** - returns v.bbbb
+* **alpha**(v), **a(v)**, **w(v)** - returns v.aaaa
 * **rgb**(v1,v2,v3) - returns float4(v1.r, v2.r, v3.r, 1)
 * **toSrgb**(v)* - converts linear to srgb
 * **fromSrgb**(v)* - converts srgb to linear
@@ -70,6 +70,11 @@ Additionaly you can use:
 * **smallereq**(v1, v2) - v1 <= v2 ? 1 : 0
 * **bigger**(v1, v2) - v1 > v2 ? 1 : 0
 * **biggereq**(v1, v2) - v1 >= v2 ? 1 : 0
+* **pos()*** - returns floating point texel position in (0,1)^3
+* **ipos()*** - returns integer texel position
+* **cpos()*** - return pos() * 2.0 - 1.0
+* **size()*** - returns texture dimensions
+* **layer()** - returns current texture layer
 
 Functions marked with * will only use the rgb components for computation and ignore alpha.
 

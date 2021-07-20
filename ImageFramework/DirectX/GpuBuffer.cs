@@ -72,7 +72,7 @@ namespace ImageFramework.DirectX
 
         public void CopyFrom(UploadBuffer buffer)
         {
-            Debug.Assert(buffer.ByteSize <= ByteSize);
+            Debug.Assert(ByteSize <= buffer.ByteSize);
             Device.Get().CopyBufferData(buffer.Handle, Handle, ByteSize);
         }
 

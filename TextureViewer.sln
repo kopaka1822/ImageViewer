@@ -20,8 +20,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThumbnailHandler", "Thumbna
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConsoleTest", "ConsoleTest\ConsoleTest.vcxproj", "{C9F74F52-0FF8-46EE-A43A-5A7BA93D68A1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Compressonator", "dependencies\compressonator\Compressonator\VS2015\CompressonatorLib.vcxproj", "{9EE67DB2-4AD8-4B9A-AE58-2E536412033C}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "dependencies\libpng\projects\vstudio\zlib\zlib.vcxproj", "{60F89955-91C6-3A36-8000-13C592FEC2DF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpng", "dependencies\libpng\projects\vstudio\libpng\libpng.vcxproj", "{D6973076-9317-4EF2-A0B8-B7A18AC0713E}"
@@ -29,6 +27,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "png", "png", "{DDFE1395-A67F-4ABF-AE66-CAABC8E0E641}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewerTests", "ViewerTests\ViewerTests.csproj", "{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Compressonator", "dependencies\compressonator\vs2017\cmp_compressonatorlib.vcxproj", "{9849F082-7283-47DE-9DB0-8D7DC647CD43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -118,16 +118,6 @@ Global
 		{C9F74F52-0FF8-46EE-A43A-5A7BA93D68A1}.Release|x64.Build.0 = Release|x64
 		{C9F74F52-0FF8-46EE-A43A-5A7BA93D68A1}.Release|x86.ActiveCfg = Release|Win32
 		{C9F74F52-0FF8-46EE-A43A-5A7BA93D68A1}.Release|x86.Build.0 = Release|Win32
-		{9EE67DB2-4AD8-4B9A-AE58-2E536412033C}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{9EE67DB2-4AD8-4B9A-AE58-2E536412033C}.Debug|x64.ActiveCfg = Debug|x64
-		{9EE67DB2-4AD8-4B9A-AE58-2E536412033C}.Debug|x64.Build.0 = Debug|x64
-		{9EE67DB2-4AD8-4B9A-AE58-2E536412033C}.Debug|x86.ActiveCfg = Debug|Win32
-		{9EE67DB2-4AD8-4B9A-AE58-2E536412033C}.Debug|x86.Build.0 = Debug|Win32
-		{9EE67DB2-4AD8-4B9A-AE58-2E536412033C}.Release|Any CPU.ActiveCfg = Release|Win32
-		{9EE67DB2-4AD8-4B9A-AE58-2E536412033C}.Release|x64.ActiveCfg = Release|x64
-		{9EE67DB2-4AD8-4B9A-AE58-2E536412033C}.Release|x64.Build.0 = Release|x64
-		{9EE67DB2-4AD8-4B9A-AE58-2E536412033C}.Release|x86.ActiveCfg = Release|Win32
-		{9EE67DB2-4AD8-4B9A-AE58-2E536412033C}.Release|x86.Build.0 = Release|Win32
 		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Debug|x64.ActiveCfg = Debug Library|x64
 		{60F89955-91C6-3A36-8000-13C592FEC2DF}.Debug|x64.Build.0 = Debug Library|x64
@@ -160,6 +150,16 @@ Global
 		{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}.Release|x64.Build.0 = Release|x64
 		{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}.Release|x86.ActiveCfg = Release|Any CPU
 		{1EF7ED46-FCE2-49BF-8F59-D894ECE21EC7}.Release|x86.Build.0 = Release|Any CPU
+		{9849F082-7283-47DE-9DB0-8D7DC647CD43}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{9849F082-7283-47DE-9DB0-8D7DC647CD43}.Debug|x64.ActiveCfg = Debug|x64
+		{9849F082-7283-47DE-9DB0-8D7DC647CD43}.Debug|x64.Build.0 = Debug|x64
+		{9849F082-7283-47DE-9DB0-8D7DC647CD43}.Debug|x86.ActiveCfg = Debug|Win32
+		{9849F082-7283-47DE-9DB0-8D7DC647CD43}.Debug|x86.Build.0 = Debug|Win32
+		{9849F082-7283-47DE-9DB0-8D7DC647CD43}.Release|Any CPU.ActiveCfg = Release|Win32
+		{9849F082-7283-47DE-9DB0-8D7DC647CD43}.Release|x64.ActiveCfg = Release|x64
+		{9849F082-7283-47DE-9DB0-8D7DC647CD43}.Release|x64.Build.0 = Release|x64
+		{9849F082-7283-47DE-9DB0-8D7DC647CD43}.Release|x86.ActiveCfg = Release|Win32
+		{9849F082-7283-47DE-9DB0-8D7DC647CD43}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

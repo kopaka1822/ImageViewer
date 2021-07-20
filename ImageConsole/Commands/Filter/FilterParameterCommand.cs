@@ -31,6 +31,7 @@ namespace ImageConsole.Commands.Filter
                             fp.GetFloatModel().Value = reader.ReadInt("value");
                             break;
                         case ParameterType.Int:
+                        case ParameterType.Enum:
                             fp.GetIntModel().Value = reader.ReadInt("value");
                             break;
                         case ParameterType.Bool:

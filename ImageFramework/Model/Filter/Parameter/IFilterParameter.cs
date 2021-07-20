@@ -10,6 +10,8 @@ namespace ImageFramework.Model.Filter.Parameter
     {
         ParameterType GetParamterType();
 
+        string GetShaderParameterType();
+
         FilterParameterModelBase GetBase();
 
         /// <summary>

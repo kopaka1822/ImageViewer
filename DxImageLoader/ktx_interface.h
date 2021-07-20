@@ -1,10 +1,8 @@
 #pragma once
 #include <memory>
-#include "Image.h"
+#include "GliImage.h"
 
-std::unique_ptr<image::IImage> ktx_load(const char* filename);
+std::unique_ptr<image::IImage> ktx2_load(const char* filename);
+std::vector<uint32_t> ktx2_get_export_formats();
 
-std::vector<uint32_t> dds_get_export_formats();
-//std::vector<uint32_t> ktx_get_export_formats();
-
-//void ktx_save_image(const char* filename, image::Image& image, gli::format format, int quality);
+void ktx2_save_image(const char* filename, GliImage& image, gli::format format, int quality);

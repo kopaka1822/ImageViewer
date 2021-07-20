@@ -140,6 +140,17 @@ namespace ImageViewer.ViewModels.Filter
                             vm = viewModel;
                         }
                         break;
+                    case ParameterType.Enum:
+                        {
+                            Debug.Assert(para is EnumFilterParameterModel);
+                            var viewModel = new EnumFilterParameterViewModel((EnumFilterParameterModel)para);
+                            View.Add(new EnumFilterParameterView(enabledBinding)
+                            {
+                                DataContext = viewModel
+                            });
+                            vm = viewModel;
+                        }
+                        break;
                     case ParameterType.Bool:
                         {
                             var viewModel = new BoolFilterParameterViewModel(para.GetBoolModel());

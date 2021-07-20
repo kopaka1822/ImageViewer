@@ -15,6 +15,7 @@ namespace ImageFramework.Model.Filter
     {
         private List<FilterModel> filter = new List<FilterModel>();
         private readonly ImagesModel images;
+        private readonly SharedModel shared;
 
         public class RetargetErrorEventArgs : EventArgs
         {
@@ -30,9 +31,10 @@ namespace ImageFramework.Model.Filter
 
         public event RetargetErrorHandler RetargetError;
 
-        public FiltersModel(ImagesModel images)
+        public FiltersModel(ImagesModel images, SharedModel shared)
         {
             this.images = images;
+            this.shared = shared;
             this.images.PropertyChanged += ImagesOnPropertyChanged;
         }
 
@@ -140,7 +142,7 @@ namespace ImageFramework.Model.Filter
             {
                 try
                 {
-                    newFilter.Add(f.Retarget(CurrentTarget));
+                    newFilter.Add(f.Retarget(CurrentTarget, shared));
                 }
                 catch (Exception)
                 {

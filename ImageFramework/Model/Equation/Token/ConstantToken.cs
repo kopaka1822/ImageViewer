@@ -34,5 +34,10 @@ namespace ImageFramework.Model.Equation.Token
 
             return $"f4(asfloat({res}u))";
         }
+
+        public override float ToFloat()
+        {
+            throw new NotImplementedException("ConstantToken::ToFloat");
+        }
     }
 }

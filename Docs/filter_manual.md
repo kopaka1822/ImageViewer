@@ -5,6 +5,7 @@ Filters are simple HLSL compute shader with a custom entry point. Filters can be
 ### Source Image:
 
 The source image can be accesed via `Texture2D src_image` or `Texture3D src_image`. This is a texture view of the currently processed layer and mipmap. Additionally, you can use the global variables `uint layer` and `uint level` to get information about the currently processed layer or mipmap level. If you need to acces a custom layer/mipmap you can use `Texture2DArray src_image_ex` or `Texture3D src_image_ex` to get the view of the entire resource.
+A linear and point `SamplerState` for texture filtering can be accessed via `linearSampler` or `pointSampler` respecitvely (clamped coordinates).
 
 ## Additional Preprocessor directives:
 ### Settings:
@@ -16,10 +17,6 @@ Sets the title of the shader that will be displayed in the filter list
 **#setting** description, *example description*
 
 Sets the description of the shader that will be displayed in the filter tab
-
-**#setting** sepa, *true/false*
-
-Specifies if the shader is a seperatable shader. If sepa is set to true, the shader will be executed one time for each dimension (2 or 3 times). In the first run, the variable `int3 filterDirection` will be set to `int3(1,0, 0)`. In the second run, the variable will be set to `int3(0,1,0)`. If we are processing a 3D image, the variable will be set to `int3(0,0,1)` in the third run. The default value is false.
 
 **#setting** type, *filter type*
 
@@ -33,6 +30,14 @@ Specifies what kind of filter function is provided. List of types and resulting 
 |DYNAMIC        | `float4 filter(int3 pixel, int3 size)`| 2D,3D
 
 refer to [*Writing DYNAMIC filter*](#Writing-DYNAMIC-filter) for a detailed explanation on DYNAMIC
+
+**#setting** sepa, *true/false*
+
+Specifies if the shader is a seperatable shader. If sepa is set to true, the shader will be executed one time for each dimension (2 or 3 times). In the first run, the (global) variable `int3 filterDirection` will be set to `int3(1,0,0)`. In the second run, the variable will be set to `int3(0,1,0)`. If we are processing a 3D image, the variable will be set to `int3(0,0,1)` in the third run. The default value is false.
+
+**#setting** iterations, *true/false*
+
+If set to true, the shader will be dispatched multiple times. The (global) variable `int iteration` contains the number of the current iteration. The function `abort_iterations()` can be called to stop the shader after the current iteration. This setting can not be used together with the sepa setting. The default value is false.
 
 **#setting** groupsize, size
 
@@ -51,7 +56,7 @@ The syntax is:
 
 *Variable Name*: Name of the shader variable.
 
-*Type*: type of the variable. Valid types are: int, float, bool.
+*Type*: type of the variable. Valid types are: int, float, bool, enum (see below at example).
 
 *DefaultValue*: Initial value of the variable.
 
@@ -79,6 +84,14 @@ Additional properties can be specified via:
 `#paramprop Gamma, onAdd, 2.0, multiply`
 
 `float a = pow(0.5, gma); // variable usage`
+
+***Enum Example:***
+
+`#param Type, type, enum {A; B; C}, A`
+
+`if(type == 0) ... // enum usage (A == 0, B == 1, C == 2)`
+
+Note: Do not put '`,`' inside the enum brackets, only '`;`' to separate
 
 ---
 

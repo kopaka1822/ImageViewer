@@ -22,6 +22,7 @@ static uint32_t s_last_progress = -1;
 
 // key = extension (e.g. png), value = DXGI formats
 static std::map<std::string, std::vector<uint32_t>> s_exportFormats;
+static std::map<std::string, int> s_globalParameteri;
 
 bool hasEnding(std::string const& fullString, std::string const& ending) {
 	if (fullString.length() >= ending.length()) {
@@ -66,7 +67,7 @@ int image_open(const char* filename)
 		}
 		else if(hasEnding(fname, ".ktx2"))
 		{
-			res = ktx_load(filename);
+			res = ktx2_load(filename);
 		}
 		else if (hasEnding(fname, ".dds") || hasEnding(fname, ".ktx"))
 		{
@@ -200,6 +201,8 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 			gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*it->second), gli::format(format), false, quality);
 		else if (ext == "ktx")
 			gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*it->second), gli::format(format), true, quality);
+		else if (ext == "ktx2")
+			ktx2_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*it->second), gli::format(format), quality);
 		else if (ext == "pfm" || ext == "hdr")
 		{
 			assertSingleLayerMip(*it->second);
@@ -213,7 +216,7 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 			int nComponents = 0;
 
 			// only 2 possible formats
-			if (format == gli::FORMAT_RGB32_SFLOAT_PACK32)
+			if (format == gli::FORMAT_RGB32_SFLOAT_PACK32 || format == gli::FORMAT_RGB8E8_UFLOAT_PACK32)
 			{
 				image::changeStride(mip, mipSize, 16, 12);
 				nComponents = 3;
@@ -287,6 +290,7 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 		s_exportFormats["jpg"] = stb_image_get_export_formats("jpg");
 		s_exportFormats["png"] = png_get_export_formats();
 		s_exportFormats["bmp"] = stb_image_get_export_formats("bmp");
+		s_exportFormats["ktx2"] = ktx2_get_export_formats();
 	}
 	auto it = s_exportFormats.find(extension);
 	if(it == s_exportFormats.end())
@@ -297,6 +301,39 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 
 	numFormats = int(it->second.size());
 	return it->second.data();
+}
+
+bool get_global_parameter_i(const char* name, int& results)
+{
+	if (s_globalParameteri.empty())
+	{
+		// insert default values
+		set_global_parameter_i("normalmap", 0);
+		set_global_parameter_i("uastc srgb", 0);
+	}
+
+	auto it = s_globalParameteri.find(name);
+	if (it == s_globalParameteri.end())
+	{
+	    set_error("could not find global parameter: " + std::string(name));
+		return false;
+	}
+
+	results = it->second;
+	return true;
+}
+
+int get_global_parameter_i(const char* name)
+{
+	int res = 0;
+	if(get_global_parameter_i(name, res)) return res;
+
+	throw std::runtime_error(s_error);
+}
+
+void set_global_parameter_i(const char* name, int value)
+{
+	s_globalParameteri[name] = value;
 }
 
 void set_progress_callback(ProgressCallback cb)

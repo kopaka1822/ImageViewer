@@ -12,12 +12,17 @@ namespace ImageFramework.Utility
         [Flags]
         public enum Channel
         {
+            Empty = 0,
             R = 1,
             G = 1 << 1,
             B = 1 << 2,
             A = 1 << 3,
+            // common combinations
             Rgb = R | G | B,
-            Rgba = R | G | B | A
+            Rgba = R | G | B | A,
+            // more uncommon
+            Rg = R | G,
+            Ra = R | A
         }
 
         public Color(float red, float green, float blue, float alpha = 1.0f)

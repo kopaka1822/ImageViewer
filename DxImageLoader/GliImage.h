@@ -10,6 +10,8 @@ protected:
 public:
 	virtual ~GliImageBase() override = default;
 	uint32_t getNumLayers() const override final { return uint32_t(m_base.layers() * m_base.faces()); }
+	uint32_t getNumNonFaceLayers() const { return uint32_t(m_base.layers()); }
+	uint32_t getNumFaces() const {return uint32_t(m_base.faces());}
 	uint32_t getNumMipmaps() const override final { return uint32_t(m_base.levels()); }
 	uint32_t getWidth(uint32_t mipmap) const override final { return m_base.extent(mipmap).x; }
 	uint32_t getHeight(uint32_t mipmap) const override final { return m_base.extent(mipmap).y; }

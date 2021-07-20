@@ -18,6 +18,7 @@ using ImageViewer.Models;
 using ImageViewer.ViewModels.Display;
 using ImageViewer.ViewModels.Image;
 using ImageViewer.ViewModels.Statistics;
+using ImageViewer.ViewModels.Tools;
 
 namespace ImageViewer.ViewModels
 {
@@ -38,6 +39,8 @@ namespace ImageViewer.ViewModels
         public ScalingViewModel Scale { get; }
 
         public ZoomBoxViewModel ZoomBox { get; }
+
+        public ArrowsViewModel Arrows { get; }
 
         private int selectedTabIndex = 0;
         public int SelectedTabIndex
@@ -64,6 +67,7 @@ namespace ImageViewer.ViewModels
             Statistics = new StatisticsViewModel(models);
             Scale = new ScalingViewModel(models);
             ZoomBox = new ZoomBoxViewModel(models);
+            Arrows = new ArrowsViewModel(models);
 
             // commands
             OpenCommand = new OpenCommand(models);
@@ -95,6 +99,8 @@ namespace ImageViewer.ViewModels
             SetThemeCommand = new SetThemeCommand(models);
             StartZoomboxCommand = new StartZoomboxCommand(models);
             RemoveZoomboxCommand = new RemoveZoomBoxCommand(models);
+            StartArrowCommand = new StartArrowCommand(models);
+            RemoveArrowCommand = new RemoveArrowCommand(models);
 
             AddFilterCommand = new AddFilterCommand(models, Filter);
 
@@ -184,6 +190,10 @@ namespace ImageViewer.ViewModels
         public ICommand StartZoomboxCommand { get; }
 
         public ICommand RemoveZoomboxCommand { get; }
+        
+        public ICommand StartArrowCommand { get; }
+
+        public ICommand RemoveArrowCommand { get; }
 
         public ICommand ArrayTo3DCommand { get; }
 

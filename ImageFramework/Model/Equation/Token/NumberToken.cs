@@ -14,6 +14,11 @@
             return ToHlsl(value);
         }
 
+        public override float ToFloat()
+        {
+            return value;
+        }
+
         // for unit testing purposes
         internal static string ToHlsl(float value)
         {

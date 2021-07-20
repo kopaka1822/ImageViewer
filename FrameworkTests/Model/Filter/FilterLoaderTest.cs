@@ -95,6 +95,36 @@ namespace FrameworkTests.Model.Filter
             TestFilter("heightToNormal.hlsl", FilterLoader.TargetType.Tex2D);
         }
 
+        [TestMethod]
+        public void Bilateral()
+        {
+            TestFilter("bilateral.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
+        [TestMethod]
+        public void GuidedBilateral()
+        {
+            TestFilter("guided_bilateral.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
+        [TestMethod]
+        public void Divergent()
+        {
+            TestFilter("divergent.hlsl");
+        }
+
+        [TestMethod]
+        public void Dithering()
+        {
+            TestFilter("dithering.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
+        [TestMethod]
+        public void HeatDistribution()
+        {
+            TestFilter("heat_distribution.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
         private void TestFilter(string name)
         {
             TestFilter(name, FilterLoader.TargetType.Tex2D);
@@ -105,7 +135,7 @@ namespace FrameworkTests.Model.Filter
         {
             var loader = new FilterLoader("filter/" + name, target);
 
-            var test = new FilterModel(loader, 1);
+            var test = new FilterModel(loader, null, 1);
         }
     }
 }

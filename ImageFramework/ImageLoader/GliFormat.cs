@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Utility;
 
 namespace ImageFramework.ImageLoader
 {
@@ -11,7 +12,7 @@ namespace ImageFramework.ImageLoader
     {
         UNDEFINED = 0,
 
-        FORMAT_FIRST, RG4_UNORM = FORMAT_FIRST,
+        RG4_UNORM,
         RGBA4_UNORM,
         BGRA4_UNORM,
         R5G6B5_UNORM,
@@ -250,7 +251,7 @@ namespace ImageFramework.ImageLoader
         BGR8_UNORM_PACK32,
         BGR8_SRGB_PACK32,
 
-        RG3B2_UNORM, LAST = RG3B2_UNORM,
+        RG3B2_UNORM,
 
         // extensions from libpng
         RA8_SRGB,
@@ -258,7 +259,9 @@ namespace ImageFramework.ImageLoader
         AR8_SRGB,
         ARGB8_SRGB,
         ABGR8_SRGB,
-        RA16_UNORM
+        RA16_UNORM,
+
+        RGB8E8_UFLOAT // hdr extension
     };
 
     public enum PixelDataType
@@ -616,6 +619,7 @@ namespace ImageFramework.ImageLoader
         {
             switch (format)
             {
+                case GliFormat.RG4_UNORM:
                 case GliFormat.RGBA4_UNORM:
                 case GliFormat.BGRA4_UNORM:
                 case GliFormat.R5G6B5_UNORM:
@@ -628,6 +632,11 @@ namespace ImageFramework.ImageLoader
             }
 
             return false;
+        }
+
+        public static bool Is8Bit(this GliFormat format)
+        {
+            return !IsLessThan8Bit(format) && IsAtMost8bit(format);
         }
 
         // some formats don't work for texture3D targets
@@ -647,282 +656,20 @@ namespace ImageFramework.ImageLoader
 
         public static bool HasAlpha(this GliFormat format)
         {
-            switch (format)
-            {
-                case GliFormat.RGBA4_UNORM:
-                case GliFormat.BGRA4_UNORM:
-                case GliFormat.RGB5A1_UNORM:
-                case GliFormat.BGR5A1_UNORM:
-                case GliFormat.A1RGB5_UNORM:
-                case GliFormat.RGBA8_UNORM:
-                case GliFormat.RGBA8_SNORM:
-                case GliFormat.RGBA8_USCALED:
-                case GliFormat.RGBA8_SSCALED:
-                case GliFormat.RGBA8_UINT:
-                case GliFormat.RGBA8_SINT:
-                case GliFormat.RGBA8_SRGB:
-                case GliFormat.BGRA8_UNORM:
-                case GliFormat.BGRA8_SNORM:
-                case GliFormat.BGRA8_USCALED:
-                case GliFormat.BGRA8_SSCALED:
-                case GliFormat.BGRA8_UINT:
-                case GliFormat.BGRA8_SINT:
-                case GliFormat.BGRA8_SRGB:
-                case GliFormat.RGBA8_UNORM_PACK32:
-                case GliFormat.RGBA8_SNORM_PACK32:
-                case GliFormat.RGBA8_USCALED_PACK32:
-                case GliFormat.RGBA8_SSCALED_PACK32:
-                case GliFormat.RGBA8_UINT_PACK32:
-                case GliFormat.RGBA8_SINT_PACK32:
-                case GliFormat.RGBA8_SRGB_PACK32:
-                case GliFormat.RGB10A2_UNORM:
-                case GliFormat.RGB10A2_SNORM:
-                case GliFormat.RGB10A2_USCALED:
-                case GliFormat.RGB10A2_SSCALED:
-                case GliFormat.RGB10A2_UINT:
-                case GliFormat.RGB10A2_SINT:
-                case GliFormat.BGR10A2_UNORM:
-                case GliFormat.BGR10A2_SNORM:
-                case GliFormat.BGR10A2_USCALED:
-                case GliFormat.BGR10A2_SSCALED:
-                case GliFormat.BGR10A2_UINT:
-                case GliFormat.BGR10A2_SINT:
-                case GliFormat.RGBA16_UNORM:
-                case GliFormat.RGBA16_SNORM:
-                case GliFormat.RGBA16_USCALED:
-                case GliFormat.RGBA16_SSCALED:
-                case GliFormat.RGBA16_UINT:
-                case GliFormat.RGBA16_SINT:
-                case GliFormat.RGBA16_SFLOAT:
-                case GliFormat.RGBA32_UINT:
-                case GliFormat.RGBA32_SINT:
-                case GliFormat.RGBA32_SFLOAT:
-                case GliFormat.RGBA64_UINT:
-                case GliFormat.RGBA64_SINT:
-                case GliFormat.RGBA64_SFLOAT:
-                case GliFormat.RGBA_DXT1_UNORM:
-                case GliFormat.RGBA_DXT1_SRGB:
-                case GliFormat.RGBA_DXT3_UNORM:
-                case GliFormat.RGBA_DXT3_SRGB:
-                case GliFormat.RGBA_DXT5_UNORM:
-                case GliFormat.RGBA_DXT5_SRGB:
-                case GliFormat.RGBA_BP_UNORM:
-                case GliFormat.RGBA_BP_SRGB:
-                case GliFormat.RGBA_ETC2_UNORM_BLOCK8:
-                case GliFormat.RGBA_ETC2_SRGB_BLOCK8:
-                case GliFormat.RGBA_ETC2_UNORM_BLOCK16:
-                case GliFormat.RGBA_ETC2_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_4X4_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_4X4_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_5X4_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_5X4_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_5X5_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_5X5_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_6X5_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_6X5_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_6X6_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_6X6_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X5_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X5_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X6_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X6_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X8_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X8_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X5_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X5_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X6_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X6_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X8_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X8_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X10_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X10_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_12X10_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_12X10_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_12X12_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_12X12_SRGB_BLOCK16:
-                case GliFormat.RGBA_PVRTC1_8X8_UNORM_BLOCK32:
-                case GliFormat.RGBA_PVRTC1_8X8_SRGB_BLOCK32:
-                case GliFormat.RGBA_PVRTC1_16X8_UNORM_BLOCK32:
-                case GliFormat.RGBA_PVRTC1_16X8_SRGB_BLOCK32:
-                case GliFormat.RGBA_PVRTC2_4X4_UNORM_BLOCK8:
-                case GliFormat.RGBA_PVRTC2_4X4_SRGB_BLOCK8:
-                case GliFormat.RGBA_PVRTC2_8X4_UNORM_BLOCK8:
-                case GliFormat.RGBA_PVRTC2_8X4_SRGB_BLOCK8:
-                case GliFormat.RGBA_ATCA_UNORM_BLOCK16:
-                case GliFormat.RGBA_ATCI_UNORM_BLOCK16:
-                case GliFormat.A8_UNORM:
-                case GliFormat.LA8_UNORM:
-                case GliFormat.A16_UNORM:
-                case GliFormat.LA16_UNORM:
-                case GliFormat.RA8_SRGB:
-                case GliFormat.RA8_UNORM:
-                case GliFormat.AR8_SRGB:
-                case GliFormat.ABGR8_SRGB:
-                case GliFormat.ARGB8_SRGB:
-                case GliFormat.RA16_UNORM:
-                    return true;
-            }
-
-            return false;
+            var channels = format.GetChannels();
+            return (channels & Color.Channel.A) == Color.Channel.A;
         }
 
         public static bool HasRgb(this GliFormat format)
         {
-            switch (format)
-            {
-                case GliFormat.RGBA4_UNORM:
-                case GliFormat.BGRA4_UNORM:
-                case GliFormat.R5G6B5_UNORM:
-                case GliFormat.B5G6R5_UNORM:
-                case GliFormat.RGB5A1_UNORM:
-                case GliFormat.BGR5A1_UNORM:
-                case GliFormat.A1RGB5_UNORM:
-                case GliFormat.RGB8_UNORM:
-                case GliFormat.RGB8_SNORM:
-                case GliFormat.RGB8_USCALED:
-                case GliFormat.RGB8_SSCALED:
-                case GliFormat.RGB8_UINT:
-                case GliFormat.RGB8_SINT:
-                case GliFormat.RGB8_SRGB:
-                case GliFormat.BGR8_UNORM:
-                case GliFormat.BGR8_SNORM:
-                case GliFormat.BGR8_USCALED:
-                case GliFormat.BGR8_SSCALED:
-                case GliFormat.BGR8_UINT:
-                case GliFormat.BGR8_SINT:
-                case GliFormat.BGR8_SRGB:
-                case GliFormat.RGBA8_UNORM:
-                case GliFormat.RGBA8_SNORM:
-                case GliFormat.RGBA8_USCALED:
-                case GliFormat.RGBA8_SSCALED:
-                case GliFormat.RGBA8_UINT:
-                case GliFormat.RGBA8_SINT:
-                case GliFormat.RGBA8_SRGB:
-                case GliFormat.BGRA8_UNORM:
-                case GliFormat.BGRA8_SNORM:
-                case GliFormat.BGRA8_USCALED:
-                case GliFormat.BGRA8_SSCALED:
-                case GliFormat.BGRA8_UINT:
-                case GliFormat.BGRA8_SINT:
-                case GliFormat.BGRA8_SRGB:
-                case GliFormat.RGBA8_UNORM_PACK32:
-                case GliFormat.RGBA8_SNORM_PACK32:
-                case GliFormat.RGBA8_USCALED_PACK32:
-                case GliFormat.RGBA8_SSCALED_PACK32:
-                case GliFormat.RGBA8_UINT_PACK32:
-                case GliFormat.RGBA8_SINT_PACK32:
-                case GliFormat.RGBA8_SRGB_PACK32:
-                case GliFormat.RGB10A2_UNORM:
-                case GliFormat.RGB10A2_SNORM:
-                case GliFormat.RGB10A2_USCALED:
-                case GliFormat.RGB10A2_SSCALED:
-                case GliFormat.RGB10A2_UINT:
-                case GliFormat.RGB10A2_SINT:
-                case GliFormat.BGR10A2_UNORM:
-                case GliFormat.BGR10A2_SNORM:
-                case GliFormat.BGR10A2_USCALED:
-                case GliFormat.BGR10A2_SSCALED:
-                case GliFormat.BGR10A2_UINT:
-                case GliFormat.BGR10A2_SINT:
-                case GliFormat.RGB16_UNORM:
-                case GliFormat.RGB16_SNORM:
-                case GliFormat.RGB16_USCALED:
-                case GliFormat.RGB16_SSCALED:
-                case GliFormat.RGB16_UINT:
-                case GliFormat.RGB16_SINT:
-                case GliFormat.RGB16_SFLOAT:
-                case GliFormat.RGBA16_UNORM:
-                case GliFormat.RGBA16_SNORM:
-                case GliFormat.RGBA16_USCALED:
-                case GliFormat.RGBA16_SSCALED:
-                case GliFormat.RGBA16_UINT:
-                case GliFormat.RGBA16_SINT:
-                case GliFormat.RGBA16_SFLOAT:
-                case GliFormat.RGB32_UINT:
-                case GliFormat.RGB32_SINT:
-                case GliFormat.RGB32_SFLOAT:
-                case GliFormat.RGBA32_UINT:
-                case GliFormat.RGBA32_SINT:
-                case GliFormat.RGBA32_SFLOAT:
-                case GliFormat.RGB64_UINT:
-                case GliFormat.RGB64_SINT:
-                case GliFormat.RGB64_SFLOAT:
-                case GliFormat.RGBA64_UINT:
-                case GliFormat.RGBA64_SINT:
-                case GliFormat.RGBA64_SFLOAT:
-                case GliFormat.RG11B10_UFLOAT:
-                case GliFormat.RGB9E5_UFLOAT:
-                case GliFormat.RGB_DXT1_UNORM:
-                case GliFormat.RGB_DXT1_SRGB:
-                case GliFormat.RGBA_DXT1_UNORM:
-                case GliFormat.RGBA_DXT1_SRGB:
-                case GliFormat.RGBA_DXT3_UNORM:
-                case GliFormat.RGBA_DXT3_SRGB:
-                case GliFormat.RGBA_DXT5_UNORM:
-                case GliFormat.RGBA_DXT5_SRGB:
-                case GliFormat.RGB_BP_UFLOAT:
-                case GliFormat.RGB_BP_SFLOAT:
-                case GliFormat.RGBA_BP_UNORM:
-                case GliFormat.RGBA_BP_SRGB:
-                case GliFormat.RGB_ETC2_UNORM_BLOCK8:
-                case GliFormat.RGB_ETC2_SRGB_BLOCK8:
-                case GliFormat.RGBA_ETC2_UNORM_BLOCK8:
-                case GliFormat.RGBA_ETC2_SRGB_BLOCK8:
-                case GliFormat.RGBA_ETC2_UNORM_BLOCK16:
-                case GliFormat.RGBA_ETC2_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_4X4_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_4X4_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_5X4_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_5X4_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_5X5_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_5X5_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_6X5_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_6X5_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_6X6_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_6X6_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X5_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X5_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X6_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X6_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X8_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_8X8_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X5_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X5_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X6_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X6_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X8_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X8_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X10_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_10X10_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_12X10_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_12X10_SRGB_BLOCK16:
-                case GliFormat.RGBA_ASTC_12X12_UNORM_BLOCK16:
-                case GliFormat.RGBA_ASTC_12X12_SRGB_BLOCK16:
-                case GliFormat.RGB_PVRTC1_8X8_UNORM_BLOCK32:
-                case GliFormat.RGB_PVRTC1_8X8_SRGB_BLOCK32:
-                case GliFormat.RGB_PVRTC1_16X8_UNORM_BLOCK32:
-                case GliFormat.RGB_PVRTC1_16X8_SRGB_BLOCK32:
-                case GliFormat.RGBA_PVRTC1_8X8_UNORM_BLOCK32:
-                case GliFormat.RGBA_PVRTC1_8X8_SRGB_BLOCK32:
-                case GliFormat.RGBA_PVRTC1_16X8_UNORM_BLOCK32:
-                case GliFormat.RGBA_PVRTC1_16X8_SRGB_BLOCK32:
-                case GliFormat.RGBA_PVRTC2_4X4_UNORM_BLOCK8:
-                case GliFormat.RGBA_PVRTC2_4X4_SRGB_BLOCK8:
-                case GliFormat.RGBA_PVRTC2_8X4_UNORM_BLOCK8:
-                case GliFormat.RGBA_PVRTC2_8X4_SRGB_BLOCK8:
-                case GliFormat.RGB_ETC_UNORM_BLOCK8:
-                case GliFormat.RGB_ATC_UNORM_BLOCK8:
-                case GliFormat.RGBA_ATCA_UNORM_BLOCK16:
-                case GliFormat.RGBA_ATCI_UNORM_BLOCK16:
-                case GliFormat.BGR8_UNORM_PACK32:
-                case GliFormat.BGR8_SRGB_PACK32:
-                case GliFormat.RG3B2_UNORM:
-                case GliFormat.ARGB8_SRGB:
-                case GliFormat.ABGR8_SRGB:
-                    return true;
-            }
+            var channels = format.GetChannels();
+            return (channels & Color.Channel.Rgb) == Color.Channel.Rgb;
+        }
 
-            return false;
+        public static bool IsGrayscale(this GliFormat format)
+        {
+            var channels = format.GetChannels();
+            return channels == Color.Channel.R || channels == Color.Channel.Ra;
         }
 
         /// <summary>
@@ -935,8 +682,13 @@ namespace ImageFramework.ImageLoader
             switch (format)
             {
                 case GliFormat.RGB9E5_UFLOAT:
-                    return "Three partial-precision floating-point numbers encoded into a single 32-bit value all sharing the same 5-bit exponent. There is no sign bit, and there is a shared 5-bit biased (15) exponent and a 9-bit mantissa for each channel";
-
+                    return "Three partial-precision floating-point numbers encoded into a single 32-bit value all sharing the same 5-bit exponent. There is no sign bit, and an each channel has a 9-bit mantissa. Infinity and NaN are not supported. The maximum representable value is 65408";
+                case GliFormat.RGB8E8_UFLOAT:
+                    // exact max value: 169476569462576773795235400185743933440 ~ 1.69e38
+                    return "Three partial-precision floating-point numbers encoded into a single 32-bit value all sharing the same 8-bit exponent. There is no sign bit, and an each channel has an 8-bit mantissa. Infinity and NaN are not supported. The maximum representable value is 1.69e38";
+                case GliFormat.RG11B10_UFLOAT:
+                    return "Three partial-precision floating-point numbers encoded into a single 32-bit value with 5-6 bit Mantissa and 5-bit Exponent. There is no sign bit, Infinity and NaN are supported. The maximum representable values are 65024 and 64512";
+                    
                 case GliFormat.RGB_DXT1_UNORM:
                 case GliFormat.RGB_DXT1_SRGB:
                     return "Three color channels (5 bits:6 bits:5 bits) (BC1)";
@@ -969,16 +721,19 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.RGBA_BP_SRGB:
                     return "Three color channels (4 to 7 bits per channel) with 0 to 8 bits of alpha (BC7)";
 
-                /*case GliFormat.RGB_ETC2_UNORM_BLOCK8:
+                case GliFormat.RGB_ETC2_UNORM_BLOCK8:
                 case GliFormat.RGB_ETC2_SRGB_BLOCK8:
                 case GliFormat.RGBA_ETC2_UNORM_BLOCK8:
                 case GliFormat.RGBA_ETC2_SRGB_BLOCK8:
                 case GliFormat.RGBA_ETC2_UNORM_BLOCK16:
                 case GliFormat.RGBA_ETC2_SRGB_BLOCK16:
+                case GliFormat.RGB_ETC_UNORM_BLOCK8:
                 case GliFormat.R_EAC_UNORM_BLOCK8:
                 case GliFormat.R_EAC_SNORM_BLOCK8:
                 case GliFormat.RG_EAC_UNORM_BLOCK16:
                 case GliFormat.RG_EAC_SNORM_BLOCK16:
+                    return "Ericsson Texture Compression (lossy block-based)";
+
                 case GliFormat.RGBA_ASTC_4X4_UNORM_BLOCK16:
                 case GliFormat.RGBA_ASTC_4X4_SRGB_BLOCK16:
                 case GliFormat.RGBA_ASTC_5X4_UNORM_BLOCK16:
@@ -1007,6 +762,8 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.RGBA_ASTC_12X10_SRGB_BLOCK16:
                 case GliFormat.RGBA_ASTC_12X12_UNORM_BLOCK16:
                 case GliFormat.RGBA_ASTC_12X12_SRGB_BLOCK16:
+                    return "Adaptive Scalable Texture Compression (lossy block-based)";
+
                 case GliFormat.RGB_PVRTC1_8X8_UNORM_BLOCK32:
                 case GliFormat.RGB_PVRTC1_8X8_SRGB_BLOCK32:
                 case GliFormat.RGB_PVRTC1_16X8_UNORM_BLOCK32:
@@ -1019,11 +776,14 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.RGBA_PVRTC2_4X4_SRGB_BLOCK8:
                 case GliFormat.RGBA_PVRTC2_8X4_UNORM_BLOCK8:
                 case GliFormat.RGBA_PVRTC2_8X4_SRGB_BLOCK8:
-                case GliFormat.RGB_ETC_UNORM_BLOCK8:
+                    return "PowerVR Texture Compression (lossy block-based)";
+                
                 case GliFormat.RGB_ATC_UNORM_BLOCK8:
+                    return "AMD compression format for RGB textures";
                 case GliFormat.RGBA_ATCA_UNORM_BLOCK16:
+                    return "AMD compression format for RGBA textures using explicit alpha encoding";
                 case GliFormat.RGBA_ATCI_UNORM_BLOCK16:
-                    break;*/
+                    return "AMD compression format for RGBA textures using interpolated alpha encoding";
             }
 
             return "";
@@ -1033,6 +793,7 @@ namespace ImageFramework.ImageLoader
         {
             switch (format)
             {
+                case GliFormat.RG4_UNORM:
                 case GliFormat.RGBA4_UNORM:
                 case GliFormat.BGRA4_UNORM:
                 case GliFormat.R5G6B5_UNORM:
@@ -1263,9 +1024,249 @@ namespace ImageFramework.ImageLoader
                 case GliFormat.RG11B10_UFLOAT:
                 case GliFormat.RGB9E5_UFLOAT:
                 case GliFormat.RGB_BP_UFLOAT:
+                case GliFormat.RGB8E8_UFLOAT:
                     return PixelDataType.UFloat;
                 default:
                     return PixelDataType.Undefined;
+            }
+        }
+
+        public static Color.Channel GetChannels(this GliFormat format)
+        {
+            switch (format)
+            {
+                case GliFormat.R8_UNORM:
+                case GliFormat.R8_SNORM:
+                case GliFormat.R8_USCALED:
+                case GliFormat.R8_SSCALED:
+                case GliFormat.R8_UINT:
+                case GliFormat.R8_SINT:
+                case GliFormat.R8_SRGB:
+                case GliFormat.R16_UNORM:
+                case GliFormat.R16_SNORM:
+                case GliFormat.R16_USCALED:
+                case GliFormat.R16_SSCALED:
+                case GliFormat.R16_UINT:
+                case GliFormat.R16_SINT:
+                case GliFormat.R16_SFLOAT:
+                case GliFormat.R32_UINT:
+                case GliFormat.R32_SINT:
+                case GliFormat.R32_SFLOAT:
+                case GliFormat.R64_UINT:
+                case GliFormat.R64_SINT:
+                case GliFormat.R64_SFLOAT:
+                case GliFormat.D16_UNORM:
+                case GliFormat.D24_UNORM_PACK32:
+                case GliFormat.D32_SFLOAT:
+                case GliFormat.S8_UINT:
+                case GliFormat.R_ATI1N_UNORM:
+                case GliFormat.R_ATI1N_SNORM:
+                case GliFormat.R_EAC_UNORM_BLOCK8:
+                case GliFormat.R_EAC_SNORM_BLOCK8:
+                case GliFormat.L8_UNORM:
+                case GliFormat.L16_UNORM:
+                    return Color.Channel.R;
+
+                case GliFormat.RG4_UNORM:
+                case GliFormat.RG8_UNORM:
+                case GliFormat.RG8_SNORM:
+                case GliFormat.RG8_USCALED:
+                case GliFormat.RG8_SSCALED:
+                case GliFormat.RG8_UINT:
+                case GliFormat.RG8_SINT:
+                case GliFormat.RG8_SRGB:
+                case GliFormat.RG16_UNORM:
+                case GliFormat.RG16_SNORM:
+                case GliFormat.RG16_USCALED:
+                case GliFormat.RG16_SSCALED:
+                case GliFormat.RG16_UINT:
+                case GliFormat.RG16_SINT:
+                case GliFormat.RG16_SFLOAT:
+                case GliFormat.RG32_UINT:
+                case GliFormat.RG32_SINT:
+                case GliFormat.RG32_SFLOAT:
+                case GliFormat.RG64_UINT:
+                case GliFormat.RG64_SINT:
+                case GliFormat.RG64_SFLOAT:
+                case GliFormat.D16_UNORM_S8_UINT_PACK32:
+                case GliFormat.D24_UNORM_S8_UINT:
+                case GliFormat.D32_SFLOAT_S8_UINT_PACK64:
+                case GliFormat.RG_ATI2N_UNORM:
+                case GliFormat.RG_ATI2N_SNORM:
+                case GliFormat.RG_EAC_UNORM_BLOCK16:
+                case GliFormat.RG_EAC_SNORM_BLOCK16:
+                    return Color.Channel.Rg;
+                
+                case GliFormat.R5G6B5_UNORM:
+                case GliFormat.B5G6R5_UNORM:
+                case GliFormat.RGB8_UNORM:
+                case GliFormat.RGB8_SNORM:
+                case GliFormat.RGB8_USCALED:
+                case GliFormat.RGB8_SSCALED:
+                case GliFormat.RGB8_UINT:
+                case GliFormat.RGB8_SINT:
+                case GliFormat.RGB8_SRGB:
+                case GliFormat.BGR8_UNORM:
+                case GliFormat.BGR8_SNORM:
+                case GliFormat.BGR8_USCALED:
+                case GliFormat.BGR8_SSCALED:
+                case GliFormat.BGR8_UINT:
+                case GliFormat.BGR8_SINT:
+                case GliFormat.BGR8_SRGB:
+                case GliFormat.RGB16_UNORM:
+                case GliFormat.RGB16_SNORM:
+                case GliFormat.RGB16_USCALED:
+                case GliFormat.RGB16_SSCALED:
+                case GliFormat.RGB16_UINT:
+                case GliFormat.RGB16_SINT:
+                case GliFormat.RGB16_SFLOAT:
+                case GliFormat.RGB32_UINT:
+                case GliFormat.RGB32_SINT:
+                case GliFormat.RGB32_SFLOAT:
+                case GliFormat.RGB64_UINT:
+                case GliFormat.RGB64_SINT:
+                case GliFormat.RGB64_SFLOAT:
+                case GliFormat.RG11B10_UFLOAT:
+                case GliFormat.RGB9E5_UFLOAT:
+                case GliFormat.RGB_DXT1_UNORM:
+                case GliFormat.RGB_DXT1_SRGB:
+                case GliFormat.RGB_BP_UFLOAT:
+                case GliFormat.RGB_BP_SFLOAT:
+                case GliFormat.RGB_ETC2_UNORM_BLOCK8:
+                case GliFormat.RGB_ETC2_SRGB_BLOCK8:
+                case GliFormat.RGB_PVRTC1_8X8_UNORM_BLOCK32:
+                case GliFormat.RGB_PVRTC1_8X8_SRGB_BLOCK32:
+                case GliFormat.RGB_PVRTC1_16X8_UNORM_BLOCK32:
+                case GliFormat.RGB_PVRTC1_16X8_SRGB_BLOCK32:
+                case GliFormat.RGB_ETC_UNORM_BLOCK8:
+                case GliFormat.RGB_ATC_UNORM_BLOCK8:
+                case GliFormat.BGR8_UNORM_PACK32:
+                case GliFormat.BGR8_SRGB_PACK32:
+                case GliFormat.RG3B2_UNORM:
+                case GliFormat.RGB8E8_UFLOAT:
+                    return Color.Channel.Rgb;
+
+                case GliFormat.RGBA4_UNORM:
+                case GliFormat.BGRA4_UNORM:
+                case GliFormat.RGB5A1_UNORM:
+                case GliFormat.BGR5A1_UNORM:
+                case GliFormat.A1RGB5_UNORM:
+                case GliFormat.RGBA8_UNORM:
+                case GliFormat.RGBA8_SNORM:
+                case GliFormat.RGBA8_USCALED:
+                case GliFormat.RGBA8_SSCALED:
+                case GliFormat.RGBA8_UINT:
+                case GliFormat.RGBA8_SINT:
+                case GliFormat.RGBA8_SRGB:
+                case GliFormat.BGRA8_UNORM:
+                case GliFormat.BGRA8_SNORM:
+                case GliFormat.BGRA8_USCALED:
+                case GliFormat.BGRA8_SSCALED:
+                case GliFormat.BGRA8_UINT:
+                case GliFormat.BGRA8_SINT:
+                case GliFormat.BGRA8_SRGB:
+                case GliFormat.RGBA8_UNORM_PACK32:
+                case GliFormat.RGBA8_SNORM_PACK32:
+                case GliFormat.RGBA8_USCALED_PACK32:
+                case GliFormat.RGBA8_SSCALED_PACK32:
+                case GliFormat.RGBA8_UINT_PACK32:
+                case GliFormat.RGBA8_SINT_PACK32:
+                case GliFormat.RGBA8_SRGB_PACK32:
+                case GliFormat.RGB10A2_UNORM:
+                case GliFormat.RGB10A2_SNORM:
+                case GliFormat.RGB10A2_USCALED:
+                case GliFormat.RGB10A2_SSCALED:
+                case GliFormat.RGB10A2_UINT:
+                case GliFormat.RGB10A2_SINT:
+                case GliFormat.BGR10A2_UNORM:
+                case GliFormat.BGR10A2_SNORM:
+                case GliFormat.BGR10A2_USCALED:
+                case GliFormat.BGR10A2_SSCALED:
+                case GliFormat.BGR10A2_UINT:
+                case GliFormat.BGR10A2_SINT:
+                case GliFormat.RGBA16_UNORM:
+                case GliFormat.RGBA16_SNORM:
+                case GliFormat.RGBA16_USCALED:
+                case GliFormat.RGBA16_SSCALED:
+                case GliFormat.RGBA16_UINT:
+                case GliFormat.RGBA16_SINT:
+                case GliFormat.RGBA16_SFLOAT:
+                case GliFormat.RGBA32_UINT:
+                case GliFormat.RGBA32_SINT:
+                case GliFormat.RGBA32_SFLOAT:
+                case GliFormat.RGBA64_UINT:
+                case GliFormat.RGBA64_SINT:
+                case GliFormat.RGBA64_SFLOAT:
+                case GliFormat.RGBA_DXT1_UNORM:
+                case GliFormat.RGBA_DXT1_SRGB:
+                case GliFormat.RGBA_DXT3_UNORM:
+                case GliFormat.RGBA_DXT3_SRGB:
+                case GliFormat.RGBA_DXT5_UNORM:
+                case GliFormat.RGBA_DXT5_SRGB:
+                case GliFormat.RGBA_BP_UNORM:
+                case GliFormat.RGBA_BP_SRGB:
+                case GliFormat.RGBA_ETC2_UNORM_BLOCK8:
+                case GliFormat.RGBA_ETC2_SRGB_BLOCK8:
+                case GliFormat.RGBA_ETC2_UNORM_BLOCK16:
+                case GliFormat.RGBA_ETC2_SRGB_BLOCK16:
+                case GliFormat.RGBA_ASTC_4X4_UNORM_BLOCK16:
+                case GliFormat.RGBA_ASTC_4X4_SRGB_BLOCK16:
+                case GliFormat.RGBA_ASTC_5X4_UNORM_BLOCK16:
+                case GliFormat.RGBA_ASTC_5X4_SRGB_BLOCK16:
+                case GliFormat.RGBA_ASTC_5X5_UNORM_BLOCK16:
+                case GliFormat.RGBA_ASTC_5X5_SRGB_BLOCK16:
+                case GliFormat.RGBA_ASTC_6X5_UNORM_BLOCK16:
+                case GliFormat.RGBA_ASTC_6X5_SRGB_BLOCK16:
+                case GliFormat.RGBA_ASTC_6X6_UNORM_BLOCK16:
+                case GliFormat.RGBA_ASTC_6X6_SRGB_BLOCK16:
+                case GliFormat.RGBA_ASTC_8X5_UNORM_BLOCK16:
+                case GliFormat.RGBA_ASTC_8X5_SRGB_BLOCK16:
+                case GliFormat.RGBA_ASTC_8X6_UNORM_BLOCK16:
+                case GliFormat.RGBA_ASTC_8X6_SRGB_BLOCK16:
+                case GliFormat.RGBA_ASTC_8X8_UNORM_BLOCK16:
+                case GliFormat.RGBA_ASTC_8X8_SRGB_BLOCK16:
+                case GliFormat.RGBA_ASTC_10X5_UNORM_BLOCK16:
+                case GliFormat.RGBA_ASTC_10X5_SRGB_BLOCK16:
+                case GliFormat.RGBA_ASTC_10X6_UNORM_BLOCK16:
+                case GliFormat.RGBA_ASTC_10X6_SRGB_BLOCK16:
+                case GliFormat.RGBA_ASTC_10X8_UNORM_BLOCK16:
+                case GliFormat.RGBA_ASTC_10X8_SRGB_BLOCK16:
+                case GliFormat.RGBA_ASTC_10X10_UNORM_BLOCK16:
+                case GliFormat.RGBA_ASTC_10X10_SRGB_BLOCK16:
+                case GliFormat.RGBA_ASTC_12X10_UNORM_BLOCK16:
+                case GliFormat.RGBA_ASTC_12X10_SRGB_BLOCK16:
+                case GliFormat.RGBA_ASTC_12X12_UNORM_BLOCK16:
+                case GliFormat.RGBA_ASTC_12X12_SRGB_BLOCK16:
+                case GliFormat.RGBA_PVRTC1_8X8_UNORM_BLOCK32:
+                case GliFormat.RGBA_PVRTC1_8X8_SRGB_BLOCK32:
+                case GliFormat.RGBA_PVRTC1_16X8_UNORM_BLOCK32:
+                case GliFormat.RGBA_PVRTC1_16X8_SRGB_BLOCK32:
+                case GliFormat.RGBA_PVRTC2_4X4_UNORM_BLOCK8:
+                case GliFormat.RGBA_PVRTC2_4X4_SRGB_BLOCK8:
+                case GliFormat.RGBA_PVRTC2_8X4_UNORM_BLOCK8:
+                case GliFormat.RGBA_PVRTC2_8X4_SRGB_BLOCK8:
+                case GliFormat.RGBA_ATCA_UNORM_BLOCK16:
+                case GliFormat.RGBA_ATCI_UNORM_BLOCK16:
+                case GliFormat.ARGB8_SRGB:
+                case GliFormat.ABGR8_SRGB:
+                    return Color.Channel.Rgba;
+
+                case GliFormat.A8_UNORM:
+                case GliFormat.A16_UNORM:
+                    return Color.Channel.A;
+
+                case GliFormat.LA8_UNORM:
+                case GliFormat.LA16_UNORM:
+                case GliFormat.RA8_SRGB:
+                case GliFormat.RA8_UNORM:
+                case GliFormat.AR8_SRGB:
+                case GliFormat.RA16_UNORM:
+                    return Color.Channel.Ra;
+
+                case GliFormat.UNDEFINED:
+                default:
+                    Debug.Assert(false);
+                    return Color.Channel.Empty;
             }
         }
 
@@ -1296,6 +1297,20 @@ namespace ImageFramework.ImageLoader
             return false;
         }
 
+        // indicates if the formats values are at most between -1 and 1 (SNorm, UNorm, Srgb)
+        public static bool IsNormed(this PixelDataType type)
+        {
+            switch (type)
+            {
+                case PixelDataType.UNorm:
+                case PixelDataType.Srgb:
+                case PixelDataType.SNorm:
+                    return true;
+            }
+
+            return false;
+        }
+
         public static string GetDescription(this PixelDataType type)
         {
             switch (type)
@@ -1312,9 +1327,9 @@ namespace ImageFramework.ImageLoader
                 case PixelDataType.UInt:
                     return "Unsigned integer";
                 case PixelDataType.SScaled:
-                    return "Signed integer interpreted as floating point";
+                    return "Signed integer interpreted as floating point format";
                 case PixelDataType.UScaled:
-                    return "Unsigned integer interpreted as floating point";
+                    return "Unsigned integer interpreted as floating point format";
                 case PixelDataType.SFloat:
                     return "Signed floating point";
                 case PixelDataType.UFloat:

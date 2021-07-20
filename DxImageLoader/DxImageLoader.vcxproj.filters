@@ -147,12 +147,6 @@
     <CopyFileToFolders Include="..\Docs\requirements.md">
       <Filter>Docs</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\dependencies\lib\glew32.dll">
-      <Filter>dll</Filter>
-    </CopyFileToFolders>
-    <CopyFileToFolders Include="..\dependencies\lib\libktx.gl.dll">
-      <Filter>dll</Filter>
-    </CopyFileToFolders>
     <CopyFileToFolders Include="..\Docs\about.md">
       <Filter>Docs</Filter>
     </CopyFileToFolders>
@@ -180,7 +174,6 @@
     <CopyFileToFolders Include="..\Docs\img\mip_compare.png">
       <Filter>Docs\img</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="..\Docs\statistics.md" />
     <CopyFileToFolders Include="..\Docs\volumetric.md">
       <Filter>Docs</Filter>
     </CopyFileToFolders>
@@ -195,6 +188,12 @@
     </CopyFileToFolders>
     <CopyFileToFolders Include="..\Docs\img\volume_slice.jpg">
       <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\dependencies\lib\ktx.dll">
+      <Filter>dll</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\statistics.md">
+      <Filter>Docs</Filter>
     </CopyFileToFolders>
   </ItemGroup>
 </Project>

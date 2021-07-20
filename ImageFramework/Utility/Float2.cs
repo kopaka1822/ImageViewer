@@ -132,5 +132,16 @@ namespace ImageFramework.Utility
                 Utility.Clamp(Y, min.Y, max.Y)
             );
         }
+
+        public Float2 Normalize()
+        {
+            var len = (float)Math.Sqrt((double)(X * X + Y * Y));
+            return new Float2(X / len, Y / len);
+        }
+
+        public Float2 RotateCCW()
+        {
+            return new Float2(-Y, X);
+        }
     }
 }

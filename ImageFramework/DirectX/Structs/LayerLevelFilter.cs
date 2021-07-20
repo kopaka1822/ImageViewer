@@ -10,8 +10,8 @@ namespace ImageFramework.DirectX.Structs
     {
         public int Layer;
         public int Level;
+        public int Iteration;
         public int Pad1;
-        public int Pad2;
         
         public int FilterX;
         public int FilterY;

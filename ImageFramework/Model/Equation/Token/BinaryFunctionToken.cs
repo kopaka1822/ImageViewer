@@ -34,6 +34,20 @@ namespace ImageFramework.Model.Equation.Token
             return funcName + "(" + val1 + "," + val2 + ")";
         }
 
+        public override float ToFloat()
+        {
+            switch (funcName)
+            {
+                case "min":
+                    return Math.Min(value1.ToFloat(), value2.ToFloat());
+                case "max":
+                    return Math.Max(value1.ToFloat(), value2.ToFloat());
+                case "pow":
+                    return (float)Math.Pow(value1.ToFloat(), value2.ToFloat());
+            }
+            throw new Exception("invalid string as function name: " + funcName);
+        }
+
         private bool IsHlslFunction()
         {
             switch (funcName)

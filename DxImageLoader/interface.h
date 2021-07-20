@@ -23,7 +23,7 @@ EXPORT(int) image_allocate(uint32_t format, int width, int height, int depth, in
 EXPORT(void) image_release(int id);
 
 /// \brief retrieves image info
-/// \brief format internal texture format, will be one of the compatible formats from Image.h
+/// format internal texture format, will be one of the compatible formats from Image.h
 EXPORT(void) image_info(int id, uint32_t& format, uint32_t& originalFormat, int& nLayer, int& nMipmaps);
 
 /// \brief retrieve info for one mipmap
@@ -46,6 +46,19 @@ EXPORT(bool) image_save(int id, const char* filename, const char* extension, uin
 
 /// \brief retrieves an array with all supported dxgi formats that are available for export with the extension
 EXPORT(const uint32_t*) get_export_formats(const char* extension, int& numFormats);
+
+/// List of global parameters:
+/// "uastc srgb" - for .ktx2 export => use uastc for srgb compression (otherwise etc1 is used). Valid for srgb uastc compressable textures
+/// "normalmap" - for .ktx2 export => indicate that the exporter/compressor should optimize data for normal maps. Valid for linear (non-srgb) uastc compressable textures
+
+/// \brief stores the value of the parameter in the results argument and returns true if found. Returns false otherwise
+EXPORT(bool)  get_global_parameter_i(const char* name, int& results);
+
+/// \brief returns the value of the parameter if found. Throws an exception otherwise
+int get_global_parameter_i(const char* name);
+
+/// \brief sets the value of a global parameter or 0 if not found
+EXPORT(void) set_global_parameter_i(const char* name, int value);
 
 typedef uint32_t(__stdcall* ProgressCallback)(float, const char*);
 

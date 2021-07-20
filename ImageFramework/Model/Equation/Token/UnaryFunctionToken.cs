@@ -21,6 +21,19 @@ namespace ImageFramework.Model.Equation.Token
             return start + value.ToHlsl() + end;
         }
 
+        public override float ToFloat()
+        {
+            switch (funcName)
+            {
+                case "sqrt": return (float)Math.Sqrt(value.ToFloat());
+                case "abs": return Math.Abs(value.ToFloat());
+                case "floor": return (float)Math.Floor(value.ToFloat());
+                case "ceil": return (float)Math.Ceiling(value.ToFloat());
+            }
+
+            throw new Exception("invalid string as function name: " + funcName);
+        }
+
         public static string GetUnaryHelperFunctions()
         {
             return @"
@@ -53,18 +66,26 @@ float4 srgbAsSnorm(float4 v)
             switch (name)
             {
                 // image viewer extensions
+                case "w":
+                case "a":
                 case "alpha":
                     front = "(";
                     end = ").aaaa";
                     break;
+                case "x":
+                case "r":
                 case "red":
                     front = "(";
                     end = ").rrrr";
                     break;
+                case "y":
+                case "g":
                 case "green":
                     front = "(";
                     end = ").gggg";
                     break;
+                case "z":
+                case "b":
                 case "blue":
                     front = "(";
                     end = ").bbbb";

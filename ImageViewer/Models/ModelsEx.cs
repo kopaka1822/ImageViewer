@@ -21,6 +21,8 @@ namespace ImageViewer.Models
         
         public BoxOverlay ZoomBox { get; }
 
+        public ArrowOverlay Arrows { get; }
+
         public IReadOnlyList<StatisticModel> Statistics { get; }
 
         public ExportConfigModel ExportConfig { get; }
@@ -57,6 +59,8 @@ namespace ImageViewer.Models
 
             ZoomBox = new BoxOverlay(this);
             Overlay.Overlays.Add(ZoomBox);
+            Arrows = new ArrowOverlay(this);
+            Overlay.Overlays.Add(Arrows);
 
             resizeController = new ResizeController(this);
             computeImageController = new ComputeImageController(this);

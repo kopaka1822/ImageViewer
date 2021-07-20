@@ -66,7 +66,7 @@ public:
 			
 			stbi_image_free(tmp);
 
-			m_original = gli::format::FORMAT_RGB9E5_UFLOAT_PACK32;
+			m_original = gli::format::FORMAT_RGB8E8_UFLOAT_PACK32;
 			m_format = gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
 			m_size = m_width * m_height * 4 * 4;
 		}
@@ -128,8 +128,7 @@ std::vector<uint32_t> stb_image_get_export_formats(const char* extension)
 	if (ext == "hdr")
 	{
 		return std::vector<uint32_t>{
-			gli::format::FORMAT_RGB32_SFLOAT_PACK32,
-				gli::format::FORMAT_R32_SFLOAT_PACK32
+            gli::format::FORMAT_RGB8E8_UFLOAT_PACK32
 		};
 	}
 

@@ -2,8 +2,8 @@
 #setting description, Maps the red input channel to a color map. Values outside [Min Value, Max Value] are clamped.
 #setting type, COLOR
 
-#param Min Value, minVal, float, 1
-#param Max Value, maxVal, float, 1
+#param Min Value, minVal, float, 0.0
+#param Max Value, maxVal, float, 1.0
 
 #keybinding Max Value, Add, 1, add
 #keybinding Max Value, OemPlus, 1, add

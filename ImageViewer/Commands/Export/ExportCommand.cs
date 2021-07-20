@@ -120,7 +120,8 @@ namespace ImageViewer.Commands.Export
                 UseCropping = models.ExportConfig.UseCropping,
                 CropStart = models.ExportConfig.CropStart,
                 CropEnd = models.ExportConfig.CropEnd,
-                Overlay = models.Overlay.Overlay
+                Overlay = models.Overlay.Overlay,
+                Quality = models.Settings.LastQuality
             };
             desc.TrySetFormat(viewModel.SelectedFormatValue);
             exportFormat = desc.FileFormat;
@@ -143,7 +144,8 @@ namespace ImageViewer.Commands.Export
                         CropStart = new Float3(box.Start, 0.0f),
                         CropEnd = new Float3(box.End, 1.0f),
                         Overlay = viewModel.ZoomBorders ? models.Overlay.Overlay : null,
-                        Scale = viewModel.ZoomBoxScale
+                        Scale = viewModel.ZoomBoxScale,
+                        Quality = models.Settings.LastQuality
                     };
                     zdesc.TrySetFormat(viewModel.SelectedFormatValue);
 
@@ -162,12 +164,13 @@ namespace ImageViewer.Commands.Export
             {"hdr", "HDR (*.hdr)|*.hdr" },
             {"pfm", "Portable float map (*.pfm)|*.pfm" },
             {"ktx", "Khronos Texture (*.ktx)|*.ktx" },
+            {"ktx2", "Khronos Texture (*.ktx2)|*.ktx2"},
             {"dds", "DirectDraw Surface (*.dds)|*.dds" },
         };
 
         private static bool Is3DFilter(string key)
         {
-            return key == "dds" || key == "ktx";
+            return key == "dds" || key == "ktx" || key == "ktx2";
         }
 
         private static string GetFilter(string preferred, bool is3D)

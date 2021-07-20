@@ -248,6 +248,8 @@ namespace ImageFramework.Model
                     {
                         await DoFilterIterationAsync(args, index, tex[srcIdx], tex[1 - srcIdx], iteration, progress);
                         srcIdx = 1 - srcIdx;
+                        // if filter.DoIterations => this indicates that no thread wants to continue and that iterations should be stopped
+                        if (filter.Shader.AbortIterations) break; 
                     }
                 }
                 // last chance before mipmap generation
@@ -271,14 +273,16 @@ namespace ImageFramework.Model
             progress.Token.ThrowIfCancellationRequested();
             var filter = args.Filters[index];
 
+            var step = 1.0f / args.Filters.Count;
+            progress.Progress = index * step;
+            string what = filter.Name;
+            if (filter.DoIterations || filter.IsSepa) what = $"{what} iteration: {iteration}";
+            progress.What = what;
+
             // do for all mipmaps if no mipmap re computation is enabled
             var nMipmaps = RecomputeMipmaps ? 1 : args.Models.Images.NumMipmaps;
-            filter.Shader.Run(args.Models.Images, src, dst, args.Models.SharedModel.Upload, iteration, nMipmaps);
+            filter.Shader.Run(args.Models.Images, src, dst, iteration, nMipmaps);
             args.Models.SharedModel.Sync.Set();
-
-            var step = 1.0f / args.Filters.Count;
-            progress.Progress = index * step + iteration * step * 0.5f;
-            progress.What = filter.Name;
 
             return args.Models.SharedModel.Sync.WaitForGpuAsync(progress.Token);
         }

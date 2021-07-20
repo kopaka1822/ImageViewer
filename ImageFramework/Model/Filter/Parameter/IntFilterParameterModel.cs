@@ -54,9 +54,14 @@ namespace ImageFramework.Model.Filter.Parameter
             }
         }
 
-        public ParameterType GetParamterType()
+        public virtual ParameterType GetParamterType()
         {
             return ParameterType.Int;
+        }
+
+        public string GetShaderParameterType()
+        {
+            return "int";
         }
 
         public FilterParameterModelBase GetBase()

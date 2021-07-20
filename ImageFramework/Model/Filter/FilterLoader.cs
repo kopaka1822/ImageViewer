@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using ImageFramework.Annotations;
+using ImageFramework.Model.Equation;
 using ImageFramework.Model.Filter.Parameter;
 using SharpDX.DXGI;
 
@@ -33,6 +35,7 @@ namespace ImageFramework.Model.Filter
         public TargetType Target { get; }
         public Type KernelType { get; private set; } = Type.Tex2D;
         public bool IsSepa { get; private set; } = false;
+        public bool Iterations { get; private set; } = false;
         public string Name { get; private set; }
         public string Description { get; private set; }
         public string Filename { get; }
@@ -153,8 +156,7 @@ namespace ImageFramework.Model.Filter
                             whole = "";
                         }
 
-                        whole = whole.TrimStart(' ');
-                        whole = whole.TrimEnd(' ');
+                        whole = whole.Trim();
 
                         HandleSetting(parameters, whole);
                         ShaderSource += "\n"; // remember line for error information
@@ -185,6 +187,9 @@ namespace ImageFramework.Model.Filter
                 throw new Exception("This filter can only be used with 3D textures");
             if(KernelType == Type.Tex2D && Target != TargetType.Tex2D)
                 throw new Exception("This filter can only be used with 2D textures");
+            //this cant be used together due to ambigouities
+            if(IsSepa && Iterations)
+                throw new Exception("sepa and iteration settings cannot be used together");
         }
 
         private void HandleTexture(string[] pars)
@@ -222,6 +227,7 @@ namespace ImageFramework.Model.Filter
                                 AddParameterAction(matchingParam.GetFloatModel(), pars[2], modType, atype);
                                 break;
                             case ParameterType.Int:
+                            case ParameterType.Enum:
                                 AddParameterAction(matchingParam.GetIntModel(), pars[2], modType, atype);
                                 break;
                             case ParameterType.Bool:
@@ -292,6 +298,7 @@ namespace ImageFramework.Model.Filter
                     AddKeybinding(matchingParam.GetFloatModel(), pars[2], modType, key);
                     break;
                 case ParameterType.Int:
+                case ParameterType.Enum:
                     AddKeybinding(matchingParam.GetIntModel(), pars[2], modType, key);
                     break;
                 case ParameterType.Bool:
@@ -336,6 +343,8 @@ namespace ImageFramework.Model.Filter
                 type = ParameterType.Int;
             else if (pars[2].ToLower().Equals("bool"))
                 type = ParameterType.Bool;
+            else if (pars[2].ToLower().StartsWith("enum"))
+                type = ParameterType.Enum;
             else throw new Exception("unknown parameter type " + pars[2]);
 
             switch (type)
@@ -348,6 +357,9 @@ namespace ImageFramework.Model.Filter
                     break;
                 case ParameterType.Bool:
                     AddBoolParam(pars);
+                    break;
+                case ParameterType.Enum:
+                    AddEnumParam(pars);
                     break;
             }
         }
@@ -379,6 +391,26 @@ namespace ImageFramework.Model.Filter
             var def = pars.Length >= 4 && GetBoolValue(pars[3]);
 
             Parameters.Add(new BoolFilterParameterModel(pars[0], pars[1], false, true, def));
+        }
+
+        private void AddEnumParam(string[] pars)
+        {
+            // check valid format: enum { A ; B ; C }
+            var enumDef = pars[2].Substring("enum".Length);
+            enumDef = enumDef.Trim();
+            if(!enumDef.StartsWith("{") || !enumDef.EndsWith("}")) 
+                throw new Exception("invalid enum syntax: " + pars[2]);
+            var enumValues = new List<string>(GetParameters(enumDef.Substring(1, enumDef.Length - 2), ';'));
+
+            var defIdx = 0;
+            if (pars.Length >= 4)
+            {
+                var def = pars[3].Trim();
+                defIdx = enumValues.IndexOf(def);
+                if (defIdx < 0) throw new Exception($"enum default value '{def}' does not match with any values of {pars[2]}");
+            }
+
+            Parameters.Add(new EnumFilterParameterModel(pars[0], pars[1], enumValues, defIdx));
         }
 
         private bool GetBoolValue(string argument)
@@ -419,7 +451,10 @@ namespace ImageFramework.Model.Filter
             switch (p[0].ToLower())
             {
                 case "sepa":
-                    IsSepa = p[1].ToLower().Equals("true");
+                    IsSepa = ParseBool(p[1]);
+                    break;
+                case "iterations":
+                    Iterations = ParseBool(p[1]);
                     break;
                 case "title":
                     Name = wholeString;
@@ -454,14 +489,21 @@ namespace ImageFramework.Model.Filter
             }
         }
 
-        private static string[] GetParameters(string s)
+        private static bool ParseBool(string value)
         {
-            string[] pars = s.Split(',');
+            value = value.ToLower();
+            if (value == "true") return true;
+            if (value == "false") return false;
+            throw new Exception("#setting bool value needs to be either true of false");
+        }
+
+        private static string[] GetParameters(string s, char split = ',')
+        {
+            string[] pars = s.Split(split);
             // remove some white spaces
             for (int i = 0; i < pars.Length; ++i)
             {
-                pars[i] = pars[i].TrimStart(' ');
-                pars[i] = pars[i].TrimEnd(' ');
+                pars[i] = pars[i].Trim();
             }
 
             return pars;

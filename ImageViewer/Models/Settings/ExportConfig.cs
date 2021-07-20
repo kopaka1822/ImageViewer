@@ -23,6 +23,8 @@ namespace ImageViewer.Models.Settings
 
         public ZoomBoxConfig ZoomBox { get; set; } = new ZoomBoxConfig();
 
+        public ArrowsConfig Arrows { get; set; } = new ArrowsConfig();
+
         public static ExportConfig LoadFromModels(ModelsEx models)
         {
             var res = new ExportConfig();
@@ -35,6 +37,7 @@ namespace ImageViewer.Models.Settings
             res.CropEndZ = models.ExportConfig.CropEnd.Z;
             res.UseCropping = models.ExportConfig.UseCropping;
             res.ZoomBox = ZoomBoxConfig.LoadFromModels(models);
+            res.Arrows = ArrowsConfig.LoadFromModels(models);
 
             return res;
         }
@@ -46,6 +49,7 @@ namespace ImageViewer.Models.Settings
             models.ExportConfig.CropEnd = new Float3(CropEndX, CropEndY, CropEndZ);
             models.ExportConfig.UseCropping = UseCropping;
             ZoomBox?.ApplyToModels(models);
+            Arrows?.ApplyToModels(models);
         }
     }
 }

@@ -83,7 +83,6 @@
     <Compile Include="DirectX\Shader.cs" />
     <Compile Include="DirectX\Structs\LayerLevelFilter.cs" />
     <Compile Include="DirectX\Structs\LayerLevelOffsetData.cs" />
-    <Compile Include="DirectX\Structs\LayerLevelData.cs" />
     <Compile Include="DirectX\Texture3D.cs" />
     <Compile Include="DirectX\TextureArray2D.cs" />
     <Compile Include="DirectX\TextureBase.cs" />
@@ -94,9 +93,16 @@
     <Compile Include="ImageLoader\ImageFormat.cs" />
     <Compile Include="ImageLoader\IO.cs" />
     <Compile Include="ImageLoader\Resource.cs" />
-    <Compile Include="Model\Equation\Token\ConstantToken.cs" />
-    <Compile Include="Model\Progress\DllProgressAdapter.cs" />
     <Compile Include="Model\Equation\Equation.cs" />
+    <Compile Include="Model\Equation\FloatEquation.cs" />
+    <Compile Include="Model\Equation\Markov\IntrinsicFunctionRule.cs" />
+    <Compile Include="Model\Equation\Token\ConstantToken.cs" />
+    <Compile Include="Model\Equation\Token\IntrinsicToken.cs" />
+    <Compile Include="Model\Filter\Parameter\EnumFilterParameterModel.cs" />
+    <Compile Include="Model\Overlay\ArrowOverlay.cs" />
+    <Compile Include="Model\Overlay\ArrowOverlayShader.cs" />
+    <Compile Include="Model\Progress\DllProgressAdapter.cs" />
+    <Compile Include="Model\Equation\HlslEquation.cs" />
     <Compile Include="Model\Equation\FormulaModel.cs" />
     <Compile Include="Model\Equation\Markov\RuleDoubleSign.cs" />
     <Compile Include="Model\Equation\Markov\RuleSign.cs" />
@@ -266,6 +272,27 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Filter\fix_alpha.hlsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Filter\bilateral.hlsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Filter\divergent.hlsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Filter\guided_bilateral.hlsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Filter\dithering.hlsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Filter\heat_distribution.hlsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

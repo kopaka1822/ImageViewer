@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Model;
+using ImageFramework.Model.Equation;
 using ImageFramework.Model.Equation.Token;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -47,14 +48,14 @@ namespace FrameworkTests.Model.Equation
         [TestMethod]
         public void OperatorPrecedence()
         {
-            var eq = new ImageFramework.Model.Equation.Equation("(3-1)*0.4+1");
+            var eq = new ImageFramework.Model.Equation.HlslEquation("(3-1)*0.4+1");
             var hlsl = eq.GetHlslExpression();
             var expected =
                 $"((({NumberToken.ToHlsl(3.0f)}-{NumberToken.ToHlsl(1.0f)})*{NumberToken.ToHlsl(0.4f)})+{NumberToken.ToHlsl(1.0f)})";
 
             Assert.AreEqual(expected, hlsl.Replace(" ", ""));
 
-            eq = new ImageFramework.Model.Equation.Equation("1+0.4*(3-1)");
+            eq = new ImageFramework.Model.Equation.HlslEquation("1+0.4*(3-1)");
             hlsl = eq.GetHlslExpression();
 
             expected =
@@ -66,7 +67,7 @@ namespace FrameworkTests.Model.Equation
         [TestMethod]
         public void SignOperatorAndBrackets()
         {
-            var eq = new ImageFramework.Model.Equation.Equation("1+0.4*-2");
+            var eq = new ImageFramework.Model.Equation.HlslEquation("1+0.4*-2");
             var hlsl = eq.GetHlslExpression();
             var expected =
                 $"({NumberToken.ToHlsl(1.0f)}+({NumberToken.ToHlsl(0.4f)}*({NumberToken.ToHlsl(-1.0f)}*{NumberToken.ToHlsl(2.0f)})))";
@@ -77,7 +78,7 @@ namespace FrameworkTests.Model.Equation
         [TestMethod]
         public void SignPrecedence()
         {
-            var eq = new ImageFramework.Model.Equation.Equation( "-1+2");
+            var eq = new ImageFramework.Model.Equation.HlslEquation( "-1+2");
             var hlsl = eq.GetHlslExpression();
             var expected = $"(({NumberToken.ToHlsl(-1.0f)}*{NumberToken.ToHlsl(1.0f)})+{NumberToken.ToHlsl(2.0f)})";
 
@@ -88,8 +89,8 @@ namespace FrameworkTests.Model.Equation
         public void PowTranslation()
         {
             // this should translate to the same expression
-            var eq = new ImageFramework.Model.Equation.Equation("red(I0)^2*0.1");
-            var eq2 = new ImageFramework.Model.Equation.Equation("pow(red(I0),2)*0.1");
+            var eq = new ImageFramework.Model.Equation.HlslEquation("red(I0)^2*0.1");
+            var eq2 = new ImageFramework.Model.Equation.HlslEquation("pow(red(I0),2)*0.1");
             var hlsl = eq.GetHlslExpression();
             var hlsl2 = eq2.GetHlslExpression();
 
@@ -107,12 +108,29 @@ namespace FrameworkTests.Model.Equation
             AssertSuccess("float_max");
         }
 
+        [TestMethod]
+        public void FloatEquationTest()
+        {
+            // simple
+            var eq = new FloatEquation("3 + 4 * 2");
+            Assert.AreEqual(3.0f + 4.0f * 2.0f, eq.GetFloatExpression(0, 0, 0), 0.01f);
+            
+            // with parameters
+            eq = new FloatEquation("max(width, height) + 1");
+            Assert.AreEqual(3.0f + 1.0f, eq.GetFloatExpression(3, 1, 1), 0.01f);
+            Assert.AreEqual(4.0f + 1.0f, eq.GetFloatExpression(3, 4, 1), 0.01f);
+
+            // invalid syntax
+            Assert.ThrowsException<Exception>(() => new FloatEquation("1 + w"));
+            Assert.ThrowsException<Exception>(() => new FloatEquation("width**2"));
+        }
+
         // equation should fail
         private void AssertThrow(string formula)
         {
             try
             {
-                var eq = new ImageFramework.Model.Equation.Equation(formula);
+                var eq = new ImageFramework.Model.Equation.HlslEquation(formula);
             }
             catch (Exception)
             {
@@ -126,7 +144,7 @@ namespace FrameworkTests.Model.Equation
         {
             try
             {
-                var eq = new ImageFramework.Model.Equation.Equation(formula);
+                var eq = new ImageFramework.Model.Equation.HlslEquation(formula);
             }
             catch (Exception e)
             {
@@ -139,7 +157,7 @@ namespace FrameworkTests.Model.Equation
         {
             try
             {
-                var eq = new ImageFramework.Model.Equation.Equation(formula);
+                var eq = new ImageFramework.Model.Equation.HlslEquation(formula);
                 var res = eq.GetHlslExpression();
                 Assert.IsTrue(res.Equals(result));
             }
@@ -153,7 +171,7 @@ namespace FrameworkTests.Model.Equation
         {
             try
             {
-                var eq = new ImageFramework.Model.Equation.Equation(formula);
+                var eq = new ImageFramework.Model.Equation.HlslEquation(formula);
                 return eq.MaxImageId;
             }
             catch (Exception e)

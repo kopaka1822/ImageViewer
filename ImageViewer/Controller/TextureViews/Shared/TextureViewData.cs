@@ -19,9 +19,9 @@ namespace ImageViewer.Controller.TextureViews.Shared
         // src = 1, dst = alpha
         public BlendState AlphaDarkenState { get; }
 
-        public SamplerState LinearSampler { get; }
+        public SamplerState LinearSampler => models.SharedModel.LinearSampler;
 
-        public SamplerState PointSampler { get; }
+        public SamplerState PointSampler => models.SharedModel.PointSampler;
 
         public UploadBuffer Buffer { get; }
 
@@ -37,9 +37,6 @@ namespace ImageViewer.Controller.TextureViews.Shared
             DefaultBlendState = CreateBlendState(false, BlendOption.One, BlendOption.Zero);
             AlphaBlendState = CreateBlendState(true, BlendOption.SourceAlpha, BlendOption.InverseSourceAlpha);
             AlphaDarkenState = CreateBlendState(true, BlendOption.One, BlendOption.SourceAlpha);
-
-            LinearSampler = CreateSamplerState(true);
-            PointSampler = CreateSamplerState(false);
 
             Buffer = models.SharedModel.Upload;
 
@@ -69,32 +66,11 @@ namespace ImageViewer.Controller.TextureViews.Shared
             return new BlendState(dev.Handle, blendDesc);
         }
 
-        private static SamplerState CreateSamplerState(bool linear)
-        {
-            var dev = ImageFramework.DirectX.Device.Get();
-            var desc = new SamplerStateDescription
-            {
-                AddressU = TextureAddressMode.Clamp,
-                AddressV = TextureAddressMode.Clamp,
-                AddressW = TextureAddressMode.Clamp,
-                BorderColor = new RawColor4(),
-                ComparisonFunction = Comparison.Never,
-                Filter = linear ? Filter.MinMagLinearMipPoint : Filter.MinMagMipPoint,
-                MaximumAnisotropy = 1,
-                MaximumLod = float.MaxValue,
-                MinimumLod = 0,
-                MipLodBias = 0
-            };
-
-            return new SamplerState(dev.Handle, desc);
-        }
         public void Dispose()
         {
             DefaultBlendState?.Dispose();
             AlphaBlendState?.Dispose();
             AlphaDarkenState?.Dispose();
-            LinearSampler?.Dispose();
-            PointSampler?.Dispose();
             Checkers?.Dispose();
         }
 

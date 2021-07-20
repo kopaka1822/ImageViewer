@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.Model.Filter;
@@ -21,20 +22,41 @@ namespace ImageFramework.Model.Shader
         private readonly FilterModel parent;
         private readonly DirectX.Shader shader;
         private readonly UploadBuffer paramBuffer;
+        private readonly GpuBuffer continueIterationBuffer;
+        private readonly SharedModel shared;
 
         private readonly int localSize;
         private readonly bool is3D;
 
-        public FilterShader(FilterModel parent, string source, int groupSize, FilterLoader.Type kernel, IShaderBuilder builder)
+        public FilterShader(FilterModel parent, string source, int groupSize, FilterLoader.Type kernel, IShaderBuilder builder, SharedModel shared)
         {
             localSize = groupSize;
             this.parent = parent;
+            this.shared = shared;
             is3D = builder.Is3D;
             shader = new DirectX.Shader(DirectX.Shader.Type.Compute, GetShaderHeader(kernel, builder) + "\n#line 1\n" + source, parent.Filename);
             if (parent.Parameters.Count != 0)
             {
                 paramBuffer = new UploadBuffer(4 * parent.Parameters.Count);
                 UpdateParamBuffer();
+            }
+            if(parent.DoIterations) continueIterationBuffer = new GpuBuffer(4, 1);
+        }
+
+        /// <summary>
+        /// Indicates if the iterations should be stopped (based on results from the previous Run())
+        /// may only be called after Run() was executed (otherwise no meaningful value might be returned)
+        /// </summary>
+        internal bool AbortIterations
+        {
+            get
+            {
+                if (continueIterationBuffer == null) return false;
+
+                // download buffer from gpu (should happen very fast since the shader was already executed when called after DoFilterIterationAsync)
+                shared.Download.CopyFrom(continueIterationBuffer, 4);
+                var continueIterations = shared.Download.GetData<int>() != 0;
+                return !continueIterations;
             }
         }
 
@@ -44,14 +66,13 @@ namespace ImageFramework.Model.Shader
         /// <param name="image">original images (might be used for texture bindings)</param>
         /// <param name="src">source texture</param>
         /// <param name="dst">destination texture</param>
-        /// <param name="cbuffer">buffer that stores some runtime information</param>
         /// <param name="iteration">current filter iteration. Should be 0 if not separable. Should be 0 or 1 if separable (x- and y-direction pass) or 2 for z-direction pass</param>
         /// <param name="numMipmaps">number of mipmaps to apply the filter on (starting with most detailed mip)</param>
         /// <remarks>make sure to call UpdateParamBuffer() if parameters have changed after the last invocation</remarks>
-        internal void Run(ImagesModel image, ITexture src, ITexture dst, UploadBuffer cbuffer, int iteration, int numMipmaps)
+        internal void Run(ImagesModel image, ITexture src, ITexture dst, int iteration, int numMipmaps)
         {
             if (parent.IsSepa) Debug.Assert(iteration == 0 || iteration == 1 || iteration == 2);
-            else Debug.Assert(iteration == 0);
+            else if (!parent.DoIterations) Debug.Assert(iteration == 0);
 
             // compatible textures?
             Debug.Assert(src.Is3D == is3D);
@@ -65,6 +86,16 @@ namespace ImageFramework.Model.Shader
                 dev.Compute.SetConstantBuffer(1, paramBuffer.Handle);
 
             dev.Compute.SetShaderResource(1, src.View);
+            dev.Compute.SetSampler(0, shared.LinearSampler);
+            dev.Compute.SetSampler(1, shared.PointSampler);
+            if (parent.DoIterations)
+            {
+                // write zero (false) into the _g_continue_iterations_buffer to indicate
+                // that iterations should be stopped (if no threads want to continue)
+                shared.Upload.SetData(0);
+                continueIterationBuffer.CopyFrom(shared.Upload); // copy zero to buffer
+                dev.Compute.SetUnorderedAccessView(1, continueIterationBuffer.View);
+            }
 
             for (int curMipmap = 0; curMipmap < numMipmaps; ++curMipmap)
             {
@@ -78,16 +109,17 @@ namespace ImageFramework.Model.Shader
                     dev.Compute.SetShaderResource(0, src.GetSrView(new LayerMipmapSlice(curLayer, curMipmap)));
                     BindTextureParameters(image, new LayerMipmapSlice(curLayer, curMipmap));
 
-                    cbuffer.SetData(new LayerLevelFilter
+                    shared.Upload.SetData(new LayerLevelFilter
                     {
                         Layer = curLayer,
                         Level = curMipmap,
+                        Iteration = iteration,
                         FilterX = iteration == 0?1:0,
                         FilterY = iteration == 1?1:0,
                         FilterZ = iteration == 2?1:0
                     });
 
-                    dev.Compute.SetConstantBuffer(0, cbuffer.Handle);
+                    dev.Compute.SetConstantBuffer(0, shared.Upload.Handle);
 
                     dev.Dispatch(
                         Utility.Utility.DivideRoundUp(size.Width, localSize), 
@@ -98,6 +130,7 @@ namespace ImageFramework.Model.Shader
 
             // remove texture bindings
             dev.Compute.SetUnorderedAccessView(0, null);
+            dev.Compute.SetUnorderedAccessView(1, null);
             dev.Compute.SetShaderResource(0, null);
             dev.Compute.SetShaderResource(1, null);
             UnbindTextureParameters();
@@ -146,10 +179,14 @@ namespace ImageFramework.Model.Shader
 {builder.SrvSingleType} src_image : register(t0);
 {builder.SrvType} src_image_ex : register(t1);
 
+SamplerState linearSampler : register(s0);
+SamplerState pointSampler : register(s1);
+
 cbuffer LayerLevelBuffer : register(b0) {{
     uint layer;
     uint level;
-    uint2 LayerLevelBuffer_padding_;
+    int iteration; // current iteration
+    uint _padding_2;
     {filterDirectionVar}
 }};
 
@@ -160,6 +197,17 @@ int3 texel(int3 coord, int layer) {{ return coord; }}
 #else
 int2 texel(int3 coord) {{ return coord.xy; }}
 int3 texel(int3 coord, int layer) {{ return int3(coord.xy, layer); }}
+#endif
+
+#if {(parent.DoIterations ? 1 : 0)}
+// contains one bool value that was initialized to false
+RWStructuredBuffer<bool> _g_continue_iterations_buffer : register(u1);
+
+// continue iterations until ALL threads call abort_iteration()
+static bool _g_continue_iterations = true;
+void abort_iterations() {{
+    _g_continue_iterations = false;
+}}
 #endif
 
 float4 filter{GetKernelDeclaration(kernel)};
@@ -185,6 +233,12 @@ void main(uint3 coord : SV_DISPATCHTHREADID) {{
     dst_image[dstCoord] = filter(src_image[texel(coord)]);
 #else // dynamic or 3D
     dst_image[dstCoord] = filter(coord, size);
+#endif
+
+#if {(parent.DoIterations ? 1 : 0)}
+    // test if at least one thread wants to continue
+    if(_g_continue_iterations) // write true to global buffer variable (initial value is false)
+        _g_continue_iterations_buffer[0] = true;
 #endif
 }}
 " + GetParamBufferDescription(parent.Parameters) + GetTextureParamBindings(parent.TextureParameters, builder);
@@ -212,7 +266,7 @@ void main(uint3 coord : SV_DISPATCHTHREADID) {{
             string res = "cbuffer FilterParamBuffer : register(b1) {\n";
             foreach (var filterParameter in parameters)
             {
-                res += "   " + filterParameter.GetParamterType().ToString().ToLower() + " " +
+                res += "   " + filterParameter.GetShaderParameterType() + " " +
                        filterParameter.GetBase().VariableName + ";\n";
             }
 
@@ -238,6 +292,7 @@ void main(uint3 coord : SV_DISPATCHTHREADID) {{
         {
             shader?.Dispose();
             paramBuffer?.Dispose();
+            continueIterationBuffer?.Dispose();
         }
     }
 }

@@ -71,7 +71,7 @@ namespace ImageViewer.ViewModels.Dialog
             Debug.Assert(selectedMipmap.Cargo == models.Display.ActiveMipmap);
 
             // all layer option for ktx and dds
-            if (models.Images.NumLayers > 1 && (extension == "ktx" || extension == "dds"))
+            if (models.Images.NumLayers > 1 && (extension == "ktx" || extension == "dds" || extension == "ktx2"))
             {
                 AvailableLayers.Add(new ListItemViewModel<int>
                 {
@@ -83,7 +83,7 @@ namespace ImageViewer.ViewModels.Dialog
             }
 
             // all mipmaps option for ktx and dds
-            if (models.Images.NumMipmaps > 1 && (extension == "ktx" || extension == "dds"))
+            if (models.Images.NumMipmaps > 1 && (extension == "ktx" || extension == "dds" || extension == "ktx2"))
             {
                 AvailableMipmaps.Add(new ListItemViewModel<int>
                 {
@@ -138,17 +138,7 @@ namespace ImageViewer.ViewModels.Dialog
             Debug.Assert(SelectedFormat != null);
 
             // enable quality
-            if (extension == "jpg")
-            {
-                hasQualityValue = true;
-                nonSrgbExportWarnings = true;
-            }
-            else if (extension == "bmp")
-            {
-                nonSrgbExportWarnings = true;
-            }
-            else SetKtxDdsQuality();
-
+            hasQualityValue = usedFormat.SupportsQuality(SelectedFormat.Cargo);
             models.ExportConfig.PropertyChanged += ExportConfigOnPropertyChanged;
             models.Settings.PropertyChanged += SettingsOnPropertyChanged;
 
@@ -174,14 +164,6 @@ namespace ImageViewer.ViewModels.Dialog
                 case nameof(SettingsModel.ExportZoomBoxScale):
                     OnPropertyChanged(nameof(ZoomBoxScale));
                     break;
-            }
-        }
-
-        private void SetKtxDdsQuality()
-        {
-            if (extension == "ktx" || extension == "dds")
-            {
-                HasQualityValue = SelectedFormat.Cargo.IsCompressed();
             }
         }
 
@@ -307,6 +289,7 @@ namespace ImageViewer.ViewModels.Dialog
                 }
 
                 OnPropertyChanged(nameof(AvailableFormats));
+                OnPropertyChanged(nameof(EnableFormat));
                 SelectedFormat = allFormats[bestFit];
                 
                 OnPropertyChanged(nameof(SelectedDataType));
@@ -356,13 +339,35 @@ namespace ImageViewer.ViewModels.Dialog
                 OnPropertyChanged(nameof(SelectedFormat));
                 OnPropertyChanged(nameof(Description));
                 OnPropertyChanged(nameof(Warning));
-                SetKtxDdsQuality();
+                HasQualityValue = usedFormat.SupportsQuality(value.Cargo);
             }
         }
 
         public GliFormat SelectedFormatValue => selectedFormat.Cargo;
 
-        public string Description => selectedFormat.Cargo.GetDescription();
+        public string Description => GetExtendedDescription(selectedFormat.Cargo);
+
+        private string GetExtendedDescription(GliFormat format)
+        {
+            var desc = format.GetDescription();
+
+            if (extension == "ktx2" && !format.IsCompressed() && usedFormat.SupportsQuality(format)) // clarify about compression
+            {
+                string outputFormat = "UASTC";
+                string compression = "Zstandard";
+                if (format.GetDataType() == PixelDataType.Srgb)
+                {
+                    outputFormat = "ETC1S";
+                    compression = "BasisLZ";
+                }
+
+                if (!String.IsNullOrEmpty(desc)) desc += ".\n";
+                desc +=
+                    $"Choosing a Quality below 100 will perform a block compression to {outputFormat} with an additional supercompression via {compression}.";
+            }
+
+            return desc;
+        }
 
         public string Warning
         {

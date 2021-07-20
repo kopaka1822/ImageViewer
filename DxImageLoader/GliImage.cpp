@@ -2,6 +2,7 @@
 #include "GliImage.h"
 #include "compress_interface.h"
 #include "interface.h"
+#include <stdexcept>
 
 bool is_grayscale(gli::format f);
 
@@ -19,13 +20,15 @@ inline texture_type convert_mod(texture_type const& Texture, gli::format Format)
 	GLI_ASSERT(!Texture.empty());
 	GLI_ASSERT(!is_compressed(Format));
 
-	const auto isSrgb = gli::is_srgb(Texture.format());
+	//const auto isSrgb = gli::is_srgb(Texture.format());
 	const auto isCompressed = gli::is_compressed(Texture.format());
+	//const auto toUnsigend = gli::is_unsigned(Format); // needs to be clamped to 0
+	//const auto toNormalized = gli::is_normalized(Format);
+    //const auto toInteger = gli::is_integer(Format) || gli::is_scaled(Format); // clamp these values to prevent overflow
+
+	auto [minClamp, maxClamp] = gli::min_max_values(Format);
 
 	assert(!isCompressed); // this should be done by compressonator
-
-	// for some reason the gli loader doesn't revert srgb compression in this case
-	//const auto convertFromSrgb = isSrgb && isCompressed;
 
 	fetch_type Fetch = gli::detail::convert<texture_type, T, gli::defaultp>::call(Texture.format()).Fetch;
 	write_type Write = gli::detail::convert<texture_type, T, gli::defaultp>::call(Format).Write;
@@ -53,8 +56,8 @@ inline texture_type convert_mod(texture_type const& Texture, gli::format Format)
 						{
 							typename texture_type::extent_type const Texelcoord(extent_type(i, j, k));
 							auto texel = Fetch(Texture, Texelcoord, Layer, Face, Level);
-							//if (convertFromSrgb)
-							//	texel = gli::convertSRGBToLinear(texel);
+
+                            texel = gli::clamp(texel, minClamp, maxClamp);
 
 							Write(
 								Copy, Texelcoord, Layer, Face, Level,

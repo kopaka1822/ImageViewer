@@ -79,7 +79,7 @@
                 VerticalAlignment="Center"/>
 
             <TextBlock
-                Text="export crop rectangle and zoom boxes"
+                Text="export crop rectangle, zoom boxes and arrows"
                 Margin="{StaticResource DefaultBorderBotRight}"
                 VerticalAlignment="Center"/>
         </StackPanel>
