@@ -506,7 +506,7 @@ namespace FrameworkTests.Model
         [TestMethod]
         public void GrayTestAllKtx2WithQuality()
         {
-            TryExportAllFormatsAndCompareGray("ktx2", false, 50);
+            TryExportAllFormatsAndCompareGray("ktx2", false, 80);
         }
 
         [TestMethod]
