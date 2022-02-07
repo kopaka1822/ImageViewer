@@ -148,6 +148,10 @@ float4 srgbAsSnorm(float4 v)
                     front = $"f4({name}((";
                     end = ").x))";
                     break;
+                case "countbits":
+                    front = "float4(countbits(uint4(int4(";
+                    end = "))))";
+                    break;
                 default:
                     front = null;
                     end = null;
