@@ -3,6 +3,8 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+// friendly error messages
+#define STBI_FAILURE_USERMSG
 #include "../dependencies/stb_image.h"
 #include "../dependencies/stb_image_write.h"
 #include <fstream>
@@ -50,7 +52,7 @@ public:
 			int nComponents = 0;
 			auto tmp = reinterpret_cast<stbi_uc*>(stbi_loadf(filename, &m_width, &m_height, &nComponents, 3));
 			if (!tmp)
-				throw std::exception("error during reading file");
+				throwStbError();
 
 			// copy data with additional alpha channel
 			const size_t size = size_t(m_width) * size_t(m_height) * 4 * 4;
@@ -76,7 +78,7 @@ public:
 			int nComponents = 0;
 			m_data = stbi_load(filename, &m_width, &m_height, &nComponents, 4);
 			if (!m_data)
-				throw std::exception("error during reading file");
+				throwStbError();
 
 			m_original = getSrgbFormat(nComponents);
 			m_format = gli::format::FORMAT_RGBA8_SRGB_PACK8;
@@ -105,6 +107,18 @@ public:
 	{
 		size = m_size;	
 		return m_data;
+	}
+
+private:
+	void throwStbError()
+	{
+		if (stbi_failure_reason())
+		{
+			std::string err = "stbi error: ";
+			err += stbi_failure_reason();
+			throw std::runtime_error(err);
+		}
+		else throw std::exception("error during reading file");
 	}
 
 private:
