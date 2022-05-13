@@ -14,6 +14,7 @@ namespace ImageViewer.Models.Display
         void MouseMove(Size3 texel);
         void MouseClick(MouseButton button, bool down, Size3 texel);
 
+        // return true if the key was handled by the overlay
         bool OnKeyDown(Key key);
 
         // additional view that is displayed below the menu bar

@@ -124,6 +124,7 @@
     <Compile Include="Controller\CropController.cs" />
     <Compile Include="Controller\ImportDialogController.cs" />
     <Compile Include="Controller\Overlays\AddArrowOverlay.cs" />
+    <Compile Include="Controller\Overlays\MovieOverlay.cs" />
     <Compile Include="Controller\Overlays\ZoomBoxOverlay.cs" />
     <Compile Include="Controller\PaintController.cs" />
     <Compile Include="Controller\TextureViews\Overlays\Sphere3DOverlay.cs" />
@@ -181,6 +182,7 @@
     <Compile Include="ViewModels\Dialog\ScaleViewModel.cs" />
     <Compile Include="ViewModels\Dialog\Tex3DToArrayViewModel.cs" />
     <Compile Include="ViewModels\Display\DisplayViewModel.cs" />
+    <Compile Include="ViewModels\Display\MovieViewModel.cs" />
     <Compile Include="ViewModels\Display\RayCastingDisplayViewModel.cs" />
     <Compile Include="ViewModels\Display\Single3DDisplayViewModel.cs" />
     <Compile Include="ViewModels\EquationsViewModel.cs" />
@@ -258,6 +260,9 @@
     </Compile>
     <Compile Include="Views\Display\ArrowsToolbar.xaml.cs">
       <DependentUpon>ArrowsToolbar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Display\MovieView.xaml.cs">
+      <DependentUpon>MovieView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Display\RayCastingView.xaml.cs">
       <DependentUpon>RayCastingView.xaml</DependentUpon>
@@ -383,6 +388,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Display\ArrowsToolbar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Display\MovieView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -602,6 +611,14 @@
   <ItemGroup>
     <Resource Include="Icons\arrow_right.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Icons\arrow_left.png" />
+    <Resource Include="Icons\pause.png" />
+    <Resource Include="Icons\pause32.png" />
+    <Resource Include="Icons\run.png" />
+    <Resource Include="Icons\run32.png" />
+    <Resource Include="Icons\stop.png" />
+    <Resource Include="Icons\stop32.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

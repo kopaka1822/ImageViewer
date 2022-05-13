@@ -16,6 +16,7 @@ using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageFramework.Utility;
+using ImageViewer.Controller.Overlays;
 using ImageViewer.Controller.TextureViews;
 using ImageViewer.Controller.TextureViews.Texture3D;
 using ImageViewer.Models;
@@ -136,6 +137,11 @@ namespace ImageViewer.ViewModels.Display
                     break;
                 case nameof(ImagesModel.NumLayers):
                     CreateLayersList();
+                    OnPropertyChanged(nameof(AllowMovieOverlay));
+                    if (models.Images.NumLayers > 1 && models.Display.ActiveOverlay == null)
+                    {
+                        ShowMovieOverlay = true;
+                    }
                     break;
             }
         }
@@ -253,6 +259,8 @@ namespace ImageViewer.ViewModels.Display
                         host.Child = models.Display.ActiveOverlay.View;
                         host.Visibility = Visibility.Visible;
                     }
+                    // this has potentially changed
+                    OnPropertyChanged(nameof(ShowMovieOverlay));
                     break;
             }
         }
@@ -285,6 +293,26 @@ namespace ImageViewer.ViewModels.Display
         {
             get => models.Display.ShowCropRectangle;
             set => models.Display.ShowCropRectangle = value;
+        }
+
+        public bool AllowMovieOverlay => models.Images.NumLayers > 1;
+
+        public bool ShowMovieOverlay
+        {
+            get => models.Display.ActiveOverlay is MovieOverlay;
+            set
+            {
+                if (value == ShowMovieOverlay) return;
+
+                if (value)
+                {
+                    models.Display.ActiveOverlay = new MovieOverlay(models);
+                }
+                else if(models.Display.ActiveOverlay is MovieOverlay)
+                {
+                    models.Display.ActiveOverlay = null;
+                }
+            }
         }
 
         public bool FlipYAxis

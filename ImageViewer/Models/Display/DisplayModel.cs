@@ -13,6 +13,7 @@ using ImageFramework.DirectX;
 using ImageFramework.DirectX.Query;
 using ImageFramework.Model;
 using ImageFramework.Utility;
+using ImageViewer.Controller.Overlays;
 using SharpDX;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
