@@ -14,6 +14,7 @@ using ImageFramework.Annotations;
 using ImageFramework.Model;
 using ImageFramework.Model.Statistics;
 using ImageViewer.Commands.Helper;
+using ImageViewer.Commands.Statistics;
 using ImageViewer.Models;
 
 namespace ImageViewer.ViewModels.Statistics
@@ -46,6 +47,7 @@ namespace ImageViewer.ViewModels.Statistics
             ContrastCommand = new ActionCommand<int>((int id) => Items[id].ImportContrast());
             StructureCommand = new ActionCommand<int>((int id) => Items[id].ImportStructure());
             SSIMCommand = new ActionCommand<int>((int id) => Items[id].ImportSSIM());
+            RecalculateCommand = new CalculateSSIMCommand(this);
 
             Items.Add(new SSIMViewModel(this, models, 0));
             Items.Add(new SSIMViewModel(this, models, 1));
@@ -94,6 +96,8 @@ namespace ImageViewer.ViewModels.Statistics
         public ICommand ContrastCommand { get; }
         public ICommand StructureCommand { get; }
         public ICommand SSIMCommand { get; }
+
+        public ICommand RecalculateCommand { get; }
 
         private void RefreshImageSources()
         {

@@ -35,7 +35,7 @@ namespace ImageViewer.ViewModels.Statistics
             switch (e.PropertyName)
             {
                 case nameof(DisplayModel.VisibleLayerMipmap):
-                    OnImagesChanged();
+                    RecalculateSSIM();
                     break;
             }
         }
@@ -82,7 +82,7 @@ namespace ImageViewer.ViewModels.Statistics
                 if (image1 == value) return;
                 image1 = value;
                 OnPropertyChanged(nameof(Image1));
-                OnImagesChanged();
+                RecalculateSSIM();
             }
         }
 
@@ -95,7 +95,7 @@ namespace ImageViewer.ViewModels.Statistics
                 if (image2 == value) return;
                 image2 = value;
                 OnPropertyChanged(nameof(Image2));
-                OnImagesChanged();
+                RecalculateSSIM();
             }
         }
 
@@ -106,7 +106,7 @@ namespace ImageViewer.ViewModels.Statistics
             image2 = FindMatchingItem(Image2);
             OnPropertyChanged(nameof(Image1));
             OnPropertyChanged(nameof(Image2));
-            OnImagesChanged();
+            RecalculateSSIM();
         }
 
         private SSIMsViewModel.ImageSourceItem FindMatchingItem(SSIMsViewModel.ImageSourceItem src)
@@ -123,7 +123,7 @@ namespace ImageViewer.ViewModels.Statistics
             return null;
         }
 
-        private void OnImagesChanged()
+        public void RecalculateSSIM()
         {
             if (!IsValidImage(image1) || !IsValidImage(image2))
             {
@@ -231,13 +231,13 @@ namespace ImageViewer.ViewModels.Statistics
             bool recompute = (image1.IsEquation && image1.Id == pipeId) || (image2.IsEquation && image2.Id == pipeId);
             if (!recompute) return;
 
-            OnImagesChanged();
+            RecalculateSSIM();
         }
 
         public void OnSettingsChanged()
         {
             if (image1 == null || image2 == null) return;
-            OnImagesChanged();
+            RecalculateSSIM();
         }
     }
 }
