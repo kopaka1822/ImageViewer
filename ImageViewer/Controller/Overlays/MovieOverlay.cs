@@ -42,8 +42,21 @@ namespace ImageViewer.Controller.Overlays
 
         public bool OnKeyDown(Key key)
         {
-            // TODO next frame etc.
-            return false;
+            switch (key)
+            {
+                case Key.OemComma:
+                    viewModel.PreviousFrame();
+                    break;
+                case Key.OemPeriod:
+                    viewModel.NextFrame();
+                    break;
+                case Key.Space:
+                    viewModel.PlayPause();
+                    break;
+                default:
+                    return false;
+            }
+            return true;
         }
 
         public UIElement View => view;

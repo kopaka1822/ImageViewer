@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Media;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace ImageViewer.ViewModels.Display
     {
         private ModelsEx models;
         private bool repeatVideo = false;
+        private bool playVideo = false;
 
         public MovieViewModel(ModelsEx models)
         {
@@ -26,12 +28,34 @@ namespace ImageViewer.ViewModels.Display
 
             PreviousCommand = new ActionCommand(PreviousFrame);
             NextCommand = new ActionCommand(NextFrame);
+            ToggleRepeatCommand = new ActionCommand(() =>
+            {
+                repeatVideo = !repeatVideo;
+                OnPropertyChanged(nameof(RepeatVideo));
+            });
+            PlayCommand = new ActionCommand(PlayPause);
+            StopCommand = new ActionCommand(Stop);
         }
 
         public void Dispose()
         {
             // unsubscribe
             models.Display.PropertyChanged -= DisplayOnPropertyChanged;
+        }
+
+        public void PlayPause()
+        {
+            // TODO set play to false when finished playing
+            // TODO set active layer to 0 if play was false and current layer is last layer
+            playVideo = !playVideo;
+            OnPropertyChanged(nameof(IsPlaying));
+        }
+
+        public void Stop()
+        {
+            playVideo = false;
+            models.Display.ActiveLayer = 0;
+            OnPropertyChanged(nameof(IsPlaying));
         }
 
         public void PreviousFrame()
@@ -65,6 +89,7 @@ namespace ImageViewer.ViewModels.Display
             {
                 case nameof(DisplayModel.ActiveLayer):
                     OnPropertyChanged(nameof(FrameID));
+                    OnPropertyChanged(nameof(TickValue));
                     break;
             }
         }
@@ -75,7 +100,9 @@ namespace ImageViewer.ViewModels.Display
         public ICommand NextCommand { get; }
         public ICommand ToggleRepeatCommand { get; }
 
+        public bool RepeatVideo => repeatVideo;
 
+        public bool IsPlaying => playVideo;
 
         private int framesPerSecond = 24;
         public string FPS
@@ -95,6 +122,21 @@ namespace ImageViewer.ViewModels.Display
                 }
 
                 OnPropertyChanged(nameof(FPS));
+                OnPropertyChanged(nameof(TickFrequency));
+            }
+        }
+
+        // this can assumed to be constant, since this view will be removed and destroyed when the image changes
+        public int MaxFrameId => models.Images.NumLayers - 1;
+        public int TickFrequency => framesPerSecond;
+
+        public int TickValue
+        {
+            get => models.Display.ActiveLayer;
+            set
+            {
+                if (value == models.Display.ActiveLayer) return;
+                models.Display.ActiveLayer = value;
             }
         }
 

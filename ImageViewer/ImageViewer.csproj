@@ -620,5 +620,8 @@
     <Resource Include="Icons\stop.png" />
     <Resource Include="Icons\stop32.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\sync.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
