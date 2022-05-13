@@ -20,21 +20,20 @@ namespace ImageViewer.ViewModels.Display
     public class MovieViewModel : INotifyPropertyChanged, IDisposable
     {
         private ModelsEx models;
-        private bool repeatVideo = false;
         private bool playVideo = false;
-        private DispatcherTimer clock = new DispatcherTimer(DispatcherPriority.Render);
+        private DispatcherTimer clock = new DispatcherTimer();
 
         public MovieViewModel(ModelsEx models)
         {
             this.models = models;
             models.Display.PropertyChanged += DisplayOnPropertyChanged;
+            models.Settings.PropertyChanged += SettingsOnPropertyChanged;
 
             PreviousCommand = new ActionCommand(PreviousFrame);
             NextCommand = new ActionCommand(NextFrame);
             ToggleRepeatCommand = new ActionCommand(() =>
             {
-                repeatVideo = !repeatVideo;
-                OnPropertyChanged(nameof(RepeatVideo));
+                models.Settings.MovieRepeat = !models.Settings.MovieRepeat;
             });
             PlayCommand = new ActionCommand(PlayPause);
             StopCommand = new ActionCommand(Stop);
@@ -43,10 +42,26 @@ namespace ImageViewer.ViewModels.Display
             OnFpsChanged();
         }
 
+        private void SettingsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(SettingsModel.MovieFps):
+                    OnFpsChanged();
+                    OnPropertyChanged(nameof(FPS));
+                    OnPropertyChanged(nameof(TickFrequency));
+                    break;
+                case nameof(SettingsModel.MovieRepeat):
+                    OnPropertyChanged(nameof(RepeatVideo));
+                    break;
+            }
+        }
+
         public void Dispose()
         {
             // unsubscribe
             models.Display.PropertyChanged -= DisplayOnPropertyChanged;
+            models.Settings.PropertyChanged -= SettingsOnPropertyChanged;
             clock.Stop();
         }
 
@@ -72,7 +87,7 @@ namespace ImageViewer.ViewModels.Display
             var prev = models.Display.ActiveLayer - 1;
             if (prev < 0)
             {
-                if (!repeatVideo) return;
+                if (!RepeatVideo) return;
                 // set to last frame
                 prev = models.Images.NumLayers - 1;
             }
@@ -85,7 +100,7 @@ namespace ImageViewer.ViewModels.Display
             var next = models.Display.ActiveLayer + 1;
             if (next >= models.Images.NumLayers)
             {
-                if (!repeatVideo) return;
+                if (!RepeatVideo) return;
                 // set to first frame
                 next = 0;
             }
@@ -109,7 +124,7 @@ namespace ImageViewer.ViewModels.Display
         public ICommand NextCommand { get; }
         public ICommand ToggleRepeatCommand { get; }
 
-        public bool RepeatVideo => repeatVideo;
+        public bool RepeatVideo => models.Settings.MovieRepeat;
 
         public bool IsPlaying
         {
@@ -135,10 +150,9 @@ namespace ImageViewer.ViewModels.Display
             }
         }
 
-        private int framesPerSecond = 24;
         public string FPS
         {
-            get => framesPerSecond.ToString(ImageFramework.Model.Models.Culture);
+            get => models.Settings.MovieFps.ToString(ImageFramework.Model.Models.Culture);
             set
             {
                 int parsedFps = 0;
@@ -146,20 +160,19 @@ namespace ImageViewer.ViewModels.Display
                 if (converted)
                 {
                     // ReSharper disable once CompareOfFloatsByEqualityOperator
-                    if (parsedFps == framesPerSecond) return;
+                    if (parsedFps == models.Settings.MovieFps) return;
 
-                    framesPerSecond = parsedFps;
+                    models.Settings.MovieFps = parsedFps;
                 }
 
-                OnFpsChanged();
+                // always invoke this (to reset invalid user entries)
                 OnPropertyChanged(nameof(FPS));
-                OnPropertyChanged(nameof(TickFrequency));
             }
         }
 
         // this can assumed to be constant, since this view will be removed and destroyed when the image changes
         public int MaxFrameId => models.Images.NumLayers - 1;
-        public int TickFrequency => framesPerSecond;
+        public int TickFrequency => models.Settings.MovieFps;
 
         public int TickValue
         {
@@ -192,7 +205,7 @@ namespace ImageViewer.ViewModels.Display
 
         private void OnFpsChanged()
         {
-            clock.Interval = TimeSpan.FromMilliseconds(1000.0f / framesPerSecond);
+            clock.Interval = TimeSpan.FromMilliseconds(1000.0f / models.Settings.MovieFps);
         }
 
         private void ClockOnTick(object sender, EventArgs e)
@@ -200,7 +213,7 @@ namespace ImageViewer.ViewModels.Display
             // advance to next frame
             NextFrame();
             // stop playback if we reached the last frame (for non repeat mode)
-            if (models.Display.ActiveLayer == MaxFrameId && !repeatVideo)
+            if (models.Display.ActiveLayer == MaxFrameId && !RepeatVideo)
             {
                 IsPlaying = false;
             }

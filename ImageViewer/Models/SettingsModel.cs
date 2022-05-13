@@ -64,6 +64,12 @@ namespace ImageViewer.Models
                 case nameof(Properties.Settings.Default.AlphaBackground):
                     OnPropertyChanged(nameof(AlphaBackground));
                     break;
+                case nameof(Properties.Settings.Default.MovieFps):
+                    OnPropertyChanged(nameof(MovieFps));
+                    break;
+                case nameof(Properties.Settings.Default.MovieRepeat):
+                    OnPropertyChanged(nameof(MovieRepeat));
+                    break;
             }
         }
 
@@ -147,6 +153,22 @@ namespace ImageViewer.Models
                 var clamp = Utility.Clamp(value, MinTexelDecimalPlaces, MaxTexelDecimalPlaces);
                 Properties.Settings.Default.TexelDecimalCount = clamp;
             }
+        }
+
+        public int MovieFps
+        {
+            get => Properties.Settings.Default.MovieFps;
+            set
+            {
+                var clamp = Utility.Clamp(value, 1, 300);
+                Properties.Settings.Default.MovieFps = clamp;
+            }
+        }
+
+        public bool MovieRepeat
+        {
+            get => Properties.Settings.Default.MovieRepeat;
+            set => Properties.Settings.Default.MovieRepeat = value;
         }
 
         public enum AlphaType

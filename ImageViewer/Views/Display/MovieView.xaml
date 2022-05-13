@@ -28,7 +28,8 @@
 
                 <Button
                     Command="{Binding PlayCommand}"
-                    Margin="{StaticResource DefaultBorderRight}">
+                    Margin="{StaticResource DefaultBorderRight}"
+                    ToolTip="Toggle Play/Pause. Bound to Spacebar">
                     <StackPanel>
                         <Image 
                             Visibility="{Binding IsPlaying, Converter={StaticResource CollapsedVisibleConverter}}"
@@ -54,7 +55,8 @@
 
                 <Button
                     Command="{Binding PreviousCommand}"
-                    Margin="{StaticResource DefaultBorderRight}">
+                    Margin="{StaticResource DefaultBorderRight}"
+                    ToolTip="Previous Frame. Bound to , key">
                     <Image 
                         Width="16" Height="16"
                         Source="../../Icons/arrow_left.png"></Image>
@@ -62,7 +64,8 @@
 
                 <Button
                     Command="{Binding NextCommand}"
-                    Margin="{StaticResource DefaultBorderRight}">
+                    Margin="{StaticResource DefaultBorderRight}"
+                    ToolTip="Next Frame. Bound to . key">
                     <Image 
                         Width="16" Height="16"
                         Source="../../Icons/arrow_right.png"></Image>
