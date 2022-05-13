@@ -29,7 +29,7 @@ namespace ImageFramework.Model
 {
     public class Models : IDisposable, INotifyPropertyChanged
     {
-        public static readonly CultureInfo Culture = new CultureInfo("en-US");
+        public static readonly CultureInfo Culture = CultureInfo.InvariantCulture;
 
         public readonly int NumPipelines;
 

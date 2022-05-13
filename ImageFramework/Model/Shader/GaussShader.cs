@@ -154,7 +154,7 @@ cbuffer InputBuffer : register(b0) {{
 {builder.TexelHelperFunctions}
 
 float kernel(int offset) {{
-    return exp(-0.5 * (offset * offset) / {variance});
+    return exp(-0.5 * (offset * offset) / {variance.ToString(Models.Culture)});
 }}
 
 bool isInside(int3 pos) {{

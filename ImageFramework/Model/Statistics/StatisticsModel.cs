@@ -35,8 +35,8 @@ namespace ImageFramework.Model.Statistics
         internal StatisticsShader LightnessShader => lightnessShader ?? (lightnessShader = new StatisticsShader(shared.Upload, StatisticsShader.LightnessValue));
         internal StatisticsShader AlphaShader => alphaShader ?? (alphaShader = new StatisticsShader(shared.Upload, StatisticsShader.AlphaValue));
 
-        internal ReduceShader MinReduce => minReduce ?? (minReduce = new ReduceShader(shared.Upload, "min(a,b)", float.MaxValue.ToString(CultureInfo.InvariantCulture)));
-        internal ReduceShader MaxReduce => maxReduce ?? (maxReduce = new ReduceShader(shared.Upload, "max(a,b)", float.MinValue.ToString(CultureInfo.InvariantCulture)));
+        internal ReduceShader MinReduce => minReduce ?? (minReduce = new ReduceShader(shared.Upload, "min(a,b)", float.MaxValue.ToString(Models.Culture)));
+        internal ReduceShader MaxReduce => maxReduce ?? (maxReduce = new ReduceShader(shared.Upload, "max(a,b)", float.MinValue.ToString(Models.Culture)));
         internal ReduceShader AvgReduce => avgReduce ?? (avgReduce = new ReduceShader(shared.Upload, "a+b", "0.0"));
         //public bool HasAlpha => !(Min.Alpha == 1.0f && Max.Alpha == 1.0f);
 
