@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Media;
 using System.Runtime.CompilerServices;
@@ -12,6 +13,7 @@ using ImageFramework.Utility;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
+using System.Windows.Threading;
 
 namespace ImageViewer.ViewModels.Display
 {
@@ -20,6 +22,7 @@ namespace ImageViewer.ViewModels.Display
         private ModelsEx models;
         private bool repeatVideo = false;
         private bool playVideo = false;
+        private DispatcherTimer clock = new DispatcherTimer(DispatcherPriority.Render);
 
         public MovieViewModel(ModelsEx models)
         {
@@ -35,27 +38,33 @@ namespace ImageViewer.ViewModels.Display
             });
             PlayCommand = new ActionCommand(PlayPause);
             StopCommand = new ActionCommand(Stop);
+
+            clock.Tick += ClockOnTick;
+            OnFpsChanged();
         }
 
         public void Dispose()
         {
             // unsubscribe
             models.Display.PropertyChanged -= DisplayOnPropertyChanged;
+            clock.Stop();
         }
 
         public void PlayPause()
         {
-            // TODO set play to false when finished playing
-            // TODO set active layer to 0 if play was false and current layer is last layer
-            playVideo = !playVideo;
-            OnPropertyChanged(nameof(IsPlaying));
+            // restart with first frame if playback stopped at last frame
+            if (!IsPlaying && models.Display.ActiveLayer == MaxFrameId)
+            {
+                models.Display.ActiveLayer = 0;
+            }
+
+            IsPlaying = !IsPlaying;
         }
 
         public void Stop()
         {
-            playVideo = false;
+            IsPlaying = false;
             models.Display.ActiveLayer = 0;
-            OnPropertyChanged(nameof(IsPlaying));
         }
 
         public void PreviousFrame()
@@ -102,7 +111,29 @@ namespace ImageViewer.ViewModels.Display
 
         public bool RepeatVideo => repeatVideo;
 
-        public bool IsPlaying => playVideo;
+        public bool IsPlaying
+        {
+            get => playVideo;
+            set
+            {
+                if (playVideo == value) return;
+
+                Debug.Assert(clock != null);
+                if (value)
+                {
+                    // start timer
+                    clock.Start();
+                }
+                else
+                {
+                    // stop timer
+                    clock.Stop();
+                }
+
+                playVideo = value;
+                OnPropertyChanged(nameof(IsPlaying));
+            }
+        }
 
         private int framesPerSecond = 24;
         public string FPS
@@ -117,10 +148,10 @@ namespace ImageViewer.ViewModels.Display
                     // ReSharper disable once CompareOfFloatsByEqualityOperator
                     if (parsedFps == framesPerSecond) return;
 
-
                     framesPerSecond = parsedFps;
                 }
 
+                OnFpsChanged();
                 OnPropertyChanged(nameof(FPS));
                 OnPropertyChanged(nameof(TickFrequency));
             }
@@ -159,8 +190,21 @@ namespace ImageViewer.ViewModels.Display
             }
         }
 
-        
+        private void OnFpsChanged()
+        {
+            clock.Interval = TimeSpan.FromMilliseconds(1000.0f / framesPerSecond);
+        }
 
+        private void ClockOnTick(object sender, EventArgs e)
+        {
+            // advance to next frame
+            NextFrame();
+            // stop playback if we reached the last frame (for non repeat mode)
+            if (models.Display.ActiveLayer == MaxFrameId && !repeatVideo)
+            {
+                IsPlaying = false;
+            }
+        }
 
 
         public event PropertyChangedEventHandler PropertyChanged;
