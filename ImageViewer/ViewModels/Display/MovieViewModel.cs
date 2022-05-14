@@ -21,7 +21,7 @@ namespace ImageViewer.ViewModels.Display
     {
         private ModelsEx models;
         private bool playVideo = false;
-        private DispatcherTimer clock = new DispatcherTimer();
+        private DispatcherTimer clock = new DispatcherTimer(DispatcherPriority.Render);
 
         public MovieViewModel(ModelsEx models)
         {
