@@ -31,11 +31,7 @@ namespace FrameworkTests.Model
         [ClassInitialize]
         public static void Init(TestContext context)
         {
-            if (Directory.Exists(ExportDir))
-                Directory.Delete(ExportDir, true);
-
-            // create temporary folder for export data
-            Directory.CreateDirectory(ExportDir);
+            TestData.CreateOutputDirectory(ExportDir);
         }
 
         [TestMethod]

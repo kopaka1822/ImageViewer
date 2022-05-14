@@ -156,5 +156,14 @@ namespace FrameworkTests
                 return tex.GetPixelColors(LayerMipmapSlice.Mip0);
             }
         }
+
+        public static void CreateOutputDirectory(string directory)
+        {
+            // delete if exists
+            if(System.IO.Directory.Exists(directory))
+                System.IO.Directory.Delete(directory, true);
+
+            System.IO.Directory.CreateDirectory(directory);
+        }
     }
 }
