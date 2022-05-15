@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
+using ImageFramework.Model.Progress;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDX.Direct2D1;
 
@@ -23,7 +25,29 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
-        public void TestDiffGifExport()
+        public void MovieMetadata()
+        {
+            var data = FFMpeg.GetMovieMetadata(TestData.Directory + "einstein/movie.mp4");
+
+            Assert.AreEqual(30, data.FramesPerSecond);
+            Assert.AreEqual(60, data.FrameCount);
+        }
+
+        [TestMethod]
+        public void MovieImport()
+        {
+            var models = new Models();
+
+            var data = FFMpeg.GetMovieMetadata(TestData.Directory + "einstein/movie.mp4");
+
+            var task = FFMpeg.ImportMovie(data, models.Progress.GetProgressInterface(new CancellationToken()));
+            task.Wait();
+
+
+        }
+
+        [TestMethod]
+        public void DiffGifExport()
         {
             var models = new Models();
 

@@ -7,7 +7,11 @@ using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ImageFramework.DirectX;
 using ImageFramework.Model.Progress;
+using MediaToolkit;
+using MediaToolkit.Model;
+using MediaToolkit.Options;
 
 namespace ImageFramework.Model.Export
 {
@@ -19,6 +23,74 @@ namespace ImageFramework.Model.Export
         public static bool IsAvailable()
         {
             return File.Exists(Path);
+        }
+
+        public class Metadata
+        {
+            public string Filename;
+            public int FramesPerSecond = 0; // frames per second
+            public int FrameCount = 0; // total number of frames
+
+            internal MediaFile File;
+        }
+
+        internal static Metadata GetMovieMetadata(string filename)
+        {
+            Debug.Assert(IsAvailable());
+
+            var file = new MediaFile(filename);
+            Debug.Assert(file != null);
+
+            using (var engine = new Engine(Path))
+            {
+                engine.GetMetadata(file); // writes to file.Metadata
+            }
+            
+            return new Metadata
+            {
+                Filename = filename,
+                FramesPerSecond = (int)Math.Round(file.Metadata.VideoData.Fps),
+                FrameCount = (int)Math.Round(file.Metadata.Duration.TotalSeconds * file.Metadata.VideoData.Fps),
+                File = file
+            };
+        }
+        // https://stackoverflow.com/questions/35380868/extract-frames-from-video-c-sharp
+        internal static async Task<TextureArray2D> ImportMovie(Metadata data, IProgress progress)
+        {
+            Debug.Assert(IsAvailable());
+            Debug.Assert(data.File != null);
+
+            // create temporary folder
+            var tmpDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetFileNameWithoutExtension(System.IO.Path.GetTempFileName()));
+            System.IO.Directory.CreateDirectory(tmpDir);
+
+
+            progress.What = "Writing Frames";
+            //progress.Token.IsCancellationRequested
+            using(var engine = new Engine(Path))
+            {
+                for(int frame = 0; frame < data.FrameCount; ++frame)
+                {
+                    var tmpFilename = $"{tmpDir}\\frame{frame:D4}.png";
+                    var outputFile = new MediaFile(tmpFilename);
+                    var options = new ConversionOptions
+                    {
+                        Seek = TimeSpan.FromSeconds((float)(frame) / (float)data.FramesPerSecond)
+                    };
+                    // TODO do this async?
+                    //engine.GetThumbnail(data.File, outputFile, options);
+                    await Task.Run(() => engine.GetThumbnail(data.File, outputFile, options));
+
+                    progress.Progress = (float)frame / (float)data.FrameCount;
+                    progress.Token.ThrowIfCancellationRequested();
+                }
+            }
+
+            TextureArray2D res = null;
+
+
+
+            return res;
         }
 
         internal static async Task ConvertAsync(GifModel.Config config, IProgress progress, int numFrames)

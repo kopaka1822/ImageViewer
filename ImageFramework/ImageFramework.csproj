@@ -204,6 +204,9 @@
     <Compile Include="Utility\Size3.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="MediaToolkit">
+      <Version>1.1.0.1</Version>
+    </PackageReference>
     <PackageReference Include="SharpDX.D3DCompiler">
       <Version>4.2.0</Version>
     </PackageReference>
