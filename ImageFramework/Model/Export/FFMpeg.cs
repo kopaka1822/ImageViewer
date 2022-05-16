@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -9,9 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Model.Progress;
-using MediaToolkit;
-using MediaToolkit.Model;
-using MediaToolkit.Options;
 
 namespace ImageFramework.Model.Export
 {
@@ -20,73 +18,119 @@ namespace ImageFramework.Model.Export
         public static string Path =>
             System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\ffmpeg.exe";
 
+        public static string ProbePath =>
+            System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\ffprobe.exe";
+
         public static bool IsAvailable()
         {
-            return File.Exists(Path);
+            return File.Exists(Path) && File.Exists(ProbePath);
         }
 
         public class Metadata
         {
             public string Filename;
             public int FramesPerSecond = 0; // frames per second
-            public int FrameCount = 0; // total number of frames
-
-            internal MediaFile File;
+            public int FrameCount = 0; // total number of frames. Theoretically this could be a double but its probably not so important
+            internal string FramesPerSecondString; // something like 30/1 for 30 fps (used internally by ffmpeg)
         }
 
         internal static Metadata GetMovieMetadata(string filename)
         {
             Debug.Assert(IsAvailable());
 
-            var file = new MediaFile(filename);
-            Debug.Assert(file != null);
-
-            using (var engine = new Engine(Path))
-            {
-                engine.GetMetadata(file); // writes to file.Metadata
-            }
-            
-            return new Metadata
+            var metadata = new Metadata
             {
                 Filename = filename,
-                FramesPerSecond = (int)Math.Round(file.Metadata.VideoData.Fps),
-                FrameCount = (int)Math.Round(file.Metadata.Duration.TotalSeconds * file.Metadata.VideoData.Fps),
-                File = file
+                FrameCount = ProbeFrameCount(filename),
+                FramesPerSecondString = ProbeFramesPerSecond(filename)
             };
+
+            Debug.Assert(metadata.FramesPerSecondString != null);
+
+            // convert frames per second string to double
+            using (var dataTable = new DataTable())
+            {
+                var outputFps = dataTable.Compute(metadata.FramesPerSecondString, null).ToString();
+                Debug.Assert(outputFps != null);
+                metadata.FramesPerSecond = (int)Math.Round(double.Parse(outputFps));
+            }
+
+            return metadata;
         }
         // https://stackoverflow.com/questions/35380868/extract-frames-from-video-c-sharp
-        internal static async Task<TextureArray2D> ImportMovie(Metadata data, IProgress progress)
+        internal static async Task<TextureArray2D> ImportMovie(Metadata data, int frameStart, int numFrames, IProgress progress)
         {
             Debug.Assert(IsAvailable());
-            Debug.Assert(data.File != null);
+            if (frameStart < 0 || numFrames < 1 || frameStart + numFrames > data.FrameCount)
+                throw new Exception($"The combination of frameStart ({frameStart}) and numFrames ({numFrames}) is invalid for movie '{data.Filename}' with {data.FrameCount} frames.");
 
             // create temporary folder
             var tmpDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetFileNameWithoutExtension(System.IO.Path.GetTempFileName()));
             System.IO.Directory.CreateDirectory(tmpDir);
 
 
-            progress.What = "Writing Frames";
-            //progress.Token.IsCancellationRequested
-            using(var engine = new Engine(Path))
-            {
-                for(int frame = 0; frame < data.FrameCount; ++frame)
-                {
-                    var tmpFilename = $"{tmpDir}\\frame{frame:D4}.png";
-                    var outputFile = new MediaFile(tmpFilename);
-                    var options = new ConversionOptions
-                    {
-                        Seek = TimeSpan.FromSeconds((float)(frame) / (float)data.FramesPerSecond)
-                    };
-                    // TODO do this async?
-                    //engine.GetThumbnail(data.File, outputFile, options);
-                    await Task.Run(() => engine.GetThumbnail(data.File, outputFile, options));
+            // extract all frames as bitmap: .\ffmpeg.exe -i .\movie.mp4 -r 30/1 out%04d.bmp
 
-                    progress.Progress = (float)frame / (float)data.FrameCount;
+            progress.What = "writing frames to disc";
+
+
+            var ffmpeg = new Process
+            {
+                StartInfo =
+                {
+                    UseShellExecute = false,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    CreateNoWindow = true,
+                    RedirectStandardError = true,
+                    FileName = Path,
+                    Arguments = $"-i \"{data.Filename}\" -vf \"select='between(\\n, {frameStart}, {frameStart + numFrames - 1})'\" \"{tmpDir}\\out%04d.bmp\""
+                }
+            };
+
+            if (!ffmpeg.Start())
+                throw new Exception("could not start ffmpeg.exe");
+
+
+            while (!ffmpeg.HasExited)
+            {
+                await Task.Run(() => ffmpeg.WaitForExit(100));
+
+                if (progress.Token.IsCancellationRequested && !ffmpeg.HasExited)
+                {
+                    ffmpeg.Kill();
                     progress.Token.ThrowIfCancellationRequested();
                 }
             }
 
-            TextureArray2D res = null;
+            Debug.Assert(ffmpeg.ExitCode == 0);
+            if (ffmpeg.ExitCode != 0)
+                throw new Exception($"ffmpeg.exe exited with error code {ffmpeg.ExitCode}");
+
+            progress.What = "importing frames";
+            // assume that all files have been written to tmpDir/out0001.bmp and so on
+            
+
+            //progress.Token.IsCancellationRequested
+                /*using(var engine = new Engine(Path))
+                {
+                    for(int frame = 0; frame < data.FrameCount; ++frame)
+                    {
+                        var tmpFilename = $"{tmpDir}\\frame{frame:D4}.png";
+                        var outputFile = new MediaFile(tmpFilename);
+                        var options = new ConversionOptions
+                        {
+                            Seek = TimeSpan.FromSeconds((float)(frame) / (float)data.FramesPerSecond)
+                        };
+                        // TODO do this async?
+                        //engine.GetThumbnail(data.File, outputFile, options);
+                        await Task.Run(() => engine.GetThumbnail(data.File, outputFile, options));
+
+                        progress.Progress = (float)frame / (float)data.FrameCount;
+                        progress.Token.ThrowIfCancellationRequested();
+                    }
+                }*/
+
+                TextureArray2D res = null;
 
 
 
@@ -155,6 +199,69 @@ namespace ImageFramework.Model.Export
 
             if(!String.IsNullOrEmpty(errors))
                 throw new Exception(errors);
+        }
+
+        // use ffprobe to determine the video frame count
+        private static int ProbeFrameCount(string filename)
+        {
+            string countFramesArgs = $"-v error -select_streams v:0 -count_frames -show_entries stream=nb_read_frames -of csv=p=0 \"{filename}\"";
+            var p = new Process
+            {
+                StartInfo =
+                {
+                    UseShellExecute = false,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    CreateNoWindow = true,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    FileName = ProbePath,
+                    Arguments = countFramesArgs
+                }
+            };
+
+            if (!p.Start())
+                throw new Exception("could not start ffprobe.exe");
+
+            p.WaitForExit();
+
+            if (p.ExitCode != 0)
+                throw new Exception($"ffprobe.exe exited with code {p.ExitCode}. {p.StandardError.ReadToEnd()}");
+
+            return int.Parse(p.StandardOutput.ReadToEnd());
+        }
+
+        // use ffprobe to determine fps
+        private static string ProbeFramesPerSecond(string filename)
+        {
+            string countFpsArgs = $"-v error -select_streams v:0 -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"{filename}\"";
+            var p = new Process
+            {
+                StartInfo =
+                {
+                    UseShellExecute = false,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    CreateNoWindow = true,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    FileName = ProbePath,
+                    Arguments = countFpsArgs
+                }
+            };
+
+            if (!p.Start())
+                throw new Exception("could not start ffprobe.exe");
+
+            p.WaitForExit();
+
+            if (p.ExitCode != 0)
+                throw new Exception($"ffprobe.exe exited with code {p.ExitCode}. {p.StandardError.ReadToEnd()}");
+
+            var output = p.StandardOutput.ReadLine();
+            if (output == null)
+                throw new Exception("ffprobe.exe did not return a valid string for frame count");
+
+            return output.Trim();
+            
         }
     }
 }

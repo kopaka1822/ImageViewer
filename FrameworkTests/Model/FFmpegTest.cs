@@ -40,7 +40,7 @@ namespace FrameworkTests.Model
 
             var data = FFMpeg.GetMovieMetadata(TestData.Directory + "einstein/movie.mp4");
 
-            var task = FFMpeg.ImportMovie(data, models.Progress.GetProgressInterface(new CancellationToken()));
+            var task = FFMpeg.ImportMovie(data, 0, data.FrameCount, models.Progress.GetProgressInterface(new CancellationToken()));
             task.Wait();
 
 
