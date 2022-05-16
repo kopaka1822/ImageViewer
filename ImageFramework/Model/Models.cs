@@ -201,8 +201,23 @@ namespace ImageFramework.Model
         {
             if (textures.Count == 0) return null;
             var first = textures[0];
-            // TODO choose a format that is more similar
-            var tex = new TextureArray2D(new LayerMipmapCount(textures.Count, first.NumMipmaps), first.Size, Format.R32G32B32A32_Float, false);
+
+            // try to find a fitting format
+            var bestFormat = first.Format;
+            if (bestFormat != Format.R32G32B32A32_Float)
+            {
+                foreach (var t in textures)
+                {
+                    if (t.Format != bestFormat)
+                    {
+                        // different formats => take a format that is supported by all types
+                        bestFormat = Format.R32G32B32A32_Float;
+                        break;
+                    }
+                }
+            }
+            
+            var tex = new TextureArray2D(new LayerMipmapCount(textures.Count, first.NumMipmaps), first.Size, bestFormat, false);
             for(int i = 0; i < textures.Count; ++i)
             {
                 for (int curMip = 0; curMip < first.NumMipmaps; ++curMip)
