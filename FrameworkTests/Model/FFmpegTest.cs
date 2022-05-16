@@ -10,6 +10,7 @@ using ImageFramework.ImageLoader;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
 using ImageFramework.Model.Progress;
+using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDX.Direct2D1;
 
@@ -40,10 +41,23 @@ namespace FrameworkTests.Model
 
             var data = FFMpeg.GetMovieMetadata(TestData.Directory + "einstein/movie.mp4");
 
-            var task = FFMpeg.ImportMovie(data, 0, data.FrameCount, models.Progress.GetProgressInterface(new CancellationToken()));
+            var task = FFMpeg.ImportMovie(data, 0, data.FrameCount, models);
             task.Wait();
 
+            var res = task.Result;
 
+            Assert.IsNotNull(res);
+            Assert.AreEqual(data.FrameCount, res.NumLayers);
+            
+            // compare a single frame (frame 2)
+            var colorsMovie = res.GetPixelColors(LayerMipmapSlice.Layer1);
+            Assert.IsNotNull(colorsMovie);
+
+            var reference = (TextureArray2D)IO.LoadImageTexture(TestData.Directory + "einstein/frame01.png");
+            var refColors = reference.GetPixelColors(LayerMipmapSlice.Layer0);
+            Assert.IsNotNull(refColors);
+
+            TestData.CompareColors(refColors, colorsMovie);
         }
 
         [TestMethod]

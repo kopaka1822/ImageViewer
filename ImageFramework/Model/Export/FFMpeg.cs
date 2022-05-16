@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.ImageLoader;
 using ImageFramework.Model.Progress;
 
 namespace ImageFramework.Model.Export
@@ -58,7 +59,7 @@ namespace ImageFramework.Model.Export
             return metadata;
         }
         // https://stackoverflow.com/questions/35380868/extract-frames-from-video-c-sharp
-        internal static async Task<TextureArray2D> ImportMovie(Metadata data, int frameStart, int numFrames, IProgress progress)
+        internal static async Task<TextureArray2D> ImportMovie(Metadata data, int frameStart, int numFrames, Models models)
         {
             Debug.Assert(IsAvailable());
             if (frameStart < 0 || numFrames < 1 || frameStart + numFrames > data.FrameCount)
@@ -70,8 +71,6 @@ namespace ImageFramework.Model.Export
 
 
             // extract all frames as bitmap: .\ffmpeg.exe -i .\movie.mp4 -r 30/1 out%04d.bmp
-
-            progress.What = "writing frames to disc";
 
 
             var ffmpeg = new Process
@@ -95,46 +94,32 @@ namespace ImageFramework.Model.Export
             {
                 await Task.Run(() => ffmpeg.WaitForExit(100));
 
-                if (progress.Token.IsCancellationRequested && !ffmpeg.HasExited)
+                /*if (progress.Token.IsCancellationRequested && !ffmpeg.HasExited)
                 {
                     ffmpeg.Kill();
                     progress.Token.ThrowIfCancellationRequested();
-                }
+                }*/
             }
 
             Debug.Assert(ffmpeg.ExitCode == 0);
             if (ffmpeg.ExitCode != 0)
                 throw new Exception($"ffmpeg.exe exited with error code {ffmpeg.ExitCode}");
 
-            progress.What = "importing frames";
             // assume that all files have been written to tmpDir/out0001.bmp and so on
-            
 
-            //progress.Token.IsCancellationRequested
-                /*using(var engine = new Engine(Path))
-                {
-                    for(int frame = 0; frame < data.FrameCount; ++frame)
-                    {
-                        var tmpFilename = $"{tmpDir}\\frame{frame:D4}.png";
-                        var outputFile = new MediaFile(tmpFilename);
-                        var options = new ConversionOptions
-                        {
-                            Seek = TimeSpan.FromSeconds((float)(frame) / (float)data.FramesPerSecond)
-                        };
-                        // TODO do this async?
-                        //engine.GetThumbnail(data.File, outputFile, options);
-                        await Task.Run(() => engine.GetThumbnail(data.File, outputFile, options));
+            var textures = new List<TextureArray2D>(numFrames);
+            // for now load images sequentially
+            for (int i = 1; i <= numFrames; i++)
+            {
+                var inputFile = $"{tmpDir}\\out{i:0000}.bmp";
+                // load texture
+                var texture = await IO.LoadImageTextureAsync(inputFile, models.Progress);
+                // extract texture 2D
+                textures.Add(texture.Texture as TextureArray2D);
+            }
 
-                        progress.Progress = (float)frame / (float)data.FrameCount;
-                        progress.Token.ThrowIfCancellationRequested();
-                    }
-                }*/
-
-                TextureArray2D res = null;
-
-
-
-            return res;
+            // convert texture array 
+            return models.CombineToArray(textures);
         }
 
         internal static async Task ConvertAsync(GifModel.Config config, IProgress progress, int numFrames)
