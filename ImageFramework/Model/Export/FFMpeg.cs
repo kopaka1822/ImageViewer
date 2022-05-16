@@ -69,57 +69,69 @@ namespace ImageFramework.Model.Export
             var tmpDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetFileNameWithoutExtension(System.IO.Path.GetTempFileName()));
             System.IO.Directory.CreateDirectory(tmpDir);
 
-
-            // extract all frames as bitmap: .\ffmpeg.exe -i .\movie.mp4 -r 30/1 out%04d.bmp
-
-
-            var ffmpeg = new Process
+            try
             {
-                StartInfo =
+                // use ffmpeg to extract frames
+                var ffmpeg = new Process
                 {
-                    UseShellExecute = false,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    CreateNoWindow = true,
-                    RedirectStandardError = true,
-                    FileName = Path,
-                    Arguments = $"-i \"{data.Filename}\" -vf \"select='between(\\n, {frameStart}, {frameStart + numFrames - 1})'\" \"{tmpDir}\\out%04d.bmp\""
+                    StartInfo =
+                    {
+                        UseShellExecute = false,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        CreateNoWindow = true,
+                        RedirectStandardError = true,
+                        FileName = Path,
+                        Arguments = $"-i \"{data.Filename}\" -vf \"select='between(\\n, {frameStart}, {frameStart + numFrames - 1})'\" \"{tmpDir}\\out%04d.bmp\""
+                    }
+                };
+
+                if (!ffmpeg.Start())
+                    throw new Exception("could not start ffmpeg.exe");
+
+
+                while (!ffmpeg.HasExited)
+                {
+                    await Task.Run(() => ffmpeg.WaitForExit(100));
+
+                    /*if (progress.Token.IsCancellationRequested && !ffmpeg.HasExited)
+                    {
+                        ffmpeg.Kill();
+                        progress.Token.ThrowIfCancellationRequested();
+                    }*/
                 }
-            };
 
-            if (!ffmpeg.Start())
-                throw new Exception("could not start ffmpeg.exe");
+                Debug.Assert(ffmpeg.ExitCode == 0);
+                if (ffmpeg.ExitCode != 0)
+                    throw new Exception($"ffmpeg.exe exited with error code {ffmpeg.ExitCode}");
 
+                // assume that all files have been written to tmpDir/out0001.bmp and so on
+                var textures = new List<TextureArray2D>(numFrames);
 
-            while (!ffmpeg.HasExited)
-            {
-                await Task.Run(() => ffmpeg.WaitForExit(100));
-
-                /*if (progress.Token.IsCancellationRequested && !ffmpeg.HasExited)
+                // for now load images sequentially
+                for (int i = 1; i <= numFrames; i++)
                 {
-                    ffmpeg.Kill();
-                    progress.Token.ThrowIfCancellationRequested();
-                }*/
+                    var inputFile = $"{tmpDir}\\out{i:0000}.bmp";
+                    // load texture
+                    var texture = await IO.LoadImageTextureAsync(inputFile, models.Progress);
+                    // extract texture 2D
+                    textures.Add(texture.Texture as TextureArray2D);
+                }
+
+                // convert texture array 
+                return models.CombineToArray(textures);
             }
-
-            Debug.Assert(ffmpeg.ExitCode == 0);
-            if (ffmpeg.ExitCode != 0)
-                throw new Exception($"ffmpeg.exe exited with error code {ffmpeg.ExitCode}");
-
-            // assume that all files have been written to tmpDir/out0001.bmp and so on
-
-            var textures = new List<TextureArray2D>(numFrames);
-            // for now load images sequentially
-            for (int i = 1; i <= numFrames; i++)
+            finally
             {
-                var inputFile = $"{tmpDir}\\out{i:0000}.bmp";
-                // load texture
-                var texture = await IO.LoadImageTextureAsync(inputFile, models.Progress);
-                // extract texture 2D
-                textures.Add(texture.Texture as TextureArray2D);
+                // always try to delete temporary directory
+                try
+                {
+                    System.IO.Directory.Delete(tmpDir, true);
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
             }
-
-            // convert texture array 
-            return models.CombineToArray(textures);
         }
 
         internal static async Task ConvertAsync(GifModel.Config config, IProgress progress, int numFrames)
