@@ -35,7 +35,7 @@ namespace ImageFramework.Model.Export
             internal string FramesPerSecondString; // something like 30/1 for 30 fps (used internally by ffmpeg)
         }
 
-        internal static Metadata GetMovieMetadata(string filename)
+        public static Metadata GetMovieMetadata(string filename)
         {
             Debug.Assert(IsAvailable());
 
@@ -59,7 +59,7 @@ namespace ImageFramework.Model.Export
             return metadata;
         }
         // https://stackoverflow.com/questions/35380868/extract-frames-from-video-c-sharp
-        internal static async Task<TextureArray2D> ImportMovie(Metadata data, int frameStart, int numFrames, Models models)
+        public static async Task<TextureArray2D> ImportMovie(Metadata data, int frameStart, int numFrames, Models models)
         {
             Debug.Assert(IsAvailable());
             if (frameStart < 0 || numFrames < 1 || frameStart + numFrames > data.FrameCount)

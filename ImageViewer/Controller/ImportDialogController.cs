@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,6 +41,24 @@ namespace ImageViewer.Controller
             models.Settings.ImagePath = System.IO.Path.GetDirectoryName(ofd.FileName);
 
             return ofd.FileNames;
+        }
+
+        public static string ShowSingleFileImportImageDialog(ModelsEx models)
+        {
+            var ofd = new Microsoft.Win32.OpenFileDialog
+            {
+                Multiselect = false,
+                InitialDirectory = models.Settings.ImagePath
+            };
+
+            if (ofd.ShowDialog(models.Window.TopmostWindow) != true) return null;
+
+            // set new image path
+            models.Settings.ImagePath = System.IO.Path.GetDirectoryName(ofd.FileName);
+            Debug.Assert(ofd.FileNames.Length == 1);
+            if(ofd.FileNames.Length == 0) return null;
+
+            return ofd.FileNames[0];
         }
 
         public async Task ImportImageAsync(string file, [CanBeNull] string alias = null)

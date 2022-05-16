@@ -90,6 +90,7 @@
     <Compile Include="Commands\Export\ExportOverwriteCommand.cs" />
     <Compile Include="Commands\Helper\Command.cs" />
     <Compile Include="Commands\Import\ImportConfigCommand.cs" />
+    <Compile Include="Commands\Import\ImportMovieCommand.cs" />
     <Compile Include="Commands\Import\ReloadImagesCommand.cs" />
     <Compile Include="Commands\Import\ReplaceEquationImageCommand.cs" />
     <Compile Include="Commands\Statistics\CalculateSSIMCommand.cs" />
@@ -622,6 +623,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\sync.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\video.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

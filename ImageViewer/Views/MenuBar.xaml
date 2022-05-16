@@ -41,6 +41,15 @@
                     <Image Source="../Icons/image_layer.png"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <MenuItem
+                Header="Import Video as TextureArray"
+                ToolTip="Imports frames from the video into a TextureArray"
+                IsEnabled="{Binding Progress.NotProcessing}"
+                Command="{Binding ImportMovieCommand}">
+                <MenuItem.Icon>
+                    <Image Source="../Icons/video.png"/>
+                </MenuItem.Icon>
+            </MenuItem>
             <Separator/>
 
             <!-- Export -->
