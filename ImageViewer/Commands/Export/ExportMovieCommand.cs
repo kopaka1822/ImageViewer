@@ -11,7 +11,10 @@ using ImageFramework.Model.Export;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 using ImageViewer.UtilityEx;
+using ImageViewer.ViewModels.Dialog;
+using ImageViewer.Views.Dialog;
 using Microsoft.Win32;
+using SharpDX.D3DCompiler;
 
 namespace ImageViewer.Commands.Export
 {
@@ -92,17 +95,14 @@ namespace ImageViewer.Commands.Export
 
             path.UpdateFromFilename(sfd.FileName);
 
-            // TODO create advanced export dialog
-            var config = new FFMpeg.MovieExportConfig
-            {
-                Filename = sfd.FileName,
-                FirstFrame = 0,
-                FrameCount = models.Images.NumLayers,
-                FramesPerSecond = models.Settings.MovieFps,
-                Preset = FFMpeg.Preset.medium,
-                Source = tex as TextureArray2D
-            };
+            var viewModel = new ExportMovieViewModel(models, sfd.FileName);
+            var dia = new ExportMovieDialog(viewModel);
 
+            if (models.Window.ShowDialog(dia) != true) return;
+
+            var config = viewModel.GetConfig();
+            config.Multiplier = multiplier;
+            config.Source = tex as TextureArray2D;
 
             await FFMpeg.ExportMovieAsync(config, models);
 

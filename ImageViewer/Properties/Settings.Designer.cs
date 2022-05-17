@@ -310,5 +310,17 @@ namespace ImageViewer.Properties {
                 this["MovieRepeat"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        public int MoviePreset {
+            get {
+                return ((int)(this["MoviePreset"]));
+            }
+            set {
+                this["MoviePreset"] = value;
+            }
+        }
     }
 }
