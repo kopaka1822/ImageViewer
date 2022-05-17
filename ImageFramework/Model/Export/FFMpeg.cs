@@ -254,7 +254,7 @@ namespace ImageFramework.Model.Export
             return task.Result;
         }
 
-        public static async Task ExportMovie(MovieExportConfig config, Models models)
+        internal static async Task ExportMovie(MovieExportConfig config, IProgress progress, Models models)
         {
             Debug.Assert(IsAvailable());
             CheckAvailable();
@@ -264,21 +264,42 @@ namespace ImageFramework.Model.Export
             var tmpDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetFileNameWithoutExtension(System.IO.Path.GetTempFileName()));
             System.IO.Directory.CreateDirectory(tmpDir);
 
+            var exportTasks = new List<Task>();
+
             try
             {
+
+
+                // first half is export to disc
+                progress.What = "writing frames to disc";
+                var progress1 = progress.CreateSubProgress(0.5f);
+
                 // export selected frames to tmp directory
                 for (int i = 0; i < config.FrameCount; ++i)
                 {
-                    // TODO add option for cropping? also use different thing
-                    models.Export.ExportAsync(new ExportDescription(config.Source, $"{tmpDir}\\out{i:0000}", "bmp")
+                    // TODO add option for cropping?
+                    var task = models.Export.ExportAsync(new ExportDescription(config.Source, $"{tmpDir}\\out{i:0000}", "bmp")
                     {
                         Layer = config.FirstFrame + i,
                         Mipmap = 0,
                         FileFormat = GliFormat.RGB8_SRGB,
                         Overlay = models.Overlay.Overlay,
-                    }.ForceAlignment(2, 2));
-                    await models.Progress.WaitForTaskAsync();
+                    }.ForceAlignment(2, 2), progress.Token);
+
+                    exportTasks.Add(task);
+                    progress1.Progress = (float)i / (float)config.FrameCount;
+                    progress.Token.ThrowIfCancellationRequested();
                 }
+
+                // wait for all tasks to finish
+                foreach (var task in exportTasks)
+                {
+                    await task;
+                }
+
+                // second half is video creation
+                var progress2 = progress.CreateSubProgress(1.0f);
+                progress.What = "converting frames to video";
 
                 // create video from exported frames
                 var exportArgs = $"-r {config.FramesPerSecond} -i \"{tmpDir}\\out%04d.bmp\" -c:v libx264 -preset {config.Preset} -crf 12 -vf \"fps={config.FramesPerSecond},format=yuv420p\" \"{config.Filename}\"";
@@ -295,7 +316,6 @@ namespace ImageFramework.Model.Export
                         Arguments = exportArgs
                     }
                 };
-                //progress.What = "converting";
 
                 // progress reports
                 string errors = "";
@@ -310,7 +330,7 @@ namespace ImageFramework.Model.Export
                         substr = substr.TrimStart().Split(' ')[0];
                         if (int.TryParse(substr, out var frame))
                         {
-                            //progress.Progress = frame / (float)numFrames;
+                            progress2.Progress = frame / (float)config.FrameCount;
                         }
                     }
                     else if (args.Data.StartsWith("error", StringComparison.OrdinalIgnoreCase))
@@ -329,11 +349,11 @@ namespace ImageFramework.Model.Export
                 {
                     await Task.Run(() => p.WaitForExit(100));
                     
-                    /*if (progress.Token.IsCancellationRequested && !p.HasExited)
+                    if (progress.Token.IsCancellationRequested && !p.HasExited)
                     {
                         p.Kill();
                         progress.Token.ThrowIfCancellationRequested();
-                    }*/
+                    }
                 }
 
                 if (!String.IsNullOrEmpty(errors))
@@ -341,6 +361,19 @@ namespace ImageFramework.Model.Export
             }
             finally
             {
+                // wait for all tasks to finish
+                foreach (var task in exportTasks)
+                {
+                    try
+                    {
+                        if(task != null) await task;
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
+                }
+
                 try
                 {
                     // delete tmpDir directory
@@ -351,6 +384,14 @@ namespace ImageFramework.Model.Export
                     // ignored
                 }
             }
+        }
+
+        public static async Task ExportMovieAsync(MovieExportConfig config, Models models)
+        {
+            var cts = new CancellationTokenSource();
+            var task = ExportMovie(config, models.Progress.GetProgressInterface(cts.Token), models);
+            models.Progress.AddTask(task, cts, false);
+            await models.Progress.WaitForTaskAsync();
         }
 
         internal static async Task ConvertAsync(GifModel.Config config, IProgress progress, int numFrames)

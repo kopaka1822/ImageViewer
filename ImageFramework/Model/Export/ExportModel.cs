@@ -39,7 +39,7 @@ namespace ImageFramework.Model.Export
             models.Progress.AddTask(ExportAsync(desc, cts.Token), cts, true);
         }
 
-        private Task ExportAsync(ExportDescription desc, CancellationToken ct)
+        internal Task ExportAsync(ExportDescription desc, CancellationToken ct)
         {
             Debug.Assert(desc.Texture != null);
 

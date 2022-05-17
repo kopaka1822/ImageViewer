@@ -73,7 +73,7 @@ namespace FrameworkTests.Model
             // delete olf file if it exists (otherwise ffmpeg will hang)
             System.IO.File.Delete(dstFilename);
 
-            var task = FFMpeg.ExportMovie(new FFMpeg.MovieExportConfig
+            var task = FFMpeg.ExportMovieAsync(new FFMpeg.MovieExportConfig
             {
                 Filename = dstFilename,
                 FirstFrame = 0,
