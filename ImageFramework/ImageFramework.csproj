@@ -101,7 +101,6 @@
     <Compile Include="Model\Filter\Parameter\EnumFilterParameterModel.cs" />
     <Compile Include="Model\Overlay\ArrowOverlay.cs" />
     <Compile Include="Model\Overlay\ArrowOverlayShader.cs" />
-    <Compile Include="Model\Progress\DllProgressAdapter.cs" />
     <Compile Include="Model\Equation\HlslEquation.cs" />
     <Compile Include="Model\Equation\FormulaModel.cs" />
     <Compile Include="Model\Equation\Markov\RuleDoubleSign.cs" />

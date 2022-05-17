@@ -66,7 +66,7 @@ namespace ImageFramework.Model
 
             var cts = new CancellationTokenSource();
 
-            progressModel.AddTask(CreateGifAsync(cfg, progressModel.GetProgressInterface(cts.Token), shared), cts);
+            progressModel.AddTask(CreateGifAsync(cfg, progressModel.GetProgressInterface(cts.Token), shared), cts, false);
         }
 
         private async Task CreateGifAsync(Config cfg, IProgress progress, SharedModel shared)
@@ -101,7 +101,6 @@ namespace ImageFramework.Model
 
             try
             {
-                progressModel.EnableDllProgress = false;
                 var leftView = left.GetSrView(LayerMipmapSlice.Mip0);
                 var rightView = right.GetSrView(LayerMipmapSlice.Mip0);
                 var overlayView = overlay?.GetSrView(LayerMipmapSlice.Mip0);
@@ -189,8 +188,6 @@ namespace ImageFramework.Model
             }
             finally
             {
-                progressModel.EnableDllProgress = true;
-
                 if(disposeImages)
                 {
                     left.Dispose();

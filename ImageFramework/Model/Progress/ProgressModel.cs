@@ -24,6 +24,13 @@ namespace ImageFramework.Model.Progress
 
     /// <summary>
     /// gives information about image pipelines in progress
+    ///
+    /// Usage for adding a task:
+    /// 1. create a cancellation token: CancellationToken ct = new CancellationToken();
+    /// 2. obtain the progress interface: progIf = ProgressModel.GetProgressInterface(ct);
+    /// 3. obtain task from an async method: task = GetAsync(progIf,...)
+    /// 4. enqueue the async task and supply the progress interface: ProgressModel.AddTask(task, ct)
+    /// (5.) wait for your task: ProgressModel.WaitForTask() or ProgressModel.WaitForTaskAsync()
     /// </summary>
     public class ProgressModel : INotifyPropertyChanged, IDisposable
     {
@@ -80,7 +87,7 @@ namespace ImageFramework.Model.Progress
         {
             if (!IsProcessing) return 0; // ignore for now => progress when opening files without task
 
-            if (EnableDllProgress)
+            if (enableDllProgress)
             {
                 Progress = prog;
                 if (What != description)
@@ -112,7 +119,7 @@ namespace ImageFramework.Model.Progress
         /// <summary>
         /// progress reports from the ImageLoader dll will be used to set progress and what
         /// </summary>
-        public bool EnableDllProgress = true;
+        private bool enableDllProgress = false;
 
         private string what = "";
 
@@ -155,8 +162,13 @@ namespace ImageFramework.Model.Progress
         /// </summary>
         public bool IsProcessing => currentTask != null;
 
-
-        internal void AddTask(Task t, CancellationTokenSource cts)
+        /// <summary>
+        /// adds a new task. If a previous task exist, it will be a blocking wait first.
+        /// </summary>
+        /// <param name="t">new task</param>
+        /// <param name="cts">cancellation token that corresponds to the task</param>
+        /// <param name="enableDllProgress">if true, the Progress and What property will be set automatically by calls from the DxImageLoader.dll (this should be true when loading or saving single images, it should be false when loading or saving multiple images)</param>
+        internal void AddTask(Task t, CancellationTokenSource cts, bool enableDllProgress)
         {
             if(currentTask != null)
                 WaitForTask();
@@ -168,6 +180,7 @@ namespace ImageFramework.Model.Progress
             LastError = "";
             Progress = 0.0f;
             What = "";
+            this.enableDllProgress = enableDllProgress;
             // automatically unregister task when finished or failed
             t.ContinueWith(OnTaskFinished);
             OnPropertyChanged(nameof(IsProcessing));
@@ -187,7 +200,7 @@ namespace ImageFramework.Model.Progress
         }
 
         /// returns a task that waits for the active task to finish.
-        /// This is guaranteed to never throw an exception
+        /// This is guaranteed to never throw an exception (information about exceptions are in LastError)
         public async Task WaitForTaskAsync()
         {
             if (currentTask == null) return;

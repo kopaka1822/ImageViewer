@@ -84,7 +84,7 @@ namespace ImageFramework.ImageLoader
             });
 
             var cts = new CancellationTokenSource();
-            progress.AddTask(task, cts);
+            progress.AddTask(task, cts, true);
 
             return task;
         }

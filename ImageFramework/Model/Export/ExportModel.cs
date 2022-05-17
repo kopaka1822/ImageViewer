@@ -36,7 +36,7 @@ namespace ImageFramework.Model.Export
         public void ExportAsync(ExportDescription desc)
         {
             var cts = new CancellationTokenSource();
-            models.Progress.AddTask(ExportAsync(desc, cts.Token), cts);
+            models.Progress.AddTask(ExportAsync(desc, cts.Token), cts, true);
         }
 
         private Task ExportAsync(ExportDescription desc, CancellationToken ct)

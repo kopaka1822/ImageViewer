@@ -308,10 +308,13 @@ namespace ImageFramework.Model
             Progress.WaitForTask();
         }
 
+        /// <summary>
+        /// enqueues the apply into the progress model
+        /// </summary>
         public void ApplyAsync()
         {
             var cts = new CancellationTokenSource();
-            Progress.AddTask(pipelineController.UpdateImagesAsync(Progress.GetProgressInterface(cts.Token)), cts);
+            Progress.AddTask(pipelineController.UpdateImagesAsync(Progress.GetProgressInterface(cts.Token)), cts, false);
         }
 
         /// <summary>

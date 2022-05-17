@@ -128,7 +128,7 @@ namespace ImageFramework.Model.Scaling
         public void WriteMipmaps(ITexture tex)
         {
             var cts = new CancellationTokenSource();
-            models.Progress.AddTask(Task.Run(async () => await WriteMipmapsAsync(tex, models.Progress.GetProgressInterface(cts.Token))), cts);
+            models.Progress.AddTask(Task.Run(async () => await WriteMipmapsAsync(tex, models.Progress.GetProgressInterface(cts.Token))), cts, false);
             models.Progress.WaitForTask();
             if (!String.IsNullOrEmpty(models.Progress.LastError))
                 throw new Exception(models.Progress.LastError);
