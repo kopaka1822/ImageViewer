@@ -77,7 +77,7 @@ namespace ImageFramework.Model.Export
             using (var tmpTex = models.SharedModel.Convert.Convert(desc.Texture, stagingFormat.DxgiFormat, desc.LayerMipmap,
                 desc.Multiplier, desc.UseCropping, cropStart,
                 cropEnd - cropStart + new Size3(1),
-                new Size3(desc.FileFormat.GetAlignmentX(), desc.FileFormat.GetAlignmentY(), 0), models.Scaling, desc.Overlay, desc.Scale))
+                desc.Alignment, models.Scaling, desc.Overlay, desc.Scale))
             {
                 // the final texture only has the relevant layers and mipmaps
                 return ExportTexture(tmpTex, desc, LayerMipmapRange.All, ct);

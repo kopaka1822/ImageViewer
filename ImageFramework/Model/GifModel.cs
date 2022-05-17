@@ -94,6 +94,11 @@ namespace ImageFramework.Model
                 Debug.Assert(left.Size.Width % 2 == 0 && left.Size.Height % 2 == 0);
             }
 
+            // prepare parallel processing
+            var numTasks = Environment.ProcessorCount;
+            var tasks = new Task[numTasks];
+            var images = new DllImageData[numTasks];
+
             try
             {
                 progressModel.EnableDllProgress = false;
@@ -104,9 +109,6 @@ namespace ImageFramework.Model
                 var curProg = progress.CreateSubProgress(0.9f);
 
                 // prepare parallel processing
-                var numTasks = Environment.ProcessorCount;
-                var tasks = new Task[numTasks];
-                var images = new DllImageData[numTasks];
                 for (int i = 0; i < numTasks; ++i)
                     images[i] = IO.CreateImage(new ImageFormat(Format.R8G8B8A8_UNorm_SRgb), left.Size,
                         LayerMipmapCount.One);
@@ -194,6 +196,12 @@ namespace ImageFramework.Model
                     left.Dispose();
                     right.Dispose();
                     overlay?.Dispose();
+                }
+
+                // dispose images
+                foreach (var dllImageData in images)
+                {
+                    dllImageData?.Dispose();
                 }
             }
         }

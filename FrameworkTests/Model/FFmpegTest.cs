@@ -61,6 +61,31 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void MovieExport()
+        {
+            var models = new Models();
+
+            var source = (TextureArray2D)IO.LoadImageTexture(TestData.Directory + "sphere_array.ktx2");
+
+            var dstFilename = TestData.Directory + "sphere_movie.mp4";
+            // delete olf file if it exists (otherwise ffmpeg will hang)
+            System.IO.File.Delete(dstFilename);
+
+            var task = FFMpeg.ExportMovie(new FFMpeg.MovieExportConfig
+            {
+                Filename = dstFilename,
+                FirstFrame = 0,
+                FrameCount = source.NumLayers,
+                FramesPerSecond = 24,
+                Preset = FFMpeg.Preset.medium,
+                Source = source
+            }, models);
+            task.Wait();
+
+            Assert.IsTrue(File.Exists(dstFilename));
+        }
+
+        [TestMethod]
         public void DiffGifExport()
         {
             var models = new Models();
