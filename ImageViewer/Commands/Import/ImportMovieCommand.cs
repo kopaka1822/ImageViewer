@@ -66,7 +66,7 @@ namespace ImageViewer.Commands.Import
             try
             {
                 // image should be fully compatible
-                var tex = await FFMpeg.ImportMovie(meta, 0, meta.FrameCount, models);
+                var tex = await FFMpeg.ImportMovieAsync(meta, 0, meta.FrameCount, models);
 
                 if (models.Images.NumImages == 0)
                 {

@@ -8,6 +8,7 @@ using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Progress;
@@ -107,7 +108,7 @@ namespace ImageFramework.Model.Export
             return metadata;
         }
         
-        public static async Task<TextureArray2D> ImportMovie(Metadata data, int frameStart, int numFrames, Models models)
+        internal static async Task<TextureArray2D> ImportMovie(Metadata data, int frameStart, int numFrames, SharedModel shared, IProgress progress)
         {
             Debug.Assert(IsAvailable());
             CheckAvailable();
@@ -119,9 +120,14 @@ namespace ImageFramework.Model.Export
             var tmpDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetFileNameWithoutExtension(System.IO.Path.GetTempFileName()));
             System.IO.Directory.CreateDirectory(tmpDir);
 
+            // create as many tasks as available threads to load the images in parallel
+            var numThreads = Environment.ProcessorCount;
+            var threadTasks = new Task<DllImageData>[numThreads];
+            var textures = new List<TextureArray2D>(numFrames);
+
             try
             {
-                // use ffmpeg to extract frames
+                // use ffmpeg to extract all frames at once (with a single command)
                 var ffmpeg = new Process
                 {
                     StartInfo =
@@ -138,16 +144,17 @@ namespace ImageFramework.Model.Export
                 if (!ffmpeg.Start())
                     throw new Exception("could not start ffmpeg.exe");
 
+                progress.What = "exporting frames to disc";
 
                 while (!ffmpeg.HasExited)
                 {
                     await Task.Run(() => ffmpeg.WaitForExit(100));
 
-                    /*if (progress.Token.IsCancellationRequested && !ffmpeg.HasExited)
+                    if (progress.Token.IsCancellationRequested && !ffmpeg.HasExited)
                     {
                         ffmpeg.Kill();
                         progress.Token.ThrowIfCancellationRequested();
-                    }*/
+                    }
                 }
 
                 Debug.Assert(ffmpeg.ExitCode == 0);
@@ -155,23 +162,74 @@ namespace ImageFramework.Model.Export
                     throw new Exception($"ffmpeg.exe exited with error code {ffmpeg.ExitCode}");
 
                 // assume that all files have been written to tmpDir/out0001.bmp and so on
-                var textures = new List<TextureArray2D>(numFrames);
+
+                progress.What = "importing frames from disc";
 
                 // for now load images sequentially
                 for (int i = 1; i <= numFrames; i++)
                 {
                     var inputFile = $"{tmpDir}\\out{i:0000}.bmp";
-                    // load texture
-                    var texture = await IO.LoadImageTextureAsync(inputFile, models.Progress);
-                    // extract texture 2D
-                    textures.Add(texture.Texture as TextureArray2D);
+                    var threadIdx = i % numThreads;
+
+                    // wait for previous task to finish before opening a new image
+                    if (threadTasks[threadIdx] != null)
+                    {
+                        // create directX texture on main thread (it is potentially not thread safe)
+                        var dllData = await threadTasks[threadIdx];
+                        textures.Add(new TextureArray2D(dllData));
+                        dllData.Dispose();
+                        threadTasks[threadIdx] = null;
+                    }
+
+                    threadTasks[threadIdx] = Task.Run(() => IO.LoadImage(inputFile), progress.Token);
+
+                    progress.Token.ThrowIfCancellationRequested();
+                    progress.Progress = i / (float)numFrames;
                 }
 
+                // wait for all tasks to finish
+                foreach (var t in threadTasks)
+                {
+                    if (t != null)
+                    {
+                        // create directX texture on main thread (it is potentially not thread safe)
+                        var dllData = await t;
+                        textures.Add(new TextureArray2D(dllData));
+                        dllData.Dispose();
+                    }
+                    progress.Token.ThrowIfCancellationRequested();
+                }
+
+                progress.What = "creating texture array";
+
                 // convert texture array 
-                return models.CombineToArray(textures);
+                return shared.Convert.CombineToArray(textures);
             }
             finally
             {
+                // terminate all running threads
+                foreach (var t in threadTasks)
+                {
+                    try
+                    {
+                        if (t != null)
+                        {
+                            var dllData = await t;
+                            dllData.Dispose();
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
+                }
+
+                // delete all intermediate textures
+                foreach (var textureArray2D in textures)
+                {
+                    textureArray2D?.Dispose();
+                }
+
                 // always try to delete temporary directory
                 try
                 {
@@ -184,6 +242,17 @@ namespace ImageFramework.Model.Export
             }
         }
 
+        // enqueues movie import into the progress model
+        public static async Task<TextureArray2D> ImportMovieAsync(Metadata data, int frameStart, int numFrames,
+            Models models)
+        {
+            var cts = new CancellationTokenSource();
+            var task = ImportMovie(data, frameStart, numFrames, models.SharedModel,
+                models.Progress.GetProgressInterface(cts.Token));
+            models.Progress.AddTask(task, cts, false);
+            await models.Progress.WaitForTaskAsync();
+            return task.Result;
+        }
 
         public static async Task ExportMovie(MovieExportConfig config, Models models)
         {

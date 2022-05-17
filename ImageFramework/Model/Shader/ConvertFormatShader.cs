@@ -209,6 +209,43 @@ namespace ImageFramework.Model.Shader
         }
 
         /// <summary>
+        /// takes a list of textures and combines them into an array.
+        /// </summary>
+        /// <param name="textures">list of images with same dimensions and no layers</param>
+        /// <returns>combined image</returns>
+        public TextureArray2D CombineToArray(List<TextureArray2D> textures)
+        {
+            if (textures.Count == 0) return null;
+            var first = textures[0];
+
+            // try to find a fitting format
+            var bestFormat = first.Format;
+            if (bestFormat != Format.R32G32B32A32_Float)
+            {
+                foreach (var t in textures)
+                {
+                    if (t.Format != bestFormat)
+                    {
+                        // different formats => take a format that is supported by all types
+                        bestFormat = Format.R32G32B32A32_Float;
+                        break;
+                    }
+                }
+            }
+
+            var tex = new TextureArray2D(new LayerMipmapCount(textures.Count, first.NumMipmaps), first.Size, bestFormat, false);
+            for (int i = 0; i < textures.Count; ++i)
+            {
+                for (int curMip = 0; curMip < first.NumMipmaps; ++curMip)
+                {
+                    CopyLayer(textures[i], new LayerMipmapSlice(0, curMip), tex, new LayerMipmapSlice(i, curMip));
+                }
+            }
+
+            return tex;
+        }
+
+        /// <summary>
         /// for unit testing purposes. Converts naked srv to TextureArray2D
         /// </summary>
         internal TextureArray2D ConvertFromRaw(SharpDX.Direct3D11.ShaderResourceView srv, Size3 size, SharpDX.DXGI.Format dstFormat, bool isInteger)
