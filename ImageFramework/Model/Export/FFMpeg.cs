@@ -67,6 +67,7 @@ namespace ImageFramework.Model.Export
             public int FirstFrame;
             public int FrameCount;
             public Preset Preset = Preset.medium;
+            public float Multiplier = 1.0f; // color multiplier from export model
 
             public void Verify()
             {
@@ -260,6 +261,10 @@ namespace ImageFramework.Model.Export
             CheckAvailable();
             config.Verify();
 
+            // delete old video file first if it exists, otherwise ffmpeg will hang
+            if (File.Exists(config.Filename))
+                File.Delete(config.Filename);
+
             // create temp directory
             var tmpDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetFileNameWithoutExtension(System.IO.Path.GetTempFileName()));
             System.IO.Directory.CreateDirectory(tmpDir);
@@ -268,8 +273,6 @@ namespace ImageFramework.Model.Export
 
             try
             {
-
-
                 // first half is export to disc
                 progress.What = "writing frames to disc";
                 var progress1 = progress.CreateSubProgress(0.5f);
@@ -278,13 +281,15 @@ namespace ImageFramework.Model.Export
                 for (int i = 0; i < config.FrameCount; ++i)
                 {
                     // TODO add option for cropping?
-                    var task = models.Export.ExportAsync(new ExportDescription(config.Source, $"{tmpDir}\\out{i:0000}", "bmp")
-                    {
-                        Layer = config.FirstFrame + i,
-                        Mipmap = 0,
-                        FileFormat = GliFormat.RGB8_SRGB,
-                        Overlay = models.Overlay.Overlay,
-                    }.ForceAlignment(2, 2), progress.Token);
+                    var task = models.Export.ExportAsync(
+                        new ExportDescription(config.Source, $"{tmpDir}\\out{i:0000}", "bmp")
+                        {
+                            Layer = config.FirstFrame + i,
+                            Mipmap = 0,
+                            FileFormat = GliFormat.RGB8_SRGB,
+                            Overlay = models.Overlay.Overlay,
+                            Multiplier = config.Multiplier
+                        }.ForceAlignment(2, 2), progress.Token);
 
                     exportTasks.Add(task);
                     progress1.Progress = (float)i / (float)config.FrameCount;
@@ -302,7 +307,8 @@ namespace ImageFramework.Model.Export
                 progress.What = "converting frames to video";
 
                 // create video from exported frames
-                var exportArgs = $"-r {config.FramesPerSecond} -i \"{tmpDir}\\out%04d.bmp\" -c:v libx264 -preset {config.Preset} -crf 12 -vf \"fps={config.FramesPerSecond},format=yuv420p\" \"{config.Filename}\"";
+                var exportArgs =
+                    $"-r {config.FramesPerSecond} -i \"{tmpDir}\\out%04d.bmp\" -c:v libx264 -preset {config.Preset} -crf 12 -vf \"fps={config.FramesPerSecond},format=yuv420p\" \"{config.Filename}\"";
 
                 var p = new Process
                 {
@@ -348,7 +354,7 @@ namespace ImageFramework.Model.Export
                 while (!p.HasExited)
                 {
                     await Task.Run(() => p.WaitForExit(100));
-                    
+
                     if (progress.Token.IsCancellationRequested && !p.HasExited)
                     {
                         p.Kill();
@@ -398,6 +404,9 @@ namespace ImageFramework.Model.Export
         {
             Debug.Assert(IsAvailable());
             CheckAvailable();
+
+            if(File.Exists(config.Filename))
+                File.Delete(config.Filename);
 
             string startArgs =
                 $"-r {config.FramesPerSecond} -f concat -safe 0 -i \"{config.TmpDirectory}\\files.txt\" -c:v libx264 -preset veryslow -crf 12 -vf \"fps={config.FramesPerSecond},format=yuv420p\" \"{config.Filename}\"";

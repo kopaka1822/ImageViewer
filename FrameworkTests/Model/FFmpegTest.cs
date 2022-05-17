@@ -85,6 +85,17 @@ namespace FrameworkTests.Model
             task.Wait();
 
             Assert.IsTrue(File.Exists(dstFilename));
+
+            // import and test first frame
+            var header = FFMpeg.GetMovieMetadata(dstFilename);
+            Assert.AreEqual(source.NumLayers, header.FrameCount);
+            var imported = FFMpeg.ImportMovieAsync(header, 0, 1, models).Result;
+
+            var sourceColors = IO.LoadImageTexture(TestData.Directory + "sphere_array_first_frame.png")
+                .GetPixelColors(LayerMipmapSlice.Layer0);
+            var importedColors = imported.GetPixelColors(LayerMipmapSlice.Layer0);
+
+            TestData.CompareColors(sourceColors, importedColors, Color.Channel.Rgb, 0.8f); // needs big tolerance, compression is not so good
         }
 
         [TestMethod]

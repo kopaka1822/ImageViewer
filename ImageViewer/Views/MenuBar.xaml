@@ -62,6 +62,14 @@
                     <Image Source="../Icons/save.png"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <MenuItem 
+                Header="Export Video"
+                Command="{Binding ExportMovieCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image Source="../Icons/save.png"/>
+                </MenuItem.Icon>
+            </MenuItem>
             <MenuItem
                 Header="{Binding ExportOverwriteCommand.Text, FallbackValue=Overwrite ...}"
                 Command="{Binding ExportOverwriteCommand}"

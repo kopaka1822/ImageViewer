@@ -217,7 +217,7 @@ namespace ImageFramework.Model.Progress
         // callback that will be executed after the active task finished
         private void OnTaskFinished(Task prevTask)
         {
-            currentTask = null;
+
             LastTaskCancelledByUser = false;
             if (currentTaskCancellation != null)
             {
@@ -225,15 +225,15 @@ namespace ImageFramework.Model.Progress
                 currentTaskCancellation.Dispose();
                 currentTaskCancellation = null;
             }
-                
-            OnPropertyChanged(nameof(IsProcessing));
-
+            
             // don't set error if cancellation was requested by the user
             if (prevTask.Exception != null && !LastTaskCancelledByUser)
             {
                 if (prevTask.Exception.InnerException != null) LastError = prevTask.Exception.InnerException.Message;
             }
 
+            currentTask = null;
+            OnPropertyChanged(nameof(IsProcessing));
             OnTaskCompleted(new TaskCompletedEventArgs(prevTask.IsCompleted));
         }
 

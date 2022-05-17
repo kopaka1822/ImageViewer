@@ -104,9 +104,6 @@ namespace ImageViewer.Commands.Export
             var tmpDir = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(Path.GetTempFileName()));
             System.IO.Directory.CreateDirectory(tmpDir);
 
-            // delete old file if it existed (otherwise ffmpeg will hang)
-            System.IO.File.Delete(sfd.FileName);
-
             GifModel.Config config = new GifModel.Config
             {
                 Filename = sfd.FileName,
