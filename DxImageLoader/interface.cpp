@@ -13,9 +13,11 @@
 #include "convert.h"
 #include "ktx_interface.h"
 #include "png_interface.h"
+#include "threadsafe_unordered_map.h"
 
-static int s_currentID = 1;
-static std::unordered_map<int, std::unique_ptr<image::IImage>> s_resources;
+static std::atomic<int> s_currentID = 1;
+static threadsafe_unordered_map<int, image::IImage> s_resources;
+
 std::string s_error;
 static ProgressCallback s_progress_callback = nullptr;
 static uint32_t s_last_progress = -1;
@@ -106,8 +108,8 @@ int image_open(const char* filename)
 			}
 	}
 
-	int id = s_currentID++;
-	s_resources[id] = move(res);
+	const int id = s_currentID++;
+	s_resources.insert(id, move(res));
 
 	return id;
 }
@@ -121,73 +123,71 @@ int image_allocate(uint32_t format, int width, int height, int depth, int layer,
 		return 0;
 	}
 
-	int id = s_currentID++;
-	s_resources[id] = move(res);
+	const int id = s_currentID++;
+	s_resources.insert(id, move(res));
 
 	return id;
 }
 
 void image_release(int id)
 {
-	auto it = s_resources.find(id);
-	if (it != s_resources.end())
-		s_resources.erase(it);
+	s_resources.erase(id);
 }
 
 void image_info(int id, uint32_t& format, uint32_t& originalFormat, int& nLayer, int& nMipmaps)
 {
-	auto it = s_resources.find(id);
-	if (it == s_resources.end())
+	auto img = s_resources.find(id);
+	if(!img)
 		return;
 
-	format = uint32_t(it->second->getFormat());
-	originalFormat = uint32_t(it->second->getOriginalFormat());
-	nLayer = int(it->second->getNumLayers());
+	format = uint32_t(img->getFormat());
+	originalFormat = uint32_t(img->getOriginalFormat());
+	nLayer = int(img->getNumLayers());
 
 	nMipmaps = 0;
 	if (nLayer > 0)
 	{
-		nMipmaps = static_cast<int>(it->second->getNumMipmaps());
+		nMipmaps = static_cast<int>(img->getNumMipmaps());
 	}
 }
 
 void image_info_mipmap(int id, int mipmap, int& width, int& height, int& depth)
 {
-	auto it = s_resources.find(id);
-	if (it == s_resources.end())
+	auto img = s_resources.find(id);
+	if(!img)
 		return;
 
-	if (it->second->getNumLayers() == 0)
+	if (img->getNumLayers() == 0)
 		return;
 
-	if (unsigned(mipmap) >= it->second->getNumMipmaps())
+	if (unsigned(mipmap) >= img->getNumMipmaps())
 		return;
 
-	width = it->second->getWidth(mipmap);
-	height = it->second->getHeight(mipmap);
-	depth = it->second->getDepth(mipmap);
+	width = img->getWidth(mipmap);
+	height = img->getHeight(mipmap);
+	depth = img->getDepth(mipmap);
 }
 
 unsigned char* image_get_mipmap(int id, int layer, int mipmap, uint32_t& size)
 {
-	auto it = s_resources.find(id);
-	if (it == s_resources.end())
+	auto img = s_resources.find(id);
+	if (!img)
 		return nullptr;
 
-	if (unsigned(layer) >= it->second->getNumLayers())
+	if (unsigned(layer) >= img->getNumLayers())
 		return nullptr;
 
-	if (unsigned(mipmap) >= it->second->getNumMipmaps())
+	if (unsigned(mipmap) >= img->getNumMipmaps())
 		return nullptr;
 
-	return it->second->getData(layer, mipmap, size);
+	return img->getData(layer, mipmap, size);
 }
 
 bool image_save(int id, const char* filename, const char* extension, uint32_t format, int quality)
 {
 	s_last_progress = -1;
-	auto it = s_resources.find(id);
-	if (it == s_resources.end())
+	auto img = s_resources.find(id);
+	if (!img)
 	{
 		set_error("invalid image id");
 		return false;
@@ -198,21 +198,21 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 	try
 	{
 		if (ext == "dds")
-			gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*it->second), gli::format(format), false, quality);
+			gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*img), gli::format(format), false, quality);
 		else if (ext == "ktx")
-			gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*it->second), gli::format(format), true, quality);
+			gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*img), gli::format(format), true, quality);
 		else if (ext == "ktx2")
-			ktx2_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*it->second), gli::format(format), quality);
+			ktx2_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*img), gli::format(format), quality);
 		else if (ext == "pfm" || ext == "hdr")
 		{
-			assertSingleLayerMip(*it->second);
-			if (it->second->getFormat() != gli::FORMAT_RGBA32_SFLOAT_PACK32)
+			assertSingleLayerMip(*img);
+			if (img->getFormat() != gli::FORMAT_RGBA32_SFLOAT_PACK32)
 				throw std::runtime_error ("expected RGBA32F image format for pfm, hdr export");
 
 			uint32_t mipSize;
-			auto mip = it->second->getData(0, 0, mipSize);
-			auto width = it->second->getWidth(0);
-			auto height = it->second->getHeight(0);
+			auto mip = img->getData(0, 0, mipSize);
+			auto width = img->getWidth(0);
+			auto height = img->getHeight(0);
 			int nComponents = 0;
 
 			// only 2 possible formats
@@ -236,21 +236,21 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 		}
 		else if(ext == "png")
 		{
-			assertSingleLayerMip(*it->second);
-			png_write(*it->second, fullName.c_str(), gli::format(format), quality);
+			assertSingleLayerMip(*img);
+			png_write(*img, fullName.c_str(), gli::format(format), quality);
 		}
 		else if (ext == "jpg" || ext == "bmp")
 		{
-			assertSingleLayerMip(*it->second);
-			if (it->second->getFormat() != gli::FORMAT_RGBA8_SRGB_PACK8 &&
-				it->second->getFormat() != gli::FORMAT_RGBA8_UNORM_PACK8 &&
-				it->second->getFormat() != gli::FORMAT_RGBA8_SNORM_PACK8)
+			assertSingleLayerMip(*img);
+			if (img->getFormat() != gli::FORMAT_RGBA8_SRGB_PACK8 &&
+				img->getFormat() != gli::FORMAT_RGBA8_UNORM_PACK8 &&
+				img->getFormat() != gli::FORMAT_RGBA8_SNORM_PACK8)
 				throw std::runtime_error("unexpected image format. Expected one of FORMAT_RGBA8_SRGB_PACK8, FORMAT_RGBA8_UNORM_PACK8, FORMAT_RGBA8_SNORM_PACK8");
 
 			uint32_t mipSize;
-			auto mip = it->second->getData(0, 0, mipSize);
-			auto width = it->second->getWidth(0);
-			auto height = it->second->getHeight(0);
+			auto mip = img->getData(0, 0, mipSize);
+			auto width = img->getWidth(0);
+			auto height = img->getHeight(0);
 			int nComponents = stb_ldr_get_num_components(gli::format(format));
 
 			if (nComponents == 3)

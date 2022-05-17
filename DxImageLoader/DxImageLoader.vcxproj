@@ -183,6 +183,7 @@
     <ClInclude Include="pfm_interface.h" />
     <ClInclude Include="png_interface.h" />
     <ClInclude Include="stbi_interface.h" />
+    <ClInclude Include="threadsafe_unordered_map.h" />
     <ClInclude Include="VkFormat.h" />
   </ItemGroup>
   <ItemGroup>

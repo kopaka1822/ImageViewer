@@ -104,6 +104,9 @@
     <ClInclude Include="png_interface.h">
       <Filter>Source Files\png</Filter>
     </ClInclude>
+    <ClInclude Include="threadsafe_unordered_map.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
