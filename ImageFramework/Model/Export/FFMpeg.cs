@@ -167,12 +167,13 @@ namespace ImageFramework.Model.Export
                 progress.What = "importing frames from disc";
 
                 // for now load images sequentially
-                for (int i = 1; i <= numFrames; i++)
+                for (int i = 1; i <= numFrames + numThreads; i++)
                 {
                     var inputFile = $"{tmpDir}\\out{i:0000}.bmp";
                     var threadIdx = i % numThreads;
 
-                    // wait for previous task to finish before opening a new image
+                    // 2.  wait for previous task to finish before opening a new image
+                    // the loop repeats itself for numThreads more times in order to wait for all tasks
                     if (threadTasks[threadIdx] != null)
                     {
                         // create directX texture on main thread (it is potentially not thread safe)
@@ -182,24 +183,18 @@ namespace ImageFramework.Model.Export
                         threadTasks[threadIdx] = null;
                     }
 
-                    threadTasks[threadIdx] = Task.Run(() => IO.LoadImage(inputFile), progress.Token);
-
-                    progress.Token.ThrowIfCancellationRequested();
-                    progress.Progress = i / (float)numFrames;
-                }
-
-                // wait for all tasks to finish
-                foreach (var t in threadTasks)
-                {
-                    if (t != null)
+                    // 1. start a new task on thread index
+                    if (i <= numFrames)
                     {
-                        // create directX texture on main thread (it is potentially not thread safe)
-                        var dllData = await t;
-                        textures.Add(new TextureArray2D(dllData));
-                        dllData.Dispose();
+                        threadTasks[threadIdx] = Task.Run(() => IO.LoadImage(inputFile), progress.Token);
+                        progress.Progress = i / (float)numFrames;
                     }
+
                     progress.Token.ThrowIfCancellationRequested();
                 }
+
+                // all task should be finished since we iterate an additional numThread times in the previous loop
+                Debug.Assert(threadTasks.All(task => task == null));
 
                 progress.What = "creating texture array";
 
@@ -282,7 +277,7 @@ namespace ImageFramework.Model.Export
                 {
                     // TODO add option for cropping?
                     var task = models.Export.ExportAsync(
-                        new ExportDescription(config.Source, $"{tmpDir}\\out{i:0000}", "bmp")
+                        new ExportDescription(config.Source, $"{tmpDir}\\out{(i + 1):0000}", "bmp")
                         {
                             Layer = config.FirstFrame + i,
                             Mipmap = 0,
@@ -300,6 +295,7 @@ namespace ImageFramework.Model.Export
                 foreach (var task in exportTasks)
                 {
                     await task;
+                    progress.Token.ThrowIfCancellationRequested();
                 }
 
                 // second half is video creation
