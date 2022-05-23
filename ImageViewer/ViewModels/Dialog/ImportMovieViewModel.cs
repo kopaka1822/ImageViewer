@@ -11,6 +11,7 @@ using ImageFramework.DirectX;
 using ImageFramework.Model.Export;
 using ImageFramework.Utility;
 using ImageViewer.Models;
+using ImageViewer.Properties;
 using Xceed.Wpf.Toolkit;
 
 namespace ImageViewer.ViewModels.Dialog
@@ -25,6 +26,10 @@ namespace ImageViewer.ViewModels.Dialog
         public ImportMovieViewModel(ModelsEx models)
         {
             this.models = models;
+            // settings to retain the configuration from the last movie
+            lastFrameCount = Settings.Default.MovieLastFrameCount;
+            firstFrame = Settings.Default.MovieLastFirstFrame;
+            lastFrame = Settings.Default.MovieLastLastFrame;
         }
 
         public void Init(FFMpeg.Metadata data, int? requiredFrames)
@@ -45,7 +50,7 @@ namespace ImageViewer.ViewModels.Dialog
 
             // set first and last frame accordingly
             firstFrame = Utility.Clamp(firstFrame, 0, data.FrameCount - 1);
-            if(lastFrame == -1) lastFrame = data.FrameCount - 1;
+            if(lastFrame < 0) lastFrame = data.FrameCount - 1;
             lastFrame = Utility.Clamp(lastFrame, 0, data.FrameCount - 1);
 
             if (requiredFrames != null)
@@ -60,6 +65,19 @@ namespace ImageViewer.ViewModels.Dialog
             {
                 ExtraText = ""; // no need to pay attention to anything
             }
+        }
+
+        // obtains the view model results and saves the configuration for next time
+        public void GetFirstFrameAndFrameCount(out int firstFrame, out int frameCount)
+        {
+            // copy required values
+            firstFrame = FirstFrame;
+            frameCount = NumFrames;
+
+            // remember in settings for restart
+            Settings.Default.MovieLastFrameCount = data.FrameCount;
+            Settings.Default.MovieLastFirstFrame = FirstFrame;
+            Settings.Default.MovieLastLastFrame = LastFrame;
         }
 
 

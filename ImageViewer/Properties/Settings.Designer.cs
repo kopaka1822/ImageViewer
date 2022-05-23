@@ -322,5 +322,41 @@ namespace ImageViewer.Properties {
                 this["MoviePreset"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int MovieLastFrameCount {
+            get {
+                return ((int)(this["MovieLastFrameCount"]));
+            }
+            set {
+                this["MovieLastFrameCount"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int MovieLastFirstFrame {
+            get {
+                return ((int)(this["MovieLastFirstFrame"]));
+            }
+            set {
+                this["MovieLastFirstFrame"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int MovieLastLastFrame {
+            get {
+                return ((int)(this["MovieLastLastFrame"]));
+            }
+            set {
+                this["MovieLastLastFrame"] = value;
+            }
+        }
     }
 }

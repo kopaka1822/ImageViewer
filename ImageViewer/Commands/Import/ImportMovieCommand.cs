@@ -71,9 +71,8 @@ namespace ImageViewer.Commands.Import
                 viewModel.Init(meta, requiredCount);
                 var dia = new ImportMovieDialog(viewModel);
                 if(models.Window.ShowDialog(dia) != true) return;
-
-                firstFrame = viewModel.FirstFrame;
-                frameCount = viewModel.LastFrame - viewModel.FirstFrame + 1;
+                // obtain results
+                viewModel.GetFirstFrameAndFrameCount(out firstFrame, out frameCount);
             }
 
             try
