@@ -54,7 +54,7 @@ namespace ImageViewer.ViewModels
                 }
                 catch (Exception e)
                 {
-                    models.Window.ShowErrorDialog(e.Message);
+                    models.Window.ShowErrorDialog(e);
                 }
             }
             UpdateHasChanges();

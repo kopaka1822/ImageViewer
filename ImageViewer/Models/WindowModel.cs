@@ -120,6 +120,11 @@ namespace ImageViewer.Models
 
                 ShowDialog(dia);
             }
+            else if (exception is AggregateException ae)
+            {
+                // try to get the root exception
+                ShowErrorDialog(ae.GetBaseException(), where);
+            }
             else ShowErrorDialog(exception.Message, where);
         }
 
