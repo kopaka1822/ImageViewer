@@ -47,8 +47,19 @@ namespace ImageViewer.Commands.Import
             var file = Controller.ImportDialogController.ShowSingleFileImportImageDialog(models);
             if (file == null) return; // nothing picked
 
-            // get metadata
-            var meta = FFMpeg.GetMovieMetadata(file);
+            // try to get metadata
+            FFMpeg.Metadata meta;
+            try
+            {
+                meta = await FFMpeg.GetMovieMetadataAsync(file, models);
+            }
+            catch (Exception e)
+            {
+                if (!models.Progress.LastTaskCancelledByUser)
+                    models.Window.ShowErrorDialog(e);
+                return;
+            }
+
             var firstFrame = 0;
             var frameCount = meta.FrameCount;
 
@@ -86,7 +97,7 @@ namespace ImageViewer.Commands.Import
                     models.Settings.MovieFps = meta.FramesPerSecond;
                 }
 
-                models.Images.AddImage(tex, true, file, GliFormat.RGB8_SRGB);
+                models.Images.AddImage(tex, false, file, GliFormat.RGB8_SRGB);
 
                 if (models.Settings.MovieFps != meta.FramesPerSecond)
                     models.Window.ShowInfoDialog($"The FPS count of the imported video ({meta.FramesPerSecond}) does not match the existing FPS count ({models.Settings.MovieFps}). The previous FPS count will be kept.");

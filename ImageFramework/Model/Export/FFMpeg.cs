@@ -108,7 +108,20 @@ namespace ImageFramework.Model.Export
 
             return metadata;
         }
-        
+
+        public static async Task<Metadata> GetMovieMetadataAsync(string filename, Models models)
+        {
+            var cts = new CancellationTokenSource();
+            var task = Task.Run(() =>
+            {
+                models.Progress.GetProgressInterface(cts.Token).What = "obtaining metadata";
+                return GetMovieMetadata(filename);
+            }, cts.Token);
+            models.Progress.AddTask(task, cts, false);
+            await models.Progress.WaitForTaskAsync();
+            return task.Result;
+        }
+
         internal static async Task<TextureArray2D> ImportMovie(Metadata data, int frameStart, int numFrames, SharedModel shared, IProgress progress)
         {
             Debug.Assert(IsAvailable());
@@ -169,7 +182,8 @@ namespace ImageFramework.Model.Export
                 // for now load images sequentially
                 for (int i = 1; i <= numFrames + numThreads; i++)
                 {
-                    var inputFile = $"{tmpDir}\\out{i:0000}.bmp";
+                    // TODO fix this => dont add frameStart and export less images
+                    var inputFile = $"{tmpDir}\\out{(i + frameStart):0000}.bmp";
                     var threadIdx = i % numThreads;
 
                     // 2.  wait for previous task to finish before opening a new image
