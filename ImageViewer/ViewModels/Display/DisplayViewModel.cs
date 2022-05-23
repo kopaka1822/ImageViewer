@@ -22,6 +22,7 @@ using ImageViewer.Controller.TextureViews.Texture3D;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
 using ImageViewer.Views;
+using ImageViewer.Views.Display;
 using Color = System.Windows.Media.Color;
 using RayCastingView = ImageViewer.Views.Display.RayCastingView;
 using Single3DView = ImageViewer.Views.Display.Single3DView;
@@ -137,11 +138,6 @@ namespace ImageViewer.ViewModels.Display
                     break;
                 case nameof(ImagesModel.NumLayers):
                     CreateLayersList();
-                    OnPropertyChanged(nameof(AllowMovieOverlay));
-                    if (models.Images.NumLayers > 1 && models.Display.ActiveOverlay == null)
-                    {
-                        ShowMovieOverlay = true;
-                    }
                     break;
             }
         }
@@ -238,6 +234,28 @@ namespace ImageViewer.ViewModels.Display
                     OnPropertyChanged(nameof(ExtendedViewVisibility));
                     break;
 
+                case nameof(DisplayModel.ExtendedStatusbarData):
+                    extendedStatusbar?.Dispose();
+                    extendedStatusbar = null;
+
+                    if (models.Display.ExtendedStatusbarData != null)
+                    {
+                        if (models.Display.ExtendedStatusbarData is MovieDisplayModel)
+                        {
+                            var view = new MovieView(models);
+                            extendedStatusbar = view;
+                            models.Window.Window.ExtendedStatusbarHost.Child = view;
+                        }
+                        else Debug.Assert(false);
+                    }
+                    else
+                    {
+                        models.Window.Window.ExtendedStatusbarHost = null;
+                    }
+
+                    OnPropertyChanged(nameof(ExtendedStatusbarVisibility));
+                    break;
+
                 case nameof(DisplayModel.FrameTime):
                     OnPropertyChanged(nameof(FrameTime));
                     break;
@@ -259,8 +277,6 @@ namespace ImageViewer.ViewModels.Display
                         host.Child = models.Display.ActiveOverlay.View;
                         host.Visibility = Visibility.Visible;
                     }
-                    // this has potentially changed
-                    OnPropertyChanged(nameof(ShowMovieOverlay));
                     break;
             }
         }
@@ -295,26 +311,6 @@ namespace ImageViewer.ViewModels.Display
             set => models.Display.ShowCropRectangle = value;
         }
 
-        public bool AllowMovieOverlay => models.Images.NumLayers > 1;
-
-        public bool ShowMovieOverlay
-        {
-            get => models.Display.ActiveOverlay is MovieOverlay;
-            set
-            {
-                if (value == ShowMovieOverlay) return;
-
-                if (value)
-                {
-                    models.Display.ActiveOverlay = new MovieOverlay(models);
-                }
-                else if(models.Display.ActiveOverlay is MovieOverlay)
-                {
-                    models.Display.ActiveOverlay = null;
-                }
-            }
-        }
-
         public bool FlipYAxis
         {
             get => models.Settings.FlipYAxis;
@@ -324,6 +320,10 @@ namespace ImageViewer.ViewModels.Display
         private IDisposable extendedView = null;
 
         public Visibility ExtendedViewVisibility => extendedView == null ? Visibility.Collapsed : Visibility.Visible;
+
+        private IDisposable extendedStatusbar = null;
+
+        public Visibility ExtendedStatusbarVisibility => extendedStatusbar == null ? Visibility.Collapsed : Visibility.Visible;
 
         public ObservableCollection<ListItemViewModel<int>> AvailableMipMaps { get; } = new ObservableCollection<ListItemViewModel<int>>();
         public ObservableCollection<ListItemViewModel<int>> AvailableLayers { get; } = new ObservableCollection<ListItemViewModel<int>>();

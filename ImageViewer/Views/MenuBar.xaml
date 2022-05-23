@@ -137,11 +137,6 @@
                     IsChecked="{Binding Display.ShowCropRectangle}"
                     ToolTip="Shows the crop box if cropping is enabled for export"
                     />
-            <MenuItem
-                Header="Show Movie Overlay (TextureArray)"
-                IsCheckable="True"
-                IsEnabled="{Binding Display.AllowMovieOverlay}"
-                IsChecked="{Binding Display.ShowMovieOverlay}"
             />
             <Separator/>
             <MenuItem

@@ -196,6 +196,12 @@ namespace ImageViewer.Controller
                         models.Display.ExtendedViewData.PropertyChanged += (s, ev) => ScheduleRedraw();
                     }
                     break;
+                case nameof(DisplayModel.ExtendedStatusbarData):
+                    if (models.Display.ExtendedStatusbarData != null)
+                    {
+                        models.Display.ExtendedStatusbarData.PropertyChanged += (s, ev) => ScheduleRedraw();
+                    }
+                    break;
             }
         }
 

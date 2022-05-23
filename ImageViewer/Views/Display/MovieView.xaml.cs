@@ -12,17 +12,27 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ImageViewer.Models;
+using ImageViewer.ViewModels.Display;
 
 namespace ImageViewer.Views.Display
 {
     /// <summary>
     /// Interaction logic for MovieView.xaml
     /// </summary>
-    public partial class MovieView : UserControl
+    public partial class MovieView : UserControl, IDisposable
     {
-        public MovieView()
+        private readonly MovieViewModel viewModel;
+
+        public MovieView(ModelsEx models)
         {
             InitializeComponent();
+            DataContext = viewModel = new MovieViewModel(models);
+        }
+
+        public void Dispose()
+        {
+            viewModel?.Dispose();
         }
     }
 }

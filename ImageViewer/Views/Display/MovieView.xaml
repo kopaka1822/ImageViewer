@@ -7,7 +7,7 @@
       mc:Ignorable="d" 
       d:DesignHeight="40" d:DesignWidth="800">
 
-    <StatusBar>
+    <StatusBar BorderThickness="0 1 0 0">
 
         <!-- FPS Area -->
         <StatusBarItem HorizontalAlignment="Left"
@@ -118,7 +118,8 @@
                     TickFrequency="{Binding TickFrequency}"
                     TickPlacement="BottomRight"
                     VerticalAlignment="Center"
-                    Value="{Binding TickValue, UpdateSourceTrigger=PropertyChanged}">
+                    Value="{Binding TickValue, UpdateSourceTrigger=PropertyChanged}"
+                    BorderThickness="0 0 16 0">
 
                 </Slider>
             </Grid>

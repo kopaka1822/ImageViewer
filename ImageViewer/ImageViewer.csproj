@@ -126,7 +126,6 @@
     <Compile Include="Controller\CropController.cs" />
     <Compile Include="Controller\ImportDialogController.cs" />
     <Compile Include="Controller\Overlays\AddArrowOverlay.cs" />
-    <Compile Include="Controller\Overlays\MovieOverlay.cs" />
     <Compile Include="Controller\Overlays\ZoomBoxOverlay.cs" />
     <Compile Include="Controller\PaintController.cs" />
     <Compile Include="Controller\TextureViews\Overlays\Sphere3DOverlay.cs" />
@@ -157,6 +156,7 @@
     <Compile Include="Controller\ViewModeController.cs" />
     <Compile Include="DirectX\SwapChain.cs" />
     <Compile Include="Models\Display\IDisplayOverlay.cs" />
+    <Compile Include="Models\Display\MovieDisplayModel.cs" />
     <Compile Include="Models\Display\RayCastingDisplayModel.cs" />
     <Compile Include="Models\Display\Single3DDisplayModel.cs" />
     <Compile Include="Models\ExportConfigModel.cs" />

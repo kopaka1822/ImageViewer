@@ -263,6 +263,10 @@ namespace ImageViewer.Controller
                     if (models.Display.ExtendedViewData == null) return;
                     models.Display.ExtendedViewData.ForceTexelRecompute += (o, ev) => DispatchRecomputeTexelColor();
                     break;
+                case nameof(DisplayModel.ExtendedStatusbarData):
+                    if (models.Display.ExtendedStatusbarData == null) return;
+                    models.Display.ExtendedStatusbarData.ForceTexelRecompute += (o, ev) => DispatchRecomputeTexelColor();
+                    break;
                 case nameof(DisplayModel.ActiveView):
                     try
                     {
