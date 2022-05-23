@@ -250,7 +250,7 @@ namespace ImageViewer.ViewModels.Display
                     }
                     else
                     {
-                        models.Window.Window.ExtendedStatusbarHost = null;
+                        models.Window.Window.ExtendedStatusbarHost.Child = null;
                     }
 
                     OnPropertyChanged(nameof(ExtendedStatusbarVisibility));
