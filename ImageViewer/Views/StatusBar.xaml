@@ -211,7 +211,8 @@
                 </Grid.ColumnDefinitions>
                 <ProgressBar 
                     Grid.Column="0"
-                    Value="{Binding Progress.ProgressValue}"/>
+                    Value="{Binding Progress.ProgressValue}"
+                    IsIndeterminate="{Binding Progress.ProgressIndeterminate}"/>
                 <TextBlock 
                     Grid.Column="0"
                     Text="{Binding Progress.ProgressDescription, FallbackValue=Current Task}"

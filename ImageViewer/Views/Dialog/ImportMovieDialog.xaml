@@ -65,7 +65,7 @@
                     Minimum="{Binding MinTime}"
                     Maximum="{Binding MaxTime}"
                     CultureInfo="{Binding Culture}"
-                    UpdateValueOnEnterKey="True"/>
+                    UpdateValueOnEnterKey="False"/>
             </Grid>
 
             <!-- Last Frame -->
@@ -99,7 +99,7 @@
                     Minimum="{Binding MinTime}"
                     Maximum="{Binding MaxTime}"
                     CultureInfo="{Binding Culture}"
-                    UpdateValueOnEnterKey="True"/>
+                    UpdateValueOnEnterKey="False"/>
             </Grid>
 
             <TextBlock TextWrapping="Wrap"
