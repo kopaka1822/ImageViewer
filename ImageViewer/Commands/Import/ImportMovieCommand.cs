@@ -10,16 +10,20 @@ using ImageFramework.Model;
 using ImageFramework.Model.Export;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
+using ImageViewer.ViewModels.Dialog;
+using ImageViewer.Views.Dialog;
 
 namespace ImageViewer.Commands.Import
 {
     public class ImportMovieCommand : Command
     {
         private readonly ModelsEx models;
+        private ImportMovieViewModel viewModel;
 
         public ImportMovieCommand(ModelsEx models)
         {
             this.models = models;
+            viewModel = new ImportMovieViewModel(models);
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
 
@@ -45,28 +49,37 @@ namespace ImageViewer.Commands.Import
 
             // get metadata
             var meta = FFMpeg.GetMovieMetadata(file);
+            var firstFrame = 0;
+            var frameCount = meta.FrameCount;
 
-            // inspect metadata, if it is not compatible show error message
-            if (meta.FrameCount > Device.MAX_TEXTURE_2D_ARRAY_DIMENSION)
+            if (models.Images.NumImages != 0 && models.Images.NumLayers > meta.FrameCount)
             {
-                models.Window.ShowErrorDialog($"Video frame count {meta.FrameCount} is higher than the supported number of layers {Device.MAX_TEXTURE_2D_ARRAY_DIMENSION}");
+                // frame count of imported video is too small and cannot be adjusted
+                models.Window.ShowErrorDialog($"Video frame count {meta.FrameCount} does not match layer count of opened image {models.Images.NumLayers}");
                 return;
             }
 
-            if (models.Images.NumImages != 0)
+            // indicated if the user needs a window to adjust the frame count
+            var openFrameSelection =
+                (models.Images.NumImages == 0) || // show on import of first video
+                (models.Images.NumImages != 0 && models.Images.NumLayers != meta.FrameCount); // show when imported video frame count does not match
+
+            if (openFrameSelection)
             {
-                // test for compability with existing data
-                if (models.Images.NumLayers != meta.FrameCount)
-                {
-                    models.Window.ShowErrorDialog($"Video frame count {meta.FrameCount} does not match layer count of opened image {models.Images.NumLayers}");
-                    return;
-                }
+                int? requiredCount = null;
+                if(models.Images.NumImages != 0) requiredCount = models.Images.NumLayers;
+                viewModel.Init(meta, requiredCount);
+                var dia = new ImportMovieDialog(viewModel);
+                if(models.Window.ShowDialog(dia) != true) return;
+
+                firstFrame = viewModel.FirstFrame;
+                frameCount = viewModel.LastFrame - viewModel.FirstFrame + 1;
             }
 
             try
             {
                 // image should be fully compatible
-                var tex = await FFMpeg.ImportMovieAsync(meta, 0, meta.FrameCount, models);
+                var tex = await FFMpeg.ImportMovieAsync(meta, firstFrame, frameCount, models);
 
                 if (models.Images.NumImages == 0)
                 {

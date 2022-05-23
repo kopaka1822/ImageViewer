@@ -178,6 +178,7 @@
     <Compile Include="ViewModels\Dialog\ExportViewModel.cs" />
     <Compile Include="ViewModels\Dialog\GifExportViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ImportArrayViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\ImportMovieViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PaddingViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelColorViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
@@ -239,6 +240,9 @@
     </Compile>
     <Compile Include="Views\Dialog\HelpDialog.xaml.cs">
       <DependentUpon>HelpDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\ImportMovieDialog.xaml.cs">
+      <DependentUpon>ImportMovieDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\PaddingDialog.xaml.cs">
       <DependentUpon>PaddingDialog.xaml</DependentUpon>
@@ -362,6 +366,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialog\HelpDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\ImportMovieDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
