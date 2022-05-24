@@ -478,6 +478,8 @@ namespace ImageFramework.Model.Export
                 throw new Exception(errors);
         }
 
+        private static readonly char[] trimChars = new char[] { ',', '\n', ' ', '\r' };
+
         // use ffprobe to determine the video frame count
         private static int ProbeFrameCount(string filename)
         {
@@ -504,7 +506,9 @@ namespace ImageFramework.Model.Export
             if (p.ExitCode != 0)
                 throw new Exception($"ffprobe.exe exited with code {p.ExitCode}. {p.StandardError.ReadToEnd()}");
 
-            return int.Parse(p.StandardOutput.ReadToEnd());
+            var output = p.StandardOutput.ReadToEnd();
+            output = output.Trim(trimChars);
+            return int.Parse(output);
         }
 
         // use ffprobe to determine fps
@@ -537,7 +541,7 @@ namespace ImageFramework.Model.Export
             if (output == null)
                 throw new Exception("ffprobe.exe did not return a valid string for frame count");
 
-            return output.Trim();
+            return output.Trim(trimChars);
             
         }
     }
