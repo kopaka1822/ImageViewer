@@ -33,7 +33,8 @@ namespace ImageViewer.Controller.Overlays
         {
             this.models = models;
             IsEnabled = true;
-            Layer = models.Display.ActiveLayer;
+            //Layer = models.Display.ActiveLayer;
+            Layer = -1; // draw the zoom box on every layer
             models.Overlay.Overlays.Add(this);
             models.Display.UserInfo = "Click left to start zoombox";
 
@@ -218,7 +219,7 @@ namespace ImageViewer.Controller.Overlays
 
         public void MouseMove(Size3 texel)
         {
-            Layer = models.Display.ActiveLayer;
+            //Layer = models.Display.ActiveLayer;
             if (firstPoint == null) return;
             SetCropRect(GetCurrentCoords(texel));
             var dim = CurDim;
