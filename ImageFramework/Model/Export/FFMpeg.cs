@@ -39,8 +39,8 @@ namespace ImageFramework.Model.Export
         public class Metadata
         {
             public string Filename;
-            public int FramesPerSecond = 0; // frames per second
-            public int FrameCount = 0; // total number of frames. Theoretically this could be a double but its probably not so important
+            public int FramesPerSecond = 0; // frames per second. Theoretically this could be a double but its probably not so important
+            public int FrameCount = 0; // total number of frames.
             internal string FramesPerSecondString; // something like 30/1 for 30 fps (used internally by ffmpeg)
         }
 

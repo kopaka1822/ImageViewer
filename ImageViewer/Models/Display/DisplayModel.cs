@@ -22,6 +22,9 @@ namespace ImageViewer.Models.Display
 {
     public interface IExtendedDisplayModel : IDisposable, INotifyPropertyChanged
     {
+        // return true if the key was handled by the overlay
+        bool OnKeyDown(System.Windows.Input.Key key);
+
         // forces the view mode controller to recompute the texel position
         event EventHandler ForceTexelRecompute;
     }

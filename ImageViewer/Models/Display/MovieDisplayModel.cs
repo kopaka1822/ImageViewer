@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using ImageFramework.Annotations;
 
 namespace ImageViewer.Models.Display
@@ -18,6 +19,26 @@ namespace ImageViewer.Models.Display
         {
             this.models = models;
             this.display = display;
+        }
+
+        public bool OnKeyDown(Key key)
+        {
+            // TODO implement
+            switch (key)
+            {
+                case Key.OemComma:
+                    //viewModel.PreviousFrame();
+                    break;
+                case Key.OemPeriod:
+                    //viewModel.NextFrame();
+                    break;
+                case Key.Space:
+                    //viewModel.PlayPause();
+                    break;
+                default:
+                    return false;
+            }
+            return true;
         }
 
         public void Dispose()

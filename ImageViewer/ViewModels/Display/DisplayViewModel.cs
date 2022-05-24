@@ -124,8 +124,22 @@ namespace ImageViewer.ViewModels.Display
 
         public bool HasPriorityKeyInvoked(Key key)
         {
-            if (models.Display.ActiveOverlay == null) return false;
-            return models.Display.ActiveOverlay.OnKeyDown(key);
+            var handled = false;
+            // test overlay first
+            if(models.Display.ActiveOverlay != null)
+            {
+                handled = models.Display.ActiveOverlay.OnKeyDown(key);
+            }
+            // test extended views (right side and statusbar)
+            if (!handled && models.Display.ExtendedStatusbarData != null)
+            {
+                handled = models.Display.ExtendedStatusbarData.OnKeyDown(key);
+            }
+            if (!handled && models.Display.ExtendedViewData != null)
+            {
+                handled = models.Display.ExtendedViewData.OnKeyDown(key);
+            }
+            return handled;
         }
 
         private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
