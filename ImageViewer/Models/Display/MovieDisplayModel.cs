@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -21,24 +22,13 @@ namespace ImageViewer.Models.Display
             this.display = display;
         }
 
+        // this is overwritten by the view model to connect the keys
+        public Func<Key, bool> OnKeyFunc { get; set; } 
+
         public bool OnKeyDown(Key key)
         {
-            // TODO implement
-            switch (key)
-            {
-                case Key.OemComma:
-                    //viewModel.PreviousFrame();
-                    break;
-                case Key.OemPeriod:
-                    //viewModel.NextFrame();
-                    break;
-                case Key.Space:
-                    //viewModel.PlayPause();
-                    break;
-                default:
-                    return false;
-            }
-            return true;
+            Debug.Assert(OnKeyFunc != null);
+            return OnKeyFunc(key);
         }
 
         public void Dispose()

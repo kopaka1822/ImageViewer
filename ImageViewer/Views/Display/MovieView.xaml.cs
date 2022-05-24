@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ImageViewer.Models;
 using ImageViewer.ViewModels.Display;
+using ImageViewer.Models.Display;
 
 namespace ImageViewer.Views.Display
 {
@@ -24,10 +25,10 @@ namespace ImageViewer.Views.Display
     {
         private readonly MovieViewModel viewModel;
 
-        public MovieView(ModelsEx models)
+        public MovieView(ModelsEx models, MovieDisplayModel baseModel)
         {
             InitializeComponent();
-            DataContext = viewModel = new MovieViewModel(models);
+            DataContext = viewModel = new MovieViewModel(models, baseModel);
         }
 
         public void Dispose()

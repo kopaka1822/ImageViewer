@@ -254,9 +254,9 @@ namespace ImageViewer.ViewModels.Display
 
                     if (models.Display.ExtendedStatusbarData != null)
                     {
-                        if (models.Display.ExtendedStatusbarData is MovieDisplayModel)
+                        if (models.Display.ExtendedStatusbarData is MovieDisplayModel bm)
                         {
-                            var view = new MovieView(models);
+                            var view = new MovieView(models, bm);
                             extendedStatusbar = view;
                             models.Window.Window.ExtendedStatusbarHost.Child = view;
                         }

@@ -23,11 +23,12 @@ namespace ImageViewer.ViewModels.Display
         private bool playVideo = false;
         private DispatcherTimer clock = new DispatcherTimer(DispatcherPriority.Render);
 
-        public MovieViewModel(ModelsEx models)
+        public MovieViewModel(ModelsEx models, MovieDisplayModel baseModel)
         {
             this.models = models;
             models.Display.PropertyChanged += DisplayOnPropertyChanged;
             models.Settings.PropertyChanged += SettingsOnPropertyChanged;
+            baseModel.OnKeyFunc = OnKeyDown;
 
             PreviousCommand = new ActionCommand(PreviousFrame);
             NextCommand = new ActionCommand(NextFrame);
@@ -40,6 +41,25 @@ namespace ImageViewer.ViewModels.Display
 
             clock.Tick += ClockOnTick;
             OnFpsChanged();
+        }
+
+        private bool OnKeyDown(Key key)
+        {
+            switch (key)
+            {
+                case Key.OemComma:
+                    PreviousFrame();
+                    break;
+                case Key.OemPeriod:
+                    NextFrame();
+                    break;
+                case Key.Space:
+                    PlayPause();
+                    break;
+                default:
+                    return false;
+            }
+            return true;
         }
 
         private void SettingsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
