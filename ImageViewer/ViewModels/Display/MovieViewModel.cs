@@ -70,6 +70,7 @@ namespace ImageViewer.ViewModels.Display
                     OnFpsChanged();
                     OnPropertyChanged(nameof(FPS));
                     OnPropertyChanged(nameof(TickFrequency));
+                    OnPropertyChanged(nameof(TimeText));
                     break;
                 case nameof(SettingsModel.MovieRepeat):
                     OnPropertyChanged(nameof(RepeatVideo));
@@ -134,6 +135,7 @@ namespace ImageViewer.ViewModels.Display
                 case nameof(DisplayModel.ActiveLayer):
                     OnPropertyChanged(nameof(FrameID));
                     OnPropertyChanged(nameof(TickValue));
+                    OnPropertyChanged(nameof(TimeText));
                     break;
             }
         }
@@ -201,6 +203,15 @@ namespace ImageViewer.ViewModels.Display
             {
                 if (value == models.Display.ActiveLayer) return;
                 models.Display.ActiveLayer = value;
+            }
+        }
+
+        public string TimeText
+        {
+            get
+            {
+                int seconds = models.Display.ActiveLayer / models.Settings.MovieFps;
+                return $"{(seconds / 60):00}:{(seconds % 60):00}";
             }
         }
 

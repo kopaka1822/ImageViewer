@@ -109,10 +109,18 @@
             VerticalContentAlignment="Stretch">
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="38"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Slider 
+                <TextBlock
+                    Text="{Binding TimeText, FallbackValue=00:00}"
+                    Grid.Column="0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"/>
+                
+                <Slider
+                    Grid.Column="1"
                     Minimum="0"
                     Maximum="{Binding MaxFrameId}"
                     TickFrequency="{Binding TickFrequency}"
