@@ -151,7 +151,7 @@ namespace ImageFramework.Model.Export
                         CreateNoWindow = true,
                         RedirectStandardError = true,
                         FileName = Path,
-                        Arguments = $"-i \"{data.Filename}\" -vf \"select='between(\\n, {frameStart}, {frameStart + numFrames - 1})'\" \"{tmpDir}\\out%04d.bmp\""
+                        Arguments = $"-i \"{data.Filename}\" -vf \"select='between(\\n, {frameStart}, {frameStart + numFrames - 1})'\" -vsync vfr \"{tmpDir}\\out%04d.bmp\""
                     }
                 };
 
@@ -182,8 +182,7 @@ namespace ImageFramework.Model.Export
                 // for now load images sequentially
                 for (int i = 1; i <= numFrames + numThreads; i++)
                 {
-                    // TODO fix this => dont add frameStart and export less images
-                    var inputFile = $"{tmpDir}\\out{(i + frameStart):0000}.bmp";
+                    var inputFile = $"{tmpDir}\\out{i:0000}.bmp";
                     var threadIdx = i % numThreads;
 
                     // 2.  wait for previous task to finish before opening a new image
