@@ -44,6 +44,7 @@ namespace ImageViewer.Models
             switch (e.PropertyName)
             {
                 case nameof(ImagePipeline.Image):
+                    cache.Clear(); // image colors have changed => invalidate cache
                     UpdateStatistics();
                     break;
             }
@@ -53,7 +54,15 @@ namespace ImageViewer.Models
         {
             if (pipe.Image != null)
             {
-                Stats = models.Stats.GetStatisticsFor(pipe.Image, display.VisibleLayerMipmap);
+                // try to obtain from cache
+                if(cache.TryGetValue(display.VisibleLayerMipmap, out var stats))
+                    Stats = stats;
+                else
+                {
+                    // calculate once and put into cache
+                    Stats = models.Stats.GetStatisticsFor(pipe.Image, display.VisibleLayerMipmap);
+                    cache.Add(display.VisibleLayerMipmap, Stats);
+                }
                 
                 OnPropertyChanged(nameof(Stats));
             }
@@ -62,10 +71,11 @@ namespace ImageViewer.Models
                 Stats = DefaultStatistics.Zero;
                 OnPropertyChanged(nameof(Stats));
             }
-            
         }
 
+        private readonly Dictionary<LayerMipmapRange, DefaultStatistics> cache = new Dictionary<LayerMipmapRange, DefaultStatistics>();
         public DefaultStatistics Stats { get; private set; } = DefaultStatistics.Zero;
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
