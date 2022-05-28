@@ -45,6 +45,12 @@
     <Filter Include="Docs\img">
       <UniqueIdentifier>{e9a0ecf1-1d70-4a7b-8bc3-0fa2bfeeb454}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\hdr">
+      <UniqueIdentifier>{59dfc0bf-3243-49db-bf08-3d70c79acbbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hdr\rgbe">
+      <UniqueIdentifier>{7382d5b5-615c-429b-987a-d227e7ca2f7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Layer.h">
@@ -107,6 +113,12 @@
     <ClInclude Include="threadsafe_unordered_map.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="hdr_interface.h">
+      <Filter>Source Files\hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\hdr\rgbe.h">
+      <Filter>Source Files\hdr\rgbe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -144,6 +156,9 @@
     </ClCompile>
     <ClCompile Include="png_interface.cpp">
       <Filter>Source Files\png</Filter>
+    </ClCompile>
+    <ClCompile Include="hdr_interface.cpp">
+      <Filter>Source Files\hdr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

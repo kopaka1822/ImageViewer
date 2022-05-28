@@ -13,6 +13,7 @@
 #include "convert.h"
 #include "ktx_interface.h"
 #include "png_interface.h"
+#include "hdr_interface.h"
 #include "threadsafe_unordered_map.h"
 
 static std::atomic<int> s_currentID = 1;
@@ -82,6 +83,10 @@ int image_open(const char* filename)
 		else if(hasEnding(fname, ".png"))
 		{
 			res = png_load(filename);
+		}
+		else if(hasEnding(fname, ".hdr"))
+		{
+			res = hdr_load(filename);
 		}
 		else
 		{
@@ -203,11 +208,16 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 			gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*img), gli::format(format), true, quality);
 		else if (ext == "ktx2")
 			ktx2_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*img), gli::format(format), quality);
-		else if (ext == "pfm" || ext == "hdr")
+		else if(ext == "hdr")
+		{
+			assertSingleLayerMip(*img);
+			hdr_write(*img, fullName.c_str());
+		}
+		else if (ext == "pfm")
 		{
 			assertSingleLayerMip(*img);
 			if (img->getFormat() != gli::FORMAT_RGBA32_SFLOAT_PACK32)
-				throw std::runtime_error ("expected RGBA32F image format for pfm, hdr export");
+				throw std::runtime_error ("expected RGBA32F image format for pfm export");
 
 			uint32_t mipSize;
 			auto mip = img->getData(0, 0, mipSize);
@@ -228,11 +238,7 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 			}
 			else throw std::runtime_error("export format not supported for pfm, hdr");
 
-			if (ext == "hdr")
-				stb_save_hdr(fullName.c_str(), width, height, nComponents, mip);
-			else if (ext == "pfm")
-				pfm_save(fullName.c_str(), width, height, nComponents, mip);
-			else assert(false);
+			pfm_save(fullName.c_str(), width, height, nComponents, mip);
 		}
 		else if(ext == "png")
 		{
@@ -286,7 +292,7 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 		s_exportFormats["dds"] = dds_get_export_formats();
 		s_exportFormats["ktx"] = ktx_get_export_formats();
 		s_exportFormats["pfm"] = pfm_get_export_formats();
-		s_exportFormats["hdr"] = stb_image_get_export_formats("hdr");
+		s_exportFormats["hdr"] = hdr_get_export_formats();
 		s_exportFormats["jpg"] = stb_image_get_export_formats("jpg");
 		s_exportFormats["png"] = png_get_export_formats();
 		s_exportFormats["bmp"] = stb_image_get_export_formats("bmp");

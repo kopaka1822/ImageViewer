@@ -166,6 +166,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\dependencies\compressonator\Compressonator\Header\Compressonator.h" />
+    <ClInclude Include="..\dependencies\hdr\rgbe.h" />
     <ClInclude Include="..\dependencies\stb_image.h" />
     <ClInclude Include="..\dependencies\stb_image_write.h" />
     <ClInclude Include="compress_interface.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="GliImage.h" />
     <ClInclude Include="gli_interface.h" />
+    <ClInclude Include="hdr_interface.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="interface.h" />
     <ClInclude Include="ktx_interface.h" />
@@ -192,6 +194,7 @@
     <ClCompile Include="exr_interface.cpp" />
     <ClCompile Include="GliImage.cpp" />
     <ClCompile Include="gli_interface.cpp" />
+    <ClCompile Include="hdr_interface.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="interface.cpp" />
     <ClCompile Include="ktx_interface.cpp" />
