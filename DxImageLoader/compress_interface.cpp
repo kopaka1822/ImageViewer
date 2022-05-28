@@ -334,9 +334,9 @@ void compressonator_convert_image(image::IImage& src, image::IImage& dst, int qu
 			const auto height = src.getHeight(mipmap);
 			info.curStepWeight = width * height;
 
-			uint32_t srcSize;
+			size_t srcSize;
 			auto srcDat = src.getData(layer, mipmap, srcSize);
-			uint32_t dstSize;
+			size_t dstSize;
 			auto dstDat = dst.getData(layer, mipmap, dstSize);
 
 			auto srcPlaneSize = srcSize / depth;
@@ -349,7 +349,7 @@ void compressonator_convert_image(image::IImage& src, image::IImage& dst, int qu
 					dstDat + dstPlaneSize * z,
 					width,
 					height,
-					srcPlaneSize, dstPlaneSize,
+					static_cast<uint32_t>(srcPlaneSize), static_cast<uint32_t>(dstPlaneSize),
 					srcFormat, dstFormat,
 					srcFormatInfo, dstFormatInfo,
 					fquality,

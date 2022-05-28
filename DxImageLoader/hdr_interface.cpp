@@ -26,7 +26,7 @@ std::unique_ptr<image::IImage> hdr_load(const char* filename)
 		));
 
 		
-		uint32_t dataSize = 0;
+		size_t dataSize = 0;
 		auto dataPtr = res->getData(0, 0, dataSize);
 		float* floatPtr = reinterpret_cast<float*>(dataPtr);
 		RGBE_ReadPixels_RLE(fp, floatPtr, width, heigth);
@@ -58,7 +58,7 @@ void hdr_write(image::IImage& image, const char* filename)
 	if(image.getFormat() != gli::FORMAT_RGBA32_SFLOAT_PACK32)
 		throw std::runtime_error("expected RGBA32F image format for hdr export");
 
-	uint32_t dataSize = 0;
+	size_t dataSize = 0;
 	auto dataPtr = image.getData(0, 0, dataSize);
 
 	// adjust stride of RGBA float data to RGB float

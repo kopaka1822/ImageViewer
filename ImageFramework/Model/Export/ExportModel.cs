@@ -98,7 +98,7 @@ namespace ImageFramework.Model.Export
             {
                 var mip = img.GetMipmap(dstLm);
                 // transfer image data
-                texture.CopyPixels(new LayerMipmapSlice( lm.FirstLayer + dstLm.Layer, lm.FirstMipmap + dstLm.Mipmap), mip.Bytes, mip.ByteSize);
+                texture.CopyPixels(new LayerMipmapSlice( lm.FirstLayer + dstLm.Layer, lm.FirstMipmap + dstLm.Mipmap), mip.Bytes, (uint)mip.ByteSize);
             }
 
             return Task.Run(() =>

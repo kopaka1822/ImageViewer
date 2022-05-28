@@ -24,7 +24,7 @@ namespace ImageFramework.DirectX
         public override MipInfo GetMipmap(LayerMipmapSlice lm)
         {
             // calc offset
-            uint mipOffset = 0;
+            ulong mipOffset = 0;
             // offset for previous layers
             for (int i = 0; i < lm.Mipmap; ++i)
             {
@@ -37,6 +37,7 @@ namespace ImageFramework.DirectX
             res.ByteSize = (uint)res.Size.Product * Format.PixelSize;
             mipOffset += res.ByteSize * (uint) lm.Layer;
             res.Bytes = ptr + (int)mipOffset;
+            
             return res;
         }
 

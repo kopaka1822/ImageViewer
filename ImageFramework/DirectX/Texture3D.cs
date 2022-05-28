@@ -42,7 +42,7 @@ namespace ImageFramework.DirectX
                 var mip = image.GetMipmap(new LayerMipmapSlice(layer, curMipmap));
                 var idx = curMipmap;
                 data[idx].DataPointer = mip.Bytes;
-                data[idx].SlicePitch = (int)(mip.ByteSize / mip.Size.Depth);
+                data[idx].SlicePitch = (int)(mip.ByteSize / (uint)mip.Size.Depth);
                 data[idx].RowPitch = data[idx].SlicePitch / mip.Size.Height;
             }
 

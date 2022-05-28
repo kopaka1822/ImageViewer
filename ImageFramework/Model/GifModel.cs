@@ -149,7 +149,7 @@ namespace ImageFramework.Model
                             // wait for previous task to finish before writing it to the file
                             if (tasks[idx] != null) await tasks[idx];
 
-                            frame.CopyPixels(LayerMipmapSlice.Mip0, dstPtr, dstSize);
+                            frame.CopyPixels(LayerMipmapSlice.Mip0, dstPtr, (uint)dstSize);
                             var filename = $"{cfg.TmpDirectory}\\frame{i:D4}";
 
                             // write to file

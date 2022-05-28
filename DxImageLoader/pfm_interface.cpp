@@ -80,7 +80,7 @@ std::unique_ptr<image::IImage> pfm_load(const char* filename)
 		gli::format::FORMAT_RGBA32_SFLOAT_PACK32,
 		width, height, 4 * 4);
 
-	uint32_t size;
+	size_t size;
 	auto data = reinterpret_cast<float*>(res->getData(0, 0, size));
 
 	if (bands == "Pf") {          // handle 1-band image 

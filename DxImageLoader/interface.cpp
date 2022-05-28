@@ -105,7 +105,7 @@ int image_open(const char* filename)
 		for(uint32_t layer = 0; layer < res->getNumLayers(); ++layer)
 			for(uint32_t mip = 0; mip < res->getNumMipmaps(); ++mip)
 			{
-				uint32_t size;
+				size_t size;
 				auto data = res->getData(layer, mip, size);
 				if (res->getFormat() == gli::FORMAT_RGBA32_SFLOAT_PACK32)
 					image::copyRedToGreenBlue<4>(data, size);
@@ -173,7 +173,7 @@ void image_info_mipmap(int id, int mipmap, int& width, int& height, int& depth)
 	depth = img->getDepth(mipmap);
 }
 
-unsigned char* image_get_mipmap(int id, int layer, int mipmap, uint32_t& size)
+unsigned char* image_get_mipmap(int id, int layer, int mipmap, uint64_t& size)
 {
 	auto img = s_resources.find(id);
 	if (!img)
@@ -219,7 +219,7 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 			if (img->getFormat() != gli::FORMAT_RGBA32_SFLOAT_PACK32)
 				throw std::runtime_error ("expected RGBA32F image format for pfm export");
 
-			uint32_t mipSize;
+			size_t mipSize;
 			auto mip = img->getData(0, 0, mipSize);
 			auto width = img->getWidth(0);
 			auto height = img->getHeight(0);
@@ -253,7 +253,7 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 				img->getFormat() != gli::FORMAT_RGBA8_SNORM_PACK8)
 				throw std::runtime_error("unexpected image format. Expected one of FORMAT_RGBA8_SRGB_PACK8, FORMAT_RGBA8_UNORM_PACK8, FORMAT_RGBA8_SNORM_PACK8");
 
-			uint32_t mipSize;
+			size_t mipSize;
 			auto mip = img->getData(0, 0, mipSize);
 			auto width = img->getWidth(0);
 			auto height = img->getHeight(0);

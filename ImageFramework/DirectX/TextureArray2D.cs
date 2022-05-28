@@ -49,7 +49,7 @@ namespace ImageFramework.DirectX
                 var idx = GetSubresourceIndex(lm);
                 data[idx].DataPointer = mip.Bytes;
                 // The distance (in bytes) from the beginning of one line of a texture to the next line.
-                data[idx].Pitch = (int)(mip.ByteSize / mip.Size.Height);
+                data[idx].Pitch = (int)(mip.ByteSize / (uint)mip.Size.Height);
             }
 
             handle = new Texture2D(Device.Get().Handle, CreateTextureDescription(false, true), data);

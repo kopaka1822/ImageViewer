@@ -23,12 +23,12 @@ size_t image::IImage::getNumPixels() const
 	return calcNumPixels(getNumLayers(), getNumMipmaps(), getWidth(0), getHeight(0), getDepth(0));
 }
 
-image::SimpleImage::SimpleImage(gli::format originalFormat, gli::format internalFormat, int width, int height,
-	int pixelByteSize)
+image::SimpleImage::SimpleImage(gli::format originalFormat, gli::format internalFormat, uint32_t width, uint32_t height,
+	uint32_t pixelByteSize)
 	:
 m_width(width), m_height(height), m_original(originalFormat), m_format(internalFormat)
 {
-	m_data.resize(width * height * pixelByteSize);
+	m_data.resize(size_t(width) * size_t(height) * size_t(pixelByteSize));
 }
 
 uint32_t image::pixelSize(gli::format format)

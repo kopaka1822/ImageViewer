@@ -14,7 +14,7 @@ namespace ImageFramework.DirectX
         {
             public IntPtr Bytes;
             public Size3 Size;
-            public uint ByteSize;
+            public UInt64 ByteSize;
         }
 
         protected ImageData(ImageFormat format, LayerMipmapCount layerMipmap, Size3 size)
