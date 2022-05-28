@@ -45,6 +45,7 @@
 
 #include <sstream>
 #include <stdio.h>
+#include "interface.h"
 
 typedef struct {
     int valid;            /* indicate which fields are valid */
@@ -297,12 +298,15 @@ void RGBE_WritePixels(FILE* fp, float* data, int numpixels)
 {
     unsigned char rgbe[4];
 
+    auto maxPixels = numpixels;
     while (numpixels-- > 0) {
         float2rgbe(rgbe, data[RGBE_DATA_RED],
             data[RGBE_DATA_GREEN], data[RGBE_DATA_BLUE]);
         data += RGBE_DATA_SIZE;
         if (fwrite(rgbe, sizeof(rgbe), 1, fp) < 1)
             throw rgbe_error(rgbe_write_error, NULL);
+
+        if (numpixels % 1000 == 0) set_progress(((maxPixels - numpixels) * 100) / maxPixels);
     }
 }
 
@@ -311,12 +315,15 @@ void RGBE_ReadPixels(FILE* fp, float* data, int numpixels)
 {
     unsigned char rgbe[4];
 
+    auto maxPixels = numpixels;
     while (numpixels-- > 0) {
         if (fread(rgbe, sizeof(rgbe), 1, fp) < 1)
             throw rgbe_error(rgbe_read_error, NULL);
         rgbe2float(&data[RGBE_DATA_RED], &data[RGBE_DATA_GREEN],
             &data[RGBE_DATA_BLUE], rgbe);
         data += RGBE_DATA_SIZE;
+
+        if(numpixels % 1000 == 0) set_progress(((maxPixels - numpixels) * 100) / maxPixels);
     }
 }
 
@@ -330,6 +337,8 @@ static void RGBE_WriteBytes_RLE(FILE* fp, unsigned char* data, int numbytes)
 #define MINRUNLENGTH 4
     int cur, beg_run, run_count, old_run_count, nonrun_count;
     unsigned char buf[2];
+
+    set_progress(0);
 
     cur = 0;
     while (cur < numbytes) {
@@ -372,6 +381,8 @@ static void RGBE_WriteBytes_RLE(FILE* fp, unsigned char* data, int numbytes)
                 throw rgbe_error(rgbe_write_error, NULL);
             cur += run_count;
         }
+
+        set_progress((cur * 100) / numbytes);
     }
 #undef MINRUNLENGTH
 }
@@ -382,6 +393,8 @@ void RGBE_WritePixels_RLE(FILE* fp, float* data, int scanline_width,
     unsigned char rgbe[4];
     std::unique_ptr<unsigned char[]> buffer;
     int i;
+
+    set_progress(0);
 
     if ((scanline_width < 8) || (scanline_width > 0x7fff))
         /* run length encoding is not allowed so write flat*/
@@ -422,6 +435,8 @@ void RGBE_ReadPixels_RLE(FILE* fp, float* data, int scanline_width,
     int i, count;
     unsigned char buf[2];
 
+    set_progress(0);
+
     if ((scanline_width < 8) || (scanline_width > 0x7fff))
     {
         /* run length encoding is not allowed so read flat*/
@@ -431,6 +446,7 @@ void RGBE_ReadPixels_RLE(FILE* fp, float* data, int scanline_width,
 
     std::unique_ptr<unsigned char[]> scanline_buffer;
 
+    auto maxScanlines = num_scanlines;
     /* read in each successive scanline */
     while (num_scanlines > 0) {
         if (fread(rgbe, sizeof(rgbe), 1, fp) < 1) {
@@ -496,5 +512,7 @@ void RGBE_ReadPixels_RLE(FILE* fp, float* data, int scanline_width,
             data += RGBE_DATA_SIZE;
         }
         num_scanlines--;
+
+        set_progress(((maxScanlines - num_scanlines) * 100) / maxScanlines);
     }
 }
