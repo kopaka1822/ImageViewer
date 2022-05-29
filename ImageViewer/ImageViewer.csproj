@@ -107,11 +107,11 @@
     <Compile Include="Commands\Import\ImportEquationImageCommand.cs" />
     <Compile Include="Commands\Tools\LatLongToCubemapCommand.cs" />
     <Compile Include="Commands\Import\OpenCommand.cs" />
-    <Compile Include="Commands\Tools\RemoveArrowCommand.cs" />
-    <Compile Include="Commands\Tools\RemoveZoomBoxCommand.cs" />
+    <Compile Include="Commands\Overlays\RemoveArrowCommand.cs" />
+    <Compile Include="Commands\Overlays\RemoveZoomBoxCommand.cs" />
     <Compile Include="Commands\Tools\ShowPaddingCommand.cs" />
-    <Compile Include="Commands\Tools\StartArrowCommand.cs" />
-    <Compile Include="Commands\Tools\StartZoomboxCommand.cs" />
+    <Compile Include="Commands\Overlays\StartArrowCommand.cs" />
+    <Compile Include="Commands\Overlays\StartZoomboxCommand.cs" />
     <Compile Include="Commands\Tools\Tex3DToArrayCommand.cs" />
     <Compile Include="Commands\View\ResizeWindowCommand.cs" />
     <Compile Include="Commands\View\SelectNaNColorCommand.cs" />
@@ -125,6 +125,7 @@
     <Compile Include="Controller\CropController.cs" />
     <Compile Include="Controller\ImportDialogController.cs" />
     <Compile Include="Controller\Overlays\AddArrowOverlay.cs" />
+    <Compile Include="Controller\Overlays\GenericBoxOverlay.cs" />
     <Compile Include="Controller\Overlays\ZoomBoxOverlay.cs" />
     <Compile Include="Controller\PaintController.cs" />
     <Compile Include="Controller\TextureViews\Overlays\Sphere3DOverlay.cs" />
@@ -154,6 +155,7 @@
     <Compile Include="Controller\TextureViews\Texture3D\Texture3DBaseView.cs" />
     <Compile Include="Controller\ViewModeController.cs" />
     <Compile Include="DirectX\SwapChain.cs" />
+    <Compile Include="Models\Display\HeatmapModel.cs" />
     <Compile Include="Models\Display\IDisplayOverlay.cs" />
     <Compile Include="Models\Display\MovieDisplayModel.cs" />
     <Compile Include="Models\Display\RayCastingDisplayModel.cs" />

@@ -142,6 +142,7 @@
     <Compile Include="Model\Equation\Token\ValueToken.cs" />
     <Compile Include="Model\ImagePipeline.cs" />
     <Compile Include="Model\ImagesModel.cs" />
+    <Compile Include="Model\Overlay\HeatmapOverlay.cs" />
     <Compile Include="Model\Progress\IProgress.cs" />
     <Compile Include="Model\Models.cs" />
     <Compile Include="Model\Overlay\BoxOverlay.cs" />
