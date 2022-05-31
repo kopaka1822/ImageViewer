@@ -126,6 +126,7 @@
     <Compile Include="Controller\ImportDialogController.cs" />
     <Compile Include="Controller\Overlays\AddArrowOverlay.cs" />
     <Compile Include="Controller\Overlays\GenericBoxOverlay.cs" />
+    <Compile Include="Controller\Overlays\HeatmapBoxOverlay.cs" />
     <Compile Include="Controller\Overlays\ZoomBoxOverlay.cs" />
     <Compile Include="Controller\PaintController.cs" />
     <Compile Include="Controller\TextureViews\Overlays\Sphere3DOverlay.cs" />
@@ -187,6 +188,7 @@
     <Compile Include="ViewModels\Dialog\ScaleViewModel.cs" />
     <Compile Include="ViewModels\Dialog\Tex3DToArrayViewModel.cs" />
     <Compile Include="ViewModels\Display\DisplayViewModel.cs" />
+    <Compile Include="ViewModels\Display\HeatmapViewModel.cs" />
     <Compile Include="ViewModels\Display\MovieViewModel.cs" />
     <Compile Include="ViewModels\Display\RayCastingDisplayViewModel.cs" />
     <Compile Include="ViewModels\Display\Single3DDisplayViewModel.cs" />
@@ -645,6 +647,8 @@
   <ItemGroup>
     <Resource Include="Icons\video.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Icons\temperature.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

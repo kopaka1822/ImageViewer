@@ -56,9 +56,12 @@ namespace ImageViewer.ViewModels.Display
             models.Display.PropertyChanged += DisplayOnPropertyChanged;
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
             models.Settings.PropertyChanged += SettingsOnPropertyChanged;
+            Heatmap = new HeatmapViewModel(models);
 
             CreateViewModes();
         }
+
+        public HeatmapViewModel Heatmap { get; }
 
         private void SettingsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {

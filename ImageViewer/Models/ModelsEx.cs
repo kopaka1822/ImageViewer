@@ -23,6 +23,8 @@ namespace ImageViewer.Models
 
         public ArrowOverlay Arrows { get; }
 
+        public HeatmapModel Heatmap { get; }
+
         public IReadOnlyList<StatisticModel> Statistics { get; }
 
         public ExportConfigModel ExportConfig { get; }
@@ -61,6 +63,7 @@ namespace ImageViewer.Models
             Overlay.Overlays.Add(ZoomBox);
             Arrows = new ArrowOverlay(this);
             Overlay.Overlays.Add(Arrows);
+            Heatmap = new HeatmapModel(this);
 
             resizeController = new ResizeController(this);
             computeImageController = new ComputeImageController(this);

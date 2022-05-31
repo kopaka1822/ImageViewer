@@ -137,7 +137,7 @@
                     IsChecked="{Binding Display.ShowCropRectangle}"
                     ToolTip="Shows the crop box if cropping is enabled for export"
                     />
-            />
+            
             <Separator/>
             <MenuItem
                 Header="Flip Y Axis"
@@ -202,7 +202,8 @@
         </MenuItem>
         <!--END VIEW-->
 
-        <MenuItem Header="Overlays">
+        <MenuItem Header="Overlays"
+                  IsEnabled="{Binding Images.IsEmptyOr2D}">
             <!-- Zoombox -->
             <MenuItem
                 Header="Add Zoombox"
@@ -300,6 +301,33 @@
                         <Setter Property="CommandParameter" Value="{Binding Id}"/>
                     </Style>
                 </MenuItem.ItemContainerStyle>
+            </MenuItem>
+
+            <Separator/>
+            
+            <!-- HEATMAP -->
+            <MenuItem 
+                Header="Heatmap"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/temperature.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+                <!-- Heatmap menu -->
+                <MenuItem
+                    Header="Enabled"
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.Heatmap.IsEnabled}"/>
+                <MenuItem
+                    Header="Set Position"
+                    IsEnabled="{Binding Display.Heatmap.IsEnabled}"
+                    Command="{Binding Display.Heatmap.SetPositionCommand}"/>
+                <MenuItem
+                    Header="Configure"
+                    IsEnabled="{Binding Display.Heatmap.IsEnabled}"
+                    Command="{Binding Display.Heatmap.ConfigureCommand}"/>
             </MenuItem>
         </MenuItem>
         <!-- END OVERLAYS -->
