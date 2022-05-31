@@ -63,8 +63,6 @@ namespace ImageFramework.Model.Overlay
         {
             Debug.Assert(HasWork);
 
-            if (!IsEnabled) return;
-
             UpdateData(lm.Mipmap);
 
             // draw box
@@ -124,19 +122,6 @@ namespace ImageFramework.Model.Overlay
             positionsBuffer?.Dispose();
         }
 
-        private bool isEnabled = false;
-
-        public bool IsEnabled
-        {
-            get => isEnabled;
-            set
-            {
-                if (value == isEnabled) return;
-                isEnabled = value;
-                OnHasChanged();
-            }
-        }
-
-        public override bool HasWork => IsEnabled;
+        public override bool HasWork => true;
     }
 }

@@ -93,6 +93,37 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void TestHeatmapOverlay()
+        {
+            var models = new Models();
+            // load dummy image to set canvas size
+            models.AddImageFromFile(TestData.Directory + "heatmap_overlay_red.png");
+
+            var heatmap = new HeatmapOverlay(models);
+            // set heatmap data
+            heatmap.Data = new HeatmapOverlay.Heatmap
+            {
+                Start = Float2.Zero,
+                End = new Float2(0.25f, 1.0f),
+                Style = HeatmapOverlay.Style.BlackRed,
+                Border = 1
+            };
+            models.Overlay.Overlays.Add(heatmap);
+
+            // export the overlay
+            Assert.IsNotNull(models.Overlay.Overlay);
+            models.Export.Export(new ExportDescription(models.Overlay.Overlay, ExportTest.ExportDir + "overlay_heatmap_tmp", "png")
+            {
+                FileFormat = GliFormat.RGBA8_SRGB
+            });
+
+            // compare colors
+            var refColors = models.Images.Images[0].Image.GetPixelColors(LayerMipmapSlice.Mip0);
+            var actualColors = models.Overlay.Overlay.GetPixelColors(LayerMipmapSlice.Mip0);
+            TestData.CompareColors(refColors, actualColors, Color.Channel.Rgba);
+        }
+
+        [TestMethod]
         public void ExportOverlayed()
         {
             var models = new Models(1);

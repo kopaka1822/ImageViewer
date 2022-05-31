@@ -96,6 +96,8 @@ cbuffer BoxBuffer : register(b0)
     int style;
 }};
 
+{Utility.Utility.FromSrgbFunction() /*the heatmap scale should appear to be linear for humans => the shader outputs linear colors that will be converted to srgb. to prevent this we need to aplly the reverse transformation (fromSrgb)*/}
+
 float4 main(float4 pos : SV_POSITION) : SV_TARGET
 {{
     int2 coord = int2(pos.xy);
@@ -117,7 +119,7 @@ float4 main(float4 pos : SV_POSITION) : SV_TARGET
     switch(style)
     {{
     case {(int)HeatmapOverlay.Style.BlackRed}:
-        color.r = v;
+        color.r = fromSrgb(v);
         break;
     case {(int)HeatmapOverlay.Style.BlackBlueGreenRed}:
 
