@@ -53,13 +53,24 @@ namespace ImageViewer.ViewModels
                 OnPropertyChanged(nameof(SelectedTabIndex));
             }
         }
+        public enum ViewerTab
+        {
+            Images = 0,
+            Filters = 1,
+            Statistics = 2
+        }
+
+        public void SetViewerTab(ViewerTab t)
+        {
+            SelectedTabIndex = (int)t;
+        }
 
         public ViewModels(ModelsEx models)
         {
             this.models = models;
 
             // view models
-            Display = new DisplayViewModel(models);
+            Display = new DisplayViewModel(models, this);
             Progress = new ProgressViewModel(models);
             Images = new ImagesViewModel(models);
             Equations = new EquationsViewModel(models);

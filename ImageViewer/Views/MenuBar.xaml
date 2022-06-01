@@ -317,9 +317,12 @@
                 </MenuItem.Icon>
                 <!-- Heatmap menu -->
                 <MenuItem
-                    Header="Enabled"
+                    Header="Enable Overlay"
                     IsCheckable="True"
                     IsChecked="{Binding Display.Heatmap.IsEnabled}"/>
+                <MenuItem
+                    Header="Load Filter"
+                    Command="{Binding Display.Heatmap.LoadFilterCommand}"/>
                 <MenuItem
                     Header="Set Position"
                     IsEnabled="{Binding Display.Heatmap.IsEnabled}"

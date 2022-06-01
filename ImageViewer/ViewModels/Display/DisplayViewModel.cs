@@ -48,7 +48,7 @@ namespace ImageViewer.ViewModels.Display
             Cargo = DisplayModel.ViewMode.Empty
         };
 
-        public DisplayViewModel(ModelsEx models)
+        public DisplayViewModel(ModelsEx models, ViewModels viewModels)
         {
             this.models = models;
             selectedSplitMode = AvailableSplitModes[models.Display.Split == DisplayModel.SplitMode.Vertical ? 0 : 1];
@@ -56,7 +56,7 @@ namespace ImageViewer.ViewModels.Display
             models.Display.PropertyChanged += DisplayOnPropertyChanged;
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
             models.Settings.PropertyChanged += SettingsOnPropertyChanged;
-            Heatmap = new HeatmapViewModel(models);
+            Heatmap = new HeatmapViewModel(models, viewModels);
 
             CreateViewModes();
         }

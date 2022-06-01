@@ -20,14 +20,17 @@ namespace ImageViewer.ViewModels.Display
     public class HeatmapViewModel : INotifyPropertyChanged
     {
         private readonly ModelsEx models;
+        private readonly ViewModels viewModels;
         private HeatmapOverlay.Heatmap lastHeatmap;
 
-        public HeatmapViewModel(ModelsEx models)
+        public HeatmapViewModel(ModelsEx models, ViewModels viewModels)
         {
             this.models = models;
+            this.viewModels = viewModels;
             models.Heatmap.PropertyChanged += HeatmapOnPropertyChanged;
 
             SetPositionCommand = new ActionCommand(SetPosition);
+            LoadFilterCommand = new ActionCommand(LoadFilter);
 
             // init last heatmap
             lastHeatmap = new HeatmapOverlay.Heatmap
@@ -60,9 +63,37 @@ namespace ImageViewer.ViewModels.Display
             models.Display.ActiveOverlay = overlay;
         }
 
+        public void LoadFilter()
+        {
+            // first check if filter is already loaded (in the view model)
+            var filter = viewModels.Filter.AvailableFilter.FirstOrDefault(filterView => filterView.Filter.Name == "Heatmap")?.Filter;
+
+            if(filter == null)
+            {
+                // filter not found, load from disc
+                try
+                {
+                    var filterPath = models.Window.ExecutionPath + "\\Filter\\heatmap.hlsl";
+                    filter = models.CreateFilter(filterPath);
+                    viewModels.Filter.AddFilter(filter);
+                }
+                catch(Exception e)
+                {
+                    models.Window.ShowErrorDialog(e);
+                    return;
+                }
+            }
+
+            // switch to filters tab and select this filter
+            viewModels.SetViewerTab(ViewModels.ViewerTab.Filters);
+            viewModels.Filter.SelectedFilter = viewModels.Filter.AvailableFilter.First(filterView => ReferenceEquals(filterView.Filter, filter));
+        }
+
         public ICommand SetPositionCommand { get; }
 
         public ICommand ConfigureCommand { get; }
+
+        public ICommand LoadFilterCommand { get; }
 
         public bool IsEnabled
         {
