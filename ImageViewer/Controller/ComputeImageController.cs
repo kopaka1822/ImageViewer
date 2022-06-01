@@ -64,9 +64,11 @@ namespace ImageViewer.Controller
             Dispatcher.CurrentDispatcher.BeginInvoke((Action)(Execute));
         }
 
-        public void Execute()
+        public async void Execute()
         {
-            models.ApplyAsync();
+            await models.ApplyAsync();
+            if(!String.IsNullOrEmpty(models.Progress.LastError))
+                models.Window.ShowErrorDialog(models.Progress.LastError);
         }
     }
 }

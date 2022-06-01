@@ -277,17 +277,18 @@ namespace ImageFramework.Model
         /// </summary>
         public void Apply()
         {
-            ApplyAsync();
-            Progress.WaitForTask();
+            var t = ApplyAsync();
+            t.Wait();
         }
 
         /// <summary>
         /// enqueues the apply into the progress model
         /// </summary>
-        public void ApplyAsync()
+        public async Task ApplyAsync()
         {
             var cts = new CancellationTokenSource();
             Progress.AddTask(pipelineController.UpdateImagesAsync(Progress.GetProgressInterface(cts.Token)), cts, false);
+            await Progress.WaitForTaskAsync();
         }
 
         /// <summary>
