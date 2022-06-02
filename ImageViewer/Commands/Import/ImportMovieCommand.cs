@@ -44,6 +44,12 @@ namespace ImageViewer.Commands.Import
 
         public override async void Execute()
         {
+            if (!FFMpeg.IsAvailable())
+            {
+                models.Window.ShowFFMpegDialog();
+                return;
+            }
+
             var file = Controller.ImportDialogController.ShowSingleFileImportImageDialog(models);
             if (file == null) return; // nothing picked
 

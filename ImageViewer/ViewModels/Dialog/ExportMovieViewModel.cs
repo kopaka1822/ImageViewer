@@ -35,6 +35,7 @@ namespace ImageViewer.ViewModels.Dialog
                 new ListItemViewModel<FFMpeg.Preset>{Cargo = FFMpeg.Preset.medium, Name = "medium" },
                 new ListItemViewModel<FFMpeg.Preset>{Cargo = FFMpeg.Preset.fast, Name = "fast" },
                 new ListItemViewModel<FFMpeg.Preset>{Cargo = FFMpeg.Preset.faster, Name = "faster" },
+                new ListItemViewModel<FFMpeg.Preset>{Cargo = FFMpeg.Preset.veryfast, Name = "very fast" },
                 new ListItemViewModel<FFMpeg.Preset>{Cargo = FFMpeg.Preset.superfast, Name = "super fast" },
                 new ListItemViewModel<FFMpeg.Preset>{Cargo = FFMpeg.Preset.ultrafast, Name = "ultra fast" },
             };

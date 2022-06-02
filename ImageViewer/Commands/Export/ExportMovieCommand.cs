@@ -72,6 +72,12 @@ namespace ImageViewer.Commands.Export
                 return;
             }
 
+            if (!FFMpeg.IsAvailable())
+            {
+                models.Window.ShowFFMpegDialog();
+                return;
+            }
+
             // get active final image
             var id = models.GetFirstEnabledPipeline();
             var tex = models.Pipelines[id].Image;

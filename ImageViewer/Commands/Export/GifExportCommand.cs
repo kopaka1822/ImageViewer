@@ -58,14 +58,7 @@ namespace ImageViewer.Commands.Export
 
             if (!FFMpeg.IsAvailable())
             {
-                if (models.Window.ShowYesNoDialog("ffmpeg is required for this feature. " +
-                                                  "Please download the ffmpeg binaries and place them in the ImageViewer root directory. " +
-                                                  "Open ffmpeg download page and ImageViewer root?", "download ffmpeg?"))
-                {
-                    var root = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                    if (root != null) System.Diagnostics.Process.Start(root);
-                    System.Diagnostics.Process.Start("https://www.ffmpeg.org/download.html");
-                }
+                models.Window.ShowFFMpegDialog();
                 return;
             }
 

@@ -17,6 +17,11 @@ namespace ImageFramework.Model.Export
 {
     public static class FFMpeg
     {
+        public class FFMpegUnavailableException : Exception
+        {
+            internal FFMpegUnavailableException() : base("could not locate ffmpeg.exe or ffprobe.exe") {}
+        }
+
         public static string Path =>
             System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\ffmpeg.exe";
 
@@ -30,10 +35,8 @@ namespace ImageFramework.Model.Export
 
         public static void CheckAvailable()
         {
-            if (!File.Exists(Path))
-                throw new Exception("could not locate ffmpeg.exe");
-            if (!File.Exists(ProbePath))
-                throw new Exception("could not locate ffprobe.exe");
+            if (!File.Exists(Path) || !File.Exists(ProbePath))
+                throw new FFMpegUnavailableException();
         }
 
         public class Metadata
@@ -114,7 +117,7 @@ namespace ImageFramework.Model.Export
             var cts = new CancellationTokenSource();
             var task = Task.Run(() =>
             {
-                models.Progress.GetProgressInterface(cts.Token).What = "obtaining metadata";
+                models.Progress.GetProgressInterface(cts.Token).What = "counting frames";
                 return GetMovieMetadata(filename);
             }, cts.Token);
             models.Progress.AddTask(task, cts, false);
