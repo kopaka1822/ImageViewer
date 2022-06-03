@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -175,11 +176,15 @@ namespace ImageFramework.DirectX
         public Direct2D(Texture2D buffer)
         {
             if (core == null) core = new Core();
-
+            
             var format = buffer.Description.Format;
 
             if (!core.Context.IsDxgiFormatSupported(format))
                 throw new Exception("Format " + format + " not supported for direct2D rendertarget");
+
+            // this is required to obtain a surface
+            Debug.Assert(buffer.Description.ArraySize == 1);
+            Debug.Assert(buffer.Description.MipLevels == 1);
 
             using (var surface = buffer.QueryInterface<SharpDX.DXGI.Surface>())
             {

@@ -69,13 +69,20 @@ namespace ImageFramework.Model.Overlay
             Shader.Bind(vertexBufferBinding);
             Shader.Draw(heatmap, cbuffer, lm.Mipmap, size.XY);
             Shader.Unbind();
+        }
+
+        public override void RenderD2D(LayerMipmapSlice lm, Size3 size, Direct2D d2d)
+        {
+            using (var ctx = d2d.Begin())
+            {
+                ctx.Text(new Float2(0.0f, 0.0f), new Float2(1000.0f, 12.0f), 10.0f, new Color(1.0f, 1.0f, 1.0f, 1.0f), "hello world");
+            }
 
             // draw text
             if (!String.IsNullOrEmpty(heatmap.MinText) || !String.IsNullOrEmpty(heatmap.MaxText))
             {
                 //using(var d2d = new Direct2D(texture))
             }
-            // TODO
         }
 
         private void UpdateData(int mipmap)
@@ -123,5 +130,8 @@ namespace ImageFramework.Model.Overlay
         }
 
         public override bool HasWork => true;
+
+        // TODO only set to true when text output is active
+        public override bool RequireD2D => true;
     }
 }
