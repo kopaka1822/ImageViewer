@@ -72,6 +72,16 @@ namespace ImageViewer.Models
             cropController = new CropController(this);
         }
 
+        /// <summary>
+        /// force shedules a recompute of image equations.
+        /// Normally this is done automatically as soon as changes are detected. However,
+        /// if the operation was aborted by the uses or some runtime error it needs to be resheduled manually
+        /// </summary>
+        public void SheduleRecompute()
+        {
+            computeImageController.ScheduleRecompute();
+        }
+
         public override void Dispose()
         {
             Settings?.Save();

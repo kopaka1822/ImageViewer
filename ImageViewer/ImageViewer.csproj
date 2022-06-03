@@ -85,7 +85,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Commands\AddFilterCommand.cs" />
-    <Compile Include="Commands\ApplyImageFormulasCommand.cs" />
     <Compile Include="Commands\Export\ExportConfigCommand.cs" />
     <Compile Include="Commands\Export\ExportMovieCommand.cs" />
     <Compile Include="Commands\Export\ExportOverwriteCommand.cs" />

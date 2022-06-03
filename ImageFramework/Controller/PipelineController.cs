@@ -24,6 +24,8 @@ namespace ImageFramework.Controller
     /// </summary>
     internal class PipelineController
     {
+
+
         private readonly Models models;
         public PipelineController(Models models)
         {
@@ -108,18 +110,28 @@ namespace ImageFramework.Controller
             };
 
             var numCompute = models.Pipelines.Count(pipe => pipe.HasChanges && pipe.IsValid && pipe.IsEnabled);
-            var curCompute = 0;
 
-            for (var i = 0; i < models.Pipelines.Count; i++)
+            try
             {
-                var pipe = models.Pipelines[i];
-                if (pipe.HasChanges && pipe.IsValid && pipe.IsEnabled)
-                {
-                    args.Filters = pipe.UseFilter ? GetPipeFilters(i) : null;
+                var curCompute = 0;
 
-                    await pipe.UpdateImageAsync(args, progress.CreateSubProgress((++curCompute) / (float)numCompute));
+                for (var i = 0; i < models.Pipelines.Count; i++)
+                {
+                    var pipe = models.Pipelines[i];
+                    if (pipe.HasChanges && pipe.IsValid && pipe.IsEnabled)
+                    {
+                        args.Filters = pipe.UseFilter ? GetPipeFilters(i) : null;
+
+                        await pipe.UpdateImageAsync(args, progress.CreateSubProgress((++curCompute) / (float)numCompute));
+                    }
                 }
             }
+            catch
+            {
+                models.OnPipelineUpdate(this, false);
+                throw;
+            }
+            models.OnPipelineUpdate(this, true);
         }
 
         /// <summary>

@@ -24,12 +24,12 @@ namespace ImageViewer.Controller
             {
                 pipe.PropertyChanged += PipeOnPropertyChanged;
             }
-            models.Progress.TaskCompleted += ProgressOnTaskCompleted;
+            models.PipelineUpdate += OnPipelineUpdate;
         }
 
-        private void ProgressOnTaskCompleted(object sender, TaskCompletedEventArgs args)
+        private void OnPipelineUpdate(object sender, bool success)
         {
-            // task may be rescheduled 
+            // task may be rescheduled (update finished)
             scheduled = false;
         }
 
@@ -57,7 +57,7 @@ namespace ImageViewer.Controller
             }
         }
 
-        private void ScheduleRecompute()
+        public void ScheduleRecompute()
         {
             if (scheduled) return;
             scheduled = true;

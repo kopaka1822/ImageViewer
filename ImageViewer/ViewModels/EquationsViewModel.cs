@@ -11,6 +11,7 @@ using ImageFramework.Annotations;
 using ImageViewer.Commands;
 using ImageViewer.Models;
 using ImageViewer.Views.List;
+using ImageViewer.Commands.Helper;
 
 namespace ImageViewer.ViewModels
 {
@@ -22,12 +23,21 @@ namespace ImageViewer.ViewModels
         public EquationsViewModel(ModelsEx models)
         {
             this.models = models;
-            this.Apply = new ApplyImageFormulasCommand(this);
+            this.ApplyCommand = new ActionCommand(ApplyFormulas);
 
             changesBrush = new SolidColorBrush(Color.FromRgb(237, 28, 36));
             noChangesBrush = (SolidColorBrush) models.Window.Window.FindResource("FontBrush");
 
-            RefreshEquations();
+            var res = new List<EquationViewModel>();
+            for (var i = 0; i < models.NumPipelines; ++i)
+            {
+                var vm = new EquationViewModel(models, i);
+                vm.PropertyChanged += OnPropertyChanged;
+                res.Add(vm);
+            }
+
+            Equations = res;
+            OnPropertyChanged(nameof(Equations));
         }
 
         private void UpdateHasChanges()
@@ -41,7 +51,7 @@ namespace ImageViewer.ViewModels
             UpdateHasChanges();
         }
 
-        public ICommand Apply { get; }
+        public ICommand ApplyCommand { get; }
 
         public void ApplyFormulas()
         {
@@ -57,7 +67,8 @@ namespace ImageViewer.ViewModels
                     models.Window.ShowErrorDialog(e);
                 }
             }
-            UpdateHasChanges();
+            // also force shedule recompute
+            models.SheduleRecompute();
         }
 
         private bool hasChanges = false;
@@ -76,28 +87,6 @@ namespace ImageViewer.ViewModels
         public Brush TabItemColor => HasChanges ? changesBrush : noChangesBrush;
 
         public List<EquationViewModel> Equations { get; private set; }
-
-        private void RefreshEquations()
-        {
-            if (Equations != null)
-            {
-                foreach (var eq in Equations)
-                {
-                    eq.PropertyChanged -= OnPropertyChanged;
-                }
-            }
-
-            var res = new List<EquationViewModel>();
-            for (var i = 0; i < models.NumPipelines; ++i)
-            {
-                var vm = new EquationViewModel(models, i);
-                vm.PropertyChanged += OnPropertyChanged;
-                res.Add(vm);
-            }
-
-            Equations = res;
-            OnPropertyChanged(nameof(Equations));
-        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

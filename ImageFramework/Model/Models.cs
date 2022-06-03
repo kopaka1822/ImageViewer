@@ -358,5 +358,14 @@ namespace ImageFramework.Model
         {
             SoftReset?.Invoke(this, EventArgs.Empty);
         }
+
+        public delegate void PipelineUpdateHandler(object sender, bool success);
+
+        public event PipelineUpdateHandler PipelineUpdate;
+
+        internal virtual void OnPipelineUpdate(object sender, bool success)
+        {
+            PipelineUpdate?.Invoke(sender, success);
+        }
     }
 }
