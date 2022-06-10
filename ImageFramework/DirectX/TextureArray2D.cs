@@ -6,9 +6,11 @@ using System.Runtime.InteropServices;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using ImageFramework.ImageLoader;
 using ImageFramework.Utility;
 using SharpDX;
+using SharpDX.Direct2D1.Effects;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
@@ -53,6 +55,24 @@ namespace ImageFramework.DirectX
             }
 
             handle = new Texture2D(Device.Get().Handle, CreateTextureDescription(false, true), data);
+
+            CreateTextureViews(false, true);
+        }
+
+        /// <summary>
+        /// create a texture array 2d from the bitmap source.
+        /// </summary>
+        public TextureArray2D(System.Windows.Media.Imaging.BitmapSource source)
+        {
+            Size = new Size3(source.PixelWidth, source.PixelHeight);
+            LayerMipmap = LayerMipmapCount.One;
+            Format = Format.B8G8R8A8_UNorm_SRgb;
+
+            var bitmap = new WriteableBitmap(source);
+            bitmap.Lock();
+            handle = new Texture2D(Device.Get().Handle, CreateTextureDescription(false, true),
+                new DataRectangle(bitmap.BackBuffer, bitmap.BackBufferStride));
+            bitmap.Unlock();
 
             CreateTextureViews(false, true);
         }

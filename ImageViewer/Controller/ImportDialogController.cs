@@ -67,7 +67,7 @@ namespace ImageViewer.Controller
             {
                 var img = await IO.LoadImageTextureAsync(file, models.Progress);
                 
-                ImportTexture(img.Texture, file, img.OriginalFormat, alias);
+                ImportTexture(img.Texture, true, file, img.OriginalFormat, alias);
             }
             catch (Exception e)
             {
@@ -76,11 +76,16 @@ namespace ImageViewer.Controller
             }
         }
 
-        private void ImportTexture(ITexture tex, string file, GliFormat imgOriginalFormat, string alias)
+        public void ImportTexture(ITexture tex, string alias, GliFormat format)
+        {
+            ImportTexture(tex, false, alias, format, alias);
+        }
+
+        private void ImportTexture(ITexture tex, bool isFile, string file, GliFormat imgOriginalFormat, string alias)
         {
             try
             {
-                models.Images.AddImage(tex, true, file, imgOriginalFormat, alias);
+                models.Images.AddImage(tex, isFile, file, imgOriginalFormat, alias);
                 tex = null; // images is now owner
             }
             catch (ImagesModel.MipmapMismatch e)
@@ -90,7 +95,7 @@ namespace ImageViewer.Controller
                 {
                     var tmp = tex.CloneWithMipmaps(models.Images.NumMipmaps);
                     models.Scaling.WriteMipmaps(tmp);
-                    ImportTexture(tmp, file, imgOriginalFormat, alias);
+                    ImportTexture(tmp, isFile, file, imgOriginalFormat, alias);
                 }
                 else
                 {

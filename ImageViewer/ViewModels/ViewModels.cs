@@ -5,26 +5,32 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ImageFramework.Annotations;
+using ImageFramework.DirectX;
+using ImageFramework.ImageLoader;
 using ImageFramework.Model;
 using ImageViewer.Commands;
 using ImageViewer.Commands.Export;
 using ImageViewer.Commands.Import;
 using ImageViewer.Commands.Tools;
 using ImageViewer.Commands.View;
+using ImageViewer.Controller;
 using ImageViewer.Models;
 using ImageViewer.ViewModels.Display;
 using ImageViewer.ViewModels.Image;
 using ImageViewer.ViewModels.Statistics;
 using ImageViewer.ViewModels.Tools;
+using SharpDX.Direct2D1.Effects;
 
 namespace ImageViewer.ViewModels
 {
     public class ViewModels : INotifyPropertyChanged, IDisposable
     {
         private readonly ModelsEx models;
+        private readonly ImportDialogController import;
 
         public DisplayViewModel Display { get; }
         public ProgressViewModel Progress { get; }
@@ -68,6 +74,7 @@ namespace ImageViewer.ViewModels
         public ViewModels(ModelsEx models)
         {
             this.models = models;
+            import = new ImportDialogController(models);
 
             // view models
             Display = new DisplayViewModel(models, this);
@@ -138,6 +145,18 @@ namespace ImageViewer.ViewModels
             // dont steal text from textboxes (they don't set handled to true...)
             if (e.OriginalSource is TextBox) return;
 
+            // handle modifier keys differently
+            if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                if (e.Key == Key.V)
+                {
+                    e.Handled = true;
+                    Application.Current.Dispatcher.Invoke(async () => await OnPasteAsync());
+                }
+
+                return;
+            }
+
             if (Display.HasPriorityKeyInvoked(e.Key))
                 return;
 
@@ -154,6 +173,33 @@ namespace ImageViewer.ViewModels
 
             if(Display.HasKeyToInvoke(e.Key))
                 Display.InvokeKey(e.Key);
+        }
+
+        public async Task OnPasteAsync()
+        {
+            try
+            {
+                // get clipboard text
+                if (Clipboard.ContainsImage())
+                {
+                    var img = Clipboard.GetImage();
+                    var tex = new TextureArray2D(img);
+
+                    import.ImportTexture(tex, "clipboard", GliFormat.RGB8_SRGB);
+                }
+                else if (Clipboard.ContainsFileDropList())
+                {
+                    var files = Clipboard.GetFileDropList();
+                    foreach (string file in files)
+                    {
+                        await import.ImportImageAsync(file);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e);   
+            }
         }
 
         public void Dispose()
