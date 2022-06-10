@@ -8,10 +8,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
+using ImageFramework.Utility;
 using ImageViewer.Commands;
 using ImageViewer.Commands.Export;
 using ImageViewer.Commands.Import;
@@ -19,11 +21,14 @@ using ImageViewer.Commands.Tools;
 using ImageViewer.Commands.View;
 using ImageViewer.Controller;
 using ImageViewer.Models;
+using ImageViewer.UtilityEx;
 using ImageViewer.ViewModels.Display;
 using ImageViewer.ViewModels.Image;
 using ImageViewer.ViewModels.Statistics;
 using ImageViewer.ViewModels.Tools;
+using SharpDX;
 using SharpDX.Direct2D1.Effects;
+using SharpDX.DXGI;
 
 namespace ImageViewer.ViewModels
 {
@@ -183,9 +188,21 @@ namespace ImageViewer.ViewModels
                 if (Clipboard.ContainsImage())
                 {
                     var img = Clipboard.GetImage();
-                    var tex = new TextureArray2D(img);
+                    if (img == null) return;
 
-                    import.ImportTexture(tex, "clipboard", GliFormat.RGB8_SRGB);
+                    var bitmap = new WriteableBitmap(img);
+                    bitmap.Lock();
+                    TextureArray2D tex;
+                    try
+                    {
+                        tex = new TextureArray2D(new Size3(img.PixelWidth, img.PixelHeight), Format.B8G8R8A8_UNorm_SRgb, new DataRectangle(bitmap.BackBuffer, bitmap.BackBufferStride));
+                    }
+                    finally
+                    {
+                        bitmap.Unlock();
+                    }
+
+                    import.ImportTexture(tex, "", GliFormat.RGB8_SRGB);
                 }
                 else if (Clipboard.ContainsFileDropList())
                 {
