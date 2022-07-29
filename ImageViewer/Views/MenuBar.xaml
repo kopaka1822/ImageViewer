@@ -336,6 +336,7 @@
         <!-- END OVERLAYS -->
 
         <MenuItem Header="Tools">
+            <!-- Scaling + Padding -->
             <MenuItem Header="Scale"
                       Command="{Binding ShowScaleCommand}"
                       IsEnabled="{Binding Progress.NotProcessing}">
@@ -356,6 +357,8 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+
+            <!-- Mipmaps -->
             <Separator/>
             <MenuItem 
                     Header="Generate Mipmaps"
@@ -413,6 +416,34 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 </MenuItem>
+
+            <!-- Alpha Test -->
+            <MenuItem
+                Header="Alpha Testing"
+                ToolTip="Additional post-processing for textures with alpha test (cutout-material)"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem 
+                    Header="Disabled (Default)"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseAlphaNone}"
+                    ToolTip="No post-processing"/>
+                <MenuItem 
+                    Header="Alpha Scale"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseAlphaScale}"
+                    ToolTip="Rescale alpha values to preserve alpha coverage (Unity: mipMapsPreserveCoverage)"/>
+                <MenuItem 
+                    Header="Alpha Pyramid"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseAlphaPyramid}"
+                    ToolTip="Redistribute alpha values to preserve alpha coverage. More noisy but better at handling semi transparent and thin materials"/>
+                <MenuItem 
+                    Header="Alpha Connectivity (Beta)"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseAlphaConnectivity}"
+                    ToolTip="Strong emphasis on maintaining connectivity in each mipmap while preserving alpha coverage"/>
+            </MenuItem>
+
             <MenuItem 
                     Header="Delete Mipmaps"
                     Command="{Binding DeleteMipmapsCommand}"
@@ -424,6 +455,9 @@
                             Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+
+
+
 
             <Separator Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}"/>
             <MenuItem

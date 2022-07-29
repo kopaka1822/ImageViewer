@@ -92,7 +92,7 @@ namespace ImageFramework.Model.Scaling
             {
                 if (value == alphaTestProcess) return;
                 alphaTestProcess = value;
-                OnPropertyChanged(nameof(AlphaTestPostprocess));
+                OnPropertyChanged(nameof(AlphaTestProcess));
             }
         }
 
