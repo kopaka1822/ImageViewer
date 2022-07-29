@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.Model.Progress;
+using ImageFramework.Model.Scaling.AlphaTest;
 using ImageFramework.Model.Scaling.Down;
 using ImageFramework.Utility;
 
@@ -21,6 +22,10 @@ namespace ImageFramework.Model.Scaling
         private IDownscalingShader lanzosMinify = null;
         private IDownscalingShader detailPreservingMinify = null;
         private IDownscalingShader veryDetailPreservingMinify = null;
+
+        private IPostprocess alphaScale = null;
+        private IPostprocess alphaPyramid = null;
+        private IPostprocess alphaConnectivity = null;
 
         internal ScalingModel(Models models)
         {
@@ -40,6 +45,14 @@ namespace ImageFramework.Model.Scaling
             Lanczos,
             DetailPreserving, // Rapid, Detail-Preserving Image Downscaling 2016 with y = 0.5
             VeryDetailPreserving, // Rapid, Detail-Preserving Image Downscaling 2016 with y = 1.0
+        }
+
+        public enum AlphaTestPostprocess
+        {
+            None, // no postprocessing
+            AlphaScale, // Castano Alpha Scaling
+            AlphaPyramid, // Cem Yuksels Alpha Distribution
+            AlphaConnectivity // experimental
         }
 
         private MagnifyFilters magnify = MagnifyFilters.MitchellNetravali;
@@ -67,6 +80,19 @@ namespace ImageFramework.Model.Scaling
                 if (value == minify) return;
                 minify = value;
                 OnPropertyChanged(nameof(Minify));
+            }
+        }
+
+        private AlphaTestPostprocess alphaTestProcess = AlphaTestPostprocess.None;
+
+        public AlphaTestPostprocess AlphaTestProcess
+        {
+            get => alphaTestProcess;
+            set
+            {
+                if (value == alphaTestProcess) return;
+                alphaTestProcess = value;
+                OnPropertyChanged(nameof(AlphaTestPostprocess));
             }
         }
 
@@ -107,6 +133,19 @@ namespace ImageFramework.Model.Scaling
             }
 
             curProg.Progress = 1.0f;
+
+            if(hasAlpha)
+            {
+                progress.What = "Post Processing Alpha";
+                var postShader = GetAlphaPostprocess();
+                if(postShader != null)
+                {
+                    postShader.Run(dstTex, hasAlpha, models.SharedModel.Upload, cache);
+
+                    models.SharedModel.Sync.Set();
+                    await models.SharedModel.Sync.WaitForGpuAsync(progress.Token);
+                }
+            }
 
             if (!tex.HasUaViews) // write back from dstTex to tex
             {
@@ -153,6 +192,20 @@ namespace ImageFramework.Model.Scaling
             }
 
             throw new Exception($"invalid minify filter specified: {minify}");
+        }
+
+        private IPostprocess GetAlphaPostprocess()
+        {
+            switch(alphaTestProcess)
+            {
+                case AlphaTestPostprocess.None:
+                    return null;
+                case AlphaTestPostprocess.AlphaScale:
+                    return alphaScale ?? (alphaScale = new AlphaScalePostprocess());
+                // TODO add other cases        
+            }
+
+            throw new Exception($"invalid alpha postprocess filter specified: {alphaTestProcess}");
         }
 
         private ITextureCache GetMinifyTextureCache(ITexture src)

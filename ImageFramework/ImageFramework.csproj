@@ -154,6 +154,9 @@
     <Compile Include="Model\Overlay\OverlayModel.cs" />
     <Compile Include="Model\Progress\ProgressModel.cs" />
     <Compile Include="Model\Progress\SubProgress.cs" />
+    <Compile Include="Model\Scaling\AlphaTest\AlphaScalePostprocess.cs" />
+    <Compile Include="Model\Scaling\AlphaTest\IPostprocess.cs" />
+    <Compile Include="Model\Scaling\AlphaTest\PostprocessBase.cs" />
     <Compile Include="Model\Scaling\Down\DetailPreservingShaderCore.cs" />
     <Compile Include="Model\Scaling\Down\DownscalingShaderBase.cs" />
     <Compile Include="Model\Scaling\Down\BoxScalingShader.cs" />
