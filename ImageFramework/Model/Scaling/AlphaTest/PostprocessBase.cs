@@ -11,5 +11,9 @@ namespace ImageFramework.Model.Scaling.AlphaTest
     internal abstract class PostprocessBase : IPostprocess
     {
         public abstract void Run(ITexture uav, bool hasAlpha, UploadBuffer upload, ITextureCache cache);
+        public virtual void Dispose()
+        {
+            
+        }
     }
 }

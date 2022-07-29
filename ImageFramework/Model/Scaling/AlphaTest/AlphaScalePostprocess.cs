@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Model.Shader;
 using ImageFramework.Model.Statistics;
 
 namespace ImageFramework.Model.Scaling.AlphaTest
@@ -15,10 +16,20 @@ namespace ImageFramework.Model.Scaling.AlphaTest
         private float threshold = 0.5f;
 
         private readonly StatisticsModel stats;
+        private readonly TransformShader scaleAlphaShader;
 
         public AlphaScalePostprocess(StatisticsModel stats)
         {
             this.stats = stats;
+            // TODO add user parameter to transform shader
+            scaleAlphaShader = new TransformShader("float4(value.r, value.g, value.b, value.a * userParameter)", "float4");
+        }
+
+        public override void Dispose()
+        {
+
+
+            base.Dispose();
         }
 
         public override void Run(ITexture uav, bool hasAlpha, UploadBuffer upload, ITextureCache cache)

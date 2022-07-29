@@ -10,7 +10,7 @@ using ImageFramework.Utility;
 namespace ImageFramework.Model.Shader
 {
     /// <summary>
-    /// transforms all values from an image
+    /// transforms all values from an image (output image must be uav)
     /// </summary>
     public class TransformShader : IDisposable
     {
@@ -23,6 +23,16 @@ namespace ImageFramework.Model.Shader
 
         public static readonly string TransformLuma = StatisticsShader.LumaValue;
         //public static readonly string TransformLuma = "return  dot(value.a * sign(value.rgb) * toSrgb(abs(value)).rgb, float3(0.299, 0.587, 0.114))";
+
+        /// <summary>
+        /// ctor for input uav = output uav (Run command with single texture parameter)
+        /// </summary>
+        /// <param name="transform">transform "value"</param>
+        /// <param name="pixelType">type of "value"</param>
+        public TransformShader(string transform, string pixelType)
+        : this(new string[]{}, $"{pixelType} value = out_image[coord]; {transform}",
+            pixelType, pixelType)
+        {}
 
         /// <summary>
         /// ctor for a single input image
@@ -53,9 +63,9 @@ namespace ImageFramework.Model.Shader
         }
 
         private DirectX.Shader Shader => shader ?? (shader = new DirectX.Shader(DirectX.Shader.Type.Compute,
-                                             GetSource(new ShaderBuilder2D(pixelTypeIn), new ShaderBuilder2D(pixelTypeOut)), "GaussShader"));
+                                             GetSource(new ShaderBuilder2D(pixelTypeIn), new ShaderBuilder2D(pixelTypeOut)), "TransformShader"));
         private DirectX.Shader Shader3D => shader3D ?? (shader3D = new DirectX.Shader(DirectX.Shader.Type.Compute,
-                                               GetSource(new ShaderBuilder3D(pixelTypeIn), new ShaderBuilder3D(pixelTypeOut)), "GaussShader3D"));
+                                               GetSource(new ShaderBuilder3D(pixelTypeIn), new ShaderBuilder3D(pixelTypeOut)), "TransformShader3D"));
 
         internal void CompileShaders()
         {
@@ -69,11 +79,19 @@ namespace ImageFramework.Model.Shader
             public Size3 Size;
         }
 
+        // input uav = output uav
+        public void Run(ITexture tex, LayerMipmapSlice lm, UploadBuffer upload)
+        {
+            Run(new ITexture[]{}, tex, lm, upload);
+        }
+
+        // single input image
         public void Run(ITexture src, ITexture dst, LayerMipmapSlice lm, UploadBuffer upload)
         {
             Run(new[]{src}, dst, lm, upload);
         }
 
+        // arbitrary number of input images
         public void Run(ITexture[] sources, ITexture dst, LayerMipmapSlice lm, UploadBuffer upload)
         {
             Debug.Assert(sources.Length == inputs.Length);

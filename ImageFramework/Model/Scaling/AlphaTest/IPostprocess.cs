@@ -4,7 +4,7 @@ using ImageFramework.Utility;
 
 namespace ImageFramework.Model.Scaling.AlphaTest
 {
-    internal interface IPostprocess
+    internal interface IPostprocess : IDisposable
     {
         /// <summary>
         /// runs the postprocess on all mipmaps of the uav texture
