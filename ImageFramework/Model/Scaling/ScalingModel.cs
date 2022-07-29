@@ -140,10 +140,19 @@ namespace ImageFramework.Model.Scaling
                 var postShader = GetAlphaPostprocess();
                 if(postShader != null)
                 {
+                    // copy over mipmap 0 as well (was skipped by the previous step)
+                    if (!ReferenceEquals(dstTex, tex))
+                    {
+                        for (int curLayer = 0; curLayer < tex.NumLayers; ++curLayer)
+                        {
+                            var lm = new LayerMipmapSlice(curLayer, 0);
+                            models.SharedModel.Convert.CopyLayer(tex, lm, dstTex, lm);
+                        }
+                    }
                     postShader.Run(dstTex, hasAlpha, models.SharedModel.Upload, cache);
 
-                    models.SharedModel.Sync.Set();
-                    await models.SharedModel.Sync.WaitForGpuAsync(progress.Token);
+                    //models.SharedModel.Sync.Set();
+                    //await models.SharedModel.Sync.WaitForGpuAsync(progress.Token);
                 }
             }
 
@@ -201,7 +210,7 @@ namespace ImageFramework.Model.Scaling
                 case AlphaTestPostprocess.None:
                     return null;
                 case AlphaTestPostprocess.AlphaScale:
-                    return alphaScale ?? (alphaScale = new AlphaScalePostprocess());
+                    return alphaScale ?? (alphaScale = new AlphaScalePostprocess(models.Stats));
                 // TODO add other cases        
             }
 

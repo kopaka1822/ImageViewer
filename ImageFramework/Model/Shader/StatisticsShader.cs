@@ -23,6 +23,9 @@ namespace ImageFramework.Model.Shader
         private readonly UploadBuffer cbuffer;
         private readonly string returnValue;
 
+        // (optional) user parameter than can be used for the return value
+        public float UserParameter { get; set; } = 0.0f;
+
         // predefined return values
         public static readonly string LuminanceValue = "return dot(value.a * value.rgb, float3(0.2125, 0.7154, 0.0721))";
         public static readonly string UniformWeightValue = "return dot(value.a * value.rgb, 1.0/3.0)";
@@ -32,6 +35,7 @@ return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
         public static readonly string LumaValue = "return dot(value.a * toSrgb(value).rgb, float3(0.299, 0.587, 0.114))";
         public static readonly string AlphaValue = "return value.a";
         public static readonly string RedValue = "return value.r";
+        public static readonly string AlphaTestCoverage = "return ((value.a < userParameter) ? 0.0 : 1.0)";
 
         /// <summary>
         /// shader used for statistics calculation
@@ -74,7 +78,8 @@ return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
                 Level = lm.Mipmap,
                 TrueBool = true,
                 Offset = offset,
-                Size = dim
+                Size = dim,
+                UserParameter = UserParameter
             };
 
             if (lm.AllLayer)
@@ -136,6 +141,7 @@ return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
             public int Level;
             public Size3 Size;
             public RawBool TrueBool;
+            public float UserParameter; // optional, can be supplied for the return value
         }
 
         private string GetSource(IShaderBuilder builder)
@@ -149,6 +155,7 @@ cbuffer InputBuffer : register(b0) {{
     uint level;
     uint3 size;
     bool trueBool;
+    float userParameter;
 }};
 
 {Utility.Utility.ToSrgbFunction()}
