@@ -21,6 +21,9 @@ namespace ImageFramework.Model.Shader
         private readonly string transform;
         private readonly string[] inputs;
 
+        // (optional) user parameter that can be used for the transformation
+        public float UserParameter { get; set; } = 0.0f;
+
         public static readonly string TransformLuma = StatisticsShader.LumaValue;
         //public static readonly string TransformLuma = "return  dot(value.a * sign(value.rgb) * toSrgb(abs(value)).rgb, float3(0.299, 0.587, 0.114))";
 
@@ -30,7 +33,7 @@ namespace ImageFramework.Model.Shader
         /// <param name="transform">transform "value"</param>
         /// <param name="pixelType">type of "value"</param>
         public TransformShader(string transform, string pixelType)
-        : this(new string[]{}, $"{pixelType} value = out_image[coord]; {transform}",
+        : this(new string[]{}, $"{pixelType} value = out_image[coordOut]; {transform}",
             pixelType, pixelType)
         {}
 
@@ -77,6 +80,7 @@ namespace ImageFramework.Model.Shader
         {
             public int Layer;
             public Size3 Size;
+            public float UserParameter;
         }
 
         // input uav = output uav
@@ -100,15 +104,16 @@ namespace ImageFramework.Model.Shader
                 Debug.Assert(src.HasSameDimensions(dst));
             }
 
-            var size = sources[0].Size.GetMip(lm.SingleMipmap);
+            var size = dst.Size.GetMip(lm.SingleMipmap);
             upload.SetData(new BufferData
             {
                 Layer = lm.SingleLayer,
-                Size = size
+                Size = size,
+                UserParameter = UserParameter
             });
             var dev = Device.Get();
-            var builder = sources[0].Is3D ? ShaderBuilder.Builder3D : ShaderBuilder.Builder2D;
-            dev.Compute.Set(sources[0].Is3D ? Shader3D.Compute : Shader.Compute);
+            var builder = dst.Is3D ? ShaderBuilder.Builder3D : ShaderBuilder.Builder2D;
+            dev.Compute.Set(dst.Is3D ? Shader3D.Compute : Shader.Compute);
             dev.Compute.SetConstantBuffer(0, upload.Handle);
             for (var i = 0; i < sources.Length; i++)
             {
@@ -146,12 +151,13 @@ namespace ImageFramework.Model.Shader
 cbuffer InputBuffer : register(b0) {{
     int layer;
     int3 size;
+    float userParameter;
 }};
 
 {Utility.Utility.ToSrgbFunction()}
 {builderIn.TexelHelperFunctions}
 
-{builderOut.Type} transform({builderIn.IntVec} coord) {{
+{builderOut.Type} transform({builderIn.IntVec} coord, int3 coordOut) {{
     {transform};
 }}
 
@@ -159,7 +165,7 @@ cbuffer InputBuffer : register(b0) {{
 void main(int3 id : SV_DispatchThreadID)
 {{
     if(any(id >= size)) return;
-    out_image[texel(id, layer)] = transform(texel(id));
+    out_image[texel(id, layer)] = transform(texel(id), texel(id, layer));
 }}
 ";
         }

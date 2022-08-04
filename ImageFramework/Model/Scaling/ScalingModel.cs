@@ -241,6 +241,10 @@ namespace ImageFramework.Model.Scaling
             triangleMinify?.Dispose();
             lanzosMinify?.Dispose();
             detailPreservingMinify?.Dispose();
+
+            alphaScale?.Dispose();
+            alphaPyramid?.Dispose();
+            alphaConnectivity?.Dispose();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

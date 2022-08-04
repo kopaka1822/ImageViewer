@@ -21,14 +21,12 @@ namespace ImageFramework.Model.Scaling.AlphaTest
         public AlphaScalePostprocess(StatisticsModel stats)
         {
             this.stats = stats;
-            // TODO add user parameter to transform shader
-            scaleAlphaShader = new TransformShader("float4(value.r, value.g, value.b, value.a * userParameter)", "float4");
+            scaleAlphaShader = new TransformShader("return float4(value.r, value.g, value.b, clamp(value.a * userParameter, 0.0, 1.0))", "float4");
         }
 
         public override void Dispose()
         {
-
-
+            scaleAlphaShader?.Dispose();
             base.Dispose();
         }
 
@@ -41,7 +39,7 @@ namespace ImageFramework.Model.Scaling.AlphaTest
                 // obtain the desired coverage when alpha blending is used
                 float desiredCoverage = stats.GetStatisticsFor(uav, new LayerMipmapSlice(layer, 0)).Alpha.Avg;
 
-                // fix alpha values for all mipmaps (including the most detailled)
+                // fix alpha values for all mipmaps (including the most detailed)
                 for (int mip = 0; mip < uav.NumMipmaps; ++mip)
                 {
                     var lm = new LayerMipmapSlice(layer, mip);
@@ -75,9 +73,13 @@ namespace ImageFramework.Model.Scaling.AlphaTest
 
                     float alphaScale = threshold / bestThreshold;
 
+                    scaleAlphaShader.UserParameter = alphaScale;
+                    if(Math.Abs(alphaScale - 1.0f) > 0.001f)
+                        scaleAlphaShader.Run(uav, lm, upload);
 
-                    // TODO scale all alpha values by this
-                    int a = 3;
+                    // DEBUG
+                    //float finalCoverage = stats.GetAlphaStatisticsFor(uav, threshold, lm).Coverage;
+                    //Debug.Assert(Math.Abs(finalCoverage - desiredCoverage) < bestError * 1.1f);
                 }
             }
         }
