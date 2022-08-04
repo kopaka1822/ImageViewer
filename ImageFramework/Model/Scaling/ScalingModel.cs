@@ -211,6 +211,8 @@ namespace ImageFramework.Model.Scaling
                     return null;
                 case AlphaTestPostprocess.AlphaScale:
                     return alphaScale ?? (alphaScale = new AlphaScalePostprocess(models.Stats));
+                case AlphaTestPostprocess.AlphaPyramid:
+                    return alphaPyramid ?? (alphaPyramid = new AlphaPyramidPostproces(models.Stats));
                 // TODO add other cases        
             }
 

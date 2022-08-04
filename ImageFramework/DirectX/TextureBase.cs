@@ -71,6 +71,16 @@ namespace ImageFramework.DirectX
             }
         }
 
+        public byte[] GetPixelAlphas(LayerMipmapSlice lm)
+        {
+            // create staging texture
+            using (var staging = GetStagingTexture(lm))
+            {
+                // obtain data from staging resource
+                return Device.Get().GetAlphaData(staging, Format, 0, Size.GetMip(lm.Mipmap));
+            }
+        }
+
         public unsafe byte[] GetBytes(LayerMipmapSlice lm, uint size)
         {
             byte[] res = new byte[size];

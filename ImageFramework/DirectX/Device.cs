@@ -199,8 +199,6 @@ namespace ImageFramework.DirectX
                 return result;
 
             }
-
-
             else
             {
                 var tmp = GetData(res, subresource, size, 4);
@@ -215,6 +213,42 @@ namespace ImageFramework.DirectX
                         if (isSrgb)
                             result[dst] = result[dst].FromSrgb();
                     }
+                }
+
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// gets alpha data, only works for the 4 supported formats.
+        /// </summary>
+        /// <returns></returns>
+        public unsafe byte[] GetAlphaData(Resource res, Format format, int subresource, Size3 size)
+        {
+            Debug.Assert(IO.SupportedFormats.Contains(format));
+
+            if (format == Format.R32G32B32A32_Float)
+            {
+                var tmp = GetData(res, subresource, size, 4 * 4);
+                var result = new byte[size.Product];
+                fixed (byte* pBuffer = tmp)
+                {
+                    for (int i = 0; i < result.Length; i++)
+                    {
+                        float alpha = ((float*) pBuffer)[i*4 + 3];
+                        result[i] = (byte)Utility.Utility.Clamp(Math.Round(alpha * 255.0f), 0.0f, 255.0f);
+                    }
+                }
+
+                return result;
+            }
+            else
+            {
+                var tmp = GetData(res, subresource, size, 4);
+                var result = new byte[size.Product];
+                for (int dst = 0, src = 0; dst < result.Length; ++dst, src += 4)
+                {
+                    result[dst] = tmp[src + 3];
                 }
 
                 return result;
