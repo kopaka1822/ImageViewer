@@ -133,6 +133,7 @@ namespace ImageFramework.Model.Scaling
             }
 
             curProg.Progress = 1.0f;
+            int firstMip = 1; // first mip to copy is 1 (0 is identical)
 
             if(hasAlpha)
             {
@@ -141,6 +142,7 @@ namespace ImageFramework.Model.Scaling
                 if(postShader != null)
                 {
                     // copy over mipmap 0 as well (was skipped by the previous step)
+                    firstMip = 0; // set first mip to zero
                     if (!ReferenceEquals(dstTex, tex))
                     {
                         for (int curLayer = 0; curLayer < tex.NumLayers; ++curLayer)
@@ -161,7 +163,7 @@ namespace ImageFramework.Model.Scaling
                 progress.What = "Finalizing Mipmaps";
                 for (int curLayer = 0; curLayer < tex.NumLayers; ++curLayer)
                 {
-                    for (int curMip = 1; curMip < tex.NumMipmaps; ++curMip)
+                    for (int curMip = firstMip; curMip < tex.NumMipmaps; ++curMip)
                     {
                         var lm = new LayerMipmapSlice(curLayer, curMip);
                         models.SharedModel.Convert.CopyLayer(dstTex, lm, tex, lm);
