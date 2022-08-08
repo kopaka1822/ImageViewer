@@ -432,6 +432,7 @@
                     IsCheckable="True"
                     IsChecked="{Binding Scale.UseAlphaScale}"
                     ToolTip="Rescale alpha values to preserve alpha coverage (Unity: mipMapsPreserveCoverage)"/>
+                <!--
                 <MenuItem 
                     Header="Alpha Pyramid"
                     IsCheckable="True"
@@ -442,6 +443,7 @@
                     IsCheckable="True"
                     IsChecked="{Binding Scale.UseAlphaConnectivity}"
                     ToolTip="Strong emphasis on maintaining connectivity in each mipmap while preserving alpha coverage"/>
+                -->
             </MenuItem>
 
             <MenuItem 
