@@ -14,6 +14,7 @@ namespace ImageFramework.Model.Scaling.AlphaTest
     internal class AlphaScalePostprocess : PostprocessBase
     {
         private float threshold = 0.5f;
+        private bool singlePixelFix = true; // enabling this will force at least one pixel to pass the alpha test (prevents the texture from completely disappearing over distance)
 
         private readonly StatisticsModel stats;
         private readonly TransformShader scaleAlphaShader;
@@ -56,6 +57,15 @@ namespace ImageFramework.Model.Scaling.AlphaTest
                     {
                         float currentCoverage = stats.GetAlphaStatisticsFor(uav, midThreshold, lm).Coverage;
                         float error = Math.Abs(currentCoverage - desiredCoverage);
+                        // fix to guarantee that at least one pixel passes the alpha test
+                        if (singlePixelFix && desiredCoverage > 0.0 && currentCoverage == 0.0f)
+                        {
+                            // decrease threshold, so that at least one pixels passes the alpha test
+                            maxThreshold = midThreshold;
+                            midThreshold = (minThreshold + maxThreshold) * 0.5f;
+                            continue;
+                        }
+
                         if (error < bestError)
                         {
                             bestThreshold = midThreshold;
