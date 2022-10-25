@@ -104,7 +104,8 @@
                     Content="_Cancel"
                     Width="60"
                     Margin="0"
-                    Command="{Binding CancelCommand}"/>
+                    Command="{Binding CancelCommand}"
+                    IsCancel="True"/>
             </StackPanel>
         </Grid>
     </Border>

@@ -27,7 +27,8 @@
             Width="80"
             HorizontalAlignment="Right"
             Margin="{StaticResource DefaultBorder}"
-            Click="OkOnClick"/>
+            Click="OkOnClick"
+            IsDefault="True"/>
     </Grid>
 
 </Window>

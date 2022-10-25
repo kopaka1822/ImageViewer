@@ -113,12 +113,14 @@
                     Width="60"
                     Click="ButtonExport_OnClick"
                     IsEnabled="{Binding IsValid}"
+                    IsDefault="True"
                 />
                 <Button 
                     Grid.Column="1" 
                     Content="_Cancel" 
                     Width="60"
-                    Click="ButtonCancel_OnClick"/>
+                    Click="ButtonCancel_OnClick"
+                    IsCancel="True"/>
             </Grid>
         </StackPanel>
     </Border>
