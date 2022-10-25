@@ -41,6 +41,12 @@ namespace ImageViewer.Models
         private readonly ClientDropController clientDropController;
         private readonly PaintController paintController;
         private readonly CropController cropController;
+
+        // transform shader with 1 srv input and 1 uav output => overwrites alpha channel with 1.0
+        public ImageFramework.Model.Shader.TransformShader OverwriteAlphaShader => overwriteAlphaShader ?? (overwriteAlphaShader = new ImageFramework.Model.Shader.TransformShader("return float4(value.r, value.g, value.b, 1.0)", "float4", "float4"));
+        private ImageFramework.Model.Shader.TransformShader overwriteAlphaShader = null;
+
+
         public ModelsEx(MainWindow window)
         : base(4)
         {
@@ -84,6 +90,7 @@ namespace ImageViewer.Models
 
         public override void Dispose()
         {
+            overwriteAlphaShader?.Dispose();
             Settings?.Save();
             ViewData?.Dispose();
             paintController?.Dispose();

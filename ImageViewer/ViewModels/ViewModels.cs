@@ -202,7 +202,22 @@ namespace ImageViewer.ViewModels
                         bitmap.Unlock();
                     }
 
-                    import.ImportTexture(tex, "", GliFormat.RGB8_SRGB);
+                    // check if the alpha channel is valid
+                    var stats = models.Stats.GetStatisticsFor(tex);
+                    bool overwriteAlpha = stats.Alpha.Max == 0.0f;
+
+                    if(!overwriteAlpha)
+                    {
+                        import.ImportTexture(tex, "", GliFormat.RGB8_SRGB);
+                        return;
+                    }
+
+                    // overwrite alpha with 1.0 before import
+                    var tex2 = new TextureArray2D(LayerMipmapCount.One, new Size3(img.PixelWidth, img.PixelHeight), Format.R32G32B32A32_Float, true);
+                    models.OverwriteAlphaShader.Run(tex, tex2, LayerMipmapSlice.Mip0, models.SharedModel.Upload);
+                    tex.Dispose();
+
+                    import.ImportTexture(tex2, "", GliFormat.RGBA8_SRGB);
                 }
                 else if (Clipboard.ContainsFileDropList())
                 {

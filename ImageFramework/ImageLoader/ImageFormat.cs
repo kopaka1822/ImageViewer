@@ -35,6 +35,10 @@ namespace ImageFramework.ImageLoader
                     DxgiFormat = Format.R8G8B8A8_SNorm; 
                     PixelSize = 4;
                     break;
+                case GliFormat.BGRA8_SRGB:
+                    DxgiFormat = Format.B8G8R8A8_UNorm_SRgb;
+                    PixelSize = 4;
+                    break;
                 default:
                     Debug.Assert(false);
                     break;
@@ -60,6 +64,10 @@ namespace ImageFramework.ImageLoader
                     break;
                 case Format.R8G8B8A8_SNorm:
                     GliFormat = GliFormat.RGBA8_SNORM;
+                    PixelSize = 4;
+                    break;
+                case Format.B8G8R8A8_UNorm_SRgb:
+                    GliFormat = GliFormat.BGRA8_SRGB;
                     PixelSize = 4;
                     break;
                 default:
