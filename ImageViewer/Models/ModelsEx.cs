@@ -46,6 +46,8 @@ namespace ImageViewer.Models
         public ImageFramework.Model.Shader.TransformShader OverwriteAlphaShader => overwriteAlphaShader ?? (overwriteAlphaShader = new ImageFramework.Model.Shader.TransformShader("return float4(value.r, value.g, value.b, 1.0)", "float4", "float4"));
         private ImageFramework.Model.Shader.TransformShader overwriteAlphaShader = null;
 
+        // TODO rename
+        public ImportDialogController Import { get; }
 
         public ModelsEx(MainWindow window)
         : base(4)
@@ -76,6 +78,8 @@ namespace ImageViewer.Models
             paintController = new PaintController(this);
             clientDropController = new ClientDropController(this);
             cropController = new CropController(this);
+
+            Import = new ImportDialogController(this);
         }
 
         /// <summary>

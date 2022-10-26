@@ -24,7 +24,6 @@ namespace ImageViewer.ViewModels.Dialog
     public class ImportArrayViewModel : INotifyPropertyChanged, IDisposable, IDropTarget
     {
         private readonly ModelsEx models;
-        private readonly ImportDialogController importDialog;
 
         private static string GetPrettyFilename(string fullPath, int numTextures)
         {
@@ -167,12 +166,11 @@ namespace ImageViewer.ViewModels.Dialog
             this.ImportCommand = new ActionCommand(Import);
             this.Apply2DCommand = new Import2DCommand(models, this);
             this.Apply3DCommand = new Import3DCommand(models, this);
-            importDialog = new ImportDialogController(models);
         }
 
         private void Import()
         {
-            var files = importDialog.ShowImportImageDialog();
+            var files = models.Import.ShowImportImageDialog();
             if (files == null) return;
 
             foreach (var file in files)

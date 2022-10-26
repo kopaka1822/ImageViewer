@@ -14,6 +14,9 @@ using ImageViewer.Models.Settings;
 
 namespace ImageViewer.Controller
 {
+    // manages imports of images
+    // TODO manage video files
+    // TODO manage config files ".icfg"
     public class ImportDialogController
     {
         private readonly ModelsEx models;

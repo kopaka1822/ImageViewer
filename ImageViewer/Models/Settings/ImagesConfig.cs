@@ -86,7 +86,6 @@ namespace ImageViewer.Models.Settings
             if(ImportMode == ViewerConfig.ImportMode.Replace)
                 models.Images.Clear();
 
-            var import = new ImportDialogController(models);
             var layerMipmaps = new LayerMipmapCount(NumLayers, NumMipmaps);
             var imgSize = new Size3(Width, Height, Depth);
 
@@ -94,7 +93,7 @@ namespace ImageViewer.Models.Settings
             foreach (var img in Images)
             {
                 if(img.Data == null)
-                    await import.ImportImageAsync(img.Filename, img.Alias);
+                    await models.Import.ImportImageAsync(img.Filename, img.Alias);
                 else
                 {
                     Debug.Assert(img.Format != null);

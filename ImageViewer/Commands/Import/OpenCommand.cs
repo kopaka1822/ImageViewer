@@ -7,17 +7,15 @@ namespace ImageViewer.Commands.Import
     public class OpenCommand : SimpleCommand
     {
         private readonly ModelsEx models;
-        private readonly ImportDialogController import;
 
         public OpenCommand(ModelsEx models)
         {
             this.models = models;
-            this.import = new ImportDialogController(models);
         }
 
         public override async void Execute()
         {
-            var files = import.ShowImportImageDialog();
+            var files = models.Import.ShowImportImageDialog();
             if (files == null) return;
 
             // nothing imported yet => show in same window
@@ -25,7 +23,7 @@ namespace ImageViewer.Commands.Import
             {
                 foreach (var file in files)
                 {
-                    await import.ImportImageAsync(file);
+                    await models.Import.ImportImageAsync(file);
                 }
                 return;
             }

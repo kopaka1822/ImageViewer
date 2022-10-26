@@ -15,12 +15,10 @@ namespace ImageViewer.ViewModels.Image
     public class ImagesViewModel : INotifyPropertyChanged, IDropTarget
     {
         private readonly ModelsEx models;
-        private readonly ImportDialogController import;
         private readonly string versionString;
         public ImagesViewModel(ModelsEx models)
         {
             this.models = models;
-            import = new ImportDialogController(models);
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
 
             versionString = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
@@ -136,7 +134,7 @@ namespace ImageViewer.ViewModels.Image
 
                 foreach (var file in items)
                 {
-                    await import.ImportImageAsync(file);
+                    await models.Import.ImportImageAsync(file);
                     
                     // put inserted image into correct position
                     models.Images.MoveImage(models.Images.NumImages - 1, desiredPosition++);

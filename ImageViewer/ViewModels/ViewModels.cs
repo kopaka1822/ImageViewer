@@ -35,7 +35,6 @@ namespace ImageViewer.ViewModels
     public class ViewModels : INotifyPropertyChanged, IDisposable
     {
         private readonly ModelsEx models;
-        private readonly ImportDialogController import;
 
         public DisplayViewModel Display { get; }
         public ProgressViewModel Progress { get; }
@@ -79,7 +78,6 @@ namespace ImageViewer.ViewModels
         public ViewModels(ModelsEx models)
         {
             this.models = models;
-            import = new ImportDialogController(models);
 
             // view models
             Display = new DisplayViewModel(models, this);
@@ -208,7 +206,8 @@ namespace ImageViewer.ViewModels
 
                     if(!overwriteAlpha)
                     {
-                        import.ImportTexture(tex, "", GliFormat.RGB8_SRGB);
+                        var format = stats.Alpha.Min == 1.0 ? GliFormat.RGB8_SRGB : GliFormat.RGBA8_SRGB;
+                        models.Import.ImportTexture(tex, "", format);
                         return;
                     }
 
@@ -217,14 +216,14 @@ namespace ImageViewer.ViewModels
                     models.OverwriteAlphaShader.Run(tex, tex2, LayerMipmapSlice.Mip0, models.SharedModel.Upload);
                     tex.Dispose();
 
-                    import.ImportTexture(tex2, "", GliFormat.RGBA8_SRGB);
+                    models.Import.ImportTexture(tex2, "", GliFormat.RGB8_SRGB);
                 }
                 else if (Clipboard.ContainsFileDropList())
                 {
                     var files = Clipboard.GetFileDropList();
                     foreach (string file in files)
                     {
-                        await import.ImportImageAsync(file);
+                        await models.Import.ImportImageAsync(file);
                     }
                 }
             }

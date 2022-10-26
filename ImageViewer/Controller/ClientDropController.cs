@@ -15,7 +15,6 @@ namespace ImageViewer.Controller
     public class ClientDropController
     {
         private readonly ModelsEx models;
-        private readonly ImportDialogController import;
 
         public ClientDropController(ModelsEx models)
         {
@@ -24,8 +23,6 @@ namespace ImageViewer.Controller
             dxHost.DragOver += (o, args) => args.Effects = DragDropEffects.Copy;
             dxHost.AllowDrop = true;
             dxHost.Drop += DxHostOnDrop;
-
-            import = new ImportDialogController(models);
         }
 
         private async void DxHostOnDrop(object sender, DragEventArgs e)
@@ -42,7 +39,7 @@ namespace ImageViewer.Controller
                     var cfg = ViewerConfig.LoadFromFile(file);
                     await cfg.ApplyToModels(models);
                 }
-                else await import.ImportImageAsync(file);
+                else await models.Import.ImportImageAsync(file);
             }
         }
     }
