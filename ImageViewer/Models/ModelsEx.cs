@@ -47,7 +47,7 @@ namespace ImageViewer.Models
         private ImageFramework.Model.Shader.TransformShader overwriteAlphaShader = null;
 
         // TODO rename
-        public ImportDialogController Import { get; }
+        public ImportModel Import { get; }
 
         public ModelsEx(MainWindow window)
         : base(4)
@@ -79,7 +79,7 @@ namespace ImageViewer.Models
             clientDropController = new ClientDropController(this);
             cropController = new CropController(this);
 
-            Import = new ImportDialogController(this);
+            Import = new ImportModel(this);
         }
 
         /// <summary>

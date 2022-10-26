@@ -122,7 +122,6 @@
     <Compile Include="Controller\ClientDropController.cs" />
     <Compile Include="Controller\ComputeImageController.cs" />
     <Compile Include="Controller\CropController.cs" />
-    <Compile Include="Controller\ImportDialogController.cs" />
     <Compile Include="Controller\Overlays\AddArrowOverlay.cs" />
     <Compile Include="Controller\Overlays\GenericBoxOverlay.cs" />
     <Compile Include="Controller\Overlays\HeatmapBoxOverlay.cs" />
@@ -161,6 +160,7 @@
     <Compile Include="Models\Display\RayCastingDisplayModel.cs" />
     <Compile Include="Models\Display\Single3DDisplayModel.cs" />
     <Compile Include="Models\ExportConfigModel.cs" />
+    <Compile Include="Models\ImportModel.cs" />
     <Compile Include="Models\SettingsModel.cs" />
     <Compile Include="Models\Settings\ArrowsConfig.cs" />
     <Compile Include="Models\Settings\DisplayConfig.cs" />

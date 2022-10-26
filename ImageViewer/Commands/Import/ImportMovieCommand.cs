@@ -50,7 +50,7 @@ namespace ImageViewer.Commands.Import
                 return;
             }
 
-            var file = Controller.ImportDialogController.ShowSingleFileImportImageDialog(models);
+            var file = ImportModel.ShowSingleFileImportImageDialog(models);
             if (file == null) return; // nothing picked
 
             // try to get metadata
