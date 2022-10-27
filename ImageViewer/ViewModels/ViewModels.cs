@@ -111,7 +111,6 @@ namespace ImageViewer.ViewModels
             HelpCommand = new HelpDialogCommand(models);
             GifExportCommand = new GifExportCommand(models);
             ImportArrayCommand = new ImportArrayCommand(models);
-            ImportMovieCommand = new ImportMovieCommand(models);
             LatLongToCubemapCommand = new LatLongToCubemapCommand(models);
             CubemapToLatLongCommand = new CubemapToLatLongCommand(models);
             ArrayTo3DCommand = new ArrayTo3DCommand(models);
@@ -223,7 +222,7 @@ namespace ImageViewer.ViewModels
                     var files = Clipboard.GetFileDropList();
                     foreach (string file in files)
                     {
-                        await models.Import.ImportImageAsync(file);
+                        await models.Import.ImportFileAsync(file);
                     }
                 }
             }
@@ -269,7 +268,6 @@ namespace ImageViewer.ViewModels
         public ICommand GifExportCommand { get; }
 
         public ICommand ImportArrayCommand { get; }
-        public ICommand ImportMovieCommand { get; }
 
         public ICommand LatLongToCubemapCommand { get; }
         public ICommand CubemapToLatLongCommand { get; }

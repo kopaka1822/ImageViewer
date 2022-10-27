@@ -66,12 +66,7 @@ namespace ImageViewer
             {
                 foreach (var arg in App.StartupArgs)
                 {
-                    if (arg.EndsWith(".icfg"))
-                    {
-                        var cfg = ViewerConfig.LoadFromFile(arg);
-                        await cfg.ApplyToModels(models);
-                    }
-                    else await models.Import.ImportImageAsync(arg);
+                    await models.Import.ImportFileAsync(arg);
                 }
             }
             catch (Exception e)

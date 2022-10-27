@@ -23,7 +23,7 @@ namespace ImageViewer.Commands.Import
             {
                 foreach (var file in files)
                 {
-                    await models.Import.ImportImageAsync(file);
+                    await models.Import.ImportFileAsync(file);
                 }
                 return;
             }

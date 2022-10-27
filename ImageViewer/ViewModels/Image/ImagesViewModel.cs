@@ -134,10 +134,15 @@ namespace ImageViewer.ViewModels.Image
 
                 foreach (var file in items)
                 {
-                    await models.Import.ImportImageAsync(file);
-                    
-                    // put inserted image into correct position
-                    models.Images.MoveImage(models.Images.NumImages - 1, desiredPosition++);
+                    var prevImages = models.Images.NumImages;
+                    await models.Import.ImportFileAsync(file);
+
+                    // move to the correct position (if it was inserted successfully)
+                    if (models.Images.NumImages > prevImages)
+                    {
+                        // put inserted image into correct position
+                        models.Images.MoveImage(models.Images.NumImages - 1, desiredPosition++);
+                    }
                 }
             }
         }

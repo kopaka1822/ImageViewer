@@ -60,8 +60,6 @@ namespace ImageFramework.Model.Export
             veryslow
         }
 
-
-
         public class MovieExportConfig
         {
             public string Filename;
@@ -545,6 +543,28 @@ namespace ImageFramework.Model.Export
 
             return output.Trim(trimChars);
             
+        }
+
+        private static IReadOnlyList<string> s_formats = null;
+        public static IReadOnlyList<string> Formats()
+        {
+            if (s_formats == null)
+            {
+                s_formats = new List<string>
+                {
+                    "mp4",
+                    "mov",
+                    "mpeg",
+                    "avi",
+                    "flv",
+                    "webm",
+                    "mpeg",
+                    "mkv",
+                    "wmv",
+                    "gif"
+                };
+            }
+            return s_formats;
         }
     }
 }

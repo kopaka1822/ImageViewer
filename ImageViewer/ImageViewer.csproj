@@ -90,7 +90,6 @@
     <Compile Include="Commands\Export\ExportOverwriteCommand.cs" />
     <Compile Include="Commands\Helper\Command.cs" />
     <Compile Include="Commands\Import\ImportConfigCommand.cs" />
-    <Compile Include="Commands\Import\ImportMovieCommand.cs" />
     <Compile Include="Commands\Import\ReloadImagesCommand.cs" />
     <Compile Include="Commands\Import\ReplaceEquationImageCommand.cs" />
     <Compile Include="Commands\Tools\ArrayTo3DCommand.cs" />

@@ -34,12 +34,7 @@ namespace ImageViewer.Controller
             
             foreach (var file in files)
             {
-                if (file.EndsWith(".icfg"))
-                {
-                    var cfg = ViewerConfig.LoadFromFile(file);
-                    await cfg.ApplyToModels(models);
-                }
-                else await models.Import.ImportImageAsync(file);
+                await models.Import.ImportFileAsync(file);
             }
         }
     }
