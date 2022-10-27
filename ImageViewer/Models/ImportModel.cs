@@ -168,7 +168,7 @@ namespace ImageViewer.Models
 
                 // indicated if the user needs a window to adjust the frame count
                 var openFrameSelection =
-                    (models.Images.NumImages == 0) || // show on import of first video
+                    (models.Images.NumImages == 0 && frameCount > 1) || // show on import of first video
                     (models.Images.NumImages != 0 && models.Images.NumLayers != meta.FrameCount); // show when imported video frame count does not match
 
                 if (openFrameSelection)
