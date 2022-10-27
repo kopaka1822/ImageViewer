@@ -22,6 +22,7 @@ namespace ImageViewer.ViewModels.Display
         private ModelsEx models;
         private bool playVideo = false;
         private DispatcherTimer clock = new DispatcherTimer(DispatcherPriority.Render);
+        private DateTime lastTickStamp;
 
         public MovieViewModel(ModelsEx models, MovieDisplayModel baseModel)
         {
@@ -39,6 +40,7 @@ namespace ImageViewer.ViewModels.Display
             PlayCommand = new ActionCommand(PlayPause);
             StopCommand = new ActionCommand(Stop);
 
+            lastTickStamp = DateTime.Now;
             clock.Tick += ClockOnTick;
             OnFpsChanged();
         }
@@ -105,6 +107,8 @@ namespace ImageViewer.ViewModels.Display
 
         public void PreviousFrame()
         {
+            IsPlaying = false; // stop playback for this feature
+
             var prev = models.Display.ActiveLayer - 1;
             if (prev < 0)
             {
@@ -118,12 +122,31 @@ namespace ImageViewer.ViewModels.Display
 
         public void NextFrame()
         {
+            IsPlaying = false; // stop playback for this feature
+
             var next = models.Display.ActiveLayer + 1;
             if (next >= models.Images.NumLayers)
             {
                 if (!RepeatVideo) return;
                 // set to first frame
                 next = 0;
+            }
+            models.Display.ActiveLayer = next;
+        }
+
+        public void AdvanceFrames(int numFrames)
+        {
+            var next = Math.Max(models.Display.ActiveLayer + numFrames, 0);
+            if (next >= models.Images.NumLayers)
+            {
+                if (!RepeatVideo)
+                {
+                    models.Display.ActiveLayer = MaxFrameId; // set last frame
+                    return;
+                }
+
+                next = 0; // set to first frame
+                lastTickStamp = DateTime.Now; // reset fractional frame count
             }
             models.Display.ActiveLayer = next;
         }
@@ -159,6 +182,7 @@ namespace ImageViewer.ViewModels.Display
                 if (value)
                 {
                     // start timer
+                    lastTickStamp = DateTime.Now;
                     clock.Start();
                 }
                 else
@@ -241,8 +265,16 @@ namespace ImageViewer.ViewModels.Display
 
         private void ClockOnTick(object sender, EventArgs e)
         {
-            // advance to next frame
-            NextFrame();
+            // calculate time that actually passed
+            var timeElapsed = (DateTime.Now - lastTickStamp).TotalSeconds;
+            // convert to frames passed
+            var fps = (double)models.Settings.MovieFps;
+            var passedFrames = (int)Math.Floor(timeElapsed * fps);
+            // advance tick stamp by actual passed seconds (accumulate the overdue seconds for next frame)
+            lastTickStamp = lastTickStamp.AddSeconds((double)passedFrames / fps);
+
+            AdvanceFrames(passedFrames);
+
             // stop playback if we reached the last frame (for non repeat mode)
             if (models.Display.ActiveLayer == MaxFrameId && !RepeatVideo)
             {
