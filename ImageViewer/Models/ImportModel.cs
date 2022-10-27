@@ -80,7 +80,7 @@ namespace ImageViewer.Models
             {
                 await ImportImageAsync(file);
             }*/
-            else if(FFMpeg.Formats().FirstOrDefault(element => String.Equals(element, extension)) != null)
+            else if (FFMpeg.Formats().Contains(extension))
             {
                 await ImportMovieAsync(file);
             }

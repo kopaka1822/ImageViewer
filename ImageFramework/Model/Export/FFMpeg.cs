@@ -545,12 +545,13 @@ namespace ImageFramework.Model.Export
             
         }
 
-        private static IReadOnlyList<string> s_formats = null;
-        public static IReadOnlyList<string> Formats()
+        //private static IReadOnlyList<string> s_formats = null;
+        private static HashSet<string> s_formats;
+        public static HashSet<string> Formats()
         {
             if (s_formats == null)
             {
-                s_formats = new List<string>
+                s_formats = new HashSet<string>
                 {
                     "mp4",
                     "mov",
