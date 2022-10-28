@@ -303,9 +303,10 @@
                 </MenuItem.ItemContainerStyle>
             </MenuItem>
 
+            <!--
+            
             <Separator/>
             
-            <!-- HEATMAP -->
             <MenuItem 
                 Header="Heatmap"
                 IsEnabled="{Binding Progress.NotProcessing}">
@@ -315,7 +316,7 @@
                         Width="16"
                         Height="16"/>
                 </MenuItem.Icon>
-                <!-- Heatmap menu -->
+                
                 <MenuItem
                     Header="Enable Overlay"
                     IsCheckable="True"
@@ -333,7 +334,10 @@
                     Command="{Binding Display.Heatmap.ConfigureCommand}"/>
             </MenuItem>
         </MenuItem>
-        <!-- END OVERLAYS -->
+                
+            -->
+            </MenuItem>
+            <!-- END OVERLAYS -->
 
         <MenuItem Header="Tools">
             <!-- Scaling + Padding -->

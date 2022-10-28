@@ -17,9 +17,7 @@ using ImageViewer.Views.Dialog;
 
 namespace ImageViewer.Models
 {
-    // manages imports of images
-    // TODO manage video files
-    // TODO manage config files ".icfg"
+    // manages imports of images, videos and config files
     public class ImportModel
     {
         private readonly ModelsEx models;
@@ -48,24 +46,6 @@ namespace ImageViewer.Models
             models.Settings.ImagePath = System.IO.Path.GetDirectoryName(ofd.FileName);
 
             return ofd.FileNames;
-        }
-
-        public string ShowSingleFileImportImageDialog()
-        {
-            var ofd = new Microsoft.Win32.OpenFileDialog
-            {
-                Multiselect = false,
-                InitialDirectory = models.Settings.ImagePath
-            };
-
-            if (ofd.ShowDialog(models.Window.TopmostWindow) != true) return null;
-
-            // set new image path
-            models.Settings.ImagePath = System.IO.Path.GetDirectoryName(ofd.FileName);
-            Debug.Assert(ofd.FileNames.Length == 1);
-            if (ofd.FileNames.Length == 0) return null;
-
-            return ofd.FileNames[0];
         }
 
         public async Task ImportFileAsync(string file)
