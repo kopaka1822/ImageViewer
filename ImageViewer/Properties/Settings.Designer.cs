@@ -290,9 +290,9 @@ namespace ImageViewer.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("24")]
-        public int MovieFps {
+        public float MovieFps {
             get {
-                return ((int)(this["MovieFps"]));
+                return ((float)(this["MovieFps"]));
             }
             set {
                 this["MovieFps"] = value;

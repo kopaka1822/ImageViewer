@@ -42,7 +42,7 @@ namespace ImageFramework.Model.Export
         public class Metadata
         {
             public string Filename;
-            public int FramesPerSecond = 0; // frames per second. Theoretically this could be a double but its probably not so important
+            public float FramesPerSecond = 0; // frames per second
             public int FrameCount = 0; // total number of frames.
             internal string FramesPerSecondString; // something like 30/1 for 30 fps (used internally by ffmpeg)
         }
@@ -63,7 +63,7 @@ namespace ImageFramework.Model.Export
         public class MovieExportConfig
         {
             public string Filename;
-            public int FramesPerSecond;
+            public int FramesPerSecond; // this is an integer because otherwise we need to determine the fraction (1.5 is an invalid framerate, it needs to be specified as 3/2)
             public TextureArray2D Source;
             public int FirstFrame;
             public int FrameCount;
@@ -104,7 +104,7 @@ namespace ImageFramework.Model.Export
             {
                 var outputFps = dataTable.Compute(metadata.FramesPerSecondString, null).ToString();
                 Debug.Assert(outputFps != null);
-                metadata.FramesPerSecond = (int)Math.Round(double.Parse(outputFps));
+                metadata.FramesPerSecond = (float)double.Parse(outputFps);
             }
 
             return metadata;

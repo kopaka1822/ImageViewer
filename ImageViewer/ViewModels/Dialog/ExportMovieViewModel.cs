@@ -20,7 +20,7 @@ namespace ImageViewer.ViewModels.Dialog
         {
             Filename = filename;
             this.models = models;
-            framesPerSecond = models.Settings.MovieFps;
+            framesPerSecond = (int)Math.Round(models.Settings.MovieFps);
             firstFrame = 0;
             lastFrame = MaxFrameIndex;
             selectedPreset = AvailablePresets.Find(item => item.Cargo == models.Settings.MoviePreset);
@@ -93,6 +93,7 @@ namespace ImageViewer.ViewModels.Dialog
             get => framesPerSecond;
             set
             {
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if(value == framesPerSecond) return;
                 framesPerSecond = value;
                 OnPropertyChanged(nameof(FramesPerSecond));

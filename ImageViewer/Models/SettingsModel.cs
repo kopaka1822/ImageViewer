@@ -159,7 +159,7 @@ namespace ImageViewer.Models
             }
         }
 
-        public int MovieFps
+        public float MovieFps
         {
             get => Properties.Settings.Default.MovieFps;
             set

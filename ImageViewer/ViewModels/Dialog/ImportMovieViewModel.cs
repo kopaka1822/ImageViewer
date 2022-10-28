@@ -136,7 +136,7 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
-        public double FPS => data.FramesPerSecond / (double)(FrameSkip + 1);
+        public float FPS => data.FramesPerSecond / (float)(FrameSkip + 1);
 
         public TimeSpan FirstFrameTime
         {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Media;
 using System.Runtime.CompilerServices;
@@ -198,11 +199,13 @@ namespace ImageViewer.ViewModels.Display
 
         public string FPS
         {
-            get => models.Settings.MovieFps.ToString(ImageFramework.Model.Models.Culture);
+            //get => models.Settings.MovieFps.ToString("F2", ImageFramework.Model.Models.Culture);
+            get => Math.Round((decimal)models.Settings.MovieFps, 2).ToString(ImageFramework.Model.Models.Culture);
             set
             {
-                int parsedFps = 0;
-                var converted = int.TryParse(value, out parsedFps);
+                float parsedFps = 0.0f;
+                var converted = float.TryParse(value, NumberStyles.Number, ImageFramework.Model.Models.Culture, out parsedFps);
+                //var converted = float.TryParse(value, parsedFps);
                 if (converted)
                 {
                     // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -218,7 +221,7 @@ namespace ImageViewer.ViewModels.Display
 
         // this can assumed to be constant, since this view will be removed and destroyed when the image changes
         public int MaxFrameId => models.Images.NumLayers - 1;
-        public int TickFrequency => models.Settings.MovieFps;
+        public float TickFrequency => models.Settings.MovieFps;
 
         public int TickValue
         {
@@ -234,7 +237,7 @@ namespace ImageViewer.ViewModels.Display
         {
             get
             {
-                int seconds = models.Display.ActiveLayer / models.Settings.MovieFps;
+                int seconds = (int)Math.Floor(models.Display.ActiveLayer / models.Settings.MovieFps);
                 return $"{(seconds / 60):00}:{(seconds % 60):00}";
             }
         }
@@ -260,7 +263,9 @@ namespace ImageViewer.ViewModels.Display
 
         private void OnFpsChanged()
         {
-            clock.Interval = TimeSpan.FromMilliseconds(1000.0f / models.Settings.MovieFps);
+            //clock.Interval = TimeSpan.FromMilliseconds(1000.0f / models.Settings.MovieFps);
+            // use half the interval because the clock is sometimes too early
+            clock.Interval = TimeSpan.FromMilliseconds(0.5f * 1000.0f / models.Settings.MovieFps);
         }
 
         private void ClockOnTick(object sender, EventArgs e)

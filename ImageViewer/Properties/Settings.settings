@@ -68,7 +68,7 @@
     <Setting Name="ExportZoomBoxScale" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">4</Value>
     </Setting>
-    <Setting Name="MovieFps" Type="System.Int32" Scope="User">
+    <Setting Name="MovieFps" Type="System.Single" Scope="User">
       <Value Profile="(Default)">24</Value>
     </Setting>
     <Setting Name="MovieRepeat" Type="System.Boolean" Scope="User">

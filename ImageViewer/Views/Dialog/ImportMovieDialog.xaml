@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:ImageViewer.Views.Dialog"
+        xmlns:clr="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="Import Video"
         Width="400"
@@ -15,6 +16,7 @@
         Style="{StaticResource WindowStyle}">
     <Window.Resources>
         <GridLength x:Key="GridWidth">70</GridLength>
+        <clr:String x:Key="FrameSkipTooltip">Reduces the amount of frames by skipping X frames after each frame</clr:String>
     </Window.Resources>
     <Border Padding="5">
         <StackPanel>
@@ -113,7 +115,7 @@
                 <TextBlock 
                     Grid.Column="0"
                     Text="Frame skip:"
-                    ToolTip="Reduces the amount of frames by skipping X frames after each frame"/>
+                    ToolTip="{StaticResource FrameSkipTooltip}"/>
 
                 <xctk:IntegerUpDown
                     Grid.Column="1"
@@ -121,6 +123,7 @@
                     HorizontalAlignment="Left"
                     Value="{Binding FrameSkip}"
                     Minimum="0"
+                    ToolTip="{StaticResource FrameSkipTooltip}"
                 />
             </Grid>
 

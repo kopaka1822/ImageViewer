@@ -159,6 +159,7 @@ namespace ImageViewer.Models
                 var firstFrame = 0;
                 var frameCount = meta.FrameCount;
                 var frameSkip = 0;
+                var fps = meta.FramesPerSecond;
 
                 if (models.Images.NumImages != 0 && models.Images.NumLayers > meta.FrameCount)
                 {
@@ -183,7 +184,7 @@ namespace ImageViewer.Models
                     // obtain results
                     movieViewModel.GetFirstFrameAndFrameCount(out firstFrame, out frameCount);
                     frameSkip = movieViewModel.FrameSkip;
-                    // TODO adjusted FPS
+                    fps = movieViewModel.FPS;
                 }
 
                 // image should be fully compatible
@@ -192,12 +193,12 @@ namespace ImageViewer.Models
                 if (models.Images.NumImages == 0)
                 {
                     // use movie fps as reference
-                    models.Settings.MovieFps = meta.FramesPerSecond;
+                    models.Settings.MovieFps = fps;
                 }
 
                 ImportTexture(tex, false, file, GliFormat.RGB8_SRGB, alias);
 
-                if (models.Settings.MovieFps != meta.FramesPerSecond)
+                if (models.Settings.MovieFps != fps)
                     models.Window.ShowInfoDialog($"The FPS count of the imported video ({meta.FramesPerSecond}) does not match the existing FPS count ({models.Settings.MovieFps}). The previous FPS count will be kept.");
             }
             catch (Exception e)
