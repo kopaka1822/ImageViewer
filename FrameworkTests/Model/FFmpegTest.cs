@@ -42,7 +42,7 @@ namespace FrameworkTests.Model
             var data = FFMpeg.GetMovieMetadata(TestData.Directory + "einstein/movie.mp4");
 
             var cts = new CancellationTokenSource();
-            var task = FFMpeg.ImportMovie(data, 0, data.FrameCount, models.SharedModel, models.Progress.GetProgressInterface(cts.Token));
+            var task = FFMpeg.ImportMovie(data, 0, 0, data.FrameCount, models.SharedModel, models.Progress.GetProgressInterface(cts.Token));
             models.Progress.AddTask(task, cts, false);
             models.Progress.WaitForTask();
 
@@ -56,6 +56,35 @@ namespace FrameworkTests.Model
             Assert.IsNotNull(colorsMovie);
 
             var reference = (TextureArray2D)IO.LoadImageTexture(TestData.Directory + "einstein/frame01.png");
+            var refColors = reference.GetPixelColors(LayerMipmapSlice.Layer0);
+            Assert.IsNotNull(refColors);
+
+            TestData.CompareColors(refColors, colorsMovie);
+        }
+
+
+        [TestMethod]
+        public void MovieImportFrameSkip() // frame skip = 2
+        {
+            var models = new Models();
+
+            var data = FFMpeg.GetMovieMetadata(TestData.Directory + "einstein/movie.mp4");
+
+            var cts = new CancellationTokenSource();
+            var task = FFMpeg.ImportMovie(data, 0, 2, data.FrameCount / 3, models.SharedModel, models.Progress.GetProgressInterface(cts.Token));
+            models.Progress.AddTask(task, cts, false);
+            models.Progress.WaitForTask();
+
+            var res = task.Result;
+
+            Assert.IsNotNull(res);
+            Assert.AreEqual(data.FrameCount / 3, res.NumLayers);
+
+            // compare a single frame (layer 4 should be equal to frame 12, since the used frames are 0, 3, 6, 9, 12)
+            var colorsMovie = res.GetPixelColors(LayerMipmapSlice.Layer4);
+            Assert.IsNotNull(colorsMovie);
+
+            var reference = (TextureArray2D)IO.LoadImageTexture(TestData.Directory + "einstein/frame12.png");
             var refColors = reference.GetPixelColors(LayerMipmapSlice.Layer0);
             Assert.IsNotNull(refColors);
 
@@ -89,7 +118,7 @@ namespace FrameworkTests.Model
             // import and test first frame
             var header = FFMpeg.GetMovieMetadata(dstFilename);
             Assert.AreEqual(source.NumLayers, header.FrameCount);
-            var imported = FFMpeg.ImportMovieAsync(header, 0, 1, models).Result;
+            var imported = FFMpeg.ImportMovieAsync(header, 0, 0, 1, models).Result;
 
             var sourceColors = IO.LoadImageTexture(TestData.Directory + "sphere_array_first_frame.png")
                 .GetPixelColors(LayerMipmapSlice.Layer0);

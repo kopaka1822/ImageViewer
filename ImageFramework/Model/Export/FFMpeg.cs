@@ -123,13 +123,14 @@ namespace ImageFramework.Model.Export
             return task.Result;
         }
 
-        internal static async Task<TextureArray2D> ImportMovie(Metadata data, int frameStart, int numFrames, SharedModel shared, IProgress progress)
+        internal static async Task<TextureArray2D> ImportMovie(Metadata data, int frameStart, int frameSkip, int numFrames, SharedModel shared, IProgress progress)
         {
             Debug.Assert(IsAvailable());
             CheckAvailable();
 
-            if (frameStart < 0 || numFrames < 1 || frameStart + numFrames > data.FrameCount)
-                throw new Exception($"The combination of frameStart ({frameStart}) and numFrames ({numFrames}) is invalid for movie '{data.Filename}' with {data.FrameCount} frames.");
+            var lastFrameIndex = frameStart + (numFrames - 1) * (frameSkip + 1);
+            if (frameStart < 0 || numFrames < 1 || lastFrameIndex >= data.FrameCount)
+                throw new Exception($"The combination of frameStart ({frameStart}), numFrames ({numFrames}) and frameSkip ({frameSkip}) is invalid for movie '{data.Filename}' with {data.FrameCount} frames.");
 
             // create temporary folder
             var tmpDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetFileNameWithoutExtension(System.IO.Path.GetTempFileName()));
@@ -152,7 +153,7 @@ namespace ImageFramework.Model.Export
                         CreateNoWindow = true,
                         RedirectStandardError = true,
                         FileName = Path,
-                        Arguments = $"-i \"{data.Filename}\" -vf \"select='between(\\n, {frameStart}, {frameStart + numFrames - 1})'\" -vsync vfr \"{tmpDir}\\out%04d.bmp\""
+                        Arguments = $"-i \"{data.Filename}\" -vf \"select='between(\\n, {frameStart}, {lastFrameIndex})'\" -vsync vfr \"{tmpDir}\\out%04d.bmp\""
                     }
                 };
 
@@ -183,7 +184,8 @@ namespace ImageFramework.Model.Export
                 // for now load images sequentially
                 for (int i = 1; i <= numFrames + numThreads; i++)
                 {
-                    var inputFile = $"{tmpDir}\\out{i:0000}.bmp";
+                    var iAfterSkip = 1 + (i - 1) * (frameSkip + 1);
+                    var inputFile = $"{tmpDir}\\out{iAfterSkip:0000}.bmp";
                     var threadIdx = i % numThreads;
 
                     // 2.  wait for previous task to finish before opening a new image
@@ -252,12 +254,19 @@ namespace ImageFramework.Model.Export
             }
         }
 
-        // enqueues movie import into the progress model
-        public static async Task<TextureArray2D> ImportMovieAsync(Metadata data, int frameStart, int numFrames,
-            Models models)
+        /// <summary>
+        /// enqueues movie import into the progress model
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="frameStart">index of first frame</param>
+        /// <param name="frameSkip">number of frames that will be skipped after each frame</param>
+        /// <param name="numFrames">total number of frames</param>
+        /// <param name="models"></param>
+        /// <returns></returns>
+        public static async Task<TextureArray2D> ImportMovieAsync(Metadata data, int frameStart, int frameSkip, int numFrames, Models models)
         {
             var cts = new CancellationTokenSource();
-            var task = ImportMovie(data, frameStart, numFrames, models.SharedModel,
+            var task = ImportMovie(data, frameStart, frameSkip, numFrames, models.SharedModel,
                 models.Progress.GetProgressInterface(cts.Token));
             models.Progress.AddTask(task, cts, false);
             await models.Progress.WaitForTaskAsync();

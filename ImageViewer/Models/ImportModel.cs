@@ -158,6 +158,7 @@ namespace ImageViewer.Models
 
                 var firstFrame = 0;
                 var frameCount = meta.FrameCount;
+                var frameSkip = 0;
 
                 if (models.Images.NumImages != 0 && models.Images.NumLayers > meta.FrameCount)
                 {
@@ -181,10 +182,12 @@ namespace ImageViewer.Models
                     if (models.Window.ShowDialog(dia) != true) return;
                     // obtain results
                     movieViewModel.GetFirstFrameAndFrameCount(out firstFrame, out frameCount);
+                    frameSkip = movieViewModel.FrameSkip;
+                    // TODO adjusted FPS
                 }
 
                 // image should be fully compatible
-                var tex = await FFMpeg.ImportMovieAsync(meta, firstFrame, frameCount, models);
+                var tex = await FFMpeg.ImportMovieAsync(meta, firstFrame, frameSkip, frameCount, models);
 
                 if (models.Images.NumImages == 0)
                 {

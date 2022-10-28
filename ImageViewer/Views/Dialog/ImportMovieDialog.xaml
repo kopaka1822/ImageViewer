@@ -102,6 +102,28 @@
                     UpdateValueOnEnterKey="False"/>
             </Grid>
 
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock 
+                    Grid.Column="0"
+                    Text="Frame skip:"
+                    ToolTip="Reduces the amount of frames by skipping X frames after each frame"/>
+
+                <xctk:IntegerUpDown
+                    Grid.Column="1"
+                    Width="80"
+                    HorizontalAlignment="Left"
+                    Value="{Binding FrameSkip}"
+                    Minimum="0"
+                />
+            </Grid>
+
             <TextBlock TextWrapping="Wrap"
                        Text="{Binding ExtraText, FallbackValue=Some Important Message}"
                        Foreground="Red"/>

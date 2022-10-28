@@ -121,6 +121,23 @@ namespace ImageViewer.ViewModels.Dialog
             }
         }
 
+        private int frameSkip = 0;
+
+        public int FrameSkip
+        {
+            get => frameSkip;
+            set
+            {
+                var clamped = Math.Max(value, 0);
+                frameSkip = clamped;
+                OnPropertyChanged(nameof(FrameSkip));
+                OnPropertyChanged(nameof(IsValid));
+                OnPropertyChanged(nameof(FrameCountText));
+            }
+        }
+
+        public double FPS => data.FramesPerSecond / (double)(FrameSkip + 1);
+
         public TimeSpan FirstFrameTime
         {
             get => TimeSpan.FromSeconds((double)firstFrame / (double)data.FramesPerSecond);
@@ -137,7 +154,9 @@ namespace ImageViewer.ViewModels.Dialog
 
         public int MaxFrameIndex { get; private set; } = 0;
 
-        public int NumFrames => Math.Max(lastFrame - firstFrame + 1, 0);
+        private int NumFramesUnskipped => Math.Max(lastFrame - firstFrame + 1, 0);
+        public int NumFrames => (NumFramesUnskipped + FrameSkip) / (FrameSkip + 1); // <=> Math.ceil(NumFramesUnskipped/(FrameSkip+1))
+
         public bool IsValid => firstFrame <= lastFrame && (LastFrame - firstFrame + 1) <= Device.MAX_TEXTURE_2D_ARRAY_DIMENSION && (requiredNumFrames == null || requiredNumFrames.Value == NumFrames);
 
         public string ExtraText { get; private set; } = "";
