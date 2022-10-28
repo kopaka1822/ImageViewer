@@ -144,7 +144,7 @@ namespace ImageViewer.Controller
 
                 gpuTimer.Start();
                 timerStarted = true;
-
+                
                 viewMode.Repaint(size);
 
             }
