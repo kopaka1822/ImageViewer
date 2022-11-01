@@ -531,6 +531,13 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <MenuItem
+                Header="Getting Started"
+                Command="{Binding HelpCommand}">
+                <MenuItem.CommandParameter>
+                    <system:String>help/getting_started.md</system:String>
+                </MenuItem.CommandParameter>
+            </MenuItem>
             <Separator/>
             <MenuItem
                 Header="Equation"

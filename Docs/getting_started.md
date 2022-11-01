@@ -8,6 +8,7 @@
 * [Filter](#filter)
 * [Statistics](#statistics) (MSE, SSIM)
 * [Videos](#videos)
+* [Cubemaps and 360 degree images](#cubemaps-and-360-degree-images)
 * [3D Images](#3d-images)
 
 # Import Images
@@ -53,8 +54,8 @@ Beware of a few things:
 
 Before exporting, make sure that only a single image equation is visible (disable them by hitting the 'eye' symbol).
 Select File->Export in the menu bar to start exporting:
-* 1. Select a destination in the "Save as" dialog. Make sure to select the correct file type in the dropdown (.png .hdr etc.)
-* 2. In the "Export" dialog you can select the desired pixel format and enable cropping if desired. The format specifies which components are saved (R=Red, G=Green, B=Blue, A=Alpha). If you work with a colored image without transparency, RGB8_SRGB should be the correct format. If you work with a grayscale image R8_SRGB can be sufficient. If you work with linear data (like normal maps or height fields) you might want to select a different data type (UNorm, SNorm, UFloat, SFloat). If you are not familiar with the different types of images formats you can refer to the [OpenGL wiki](https://www.khronos.org/opengl/wiki/Image_Format).
+1. Select a destination in the "Save as" dialog. Make sure to select the correct file type in the dropdown (.png .hdr etc.)
+2. In the "Export" dialog you can select the desired pixel format and enable cropping if desired. The format specifies which components are saved (R=Red, G=Green, B=Blue, A=Alpha). If you work with a colored image without transparency, RGB8_SRGB should be the correct format. If you work with a grayscale image R8_SRGB can be sufficient. If you work with linear data (like normal maps or height fields) you might want to select a different data type (UNorm, SNorm, UFloat, SFloat). If you are not familiar with the different types of images formats you can refer to the [OpenGL wiki](https://www.khronos.org/opengl/wiki/Image_Format).
 
 If you have made minor changes to the input image and you want to overwrite the image without changing the format, you can select the File->Overwrite from the menu bar.
 
@@ -131,6 +132,19 @@ The important controls can be found in the status bar on the bottom. From left t
 All the usual image viewer features are supported as well (import and comparison of multiple videos, custom image equations and filters, etc.)
 
 Videos can be exported into an image format like dds, ktx and ktx2 via File->Export or as .mp4 via File->ExportVideo. However, the sound will be lost after import. Individual frames can also be exported via File->Export (for .png, .hdr etc.).
+
+# Cubemaps and 360 degree images
+ 
+You can open cubemaps in dds and ktx format or open 360° images (Latitude-Longitude maps). Select
+'Polar360' to view your 360 degree images in 3D.
+
+![](img/polar.jpg)
+
+![](img/polar2.jpg)
+
+### Lat-Long Cubemap Conversion
+Convert between Lat-Long (polar 360 degree) and Cubemaps with `Tools->LatLong to Cubemap` and `Tools->Cubemap to LatLong`. You can create a Cubemap from multiple 2D images with `File->Import as Array`.
+
 
 # 3D Images
 

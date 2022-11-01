@@ -213,5 +213,58 @@
     <CopyFileToFolders Include="..\Docs\statistics.md">
       <Filter>Docs</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\getting_started.md">
+      <Filter>Docs</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\compare.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\cube_level.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\einstein.gif">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\filter.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_compare.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_equations.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_import.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_ssim.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_ssim2.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_statistics.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_videos.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\polar.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\polar2.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\transparent.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\volume_view.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Docs\build.md">
+      <Filter>Docs</Filter>
+    </None>
   </ItemGroup>
 </Project>
