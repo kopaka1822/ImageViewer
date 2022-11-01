@@ -36,7 +36,7 @@ namespace ImageViewer.Models.Display
             Empty,
             Single,
             CubeMap,
-            Polar,
+            Polar360,
             CubeCrossView,
             Volume,
             ShearWarp
@@ -92,7 +92,7 @@ namespace ImageViewer.Models.Display
                     extendedView = null;
                 }
                 // update extended statusbar
-                if(activeView == ViewMode.Single && models.Images.ImageType == typeof(TextureArray2D) && models.Images.NumLayers > 1)
+                if(!activeView.IsMultiLayerView() && models.Images.ImageType == typeof(TextureArray2D) && models.Images.NumLayers > 1)
                 {
                     extendedStatusbar = new MovieDisplayModel(models, this);
                 }
@@ -463,9 +463,9 @@ namespace ImageViewer.Models.Display
                             modes.Insert(0, ViewMode.CubeMap);
                             modes.Insert(1, ViewMode.CubeCrossView);
                         }
-                        else if (models.Images.NumLayers == 1 && models.Images.ImageType == typeof(TextureArray2D))
+                        else if (models.Images.ImageType == typeof(TextureArray2D))
                         {
-                            modes.Add(ViewMode.Polar);
+                            modes.Add(ViewMode.Polar360);
                         }
                         else if(models.Images.ImageType == typeof(Texture3D))
                         {

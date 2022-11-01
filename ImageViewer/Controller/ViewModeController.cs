@@ -293,7 +293,7 @@ namespace ImageViewer.Controller
                                 else
                                     currentView = new SingleTextureView(models);
                                 break;
-                            case DisplayModel.ViewMode.Polar:
+                            case DisplayModel.ViewMode.Polar360:
                                 currentView = new PolarTextureView(models);
                                 break;
                             case DisplayModel.ViewMode.CubeMap:
