@@ -11,7 +11,7 @@ The magnitude is proportional to physical power, but the spectral composition is
 * *Average* - equally weights each channel (good for general error comparison)
 * *Luma* - video luma (sRGB)
 * *Lightness* - gamma corrected luminance
-* *Alpha* - image alpha channel (just for fun)
+* *Alpha* - image alpha channel (for coverage)
 * *SSIM* - compares two images with the [SSIM](#SSIM) index
 
 ## MAE/MSE and more
