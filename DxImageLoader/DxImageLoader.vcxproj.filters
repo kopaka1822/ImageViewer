@@ -261,6 +261,12 @@
     <CopyFileToFolders Include="..\Docs\img\volume_view.jpg">
       <Filter>Docs\img</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\alpha_test_degen.PNG">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\alpha_test_equation.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Docs\build.md">
