@@ -18,3 +18,5 @@ During export (**File->Export**), the contents inside these zoomboxes can be exp
 The arrow overlays can be acessed via **Overlays->Add Arrow**. Place the arrow origin by left clicking any texel in the image. Place the arrowhead by left clicking again. The thickness of the arrow can be changed with the + and - keys after the first left click:
 
 ![](img/arrow_overlay.png)
+
+The arrows will be included when using **File->Export**.
