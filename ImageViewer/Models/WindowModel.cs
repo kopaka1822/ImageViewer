@@ -55,10 +55,20 @@ namespace ImageViewer.Models
         public bool? ShowDialog(Window dialog)
         {
             dialog.Owner = TopmostWindow;
+            dialog.ShowInTaskbar = false;
             windowStack.Push(dialog);
             var res = dialog.ShowDialog();
             windowStack.Pop();
             return res;
+        }
+
+        /// <summary>
+        /// shows a window but does not wait for it to close (i.e. wiki entry, manual)
+        /// </summary>
+        public void ShowWindow(Window dialog)
+        {
+            dialog.Owner = TopmostWindow;
+            dialog.Show();
         }
 
         private void WindowOnLoaded(object sender, RoutedEventArgs e)

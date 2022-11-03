@@ -23,7 +23,7 @@ namespace ImageViewer.Commands
             var dia = new HelpDialog(models, parameter);
 
             if(dia.IsValid)
-                models.Window.ShowDialog(dia);
+                models.Window.ShowWindow(dia);
         }
     }
 }
