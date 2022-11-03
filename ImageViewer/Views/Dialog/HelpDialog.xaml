@@ -21,14 +21,33 @@
             x:Name="Browser"
             
             />
-        <Button 
-            Grid.Row="1"
-            Content="OK"
-            Width="80"
-            HorizontalAlignment="Right"
-            Margin="{StaticResource DefaultBorder}"
-            Click="OkOnClick"
-            IsDefault="True"/>
+
+        <Grid
+            Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button 
+                Grid.Column="0"
+                Content="Back"
+                Width="80"
+                HorizontalAlignment="Left"
+                Margin="{StaticResource DefaultBorder}"
+                Click="BackOnClick"
+                IsEnabled="{Binding BackIsEnabled}"/>
+
+            <Button 
+                Grid.Column="1"
+                Content="OK"
+                Width="80"
+                HorizontalAlignment="Right"
+                Margin="{StaticResource DefaultBorder}"
+                Click="OkOnClick"
+                IsDefault="True"/>
+        </Grid>
+        
     </Grid>
 
 </Window>

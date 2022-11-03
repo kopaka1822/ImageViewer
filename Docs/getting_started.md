@@ -9,7 +9,7 @@
 * [Statistics](#statistics) (MSE, SSIM)
 * [Videos](#videos)
 * [Cubemaps and 360 degree images](#cubemaps-and-360-degree-images)
-* [3D Images](#3d-images)
+* [3D Images](#image-3d)
 
 # Import Images
 
@@ -146,7 +146,7 @@ You can open cubemaps in dds and ktx format or open 360° images (Latitude-Longi
 Convert between Lat-Long (polar 360 degree) and Cubemaps with `Tools->LatLong to Cubemap` and `Tools->Cubemap to LatLong`. You can create a Cubemap from multiple 2D images with `File->Import as Array`.
 
 
-# 3D Images
+# Image 3D
 
 3D images can be displayed as well and are supported by the majority of image viewer features (export, custom filtering, mipmap generation and more). Simple flat shading and transparency rendering is also supported to help visualize certain datasets.
 
