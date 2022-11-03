@@ -18,7 +18,7 @@ using ImageViewer.Views.Display;
 
 namespace ImageViewer.Controller.Overlays
 {
-    public class AddArrowOverlay : ArrowOverlay, IDisplayOverlay
+    public class AddArrowOverlay : ArrowOverlay, IDisplayOverlay, INotifyPropertyChanged
     {
         private readonly ModelsEx models;
         private bool isDisposed = false;
@@ -43,6 +43,7 @@ namespace ImageViewer.Controller.Overlays
             {
                 models.Settings.ArrowWidth = value;
                 MouseMove(models.Display.TexelPosition ?? Size3.Zero);
+                
             }
         }
 
@@ -108,10 +109,12 @@ namespace ImageViewer.Controller.Overlays
                 case Key.Add:
                 case Key.OemPlus:
                     StrokeWidth += 1;
+                    OnPropertyChanged(nameof(StrokeWidth));
                     return true;
                 case Key.Subtract:
                 case Key.OemMinus:
                     StrokeWidth = Math.Max(1, StrokeWidth - 1);
+                    OnPropertyChanged(nameof(StrokeWidth));
                     return true;
                 case Key.Escape:
                     models.Display.ActiveOverlay = null;
@@ -131,6 +134,14 @@ namespace ImageViewer.Controller.Overlays
             models.Overlay.Overlays.Remove(this);
             base.Dispose();
             models.Display.UserInfo = "";
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

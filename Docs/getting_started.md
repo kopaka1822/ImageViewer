@@ -10,6 +10,7 @@
 * [Videos](#videos)
 * [Cubemaps and 360 degree images](#cubemaps-and-360-degree-images)
 * [3D Images](#image-3d)
+* [Further Reading](#further-reading)
 
 # Import Images
 
@@ -157,3 +158,13 @@ Additionally, you can explore the insides of a 3D texture with the 'Slice' featu
 ![](img/volume_slice.jpg)
 
 For more on 3D images see [here](volumetric.md).
+
+## Further Reading
+
+Detailed descriptions are available for:
+* [Image Equations](equation.md)
+* [Filters](filter_manual.md)
+* [Statistics](statistics.md)
+* [Mipmaps](mipmaps.md)
+* [3D Images](volumetric.md)
+* [Overlays](overlays.md)

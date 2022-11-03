@@ -576,6 +576,13 @@
                     <system:String>help/volumetric.md</system:String>
                 </MenuItem.CommandParameter>
             </MenuItem>
+            <MenuItem
+                Header="Overlays"
+                Command="{Binding HelpCommand}">
+                <MenuItem.CommandParameter>
+                    <system:String>help/overlays.md</system:String>
+                </MenuItem.CommandParameter>
+            </MenuItem>
         </MenuItem>
     </Menu>
 </UserControl>

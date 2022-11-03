@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:ImageViewer.Views.Dialog"
         mc:Ignorable="d"
         Title="Help" 
-        Height="600" 
-        Width="800"
+        Height="720" 
+        Width="1080"
         Icon="../../Icons/help.png"
         Style="{StaticResource WindowStyle}"
         WindowStartupLocation="CenterOwner">

@@ -267,6 +267,18 @@
     <CopyFileToFolders Include="..\Docs\img\alpha_test_equation.png">
       <Filter>Docs\img</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\arrow_overlay.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\zoombox.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\zoombox_zoom.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\overlays.md">
+      <Filter>Docs</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Docs\build.md">
