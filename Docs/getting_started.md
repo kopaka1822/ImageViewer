@@ -118,6 +118,8 @@ The [Structural Similarity (SSIM) index](https://www.cns.nyu.edu/pub/eero/wang03
 Common video files (mp4, mov, mpeg, avi, flv, webm, mpeg, mkv, vmv) and animated gif files can be imported as well. In this case, the files will be interpreted as *texture 2D arrays* which are natively supported by image formats like dds, ktx and ktx2.
 After the import, a dialog will pop up, in which you can specify the range of frames that should be imported. Beware that long and high-resolution videos can not be imported as a whole, because the *texture 2D array* does only support up to 2048 layers/frames. Furthermore, each frame will be stored in an uncompressed format so the gpu can run out of memory rather quickly.
 
+Tip: Consider using 'Frame skip' in the import dialog, if your video is too long or you run out of gpu memory. This setting will only import every Xth frame.
+
 An example of the video interface is shown below:
 
 ![](img/gs_videos.png)
@@ -162,9 +164,9 @@ For more on 3D images see [here](volumetric.md).
 ## Further Reading
 
 Detailed descriptions are available for:
-* [Image Equations](equation.md)
-* [Filters](filter_manual.md)
-* [Statistics](statistics.md)
-* [Mipmaps](mipmaps.md)
-* [3D Images](volumetric.md)
-* [Overlays](overlays.md)
+* [Image Equations](equation.md) (+ list of all instrinsic functions)
+* [Filters](filter_manual.md) (how to write your own filters)
+* [Statistics](statistics.md) (MSE, MAE, PSNR, SSIM)
+* [Mipmaps](mipmaps.md) (lanczos filter, alpha testing => preserve coverage)
+* [3D Images](volumetric.md) (create and view)
+* [Overlays](overlays.md) (Zoomboxes and arrows)
