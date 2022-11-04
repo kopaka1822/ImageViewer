@@ -15,6 +15,7 @@ using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Progress;
 using ImageFramework.Utility;
+using Format = SharpDX.DXGI.Format;
 
 namespace ImageFramework.Model.Export
 {
@@ -138,6 +139,10 @@ namespace ImageFramework.Model.Export
             if (frameStart < 0 || numFrames < 1 || lastFrameIndex >= data.FrameCount)
                 throw new Exception($"The combination of frameStart ({frameStart}), numFrames ({numFrames}) and frameSkip ({frameSkip}) is invalid for movie '{data.Filename}' with {data.FrameCount} frames.");
 
+            // reserve memory for the result texture
+            var resultTex = new TextureArray2D(new LayerMipmapCount(numFrames, 1), new Size3(data.Width, data.Height),
+                Format.R8G8B8A8_UNorm_SRgb, false);
+
             // create temporary folder
             var tmpDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetFileNameWithoutExtension(System.IO.Path.GetTempFileName()));
             System.IO.Directory.CreateDirectory(tmpDir);
@@ -145,11 +150,7 @@ namespace ImageFramework.Model.Export
             // create as many tasks as available threads to load the images in parallel
             var numThreads = Environment.ProcessorCount;
             var threadTasks = new Task<DllImageData>[numThreads];
-            var textures = new List<TextureArray2D>(numFrames);
 
-            //var resultTex = new TextureArray2D(new LayerMipmapCount(numFrames, 1), )
-
-            // test memory requirement by creating a texture
             try
             {
                 // use ffmpeg to extract all frames at once (with a single command)
@@ -220,6 +221,7 @@ namespace ImageFramework.Model.Export
                 var prog2 = progress.CreateSubProgress(1.0f);
                 prog2.What = "importing frames from disc";
 
+                int curLayer = 0;
                 // for now load images sequentially
                 for (int i = 1; i <= numFrames + numThreads; i++)
                 {
@@ -233,7 +235,11 @@ namespace ImageFramework.Model.Export
                     {
                         // create directX texture on main thread (it is potentially not thread safe)
                         var dllData = await threadTasks[threadIdx];
-                        textures.Add(new TextureArray2D(dllData));
+                        using (var frameTex = new TextureArray2D(dllData))
+                        {
+                            // copy layer to target texture
+                            shared.Convert.CopyLayer(frameTex, LayerMipmapSlice.Mip0, resultTex, new LayerMipmapSlice(curLayer++, 0));
+                        }
                         dllData.Dispose();
                         threadTasks[threadIdx] = null;
                     }
@@ -251,10 +257,10 @@ namespace ImageFramework.Model.Export
                 // all task should be finished since we iterate an additional numThread times in the previous loop
                 Debug.Assert(threadTasks.All(task => task == null));
 
-                progress.What = "creating texture array";
-
-                // convert texture array 
-                return shared.Convert.CombineToArray(textures);
+                // store result text into savedResult, because resultTex will be disposed in the finally statement
+                var savedResult = resultTex;
+                resultTex = null;
+                return savedResult;
             }
             finally
             {
@@ -276,10 +282,7 @@ namespace ImageFramework.Model.Export
                 }
 
                 // delete all intermediate textures
-                foreach (var textureArray2D in textures)
-                {
-                    textureArray2D?.Dispose();
-                }
+                resultTex?.Dispose();
 
                 // always try to delete temporary directory
                 try
@@ -531,8 +534,9 @@ namespace ImageFramework.Model.Export
         // use ffprobe to determine the video frame count
         private static int ProbeFrameCount(string filename)
         {
-            string countFramesArgs = $"-v error -select_streams v:0 -count_frames -show_entries stream=nb_read_frames -of csv=p=0 \"{filename}\"";
-            //string countFramesArgs = $"-v quiet -pretty -select_streams v:0 -count_frames -show_entries stream=nb_read_frames \"{filename}\"";
+            //string countFramesArgs = $"-v error -select_streams v:0 -count_frames -show_entries stream=nb_read_frames -of csv=p=0 \"{filename}\"";
+            string countFramesArgs = $"-v error -select_streams v:0 -count_packets -show_entries stream=nb_read_packets -of csv=p=0 \"{filename}\"";
+            
             var p = new Process
             {
                 StartInfo =
