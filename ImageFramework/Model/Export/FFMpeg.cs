@@ -2,16 +2,19 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Channels;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Shapes;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model.Progress;
+using ImageFramework.Utility;
 
 namespace ImageFramework.Model.Export
 {
@@ -44,6 +47,8 @@ namespace ImageFramework.Model.Export
             public string Filename;
             public float FramesPerSecond = 0; // frames per second
             public int FrameCount = 0; // total number of frames.
+            public int Width = 0; // width of a frame
+            public int Height = 0; // height of a frame
             internal string FramesPerSecondString; // something like 30/1 for 30 fps (used internally by ffmpeg)
         }
 
@@ -93,9 +98,10 @@ namespace ImageFramework.Model.Export
             var metadata = new Metadata
             {
                 Filename = filename,
-                FrameCount = ProbeFrameCount(filename),
-                FramesPerSecondString = ProbeFramesPerSecond(filename)
+                FrameCount = ProbeFrameCount(filename)
             };
+
+            FillMetadataWidthHeightFps(metadata);
 
             Debug.Assert(metadata.FramesPerSecondString != null);
 
@@ -141,6 +147,9 @@ namespace ImageFramework.Model.Export
             var threadTasks = new Task<DllImageData>[numThreads];
             var textures = new List<TextureArray2D>(numFrames);
 
+            //var resultTex = new TextureArray2D(new LayerMipmapCount(numFrames, 1), )
+
+            // test memory requirement by creating a texture
             try
             {
                 // use ffmpeg to extract all frames at once (with a single command)
@@ -523,6 +532,7 @@ namespace ImageFramework.Model.Export
         private static int ProbeFrameCount(string filename)
         {
             string countFramesArgs = $"-v error -select_streams v:0 -count_frames -show_entries stream=nb_read_frames -of csv=p=0 \"{filename}\"";
+            //string countFramesArgs = $"-v quiet -pretty -select_streams v:0 -count_frames -show_entries stream=nb_read_frames \"{filename}\"";
             var p = new Process
             {
                 StartInfo =
@@ -551,9 +561,10 @@ namespace ImageFramework.Model.Export
         }
 
         // use ffprobe to determine fps
-        private static string ProbeFramesPerSecond(string filename)
+        //private static string ProbeFramesPerSecond(string filename)
+        private static void FillMetadataWidthHeightFps(Metadata meta)
         {
-            string countFpsArgs = $"-v error -select_streams v:0 -of default=noprint_wrappers=1:nokey=1 -show_entries stream=r_frame_rate \"{filename}\"";
+            string countFpsArgs = $"-v error -select_streams v:0 -of default=noprint_wrappers=1 -show_entries stream=r_frame_rate,width,height \"{meta.Filename}\"";
             var p = new Process
             {
                 StartInfo =
@@ -567,6 +578,7 @@ namespace ImageFramework.Model.Export
                     Arguments = countFpsArgs
                 }
             };
+            
 
             if (!p.Start())
                 throw new Exception("could not start ffprobe.exe");
@@ -576,12 +588,31 @@ namespace ImageFramework.Model.Export
             if (p.ExitCode != 0)
                 throw new Exception($"ffprobe.exe exited with code {p.ExitCode}. {p.StandardError.ReadToEnd()}");
 
-            var output = p.StandardOutput.ReadLine();
-            if (output == null)
-                throw new Exception("ffprobe.exe did not return a valid string for frame count");
+            string line;
+            while ((line = p.StandardOutput.ReadLine()) != null)
+            {
+                if (line.StartsWith("width="))
+                {
+                    var widthStr = line.Substring("width=".Length);
+                    int.TryParse(widthStr, out meta.Width);
+                }
+                else if (line.StartsWith("height="))
+                {
+                    var heightStr = line.Substring("height=".Length);
+                    int.TryParse(heightStr, out meta.Height);
+                }
+                else if (line.StartsWith("r_frame_rate="))
+                {
+                    meta.FramesPerSecondString = line.Substring("r_frame_rate=".Length).Trim();
+                }
+            }
 
-            return output.Trim(trimChars);
-            
+            if(String.IsNullOrEmpty(meta.FramesPerSecondString))
+                throw new Exception("ffprobe.exe did not return a valid string for frame count");
+            if(meta.Width <= 0)
+                throw new Exception("ffprobe.exe did not return a valid string for frame width");
+            if (meta.Height <= 0)
+                throw new Exception("ffprobe.exe did not return a valid string for frame height");
         }
 
         //private static IReadOnlyList<string> s_formats = null;
