@@ -163,7 +163,7 @@ namespace ImageFramework.Model.Export
                         CreateNoWindow = true,
                         RedirectStandardError = true,
                         FileName = Path,
-                        Arguments = $"-i \"{data.Filename}\" -vf \"select='between(\\n, {frameStart}, {lastFrameIndex})'\" -vsync vfr \"{tmpDir}\\out%04d.bmp\""
+                        Arguments = $"-i \"{data.Filename}\" -vf \"select='between(\\n, {frameStart}, {lastFrameIndex})'\" -vsync passthrough \"{tmpDir}\\out%04d.bmp\""
                     }
                 };
 
