@@ -59,7 +59,7 @@ namespace ImageViewer.ViewModels.Dialog
             }
             else if (data.FrameCount > Device.MAX_TEXTURE_2D_ARRAY_DIMENSION)
             {
-                ExtraText = $"The Image Viewer only supports videos up to {Device.MAX_TEXTURE_2D_ARRAY_DIMENSION} frames. Please select the first frame and last frame accordingly.";
+                ExtraText = $"The Image Viewer only supports videos up to {Device.MAX_TEXTURE_2D_ARRAY_DIMENSION} frames. Please adjust the first frame and last frame accordingly or use 'Frame skip'.";
             }
             else
             {
@@ -157,7 +157,7 @@ namespace ImageViewer.ViewModels.Dialog
         private int NumFramesUnskipped => Math.Max(lastFrame - firstFrame + 1, 0);
         public int NumFrames => (NumFramesUnskipped + FrameSkip) / (FrameSkip + 1); // <=> Math.ceil(NumFramesUnskipped/(FrameSkip+1))
 
-        public bool IsValid => firstFrame <= lastFrame && (LastFrame - firstFrame + 1) <= Device.MAX_TEXTURE_2D_ARRAY_DIMENSION && (requiredNumFrames == null || requiredNumFrames.Value == NumFrames);
+        public bool IsValid => firstFrame <= lastFrame && NumFrames <= Device.MAX_TEXTURE_2D_ARRAY_DIMENSION && (requiredNumFrames == null || requiredNumFrames.Value == NumFrames);
 
         public string ExtraText { get; private set; } = "";
 

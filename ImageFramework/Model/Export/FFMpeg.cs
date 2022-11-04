@@ -181,7 +181,7 @@ namespace ImageFramework.Model.Export
                         substr = substr.TrimStart().Split(' ')[0];
                         if (int.TryParse(substr, out var frame))
                         {
-                            prog1.Progress = frame / (float)numFrames;
+                            prog1.Progress = (frame - frameStart) / (float)(lastFrameIndex - frameStart + 1);
                         }
                     }
                     else if (args.Data.StartsWith("error", StringComparison.OrdinalIgnoreCase))
