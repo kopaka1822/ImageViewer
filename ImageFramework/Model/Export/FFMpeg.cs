@@ -157,14 +157,40 @@ namespace ImageFramework.Model.Export
                     }
                 };
 
+                var prog1 = progress.CreateSubProgress(0.5f);
+                string errors = "";
+                ffmpeg.ErrorDataReceived += (sender, args) =>
+                {
+                    if (args.Data == null) return;
+
+                    Console.Error.WriteLine("FFMPEG: " + args.Data);
+
+                    if (args.Data.StartsWith("frame="))
+                    {
+                        var substr = args.Data.Substring("frame=".Length);
+                        substr = substr.TrimStart().Split(' ')[0];
+                        if (int.TryParse(substr, out var frame))
+                        {
+                            prog1.Progress = frame / (float)numFrames;
+                        }
+                    }
+                    else if (args.Data.StartsWith("error", StringComparison.OrdinalIgnoreCase))
+                    {
+                        errors += args.Data;
+                        errors += "\n";
+                    }
+                };
+
                 if (!ffmpeg.Start())
                     throw new Exception("could not start ffmpeg.exe");
+                ffmpeg.BeginErrorReadLine();
 
-                progress.What = "exporting frames to disc";
+
 
                 while (!ffmpeg.HasExited)
                 {
                     await Task.Run(() => ffmpeg.WaitForExit(100));
+                    prog1.What = "decoding frames to disc";
 
                     if (progress.Token.IsCancellationRequested && !ffmpeg.HasExited)
                     {
@@ -175,11 +201,15 @@ namespace ImageFramework.Model.Export
 
                 Debug.Assert(ffmpeg.ExitCode == 0);
                 if (ffmpeg.ExitCode != 0)
+                {
+                    if (!String.IsNullOrEmpty(errors))
+                        throw new Exception(errors);
                     throw new Exception($"ffmpeg.exe exited with error code {ffmpeg.ExitCode}");
+                }
 
                 // assume that all files have been written to tmpDir/out0001.bmp and so on
-
-                progress.What = "importing frames from disc";
+                var prog2 = progress.CreateSubProgress(1.0f);
+                prog2.What = "importing frames from disc";
 
                 // for now load images sequentially
                 for (int i = 1; i <= numFrames + numThreads; i++)
@@ -203,7 +233,7 @@ namespace ImageFramework.Model.Export
                     if (i <= numFrames)
                     {
                         threadTasks[threadIdx] = Task.Run(() => IO.LoadImage(inputFile), progress.Token);
-                        progress.Progress = i / (float)numFrames;
+                        prog2.Progress = i / (float)numFrames;
                     }
 
                     progress.Token.ThrowIfCancellationRequested();
