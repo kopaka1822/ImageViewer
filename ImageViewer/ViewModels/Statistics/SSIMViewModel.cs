@@ -22,13 +22,31 @@ namespace ImageViewer.ViewModels.Statistics
     {
         private readonly ModelsEx models;
         private readonly SSIMsViewModel parent;
+        private readonly StatisticsViewModel statisticsViewModel;
 
-        public SSIMViewModel(SSIMsViewModel parent, ModelsEx models, int id)
+        public SSIMViewModel(SSIMsViewModel parent, StatisticsViewModel statViewModel, ModelsEx models, int id)
         {
             this.parent = parent;
+            this.statisticsViewModel = statViewModel;
             this.models = models;
             this.models.Display.PropertyChanged += DisplayOnPropertyChanged;
+            statViewModel.PropertyChanged += ViewModelOnPropertyChanged;
             this.id = id;
+        }
+
+        // tab should be visible and ssim should be enabled
+        public bool UpdateSSIMValues => statisticsViewModel.IsVisible && statisticsViewModel.ShowSSIM;
+
+        private void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(StatisticsViewModel.IsVisible):
+                case nameof(StatisticsViewModel.ShowSSIM):
+                    // test if tab is visible and selected channel is correct
+                    RecalculateSSIM(false);
+                    break;
+            }
         }
 
         private void DisplayOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -137,6 +155,9 @@ namespace ImageViewer.ViewModels.Statistics
                 IsValid = false;
                 return;
             }
+
+            // ignore updates if not visible
+            if (!UpdateSSIMValues) return;
 
             // try to obtain cached entry
             var lm = models.Display.VisibleLayerMipmap;

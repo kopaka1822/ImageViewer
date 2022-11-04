@@ -51,7 +51,7 @@ Note that RGB will be clamped between 0.0 and 1.0 which results in SSIM values b
             }
 
             models.Window.Window.TabControl.SelectionChanged += TabControlOnSelectionChanged;
-            SSIM = new SSIMsViewModel(models);
+            SSIM = new SSIMsViewModel(models, this);
         }
 
         private void TabControlOnSelectionChanged(object sender, SelectionChangedEventArgs selectionChangedEventArgs)

@@ -31,7 +31,7 @@ namespace ImageViewer.ViewModels.Statistics
             public string ToolTip => null;
         }
 
-        public SSIMsViewModel(ModelsEx models)
+        public SSIMsViewModel(ModelsEx models, StatisticsViewModel parentViewModel)
         {
             this.models = models;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
@@ -47,8 +47,8 @@ namespace ImageViewer.ViewModels.Statistics
             StructureCommand = new ActionCommand<int>((int id) => Items[id].ImportStructure());
             SSIMCommand = new ActionCommand<int>((int id) => Items[id].ImportSSIM());
 
-            Items.Add(new SSIMViewModel(this, models, 0));
-            Items.Add(new SSIMViewModel(this, models, 1));
+            Items.Add(new SSIMViewModel(this, parentViewModel, models, 0));
+            Items.Add(new SSIMViewModel(this, parentViewModel, models, 1));
 
             RefreshImageSources();
         }
