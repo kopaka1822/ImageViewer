@@ -2,6 +2,8 @@
 
 An image viewer for anyone related to computer graphics.
 
+-> [Getting Started Guide](getting_started.md) <-
+
 ## File Formats
 
 * bmp, jpg, png, tga, gif
