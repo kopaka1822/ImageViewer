@@ -2,7 +2,8 @@
 
 ## Overview
 
-* [Import Images](#compare-images)
+* [Import Images](#import-images)
+* [Compare Images](#compare-images)
 * [Image Equations](#image-equations)
 * [Export](#export)
 * [Filter](#filter)
@@ -23,6 +24,11 @@ The imported images will be displayed on the right side of the editor in the "Im
 * B: Position of the mouse cursor in the image
 * C: Color at the mouse cursors position (default: linear color values from 0.0 to 1.0). If you want to change the display format to 0-255, go to View->PixelDisplay in the menu and select 'byte (sRGB)'
 * D: Zoom level (can be changed with the mouse wheel)
+
+The supported image formats are:
+* bmp, jpg, png, tga, gif
+* hdr, pfm, exr (import only)
+* dds, ktx, ktx2
 
 # Compare Images
 
@@ -73,6 +79,8 @@ Filter are HLSL compute shader that can be imported by the ImageViewer. Only a s
 * A: switch to the filter tab and open a filter via 'Add Filter'
 * B: press 'Apply' to apply the changes
 * C: You can change the filter user parameters in the menu below
+
+The equation visibility user parameter can be used to selectively enable/disable a filter for a specific image equation.
 
 For more information on how to write your own filter, please refer to the [Filter Manual](filter_manual.md).
 
