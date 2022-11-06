@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Threading.Tasks;
 using ImageFramework.ImageLoader;
 using ImageFramework.Utility;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
-using Resource = ImageFramework.ImageLoader.Resource;
 
 namespace ImageFramework.DirectX
 {
@@ -49,13 +43,27 @@ namespace ImageFramework.DirectX
                 var idx = GetSubresourceIndex(lm);
                 data[idx].DataPointer = mip.Bytes;
                 // The distance (in bytes) from the beginning of one line of a texture to the next line.
-                data[idx].Pitch = (int)(mip.ByteSize / mip.Size.Height);
+                data[idx].Pitch = (int)(mip.ByteSize / (uint)mip.Size.Height);
             }
 
             handle = new Texture2D(Device.Get().Handle, CreateTextureDescription(false, true), data);
 
             CreateTextureViews(false, true);
         }
+
+        // create a texture from a raw data rectangle (i.e. from a windows bitmap)
+        public TextureArray2D(Size3 size, Format format, DataRectangle data)
+        {
+            Size = size;
+            Debug.Assert(Size.Depth == 1);
+            LayerMipmap = LayerMipmapCount.One;
+            Format = format;
+
+            handle = new Texture2D(Device.Get().Handle, CreateTextureDescription(false, true), data);
+
+            CreateTextureViews(false, true);
+        }
+
 
         /// <summary>
         /// creates a 2d texture from an array of colors

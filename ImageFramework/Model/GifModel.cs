@@ -66,7 +66,7 @@ namespace ImageFramework.Model
 
             var cts = new CancellationTokenSource();
 
-            progressModel.AddTask(CreateGifAsync(cfg, progressModel.GetProgressInterface(cts.Token), shared), cts);
+            progressModel.AddTask(CreateGifAsync(cfg, progressModel.GetProgressInterface(cts.Token), shared), cts, false);
         }
 
         private async Task CreateGifAsync(Config cfg, IProgress progress, SharedModel shared)
@@ -94,9 +94,13 @@ namespace ImageFramework.Model
                 Debug.Assert(left.Size.Width % 2 == 0 && left.Size.Height % 2 == 0);
             }
 
+            // prepare parallel processing
+            var numTasks = Environment.ProcessorCount;
+            var tasks = new Task[numTasks];
+            var images = new DllImageData[numTasks];
+
             try
             {
-                progressModel.EnableDllProgress = false;
                 var leftView = left.GetSrView(LayerMipmapSlice.Mip0);
                 var rightView = right.GetSrView(LayerMipmapSlice.Mip0);
                 var overlayView = overlay?.GetSrView(LayerMipmapSlice.Mip0);
@@ -104,9 +108,6 @@ namespace ImageFramework.Model
                 var curProg = progress.CreateSubProgress(0.9f);
 
                 // prepare parallel processing
-                var numTasks = Environment.ProcessorCount;
-                var tasks = new Task[numTasks];
-                var images = new DllImageData[numTasks];
                 for (int i = 0; i < numTasks; ++i)
                     images[i] = IO.CreateImage(new ImageFormat(Format.R8G8B8A8_UNorm_SRgb), left.Size,
                         LayerMipmapCount.One);
@@ -148,7 +149,7 @@ namespace ImageFramework.Model
                             // wait for previous task to finish before writing it to the file
                             if (tasks[idx] != null) await tasks[idx];
 
-                            frame.CopyPixels(LayerMipmapSlice.Mip0, dstPtr, dstSize);
+                            frame.CopyPixels(LayerMipmapSlice.Mip0, dstPtr, (uint)dstSize);
                             var filename = $"{cfg.TmpDirectory}\\frame{i:D4}";
 
                             // write to file
@@ -187,13 +188,17 @@ namespace ImageFramework.Model
             }
             finally
             {
-                progressModel.EnableDllProgress = true;
-
                 if(disposeImages)
                 {
                     left.Dispose();
                     right.Dispose();
                     overlay?.Dispose();
+                }
+
+                // dispose images
+                foreach (var dllImageData in images)
+                {
+                    dllImageData?.Dispose();
                 }
             }
         }

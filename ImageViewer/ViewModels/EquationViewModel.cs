@@ -46,7 +46,27 @@ namespace ImageViewer.ViewModels
             ToggleAlphaCommand = new ActionCommand(() => AutoAlpha = !AutoAlpha);
             ToggleVisibilityCommand = new ActionCommand(() => IsVisible = !IsVisible);
 
+            models.PipelineUpdate += OnPipelineUpdate;
+
             AdjustAlphaFormula();
+        }
+
+        private void OnPipelineUpdate(object sender, bool success)
+        {
+            //if (success) return;
+
+            // some pipelines could not be executed => in this case the image is not set
+            if (model.IsEnabled && model.IsValid && !HasChanges && model.Image == null)
+            {
+                applicationFailed = true;
+                if(HasChangedChanged()) OnPropertyChanged(nameof(HasChanges));
+            }
+            // if the pipeline has previously failed, but now succeded, remove the application failed flag
+            if(applicationFailed && model.Image != null)
+            {
+                applicationFailed = false;
+                if (HasChangedChanged()) OnPropertyChanged(nameof(HasChanges));
+            }
         }
 
         private void StatisticsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -106,7 +126,8 @@ namespace ImageViewer.ViewModels
             Alpha.Apply();
             model.UseFilter = useFilter;
             model.RecomputeMipmaps = recomputeMipmaps;
-            prevHasChanged = false;
+            if (HasChangedChanged())
+                OnPropertyChanged(nameof(HasChanges));
         }
 
         private void ModelOnPropertyChanged(object sender, PropertyChangedEventArgs args)
@@ -265,11 +286,15 @@ namespace ImageViewer.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        // indicates if the formula was applied, but some error occured during execution
+        private bool applicationFailed = false;
+
         private bool prevHasChanged = false;
         public bool HasChanges => Color.HasChanges ||
                                   Alpha.HasChanges ||
                                   useFilter != model.UseFilter ||
-                                  recomputeMipmaps != model.RecomputeMipmaps;
+                                  recomputeMipmaps != model.RecomputeMipmaps ||
+                                  applicationFailed;
 
         /// <summary>
         /// indicates if the has changed property changed since the last query

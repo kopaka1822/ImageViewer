@@ -344,7 +344,7 @@ std::unique_ptr<image::IImage> png_load(const char* filename)
 		std::vector<png_bytep> rows;
 		rows.resize(info.height);
 		s_num_rows = info.height;
-		uint32_t dataSize;
+		size_t dataSize;
 		auto data = res->getData(0, 0, dataSize);
 		auto rowStride = info.width * (info.bitDepth <= 8 ? 4 : 2 * 4);
 		for(auto& r:  rows)
@@ -441,7 +441,7 @@ void png_write(image::IImage& image, const char* filename, gli::format format, i
 		if(info.bitDepth == 16 && image::littleendian())
 			png_set_swap(pPng);
 
-		uint32_t dataSize;
+		size_t dataSize;
 		auto data = image.getData(0, 0, dataSize);
 
 		if(info.bitDepth == 16)

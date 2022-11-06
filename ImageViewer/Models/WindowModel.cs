@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
+using ImageFramework.Model.Export;
 using ImageViewer.DirectX;
 using ImageViewer.Views.Dialog;
 using Size = System.Drawing.Size;
@@ -54,10 +55,20 @@ namespace ImageViewer.Models
         public bool? ShowDialog(Window dialog)
         {
             dialog.Owner = TopmostWindow;
+            dialog.ShowInTaskbar = false;
             windowStack.Push(dialog);
             var res = dialog.ShowDialog();
             windowStack.Pop();
             return res;
+        }
+
+        /// <summary>
+        /// shows a window but does not wait for it to close (i.e. wiki entry, manual)
+        /// </summary>
+        public void ShowWindow(Window dialog)
+        {
+            dialog.Owner = TopmostWindow;
+            dialog.Show();
         }
 
         private void WindowOnLoaded(object sender, RoutedEventArgs e)
@@ -120,7 +131,30 @@ namespace ImageViewer.Models
 
                 ShowDialog(dia);
             }
+            else if (exception is AggregateException ae)
+            {
+                // try to get the root exception
+                ShowErrorDialog(ae.GetBaseException(), where);
+            }
+            else if (exception is FFMpeg.FFMpegUnavailableException)
+            {
+                // display information on how to install ffmpeg
+                ShowFFMpegDialog();
+            }
             else ShowErrorDialog(exception.Message, where);
+        }
+
+        // shows an extended dialog on how to get ffmpeg
+        public void ShowFFMpegDialog()
+        {
+            Debug.Assert(!FFMpeg.IsAvailable());
+            if (ShowYesNoDialog("ffmpeg is required for this feature. " +
+                                "Please download the ffmpeg binaries and place them in the ImageViewer root directory. " +
+                                "Open ffmpeg download page and ImageViewer root?", "download ffmpeg?"))
+            {
+                System.Diagnostics.Process.Start(ExecutionPath);
+                System.Diagnostics.Process.Start("https://www.ffmpeg.org/download.html");
+            }
         }
 
         public void ShowInfoDialog(string message, string title = "Info")

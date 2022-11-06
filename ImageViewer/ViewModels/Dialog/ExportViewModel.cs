@@ -242,8 +242,10 @@ namespace ImageViewer.ViewModels.Dialog
             get => selectedLayer;
             set
             {
-                if (value == null) return;
-                models.ExportConfig.Layer = selectedLayer.Cargo;
+                if (value == null || value == selectedLayer) return;
+                selectedLayer = value;
+                models.ExportConfig.Layer = value.Cargo;
+                OnPropertyChanged(nameof(SelectedLayer));
             }
         }
 
@@ -253,8 +255,10 @@ namespace ImageViewer.ViewModels.Dialog
             get => selectedMipmap;
             set
             {
-                if (value == null) return;
+                if (value == null || value == selectedMipmap) return;
+                selectedMipmap = value;
                 models.ExportConfig.Mipmap = value.Cargo;
+                OnPropertyChanged(nameof(SelectedMipmap));
             }
         }
 

@@ -16,11 +16,13 @@ using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageFramework.Utility;
+using ImageViewer.Controller.Overlays;
 using ImageViewer.Controller.TextureViews;
 using ImageViewer.Controller.TextureViews.Texture3D;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
 using ImageViewer.Views;
+using ImageViewer.Views.Display;
 using Color = System.Windows.Media.Color;
 using RayCastingView = ImageViewer.Views.Display.RayCastingView;
 using Single3DView = ImageViewer.Views.Display.Single3DView;
@@ -46,7 +48,7 @@ namespace ImageViewer.ViewModels.Display
             Cargo = DisplayModel.ViewMode.Empty
         };
 
-        public DisplayViewModel(ModelsEx models)
+        public DisplayViewModel(ModelsEx models, ViewModels viewModels)
         {
             this.models = models;
             selectedSplitMode = AvailableSplitModes[models.Display.Split == DisplayModel.SplitMode.Vertical ? 0 : 1];
@@ -54,9 +56,12 @@ namespace ImageViewer.ViewModels.Display
             models.Display.PropertyChanged += DisplayOnPropertyChanged;
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
             models.Settings.PropertyChanged += SettingsOnPropertyChanged;
+            Heatmap = new HeatmapViewModel(models, viewModels);
 
             CreateViewModes();
         }
+
+        public HeatmapViewModel Heatmap { get; }
 
         private void SettingsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -122,8 +127,22 @@ namespace ImageViewer.ViewModels.Display
 
         public bool HasPriorityKeyInvoked(Key key)
         {
-            if (models.Display.ActiveOverlay == null) return false;
-            return models.Display.ActiveOverlay.OnKeyDown(key);
+            var handled = false;
+            // test overlay first
+            if(models.Display.ActiveOverlay != null)
+            {
+                handled = models.Display.ActiveOverlay.OnKeyDown(key);
+            }
+            // test extended views (right side and statusbar)
+            if (!handled && models.Display.ExtendedStatusbarData != null)
+            {
+                handled = models.Display.ExtendedStatusbarData.OnKeyDown(key);
+            }
+            if (!handled && models.Display.ExtendedViewData != null)
+            {
+                handled = models.Display.ExtendedViewData.OnKeyDown(key);
+            }
+            return handled;
         }
 
         private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -232,6 +251,28 @@ namespace ImageViewer.ViewModels.Display
                     OnPropertyChanged(nameof(ExtendedViewVisibility));
                     break;
 
+                case nameof(DisplayModel.ExtendedStatusbarData):
+                    extendedStatusbar?.Dispose();
+                    extendedStatusbar = null;
+
+                    if (models.Display.ExtendedStatusbarData != null)
+                    {
+                        if (models.Display.ExtendedStatusbarData is MovieDisplayModel bm)
+                        {
+                            var view = new MovieView(models, bm);
+                            extendedStatusbar = view;
+                            models.Window.Window.ExtendedStatusbarHost.Child = view;
+                        }
+                        else Debug.Assert(false);
+                    }
+                    else
+                    {
+                        models.Window.Window.ExtendedStatusbarHost.Child = null;
+                    }
+
+                    OnPropertyChanged(nameof(ExtendedStatusbarVisibility));
+                    break;
+
                 case nameof(DisplayModel.FrameTime):
                     OnPropertyChanged(nameof(FrameTime));
                     break;
@@ -297,6 +338,10 @@ namespace ImageViewer.ViewModels.Display
 
         public Visibility ExtendedViewVisibility => extendedView == null ? Visibility.Collapsed : Visibility.Visible;
 
+        private IDisposable extendedStatusbar = null;
+
+        public Visibility ExtendedStatusbarVisibility => extendedStatusbar == null ? Visibility.Collapsed : Visibility.Visible;
+
         public ObservableCollection<ListItemViewModel<int>> AvailableMipMaps { get; } = new ObservableCollection<ListItemViewModel<int>>();
         public ObservableCollection<ListItemViewModel<int>> AvailableLayers { get; } = new ObservableCollection<ListItemViewModel<int>>();
 
@@ -324,7 +369,7 @@ namespace ImageViewer.ViewModels.Display
 
         // layers are fixed for cube maps
         public bool ChooseLayers => models.Display.ActiveView == DisplayModel.ViewMode.Single ||
-                                    models.Display.ActiveView == DisplayModel.ViewMode.Polar;
+                                    models.Display.ActiveView == DisplayModel.ViewMode.Polar360;
 
         private ListItemViewModel<int> selectedMipMap = EmptyMipMap;
         public ListItemViewModel<int> SelectedMipMap

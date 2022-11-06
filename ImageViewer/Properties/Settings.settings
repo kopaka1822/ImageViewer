@@ -68,5 +68,23 @@
     <Setting Name="ExportZoomBoxScale" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">4</Value>
     </Setting>
+    <Setting Name="MovieFps" Type="System.Single" Scope="User">
+      <Value Profile="(Default)">24</Value>
+    </Setting>
+    <Setting Name="MovieRepeat" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="MoviePreset" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">8</Value>
+    </Setting>
+    <Setting Name="MovieLastFrameCount" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="MovieLastFirstFrame" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="MovieLastLastFrame" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">-1</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -41,6 +41,15 @@
                     <Image Source="../Icons/image_layer.png"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <!--<MenuItem
+                Header="Import Video as TextureArray"
+                ToolTip="Imports frames from the video into a TextureArray"
+                IsEnabled="{Binding Progress.NotProcessing}"
+                Command="{Binding ImportMovieCommand}">
+                <MenuItem.Icon>
+                    <Image Source="../Icons/video.png"/>
+                </MenuItem.Icon>
+            </MenuItem>-->
             <Separator/>
 
             <!-- Export -->
@@ -49,6 +58,14 @@
                     InputGestureText="Ctrl+S"
                     Command="{Binding ExportCommand}"
                     IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image Source="../Icons/save.png"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem 
+                Header="Export Video"
+                Command="{Binding ExportMovieCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
                     <Image Source="../Icons/save.png"/>
                 </MenuItem.Icon>
@@ -120,6 +137,7 @@
                     IsChecked="{Binding Display.ShowCropRectangle}"
                     ToolTip="Shows the crop box if cropping is enabled for export"
                     />
+            
             <Separator/>
             <MenuItem
                 Header="Flip Y Axis"
@@ -184,7 +202,145 @@
         </MenuItem>
         <!--END VIEW-->
 
+        <MenuItem Header="Overlays"
+                  IsEnabled="{Binding Images.IsEmptyOr2D}">
+            <!-- Zoombox -->
+            <MenuItem
+                Header="Add Zoombox"
+                Command="{Binding StartZoomboxCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}"
+                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/image_box.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem
+                Header="Remove Zoombox"
+                IsEnabled="{Binding ZoomBox.HasBoxes}"
+                ItemsSource="{Binding ZoomBox.Boxes}"
+                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/cancel.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+                <MenuItem.ItemTemplate>
+                    <DataTemplate DataType="Border">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Box "
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Id}"
+                                       Margin="{StaticResource DefaultBorderRight}"
+                                       VerticalAlignment="Center"/>
+                            <Border 
+                                Width="16" 
+                                Height="16"
+                                Background="{Binding Brush, FallbackValue=Blue}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </MenuItem.ItemTemplate>
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="MenuItem">
+                        <Setter Property="Header" Value="{Binding}"/>
+                        <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.RemoveZoomboxCommand}"/>
+                        <Setter Property="CommandParameter" Value="{Binding Id}"/>
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+            </MenuItem>
+
+            <Separator/>
+
+            <!-- Arrows -->
+            <MenuItem
+                Header="Add Arrow"
+                Command="{Binding StartArrowCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}"
+                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/arrow_right.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem
+                Header="Remove Arrow"
+                Command="{Binding StartArrowCommand}"
+                IsEnabled="{Binding Arrows.HasArrows}"
+                ItemsSource="{Binding Arrows.Arrows}"
+                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/cancel.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+                <MenuItem.ItemTemplate>
+                    <DataTemplate DataType="Border">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Arrow "
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Id}"
+                                       Margin="{StaticResource DefaultBorderRight}"
+                                       VerticalAlignment="Center"/>
+                            <Border 
+                                Width="16" 
+                                Height="16"
+                                Background="{Binding Brush, FallbackValue=Blue}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </MenuItem.ItemTemplate>
+                <MenuItem.ItemContainerStyle>
+                    <Style TargetType="MenuItem">
+                        <Setter Property="Header" Value="{Binding}"/>
+                        <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.RemoveArrowCommand}"/>
+                        <Setter Property="CommandParameter" Value="{Binding Id}"/>
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+            </MenuItem>
+
+            <!--
+            
+            <Separator/>
+            
+            <MenuItem 
+                Header="Heatmap"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/temperature.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+                
+                <MenuItem
+                    Header="Enable Overlay"
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.Heatmap.IsEnabled}"/>
+                <MenuItem
+                    Header="Load Filter"
+                    Command="{Binding Display.Heatmap.LoadFilterCommand}"/>
+                <MenuItem
+                    Header="Set Position"
+                    IsEnabled="{Binding Display.Heatmap.IsEnabled}"
+                    Command="{Binding Display.Heatmap.SetPositionCommand}"/>
+                <MenuItem
+                    Header="Configure"
+                    IsEnabled="{Binding Display.Heatmap.IsEnabled}"
+                    Command="{Binding Display.Heatmap.ConfigureCommand}"/>
+            </MenuItem>
+        </MenuItem>
+                
+            -->
+            </MenuItem>
+            <!-- END OVERLAYS -->
+
         <MenuItem Header="Tools">
+            <!-- Scaling + Padding -->
             <MenuItem Header="Scale"
                       Command="{Binding ShowScaleCommand}"
                       IsEnabled="{Binding Progress.NotProcessing}">
@@ -205,6 +361,8 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+
+            <!-- Mipmaps -->
             <Separator/>
             <MenuItem 
                     Header="Generate Mipmaps"
@@ -262,6 +420,36 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 </MenuItem>
+
+            <!-- Alpha Test -->
+            <MenuItem
+                Header="Alpha Testing"
+                ToolTip="Additional post-processing for textures with alpha test (cutout-material)"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem 
+                    Header="Disabled (Default)"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseAlphaNone}"
+                    ToolTip="No post-processing"/>
+                <MenuItem 
+                    Header="Alpha Scale"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseAlphaScale}"
+                    ToolTip="Rescale alpha values to preserve alpha coverage (Unity: mipMapsPreserveCoverage)"/>
+                <!--
+                <MenuItem 
+                    Header="Alpha Pyramid"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseAlphaPyramid}"
+                    ToolTip="Redistribute alpha values to preserve alpha coverage. More noisy but better at handling semi transparent and thin materials"/>
+                <MenuItem 
+                    Header="Alpha Connectivity (Beta)"
+                    IsCheckable="True"
+                    IsChecked="{Binding Scale.UseAlphaConnectivity}"
+                    ToolTip="Strong emphasis on maintaining connectivity in each mipmap while preserving alpha coverage"/>
+                -->
+            </MenuItem>
+
             <MenuItem 
                     Header="Delete Mipmaps"
                     Command="{Binding DeleteMipmapsCommand}"
@@ -274,103 +462,8 @@
                 </MenuItem.Icon>
             </MenuItem>
 
-            <Separator Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}"/>
-            <!-- Zoombox -->
-            <MenuItem
-                Header="Add Zoombox"
-                Command="{Binding StartZoomboxCommand}"
-                IsEnabled="{Binding Progress.NotProcessing}"
-                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
-                <MenuItem.Icon>
-                    <Image 
-                        Source="../Icons/image_box.png"
-                        Width="16"
-                        Height="16"/>
-                </MenuItem.Icon>
-            </MenuItem>
-            <MenuItem
-                Header="Remove Zoombox"
-                IsEnabled="{Binding ZoomBox.HasBoxes}"
-                ItemsSource="{Binding ZoomBox.Boxes}"
-                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
-                <MenuItem.Icon>
-                    <Image 
-                        Source="../Icons/cancel.png"
-                        Width="16"
-                        Height="16"/>
-                </MenuItem.Icon>
-                <MenuItem.ItemTemplate>
-                    <DataTemplate DataType="Border">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Box "
-                                       VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding Id}"
-                                       Margin="{StaticResource DefaultBorderRight}"
-                                       VerticalAlignment="Center"/>
-                            <Border 
-                                Width="16" 
-                                Height="16"
-                                Background="{Binding Brush, FallbackValue=Blue}"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </MenuItem.ItemTemplate>
-                <MenuItem.ItemContainerStyle>
-                    <Style TargetType="MenuItem">
-                        <Setter Property="Header" Value="{Binding}"/>
-                        <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.RemoveZoomboxCommand}"/>
-                        <Setter Property="CommandParameter" Value="{Binding Id}"/>
-                    </Style>
-                </MenuItem.ItemContainerStyle>
-            </MenuItem>
 
-            <!-- Arrows -->
-            <MenuItem
-                Header="Add Arrow"
-                Command="{Binding StartArrowCommand}"
-                IsEnabled="{Binding Progress.NotProcessing}"
-                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
-                <MenuItem.Icon>
-                    <Image 
-                        Source="../Icons/arrow_right.png"
-                        Width="16"
-                        Height="16"/>
-                </MenuItem.Icon>
-            </MenuItem>
-            <MenuItem
-                Header="Remove Arrow"
-                Command="{Binding StartArrowCommand}"
-                IsEnabled="{Binding Arrows.HasArrows}"
-                ItemsSource="{Binding Arrows.Arrows}"
-                Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}">
-                <MenuItem.Icon>
-                    <Image 
-                        Source="../Icons/cancel.png"
-                        Width="16"
-                        Height="16"/>
-                </MenuItem.Icon>
-                <MenuItem.ItemTemplate>
-                    <DataTemplate DataType="Border">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Arrow "
-                                       VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding Id}"
-                                       Margin="{StaticResource DefaultBorderRight}"
-                                       VerticalAlignment="Center"/>
-                            <Border 
-                                Width="16" 
-                                Height="16"
-                                Background="{Binding Brush, FallbackValue=Blue}"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </MenuItem.ItemTemplate>
-                <MenuItem.ItemContainerStyle>
-                    <Style TargetType="MenuItem">
-                        <Setter Property="Header" Value="{Binding}"/>
-                        <Setter Property="Command" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.RemoveArrowCommand}"/>
-                        <Setter Property="CommandParameter" Value="{Binding Id}"/>
-                    </Style>
-                </MenuItem.ItemContainerStyle>
-            </MenuItem>
+
 
             <Separator Visibility="{Binding Images.IsEmptyOr2D, Converter={StaticResource VisibleCollapsedConverter}}"/>
             <MenuItem
@@ -438,6 +531,13 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <MenuItem
+                Header="Getting Started"
+                Command="{Binding HelpCommand}">
+                <MenuItem.CommandParameter>
+                    <system:String>help/getting_started.md</system:String>
+                </MenuItem.CommandParameter>
+            </MenuItem>
             <Separator/>
             <MenuItem
                 Header="Equation"
@@ -474,6 +574,13 @@
                 Command="{Binding HelpCommand}">
                 <MenuItem.CommandParameter>
                     <system:String>help/volumetric.md</system:String>
+                </MenuItem.CommandParameter>
+            </MenuItem>
+            <MenuItem
+                Header="Overlays"
+                Command="{Binding HelpCommand}">
+                <MenuItem.CommandParameter>
+                    <system:String>help/overlays.md</system:String>
                 </MenuItem.CommandParameter>
             </MenuItem>
         </MenuItem>

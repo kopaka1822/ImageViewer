@@ -5,20 +5,30 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using ImageFramework.Annotations;
+using ImageFramework.DirectX;
+using ImageFramework.ImageLoader;
 using ImageFramework.Model;
+using ImageFramework.Utility;
 using ImageViewer.Commands;
 using ImageViewer.Commands.Export;
 using ImageViewer.Commands.Import;
 using ImageViewer.Commands.Tools;
 using ImageViewer.Commands.View;
+using ImageViewer.Controller;
 using ImageViewer.Models;
+using ImageViewer.UtilityEx;
 using ImageViewer.ViewModels.Display;
 using ImageViewer.ViewModels.Image;
 using ImageViewer.ViewModels.Statistics;
 using ImageViewer.ViewModels.Tools;
+using SharpDX;
+using SharpDX.Direct2D1.Effects;
+using SharpDX.DXGI;
 
 namespace ImageViewer.ViewModels
 {
@@ -53,13 +63,24 @@ namespace ImageViewer.ViewModels
                 OnPropertyChanged(nameof(SelectedTabIndex));
             }
         }
+        public enum ViewerTab
+        {
+            Images = 0,
+            Filters = 1,
+            Statistics = 2
+        }
+
+        public void SetViewerTab(ViewerTab t)
+        {
+            SelectedTabIndex = (int)t;
+        }
 
         public ViewModels(ModelsEx models)
         {
             this.models = models;
 
             // view models
-            Display = new DisplayViewModel(models);
+            Display = new DisplayViewModel(models, this);
             Progress = new ProgressViewModel(models);
             Images = new ImagesViewModel(models);
             Equations = new EquationsViewModel(models);
@@ -74,6 +95,7 @@ namespace ImageViewer.ViewModels
             ImportCommand = new ImportCommand(models);
             ImportEquationImageCommand = new ImportEquationImageCommand(models);
             ExportCommand = new ExportCommand(models);
+            ExportMovieCommand = new ExportMovieCommand(models);
             ExportOverwriteCommand = new ExportOverwriteCommand(models);
             ReloadImagesCommand = new ReloadImagesCommand(models);
             ReplaceEquationImageCommand = new ReplaceEquationImageCommand(models);
@@ -125,6 +147,18 @@ namespace ImageViewer.ViewModels
             // dont steal text from textboxes (they don't set handled to true...)
             if (e.OriginalSource is TextBox) return;
 
+            // handle modifier keys differently
+            if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                if (e.Key == Key.V)
+                {
+                    e.Handled = true;
+                    Application.Current.Dispatcher.Invoke(async () => await OnPasteAsync());
+                }
+
+                return;
+            }
+
             if (Display.HasPriorityKeyInvoked(e.Key))
                 return;
 
@@ -143,6 +177,61 @@ namespace ImageViewer.ViewModels
                 Display.InvokeKey(e.Key);
         }
 
+        public async Task OnPasteAsync()
+        {
+            try
+            {
+                // get clipboard text
+                if (Clipboard.ContainsImage())
+                {
+                    var img = Clipboard.GetImage();
+                    if (img == null) return;
+
+                    var bitmap = new WriteableBitmap(img);
+                    bitmap.Lock();
+                    TextureArray2D tex;
+                    try
+                    {
+                        tex = new TextureArray2D(new Size3(img.PixelWidth, img.PixelHeight), Format.B8G8R8A8_UNorm_SRgb, new DataRectangle(bitmap.BackBuffer, bitmap.BackBufferStride));
+                    }
+                    finally
+                    {
+                        bitmap.Unlock();
+                    }
+
+                    // check if the alpha channel is valid
+                    var stats = models.Stats.GetStatisticsFor(tex);
+                    bool overwriteAlpha = stats.Alpha.Max == 0.0f;
+
+                    if(!overwriteAlpha)
+                    {
+                        var format = stats.Alpha.Min == 1.0 ? GliFormat.RGB8_SRGB : GliFormat.RGBA8_SRGB;
+                        models.Import.ImportTexture(tex, "", format);
+                        return;
+                    }
+
+                    // overwrite alpha with 1.0 before import
+                    var tex2 = new TextureArray2D(LayerMipmapCount.One, new Size3(img.PixelWidth, img.PixelHeight), Format.R32G32B32A32_Float, true);
+                    models.OverwriteAlphaShader.Run(tex, tex2, LayerMipmapSlice.Mip0, models.SharedModel.Upload);
+                    tex.Dispose();
+
+                    models.Import.ImportTexture(tex2, "", GliFormat.RGB8_SRGB);
+                }
+                else if (Clipboard.ContainsFileDropList())
+                {
+                    var files = Clipboard.GetFileDropList();
+                    foreach (string file in files)
+                    {
+                        await models.Import.ImportFileAsync(file);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e);   
+            }
+        }
+
         public void Dispose()
         {
             models?.Dispose();
@@ -159,6 +248,8 @@ namespace ImageViewer.ViewModels
         public ICommand ImportEquationImageCommand { get; }
 
         public ICommand ExportCommand { get; }
+
+        public ICommand ExportMovieCommand { get; }
         public ICommand ExportOverwriteCommand { get; }
         public ICommand ShowPixelDisplayCommand { get; }
 

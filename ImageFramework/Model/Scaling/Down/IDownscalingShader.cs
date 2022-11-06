@@ -6,7 +6,8 @@ namespace ImageFramework.Model.Scaling.Down
 {
     internal interface IDownscalingShader : IDisposable
     {
-        /// <param name="src">src texture as input (most detailed mip will be used)</param>
+        /// <param name="src">src texture as input</param>
+        /// <param name="srcMipmap">mipmap of the source texture</param>
         /// <param name="dst">dst texture (may be same as source)</param>
         /// <param name="dstMipmap">dst mipmap level</param>
         /// <param name="hasAlpha">indicates if the texture has an alpha channel</param>

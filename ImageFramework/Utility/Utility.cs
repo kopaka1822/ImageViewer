@@ -33,14 +33,18 @@ namespace ImageFramework.Utility
         {
             return
                 @"
+float fromSrgb(float c){
+    if(c >= 1.0) return 1.0;
+    if(c <= 0.0) return 0.0;
+    if(c <= 0.04045) return c / 12.92;
+    return pow(max((c + 0.055)/1.055, 0.0), 2.4);
+}
+
 float4 fromSrgb(float4 c){
     float3 r;
     [unroll]
     for(int i = 0; i < 3; ++i){
-        if(c[i] >= 1.0) r[i] = 1.0;
-        else if(c[i] <= 0.0) r[i] = 0.0;
-        else if(c[i] <= 0.04045) r[i] = c[i] / 12.92;
-        else r[i] = pow(max((c[i] + 0.055)/1.055, 0.0), 2.4);
+        r[i] = fromSrgb(c[i]);
     }
     return float4(r, c.a);
 }";

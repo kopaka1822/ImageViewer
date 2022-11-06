@@ -33,6 +33,8 @@ namespace ImageFramework.DirectX
 
         Color[] GetPixelColors(LayerMipmapSlice lm);
 
+        byte[] GetPixelAlphas(LayerMipmapSlice lm);
+
         // gets bytes from the specified slice
         unsafe byte[] GetBytes(LayerMipmapSlice lm, uint size);
 

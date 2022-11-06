@@ -29,7 +29,7 @@ namespace ImageFramework.Model
 {
     public class Models : IDisposable, INotifyPropertyChanged
     {
-        public static readonly CultureInfo Culture = new CultureInfo("en-US");
+        public static readonly CultureInfo Culture = CultureInfo.InvariantCulture;
 
         public readonly int NumPipelines;
 
@@ -199,18 +199,7 @@ namespace ImageFramework.Model
         /// <returns>combined image</returns>
         public TextureArray2D CombineToArray(List<TextureArray2D> textures)
         {
-            if (textures.Count == 0) return null;
-            var first = textures[0];
-            var tex = new TextureArray2D(new LayerMipmapCount(textures.Count, first.NumMipmaps), first.Size, Format.R32G32B32A32_Float, false);
-            for(int i = 0; i < textures.Count; ++i)
-            {
-                for (int curMip = 0; curMip < first.NumMipmaps; ++curMip)
-                {
-                    SharedModel.Convert.CopyLayer(textures[i], new LayerMipmapSlice(0, curMip), tex, new LayerMipmapSlice(i, curMip));
-                }
-            }
-
-            return tex;
+            return SharedModel.Convert.CombineToArray(textures);
         }
 
         /// converts lat long to cubemap
@@ -288,14 +277,18 @@ namespace ImageFramework.Model
         /// </summary>
         public void Apply()
         {
-            ApplyAsync();
-            Progress.WaitForTask();
+            var t = ApplyAsync();
+            t.Wait();
         }
 
-        public void ApplyAsync()
+        /// <summary>
+        /// enqueues the apply into the progress model
+        /// </summary>
+        public async Task ApplyAsync()
         {
             var cts = new CancellationTokenSource();
-            Progress.AddTask(pipelineController.UpdateImagesAsync(Progress.GetProgressInterface(cts.Token)), cts);
+            Progress.AddTask(pipelineController.UpdateImagesAsync(Progress.GetProgressInterface(cts.Token)), cts, false);
+            await Progress.WaitForTaskAsync();
         }
 
         /// <summary>
@@ -364,6 +357,15 @@ namespace ImageFramework.Model
         protected virtual void OnSoftReset()
         {
             SoftReset?.Invoke(this, EventArgs.Empty);
+        }
+
+        public delegate void PipelineUpdateHandler(object sender, bool success);
+
+        public event PipelineUpdateHandler PipelineUpdate;
+
+        internal virtual void OnPipelineUpdate(object sender, bool success)
+        {
+            PipelineUpdate?.Invoke(sender, success);
         }
     }
 }

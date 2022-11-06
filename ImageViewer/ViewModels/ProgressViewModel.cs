@@ -34,9 +34,11 @@ namespace ImageViewer.ViewModels
                 case nameof(ProgressModel.IsProcessing):
                     OnPropertyChanged(nameof(EnableProgress));
                     OnPropertyChanged(nameof(NotProcessing));
+                    OnPropertyChanged(nameof(ProgressIndeterminate));
                     break;
                 case nameof(ProgressModel.Progress):
                     OnPropertyChanged(nameof(ProgressValue));
+                    OnPropertyChanged(nameof(ProgressIndeterminate));
                     break;
                 case nameof(ProgressModel.What):
                     OnPropertyChanged(nameof(ProgressDescription));
@@ -58,6 +60,8 @@ namespace ImageViewer.ViewModels
             // dont allow changes from the ui
             set => OnPropertyChanged(nameof(ProgressValue));
         }
+
+        public bool ProgressIndeterminate => models.Progress.Progress == 0.0f;
 
         public string ProgressDescription => models.Progress.What;
 

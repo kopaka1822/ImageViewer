@@ -144,7 +144,7 @@ namespace ImageViewer.Controller
 
                 gpuTimer.Start();
                 timerStarted = true;
-
+                
                 viewMode.Repaint(size);
 
             }
@@ -194,6 +194,12 @@ namespace ImageViewer.Controller
                     if (models.Display.ExtendedViewData != null)
                     {
                         models.Display.ExtendedViewData.PropertyChanged += (s, ev) => ScheduleRedraw();
+                    }
+                    break;
+                case nameof(DisplayModel.ExtendedStatusbarData):
+                    if (models.Display.ExtendedStatusbarData != null)
+                    {
+                        models.Display.ExtendedStatusbarData.PropertyChanged += (s, ev) => ScheduleRedraw();
                     }
                     break;
             }

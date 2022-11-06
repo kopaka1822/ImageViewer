@@ -28,7 +28,7 @@ namespace ImageFramework.ImageLoader
         public static extern void image_info_mipmap(int id, int mipmap, out int width, out int height, out int depth);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr image_get_mipmap(int id, int layer, int mipmap, out uint size);
+        public static extern IntPtr image_get_mipmap(int id, int layer, int mipmap, out ulong size);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         [return: MarshalAs(UnmanagedType.I1)]

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using ImageFramework.Annotations;
 using ImageFramework.Utility;
 
@@ -88,6 +89,11 @@ namespace ImageViewer.Models.Display
         protected virtual void OnForceTexelRecompute()
         {
             ForceTexelRecompute?.Invoke(this, EventArgs.Empty);
+        }
+
+        public bool OnKeyDown(Key key)
+        {
+            return false;
         }
     }
 }

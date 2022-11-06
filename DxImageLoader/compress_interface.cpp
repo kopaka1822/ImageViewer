@@ -189,8 +189,10 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSourc
 		return CMP_FORMAT_ETC_RGB;
 
 	case gli::format::FORMAT_RGB_ETC2_SRGB_BLOCK8:
+		exInfo.swizzleRGB = true;
 		return CMP_FORMAT_ETC2_SRGB;
 	case gli::format::FORMAT_RGB_ETC2_UNORM_BLOCK8:
+		exInfo.swizzleRGB = true;
 		return CMP_FORMAT_ETC2_RGB;
 	case gli::format::FORMAT_RGBA_ETC2_SRGB_BLOCK8:
 		if (isSource) exInfo.swizzleRGB = true;
@@ -332,9 +334,9 @@ void compressonator_convert_image(image::IImage& src, image::IImage& dst, int qu
 			const auto height = src.getHeight(mipmap);
 			info.curStepWeight = width * height;
 
-			uint32_t srcSize;
+			size_t srcSize;
 			auto srcDat = src.getData(layer, mipmap, srcSize);
-			uint32_t dstSize;
+			size_t dstSize;
 			auto dstDat = dst.getData(layer, mipmap, dstSize);
 
 			auto srcPlaneSize = srcSize / depth;
@@ -347,7 +349,7 @@ void compressonator_convert_image(image::IImage& src, image::IImage& dst, int qu
 					dstDat + dstPlaneSize * z,
 					width,
 					height,
-					srcPlaneSize, dstPlaneSize,
+					static_cast<uint32_t>(srcPlaneSize), static_cast<uint32_t>(dstPlaneSize),
 					srcFormat, dstFormat,
 					srcFormatInfo, dstFormatInfo,
 					fquality,

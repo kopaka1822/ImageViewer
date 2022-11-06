@@ -72,7 +72,8 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
                 <Button
-                    Command="{Binding Equations.Apply}"
+                    Command="{Binding Equations.ApplyCommand}"
+                    IsEnabled="{Binding Equations.HasChanges}"
                     Content="Apply"
                     Width="80"
                     HorizontalAlignment="Right"

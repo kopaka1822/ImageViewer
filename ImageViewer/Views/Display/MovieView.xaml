@@ -1,0 +1,136 @@
+﻿<UserControl x:Class="ImageViewer.Views.Display.MovieView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:ImageViewer.Views"
+      mc:Ignorable="d" 
+      d:DesignHeight="40" d:DesignWidth="800">
+
+    <StatusBar BorderThickness="0 1 0 0">
+
+        <!-- FPS Area -->
+        <StatusBarItem HorizontalAlignment="Left"
+                       BorderThickness="0 0 1 0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="FPS:" Margin="{StaticResource DefaultBorderRight}"/>
+                <local:CustomTextBox
+                    Width="70"
+                    Text="{Binding FPS}"/>
+            </StackPanel>
+        </StatusBarItem>
+
+        <!-- PLAY AREA -->
+        <StatusBarItem
+            HorizontalAlignment="Left"
+            BorderThickness="0 0 1 0">
+            <StackPanel Orientation="Horizontal">
+
+                <Button
+                    Command="{Binding PlayCommand}"
+                    Margin="{StaticResource DefaultBorderRight}"
+                    ToolTip="Toggle Play/Pause. Bound to Spacebar">
+                    <StackPanel>
+                        <Image 
+                            Visibility="{Binding IsPlaying, Converter={StaticResource CollapsedVisibleConverter}}"
+                            Width="16" Height="16"
+                            Source="../../Icons/run.png"/>
+                        <Image 
+                            Visibility="{Binding IsPlaying, Converter={StaticResource VisibleCollapsedConverter}}"
+                            Width="16" Height="16"
+                            Source="../../Icons/pause.png"/>
+                    </StackPanel>
+                    
+                </Button>
+
+                <Button
+                    Command="{Binding StopCommand}"
+                    Margin="{StaticResource DefaultBorderRight}">
+                    <Image 
+                        Width="16" Height="16"
+                        Source="../../Icons/stop.png"></Image>
+                </Button>
+
+                <Border Width="10"/>
+
+                <Button
+                    Command="{Binding PreviousCommand}"
+                    Margin="{StaticResource DefaultBorderRight}"
+                    ToolTip="Previous Frame. Bound to , key">
+                    <Image 
+                        Width="16" Height="16"
+                        Source="../../Icons/arrow_left.png"></Image>
+                </Button>
+
+                <Button
+                    Command="{Binding NextCommand}"
+                    Margin="{StaticResource DefaultBorderRight}"
+                    ToolTip="Next Frame. Bound to . key">
+                    <Image 
+                        Width="16" Height="16"
+                        Source="../../Icons/arrow_right.png"></Image>
+                </Button>
+
+                <Border Width="10"/>
+
+                <TextBlock Text="Frame:" VerticalAlignment="Center" Margin="{StaticResource DefaultBorderRight}"/>
+
+                <local:CustomTextBox
+                    Width="70"
+                    Text="{Binding FrameID}"
+                    Margin="{StaticResource DefaultBorderRight}"/>
+
+                <Button
+                    Command="{Binding ToggleRepeatCommand}"
+                    Margin="{StaticResource DefaultBorderRight}"
+                    ToolTip="Toogle Repeat"
+                    >
+                    <StackPanel>
+                        <Image 
+                            Visibility="{Binding RepeatVideo, Converter={StaticResource VisibleCollapsedConverter}}"
+                            Width="16" Height="16"
+                            Source="../../Icons/cancel.png"/>
+                        <Image 
+                            Visibility="{Binding RepeatVideo, Converter={StaticResource CollapsedVisibleConverter}}"
+                            Width="16" Height="16"
+                            Source="../../Icons/sync.png"/>
+                    </StackPanel>
+                    
+                </Button>
+            </StackPanel>
+        </StatusBarItem>
+
+
+
+
+        <!-- Tracker Area -->
+        <StatusBarItem 
+            HorizontalContentAlignment="Stretch"
+            VerticalContentAlignment="Stretch">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="38"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock
+                    Text="{Binding TimeText, FallbackValue=00:00}"
+                    Grid.Column="0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"/>
+                
+                <Slider
+                    Grid.Column="1"
+                    Minimum="0"
+                    Maximum="{Binding MaxFrameId}"
+                    TickFrequency="{Binding TickFrequency}"
+                    TickPlacement="BottomRight"
+                    VerticalAlignment="Center"
+                    Value="{Binding TickValue, UpdateSourceTrigger=PropertyChanged}"
+                    BorderThickness="0 0 16 0">
+
+                </Slider>
+            </Grid>
+        </StatusBarItem>
+    </StatusBar>
+</UserControl>

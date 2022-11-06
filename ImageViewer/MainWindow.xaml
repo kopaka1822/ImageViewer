@@ -14,8 +14,7 @@
         Width="600"
         Icon="Icons/app.png"
         Style="{StaticResource WindowStyle}"
-        x:Name="Window"
-        >
+        x:Name="Window">
 
     <Window.Resources>
         <ContextMenu x:Key="ClientContextMenu">
@@ -127,7 +126,13 @@
                 </TabControl>
             </Grid>
 
-            <views:StatusBar Grid.Row="1"/>
+            <StackPanel Grid.Row="1">
+                <Border
+                    x:Name="ExtendedStatusbarHost"
+                    Visibility="{Binding Display.ExtendedStatusbarVisibility}">
+                </Border>
+                <views:StatusBar/>
+            </StackPanel>
         </Grid>
     </DockPanel>
 </Window>

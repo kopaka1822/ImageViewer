@@ -45,6 +45,12 @@
     <Filter Include="Docs\img">
       <UniqueIdentifier>{e9a0ecf1-1d70-4a7b-8bc3-0fa2bfeeb454}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\hdr">
+      <UniqueIdentifier>{59dfc0bf-3243-49db-bf08-3d70c79acbbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hdr\rgbe">
+      <UniqueIdentifier>{7382d5b5-615c-429b-987a-d227e7ca2f7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Layer.h">
@@ -104,6 +110,15 @@
     <ClInclude Include="png_interface.h">
       <Filter>Source Files\png</Filter>
     </ClInclude>
+    <ClInclude Include="threadsafe_unordered_map.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr_interface.h">
+      <Filter>Source Files\hdr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dependencies\hdr\rgbe.h">
+      <Filter>Source Files\hdr\rgbe</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -141,6 +156,9 @@
     </ClCompile>
     <ClCompile Include="png_interface.cpp">
       <Filter>Source Files\png</Filter>
+    </ClCompile>
+    <ClCompile Include="hdr_interface.cpp">
+      <Filter>Source Files\hdr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -195,5 +213,76 @@
     <CopyFileToFolders Include="..\Docs\statistics.md">
       <Filter>Docs</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\getting_started.md">
+      <Filter>Docs</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\compare.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\cube_level.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\einstein.gif">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\filter.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_compare.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_equations.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_import.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_ssim.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_ssim2.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_statistics.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_videos.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\polar.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\polar2.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\transparent.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\volume_view.jpg">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\alpha_test_degen.PNG">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\alpha_test_equation.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\arrow_overlay.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\zoombox.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\zoombox_zoom.png">
+      <Filter>Docs\img</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\overlays.md">
+      <Filter>Docs</Filter>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Docs\build.md">
+      <Filter>Docs</Filter>
+    </None>
   </ItemGroup>
 </Project>

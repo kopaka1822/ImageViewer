@@ -220,6 +220,8 @@ namespace ImageFramework.Model.Export
         {
             get
             {
+                if (forcedAlignment.HasValue) return true;
+
                 if (!FileFormat.IsCompressed()) return false;
                 var mipDim = Texture.Size.GetMip(Math.Max(Mipmap, 0));
                 if (mipDim.Width % FileFormat.GetAlignmentX() != 0)
@@ -228,6 +230,18 @@ namespace ImageFramework.Model.Export
                     return true;
                 return false;
             }
+        }
+
+        public Size3 Alignment =>
+            forcedAlignment ?? new Size3(FileFormat.GetAlignmentX(), FileFormat.GetAlignmentY(), 0);
+
+        private Size3? forcedAlignment = null;
+
+        public ExportDescription ForceAlignment(int alignX, int alignY = 0, int alignZ = 0)
+        {
+            Debug.Assert(alignX != 0 || alignY != 0 || alignZ != 0);
+            forcedAlignment = new Size3(alignX, alignY, alignZ);
+            return this;
         }
 
         /// <summary>

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ImageFramework.Annotations;
 using ImageViewer.Models;
 using Markdig;
 using Markdig.Renderers;
@@ -23,16 +26,21 @@ namespace ImageViewer.Views.Dialog
     /// <summary>
     /// Interaction logic for HelpDialog.xaml
     /// </summary>
-    public partial class HelpDialog : Window
+    public partial class HelpDialog : Window, INotifyPropertyChanged
     {
         public bool IsValid { get; private set; } = true;
         private string curDirectory;
         private readonly ModelsEx models;
         private Stack<string> history;
 
+        // public bindings
+
+        public bool BackIsEnabled => history.Count > 1;
+
         public HelpDialog(ModelsEx models, string filename)
         {
             InitializeComponent();
+            DataContext = this;
             this.models = models;
             history = new Stack<string>();
 
@@ -75,12 +83,6 @@ namespace ImageViewer.Views.Dialog
             // correct links
             text = text.Replace("![](", "![](" + fileDirectory);
 
-            // add back link
-            if (history.Count > 0)
-            {
-                text += "\n[Back](back)";
-            }
-            
             history.Push(filename);
 
             //var pipe = new MarkdownPipeline();
@@ -103,6 +105,9 @@ namespace ImageViewer.Views.Dialog
 ";
             // display markup in browser
             Browser.NavigateToString(html);
+
+            // update status of back button
+            OnPropertyChanged(nameof(BackIsEnabled));
         }
 
         private void BrowserOnNavigating(object sender, NavigatingCancelEventArgs args)
@@ -119,12 +124,6 @@ namespace ImageViewer.Views.Dialog
                 args.Cancel = true;
                 System.Diagnostics.Process.Start(args.Uri.ToString());
             }
-            else if (args.Uri.LocalPath == "back" && history.Count > 1)
-            {
-                args.Cancel = true;
-                history.Pop();
-                LoadPage(history.Pop(), true);
-            }
             else
             {
                 args.Cancel = true;
@@ -136,6 +135,22 @@ namespace ImageViewer.Views.Dialog
         private void OkOnClick(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void BackOnClick(object sender, RoutedEventArgs e)
+        {
+            if (history.Count < 2) return;
+
+            history.Pop();
+            LoadPage(history.Pop(), true);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

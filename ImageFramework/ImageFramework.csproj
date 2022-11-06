@@ -55,6 +55,7 @@
     <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -101,7 +102,6 @@
     <Compile Include="Model\Filter\Parameter\EnumFilterParameterModel.cs" />
     <Compile Include="Model\Overlay\ArrowOverlay.cs" />
     <Compile Include="Model\Overlay\ArrowOverlayShader.cs" />
-    <Compile Include="Model\Progress\DllProgressAdapter.cs" />
     <Compile Include="Model\Equation\HlslEquation.cs" />
     <Compile Include="Model\Equation\FormulaModel.cs" />
     <Compile Include="Model\Equation\Markov\RuleDoubleSign.cs" />
@@ -143,6 +143,8 @@
     <Compile Include="Model\Equation\Token\ValueToken.cs" />
     <Compile Include="Model\ImagePipeline.cs" />
     <Compile Include="Model\ImagesModel.cs" />
+    <Compile Include="Model\Overlay\HeatmapOverlay.cs" />
+    <Compile Include="Model\Overlay\HeatmapOverlayShader.cs" />
     <Compile Include="Model\Progress\IProgress.cs" />
     <Compile Include="Model\Models.cs" />
     <Compile Include="Model\Overlay\BoxOverlay.cs" />
@@ -152,6 +154,10 @@
     <Compile Include="Model\Overlay\OverlayModel.cs" />
     <Compile Include="Model\Progress\ProgressModel.cs" />
     <Compile Include="Model\Progress\SubProgress.cs" />
+    <Compile Include="Model\Scaling\AlphaTest\AlphaPyramidPostproces.cs" />
+    <Compile Include="Model\Scaling\AlphaTest\AlphaScalePostprocess.cs" />
+    <Compile Include="Model\Scaling\AlphaTest\IPostprocess.cs" />
+    <Compile Include="Model\Scaling\AlphaTest\PostprocessBase.cs" />
     <Compile Include="Model\Scaling\Down\DetailPreservingShaderCore.cs" />
     <Compile Include="Model\Scaling\Down\DownscalingShaderBase.cs" />
     <Compile Include="Model\Scaling\Down\BoxScalingShader.cs" />
@@ -179,6 +185,7 @@
     <Compile Include="Model\Shader\StatisticsShader.cs" />
     <Compile Include="Model\Shader\TransformShader.cs" />
     <Compile Include="Model\SharedModel.cs" />
+    <Compile Include="Model\Statistics\AlphaStatistics.cs" />
     <Compile Include="Model\Statistics\DefaultStatistics.cs" />
     <Compile Include="Model\Statistics\ImagesCorrelationStats.cs" />
     <Compile Include="Model\Statistics\ImageVarianceStats.cs" />
@@ -293,6 +300,19 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Filter\heat_distribution.hlsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Filter\alpha_test.hlsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Filter\move_pixels.hlsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Filter\alpha_test_preprocessing.hlsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

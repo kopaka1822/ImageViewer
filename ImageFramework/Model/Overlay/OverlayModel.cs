@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -37,7 +38,7 @@ namespace ImageFramework.Model.Overlay
             blendDesc.RenderTarget[0].IsBlendEnabled = true;
             blendDesc.RenderTarget[0].RenderTargetWriteMask = ColorWriteMaskFlags.All;
 
-            // C' = a_src * c_src + (1.0 - a_src) * a_dst
+            // C' = a_src * c_src + (1.0 - a_src) * c_dst
             blendDesc.RenderTarget[0].BlendOperation = BlendOperation.Add;
             blendDesc.RenderTarget[0].SourceBlend = BlendOption.SourceAlpha;
             blendDesc.RenderTarget[0].DestinationBlend = BlendOption.InverseSourceAlpha;
@@ -117,6 +118,7 @@ namespace ImageFramework.Model.Overlay
                 // recompute texture
                 var dev = Device.Get();
                 overlayTex = cache.GetTexture();
+                
                 foreach (var lm in overlayTex.LayerMipmap.Range)
                 {
                     // bind and clear rendertarget
@@ -130,7 +132,32 @@ namespace ImageFramework.Model.Overlay
                     foreach (var overlay in Overlays)
                     {
                         if(overlay.HasWork)
+                        {
                             overlay.Render(lm, size);
+                            // use d2d for 2d overlays
+                            if(overlay.RequireD2D && overlayTex is TextureArray2D)
+                            {
+                                //var stagingTex = cache.Get2DSrgbStagingTexture(lm.Mipmap);
+                                var stagingTex = overlayTex as TextureArray2D;
+                                if (overlayTex.NumLayers > 1 || overlayTex.NumMipmaps > 1)
+                                {
+                                    stagingTex = cache.Get2DSrgbStagingTexture(lm.Mipmap);
+                                    dev.ClearRenderTargetView(stagingTex.GetRtView(LayerMipmapSlice.Mip0), new RawColor4(0.0f, 0.0f, 0.0f, 1.0f));
+                                }
+
+                                using (var d2d = new Direct2D(stagingTex))
+                                {
+                                    overlay.RenderD2D(lm, size, d2d);
+                                }
+                                
+                                if(!ReferenceEquals(overlayTex, stagingTex))
+                                {
+                                    // TODO compose texures
+                                    Debug.Assert(false);
+                                }
+                            }
+                        }
+                            
                     }
                 }
                 

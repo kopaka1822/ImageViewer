@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <sys/types.h>
 
 /*
  * Don't use khrplatform.h in order not to break apps existing
@@ -201,6 +202,8 @@ typedef enum ktx_error_code_e {
  * @brief Opaque handle to a ktxHashList.
  */
 typedef struct ktxKVListEntry* ktxHashList;
+
+typedef struct ktxStream ktxStream;
 
 #define KTX_APIENTRYP KTX_APIENTRY *
 /**
@@ -477,6 +480,9 @@ typedef KTX_error_code
 typedef KTX_error_code
     (KTX_APIENTRY* PFNKTEXWRITETOMEMORY)(ktxTexture* This,
                                          ktx_uint8_t** bytes, ktx_size_t* size);
+typedef KTX_error_code
+    (KTX_APIENTRY* PFNKTEXWRITETOSTREAM)(ktxTexture* This,
+                                         ktxStream* dststr);
 
 /**
  * @memberof ktxTexture
@@ -497,6 +503,7 @@ typedef KTX_error_code
     PFNKTEXWRITETOSTDIOSTREAM WriteToStdioStream;
     PFNKTEXWRITETONAMEDFILE WriteToNamedFile;
     PFNKTEXWRITETOMEMORY WriteToMemory;
+    PFNKTEXWRITETOSTREAM WriteToStream;
 };
 
 /****************************************************************
@@ -516,8 +523,8 @@ typedef KTX_error_code
  *        ktxTexture.
  * @copydoc ktxTexture2_GetImageOffset
  */
-#define ktxTexture_GetImageOffset(This, faceSlice, layer, level, pOffset) \
-            (This)->vtbl->GetImageOffset(This, faceSlice, layer, level, pOffset)
+#define ktxTexture_GetImageOffset(This, level, layer, faceSlice, pOffset) \
+            (This)->vtbl->GetImageOffset(This, level, layer, faceSlice, pOffset)
 
 /**
  * @~English
@@ -616,6 +623,14 @@ typedef KTX_error_code
  */
 #define ktxTexture_WriteToMemory(This, ppDstBytes, pSize) \
                   (This)->vtbl->WriteToMemory(This, ppDstBytes, pSize)
+
+/**
+ * @~English
+ * @brief Helper for calling the WriteToStream virtual method of a ktxTexture.
+ * @copydoc ktxTexture2_WriteToStream
+ */
+#define ktxTexture_WriteToStream(This, dststr) \
+                  (This)->vtbl->WriteToStream(This, dststr)
 
 
 /**
@@ -755,13 +770,120 @@ enum ktxTextureCreateFlagBits {
  */
 typedef ktx_uint32_t ktxTextureCreateFlags;
 
+/*===========================================================*
+* ktxStream
+*===========================================================*/
+
+/*
+ * This is unsigned to allow ktxmemstreams to use the
+ * full amount of memory available. Platforms will
+ * limit the size of ktxfilestreams to, e.g, MAX_LONG
+ * on 32-bit and ktxfilestreams raises errors if
+ * offset values exceed the limits. This choice may
+ * need to be revisited if we ever start needing -ve
+ * offsets.
+ *
+ * Should the 2GB file size handling limit on 32-bit
+ * platforms become a problem, ktxfilestream will have
+ * to be changed to explicitly handle large files by
+ * using the 64-bit stream functions.
+ */
+#if defined(_MSC_VER) && defined(_WIN64)
+  typedef unsigned __int64 ktx_off_t;
+#else
+  typedef   off_t ktx_off_t;
+#endif
+typedef struct ktxMem ktxMem;
+typedef struct ktxStream ktxStream;
+
+enum streamType { eStreamTypeFile = 1, eStreamTypeMemory = 2, eStreamTypeCustom = 3 };
+
+/**
+ * @~English
+ * @brief type for a pointer to a stream reading function
+ */
+typedef KTX_error_code (*ktxStream_read)(ktxStream* str, void* dst,
+                                         const ktx_size_t count);
+/**
+ * @~English
+ * @brief type for a pointer to a stream skipping function
+ */
+typedef KTX_error_code (*ktxStream_skip)(ktxStream* str,
+                                         const ktx_size_t count);
+
+/**
+ * @~English
+ * @brief type for a pointer to a stream reading function
+ */
+typedef KTX_error_code (*ktxStream_write)(ktxStream* str, const void *src,
+                                          const ktx_size_t size,
+                                          const ktx_size_t count);
+
+/**
+ * @~English
+ * @brief type for a pointer to a stream position query function
+ */
+typedef KTX_error_code (*ktxStream_getpos)(ktxStream* str, ktx_off_t* const offset);
+
+/**
+ * @~English
+ * @brief type for a pointer to a stream position query function
+ */
+typedef KTX_error_code (*ktxStream_setpos)(ktxStream* str, const ktx_off_t offset);
+
+/**
+ * @~English
+ * @brief type for a pointer to a stream size query function
+ */
+typedef KTX_error_code (*ktxStream_getsize)(ktxStream* str, ktx_size_t* const size);
+
+/**
+ * @~English
+ * @brief Destruct a stream
+ */
+typedef void (*ktxStream_destruct)(ktxStream* str);
+
+/**
+ * @~English
+ *
+ * @brief Interface of ktxStream.
+ *
+ * @author Maksim Kolesin
+ * @author Georg Kolling, Imagination Technology
+ * @author Mark Callow, HI Corporation
+ */
+struct ktxStream
+{
+    ktxStream_read read;   /*!< @internal pointer to function for reading bytes. */
+    ktxStream_skip skip;   /*!< @internal pointer to function for skipping bytes. */
+    ktxStream_write write; /*!< @internal pointer to function for writing bytes. */
+    ktxStream_getpos getpos; /*!< @internal pointer to function for getting current position in stream. */
+    ktxStream_setpos setpos; /*!< @internal pointer to function for setting current position in stream. */
+    ktxStream_getsize getsize; /*!< @internal pointer to function for querying size. */
+    ktxStream_destruct destruct; /*!< @internal destruct the stream. */
+
+    enum streamType type;
+    union {
+        FILE* file;
+        ktxMem* mem;
+        struct
+        {
+            void* address;
+            void* allocatorAddress;
+            ktx_size_t size;
+        } custom_ptr;
+    } data;                /**< @internal pointer to the stream data. */
+    ktx_off_t readpos;     /**< @internal used by FileStream for stdin. */
+    ktx_bool_t closeOnDestruct; /**< @internal Close FILE* or dispose of memory on destruct. */
+};
+
 /*
  * See the implementation files for the full documentation of the following
  * functions.
  */
 
 /*
- * These three create a ktxTexture1 or ktxTexture2 according to the data
+ * These four create a ktxTexture1 or ktxTexture2 according to the data
  * header, and return a pointer to the base ktxTexture class.
  */
 KTX_API KTX_error_code KTX_APIENTRY
@@ -776,6 +898,11 @@ ktxTexture_CreateFromNamedFile(const char* const filename,
 
 KTX_API KTX_error_code KTX_APIENTRY
 ktxTexture_CreateFromMemory(const ktx_uint8_t* bytes, ktx_size_t size,
+                            ktxTextureCreateFlags createFlags,
+                            ktxTexture** newTex);
+
+KTX_API KTX_error_code KTX_APIENTRY
+ktxTexture_CreateFromStream(ktxStream* stream,
                             ktxTextureCreateFlags createFlags,
                             ktxTexture** newTex);
 
@@ -824,7 +951,7 @@ ktxTexture1_Create(ktxTextureCreateInfo* createInfo,
                    ktxTexture1** newTex);
 
 /*
- * These three create a ktxTexture1 provided the data is in KTX format.
+ * These four create a ktxTexture1 provided the data is in KTX format.
  */
 KTX_API KTX_error_code KTX_APIENTRY
 ktxTexture1_CreateFromStdioStream(FILE* stdioStream,
@@ -840,6 +967,11 @@ KTX_API KTX_error_code KTX_APIENTRY
 ktxTexture1_CreateFromMemory(const ktx_uint8_t* bytes, ktx_size_t size,
                             ktxTextureCreateFlags createFlags,
                             ktxTexture1** newTex);
+
+KTX_API KTX_error_code KTX_APIENTRY
+ktxTexture1_CreateFromStream(ktxStream* stream,
+                             ktxTextureCreateFlags createFlags,
+                             ktxTexture1** newTex);
 
 KTX_API ktx_bool_t KTX_APIENTRY
 ktxTexture1_NeedsTranscoding(ktxTexture1* This);
@@ -864,6 +996,12 @@ ktxTexture1_WriteKTX2ToMemory(ktxTexture1* This,
                              ktx_uint8_t** bytes, ktx_size_t* size);
 
 /*
+ * Write a ktxTexture object to a ktxStream in KTX format.
+ */
+KTX_API KTX_error_code KTX_APIENTRY
+ktxTexture1_WriteKTX2ToStream(ktxTexture1* This, ktxStream *dststr);
+
+/*
  * Create a new ktxTexture2.
  */
 KTX_API KTX_error_code KTX_APIENTRY
@@ -878,7 +1016,7 @@ KTX_API KTX_error_code KTX_APIENTRY
 ktxTexture2_CreateCopy(ktxTexture2* orig, ktxTexture2** newTex);
 
  /*
-  * These three create a ktxTexture2 provided the data is in KTX2 format.
+  * These four create a ktxTexture2 provided the data is in KTX2 format.
   */
 KTX_API KTX_error_code KTX_APIENTRY
 ktxTexture2_CreateFromStdioStream(FILE* stdioStream,
@@ -894,6 +1032,11 @@ KTX_API KTX_error_code KTX_APIENTRY
 ktxTexture2_CreateFromMemory(const ktx_uint8_t* bytes, ktx_size_t size,
                             ktxTextureCreateFlags createFlags,
                             ktxTexture2** newTex);
+
+KTX_API KTX_error_code KTX_APIENTRY
+ktxTexture2_CreateFromStream(ktxStream* stream,
+                             ktxTextureCreateFlags createFlags,
+                             ktxTexture2** newTex);
 
 KTX_API KTX_error_code KTX_APIENTRY
 ktxTexture2_CompressBasis(ktxTexture2* This, ktx_uint32_t quality);
@@ -949,7 +1092,122 @@ typedef enum ktx_pack_uastc_flag_bits_e {
 } ktx_pack_uastc_flag_bits_e;
 typedef ktx_uint32_t ktx_pack_uastc_flags;
 
+/**
+ * @~English
+ * @brief Options specifiying ASTC encoding quality levels.
+ */
+typedef enum ktx_pack_astc_quality_levels_e {
+    KTX_PACK_ASTC_QUALITY_LEVEL_FASTEST  = 0,
+        /*!< Fastest compression. */
+    KTX_PACK_ASTC_QUALITY_LEVEL_FAST   = 10,
+        /*!< Fast compression. */
+    KTX_PACK_ASTC_QUALITY_LEVEL_MEDIUM   = 60,
+        /*!< Medium compression. */
+    KTX_PACK_ASTC_QUALITY_LEVEL_THOROUGH   = 98,
+        /*!< Slower compression. */
+    KTX_PACK_ASTC_QUALITY_LEVEL_EXHAUSTIVE = 100,
+        /*!< Very slow compression. */
+    KTX_PACK_ASTC_QUALITY_LEVEL_MAX = KTX_PACK_ASTC_QUALITY_LEVEL_EXHAUSTIVE,
+        /*!< Maximum supported quality level. */
+} ktx_pack_astc_quality_levels_e;
+
+/**
+ * @~English
+ * @brief Options specifiying ASTC encoding block dimensions
+ */
+typedef enum ktx_pack_astc_block_dimension_e {
+    // 2D formats
+    KTX_PACK_ASTC_BLOCK_DIMENSION_4x4,                    //: 8.00 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_5x4,                    //: 6.40 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_5x5,                    //: 5.12 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_6x5,                    //: 4.27 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_6x6,                    //: 3.56 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_8x5,                    //: 3.20 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_8x6,                    //: 2.67 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_10x5,                   //: 2.56 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_10x6,                   //: 2.13 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_8x8,                    //: 2.00 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_10x8,                   //: 1.60 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_10x10,                  //: 1.28 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_12x10,                  //: 1.07 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_12x12,                  //: 0.89 bpp
+    // 3D formats
+    KTX_PACK_ASTC_BLOCK_DIMENSION_3x3x3,                  //: 4.74 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_4x3x3,                  //: 3.56 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_4x4x3,                  //: 2.67 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_4x4x4,                  //: 2.00 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_5x4x4,                  //: 1.60 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_5x5x4,                  //: 1.28 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_5x5x5,                  //: 1.02 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_6x5x5,                  //: 0.85 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_6x6x5,                  //: 0.71 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_6x6x6,                  //: 0.59 bpp
+    KTX_PACK_ASTC_BLOCK_DIMENSION_MAX = KTX_PACK_ASTC_BLOCK_DIMENSION_6x6x6
+        /*!< Maximum supported blocks. */
+} ktx_pack_astc_block_dimension_e;
+
+/**
+ * @~English
+ * @brief Options specifying ASTC encoder profile mode
+ *        This and function is used later to derive the profile.
+ */
+typedef enum ktx_pack_astc_encoder_mode_e {
+    KTX_PACK_ASTC_ENCODER_MODE_DEFAULT,
+    KTX_PACK_ASTC_ENCODER_MODE_LDR,
+    KTX_PACK_ASTC_ENCODER_MODE_HDR,
+    KTX_PACK_ASTC_ENCODER_MODE_MAX = KTX_PACK_ASTC_ENCODER_MODE_HDR
+} ktx_pack_astc_encoder_mode_e;
+
 extern KTX_API const ktx_uint32_t KTX_ETC1S_DEFAULT_COMPRESSION_LEVEL;
+
+/**
+ * @memberof ktxTexture
+ * @~English
+ * @brief Structure for passing extended parameters to
+ *        ktxTexture_CompressAstc.
+ *
+ * Passing a struct initialized to 0 (e.g. " = {};") will use the default
+ * values. Only those settings to be modified need be non-zero.
+ */
+typedef struct ktxAstcParams {
+    ktx_uint32_t structSize;
+        /*!< Size of this struct. Used so library can tell which version
+             of struct is being passed.
+         */
+    ktx_bool_t verbose;
+        /*!< If true, prints Astc encoder operation details to
+             @c stdout. Not recommended for GUI apps.
+         */
+    ktx_uint32_t threadCount;
+        /*!< Number of threads used for compression. Default is 1. */
+
+    /* astcenc params */
+    ktx_uint32_t blockDimension;
+        /*!< Combinations of block dimensions that astcenc supports
+          i.e. 6x6, 8x8, 6x5 etc*/
+
+    ktx_uint32_t mode;
+        /*!< Can be {ldr/hdr} from astcenc*/
+
+    ktx_uint32_t qualityLevel;
+        /*!< astcenc supports -fastest, -fast, -medium, -thorough, -exhaustive*/
+
+    ktx_bool_t normalMap;
+        /*!< Tunes codec parameters for better quality on normal maps
+          In this mode normals are compressed to X,Y components
+          Discarding Z component, reader will need to generate Z
+          component in shaders.
+        */
+    char inputSwizzle[4];
+         /*!< A swizzle to provide as input to astcenc. It must match the regular
+             expression /^[rgba01]{4}$/.*/
+} ktxAstcParams;
+
+KTX_API KTX_error_code KTX_APIENTRY
+ktxTexture2_CompressAstcEx(ktxTexture2* This, ktxAstcParams* params);
+
+KTX_API KTX_error_code KTX_APIENTRY
+ktxTexture2_CompressAstc(ktxTexture2* This, ktx_uint32_t quality);
 
 /**
  * @memberof ktxTexture2
@@ -1022,13 +1280,23 @@ typedef struct ktxBasisParams {
              higher quality but less quality per output bit (try [1.0,3.0]).
              This will override the value chosen by @c qualityLevel.
          */
+    char inputSwizzle[4];
+         /*!< A swizzle to apply before encoding. It must match the regular
+             expression /^[rgba01]{4}$/. If both this and preSwizzle
+             are specified ktxTexture_CompressBasisEx will raise
+             KTX_INVALID_OPERATION. */
+
     ktx_bool_t normalMap;
         /*!< Tunes codec parameters for better quality on normal maps (no
              selector RDO, no endpoint RDO). Only valid for linear textures.
          */
     ktx_bool_t separateRGToRGB_A;
         /*!< Separates the input R and G channels to RGB and A (for tangent
-             space XY normal maps). Only valid for 2-component textures.
+             space XY normal maps). Equivalent to @c inputSwizzle "rrrg".
+             Separation is the default for 2 component textures. If both this
+             and inputSwizzle are set, the latter wins therefore set
+             @c inputSwizzle to change the default for 2 component
+             textures.
          */
     ktx_bool_t preSwizzle;
         /*!< If the texture has @c KTXswizzle metadata, apply it before
@@ -1495,4 +1763,3 @@ Initial release.
 */
 
 #endif /* KTX_H_A55A6F00956F42F3A137C11929827FE1 */
-

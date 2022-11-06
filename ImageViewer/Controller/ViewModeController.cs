@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -23,6 +23,7 @@ using SharpDX.Direct3D11;
 using Device = ImageFramework.DirectX.Device;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Point = System.Drawing.Point;
+using Size = System.Drawing.Size;
 using Texture3D = ImageFramework.DirectX.Texture3D;
 
 namespace ImageViewer.Controller
@@ -32,9 +33,10 @@ namespace ImageViewer.Controller
         private readonly ModelsEx models;
         private bool mouseDown = false;
         private bool mouse2Down = false; // middle mouse button
-        private Point mousePosition = new Point(0);
+        // mouse position in DPI coordinates (based on models.Window.ClientSize)
+        private Vector2 mousePosition = new Vector2(0.0f, 0.0f);
         // mouse position for displaying multiple views can be fixed
-        private Point? fixedMousePosition = null;
+        private Vector2? fixedMousePosition = null;
         private readonly Border dxHost;
         private ITextureView currentView = new EmptyView();
         private bool recomputeScheduled = false;
@@ -80,7 +82,7 @@ namespace ImageViewer.Controller
             recomputeScheduled = false;
 
             models.Display.TexelPosition = currentView.GetTexelPosition(
-                ConvertToCanonical(new Vector2(mousePosition.X, mousePosition.Y)));
+                ConvertToCanonical(mousePosition));
         }
 
         /// <summary>
@@ -95,11 +97,12 @@ namespace ImageViewer.Controller
 
             var visible = models.GetEnabledPipelines();
 
-            var scissorsPos = new Point(mousePosition.X, mousePosition.Y);
+            // mouse position needs to be converted from dpi aware pixels to actual screen pixels
+            var scissorsPos = ConvertFromDpiToPixels(mousePosition, size);
 
             if (visible.Count < 2) fixedMousePosition = null;
-            if(fixedMousePosition != null)
-                scissorsPos = new Point(fixedMousePosition.Value.X, fixedMousePosition.Value.Y);
+            if (fixedMousePosition.HasValue)
+                scissorsPos = ConvertFromDpiToPixels(fixedMousePosition.Value, size);
 
             if (visible.Count == 1)
             {
@@ -156,12 +159,12 @@ namespace ImageViewer.Controller
 
         private void DxHostOnMouseMove(object sender, MouseEventArgs e)
         {
-            var newPosition = new Point((int)e.GetPosition(dxHost).X, (int)e.GetPosition(dxHost).Y);
+            var newPosition = new Vector2((float)e.GetPosition(dxHost).X, (float)e.GetPosition(dxHost).Y);
 
             if (mouseDown || mouse2Down)
             {
                 // drag event
-                var diff = new Point(newPosition.X - mousePosition.X, newPosition.Y - mousePosition.Y);
+                var diff = newPosition - mousePosition;
                 if (Math.Abs(diff.X) > 0.01 || Math.Abs(diff.Y) > 0.01)
                 {
                     if(mouseDown)
@@ -196,7 +199,7 @@ namespace ImageViewer.Controller
                 e.Handled = true;
             }
                 
-            mousePosition = new Point((int)e.GetPosition(dxHost).X, (int)e.GetPosition(dxHost).Y);
+            mousePosition = new Vector2((float)e.GetPosition(dxHost).X, (float)e.GetPosition(dxHost).Y);
 
             if(models.Display.TexelPosition.HasValue)
                 models.Display.ActiveOverlay?.MouseClick(e.ChangedButton, false, models.Display.TexelPosition.Value);
@@ -217,7 +220,7 @@ namespace ImageViewer.Controller
             }
                 
 
-            mousePosition = new Point((int)e.GetPosition(dxHost).X, (int)e.GetPosition(dxHost).Y);
+            mousePosition = new Vector2((float)e.GetPosition(dxHost).X, (float)e.GetPosition(dxHost).Y);
 
             // toggle fixed mouse position
             if (e.ChangedButton == MouseButton.Left && e.ClickCount > 1)
@@ -243,11 +246,21 @@ namespace ImageViewer.Controller
             DispatchRecomputeTexelColor();
         }
 
+        // converts from [0, models.Window.ClientSize] to [-1, 1]
         private Vector2 ConvertToCanonical(Vector2 windowCoord)
         {
             return new Vector2(
                 (float)(windowCoord.X * 2.0 / models.Window.ClientSize.Width - 1.0),
                 (float)(windowCoord.Y * 2.0 / models.Window.ClientSize.Height - 1.0)
+            );
+        }
+
+        // converts from [0, models.Window.ClientSize] to [0, pixelSize]
+        private Point ConvertFromDpiToPixels(Vector2 dpiCoord, Size pixelSize)
+        {
+            return new Point(
+                (int)(dpiCoord.X * pixelSize.Width / models.Window.ClientSize.Width),
+                (int)(dpiCoord.Y * pixelSize.Height / models.Window.ClientSize.Height) 
             );
         }
 
@@ -263,6 +276,10 @@ namespace ImageViewer.Controller
                     if (models.Display.ExtendedViewData == null) return;
                     models.Display.ExtendedViewData.ForceTexelRecompute += (o, ev) => DispatchRecomputeTexelColor();
                     break;
+                case nameof(DisplayModel.ExtendedStatusbarData):
+                    if (models.Display.ExtendedStatusbarData == null) return;
+                    models.Display.ExtendedStatusbarData.ForceTexelRecompute += (o, ev) => DispatchRecomputeTexelColor();
+                    break;
                 case nameof(DisplayModel.ActiveView):
                     try
                     {
@@ -276,7 +293,7 @@ namespace ImageViewer.Controller
                                 else
                                     currentView = new SingleTextureView(models);
                                 break;
-                            case DisplayModel.ViewMode.Polar:
+                            case DisplayModel.ViewMode.Polar360:
                                 currentView = new PolarTextureView(models);
                                 break;
                             case DisplayModel.ViewMode.CubeMap:

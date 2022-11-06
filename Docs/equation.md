@@ -29,6 +29,7 @@ Most of the HLSL functions may be used as well:
 * **ceil**(value)
 * **clamp**(value, min, max)
 * **cos**(value)
+* **countbits**(value) - count bits of the integer representation: countbits(int(value))
 * **cross**(value1, value2)*
 * **distance**(value1, value2)*
 * **dot**(value1, value2)*

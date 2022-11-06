@@ -64,15 +64,9 @@ namespace ImageViewer
         {
             try
             {
-                var import = new ImportDialogController(models);
                 foreach (var arg in App.StartupArgs)
                 {
-                    if (arg.EndsWith(".icfg"))
-                    {
-                        var cfg = ViewerConfig.LoadFromFile(arg);
-                        await cfg.ApplyToModels(models);
-                    }
-                    else await import.ImportImageAsync(arg);
+                    await models.Import.ImportFileAsync(arg);
                 }
             }
             catch (Exception e)

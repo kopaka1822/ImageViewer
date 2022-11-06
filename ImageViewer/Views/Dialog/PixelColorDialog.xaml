@@ -26,6 +26,7 @@
             Width="80"
             HorizontalAlignment="Right"
             Margin="{StaticResource DefaultBorderTop}"
-            Click="OkOnClick"/>
+            Click="OkOnClick"
+            IsDefault="True"/>
     </StackPanel>
 </Window>

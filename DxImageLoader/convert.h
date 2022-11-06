@@ -73,4 +73,59 @@ namespace image
 			}
 		}
 	}
+
+	template<class T>
+	inline void expandRGBtoRGBA(T* data, size_t numPixels, T alphaValue)
+	{
+		T* curEnd = data + numPixels * 3;
+		T* actualEnd = data + numPixels * 4;
+		// move to last pixel
+		curEnd -= 3;
+		actualEnd -= 4;
+
+		while(curEnd >= data)
+		{
+			auto r = curEnd[0];
+			auto g = curEnd[1];
+			auto b = curEnd[2];
+			actualEnd[0] = r;
+			actualEnd[1] = g;
+			actualEnd[2] = b;
+			actualEnd[3] = alphaValue;
+
+			// move one pixel left
+			curEnd -= 3;
+			actualEnd -= 4;
+		}
+		assert(curEnd + 3 == data);
+		assert(actualEnd + 4 == data);
+	}
+
+	template<class T>
+	inline void expandBGRtoRGBA(T* data, size_t numPixels, T alphaValue)
+	{
+		T* curEnd = data + numPixels * 3;
+		T* actualEnd = data + numPixels * 4;
+		// move to last pixel
+		curEnd -= 3;
+		actualEnd -= 4;
+
+		while (curEnd >= data)
+		{
+			auto b = curEnd[0];
+			auto g = curEnd[1];
+			auto r = curEnd[2];
+			actualEnd[0] = r;
+			actualEnd[1] = g;
+			actualEnd[2] = b;
+			actualEnd[3] = alphaValue;
+
+			// move one pixel left
+			curEnd -= 3;
+			actualEnd -= 4;
+		}
+
+		assert(curEnd + 3 == data);
+		assert(actualEnd + 4 == data);
+	}
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.Model.Progress;
+using ImageFramework.Model.Scaling.AlphaTest;
 using ImageFramework.Model.Scaling.Down;
 using ImageFramework.Utility;
 
@@ -21,6 +22,10 @@ namespace ImageFramework.Model.Scaling
         private IDownscalingShader lanzosMinify = null;
         private IDownscalingShader detailPreservingMinify = null;
         private IDownscalingShader veryDetailPreservingMinify = null;
+
+        private IPostprocess alphaScale = null;
+        private IPostprocess alphaPyramid = null;
+        private IPostprocess alphaConnectivity = null;
 
         internal ScalingModel(Models models)
         {
@@ -40,6 +45,14 @@ namespace ImageFramework.Model.Scaling
             Lanczos,
             DetailPreserving, // Rapid, Detail-Preserving Image Downscaling 2016 with y = 0.5
             VeryDetailPreserving, // Rapid, Detail-Preserving Image Downscaling 2016 with y = 1.0
+        }
+
+        public enum AlphaTestPostprocess
+        {
+            None, // no postprocessing
+            AlphaScale, // Castano Alpha Scaling
+            AlphaPyramid, // Cem Yuksels Alpha Distribution
+            AlphaConnectivity // experimental
         }
 
         private MagnifyFilters magnify = MagnifyFilters.MitchellNetravali;
@@ -67,6 +80,19 @@ namespace ImageFramework.Model.Scaling
                 if (value == minify) return;
                 minify = value;
                 OnPropertyChanged(nameof(Minify));
+            }
+        }
+
+        private AlphaTestPostprocess alphaTestProcess = AlphaTestPostprocess.None;
+
+        public AlphaTestPostprocess AlphaTestProcess
+        {
+            get => alphaTestProcess;
+            set
+            {
+                if (value == alphaTestProcess) return;
+                alphaTestProcess = value;
+                OnPropertyChanged(nameof(AlphaTestProcess));
             }
         }
 
@@ -107,13 +133,37 @@ namespace ImageFramework.Model.Scaling
             }
 
             curProg.Progress = 1.0f;
+            int firstMip = 1; // first mip to copy is 1 (0 is identical)
+
+            if(hasAlpha)
+            {
+                progress.What = "Post Processing Alpha";
+                var postShader = GetAlphaPostprocess();
+                if(postShader != null)
+                {
+                    // copy over mipmap 0 as well (was skipped by the previous step)
+                    firstMip = 0; // set first mip to zero
+                    if (!ReferenceEquals(dstTex, tex))
+                    {
+                        for (int curLayer = 0; curLayer < tex.NumLayers; ++curLayer)
+                        {
+                            var lm = new LayerMipmapSlice(curLayer, 0);
+                            models.SharedModel.Convert.CopyLayer(tex, lm, dstTex, lm);
+                        }
+                    }
+                    postShader.Run(dstTex, hasAlpha, models.SharedModel.Upload, cache);
+
+                    //models.SharedModel.Sync.Set();
+                    //await models.SharedModel.Sync.WaitForGpuAsync(progress.Token);
+                }
+            }
 
             if (!tex.HasUaViews) // write back from dstTex to tex
             {
                 progress.What = "Finalizing Mipmaps";
                 for (int curLayer = 0; curLayer < tex.NumLayers; ++curLayer)
                 {
-                    for (int curMip = 1; curMip < tex.NumMipmaps; ++curMip)
+                    for (int curMip = firstMip; curMip < tex.NumMipmaps; ++curMip)
                     {
                         var lm = new LayerMipmapSlice(curLayer, curMip);
                         models.SharedModel.Convert.CopyLayer(dstTex, lm, tex, lm);
@@ -128,7 +178,7 @@ namespace ImageFramework.Model.Scaling
         public void WriteMipmaps(ITexture tex)
         {
             var cts = new CancellationTokenSource();
-            models.Progress.AddTask(Task.Run(async () => await WriteMipmapsAsync(tex, models.Progress.GetProgressInterface(cts.Token))), cts);
+            models.Progress.AddTask(Task.Run(async () => await WriteMipmapsAsync(tex, models.Progress.GetProgressInterface(cts.Token))), cts, false);
             models.Progress.WaitForTask();
             if (!String.IsNullOrEmpty(models.Progress.LastError))
                 throw new Exception(models.Progress.LastError);
@@ -155,6 +205,22 @@ namespace ImageFramework.Model.Scaling
             throw new Exception($"invalid minify filter specified: {minify}");
         }
 
+        private IPostprocess GetAlphaPostprocess()
+        {
+            switch(alphaTestProcess)
+            {
+                case AlphaTestPostprocess.None:
+                    return null;
+                case AlphaTestPostprocess.AlphaScale:
+                    return alphaScale ?? (alphaScale = new AlphaScalePostprocess(models.Stats));
+                case AlphaTestPostprocess.AlphaPyramid:
+                    return alphaPyramid ?? (alphaPyramid = new AlphaPyramidPostproces(models.Stats));
+                // TODO add other cases        
+            }
+
+            throw new Exception($"invalid alpha postprocess filter specified: {alphaTestProcess}");
+        }
+
         private ITextureCache GetMinifyTextureCache(ITexture src)
         {
             // determine which texture cache to use
@@ -179,6 +245,10 @@ namespace ImageFramework.Model.Scaling
             triangleMinify?.Dispose();
             lanzosMinify?.Dispose();
             detailPreservingMinify?.Dispose();
+
+            alphaScale?.Dispose();
+            alphaPyramid?.Dispose();
+            alphaConnectivity?.Dispose();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

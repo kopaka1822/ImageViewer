@@ -4,6 +4,7 @@ Requirements:
 - Windows x64
 - Visual Studio 2019 (with C++, C# and NuGet Package Manager)
 - .NET Framework 4.6.1
+- Git LFS: https://git-lfs.github.com/ (Some submodules need git-lfs to work properly when cloning)
 
 Instructions:
 

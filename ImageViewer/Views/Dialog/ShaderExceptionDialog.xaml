@@ -55,7 +55,8 @@
                 <Button 
                     Content="_Cancel"
                     Width="60"
-                    Click="Cancel_OnClick"/>
+                    Click="Cancel_OnClick"
+                    IsCancel="True"/>
             </StackPanel>
         </Grid>
 

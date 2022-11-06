@@ -166,6 +166,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\dependencies\compressonator\Compressonator\Header\Compressonator.h" />
+    <ClInclude Include="..\dependencies\hdr\rgbe.h" />
     <ClInclude Include="..\dependencies\stb_image.h" />
     <ClInclude Include="..\dependencies\stb_image_write.h" />
     <ClInclude Include="compress_interface.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="GliImage.h" />
     <ClInclude Include="gli_interface.h" />
+    <ClInclude Include="hdr_interface.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="interface.h" />
     <ClInclude Include="ktx_interface.h" />
@@ -183,6 +185,7 @@
     <ClInclude Include="pfm_interface.h" />
     <ClInclude Include="png_interface.h" />
     <ClInclude Include="stbi_interface.h" />
+    <ClInclude Include="threadsafe_unordered_map.h" />
     <ClInclude Include="VkFormat.h" />
   </ItemGroup>
   <ItemGroup>
@@ -191,6 +194,7 @@
     <ClCompile Include="exr_interface.cpp" />
     <ClCompile Include="GliImage.cpp" />
     <ClCompile Include="gli_interface.cpp" />
+    <ClCompile Include="hdr_interface.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="interface.cpp" />
     <ClCompile Include="ktx_interface.cpp" />
@@ -338,6 +342,149 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Docs\build.md" />
+    <CopyFileToFolders Include="..\Docs\getting_started.md">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\overlays.md">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help</DestinationFolders>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\Docs\img\compare.jpg">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\cube_level.jpg">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\einstein.gif">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\filter.jpg">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_compare.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_equations.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_import.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_ssim.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_ssim2.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_statistics.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\gs_videos.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\polar.jpg">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\polar2.jpg">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\transparent.jpg">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\volume_view.jpg">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\Docs\img\alpha_test_degen.PNG">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\alpha_test_equation.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="..\Docs\img\arrow_overlay.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\zoombox.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="..\Docs\img\zoombox_zoom.png">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\help\img</DestinationFolders>
+      <DestinationFolders Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\help\img</DestinationFolders>
     </CopyFileToFolders>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

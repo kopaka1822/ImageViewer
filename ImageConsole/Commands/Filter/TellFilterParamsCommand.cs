@@ -37,7 +37,7 @@ namespace ImageConsole.Commands.Filter
                         Console.Out.WriteLine(fp.GetBoolModel().Value);
                         break;
                     case ParameterType.Enum:
-                        Console.Out.Write(((EnumFilterParameterModel)fp).DisplayValue);
+                        Console.Out.WriteLine(((EnumFilterParameterModel)fp).DisplayValue);
                         break;
                 }
             }

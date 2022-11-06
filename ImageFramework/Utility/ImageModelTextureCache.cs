@@ -21,6 +21,7 @@ namespace ImageFramework.Utility
         private readonly Format format;
         private readonly bool createUav;
         private readonly bool createRtv;
+        private TextureArray2D[] staging2D;
 
         public ImageModelTextureCache(ImagesModel images, Format format = Format.R32G32B32A32_Float, bool createUav = true, bool createRtv = true)
         {
@@ -37,6 +38,26 @@ namespace ImageFramework.Utility
 
             // make new texture with the current configuration
             return images.CreateEmptyTexture(format, createUav, createRtv);
+        }
+
+        /// <summary>
+        /// creates a 2d srgb staging texture
+        /// </summary>
+        /// <param name="mipmap"></param>
+        /// <returns></returns>
+        public TextureArray2D Get2DSrgbStagingTexture(int mipmap)
+        {
+            Debug.Assert(mipmap < images.NumMipmaps);
+            if(staging2D == null)
+            {
+                staging2D = new TextureArray2D[images.NumMipmaps];
+            }
+            if(staging2D[mipmap] == null)
+            {
+                // create new staging texture
+                staging2D[mipmap] = new TextureArray2D(LayerMipmapCount.One, images.Size.GetMip(mipmap), Format.R8G8B8A8_UNorm_SRgb, false, true);
+            }
+            return staging2D[mipmap];
         }
 
         public void StoreTexture(ITexture tex)
@@ -67,6 +88,15 @@ namespace ImageFramework.Utility
                 tex.Dispose();
             }
             textures.Clear();
+            
+            if(staging2D != null)
+            {
+                foreach (var context in staging2D)
+                {
+                    context.Dispose();
+                }
+                staging2D = null;
+            }
         }
 
         private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs args)

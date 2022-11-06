@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageFramework.Model.Scaling;
 using ImageViewer.Models;
+using SharpDX.Direct3D11;
+using SharpDX.DXGI;
 
 namespace ImageViewer.ViewModels
 {
@@ -31,6 +33,12 @@ namespace ImageViewer.ViewModels
                     OnPropertyChanged(nameof(UseLanzosFilter));
                     OnPropertyChanged(nameof(UseDetailPreserving));
                     OnPropertyChanged(nameof(UseVeryDetailPreserving));
+                    break;
+                case nameof(ScalingModel.AlphaTestProcess):
+                    OnPropertyChanged(nameof(UseAlphaNone));
+                    OnPropertyChanged(nameof(UseAlphaScale));
+                    OnPropertyChanged(nameof(UseAlphaPyramid));
+                    OnPropertyChanged(nameof(UseAlphaConnectivity));
                     break;
             }
         }
@@ -68,6 +76,35 @@ namespace ImageViewer.ViewModels
         private void SetMinify(bool value, ScalingModel.MinifyFilters filter)
         {
             if (value) models.Scaling.Minify = filter;
+        }
+
+        public bool UseAlphaNone
+        {
+            get => models.Scaling.AlphaTestProcess == ScalingModel.AlphaTestPostprocess.None;
+            set => SetAlpha(value, ScalingModel.AlphaTestPostprocess.None);
+        }
+
+        public bool UseAlphaScale
+        {
+            get => models.Scaling.AlphaTestProcess == ScalingModel.AlphaTestPostprocess.AlphaScale;
+            set => SetAlpha(value, ScalingModel.AlphaTestPostprocess.AlphaScale);
+        }
+
+        public bool UseAlphaPyramid
+        {
+            get => models.Scaling.AlphaTestProcess == ScalingModel.AlphaTestPostprocess.AlphaPyramid;
+            set => SetAlpha(value, ScalingModel.AlphaTestPostprocess.AlphaPyramid);
+        }
+
+        public bool UseAlphaConnectivity
+        {
+            get => models.Scaling.AlphaTestProcess == ScalingModel.AlphaTestPostprocess.AlphaConnectivity;
+            set => SetAlpha(value, ScalingModel.AlphaTestPostprocess.AlphaConnectivity);
+        }
+
+        private void SetAlpha(bool value, ScalingModel.AlphaTestPostprocess mode)
+        {
+            if(value) models.Scaling.AlphaTestProcess = mode;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

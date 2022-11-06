@@ -185,7 +185,6 @@ namespace ImageFramework.Model
             {
                 // changes remain true
                 Console.WriteLine("ImagePipeline threw OperationCancelledException");
-                IsValid = false;
                 throw;
             }
         }

@@ -13,6 +13,7 @@ using ImageFramework.DirectX;
 using ImageFramework.DirectX.Query;
 using ImageFramework.Model;
 using ImageFramework.Utility;
+using ImageViewer.Controller.Overlays;
 using SharpDX;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
@@ -21,6 +22,9 @@ namespace ImageViewer.Models.Display
 {
     public interface IExtendedDisplayModel : IDisposable, INotifyPropertyChanged
     {
+        // return true if the key was handled by the overlay
+        bool OnKeyDown(System.Windows.Input.Key key);
+
         // forces the view mode controller to recompute the texel position
         event EventHandler ForceTexelRecompute;
     }
@@ -32,7 +36,7 @@ namespace ImageViewer.Models.Display
             Empty,
             Single,
             CubeMap,
-            Polar,
+            Polar360,
             CubeCrossView,
             Volume,
             ShearWarp
@@ -73,6 +77,8 @@ namespace ImageViewer.Models.Display
                 bool updateVisibleLayerMipmap = value.IsMultiLayerView() != activeView.IsMultiLayerView();
                 activeView = value;
                 extendedView?.Dispose();
+                extendedStatusbar?.Dispose();
+                // update extended view
                 if (activeView == ViewMode.Single && models.Images.ImageType == typeof(Texture3D))
                 {
                     extendedView = new Single3DDisplayModel(models, this);
@@ -85,8 +91,18 @@ namespace ImageViewer.Models.Display
                 {
                     extendedView = null;
                 }
+                // update extended statusbar
+                if(!activeView.IsMultiLayerView() && models.Images.ImageType == typeof(TextureArray2D) && models.Images.NumLayers > 1)
+                {
+                    extendedStatusbar = new MovieDisplayModel(models, this);
+                }
+                else
+                {
+                    extendedStatusbar = null;
+                }
                 OnPropertyChanged(nameof(ActiveView));
                 OnPropertyChanged(nameof(ExtendedViewData));
+                OnPropertyChanged(nameof(ExtendedStatusbarData));
                 if(updateVisibleLayerMipmap)
                     OnPropertyChanged(nameof(VisibleLayerMipmap));
             }
@@ -110,6 +126,10 @@ namespace ImageViewer.Models.Display
 
         private IExtendedDisplayModel extendedView = null;
         public IExtendedDisplayModel ExtendedViewData => extendedView;
+
+        private IExtendedDisplayModel extendedStatusbar = null;
+
+        public IExtendedDisplayModel ExtendedStatusbarData => extendedStatusbar;
 
         private static readonly float[] ZOOM_POINTS = { 0.01f, 0.02f, 0.05f, 0.1f, 0.25f, 0.33f, 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f, 4.0f, 8.0f, 16.0f, 32.0f, 64.0f, 128.0f };
         private float zoom = 1.0f;
@@ -443,9 +463,9 @@ namespace ImageViewer.Models.Display
                             modes.Insert(0, ViewMode.CubeMap);
                             modes.Insert(1, ViewMode.CubeCrossView);
                         }
-                        else if (models.Images.NumLayers == 1 && models.Images.ImageType == typeof(TextureArray2D))
+                        else if (models.Images.ImageType == typeof(TextureArray2D))
                         {
-                            modes.Add(ViewMode.Polar);
+                            modes.Add(ViewMode.Polar360);
                         }
                         else if(models.Images.ImageType == typeof(Texture3D))
                         {

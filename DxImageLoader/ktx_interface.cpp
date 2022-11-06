@@ -52,7 +52,7 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 		{
 			for(uint32_t level = 0; level < i.numLevels; ++level)
 			{
-				uint32_t byteSize;
+				size_t byteSize;
 				const uint8_t* data = image.getData(layer * i.numFaces + face, level, byteSize);
 				auto curDepth = image.getDepth(level);
 				
@@ -170,7 +170,7 @@ std::unique_ptr<image::IImage> ktx2_load(const char* filename)
 				//ktex2->vtbl->GetImageOffset(ktex, mip, srcLayer, srcFace, &offset);
 				auto ktxLvlSize = ktxTexture_GetImageSize(ktex, ktx_uint32_t(mip));
 				ktxLvlSize *= res->getDepth(mip); // is not multiplied with depth layer
-				uint32_t size;
+				size_t size;
 				auto dstData = res->getData(dstLayer, mip, size);
 				if(ktxLvlSize != size)
 					throw std::runtime_error("suggested level size of gli does not match with ktx api");

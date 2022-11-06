@@ -54,6 +54,22 @@ namespace ImageViewer.Commands.Export
             return models.Images.NumImages > 0 && models.NumEnabled > 0;
         }
 
+        public static float GetImageMultiplier(ModelsEx models)
+        {
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if (models.Display.Multiplier != 1.0f)
+            {
+                if (models.Window.ShowYesNoDialog(
+                        $"Color multiplier is currently set to {models.Display.MultiplierString}. Do you want to include the multiplier in the export?",
+                        "Keep Color Multiplier?"))
+                {
+                    return models.Display.Multiplier;
+                }
+            }
+
+            return 1.0f;
+        }
+
         public override async void Execute()
         {
             // make sure only one image is visible
@@ -68,17 +84,7 @@ namespace ImageViewer.Commands.Export
             var tex = models.Pipelines[id].Image;
             if (tex == null) return; // not yet computed?
 
-            float multiplier = 1.0f;
-            // ReSharper disable once CompareOfFloatsByEqualityOperator
-            if (models.Display.Multiplier != 1.0f)
-            {
-                if (models.Window.ShowYesNoDialog(
-                    $"Color multiplier is currently set to {models.Display.MultiplierString}. Do you want to include the multiplier in the export?",
-                    "Keep Color Multiplier?"))
-                {
-                    multiplier = models.Display.Multiplier;
-                }
-            }
+            float multiplier = GetImageMultiplier(models);
 
             if (path.InitFromEquations(models))
             {

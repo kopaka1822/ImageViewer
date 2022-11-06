@@ -18,6 +18,7 @@ namespace ImageFramework.Model.Statistics
         private StatisticsShader lumaShader;
         private StatisticsShader lightnessShader;
         private StatisticsShader alphaShader;
+        private StatisticsShader alphaCoverageShader;
         private ReduceShader minReduce;
         private ReduceShader maxReduce;
         private ReduceShader avgReduce;
@@ -35,8 +36,10 @@ namespace ImageFramework.Model.Statistics
         internal StatisticsShader LightnessShader => lightnessShader ?? (lightnessShader = new StatisticsShader(shared.Upload, StatisticsShader.LightnessValue));
         internal StatisticsShader AlphaShader => alphaShader ?? (alphaShader = new StatisticsShader(shared.Upload, StatisticsShader.AlphaValue));
 
-        internal ReduceShader MinReduce => minReduce ?? (minReduce = new ReduceShader(shared.Upload, "min(a,b)", float.MaxValue.ToString(CultureInfo.InvariantCulture)));
-        internal ReduceShader MaxReduce => maxReduce ?? (maxReduce = new ReduceShader(shared.Upload, "max(a,b)", float.MinValue.ToString(CultureInfo.InvariantCulture)));
+        internal StatisticsShader AlphaCoverageShader => alphaCoverageShader ?? (alphaCoverageShader = new StatisticsShader(shared.Upload, StatisticsShader.AlphaTestCoverage));
+
+        internal ReduceShader MinReduce => minReduce ?? (minReduce = new ReduceShader(shared.Upload, "min(a,b)", float.MaxValue.ToString(Models.Culture)));
+        internal ReduceShader MaxReduce => maxReduce ?? (maxReduce = new ReduceShader(shared.Upload, "max(a,b)", float.MinValue.ToString(Models.Culture)));
         internal ReduceShader AvgReduce => avgReduce ?? (avgReduce = new ReduceShader(shared.Upload, "a+b", "0.0"));
         //public bool HasAlpha => !(Min.Alpha == 1.0f && Max.Alpha == 1.0f);
 
@@ -90,6 +93,18 @@ namespace ImageFramework.Model.Statistics
             return new DefaultStatistics(this, texture, LayerMipmapRange.MostDetailed);
         }
 
+        public AlphaStatistics GetAlphaStatisticsFor(ITexture texture, float threshold, LayerMipmapRange lm)
+        {
+            // set user parameter for alpha coverage statistics
+            AlphaCoverageShader.UserParameter = threshold;
+
+            return new AlphaStatistics
+            {
+                Threshold = threshold,
+                Coverage = GetStats(texture, lm, AlphaCoverageShader, AvgReduce, true)
+            };
+        }
+
         public void Dispose()
         {
             buffer?.Dispose();
@@ -97,6 +112,8 @@ namespace ImageFramework.Model.Statistics
             uniformShader?.Dispose();
             lumaShader?.Dispose();
             lightnessShader?.Dispose();
+            alphaShader?.Dispose();
+            alphaCoverageShader?.Dispose();
             minReduce?.Dispose();
             maxReduce?.Dispose();
             avgReduce?.Dispose();

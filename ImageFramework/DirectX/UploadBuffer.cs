@@ -18,7 +18,10 @@ namespace ImageFramework.DirectX
         public readonly Buffer Handle;
         public int ByteSize { get; }
 
-        public UploadBuffer(int byteSize, BindFlags binding = BindFlags.ConstantBuffer)
+        /// <summary>
+        /// default constructor for non structured data
+        /// </summary>
+        public UploadBuffer(int byteSize, BindFlags binding = BindFlags.ConstantBuffer, ResourceOptionFlags resourceFlags = ResourceOptionFlags.None)
         {
             ByteSize = Utility.Utility.AlignTo(byteSize, 16);
 
@@ -26,9 +29,29 @@ namespace ImageFramework.DirectX
             {
                 BindFlags = binding,
                 CpuAccessFlags = CpuAccessFlags.None,
-                OptionFlags = ResourceOptionFlags.None,
+                OptionFlags = resourceFlags,
                 SizeInBytes = ByteSize,
                 StructureByteStride = 0,
+                Usage = ResourceUsage.Default
+            };
+
+            Handle = new Buffer(Device.Get().Handle, bufferDesc);
+        }
+
+        /// <summary>
+        /// specialized constructor for structured buffers
+        /// </summary>
+        public UploadBuffer(int byteSize, int structureByteSize, BindFlags binding = BindFlags.ShaderResource)
+        {
+            ByteSize = Utility.Utility.AlignTo(byteSize, 16);
+
+            var bufferDesc = new BufferDescription
+            {
+                BindFlags = binding,
+                CpuAccessFlags = CpuAccessFlags.None,
+                OptionFlags = ResourceOptionFlags.BufferStructured,
+                SizeInBytes = ByteSize,
+                StructureByteStride = structureByteSize,
                 Usage = ResourceUsage.Default
             };
 

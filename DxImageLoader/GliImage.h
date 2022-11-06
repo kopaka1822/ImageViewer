@@ -18,15 +18,15 @@ public:
 	uint32_t getDepth(uint32_t mipmap) const override final { return m_base.extent(mipmap).z; }
 	gli::format getFormat() const override final { return m_base.format(); }
 	gli::format getOriginalFormat() const override final { return m_original; }
-	uint8_t* getData(uint32_t layer, uint32_t mipmap, uint32_t& size) override final
+	uint8_t* getData(uint32_t layer, uint32_t mipmap, size_t& size) override final
 	{
-		size = uint32_t(m_base.size(mipmap));
+		size = m_base.size(mipmap);
 		auto gliface = layer % m_base.faces();
 		auto glilayer = layer / m_base.faces();
 
 		return reinterpret_cast<uint8_t*>(m_base.data(glilayer, gliface, mipmap));
 	}
-	const uint8_t* getData(uint32_t layer, uint32_t mipmap, uint32_t& size) const override final
+	const uint8_t* getData(uint32_t layer, uint32_t mipmap, size_t& size) const override final
 	{
 		return const_cast<GliImageBase*>(this)->getData(layer, mipmap, size);
 	}

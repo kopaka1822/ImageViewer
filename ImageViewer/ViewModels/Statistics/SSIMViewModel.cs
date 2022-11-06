@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
+using ImageFramework.Model.Statistics;
 using ImageFramework.Utility;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
@@ -21,13 +22,31 @@ namespace ImageViewer.ViewModels.Statistics
     {
         private readonly ModelsEx models;
         private readonly SSIMsViewModel parent;
+        private readonly StatisticsViewModel statisticsViewModel;
 
-        public SSIMViewModel(SSIMsViewModel parent, ModelsEx models, int id)
+        public SSIMViewModel(SSIMsViewModel parent, StatisticsViewModel statViewModel, ModelsEx models, int id)
         {
             this.parent = parent;
+            this.statisticsViewModel = statViewModel;
             this.models = models;
             this.models.Display.PropertyChanged += DisplayOnPropertyChanged;
+            statViewModel.PropertyChanged += ViewModelOnPropertyChanged;
             this.id = id;
+        }
+
+        // tab should be visible and ssim should be enabled
+        public bool UpdateSSIMValues => statisticsViewModel.IsVisible && statisticsViewModel.ShowSSIM;
+
+        private void ViewModelOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(StatisticsViewModel.IsVisible):
+                case nameof(StatisticsViewModel.ShowSSIM):
+                    // test if tab is visible and selected channel is correct
+                    RecalculateSSIM(false);
+                    break;
+            }
         }
 
         private void DisplayOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -35,7 +54,7 @@ namespace ImageViewer.ViewModels.Statistics
             switch (e.PropertyName)
             {
                 case nameof(DisplayModel.VisibleLayerMipmap):
-                    OnImagesChanged();
+                    RecalculateSSIM(false);
                     break;
             }
         }
@@ -82,7 +101,7 @@ namespace ImageViewer.ViewModels.Statistics
                 if (image1 == value) return;
                 image1 = value;
                 OnPropertyChanged(nameof(Image1));
-                OnImagesChanged();
+                RecalculateSSIM(true);
             }
         }
 
@@ -95,7 +114,7 @@ namespace ImageViewer.ViewModels.Statistics
                 if (image2 == value) return;
                 image2 = value;
                 OnPropertyChanged(nameof(Image2));
-                OnImagesChanged();
+                RecalculateSSIM(true);
             }
         }
 
@@ -106,7 +125,7 @@ namespace ImageViewer.ViewModels.Statistics
             image2 = FindMatchingItem(Image2);
             OnPropertyChanged(nameof(Image1));
             OnPropertyChanged(nameof(Image2));
-            OnImagesChanged();
+            RecalculateSSIM(true);
         }
 
         private SSIMsViewModel.ImageSourceItem FindMatchingItem(SSIMsViewModel.ImageSourceItem src)
@@ -123,8 +142,13 @@ namespace ImageViewer.ViewModels.Statistics
             return null;
         }
 
-        private void OnImagesChanged()
+        private readonly Dictionary<LayerMipmapRange, SSIMModel.Stats> cache = new Dictionary<LayerMipmapRange, SSIMModel.Stats>();
+
+        private void RecalculateSSIM(bool invalidateCache)
         {
+            if(invalidateCache)
+                cache.Clear();
+
             if (!IsValidImage(image1) || !IsValidImage(image2))
             {
                 // reset
@@ -132,14 +156,23 @@ namespace ImageViewer.ViewModels.Statistics
                 return;
             }
 
-            // calculate stats
-            var i1 = GetImage(image1);
-            var i2 = GetImage(image2);
+            // ignore updates if not visible
+            if (!UpdateSSIMValues) return;
 
-            Debug.Assert(i1 != null);
-            Debug.Assert(i2 != null);
+            // try to obtain cached entry
+            var lm = models.Display.VisibleLayerMipmap;
+            if (!cache.TryGetValue(lm, out var stats))
+            {
+                // calculate stats and insert into cache
+                var i1 = GetImage(image1);
+                var i2 = GetImage(image2);
 
-            var stats = models.SSIM.GetStats(i1, i2, models.Display.VisibleLayerMipmap, parent.Settings);
+                Debug.Assert(i1 != null);
+                Debug.Assert(i2 != null);
+
+                stats = models.SSIM.GetStats(i1, i2, lm, parent.Settings);
+                cache.Add(lm, stats);
+            }
 
             Luminance = stats.Luminance.ToString(ImageFramework.Model.Models.Culture);
             Structure = stats.Structure.ToString(ImageFramework.Model.Models.Culture);
@@ -231,13 +264,13 @@ namespace ImageViewer.ViewModels.Statistics
             bool recompute = (image1.IsEquation && image1.Id == pipeId) || (image2.IsEquation && image2.Id == pipeId);
             if (!recompute) return;
 
-            OnImagesChanged();
+            RecalculateSSIM(true);
         }
 
         public void OnSettingsChanged()
         {
             if (image1 == null || image2 == null) return;
-            OnImagesChanged();
+            RecalculateSSIM(true);
         }
     }
 }

@@ -49,11 +49,13 @@
                     Margin="{StaticResource DefaultBorderRight}" 
                     Width="60"
                     Click="Apply_OnClick"
+                    IsDefault="True"
                 />
                 <Button 
                     Content="_Cancel"
                     Width="60"
-                    Click="Cancel_OnClick"/>
+                    Click="Cancel_OnClick"
+                    IsCancel="True"/>
             </StackPanel>
         </StackPanel>
     </Border>

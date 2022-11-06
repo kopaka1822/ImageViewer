@@ -46,7 +46,7 @@ namespace ImageFramework.Model
             public bool IsFile => LastModified != null;
 
             /// <param name="image">valid texture</param>
-            /// <param name="isFile">indicates if the texture was loaded from a file</param>
+            /// <param name="isFile">indicates if the texture was loaded from a file (should be false when the image was somehow converted, since this is being used to determine if "overwrite" is a possible operation)</param>
             /// <param name="filename">original filename or proposed filename (when not directly imported)</param>
             /// <param name="alias">display name</param>
             /// <param name="originalFormat">original internal format</param>

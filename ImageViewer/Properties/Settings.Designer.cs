@@ -12,7 +12,7 @@ namespace ImageViewer.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.4.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.0.3.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -284,6 +284,78 @@ namespace ImageViewer.Properties {
             }
             set {
                 this["ExportZoomBoxScale"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("24")]
+        public float MovieFps {
+            get {
+                return ((float)(this["MovieFps"]));
+            }
+            set {
+                this["MovieFps"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool MovieRepeat {
+            get {
+                return ((bool)(this["MovieRepeat"]));
+            }
+            set {
+                this["MovieRepeat"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8")]
+        public int MoviePreset {
+            get {
+                return ((int)(this["MoviePreset"]));
+            }
+            set {
+                this["MoviePreset"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int MovieLastFrameCount {
+            get {
+                return ((int)(this["MovieLastFrameCount"]));
+            }
+            set {
+                this["MovieLastFrameCount"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int MovieLastFirstFrame {
+            get {
+                return ((int)(this["MovieLastFirstFrame"]));
+            }
+            set {
+                this["MovieLastFirstFrame"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-1")]
+        public int MovieLastLastFrame {
+            get {
+                return ((int)(this["MovieLastLastFrame"]));
+            }
+            set {
+                this["MovieLastLastFrame"] = value;
             }
         }
     }

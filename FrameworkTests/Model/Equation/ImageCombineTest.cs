@@ -101,6 +101,7 @@ namespace FrameworkTests.Model.Equation
             TestFormula("all(I0)");
             TestFormula("any(I0)");
             TestFormula("radians(I0)");
+            TestFormula("countbits(I0)");
         }
 
         [TestMethod]
@@ -274,6 +275,31 @@ namespace FrameworkTests.Model.Equation
             eq.Formula = "Red(normalize(0))";
             TestFor(models, float.NaN);
         }
+
+        [TestMethod]
+        public void CountbitsResults()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "pixel.png");
+            var eq = models.Pipelines[0].Alpha;
+
+            eq.Formula = "Red(countbits(RGB(0, 0, 0)))";
+            TestFor(models, 0.0f);
+
+            eq.Formula = "Red(countbits(RGB(1, 0, 0)))";
+            TestFor(models, 1.0f);
+
+            eq.Formula = "Red(countbits(RGB(2, 0, 0)))";
+            TestFor(models, 1.0f);
+
+            eq.Formula = "Red(countbits(RGB(3, 0, 0)))";
+            TestFor(models, 2.0f);
+
+            // interpret signed values as integers and cast to unsigned integer to count bits
+            eq.Formula = "Red(countbits(RGB(-1, 0, 0)))";
+            TestFor(models, 32.0f);
+        }
+
 
         // compares average alpha value with given value
         private static void TestFor(Models m, float value, float tolerance = 0.001f)

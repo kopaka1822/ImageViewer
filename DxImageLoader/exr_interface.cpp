@@ -20,7 +20,7 @@ std::unique_ptr<image::IImage> openexr_load(const char* filename)
 		width, height, 4 * 4
 	);
 
-	uint32_t imgSize;
+	size_t imgSize;
 	auto dst = res->getData(0, 0, imgSize);
 
 	memcpy(dst, out, imgSize);

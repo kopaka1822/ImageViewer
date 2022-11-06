@@ -50,7 +50,7 @@ namespace ImageViewer.Commands.Import
             return true;
         }
 
-        public override void Execute(int parameter)
+        public override async void Execute(int parameter)
         {
             var pipe = models.Pipelines[parameter];
 
@@ -64,7 +64,9 @@ namespace ImageViewer.Commands.Import
 
             models.Images.ReplaceImage(imgIdx, img, GliFormat.RGBA32_SFLOAT);
 
-            models.ApplyAsync();
+            await models.ApplyAsync();
+            if (!String.IsNullOrEmpty(models.Progress.LastError))
+                models.Window.ShowErrorDialog(models.Progress.LastError);
         }
     }
 }

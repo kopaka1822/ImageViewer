@@ -20,8 +20,8 @@ namespace image
 		virtual gli::format getFormat() const = 0;
 		// the original format of the file
 		virtual gli::format getOriginalFormat() const = 0;
-		virtual uint8_t* getData(uint32_t layer, uint32_t mipmap, uint32_t& size) = 0;
-		virtual const uint8_t* getData(uint32_t layer, uint32_t mipmap, uint32_t& size) const = 0;
+		virtual uint8_t* getData(uint32_t layer, uint32_t mipmap, size_t& size) = 0;
+		virtual const uint8_t* getData(uint32_t layer, uint32_t mipmap, size_t& size) const = 0;
 
 		// progress helper
 		static size_t calcNumPixels(uint32_t numLayer, uint32_t numLevels, uint32_t width, uint32_t height, uint32_t depth);
@@ -37,7 +37,7 @@ namespace image
 	class SimpleImage final : public IImage
 	{
 	public:
-		SimpleImage(gli::format originalFormat, gli::format internalFormat, int width, int height, int pixelByteSize);
+		SimpleImage(gli::format originalFormat, gli::format internalFormat, uint32_t width, uint32_t height, uint32_t pixelByteSize);
 
 		uint32_t getNumLayers() const override { return 1; }
 		uint32_t getNumMipmaps() const override { return 1; }
@@ -46,14 +46,14 @@ namespace image
 		uint32_t getDepth(uint32_t mipmap) const override { return 1; }
 		gli::format getFormat() const override { return m_format; }
 		gli::format getOriginalFormat() const override { return m_original; }
-		uint8_t* getData(uint32_t layer, uint32_t mipmap, uint32_t& size) override
+		uint8_t* getData(uint32_t layer, uint32_t mipmap, size_t& size) override
 		{
-			size = uint32_t(m_data.size());
+			size = m_data.size();
 			return m_data.data();
 		}
-		const uint8_t* getData(uint32_t layer, uint32_t mipmap, uint32_t& size) const override
+		const uint8_t* getData(uint32_t layer, uint32_t mipmap, size_t& size) const override
 		{
-			size = uint32_t(m_data.size());
+			size = m_data.size();
 			return m_data.data();
 		}
 

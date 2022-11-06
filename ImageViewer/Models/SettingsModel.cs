@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Annotations;
+using ImageFramework.Model.Export;
 using ImageFramework.Model.Shader;
 using ImageFramework.Model.Statistics;
 using ImageFramework.Utility;
@@ -63,6 +64,15 @@ namespace ImageViewer.Models
                     break;
                 case nameof(Properties.Settings.Default.AlphaBackground):
                     OnPropertyChanged(nameof(AlphaBackground));
+                    break;
+                case nameof(Properties.Settings.Default.MovieFps):
+                    OnPropertyChanged(nameof(MovieFps));
+                    break;
+                case nameof(Properties.Settings.Default.MovieRepeat):
+                    OnPropertyChanged(nameof(MovieRepeat));
+                    break;
+                case nameof(Properties.Settings.Default.MoviePreset):
+                    OnPropertyChanged(nameof(MoviePreset));
                     break;
             }
         }
@@ -147,6 +157,28 @@ namespace ImageViewer.Models
                 var clamp = Utility.Clamp(value, MinTexelDecimalPlaces, MaxTexelDecimalPlaces);
                 Properties.Settings.Default.TexelDecimalCount = clamp;
             }
+        }
+
+        public float MovieFps
+        {
+            get => Properties.Settings.Default.MovieFps;
+            set
+            {
+                var clamp = Utility.Clamp(value, 1, 300);
+                Properties.Settings.Default.MovieFps = clamp;
+            }
+        }
+
+        public bool MovieRepeat
+        {
+            get => Properties.Settings.Default.MovieRepeat;
+            set => Properties.Settings.Default.MovieRepeat = value;
+        }
+
+        public FFMpeg.Preset MoviePreset
+        {
+            get => (FFMpeg.Preset)Properties.Settings.Default.MoviePreset;
+            set => Properties.Settings.Default.MoviePreset = (int)value;
         }
 
         public enum AlphaType

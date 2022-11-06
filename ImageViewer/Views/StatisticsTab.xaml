@@ -96,6 +96,16 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
+                    <!--<Separator Margin="{StaticResource DefaultBorderBottom}"/>
+                    <Button
+                        Content="Recalculate"
+                        Width="90"
+                        HorizontalAlignment="Right"
+                        Command="{Binding Statistics.SSIM.RecalculateCommand}"
+                        ToolTip="Normally, this should happen automatically. However, on some machines it does not."/>-->
+
+
+
                 </StackPanel>
                 
                 <TextBlock 

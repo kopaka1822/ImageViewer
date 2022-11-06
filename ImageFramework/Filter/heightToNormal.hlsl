@@ -5,7 +5,7 @@
 #define OUTPUT_LDR_SRGB 0
 #define OUTPUT_LDR 1
 #define OUTPUT_SIGNED 2
-#param Strength, strength, float, 1.0, 0.1, 100.0
+#param Aspect Ratio of heightmap height to texture size (what is the maximum height of the height map in world space if the texture would span one world unit?), aspectRatio, float, 0.01, 0.001, 1000.0
 
 float3 fromSrgb(float3 c){
     float3 r;
@@ -31,10 +31,11 @@ float4 filter(int2 pixelCoord, int2 size)
 	float top = getPixel(pixelCoord + int2(0, 1), size);
 	float bottom = getPixel(pixelCoord + int2(0, -1), size);
 
-	float3 xVec = float3(2.0, 0.0, right - left);
-	float3 yVec = float3(0.0, 2.0, bottom - top);
+	float heightScale = size.x * aspectRatio;
+	float3 xVec = float3(2.0, 0.0, (right - left) * heightScale);
+	float3 yVec = float3(0.0, 2.0, (bottom - top) * heightScale);
 
-	float4 res = float4(normalize(cross(xVec, yVec) * float3(1, 1, 1.0 / strength)), 1.0);
+	float4 res = float4(normalize(cross(xVec, yVec)), 1.0);
 	if (output == OUTPUT_LDR_SRGB || output == OUTPUT_LDR) res.xyz = (res.xyz + 1.0) * 0.5;
 	if (output == OUTPUT_LDR_SRGB) res.xyz = fromSrgb(res.xyz);
 	return res;

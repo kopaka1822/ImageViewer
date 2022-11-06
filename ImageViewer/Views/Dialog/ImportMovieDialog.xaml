@@ -1,0 +1,159 @@
+﻿<Window x:Class="ImageViewer.Views.Dialog.ImportMovieDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:ImageViewer.Views.Dialog"
+        xmlns:clr="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="Import Video"
+        Width="400"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Icon="../../Icons/app.png"
+        Style="{StaticResource WindowStyle}">
+    <Window.Resources>
+        <GridLength x:Key="GridWidth">70</GridLength>
+        <clr:String x:Key="FrameSkipTooltip">Reduces the amount of frames by skipping X frames after each frame</clr:String>
+    </Window.Resources>
+    <Border Padding="5">
+        <StackPanel>
+            <!-- Filename -->
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock 
+                    Grid.Column="0" 
+                    Text="Filename:"/>
+                <TextBox 
+                    Grid.Column="1" 
+                    IsEnabled="False"
+                    Text="{Binding Filename}"/>
+            </Grid>
+
+            <!-- First Frame -->
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock 
+                    Grid.Column="0" 
+                    Text="First Frame:"/>
+                <xctk:IntegerUpDown
+                    Grid.Column="1"
+                    Width="80"
+                    HorizontalAlignment="Left"
+                    Value="{Binding FirstFrame}"
+                    Minimum="0"
+                    Maximum="{Binding MaxFrameIndex}"/>
+
+                <TextBlock 
+                    Grid.Column="2" 
+                    Text="Time:"/>
+                
+                <xctk:TimeSpanUpDown
+                    Grid.Column="3"
+                    FractionalSecondsDigitsCount="2"
+                    Value="{Binding FirstFrameTime}"
+                    Minimum="{Binding MinTime}"
+                    Maximum="{Binding MaxTime}"
+                    CultureInfo="{Binding Culture}"
+                    UpdateValueOnEnterKey="False"/>
+            </Grid>
+
+            <!-- Last Frame -->
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock 
+                    Grid.Column="0" 
+                    Text="Last Frame:"/>
+                <xctk:IntegerUpDown
+                    Grid.Column="1"
+                    Width="80"
+                    HorizontalAlignment="Left"
+                    Value="{Binding LastFrame}"
+                    Minimum="0"
+                    Maximum="{Binding MaxFrameIndex}"/>
+
+                <TextBlock 
+                    Grid.Column="2" 
+                    Text="Time:"/>
+
+                <xctk:TimeSpanUpDown
+                    Grid.Column="3"
+                    FractionalSecondsDigitsCount="2"
+                    Value="{Binding LastFrameTime}"
+                    Minimum="{Binding MinTime}"
+                    Maximum="{Binding MaxTime}"
+                    CultureInfo="{Binding Culture}"
+                    UpdateValueOnEnterKey="False"/>
+            </Grid>
+
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock 
+                    Grid.Column="0"
+                    Text="Frame skip:"
+                    ToolTip="{StaticResource FrameSkipTooltip}"/>
+
+                <xctk:IntegerUpDown
+                    Grid.Column="1"
+                    Width="80"
+                    HorizontalAlignment="Left"
+                    Value="{Binding FrameSkip}"
+                    Minimum="0"
+                    ToolTip="{StaticResource FrameSkipTooltip}"
+                />
+            </Grid>
+
+            <TextBlock TextWrapping="Wrap"
+                       Text="{Binding ExtraText, FallbackValue=Some Important Message}"
+                       Foreground="Red"/>
+
+            <TextBlock TextWrapping="Wrap"
+                       Text="{Binding FrameCountText}"/>
+
+            <Grid HorizontalAlignment="Right">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button 
+                    Content="_Import" 
+                    Margin="{StaticResource DefaultBorderRight}"
+                    Width="60"
+                    Click="ButtonExport_OnClick"
+                    IsEnabled="{Binding IsValid}"
+                    IsDefault="True"
+                />
+                <Button 
+                    Grid.Column="1" 
+                    Content="_Cancel" 
+                    Width="60"
+                    Click="ButtonCancel_OnClick"
+                    IsCancel="True"/>
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>
