@@ -39,6 +39,8 @@ namespace ImageViewer.ViewModels.Dialog
             this.filename = filename;
             this.is3D = is3D;
             this.usedFormat = ExportDescription.GetExportFormat(extension);
+            if(usedFormat == null)
+                throw new Exception("unsupported export format: " + extension);
             this.Crop = models.ExportConfig.GetViewModel(models);
             models.Display.IsExporting = true;
 

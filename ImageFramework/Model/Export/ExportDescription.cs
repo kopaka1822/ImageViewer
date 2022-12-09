@@ -257,9 +257,11 @@ namespace ImageFramework.Model.Export
         }
 
         private static List<ExportFormatModel> s_exportFormatModels;
+
+        // returns first matching export format or null if not found
         public static ExportFormatModel GetExportFormat(string extension)
         {
-            return Formats.First(f => f.Extension == extension);
+            return Formats.FirstOrDefault(f => f.Extension == extension);
         }
 
         public static IReadOnlyList<ExportFormatModel> Formats

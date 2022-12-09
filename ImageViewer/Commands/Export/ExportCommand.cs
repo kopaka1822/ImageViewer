@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using ImageFramework.ImageLoader;
@@ -113,7 +114,17 @@ namespace ImageViewer.Commands.Export
 
             path.UpdateFromFilename(sfd.FileName);
 
-            var viewModel = new ExportViewModel(models, path.Extension, exportFormat.Value, sfd.FileName, tex.Is3D, models.Statistics[id].Stats);
+            ExportViewModel viewModel;
+            try
+            {
+                 viewModel = new ExportViewModel(models, path.Extension, exportFormat.Value, sfd.FileName, tex.Is3D, models.Statistics[id].Stats);
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e);
+                return;
+            }
+
             var dia = new ExportDialog(viewModel);
 
             if (models.Window.ShowDialog(dia) != true) return;
