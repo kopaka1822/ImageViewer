@@ -116,13 +116,25 @@ namespace ImageViewer.Models
 
         public string ImagePath
         {
-            get => Properties.Settings.Default.ImagePath ?? "";
+            get
+            {
+                // check if directory exists
+                if (System.IO.Directory.Exists(Properties.Settings.Default.ImagePath))
+                    return Properties.Settings.Default.ImagePath;
+                return "";
+            }
             set => Properties.Settings.Default.ImagePath = value;
         }
 
         public string FilterPath
         {
-            get => Properties.Settings.Default.FilterPath ?? "";
+            get
+            {
+                // check if directory exists
+                if (System.IO.Directory.Exists(Properties.Settings.Default.FilterPath))
+                    return Properties.Settings.Default.FilterPath;
+                return "";
+            }
             set => Properties.Settings.Default.FilterPath = value;
         }
         public Statistics StatisticsChannel
