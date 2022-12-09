@@ -245,7 +245,7 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 			assertSingleLayerMip(*img);
 			png_write(*img, fullName.c_str(), gli::format(format), quality);
 		}
-		else if (ext == "jpg" || ext == "bmp")
+		else if (ext == "jpg" || ext == "bmp" || ext == "tga")
 		{
 			assertSingleLayerMip(*img);
 			if (img->getFormat() != gli::FORMAT_RGBA8_SRGB_PACK8 &&
@@ -272,6 +272,8 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 				stb_save_bmp(fullName.c_str(), width, height, nComponents, mip);
 			else if (ext == "jpg")
 				stb_save_jpg(fullName.c_str(), width, height, nComponents, mip, quality);
+			else if (ext == "tga")
+				stb_save_tga(fullName.c_str(), width, height, nComponents, mip);
 			else assert(false);
 		}
 		else throw std::runtime_error("file extension not supported");
@@ -297,6 +299,7 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 		s_exportFormats["png"] = png_get_export_formats();
 		s_exportFormats["bmp"] = stb_image_get_export_formats("bmp");
 		s_exportFormats["ktx2"] = ktx2_get_export_formats();
+		s_exportFormats["tga"] = stb_image_get_export_formats("tga");
 	}
 	auto it = s_exportFormats.find(extension);
 	if(it == s_exportFormats.end())

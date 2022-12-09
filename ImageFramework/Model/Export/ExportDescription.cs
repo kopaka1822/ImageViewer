@@ -279,6 +279,7 @@ namespace ImageFramework.Model.Export
                     formats.Add(new ExportFormatModel("dds"));
                     formats.Add(new ExportFormatModel("ktx"));
                     formats.Add(new ExportFormatModel("ktx2"));
+                    formats.Add(new ExportFormatModel("tga"));
                     s_exportFormatModels = formats;
                 }
 

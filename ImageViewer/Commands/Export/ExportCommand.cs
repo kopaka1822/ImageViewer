@@ -178,6 +178,7 @@ namespace ImageViewer.Commands.Export
             {"png", "PNG (*.png)|*.png" },
             {"bmp", "BMP (*.bmp)|*.bmp" },
             {"jpg", "JPEG (*.jpg)|*.jpg" },
+            {"tga", "TGA (*.tga)|*.tga"},
             {"hdr", "HDR (*.hdr)|*.hdr" },
             {"pfm", "Portable float map (*.pfm)|*.pfm" },
             {"ktx", "Khronos Texture (*.ktx)|*.ktx" },

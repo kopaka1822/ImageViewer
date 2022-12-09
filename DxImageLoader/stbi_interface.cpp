@@ -158,7 +158,7 @@ std::vector<uint32_t> stb_image_get_export_formats(const char* extension)
 	formats.push_back(gli::format::FORMAT_RGB8_SNORM_PACK8);
 
 	// RGBA8
-	if(ext == "png")
+	if(ext == "png" || ext == "tga")
 	{
 		formats.push_back(gli::format::FORMAT_RGBA8_SRGB_PACK8);
 		formats.push_back(gli::format::FORMAT_RGBA8_UNORM_PACK8);
@@ -221,6 +221,13 @@ void stb_save_jpg(const char* filename, int width, int height, int components, c
 	if (quality < 1 || quality > 100)
 		throw std::out_of_range("quality must be between 1 and 100");
 	auto res = stbi_write_jpg(filename, width, height, components, data, quality);
+	if (!res)
+		throw std::exception("could not save file");
+}
+
+void stb_save_tga(const char* filename, int width, int height, int components, const void* data)
+{
+	auto res = stbi_write_tga(filename, width, height, components, data);
 	if (!res)
 		throw std::exception("could not save file");
 }
