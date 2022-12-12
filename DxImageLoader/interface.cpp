@@ -14,6 +14,7 @@
 #include "ktx_interface.h"
 #include "png_interface.h"
 #include "hdr_interface.h"
+#include "numpy_interface.h"
 #include "threadsafe_unordered_map.h"
 
 static std::atomic<int> s_currentID = 1;
@@ -87,6 +88,10 @@ int image_open(const char* filename)
 		else if(hasEnding(fname, ".hdr"))
 		{
 			res = hdr_load(filename);
+		}
+		else if(hasEnding(fname, ".npy"))
+		{
+			res = numpy_load(filename);
 		}
 		else
 		{
