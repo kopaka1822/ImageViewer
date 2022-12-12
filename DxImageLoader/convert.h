@@ -128,7 +128,7 @@ namespace image
 	}
 
 	template<class T>
-	inline void expandRtoRGBA(T* data, size_t numPixels, T greenBlueValue, T alphaValue)
+	inline void expandRtoRGBA(T* data, size_t numPixels, T alphaValue)
 	{
 		T* curEnd = data + numPixels;
 		T* actualEnd = data + numPixels * 4;
@@ -140,8 +140,8 @@ namespace image
 		{
 			auto r = curEnd[0];
 			actualEnd[0] = r;
-			actualEnd[1] = greenBlueValue;
-			actualEnd[2] = greenBlueValue;
+			actualEnd[1] = r;
+			actualEnd[2] = r;
 			actualEnd[3] = alphaValue;
 
 			// move one pixel left

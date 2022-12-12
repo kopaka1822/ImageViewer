@@ -42,7 +42,7 @@ public:
 		{
 		case 1: // pad with 3 additional floats
 			m_data.resize(m_data.size() * 4);
-			image::expandRtoRGBA(m_data.data(), m_width * m_height * m_depth, 0.0f, 1.0f);
+			image::expandRtoRGBA(m_data.data(), m_width * m_height * m_depth, 1.0f);
 			break;
 		case 2:
 			m_data.resize(m_data.size() * 2);
