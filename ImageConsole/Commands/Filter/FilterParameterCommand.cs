@@ -28,7 +28,7 @@ namespace ImageConsole.Commands.Filter
                     switch (fp.GetParamterType())
                     {
                         case ParameterType.Float:
-                            fp.GetFloatModel().Value = reader.ReadInt("value");
+                            fp.GetFloatModel().Value = reader.ReadFloat("value");
                             break;
                         case ParameterType.Int:
                         case ParameterType.Enum:
