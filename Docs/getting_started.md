@@ -228,7 +228,7 @@ The quotation marks "" indicate the the command needs to be put into quotation m
 
 ### Batch Processing
 
-The following example converts all pfm files from the pictures directory to png files:
+The following Python script converts all pfm files from the pictures directory to png files:
 ```python
 import os
 ImageConsolePath = "C:/ImageViewer/ImageConsole.exe"
