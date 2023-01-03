@@ -19,17 +19,20 @@ public:
 		if (shape.empty())
 			throw std::exception("array shape is empty");
 
+		// reverse shape (width is always the last dimension, then height, depth...)
+		std::reverse(shape.begin(), shape.end());
+
 		// split shape information into width, height, layers and components (image format)
-		m_height = shape[0];
+		m_width = shape[0];
 		if (shape.size() > 1)
-			m_width = shape[1];
+			m_height = shape[1];
 		auto nComponents = 1;
 		if (shape.size() > 2)
 		{
 			// try to fit the remaining dimensions into the color format
 			if(shape[2] <= 4 && shape.size() == 3)
 			{
-				nComponents = shape[2];
+				nComponents = int(shape[2]);
 			}
 			else
 			{
@@ -78,6 +81,21 @@ public:
 	}
 
 private:
+	template<typename T>
+	static void fixEndian(T* data, size_t size, char dataEndian, char hostEndian)
+	{
+		if (dataEndian == no_endian_char) return; // nothing do do
+		if (dataEndian == hostEndian) return;
+		if (sizeof(T) == 1) return;
+
+		// reverse bit order
+		for (const auto end = data + size; data != end; ++data)
+		{
+			char* byteStart = reinterpret_cast<char*>(data);
+			std::reverse(byteStart, byteStart + sizeof(T));
+		}
+
+	}
     static std::vector <float> LoadArrayFromNumpyForceFloat(const char* filename, std::vector<unsigned long>& shape, gli::format& originalFormat)
     {
     	std::ifstream stream(filename, std::ifstream::binary);
@@ -112,12 +130,14 @@ private:
 			switch (header.dtype.itemsize)
 			{
 			case sizeof(float):
+				fixEndian(reinterpret_cast<float*>(tmpData.data()), size, header.dtype.byteorder, host_endian_char);
 				std::copy_n(reinterpret_cast<float*>(tmpData.data()), size, data.begin());
 				originalFormat = gli::format::FORMAT_R32_SFLOAT_PACK32;
 				break;
 			case sizeof(double):
 			// same as double
 			//case sizeof(long double):
+				fixEndian(reinterpret_cast<double*>(tmpData.data()), size, header.dtype.byteorder, host_endian_char);
 				std::copy_n(reinterpret_cast<double*>(tmpData.data()), size, data.begin());
 				originalFormat = gli::format::FORMAT_R64_SFLOAT_PACK64;
 				break;
@@ -133,14 +153,17 @@ private:
 				originalFormat = gli::format::FORMAT_R8_SINT_PACK8;
 				break;
 			case sizeof(short):
+				fixEndian(reinterpret_cast<short*>(tmpData.data()), size, header.dtype.byteorder, host_endian_char);
 				std::copy_n(reinterpret_cast<short*>(tmpData.data()), size, data.begin());
 				originalFormat = gli::format::FORMAT_R16_SINT_PACK16;
 				break;
 			case sizeof(int):
+				fixEndian(reinterpret_cast<int*>(tmpData.data()), size, header.dtype.byteorder, host_endian_char);
 				std::copy_n(reinterpret_cast<int*>(tmpData.data()), size, data.begin());
 				originalFormat = gli::format::FORMAT_R32_SINT_PACK32;
 				break;
 			case sizeof(long long):
+				fixEndian(reinterpret_cast<long long*>(tmpData.data()), size, header.dtype.byteorder, host_endian_char);
 				std::copy_n(reinterpret_cast<long long*>(tmpData.data()), size, data.begin());
 				originalFormat = gli::format::FORMAT_R64_SINT_PACK64;
 				break;
@@ -151,19 +174,22 @@ private:
 		case 'u': // unsigned integer kind
 			switch (header.dtype.itemsize)
 			{
-			case sizeof(unsigned char) :
+			case sizeof(unsigned char):
 				std::copy_n(reinterpret_cast<unsigned char*>(tmpData.data()), size, data.begin());
 				originalFormat = gli::format::FORMAT_R8_UINT_PACK8;
 				break;
-			case sizeof(unsigned short) :
+			case sizeof(unsigned short):
+				fixEndian(reinterpret_cast<unsigned short*>(tmpData.data()), size, header.dtype.byteorder, host_endian_char);
 				std::copy_n(reinterpret_cast<unsigned short*>(tmpData.data()), size, data.begin());
 				originalFormat = gli::format::FORMAT_R16_UINT_PACK16;
 				break;
-			case sizeof(unsigned int) :
+			case sizeof(unsigned int):
+				fixEndian(reinterpret_cast<unsigned int*>(tmpData.data()), size, header.dtype.byteorder, host_endian_char);
 				std::copy_n(reinterpret_cast<unsigned int*>(tmpData.data()), size, data.begin());
 				originalFormat = gli::format::FORMAT_R32_UINT_PACK32;
 				break;
-			case sizeof(unsigned long long) :
+			case sizeof(unsigned long long):
+				fixEndian(reinterpret_cast<unsigned long long*>(tmpData.data()), size, header.dtype.byteorder, host_endian_char);
 				std::copy_n(reinterpret_cast<unsigned long long*>(tmpData.data()), size, data.begin());
 				originalFormat = gli::format::FORMAT_R64_UINT_PACK64;
 				break;
@@ -177,18 +203,6 @@ private:
 			std::stringstream ss;
 			ss << "unsupported kind: " << header.dtype.kind;
 			throw std::runtime_error(ss.str());
-		}
-
-		// fix endianess ?
-		if(header.dtype.byteorder != host_endian_char && header.dtype.byteorder != no_endian_char)
-		{
-			auto swapBytes = [](float& fptr)
-			{
-				char* ptr = reinterpret_cast<char*>(&fptr);
-				std::swap(ptr[0], ptr[3]);
-				std::swap(ptr[1], ptr[2]);
-			};
-			std::for_each(data.begin(), data.end(), swapBytes);
 		}
 
 		return data;
