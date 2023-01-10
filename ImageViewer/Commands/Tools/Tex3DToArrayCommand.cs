@@ -69,8 +69,17 @@ namespace ImageViewer.Commands.Tools
 
             if (models.Window.ShowDialog(dia) != true) return;
 
-            var tex = models.ConvertTo2DArray((Texture3D) srcTex, vm.FreeAxis1, vm.FreeAxis2, vm.FirstSlice,
+            TextureArray2D tex = null;
+            try
+            {
+                tex = models.ConvertTo2DArray((Texture3D)srcTex, vm.FreeAxis1, vm.FreeAxis2, vm.FirstSlice,
                 vm.LastSlice - vm.FirstSlice + 1);
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e);
+                return;
+            }
 
             // clear all textures
             models.Reset();

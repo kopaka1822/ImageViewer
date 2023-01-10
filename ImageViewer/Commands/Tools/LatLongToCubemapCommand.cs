@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageViewer.Commands.Helper;
@@ -59,8 +60,17 @@ namespace ImageViewer.Commands.Tools
             };
             if (models.Window.ShowDialog(dia) != true) return;
 
-            var tex = models.ConvertToCubemap((TextureArray2D)srcTex, vm.Width);
-
+            TextureArray2D tex = null;
+            try
+            {
+                tex = models.ConvertToCubemap((TextureArray2D)srcTex, vm.Width);
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e);
+                return;
+            }
+            
             // clear all images
             models.Reset();
 

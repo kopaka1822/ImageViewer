@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using ImageFramework.Model;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
@@ -32,7 +33,14 @@ namespace ImageViewer.Commands.Tools
 
         public override void Execute()
         {
-            models.Images.GenerateMipmaps(models.Scaling);
+            try
+            {
+                models.Images.GenerateMipmaps(models.Scaling);
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e);
+            }
         }
     }
 }
