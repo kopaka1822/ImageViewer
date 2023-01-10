@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.ImageLoader;
 using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
@@ -43,7 +44,8 @@ namespace ImageFramework.Model.Shader
         {
             Debug.Assert(latlong.NumLayers == 1);
 
-            var dst = new TextureArray2D(new LayerMipmapCount(6, 1), new Size3(resolution, resolution), Format.R32G32B32A32_Float, false);
+            Debug.Assert(ImageFormat.IsSupported(latlong.Format));
+            var dst = new TextureArray2D(new LayerMipmapCount(6, 1), new Size3(resolution, resolution), latlong.Format, false);
 
             var dev = Device.Get();
             quad.Bind(false);
@@ -74,7 +76,8 @@ namespace ImageFramework.Model.Shader
         {
             Debug.Assert(cube.NumLayers == 6);
 
-            var dst = new TextureArray2D(LayerMipmapCount.One, new Size3(resolution, Math.Max(resolution / 2, 1)), Format.R32G32B32A32_Float, false);
+            Debug.Assert(ImageFormat.IsSupported(cube.Format));
+            var dst = new TextureArray2D(LayerMipmapCount.One, new Size3(resolution, Math.Max(resolution / 2, 1)), cube.Format, false);
 
             var dev = Device.Get();
             quad.Bind(false);
