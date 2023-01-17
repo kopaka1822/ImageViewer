@@ -8,6 +8,9 @@
 #include "convert.h"
 using namespace npy;
 
+// TODO make this a configurable setting
+static const bool NumpyIs3D = false;
+
 class NumpyImage final : public image::IImage
 {
 public:
@@ -23,22 +26,12 @@ public:
 		std::reverse(shape.begin(), shape.end());
 
 		// split shape information into width, height, layers and components (image format)
+		auto nComponents = 1; // for now nComponents is always 1
 		m_width = shape[0];
 		if (shape.size() > 1)
 			m_height = shape[1];
-		auto nComponents = 1;
 		if (shape.size() > 2)
-		{
-			// try to fit the remaining dimensions into the color format
-			if(shape[2] <= 4 && shape.size() == 3)
-			{
-				nComponents = int(shape[2]);
-			}
-			else
-			{
-				m_depth = calcRemainingDimensions(shape, 2);
-			}
-		}
+			m_depth = calcRemainingDimensions(shape, 2);
 		
 		// pad format to fit 4 components
 		switch (nComponents)
@@ -61,19 +54,28 @@ public:
 		}
 	}
 
-	uint32_t getNumLayers() const override { return 1; }
+	uint32_t getNumLayers() const override { return NumpyIs3D ? 1 : m_depth; }
 	uint32_t getNumMipmaps() const override { return 1; }
 	uint32_t getWidth(uint32_t mipmap) const override { return m_width; }
 	uint32_t getHeight(uint32_t mipmap) const override { return m_height; }
-	uint32_t getDepth(uint32_t mipmap) const override { return m_depth; }
+	uint32_t getDepth(uint32_t mipmap) const override { return NumpyIs3D ? m_depth : 1; }
 	gli::format getFormat() const override { return gli::FORMAT_RGBA32_SFLOAT_PACK32; }
 	gli::format getOriginalFormat() const override { return m_originalFormat; }
 	uint8_t* getData(uint32_t layer, uint32_t mipmap, size_t& size) override
 	{
-		assert(layer == 0);
-		assert(mipmap == 0);
-		size = m_data.size() * sizeof(float);
-		return reinterpret_cast<uint8_t*>(m_data.data());
+		if (NumpyIs3D)
+		{
+			assert(layer == 0);
+			assert(mipmap == 0);
+			size = m_data.size() * sizeof(float);
+			return reinterpret_cast<uint8_t*>(m_data.data());
+		}
+		else
+		{
+			assert(mipmap == 0);
+			size = m_data.size() * sizeof(float) / m_depth;
+			return reinterpret_cast<uint8_t*>(m_data.data()) + size * layer;
+		}
 	}
 	const uint8_t* getData(uint32_t layer, uint32_t mipmap, size_t& size) const override
 	{
@@ -231,7 +233,7 @@ private:
 	std::vector<float> m_data;
 	gli::format m_originalFormat = gli::format::FORMAT_UNDEFINED;
 	uint32_t m_width = 1;
-	uint32_t m_height = 0;
+	uint32_t m_height = 1;
 	uint32_t m_depth = 1;
 };
 
