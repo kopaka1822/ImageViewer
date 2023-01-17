@@ -112,6 +112,7 @@ namespace ImageFramework.Model.Shader
                     shared.Upload.SetData(new LayerLevelFilter
                     {
                         Layer = curLayer,
+                        Layers = image.NumLayers,
                         Level = curMipmap,
                         Iteration = iteration,
                         FilterX = iteration == 0?1:0,
@@ -186,7 +187,7 @@ cbuffer LayerLevelBuffer : register(b0) {{
     uint layer;
     uint level;
     int iteration; // current iteration
-    uint _padding_2;
+    uint layers;
     {filterDirectionVar}
 }};
 
