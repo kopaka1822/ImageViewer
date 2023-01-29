@@ -303,7 +303,7 @@
                 </MenuItem.ItemContainerStyle>
             </MenuItem>
 
-            <!--
+            
             
             <Separator/>
             
@@ -328,16 +328,14 @@
                     Header="Set Position"
                     IsEnabled="{Binding Display.Heatmap.IsEnabled}"
                     Command="{Binding Display.Heatmap.SetPositionCommand}"/>
-                <MenuItem
+                <!--<MenuItem
                     Header="Configure"
                     IsEnabled="{Binding Display.Heatmap.IsEnabled}"
-                    Command="{Binding Display.Heatmap.ConfigureCommand}"/>
+                    Command="{Binding Display.Heatmap.ConfigureCommand}"/>-->
             </MenuItem>
         </MenuItem>
-                
-            -->
-            </MenuItem>
-            <!-- END OVERLAYS -->
+
+        <!-- END OVERLAYS -->
 
         <MenuItem Header="Tools">
             <!-- Scaling + Padding -->

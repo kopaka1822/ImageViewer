@@ -1,8 +1,8 @@
 #setting title, Heatmap
-#setting description, Maps the red input channel to a color map. Values outside [Min Value, Max Value] are clamped.
+#setting description, Maps the red input channel to a color map. Values outside [Min Value, Max Value] are clamped. A screen overlay can be enabled via Overlays->Heatmap.
 #setting type, COLOR
 
-#param Type, type, enum {BlackRed; BlackBlueGreenRed}, BlackRed
+#param Type, type, enum {BlackRed; BlackBlueGreenRed}, BlackBlueGreenRed
 
 #param Min Value, minVal, float, 0.0
 #param Max Value, maxVal, float, 1.0

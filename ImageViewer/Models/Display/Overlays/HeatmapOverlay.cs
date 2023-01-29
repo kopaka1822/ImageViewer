@@ -1,62 +1,42 @@
-﻿using System;
+﻿using ImageFramework.DirectX;
+using ImageFramework.Model.Overlay;
+using ImageFramework.Model;
+using ImageFramework.Utility;
+using SharpDX.Direct3D11;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ImageFramework.DirectX;
-using ImageFramework.Utility;
-using SharpDX.Direct3D11;
 
-namespace ImageFramework.Model.Overlay
+namespace ImageViewer.Models.Display.Overlays
 {
     public class HeatmapOverlay : OverlayBase
     {
-        public enum Style
-        {
-            BlackRed,
-            //BlackRedYellowWhite,
-            BlackBlueGreenRed
-        }
+
 
         private readonly ImagesModel images;
+        private readonly HeatmapModel heatmap;
         private readonly UploadBuffer cbuffer;
         private UploadBuffer positionsBuffer;
         private VertexBufferBinding vertexBufferBinding;
         private HeatmapOverlayShader shader;
         private HeatmapOverlayShader Shader => shader ?? (shader = new HeatmapOverlayShader());
 
-        public HeatmapOverlay(Models models)
+        public HeatmapOverlay(ImageFramework.Model.Models models, HeatmapModel parent)
         {
             this.cbuffer = models.SharedModel.Upload;
             this.images = models.Images;
+            this.heatmap = parent;
+            this.heatmap.PropertyChanged += HeatmapOnPropertyChanged;
         }
 
-        public struct Heatmap
+        private void HeatmapOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            // top left
-            public Float2 Start;
-            // bottom right
-            public Float2 End;
-            // fill style
-            public Style Style;
-            // border size
-            public int Border;
-            // optional text values (may be null)
-            public string MinText;
-            public string MaxText;
-        }
-
-        private Heatmap heatmap = new Heatmap();
-
-        public Heatmap Data
-        {
-            get => heatmap;
-            set
-            {
-                heatmap = value;
-                OnHasChanged();
-            }
+            // TODO make more precise
+            OnHasChanged();
         }
 
         public override void Render(LayerMipmapSlice lm, Size3 size)
@@ -71,9 +51,10 @@ namespace ImageFramework.Model.Overlay
             Shader.Unbind();
         }
 
+        public override bool RequireD2D => false; // TODO enable d2d for text output 
         public override void RenderD2D(LayerMipmapSlice lm, Size3 size, Direct2D d2d)
         {
-            using (var ctx = d2d.Begin())
+            /*using (var ctx = d2d.Begin())
             {
                 ctx.Text(new Float2(0.0f, 0.0f), new Float2(1000.0f, 12.0f), 10.0f, new Color(1.0f, 1.0f, 1.0f, 1.0f), "hello world");
             }
@@ -82,7 +63,7 @@ namespace ImageFramework.Model.Overlay
             if (!String.IsNullOrEmpty(heatmap.MinText) || !String.IsNullOrEmpty(heatmap.MaxText))
             {
                 //using(var d2d = new Direct2D(texture))
-            }
+            }*/
         }
 
         private void UpdateData(int mipmap)
@@ -131,7 +112,6 @@ namespace ImageFramework.Model.Overlay
 
         public override bool HasWork => true;
 
-        // TODO only set to true when text output is active
-        public override bool RequireD2D => true;
+
     }
 }

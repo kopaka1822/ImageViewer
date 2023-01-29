@@ -1,29 +1,28 @@
-﻿using System;
+﻿using ImageFramework.DirectX;
+using ImageFramework.Utility;
+using SharpDX.Direct3D11;
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ImageFramework.DirectX;
-using ImageFramework.Utility;
-using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Device = ImageFramework.DirectX.Device;
 
-namespace ImageFramework.Model.Overlay
+namespace ImageViewer.Models.Display.Overlays
 {
     class HeatmapOverlayShader
     {
-        private readonly DirectX.Shader vertex;
-        private readonly DirectX.Shader pixel;
+        private readonly Shader vertex;
+        private readonly Shader pixel;
         private readonly InputLayout input;
 
         public HeatmapOverlayShader()
         {
-            vertex = new DirectX.Shader(DirectX.Shader.Type.Vertex, GetVertexSource(), "HeatmapOVerlayVertex", out var bytecode);
-            pixel = new DirectX.Shader(DirectX.Shader.Type.Pixel, GetPixelSource(), "HeatmapOverlayPixel");
+            vertex = new Shader(Shader.Type.Vertex, GetVertexSource(), "HeatmapOVerlayVertex", out var bytecode);
+            pixel = new Shader(Shader.Type.Pixel, GetPixelSource(), "HeatmapOverlayPixel");
 
-            var dev = DirectX.Device.Get();
+            var dev = Device.Get();
             input = new InputLayout(dev.Handle, bytecode, new InputElement[]
             {
                 new InputElement("POSITION", 0, Format.R32G32_Float, 0)
@@ -32,7 +31,7 @@ namespace ImageFramework.Model.Overlay
 
         public void Bind(VertexBufferBinding vertexBuffer)
         {
-            var dev = DirectX.Device.Get();
+            var dev = Device.Get();
             dev.Vertex.Set(vertex.Vertex);
             dev.Pixel.Set(pixel.Pixel);
             dev.InputAssembler.InputLayout = input;
@@ -47,14 +46,14 @@ namespace ImageFramework.Model.Overlay
             public int Style;
         }
 
-        public void Draw(HeatmapOverlay.Heatmap data, UploadBuffer upload, int mipmap, Size2 dim)
+        public void Draw(HeatmapModel data, UploadBuffer upload, int mipmap, Size2 dim)
         {
-            var dev = DirectX.Device.Get();
+            var dev = Device.Get();
             var ibox = new IntBox();
             ibox.Start = data.Start.ToPixels(dim);
             ibox.End = data.End.ToPixels(dim);
             ibox.Border = data.Border;
-            ibox.Style = (int) data.Style;
+            ibox.Style = (int)data.Style;
 
             upload.SetData(ibox);
             dev.Pixel.SetConstantBuffer(0, upload.Handle);
@@ -96,7 +95,20 @@ cbuffer BoxBuffer : register(b0)
     int style;
 }};
 
-{Utility.Utility.FromSrgbFunction() /*the heatmap scale should appear to be linear for humans => the shader outputs linear colors that will be converted to srgb. to prevent this we need to aplly the reverse transformation (fromSrgb)*/}
+{Utility.FromSrgbFunction() /*the heatmap scale should appear to be linear for humans => the shader outputs linear colors that will be converted to srgb. to prevent this we need to aplly the reverse transformation (fromSrgb)*/}
+
+float3 getColorBlackBlueGreenRed(float v)
+{{
+	if(v < 0.2)
+		return lerp(float3(0.0, 0.0, 0.0), float3(0.0, 0.0, 1.0), v * 5.0);
+	if(v < 0.4)
+		return lerp(float3(0.0, 0.0, 1.0), float3(0.0, 1.0, 1.0), (v - 0.2) * 5.0);
+	if(v < 0.6)
+		return lerp(float3(0.0, 1.0, 1.0), float3(0.0, 1.0, 0.0), (v - 0.4) * 5.0);
+	if(v < 0.8)
+		return lerp(float3(0.0, 1.0, 0.0), float3(1.0, 1.0, 0.0), (v - 0.6) * 5.0);
+	return lerp(float3(1.0, 1.0, 0.0), float3(1.0, 0.0, 0.0), (v - 0.8) * 5.0);
+}}
 
 float4 main(float4 pos : SV_POSITION) : SV_TARGET
 {{
@@ -118,11 +130,11 @@ float4 main(float4 pos : SV_POSITION) : SV_TARGET
     float4 color = float4(0.0, 0.0, 0.0, 1.0);
     switch(style)
     {{
-    case {(int)HeatmapOverlay.Style.BlackRed}:
+    case {(int)HeatmapModel.ColorStyle.BlackRed}:
         color.r = fromSrgb(v);
         break;
-    case {(int)HeatmapOverlay.Style.BlackBlueGreenRed}:
-
+    case {(int)HeatmapModel.ColorStyle.BlackBlueGreenRed}:
+        color.rgb = getColorBlackBlueGreenRed(v);
         break;
     }}
     

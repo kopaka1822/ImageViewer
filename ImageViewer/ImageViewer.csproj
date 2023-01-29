@@ -156,6 +156,8 @@
     <Compile Include="Models\Display\HeatmapModel.cs" />
     <Compile Include="Models\Display\IDisplayOverlay.cs" />
     <Compile Include="Models\Display\MovieDisplayModel.cs" />
+    <Compile Include="Models\Display\Overlays\HeatmapOverlay.cs" />
+    <Compile Include="Models\Display\Overlays\HeatmapOverlayShader.cs" />
     <Compile Include="Models\Display\RayCastingDisplayModel.cs" />
     <Compile Include="Models\Display\Single3DDisplayModel.cs" />
     <Compile Include="Models\ExportConfigModel.cs" />
@@ -648,5 +650,6 @@
   <ItemGroup>
     <Resource Include="Icons\temperature.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

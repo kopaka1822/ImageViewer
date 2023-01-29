@@ -19,7 +19,7 @@ namespace ImageViewer.Controller.Overlays
 
         private void HeatmapOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (models.Heatmap.Heatmap == null)
+            if (!models.Heatmap.IsEnabled)
             {
                 // heatmap was disabled => abort this overlay
                 Debug.Assert(ReferenceEquals(this, models.Display.ActiveOverlay));
@@ -30,15 +30,9 @@ namespace ImageViewer.Controller.Overlays
 
         protected override void OnFinished(Float2 start, Float2 end)
         {
-            if (models.Heatmap.Heatmap == null) return;
-
-            // obtain current setting
-            var hm = models.Heatmap.Heatmap.Value;
-
             // overwrite start and end
-            hm.Start = start;
-            hm.End = end;
-            models.Heatmap.Heatmap = hm;
+            models.Heatmap.Start = start;
+            models.Heatmap.End = end;
         }
 
         public override void Dispose()
