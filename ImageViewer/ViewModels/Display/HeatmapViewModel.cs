@@ -33,10 +33,22 @@ namespace ImageViewer.ViewModels.Display
             this.viewModels = viewModels;
 
             SetPositionCommand = new ActionCommand(SetPosition);
-            LoadFilterCommand = new ActionCommand(LoadFilter);
+            //LoadFilterCommand = new ActionCommand(LoadFilter);
 
             // listen to filters to synchronize filter with heatmap
             models.Filter.PropertyChanged += FiltersPropertyChanged;
+            models.Heatmap.PropertyChanged += HeatmapPropertyChanged;
+        }
+
+        private void HeatmapPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(HeatmapModel.IsEnabled):
+                    if (models.Heatmap.IsEnabled && curFilter == null)
+                        LoadFilter(); // load filter if it was not loaded yet
+                    break;
+            }
         }
 
         private void FiltersPropertyChanged(object sender, PropertyChangedEventArgs e)

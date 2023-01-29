@@ -65,7 +65,7 @@ namespace ImageViewer.Models.Display
             }
         }
 
-        private ColorStyle style = ColorStyle.BlackRed;
+        private ColorStyle style = ColorStyle.BlackBlueGreenRed;
         public ColorStyle Style
         {
             get => style;
