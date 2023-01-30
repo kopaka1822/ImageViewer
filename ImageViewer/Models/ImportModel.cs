@@ -53,8 +53,18 @@ namespace ImageViewer.Models
             var extension = file.Substring(file.LastIndexOf('.') + 1).ToLower();
             if (extension == "icfg")
             {
-                var cfg = ViewerConfig.LoadFromFile(file);
-                await cfg.ApplyToModels(models);
+                try
+                {
+                    var cfg = ViewerConfig.LoadFromFile(file);
+                    await cfg.ApplyToModels(models);
+
+                    models.Settings.AddRecentFile(file);
+                }
+                catch (Exception e)
+                {
+                    models.Window.ShowErrorDialog(e, "Could not load config");
+                }
+
             }
             /*else if (ExportDescription.Formats.FirstOrDefault(element => element.Extension == extension) != null)
             {
@@ -79,6 +89,8 @@ namespace ImageViewer.Models
                 var img = await IO.LoadImageTextureAsync(file, models.Progress);
 
                 ImportTexture(img.Texture, true, file, img.OriginalFormat, alias);
+
+                models.Settings.AddRecentFile(file);
             }
             catch (Exception e)
             {
@@ -180,6 +192,8 @@ namespace ImageViewer.Models
 
                 if (models.Settings.MovieFps != fps)
                     models.Window.ShowInfoDialog($"The FPS count of the imported video ({meta.FramesPerSecond}) does not match the existing FPS count ({models.Settings.MovieFps}). The previous FPS count will be kept.");
+
+                models.Settings.AddRecentFile(file);
             }
             catch (Exception e)
             {

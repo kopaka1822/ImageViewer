@@ -18,6 +18,8 @@ namespace ImageViewer.Models
 {
     public class SettingsModel : INotifyPropertyChanged
     {
+        private const int MAX_RECENT_ENTRIES = 15;
+
         public enum TexelDisplayMode
         {
             LinearDecimal,
@@ -81,6 +83,9 @@ namespace ImageViewer.Models
                     break;
                 case nameof(Properties.Settings.Default.MoviePreset):
                     OnPropertyChanged(nameof(MoviePreset));
+                    break;
+                case nameof(Properties.Settings.Default.RecentFiles):
+                    OnPropertyChanged(nameof(RecentFiles));
                     break;
             }
         }
@@ -300,6 +305,32 @@ namespace ImageViewer.Models
                 Properties.Settings.Default.ExportZoomBoxScale = value;
                 OnPropertyChanged(nameof(ExportZoomBoxScale));
             }
+        }
+
+        public System.Collections.Specialized.StringCollection RecentFiles
+        {
+            get
+            {
+                var res = Properties.Settings.Default.RecentFiles;
+                if (res == null) res = Properties.Settings.Default.RecentFiles = new System.Collections.Specialized.StringCollection();
+                return res;
+            }
+        }
+
+        public void AddRecentFile(string filename)
+        {
+            if (String.IsNullOrEmpty(filename)) return;
+            
+            var list = RecentFiles;
+            // remove filename if it already exists
+            list.Remove(filename);
+            list.Insert(0, filename);
+
+            // only keep MAX_RECENT_ENTRIES
+            while (list.Count > MAX_RECENT_ENTRIES)
+                list.RemoveAt(list.Count - 1);
+
+            OnPropertyChanged(nameof(RecentFiles));
         }
 
         public void Save()

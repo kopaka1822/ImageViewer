@@ -122,6 +122,8 @@
 
             <converter:BoolIntConverter x:Key="BoolIntConverter"/>
 
+            <converter:PathToFilenameConverter x:Key="PathToFilenameConverter"/>
+
             <!-- Borders etc. -->
 
             <system:Double x:Key="DefaultBorderValue">5</system:Double>

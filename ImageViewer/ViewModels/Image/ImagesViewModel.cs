@@ -1,11 +1,16 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Input;
 using GongSolutions.Wpf.DragDrop;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
+using ImageViewer.Commands.Helper;
 using ImageViewer.Controller;
 using ImageViewer.Models;
 using ImageViewer.Views.List;
@@ -20,8 +25,32 @@ namespace ImageViewer.ViewModels.Image
         {
             this.models = models;
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
+            models.Settings.PropertyChanged += SettingsOnPropertyChanged;
 
             versionString = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+
+            ImportRecentCommand = new ActionCommand<string>(ImportRecent);
+        }
+
+        public ICommand ImportRecentCommand { get; }
+
+        public async void ImportRecent(string filename)
+        {
+            if (filename == null) return;
+            
+            await models.Import.ImportFileAsync(filename);
+        }
+
+        public IReadOnlyCollection<string> RecentFiles => models.Settings.RecentFiles.Cast<string>().ToList();
+
+        private void SettingsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(SettingsModel.RecentFiles):
+                    OnPropertyChanged(nameof(RecentFiles));
+                    break;
+            }
         }
 
         private void ImagesOnPropertyChanged(object o, PropertyChangedEventArgs args)
