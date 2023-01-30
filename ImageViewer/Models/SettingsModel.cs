@@ -41,7 +41,15 @@ namespace ImageViewer.Models
             // required if assembly version changes
             if (Properties.Settings.Default.UpdateSettings)
             {
-                Properties.Settings.Default.Upgrade();
+                try
+                {
+                    Properties.Settings.Default.Upgrade();
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+
                 Properties.Settings.Default.UpdateSettings = false;
                 Save();
             }

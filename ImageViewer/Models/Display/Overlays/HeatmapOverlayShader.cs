@@ -97,6 +97,10 @@ cbuffer BoxBuffer : register(b0)
 
 {Utility.FromSrgbFunction() /*the heatmap scale should appear to be linear for humans => the shader outputs linear colors that will be converted to srgb. to prevent this we need to aplly the reverse transformation (fromSrgb)*/}
 
+float3 fromSrgb(float3 c){{
+	return float3(fromSrgb(c.x), fromSrgb(c.y), fromSrgb(c.z));
+}}
+
 float3 getColorBlackBlueGreenRed(float v)
 {{
 	if(v < 0.2)
@@ -109,6 +113,56 @@ float3 getColorBlackBlueGreenRed(float v)
 		return lerp(float3(0.0, 1.0, 0.0), float3(1.0, 1.0, 0.0), (v - 0.6) * 5.0);
 	return lerp(float3(1.0, 1.0, 0.0), float3(1.0, 0.0, 0.0), (v - 0.8) * 5.0);
 }}
+
+// color tables from: https://www.kennethmoreland.com/color-advice/
+static float4 inferno[] = {{
+    float4(0, 0, 0, 0.0),
+    float4(40, 11, 84, 0.14),
+    float4(101, 21, 110, 0.29),
+    float4(159, 42, 99, 0.43),
+    float4(212, 72, 66, 0.57),
+    float4(245, 125, 21, 0.71),
+    float4(250, 193, 39, 0.86),
+    float4(252, 255, 164, 1.0),
+}};
+
+static float4 coolWarm[] = {{
+    float4(59, 76, 192, 0.0),
+    float4(99, 125, 213, 0.142857143),
+    float4(149, 173, 227, 0.285714286),
+    float4(209, 220, 238, 0.428571429),
+	float4(242, 242, 242, 0.5),
+    float4(236, 215, 203, 0.571428571),
+    float4(222, 158, 134, 0.714285714),
+    float4(203, 99, 79, 0.857142857),
+    float4(180,4,38, 1.0),
+}};
+
+static float4 blackBody[] = {{
+    float4(0, 0, 0, 0),
+    float4(65, 23, 18, 0.142857143),
+    float4(128, 31, 27, 0.285714286),
+    float4(188, 51, 32, 0.428571429),
+    float4(224, 101, 10, 0.571428571),
+    float4(232, 161, 26, 0.714285714),
+    float4(231, 218, 48, 0.857142857),
+    float4(255, 255, 255, 1),
+}};
+
+#define COLOR_TABLE_FUNC(SIZE)                            \
+float3 getColorFromTable##SIZE(float v, float4 table[SIZE]) {{   \
+	float4 c1 = table[0]; float4 c2 = table[1];           \
+	[unroll] for(int i = 1; i < SIZE; i++) {{              \
+        c2 = table[i];                                    \
+		if(v < c2.w) break;                               \
+		c1 = c2;                                          \
+    }}                                                     \
+    float3 c = lerp(fromSrgb(c1.rgb/255.0), fromSrgb(c2.rgb/255.0), (v - c1.w) / max(c2.w - c1.w, 0.0001));	\
+	return c;                                             \
+}}
+
+COLOR_TABLE_FUNC(8)
+COLOR_TABLE_FUNC(9)
 
 float4 main(float4 pos : SV_POSITION) : SV_TARGET
 {{
@@ -130,11 +184,19 @@ float4 main(float4 pos : SV_POSITION) : SV_TARGET
     float4 color = float4(0.0, 0.0, 0.0, 1.0);
     switch(style)
     {{
-    case {(int)HeatmapModel.ColorStyle.BlackRed}:
+    case {(int)HeatmapModel.ColorStyle.Grayscale}:
         color.r = fromSrgb(v);
+        color.g = color.r;
+        color.b = color.r;  
         break;
-    case {(int)HeatmapModel.ColorStyle.BlackBlueGreenRed}:
-        color.rgb = getColorBlackBlueGreenRed(v);
+    case {(int)HeatmapModel.ColorStyle.Inferno}:
+        color.rgb = getColorFromTable8(v, inferno);
+        break;
+    case {(int)HeatmapModel.ColorStyle.CoolWarm}:
+        color.rgb = getColorFromTable9(v, coolWarm);
+        break;
+    case {(int)HeatmapModel.ColorStyle.BlackBody}:
+        color.rgb = getColorFromTable8(v, blackBody);
         break;
     }}
     

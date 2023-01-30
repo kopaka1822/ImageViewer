@@ -57,7 +57,7 @@ namespace ImageViewer.ViewModels.Display
             {
                 case nameof(FiltersModel.Filter):
                     UnregisterFilter();
-                    var newHeatmapFilter = models.Filter.Filter.FirstOrDefault(filter => filter.Name == "Heatmap");
+                    var newHeatmapFilter = models.Filter.Filter.LastOrDefault(filter => filter.Name == "Heatmap");
                     RegisterFilter(newHeatmapFilter);
                     break;
             }
@@ -79,7 +79,7 @@ namespace ImageViewer.ViewModels.Display
 
         private void RegisterFilter(FilterModel filter)
         {
-            Debug.Assert(filter != null);
+            if (filter == null) return;
             Debug.Assert(filter.Name == "Heatmap");
 
             // look for the relevant parameters

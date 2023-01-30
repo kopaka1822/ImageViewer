@@ -19,9 +19,10 @@ namespace ImageViewer.Models.Display
 
         public enum ColorStyle
         {
-            BlackRed,
-            //BlackRedYellowWhite,
-            BlackBlueGreenRed
+            Grayscale,
+            Inferno,
+            CoolWarm,
+            BlackBody,
         }
 
         public HeatmapModel(ImageFramework.Model.Models models)
@@ -65,7 +66,7 @@ namespace ImageViewer.Models.Display
             }
         }
 
-        private ColorStyle style = ColorStyle.BlackBlueGreenRed;
+        private ColorStyle style = ColorStyle.Inferno;
         public ColorStyle Style
         {
             get => style;
