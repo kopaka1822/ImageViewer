@@ -47,6 +47,7 @@ namespace ImageViewer.ViewModels.Display
                 case nameof(HeatmapModel.IsEnabled):
                     if (models.Heatmap.IsEnabled && curFilter == null)
                         LoadFilter(); // load filter if it was not loaded yet
+                    OnPropertyChanged(nameof(IsEnabled));
                     break;
             }
         }
@@ -79,7 +80,12 @@ namespace ImageViewer.ViewModels.Display
 
         private void RegisterFilter(FilterModel filter)
         {
-            if (filter == null) return;
+            if (filter == null)
+            {
+                // no filter found => disable heatmap
+                models.Heatmap.IsEnabled = false;
+                return;
+            }
             Debug.Assert(filter.Name == "Heatmap");
 
             // look for the relevant parameters
@@ -143,10 +149,6 @@ namespace ImageViewer.ViewModels.Display
         }
 
         public ICommand SetPositionCommand { get; }
-
-        public ICommand ConfigureCommand { get; }
-
-        public ICommand LoadFilterCommand { get; }
 
         public bool IsEnabled
         {
