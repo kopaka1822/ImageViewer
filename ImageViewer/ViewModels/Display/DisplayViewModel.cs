@@ -59,6 +59,18 @@ namespace ImageViewer.ViewModels.Display
             Heatmap = new HeatmapViewModel(models, viewModels);
 
             CreateViewModes();
+            UpdateChannelFilterFromPipeline(models.Pipelines[0]);
+            models.Pipelines[0].PropertyChanged += PipelineOnPropertyChanged; // for now only subscribe to the first pipeline
+        }
+
+        private void PipelineOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(ImagePipeline.ChannelFilter):
+                    UpdateChannelFilterFromPipeline((ImagePipeline)sender);
+                    break;
+            }
         }
 
         public HeatmapViewModel Heatmap { get; }
@@ -359,6 +371,40 @@ namespace ImageViewer.ViewModels.Display
             }
         };
 
+        public ObservableCollection<ListItemViewModel<ImagePipeline.ChannelFilters>> AvailableChannelFilter { get; } = new ObservableCollection<ListItemViewModel<ImagePipeline.ChannelFilters>>
+        {
+            new ListItemViewModel<ImagePipeline.ChannelFilters>
+            {
+                Name = "Red",
+                Cargo = ImagePipeline.ChannelFilters.Red
+            },
+            new ListItemViewModel<ImagePipeline.ChannelFilters>
+            {
+                Name = "Green",
+                Cargo = ImagePipeline.ChannelFilters.Green
+            },
+            new ListItemViewModel<ImagePipeline.ChannelFilters>
+            {
+                Name = "Blue",
+                Cargo = ImagePipeline.ChannelFilters.Blue
+            },
+            new ListItemViewModel<ImagePipeline.ChannelFilters>
+            {
+                Name = "Alpha",
+                Cargo = ImagePipeline.ChannelFilters.Alpha
+            },
+            new ListItemViewModel<ImagePipeline.ChannelFilters>
+            {
+                Name = "RGB",
+                Cargo = ImagePipeline.ChannelFilters.RGB
+            },
+            new ListItemViewModel<ImagePipeline.ChannelFilters>
+            {
+                Name = "RGBA",
+                Cargo = ImagePipeline.ChannelFilters.RGBA
+            }
+        };
+
         public ObservableCollection<ListItemViewModel<DisplayModel.ViewMode>> AvailableViewModes { get; } =
             new ObservableCollection<ListItemViewModel<DisplayModel.ViewMode>>();
 
@@ -414,6 +460,30 @@ namespace ImageViewer.ViewModels.Display
                 OnPropertyChanged(nameof(SelectedSplitMode));
                 models.Display.Split = value.Cargo;
             }
+        }
+
+        private ListItemViewModel<ImagePipeline.ChannelFilters> selectedChannelFilter;
+        public ListItemViewModel<ImagePipeline.ChannelFilters> SelectedChannelFilter
+        {
+            get => selectedChannelFilter;
+            set
+            {
+                if (value == null || selectedChannelFilter == value) return;
+                selectedChannelFilter = value;
+                
+                // change setting in pipeline
+                foreach (var pipe in models.Pipelines)
+                    pipe.ChannelFilter = value.Cargo;
+            }
+        }
+
+        private void UpdateChannelFilterFromPipeline(ImagePipeline pipe)
+        {
+            Debug.Assert(pipe != null);
+            if (selectedChannelFilter != null && selectedChannelFilter.Cargo == pipe.ChannelFilter)
+                return;
+
+            selectedChannelFilter = AvailableChannelFilter.FirstOrDefault(x => x.Cargo == pipe.ChannelFilter);
         }
 
         private ListItemViewModel<DisplayModel.ViewMode> selectedViewMode = EmptyViewMode;

@@ -21,6 +21,16 @@ namespace ImageFramework.Model
 {
     public class ImagePipeline : INotifyPropertyChanged, IDisposable
     {
+        public enum ChannelFilters
+        {
+            Red, // => rrr1
+            Green, // => ggg1
+            Blue, // => bbb1
+            Alpha, // => aaa1
+            RGB, // => rgb1
+            RGBA // => rgba (no filter)
+        }
+
         public ImagePipeline(int defaultImage)
         {
             Color = new FormulaModel(defaultImage);
@@ -42,6 +52,21 @@ namespace ImageFramework.Model
                 HasChanges = true;
             }
         }
+
+        private ChannelFilters channelFilter = ChannelFilters.RGBA;
+        public ChannelFilters ChannelFilter
+        {
+            get => channelFilter;
+            set
+            {
+                if (value == channelFilter) return;
+                channelFilter = value;
+                OnPropertyChanged(nameof(ChannelFilter));
+                HasChanges = true;
+            }
+        }
+
+        private bool RequireChannelFilter => ChannelFilter != ChannelFilters.RGBA;
 
         private bool recomputeMipmaps = false;
         /// <summary>
@@ -178,6 +203,11 @@ namespace ImageFramework.Model
                     await args.Models.Scaling.WriteMipmapsAsync(Image, progFilter.CreateSubProgress(1.0f));
                 }
 
+                if (RequireChannelFilter)
+                {
+                    ExecuteChannelFilter(args);
+                }
+
                 HasChanges = false;
                 OnPropertyChanged(nameof(Image));
             }
@@ -194,7 +224,9 @@ namespace ImageFramework.Model
             // early out if color and alpha are from an input image
             if (Color.Formula.Length == 2 && Color.Formula.StartsWith("I") && Alpha.Formula == Color.Formula // one of the input images
                 && (!UseFilter || args.Filters.Count == 0) // no filters used
-                && (!RecomputeMipmaps || args.Models.Images.NumMipmaps <= 1)) // no mipmap re computation
+                && (!RecomputeMipmaps || args.Models.Images.NumMipmaps <= 1) // no mipmap re computation
+                && !RequireChannelFilter // no channel filter required
+            ) 
             {
                 // just reference the input image
                 if (int.TryParse(Color.Formula.Substring(1), out var imgId))
@@ -224,6 +256,12 @@ namespace ImageFramework.Model
 
                 Image = texSrc;
             }
+        }
+
+        private void ExecuteChannelFilter(UpdateImageArgs args)
+        {
+            // overwrite Image via uav:
+            args.Models.SharedModel.ChannelFilter.Convert(Image, ChannelFilter, args.Models.SharedModel.Upload);
         }
 
         private async Task ExecuteFilter(UpdateImageArgs args, IProgress progress)

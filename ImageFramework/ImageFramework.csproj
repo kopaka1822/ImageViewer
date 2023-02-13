@@ -165,6 +165,7 @@
     <Compile Include="Model\Scaling\Down\TriangleScalingShader.cs" />
     <Compile Include="Model\Scaling\Down\IDownscalingShader.cs" />
     <Compile Include="Model\Scaling\ScalingModel.cs" />
+    <Compile Include="Model\Shader\ChannelFilterShader.cs" />
     <Compile Include="Model\Shader\ConvertPolarShader.cs" />
     <Compile Include="Model\Shader\ConvertTo3DShader.cs" />
     <Compile Include="Model\Shader\FilterShader.cs" />
