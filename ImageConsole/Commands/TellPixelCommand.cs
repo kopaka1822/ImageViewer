@@ -27,10 +27,10 @@ namespace ImageConsole.Commands
 
             model.Apply();
             var color = model.GetPixelValue(model.Pipelines[0].Image, new Size3(x, y, 0), new LayerMipmapSlice(layer, mipmap), radius);
-            Console.Out.WriteLine(color.ToDecimalString(true, 5));
+            Console.Out.WriteLine(color.ToDecimalString(false, true, 5));
             
             color = color.ToSrgb();
-            Console.Out.WriteLine(color.ToBitString(true));
+            Console.Out.WriteLine(color.ToBitString(false, true));
         }
     }
 }

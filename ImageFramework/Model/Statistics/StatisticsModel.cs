@@ -18,6 +18,7 @@ namespace ImageFramework.Model.Statistics
         private StatisticsShader lumaShader;
         private StatisticsShader lightnessShader;
         private StatisticsShader alphaShader;
+        private StatisticsShader grayscaleShader;
         private StatisticsShader alphaCoverageShader;
         private ReduceShader minReduce;
         private ReduceShader maxReduce;
@@ -35,6 +36,7 @@ namespace ImageFramework.Model.Statistics
         internal StatisticsShader LumaShader => lumaShader ?? (lumaShader = new StatisticsShader(shared.Upload, StatisticsShader.LumaValue));
         internal StatisticsShader LightnessShader => lightnessShader ?? (lightnessShader = new StatisticsShader(shared.Upload, StatisticsShader.LightnessValue));
         internal StatisticsShader AlphaShader => alphaShader ?? (alphaShader = new StatisticsShader(shared.Upload, StatisticsShader.AlphaValue));
+        internal StatisticsShader GrayscaleShader => grayscaleShader ?? (grayscaleShader = new StatisticsShader(shared.Upload, StatisticsShader.GrayscaleValue));
 
         internal StatisticsShader AlphaCoverageShader => alphaCoverageShader ?? (alphaCoverageShader = new StatisticsShader(shared.Upload, StatisticsShader.AlphaTestCoverage));
 

@@ -103,16 +103,20 @@ namespace ImageFramework.Utility
         /// <summary>
         /// convertes color into a decimal string representaion
         /// </summary>
+        /// <param name="isGray">indicates if only the red channel should be displayed (rgb if false)</param>
         /// <param name="showAlpha">indicates if the alpha component is included</param>
         /// <param name="decimalPlaces">presicion for the decimal number</param>
         /// <returns></returns>
-        public string ToDecimalString(bool showAlpha, int decimalPlaces)
+        public string ToDecimalString(bool isGray, bool showAlpha, int decimalPlaces)
         {
             var r = ScalarToString(Red, decimalPlaces);
             var g = ScalarToString(Green, decimalPlaces);
             var b = ScalarToString(Blue, decimalPlaces);
             var a = ScalarToString(Alpha, decimalPlaces);
-            return $"{r} {g} {b}" + (showAlpha ? $" {a}" : "");
+            var res = r;
+            if (!isGray) res += $" {g} {b}";
+            if (showAlpha) res += $" {a}";
+            return res;
         }
 
         /// <summary>
@@ -120,14 +124,28 @@ namespace ImageFramework.Utility
         /// </summary>
         /// <param name="showAlpha">indicates if the alpha component is included</param>
         /// <returns></returns>
-        public string ToBitString(bool showAlpha)
+        public string ToBitString(bool isGray, bool showAlpha)
         {
-            return $"{ScalarToByte(Red)} {ScalarToByte(Green)} {ScalarToByte(Blue)}" + (showAlpha ? $" {ScalarToByte(Alpha)}" : "");
+            var r = ScalarToByte(Red);
+            var g = ScalarToByte(Green);
+            var b = ScalarToByte(Blue);
+            var a = ScalarToByte(Alpha);
+            var res = r;
+            if (!isGray) res += $" {g} {b}";
+            if (showAlpha) res += $" {a}";
+            return res;
         }
 
-        public string ToFloatString(bool showAlpha, int decimalPlaces)
+        public string ToFloatString(bool isGray, bool showAlpha, int decimalPlaces)
         {
-            return $"{FloatToString(Red, decimalPlaces)} {FloatToString(Green, decimalPlaces)} {FloatToString(Blue, decimalPlaces)}" + (showAlpha ? $" {FloatToString(Alpha, decimalPlaces)}" : "");
+            var r = FloatToString(Red, decimalPlaces);
+            var g = FloatToString(Green, decimalPlaces);
+            var b = FloatToString(Blue, decimalPlaces);
+            var a = FloatToString(Alpha, decimalPlaces);
+            var res = r;
+            if (!isGray) res += $" {g} {b}";
+            if (showAlpha) res += $" {a}";
+            return res;
         }
 
         /// <summary>

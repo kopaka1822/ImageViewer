@@ -245,11 +245,11 @@ namespace ImageViewer.ViewModels
 
                 if (models.Settings.TexelDisplay == SettingsModel.TexelDisplayMode.SrgbDecimal ||
                     models.Settings.TexelDisplay == SettingsModel.TexelDisplayMode.LinearDecimal)
-                    res = c.ToDecimalString(statistics.Stats.HasAlpha, models.Settings.TexelDecimalPlaces);
+                    res = c.ToDecimalString(statistics.Stats.IsGrayscale, statistics.Stats.HasAlpha, models.Settings.TexelDecimalPlaces);
                 else if (models.Settings.TexelDisplay == SettingsModel.TexelDisplayMode.LinearFloat)
-                    res = c.ToFloatString(statistics.Stats.HasAlpha, models.Settings.TexelDecimalPlaces);
+                    res = c.ToFloatString(statistics.Stats.IsGrayscale, statistics.Stats.HasAlpha, models.Settings.TexelDecimalPlaces);
                 else // byte 
-                    res = c.ToBitString(statistics.Stats.HasAlpha);
+                    res = c.ToBitString(statistics.Stats.IsGrayscale, statistics.Stats.HasAlpha);
 
                 return $"E{imageId + 1}: " + res;
             }

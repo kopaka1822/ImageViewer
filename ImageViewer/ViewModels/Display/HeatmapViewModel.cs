@@ -66,12 +66,9 @@ namespace ImageViewer.ViewModels.Display
 
         // unregister current filter
         private void UnregisterFilter()
-        { ;
+        {
             if (unsubFilter == null)
-            {
-                Debug.Assert(unsubFilter == null);
                 return;
-            }
 
             unsubFilter();
             curFilter = null;
