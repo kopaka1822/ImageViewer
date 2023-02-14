@@ -167,7 +167,7 @@ namespace ImageFramework.Model.Statistics
             else if (hasAlpha == format.HasAlpha())
                 rating += alphaMatchWeight; // alpha state matching
 
-            if (isGrayscale && !format.IsGrayscale())
+            if (isGrayscale != format.IsGrayscale())
                 rating -= grayscaleMissWeight;
             else if (isGrayscale == format.IsGrayscale())
                 rating += grayscaleMatchWeight;
