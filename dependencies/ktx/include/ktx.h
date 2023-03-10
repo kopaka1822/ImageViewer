@@ -35,9 +35,15 @@
  */
 #if defined(KHRONOS_STATIC)
   #define KTX_API
-#elif defined(_WIN32)
+#elif defined(_WIN32) || defined(__CYGWIN__)
   #if !defined(KTX_API)
-    #define KTX_API __declspec(dllimport)
+    #if __GNUC__
+      #define KTX_API __attribute__ ((dllimport))
+    #elif _MSC_VER
+      #define KTX_API __declspec(dllimport)
+    #else
+      #error "Your compiler's equivalent of dllimport is unknown"
+    #endif
   #endif
 #elif defined(__ANDROID__)
   #define KTX_API __attribute__((visibility("default")))
@@ -326,7 +332,7 @@ typedef struct ktxTexture {
  * KTX_TRUE if mipmaps should be generated for the texture by
  * ktxTexture_GLUpload() or ktxTexture_VkUpload().
  */
-/**
+/**n
  * @typedef ktxTexture::baseWidth
  * @~English
  * @brief Width of the texture's base level.
@@ -700,9 +706,10 @@ typedef struct ktxTexture2 {
 /**
  * @memberof ktxTexture
  * @~English
- * @brief Structure for passing texture information to ktxTexture[12]_Create().
+ * @brief Structure for passing texture information to ktxTexture1_Create() and
+ *        ktxTexture2_Create().
  *
- * @sa ktxTexture_Create()
+ * @sa ktxTexture1_Create() and ktxTexture2_Create().
  */
 typedef struct
 {
@@ -736,7 +743,7 @@ typedef struct
  * @~English
  * @brief Enum for requesting, or not, allocation of storage for images.
  *
- * @sa ktxTexture_Create()
+ * @sa ktxTexture1_Create() and ktxTexture2_Create().
  */
 typedef enum {
     KTX_TEXTURE_CREATE_NO_STORAGE = 0,  /*!< Don't allocate any image storage. */
@@ -813,7 +820,7 @@ typedef KTX_error_code (*ktxStream_skip)(ktxStream* str,
 
 /**
  * @~English
- * @brief type for a pointer to a stream reading function
+ * @brief type for a pointer to a stream writing function
  */
 typedef KTX_error_code (*ktxStream_write)(ktxStream* str, const void *src,
                                           const ktx_size_t size,
@@ -854,27 +861,27 @@ typedef void (*ktxStream_destruct)(ktxStream* str);
  */
 struct ktxStream
 {
-    ktxStream_read read;   /*!< @internal pointer to function for reading bytes. */
-    ktxStream_skip skip;   /*!< @internal pointer to function for skipping bytes. */
-    ktxStream_write write; /*!< @internal pointer to function for writing bytes. */
-    ktxStream_getpos getpos; /*!< @internal pointer to function for getting current position in stream. */
-    ktxStream_setpos setpos; /*!< @internal pointer to function for setting current position in stream. */
-    ktxStream_getsize getsize; /*!< @internal pointer to function for querying size. */
-    ktxStream_destruct destruct; /*!< @internal destruct the stream. */
+    ktxStream_read read;   /*!< pointer to function for reading bytes. */
+    ktxStream_skip skip;   /*!< pointer to function for skipping bytes. */
+    ktxStream_write write; /*!< pointer to function for writing bytes. */
+    ktxStream_getpos getpos; /*!< pointer to function for getting current position in stream. */
+    ktxStream_setpos setpos; /*!< pointer to function for setting current position in stream. */
+    ktxStream_getsize getsize; /*!< pointer to function for querying size. */
+    ktxStream_destruct destruct; /*!< destruct the stream. */
 
     enum streamType type;
     union {
-        FILE* file;
-        ktxMem* mem;
+        FILE* file;        /**< a stdio FILE pointer for a ktxFileStream. */
+        ktxMem* mem;       /**< a pointer to a ktxMem struct for a ktxMemStream. */
         struct
         {
-            void* address;
-            void* allocatorAddress;
-            ktx_size_t size;
-        } custom_ptr;
-    } data;                /**< @internal pointer to the stream data. */
-    ktx_off_t readpos;     /**< @internal used by FileStream for stdin. */
-    ktx_bool_t closeOnDestruct; /**< @internal Close FILE* or dispose of memory on destruct. */
+            void* address;           /**< pointer to the data. */
+            void* allocatorAddress;  /**< pointer to a memory allocator. */
+            ktx_size_t size;         /**< size of the data. */
+        } custom_ptr;      /**< pointer to a struct for custom streams. */
+    } data;                /**< pointer to the stream data. */
+    ktx_off_t readpos;     /**< used by FileStream for stdin. */
+    ktx_bool_t closeOnDestruct; /**< Close FILE* or dispose of memory on destruct. */
 };
 
 /*
@@ -1166,41 +1173,57 @@ extern KTX_API const ktx_uint32_t KTX_ETC1S_DEFAULT_COMPRESSION_LEVEL;
  * @brief Structure for passing extended parameters to
  *        ktxTexture_CompressAstc.
  *
- * Passing a struct initialized to 0 (e.g. " = {};") will use the default
- * values. Only those settings to be modified need be non-zero.
+ * Passing a struct initialized to 0 (e.g. " = {0};") will use blockDimension
+ * 4x4, mode LDR and qualityLevel FASTEST. Setting qualityLevel to
+ * KTX_PACK_ASTC_QUALITY_LEVEL_MEDIUM is recommended.
  */
 typedef struct ktxAstcParams {
     ktx_uint32_t structSize;
         /*!< Size of this struct. Used so library can tell which version
              of struct is being passed.
          */
+
     ktx_bool_t verbose;
         /*!< If true, prints Astc encoder operation details to
              @c stdout. Not recommended for GUI apps.
          */
+
     ktx_uint32_t threadCount;
-        /*!< Number of threads used for compression. Default is 1. */
+        /*!< Number of threads used for compression. Default is 1.
+         */
 
     /* astcenc params */
     ktx_uint32_t blockDimension;
         /*!< Combinations of block dimensions that astcenc supports
-          i.e. 6x6, 8x8, 6x5 etc*/
+          i.e. 6x6, 8x8, 6x5 etc
+         */
 
     ktx_uint32_t mode;
-        /*!< Can be {ldr/hdr} from astcenc*/
+        /*!< Can be {ldr/hdr} from astcenc
+         */
 
     ktx_uint32_t qualityLevel;
-        /*!< astcenc supports -fastest, -fast, -medium, -thorough, -exhaustive*/
+        /*!< astcenc supports -fastest, -fast, -medium, -thorough, -exhaustive
+         */
 
     ktx_bool_t normalMap;
         /*!< Tunes codec parameters for better quality on normal maps
           In this mode normals are compressed to X,Y components
           Discarding Z component, reader will need to generate Z
           component in shaders.
-        */
+         */
+
+    ktx_bool_t perceptual;
+        /*!< The codec should optimize for perceptual error, instead of direct
+           RMS error. This aims to improves perceived image quality, but
+           typically lowers the measured PSNR score. Perceptual methods are
+           currently only available for normal maps and RGB color data.
+         */
+
     char inputSwizzle[4];
          /*!< A swizzle to provide as input to astcenc. It must match the regular
-             expression /^[rgba01]{4}$/.*/
+             expression /^[rgba01]{4}$/.
+          */
 } ktxAstcParams;
 
 KTX_API KTX_error_code KTX_APIENTRY
@@ -1213,10 +1236,19 @@ ktxTexture2_CompressAstc(ktxTexture2* This, ktx_uint32_t quality);
  * @memberof ktxTexture2
  * @~English
  * @brief Structure for passing extended parameters to
- *        ktxTexture2_CompressBasisEx.
+ *        ktxTexture2_CompressBasisEx().
  *
- * Passing a struct initialized to 0 (e.g. " = {};") will use the default
- * values. Only those settings to be modified need be non-zero.
+ * If you only want default values, use ktxTexture2_CompressBasis(). Here, at a minimum you
+ * must initialize the structure as follows:
+ * @code
+ *  ktxBasisParams params = {0};
+ *  params.structSize = sizeof(params);
+ *  params.compressionLevel = KTX_ETC1S_DEFAULT_COMPRESSION_LEVEL;
+ * @endcode
+ *
+ * @e compressionLevel has to be explicitly set because 0 is a valid @e compressionLevel
+ * but is not the default used by the BasisU encoder when no value is set. Only the other
+ * settings that are to be non-default must be non-zero.
  */
 typedef struct ktxBasisParams {
     ktx_uint32_t structSize;
@@ -1281,22 +1313,19 @@ typedef struct ktxBasisParams {
              This will override the value chosen by @c qualityLevel.
          */
     char inputSwizzle[4];
-         /*!< A swizzle to apply before encoding. It must match the regular
+        /*!< A swizzle to apply before encoding. It must match the regular
              expression /^[rgba01]{4}$/. If both this and preSwizzle
              are specified ktxTexture_CompressBasisEx will raise
-             KTX_INVALID_OPERATION. */
-
+             KTX_INVALID_OPERATION.
+         */
     ktx_bool_t normalMap;
         /*!< Tunes codec parameters for better quality on normal maps (no
-             selector RDO, no endpoint RDO). Only valid for linear textures.
+             selector RDO, no endpoint RDO) and sets the texture's DFD appropriately.
+             Only valid for linear textures.
          */
     ktx_bool_t separateRGToRGB_A;
-        /*!< Separates the input R and G channels to RGB and A (for tangent
-             space XY normal maps). Equivalent to @c inputSwizzle "rrrg".
-             Separation is the default for 2 component textures. If both this
-             and inputSwizzle are set, the latter wins therefore set
-             @c inputSwizzle to change the default for 2 component
-             textures.
+        /*!< @deprecated. This was and is a no-op. 2-component inputs have always been
+             automatically separated using an "rrrg" inputSwizzle. @sa inputSwizzle and normalMode.
          */
     ktx_bool_t preSwizzle;
         /*!< If the texture has @c KTXswizzle metadata, apply it before
@@ -1331,28 +1360,35 @@ typedef struct ktxBasisParams {
                 KTX_PACK_UASTC_LEVEL_VERYSLOW | 48.24dB
          */
     ktx_bool_t uastcRDO;
-        /*!< Enable Rate Distortion Optimization (RDO) post-processing. */
+        /*!< Enable Rate Distortion Optimization (RDO) post-processing.
+         */
     float uastcRDOQualityScalar;
         /*!< UASTC RDO quality scalar (lambda). Lower values yield higher
              quality/larger LZ compressed files, higher values yield lower
              quality/smaller LZ compressed files. A good range to try is [.2,4].
-             Full range is [.001,50.0]. Default is 1.0. */
+             Full range is [.001,50.0]. Default is 1.0.
+         */
     ktx_uint32_t uastcRDODictSize;
         /*!< UASTC RDO dictionary size in bytes. Default is 4096. Lower
-             values=faster, but give less compression. Range is [64,65536]. */
+             values=faster, but give less compression. Range is [64,65536].
+         */
     float uastcRDOMaxSmoothBlockErrorScale;
         /*!< UASTC RDO max smooth block error scale. Range is [1,300].
              Default is 10.0, 1.0 is disabled. Larger values suppress more
-             artifacts (and allocate more bits) on smooth blocks. */
+             artifacts (and allocate more bits) on smooth blocks.
+         */
     float uastcRDOMaxSmoothBlockStdDev;
         /*!< UASTC RDO max smooth block standard deviation. Range is
              [.01,65536.0]. Default is 18.0. Larger values expand the range of
-             blocks considered smooth. */
+             blocks considered smooth.
+         */
     ktx_bool_t uastcRDODontFavorSimplerModes;
-        /*!< Do not favor simpler UASTC modes in RDO mode. */
+        /*!< Do not favor simpler UASTC modes in RDO mode.
+         */
     ktx_bool_t uastcRDONoMultithreading;
         /*!< Disable RDO multithreading (slightly higher compression,
-             deterministic). */
+             deterministic).
+         */
 
 } ktxBasisParams;
 
@@ -1658,7 +1694,7 @@ KTX_API KTX_error_code KTX_APIENTRY ktxPrintInfoForMemory(const ktx_uint8_t* byt
 /**
  * @deprecated Will be dropped before V4 release.
  */
-#define ktxTexture_GetSize ktxTexture_getDatasize
+#define ktxTexture_GetSize ktxTexture_GetDatasize
 
 /**
 @~English
