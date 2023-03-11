@@ -373,3 +373,9 @@ void gli_save_image(const char* filename, GliImage& image, gli::format format, b
 	if (ktx) res->saveKtx(filename);
 	else res->saveDds(filename);
 }
+
+gli::format get_format_from_GL(uint32_t internalFormat, uint32_t externalFormat, uint32_t type)
+{
+	gli::gl GL(gli::gl::PROFILE_GL33);
+	return GL.find(gli::gl::internal_format(internalFormat), gli::gl::external_format(externalFormat), gli::gl::type_format(type));
+}

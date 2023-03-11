@@ -69,11 +69,11 @@ int image_open(const char* filename)
 		{
 			res = pfm_load(filename);
 		}
-		else if(hasEnding(fname, ".ktx2"))
+		else if(hasEnding(fname, ".ktx") || hasEnding(fname, ".ktx2"))
 		{
-			res = ktx2_load(filename);
+			res = ktx_load(filename);
 		}
-		else if (hasEnding(fname, ".dds") || hasEnding(fname, ".ktx"))
+		else if (hasEnding(fname, ".dds"))
 		{
 			res = gli_load(filename);
 		}

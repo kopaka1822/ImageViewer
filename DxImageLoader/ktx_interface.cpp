@@ -11,6 +11,7 @@
 
 #include "GliImage.h"
 #include "interface.h"
+#include "gli_interface.h"
 
 gli::format convertFormat(VkFormat format);
 VkFormat convertFormat(gli::format);
@@ -108,16 +109,69 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 	ktxTexture_Destroy(ktxTexture(ktex));
 }
 
-std::unique_ptr<image::IImage> ktx2_load(const char* filename)
+std::unique_ptr<image::IImage> ktx_load_base(ktxTexture* ktex, gli::format format, gli::format originalFormat)
 {
-	ktxTexture* ktex;
-	auto err = ktxTexture_CreateFromNamedFile(filename, KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktex);
-	if (err != KTX_SUCCESS)
-		throw std::runtime_error(std::string("failed to load file: ") + ktxErrorString(err));
+	// store data in gli storage to be able to convert it easily
+	auto res = std::make_unique<GliImage>(format, originalFormat,
+		ktex->numLayers, ktex->numFaces, ktex->numLevels,
+		ktex->baseWidth, ktex->baseHeight, ktex->baseDepth);
 
-	if (ktex->classId != ktxTexture2_c)
-		throw std::runtime_error("expected ktx2 texture but got ktx1 texture");
 
+	ktx_uint32_t dstLayer = 0;
+	for (ktx_uint32_t srcLayer = 0; srcLayer < ktex->numLayers; ++srcLayer)
+	{
+		for (ktx_uint32_t srcFace = 0; srcFace < ktex->numFaces; ++srcFace)
+		{
+			for (ktx_uint32_t mip = 0; mip < ktex->numLevels; ++mip)
+			{
+				ktx_size_t offset = 0;
+				ktxTexture_GetImageOffset(ktex, ktx_uint32_t(mip), ktx_uint32_t(srcLayer), ktx_uint32_t(srcFace), &offset);
+				//ktex2->vtbl->GetImageOffset(ktex, mip, srcLayer, srcFace, &offset);
+				auto ktxLvlSize = ktxTexture_GetImageSize(ktex, ktx_uint32_t(mip));
+				ktxLvlSize *= res->getDepth(mip); // is not multiplied with depth layer
+				size_t size;
+				auto dstData = res->getData(dstLayer, mip, size);
+				if (ktxLvlSize != size)
+					throw std::runtime_error("suggested level size of gli does not match with ktx api");
+				memcpy(dstData, ktex->pData + offset, size);
+
+			}
+			++dstLayer;
+		}
+	}
+
+	ktxTexture_Destroy(ktex);
+
+	if (!image::isSupported(res->getFormat()))
+	{
+		res = res->convert(image::getSupportedFormat(res->getFormat()), 100);
+	}
+
+	if (ktex->orientation.y == KTX_ORIENT_Y_UP)
+		res->flip();
+
+	return res;
+}
+
+std::unique_ptr<image::IImage> ktx1_load(ktxTexture* ktex)
+{
+	assert(ktex->classId == ktxTexture1_c);
+	ktxTexture1* ktex1 = reinterpret_cast<ktxTexture1*>(ktex);
+
+	gli::format format = gli::FORMAT_UNDEFINED;
+	gli::format originalFormat = format;
+	assert(!ktxTexture1_NeedsTranscoding(ktex1)); // currently set to return false 
+	format = originalFormat = get_format_from_GL(ktex1->glInternalformat, ktex1->glFormat, ktex1->glType);
+
+	if (format == gli::FORMAT_UNDEFINED)
+		throw std::runtime_error("could not interpret format id " + std::to_string(ktex1->glFormat));
+
+	return ktx_load_base(ktex, format, originalFormat);
+}
+
+std::unique_ptr<image::IImage> ktx2_load(ktxTexture* ktex)
+{
+	assert(ktex->classId == ktxTexture2_c);
 	ktxTexture2* ktex2 = reinterpret_cast<ktxTexture2*>(ktex);
 
 	gli::format format = gli::FORMAT_UNDEFINED;
@@ -127,7 +181,7 @@ std::unique_ptr<image::IImage> ktx2_load(const char* filename)
 		const auto compressionSheme = ktex2->supercompressionScheme;
 		auto numComponents = ktxTexture2_GetNumComponents(ktex2);
 		// do transcoding
-		err = ktxTexture2_TranscodeBasis(ktex2, KTX_TTF_RGBA32, 0);
+		auto err = ktxTexture2_TranscodeBasis(ktex2, KTX_TTF_RGBA32, 0);
 		if (err != KTX_SUCCESS)
 			throw std::runtime_error(std::string("failed to transcode file: ") + ktxErrorString(err));
 		// set format and (previous) original format
@@ -148,50 +202,24 @@ std::unique_ptr<image::IImage> ktx2_load(const char* filename)
 	if (format == gli::FORMAT_UNDEFINED)
 		throw std::runtime_error("could not interpret format id " + std::to_string(ktex2->vkFormat));
 
-	// store data in gli storage to be able to convert it easily
-	auto res = std::make_unique<GliImage>(format, originalFormat,
-	    ktex->numLayers, ktex->numFaces, ktex->numLevels, 
-		ktex->baseWidth, ktex->baseHeight, ktex->baseDepth);
+	return ktx_load_base(ktex, format, originalFormat);
+}
 
-	//auto ktxSize = ktxTexture_GetSize(ktex);
-	//assert(ktxSize == res->getSize());
-	//err = ktxTexture_LoadImageData(ktex, res->getData(), res->getSize());
-	//if (err != KTX_SUCCESS)
-	//	throw std::runtime_error(std::string("could not load image data: ") + ktxErrorString(err));
-	ktx_uint32_t dstLayer = 0;
-	for(ktx_uint32_t srcLayer = 0; srcLayer < ktex->numLayers; ++srcLayer)
+std::unique_ptr<image::IImage> ktx_load(const char* filename)
+{
+	ktxTexture* ktex;
+	auto err = ktxTexture_CreateFromNamedFile(filename, KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktex);
+	if (err != KTX_SUCCESS)
+		throw std::runtime_error(std::string("failed to load file: ") + ktxErrorString(err));
+
+	switch (ktex->classId)
 	{
-		for(ktx_uint32_t srcFace = 0; srcFace < ktex->numFaces; ++srcFace)
-		{
-			for(ktx_uint32_t mip = 0; mip < ktex->numLevels; ++mip)
-			{
-				ktx_size_t offset = 0;
-				ktxTexture_GetImageOffset(ktex, ktx_uint32_t(mip), ktx_uint32_t(srcLayer), ktx_uint32_t(srcFace), &offset);
-				//ktex2->vtbl->GetImageOffset(ktex, mip, srcLayer, srcFace, &offset);
-				auto ktxLvlSize = ktxTexture_GetImageSize(ktex, ktx_uint32_t(mip));
-				ktxLvlSize *= res->getDepth(mip); // is not multiplied with depth layer
-				size_t size;
-				auto dstData = res->getData(dstLayer, mip, size);
-				if(ktxLvlSize != size)
-					throw std::runtime_error("suggested level size of gli does not match with ktx api");
-				memcpy(dstData, ktex->pData + offset, size);
-				
-			}
-			++dstLayer;
-		}
+	case ktxTexture1_c:
+		return ktx1_load(ktex);
+	case ktxTexture2_c:
+		return ktx2_load(ktex);
 	}
-
-	ktxTexture_Destroy(ktex);
-
-	if (!image::isSupported(res->getFormat()))
-	{
-		res = res->convert(image::getSupportedFormat(res->getFormat()), 100);
-	}
-
-	if(ktex->orientation.y == KTX_ORIENT_Y_UP)
-		res->flip();
-	
-	return res;
+	throw std::runtime_error("expected ktx2 texture or ktx1 texture class but got unknown class");
 }
 
 gli::format convertFormat(VkFormat format)
