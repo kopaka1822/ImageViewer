@@ -210,7 +210,8 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 		if (ext == "dds")
 			gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*img), gli::format(format), false, quality);
 		else if (ext == "ktx")
-			gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*img), gli::format(format), true, quality);
+			//gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*img), gli::format(format), true, quality);
+			ktx1_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*img), gli::format(format), quality);
 		else if (ext == "ktx2")
 			ktx2_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*img), gli::format(format), quality);
 		else if(ext == "hdr")

@@ -379,3 +379,9 @@ gli::format get_format_from_GL(uint32_t internalFormat, uint32_t externalFormat,
 	gli::gl GL(gli::gl::PROFILE_GL33);
 	return GL.find(gli::gl::internal_format(internalFormat), gli::gl::external_format(externalFormat), gli::gl::type_format(type));
 }
+
+uint32_t get_gl_format(gli::format format)
+{
+	gli::gl GL(gli::gl::PROFILE_GL33);
+	return uint32_t(GL.translate(format, gli::swizzles()).Internal);
+}

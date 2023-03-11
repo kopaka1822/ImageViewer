@@ -16,6 +16,76 @@
 gli::format convertFormat(VkFormat format);
 VkFormat convertFormat(gli::format);
 
+void set_ktx_image_data(ktxTexture* ktex, GliImage& image)
+{
+	// set image data for all layers, faces and levels
+	for (uint32_t layer = 0; layer < image.getNumNonFaceLayers(); ++layer)
+	{
+		for (uint32_t face = 0; face < image.getNumFaces(); ++face)
+		{
+			for (uint32_t level = 0; level < image.getNumMipmaps(); ++level)
+			{
+				size_t byteSize;
+				const uint8_t* data = image.getData(layer * image.getNumFaces() + face, level, byteSize);
+				auto curDepth = image.getDepth(level);
+
+				if (curDepth == 1)
+				{
+					auto err = ktxTexture_SetImageFromMemory(ktex, level, layer, face, data, byteSize);
+					if (err != KTX_SUCCESS)
+						throw std::runtime_error(std::string("could not set image data: ") + ktxErrorString(err));
+				}
+				else // for multiple depth slices => split as if it has multiple faces
+				{
+					auto sliceSize = byteSize / curDepth;
+					for (uint32_t z = 0; z < curDepth; ++z)
+					{
+						auto err = ktxTexture_SetImageFromMemory(ktex, level, layer, z, data + z * sliceSize, sliceSize);
+						if (err != KTX_SUCCESS)
+							throw std::runtime_error(std::string("could not set image data: ") + ktxErrorString(err));
+					}
+				}
+			}
+		}
+	}
+}
+
+void ktx1_save_image(const char* filename, GliImage& image, gli::format format, int quality)
+{
+	// convert format if it does not match
+	if (image.getFormat() != format)
+	{
+		auto tmp = image.convert(format, quality);
+		ktx1_save_image(filename, *tmp, format, quality);
+		return;
+	}
+
+	ktxTexture1* ktex;
+	ktxTextureCreateInfo i;
+	i.glInternalformat = get_gl_format(format);
+	i.vkFormat = convertFormat(format);
+	i.baseWidth = image.getWidth(0);
+	i.baseHeight = image.getHeight(0);
+	i.baseDepth = image.getDepth(0);
+	if (i.baseDepth > 1) i.numDimensions = 3;
+	else if (i.baseHeight > 1 || quality < 100) i.numDimensions = 2;
+	else i.numDimensions = 1;
+	i.numLevels = image.getNumMipmaps();
+	i.numLayers = image.getNumNonFaceLayers();
+	i.numFaces = image.getNumFaces();
+	i.isArray = i.numLayers > 1;
+	i.generateMipmaps = false; // TODO let the user select
+
+	auto err = ktxTexture1_Create(&i, KTX_TEXTURE_CREATE_ALLOC_STORAGE, &ktex);
+	if (err != KTX_SUCCESS)
+		throw std::runtime_error(std::string("failed create ktx texture storage: ") + ktxErrorString(err));
+
+	set_ktx_image_data(ktxTexture(ktex), image);
+
+	ktxTexture_WriteToNamedFile(ktxTexture(ktex), filename);
+	ktxTexture_Destroy(ktxTexture(ktex));
+}
+
 void ktx2_save_image(const char* filename, GliImage& image, gli::format format, int quality)
 {
 	// convert format if it does not match
@@ -46,36 +116,7 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 	if(err != KTX_SUCCESS)
 		throw std::runtime_error(std::string("failed create ktx texture storage: ") + ktxErrorString(err));
 
-	// set image data for all layers, faces and levels
-	for(uint32_t layer = 0; layer < i.numLayers; ++layer)
-	{
-		for(uint32_t face = 0; face < i.numFaces; ++face)
-		{
-			for(uint32_t level = 0; level < i.numLevels; ++level)
-			{
-				size_t byteSize;
-				const uint8_t* data = image.getData(layer * i.numFaces + face, level, byteSize);
-				auto curDepth = image.getDepth(level);
-				
-				if(curDepth == 1)
-				{
-					err = ktxTexture_SetImageFromMemory(ktxTexture(ktex), level, layer, face, data, byteSize);
-					if (err != KTX_SUCCESS)
-						throw std::runtime_error(std::string("could not set image data: ") + ktxErrorString(err));
-				}
-				else // for multiple depth slices => split as if it has multiple faces
-				{
-					auto sliceSize = byteSize / curDepth;
-					for(uint32_t z = 0; z < curDepth; ++z)
-					{
-						err = ktxTexture_SetImageFromMemory(ktxTexture(ktex), level, layer, z, data + z * sliceSize, sliceSize);
-						if (err != KTX_SUCCESS)
-							throw std::runtime_error(std::string("could not set image data: ") + ktxErrorString(err));
-					}
-				}
-			}
-		}
-	}
+	set_ktx_image_data(ktxTexture(ktex), image);
 
 	// optionally compress (if it was not already compressed)
 	if(!is_compressed(format) && quality < 100)
