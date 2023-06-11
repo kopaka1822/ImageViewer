@@ -117,7 +117,8 @@ namespace ImageFramework.Model.Shader
                         Iteration = iteration,
                         FilterX = iteration == 0?1:0,
                         FilterY = iteration == 1?1:0,
-                        FilterZ = iteration == 2?1:0
+                        FilterZ = iteration == 2?1:0,
+                        TrueBool = true // hack to force detecting nans
                     });
 
                     dev.Compute.SetConstantBuffer(0, shared.Upload.Handle);
@@ -189,7 +190,21 @@ cbuffer LayerLevelBuffer : register(b0) {{
     int iteration; // current iteration
     uint layers;
     {filterDirectionVar}
+    bool trueBool; // will always be 1. Hack to force detecting nans
 }};
+
+bool isNan(float v) {{
+    float vi = v;
+    if(!trueBool) vi = 0.0; // true bool is always true, so this won't be executed
+
+    // little trick to detect nans because v[i] != v[i] will be optimized away.
+    return v != vi;
+}}
+bool2 isNan(float2 v) {{ return bool2(isNan(v.x), isNan(v.y)); }}
+bool3 isNan(float3 v) {{ return bool3(isNan(v.xy), isNan(v.z)); }}
+bool4 isNan(float4 v) {{ return bool4(isNan(v.xyz), isNan(v.w)); }}
+// overwrite hlsl isnan intrinsic because it is broken
+#define isnan(v) isNan(v)
 
 // texel helper function
 #if {builder.Is3DInt}

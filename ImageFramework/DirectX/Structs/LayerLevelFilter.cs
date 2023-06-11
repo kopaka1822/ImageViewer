@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SharpDX.Mathematics.Interop;
 
 namespace ImageFramework.DirectX.Structs
 {
@@ -16,5 +17,6 @@ namespace ImageFramework.DirectX.Structs
         public int FilterX;
         public int FilterY;
         public int FilterZ;
+        public RawBool TrueBool;
     }
 }
