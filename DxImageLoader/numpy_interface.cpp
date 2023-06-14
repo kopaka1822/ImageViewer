@@ -22,17 +22,25 @@ public:
 		if (shape.empty())
 			throw std::exception("array shape is empty");
 
+		auto nComponents = 1; // for now nComponents is always 1
+
+		// last dimension is usually the channel size. Try to use it as channel size if it is small enough (and texture is at least 2D)
+		if (shape.size() > 2 && shape.back() <= 4)
+		{
+			nComponents = shape.back();
+			shape.pop_back(); // remove from list
+		}
+
 		// reverse shape (width is always the last dimension, then height, depth...)
 		std::reverse(shape.begin(), shape.end());
-
+		
 		// split shape information into width, height, layers and components (image format)
-		auto nComponents = 1; // for now nComponents is always 1
 		m_width = shape[0];
 		if (shape.size() > 1)
 			m_height = shape[1];
 		if (shape.size() > 2)
 			m_depth = calcRemainingDimensions(shape, 2);
-		
+
 		// pad format to fit 4 components
 		switch (nComponents)
 		{
