@@ -176,6 +176,24 @@ namespace ImageViewer.ViewModels
 
         public void AddFilter(FilterModel filter)
         {
+            foreach(var texParam in filter.TextureParameters)
+            {
+                // try to match the texParam.Name with one of the existing textures
+                int bestFilterIndex = 0;
+                int bestFilterScore = Int32.MaxValue;
+                // iterate through all images
+                for (int i = 0; i < models.Images.NumImages; ++i)
+                {
+                    var score = GetDamerauLevenshteinDistance(texParam.Name, models.Images.GetImageAlias(i));
+                    if (score < bestFilterScore)
+                    {
+                        bestFilterScore = score;
+                        bestFilterIndex = i;
+                    }
+                }
+
+                texParam.Source = bestFilterIndex;
+            }
             var item = new FilterItem(this, filter, models.Images);
             items.Add(item);
             UpdateAvailableFilter();
@@ -384,6 +402,69 @@ namespace ImageViewer.ViewModels
             {
                 filterItem.Parameters.InvokeKey(key);
             }
+        }
+
+        // get the distance between two strings (smaller = more similar)
+        // runtime is s.Length * t.Length, but is capped to maxLen*maxLen
+        // from: https://stackoverflow.com/questions/6944056/compare-string-similarity
+        private static int GetDamerauLevenshteinDistance(string s, string t, int maxLen = 32)
+        {
+            if (string.IsNullOrEmpty(s))
+            {
+                return Int32.MaxValue;
+            }
+
+            if (string.IsNullOrEmpty(t))
+            {
+                return Int32.MaxValue;
+            }
+
+            int n = Math.Min(s.Length, maxLen); // length of s
+            int m = Math.Min(t.Length, maxLen); // length of t
+
+            if (n == 0)
+            {
+                return m;
+            }
+
+            if (m == 0)
+            {
+                return n;
+            }
+
+            int[] p = new int[n + 1]; //'previous' cost array, horizontally
+            int[] d = new int[n + 1]; // cost array, horizontally
+
+            // indexes into strings s and t
+            int i; // iterates through s
+            int j; // iterates through t
+
+            for (i = 0; i <= n; i++)
+            {
+                p[i] = i;
+            }
+
+            for (j = 1; j <= m; j++)
+            {
+                char tJ = t[j - 1]; // jth character of t
+                d[0] = j;
+
+                for (i = 1; i <= n; i++)
+                {
+                    int cost = s[i - 1] == tJ ? 0 : 1; // cost
+                    // minimum of cell to the left+1, to the top+1, diagonally left and up +cost                
+                    d[i] = Math.Min(Math.Min(d[i - 1] + 1, p[i] + 1), p[i - 1] + cost);
+                }
+
+                // copy current distance counts to 'previous row' distance counts
+                int[] dPlaceholder = p; //placeholder to assist in swapping p and d
+                p = d;
+                d = dPlaceholder;
+            }
+
+            // our last action in the above loop was to switch d and p, so p now 
+            // actually has the most recent cost counts
+            return p[n];
         }
     }
 }
