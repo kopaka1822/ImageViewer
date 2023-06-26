@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms.VisualStyles;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
+using ImageFramework.ImageLoader;
 using ImageFramework.Utility;
 using ImageViewer.Models;
 using SharpDX.Direct2D1;
@@ -26,13 +27,23 @@ namespace ImageViewer.ViewModels.Dialog
 
         private Size3? requiredSize;
 
+        public struct InitStatus
+        {
+            public bool IsCompatible; // true if the shape can be adjusted for import
+            public bool IsConfigurable; // false, if there is nothing left to configure (dialog is not required)
+        }
+
         public ImportNpyViewModel(ModelsEx models)
         {
             this.models = models;
         }
 
-        public bool Init(string filename, int[] shape)
+        public InitStatus Init(string filename, int[] shape)
         {
+            InitStatus status;
+            status.IsCompatible = true;
+            status.IsConfigurable = true;
+
             Filename = filename;
             this.shape = shape;
             // make comma separated string from shape
@@ -68,20 +79,29 @@ namespace ImageViewer.ViewModels.Dialog
 
                 // see if color channels can be used
                 var shapeRGBA = CalcShape(true);
-                var shapeGray = CalcShape(true);
+                var shapeGray = CalcShape(false);
                 var rgbaCompatible = IsShapeCompatible(requiredSize, shapeRGBA);
                 var grayCompatible = IsShapeCompatible(requiredSize, shapeGray);
 
-                if (!rgbaCompatible && !grayCompatible) return false;
+                if (!rgbaCompatible && !grayCompatible)
+                {
+                    status.IsCompatible = false;
+                    return status;
+                }
 
                 if(rgbaCompatible && grayCompatible)
                 {
                     UseRGBAEnabled = true;
+                    // it is configurable, since there is a choice
+                    status.IsConfigurable = true;
                 }
                 else
                 {
                     UseRGBAEnabled = false;
                     UseRGBA = rgbaCompatible;
+
+                    // test if at least the layers need to be configured
+                    status.IsConfigurable = CalcShape(UseRGBA).Z > requiredSize.Value.Z;
                 }
             }
 
@@ -89,7 +109,16 @@ namespace ImageViewer.ViewModels.Dialog
             SetMaxCompatibleLayer();
             UpdatePreviewText();
 
-            return true;
+            return status;
+        }
+
+        // applies settings to the image loader dll
+        public void ApplySettings()
+        {
+            IO.SetGlobalParameter("npy is3D", SelectedTextureType == SelectedTextureType3D ? 1 : 0);
+            IO.SetGlobalParameter("npy useChannel", UseRGBA ? 1 : 0);
+            IO.SetGlobalParameter("npy firstLayer", FirstLayer);
+            IO.SetGlobalParameter("npy lastLayer", LastLayer);
         }
 
         void UpdateLayerIndices()
@@ -211,6 +240,9 @@ Number of available {layer} slices: {MaxLayerIndex + 1}";
             if (warnings.Length > 0)
                 warnings += "This may prevent the creation of the texture resource!";
 
+            if (!IsValid && requiredSize.HasValue)
+                warnings += $"The Layer/Z count needs to match {requiredSize.Value.Z}! Current Value: {LastLayer - FirstLayer + 1}.";
+
             ExtraText = warnings;
             OnPropertyChanged(nameof(ExtraText));
         }
@@ -282,7 +314,7 @@ Number of available {layer} slices: {MaxLayerIndex + 1}";
         }
         public int MaxLayerIndex { get; set; } = 0;
 
-        public bool IsValid => IsShapeCorrect(requiredSize, CurrentShape);
+        public bool IsValid => IsShapeCorrect(requiredSize, CurrentShape) && LastLayer >= FirstLayer;
 
         public event PropertyChangedEventHandler PropertyChanged;
 

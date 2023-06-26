@@ -79,10 +79,11 @@
                 <TextBlock 
                     Grid.Column="0" 
                     Text="Texture Type:"
-                    IsEnabled="{Binding SelectedTextureTypeEnabled}"/>
+                    />
                 <ComboBox
                     Grid.Column="1"
-                    SelectedIndex="{Binding SelectedTextureType, FallbackValue=0}">
+                    SelectedIndex="{Binding SelectedTextureType, FallbackValue=0}"
+                    IsEnabled="{Binding SelectedTextureTypeEnabled}">
                     <ComboBoxItem>Texture2DArray</ComboBoxItem>
                     <ComboBoxItem>Texture3D</ComboBoxItem>
                 </ComboBox>

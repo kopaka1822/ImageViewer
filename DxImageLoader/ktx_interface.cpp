@@ -87,11 +87,11 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 		params.qualityLevel = std::max((quality * 254) / 99 + 1, 1); // scale quality [0, 99] between [1, 255]
 		params.normalMap = KTX_FALSE;
 		if (!gli::is_srgb(format)) // only valid for linear textures
-	        params.normalMap = get_global_parameter_i("normalmap") ? KTX_TRUE : KTX_FALSE;
+	        params.normalMap = get_global_parameter_i("normalmap", 0) ? KTX_TRUE : KTX_FALSE;
 
 	    // select uastc for everything that is not color (here: for everyhing that is not SRGB)
 		// unless the "uastc srgb" flag is set => then use usastc as well
-		if(!gli::is_srgb(format) || get_global_parameter_i("uastc srgb"))
+		if(!gli::is_srgb(format) || get_global_parameter_i("uastc srgb", 0))
 		{
 		    params.uastc = KTX_TRUE;
 			params.uastcFlags = KTX_PACK_UASTC_MAX_LEVEL; // maximum supported quality

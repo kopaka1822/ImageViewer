@@ -118,6 +118,12 @@ namespace ImageFramework.ImageLoader
             return res;
         }
 
+        // sets a global parameter for export
+        public static void SetGlobalParameter(string name, int value)
+        {
+            Dll.set_global_parameter_i(name, value);
+        }
+
         /// <summary>
         /// returns the shape of a numpy array
         /// </summary>

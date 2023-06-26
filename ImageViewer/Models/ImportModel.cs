@@ -214,18 +214,19 @@ namespace ImageViewer.Models
             {
                 var shape = IO.NpyGetShape(file);
 
-                var openDialoge = true;
-                if (openDialoge)
+                if (npyViewModel == null) npyViewModel = new ImportNpyViewModel(models);
+                var status = npyViewModel.Init(file, shape);
+                if (!status.IsCompatible)
+                    throw new Exception("Numpy Shape is incompatible. Found " + npyViewModel.Shape);
+
+                if (status.IsConfigurable)
                 {
-                    if (npyViewModel == null) npyViewModel = new ImportNpyViewModel(models);
-                    if (!npyViewModel.Init(file, shape))
-                        throw new Exception("Numpy Shape is incompatible. Found " + npyViewModel.Shape);
+                    // let the user configure
                     var dia = new ImportNpyDialog(npyViewModel);
-                    
                     if (models.Window.ShowDialog(dia) != true) return;
-                    // obtain results => apply numpy import settings
-                    
                 }
+                
+                npyViewModel.ApplySettings();
             }
             catch (Exception e)
             {

@@ -47,6 +47,9 @@ namespace ImageFramework.ImageLoader
         public static extern void set_progress_callback([MarshalAs(UnmanagedType.FunctionPtr)] ProgressDelegate pDelegate);
 
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern void set_global_parameter_i(string name, int value);
+
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr npy_get_shape(string filename, out uint nDims);
 
         public static string GetError()
