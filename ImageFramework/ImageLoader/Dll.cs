@@ -46,6 +46,9 @@ namespace ImageFramework.ImageLoader
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         public static extern void set_progress_callback([MarshalAs(UnmanagedType.FunctionPtr)] ProgressDelegate pDelegate);
 
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr npy_get_shape(string filename, out uint nDims);
+
         public static string GetError()
         {
             var ptr = get_error(out var length);
@@ -54,5 +57,7 @@ namespace ImageFramework.ImageLoader
 
         [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
         public static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
+
+        
     }
 }

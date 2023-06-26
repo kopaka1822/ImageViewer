@@ -11,6 +11,7 @@ using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
+using ImageFramework.Utility;
 using ImageViewer.Models.Settings;
 using ImageViewer.ViewModels.Dialog;
 using ImageViewer.Views.Dialog;
@@ -22,6 +23,7 @@ namespace ImageViewer.Models
     {
         private readonly ModelsEx models;
         private ImportMovieViewModel movieViewModel = null;
+        private ImportNpyViewModel npyViewModel = null;
 
         public ImportModel(ModelsEx models)
         {
@@ -70,6 +72,10 @@ namespace ImageViewer.Models
             {
                 await ImportImageAsync(file);
             }*/
+            else if(extension == "npy")
+            {
+                await ImportNpyAsync(file);
+            }
             else if (FFMpeg.Formats().Contains(extension))
             {
                 await ImportMovieAsync(file);
@@ -200,6 +206,35 @@ namespace ImageViewer.Models
                 if (!models.Progress.LastTaskCancelledByUser)
                     models.Window.ShowErrorDialog(e);
             }
+        }
+
+        public async Task ImportNpyAsync(string file, [CanBeNull] string alias = null)
+        {
+            try
+            {
+                var shape = IO.NpyGetShape(file);
+
+                var openDialoge = true;
+                if (openDialoge)
+                {
+                    if (npyViewModel == null) npyViewModel = new ImportNpyViewModel(models);
+                    if (!npyViewModel.Init(file, shape))
+                        throw new Exception("Numpy Shape is incompatible. Found " + npyViewModel.Shape);
+                    var dia = new ImportNpyDialog(npyViewModel);
+                    
+                    if (models.Window.ShowDialog(dia) != true) return;
+                    // obtain results => apply numpy import settings
+                    
+                }
+            }
+            catch (Exception e)
+            {
+                if (!models.Progress.LastTaskCancelledByUser)
+                    models.Window.ShowErrorDialog(e);
+            }
+
+            // perform import via normal interface (the dialog is just for settings)
+            await ImportImageAsync(file, alias);
         }
     }
 }

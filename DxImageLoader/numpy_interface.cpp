@@ -6,7 +6,38 @@
 
 #include "npy.h"
 #include "convert.h"
+#include "interface.h"
 using namespace npy;
+
+unsigned* npy_get_shape(const char* filename, unsigned int* dim)
+{
+	std::ifstream stream(filename, std::ifstream::binary);
+	if (!stream)
+	{
+		set_error("could not open file");
+		return nullptr;
+	}
+
+	std::string header_s = read_header(stream);
+	// parse header
+	header_t header = parse_header(header_s);
+	
+	static std::vector<unsigned int> s_shape;
+	s_shape.assign(header.shape.begin(), header.shape.end());
+	
+	if (std::any_of(header.shape.begin(), header.shape.end(), [](ndarray_len_t i){
+		return i > static_cast<ndarray_len_t>(std::numeric_limits<unsigned int>::max());
+		}
+	))
+	{
+		set_error("one of the shape dimensions is larger than 32bit (too large for import)");
+		return nullptr;
+	}
+
+	if(dim) *dim = unsigned(s_shape.size());
+
+	return s_shape.data();
+}
 
 // TODO make this a configurable setting
 static const bool NumpyIs3D = false;
