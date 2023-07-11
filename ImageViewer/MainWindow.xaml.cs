@@ -69,11 +69,17 @@ namespace ImageViewer
                 foreach (var arg in App.StartupArgs)
                 {
                     await models.Import.ImportFileAsync(arg);
+                    if (models.Import.CancelledByUser)
+                    {
+                        Close();
+                        return;
+                    }
                 }
             }
             catch (Exception e)
             {
                 models.Window.ShowErrorDialog(e);
+                Close();
             }
         }
 
