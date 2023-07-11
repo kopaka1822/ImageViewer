@@ -57,8 +57,10 @@ namespace ImageViewer
             // handle startup arguments
             if (App.StartupArgs.Length == 0) return;
 
-            LoadStartupArgsAsync();
+            Loaded += (o, e) => LoadStartupArgsAsync();
         }
+
+
 
         private async void LoadStartupArgsAsync()
         {

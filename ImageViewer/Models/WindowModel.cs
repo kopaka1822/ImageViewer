@@ -22,7 +22,7 @@ namespace ImageViewer.Models
     {
         public MainWindow Window { get; }
 
-        public Window TopmostWindow => windowStack.Count > 0 ? windowStack.Peek() : null;
+        public Window TopmostWindow => windowStack.Peek();
 
         private readonly Stack<Window> windowStack = new Stack<Window>();
         public Size ClientSize { get; private set; } = new Size(0, 0);
@@ -40,6 +40,8 @@ namespace ImageViewer.Models
             ExecutionPath = System.IO.Path.GetDirectoryName(AssemblyPath);
 
             window.Loaded += WindowOnLoaded;
+
+            windowStack.Push(window);
 
             var bgBrush = (SolidColorBrush)Window.FindResource("BackgroundBrush");
             var tmpColor = new ImageFramework.Utility.Color(bgBrush.Color.ScR, bgBrush.Color.ScG, bgBrush.Color.ScB, 1.0f);
@@ -93,9 +95,6 @@ namespace ImageViewer.Models
 
             SwapChain.Resize(ClientSize.Width, ClientSize.Height);
             OnPropertyChanged(nameof(SwapChain));
-
-            // the window is loaded at this point
-            windowStack.Push(Window);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
