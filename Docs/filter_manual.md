@@ -4,7 +4,7 @@ Filters are simple HLSL compute shader with a custom entry point. Filters can be
 
 ### Source Image:
 
-The source image can be accesed via `Texture2D src_image` or `Texture3D src_image`. This is a texture view of the currently processed layer and mipmap. Additionally, you can use the global variables `uint level`, `uint layer` and `uint layers` to get information about the currently processed mipmap level, layer and total number of layers. If you need to acces a custom layer/mipmap you can use `Texture2DArray src_image_ex` or `Texture3D src_image_ex` to get the view of the entire resource.
+The source image can be accesed via `Texture2D src_image` or `Texture3D src_image`. This is a texture view of the currently processed layer and mipmap. Additionally, you can use the global variables `uint level`, `uint layer`, `uint levels` and `uint layers` to get information about the currently processed mipmap level, layer and total number of mipmap levels or layers. If you need to acces a custom layer/mipmap you can use `Texture2DArray src_image_ex` or `Texture3D src_image_ex` to get the view of the entire resource.
 A linear and point `SamplerState` for texture filtering can be accessed via `linearSampler` or `pointSampler` respecitvely (clamped coordinates).
 
 ## Additional Preprocessor directives:
@@ -37,7 +37,7 @@ Specifies if the shader is a seperatable shader. If sepa is set to true, the sha
 
 **#setting** iterations, *true/false*
 
-If set to true, the shader will be dispatched multiple times. The (global) variable `int iteration` contains the number of the current iteration. The function `abort_iterations()` can be called to stop the shader after the current iteration. This setting can not be used together with the sepa setting. The default value is false.
+If set to true, the shader will be dispatched multiple times. The (global) variable `uint iteration` contains the number of the current iteration. The function `abort_iterations()` can be called to stop the shader after the current iteration. This setting can not be used together with the sepa setting. The default value is false.
 
 **#setting** groupsize, size
 

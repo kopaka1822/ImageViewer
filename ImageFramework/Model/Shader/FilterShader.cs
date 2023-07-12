@@ -114,6 +114,7 @@ namespace ImageFramework.Model.Shader
                         Layer = curLayer,
                         Layers = image.NumLayers,
                         Level = curMipmap,
+                        Levels = image.NumMipmaps,
                         Iteration = iteration,
                         FilterX = iteration == 0?1:0,
                         FilterY = iteration == 1?1:0,
@@ -174,8 +175,6 @@ namespace ImageFramework.Model.Shader
 
         private string GetShaderHeader(FilterLoader.Type kernel, IShaderBuilder builder)
         {
-            string filterDirectionVar = parent.IsSepa ? "int3 filterDirection;" : "";
-
             return $@"
 {builder.UavType}  dst_image : register(u0);
 {builder.SrvSingleType} src_image : register(t0);
@@ -187,9 +186,12 @@ SamplerState pointSampler : register(s1);
 cbuffer LayerLevelBuffer : register(b0) {{
     uint layer;
     uint level;
-    int iteration; // current iteration
+    uint iteration; // current iteration
     uint layers;
-    {filterDirectionVar}
+
+    int3 filterDirection;
+    uint levels;
+
     bool trueBool; // will always be 1. Hack to force detecting nans
 }};
 

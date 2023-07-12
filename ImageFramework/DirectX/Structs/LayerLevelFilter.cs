@@ -17,6 +17,8 @@ namespace ImageFramework.DirectX.Structs
         public int FilterX;
         public int FilterY;
         public int FilterZ;
+        public int Levels;
+
         public RawBool TrueBool;
     }
 }
