@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,6 +79,9 @@ namespace ImageConsole
         {
             using (var model = new Models(1))
             {
+                // overwrite culture for Console.WriteLine / ReadLine
+                CultureInfo.DefaultThreadCurrentCulture = Models.Culture;
+                
                 model.Progress.PropertyChanged += ProgressOnPropertyChanged;
 
                 // handle startup arguments

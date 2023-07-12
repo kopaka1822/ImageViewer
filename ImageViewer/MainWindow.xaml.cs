@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,6 +38,7 @@ namespace ImageViewer
 
             try
             {
+                CultureInfo.DefaultThreadCurrentCulture = ImageFramework.Model.Models.Culture; // prevent possible headaches from number conversion ('0,5' instead of '0.5' which results in shader errors)
                 models = new ModelsEx(this);
                 ViewModel = new ViewModels.ViewModels(models);
             }
