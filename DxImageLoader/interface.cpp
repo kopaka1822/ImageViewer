@@ -26,7 +26,8 @@ static uint32_t s_last_progress = -1;
 
 // key = extension (e.g. png), value = DXGI formats
 static std::map<std::string, std::vector<uint32_t>> s_exportFormats;
-static std::map<std::string, int> s_globalParameteri;
+static std::unordered_map<std::string, int> s_globalParameteri;
+static std::mutex s_globalParameterMutex;
 
 bool hasEnding(std::string const& fullString, std::string const& ending) {
 	if (fullString.length() >= ending.length()) {
@@ -318,36 +319,33 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 	return it->second.data();
 }
 
-bool get_global_parameter_i(const char* name, int& results)
+int get_global_parameter_i(const char* name)
 {
-	if (s_globalParameteri.empty())
-	{
-		// insert default values
-		set_global_parameter_i("normalmap", 0);
-		set_global_parameter_i("uastc srgb", 0);
-	}
-
+	std::lock_guard<std::mutex> g(s_globalParameterMutex);
 	auto it = s_globalParameteri.find(name);
 	if (it == s_globalParameteri.end())
 	{
-	    set_error("could not find global parameter: " + std::string(name));
-		return false;
+		set_error("global parameter not found: " + std::string(name));
+		throw std::runtime_error(s_error);
 	}
 
-	results = it->second;
-	return true;
+	return it->second;
 }
 
-int get_global_parameter_i(const char* name)
+int get_global_parameter_i(const char* name, int defaultValue)
 {
-	int res = 0;
-	if(get_global_parameter_i(name, res)) return res;
-
-	throw std::runtime_error(s_error);
+	std::lock_guard<std::mutex> g(s_globalParameterMutex);
+	auto it = s_globalParameteri.find(name);
+	if (it == s_globalParameteri.end())
+	{
+		return defaultValue;
+	}
+	return it->second;
 }
 
 void set_global_parameter_i(const char* name, int value)
 {
+	std::lock_guard<std::mutex> g(s_globalParameterMutex);
 	s_globalParameteri[name] = value;
 }
 

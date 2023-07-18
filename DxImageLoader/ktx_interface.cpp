@@ -129,11 +129,11 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 		params.qualityLevel = std::max((quality * 254) / 99 + 1, 1); // scale quality [0, 99] between [1, 255]
 		params.normalMap = KTX_FALSE;
 		if (!gli::is_srgb(format)) // only valid for linear textures
-	        params.normalMap = get_global_parameter_i("normalmap") ? KTX_TRUE : KTX_FALSE;
+	        params.normalMap = get_global_parameter_i("normalmap", 0) ? KTX_TRUE : KTX_FALSE;
 
 	    // select uastc for everything that is not color (here: for everyhing that is not SRGB)
 		// unless the "uastc srgb" flag is set => then use usastc as well
-		if(!gli::is_srgb(format) || get_global_parameter_i("uastc srgb"))
+		if(!gli::is_srgb(format) || get_global_parameter_i("uastc srgb", 0))
 		{
 		    params.uastc = KTX_TRUE;
 			params.uastcFlags = KTX_PACK_UASTC_MAX_LEVEL; // maximum supported quality
@@ -696,7 +696,8 @@ VkFormat convertFormat(gli::format format)
 	case gli::FORMAT_RGBA_BP_SRGB_BLOCK16: return VK_FORMAT_BC7_SRGB_BLOCK;
 	case gli::FORMAT_RGBA_ETC2_UNORM_BLOCK16: return VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK;
 	case gli::FORMAT_RGBA_ETC2_SRGB_BLOCK16: return VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK;
-		
+
+
 	// order different but same components (TODO experimental)
 	//case gli::FORMAT_RGB10A2_UNORM_PACK32: 
 	//	return VK_FORMAT_A2R10G10B10_UNORM_PACK32;
@@ -762,80 +763,58 @@ std::vector<uint32_t> ktx2_get_export_formats()
 	gli::FORMAT_A1RGB5_UNORM_PACK16,
 	gli::FORMAT_R8_UNORM_PACK8,
 	gli::FORMAT_R8_SNORM_PACK8,
-	gli::FORMAT_R8_USCALED_PACK8,
-	gli::FORMAT_R8_SSCALED_PACK8,
 	gli::FORMAT_R8_UINT_PACK8,
 	gli::FORMAT_R8_SINT_PACK8,
 	gli::FORMAT_R8_SRGB_PACK8,
 	gli::FORMAT_RG8_UNORM_PACK8,
 	gli::FORMAT_RG8_SNORM_PACK8,
-	gli::FORMAT_RG8_USCALED_PACK8,
-	gli::FORMAT_RG8_SSCALED_PACK8,
 	gli::FORMAT_RG8_UINT_PACK8,
 	gli::FORMAT_RG8_SINT_PACK8,
 	gli::FORMAT_RG8_SRGB_PACK8,
 	gli::FORMAT_RGB8_UNORM_PACK8,
 	gli::FORMAT_RGB8_SNORM_PACK8,
-	gli::FORMAT_RGB8_USCALED_PACK8,
-	gli::FORMAT_RGB8_SSCALED_PACK8,
 	gli::FORMAT_RGB8_UINT_PACK8,
 	gli::FORMAT_RGB8_SINT_PACK8,
 	gli::FORMAT_RGB8_SRGB_PACK8,
 	gli::FORMAT_BGR8_UNORM_PACK8,
 	gli::FORMAT_BGR8_SNORM_PACK8,
-	gli::FORMAT_BGR8_USCALED_PACK8,
-	gli::FORMAT_BGR8_SSCALED_PACK8,
 	// those give some block size mismatch error from gli:
 	//gli::FORMAT_BGR8_UINT_PACK8,
 	//gli::FORMAT_BGR8_SINT_PACK8,
 	gli::FORMAT_BGR8_SRGB_PACK8,
 	gli::FORMAT_RGBA8_UNORM_PACK8,
 	gli::FORMAT_RGBA8_SNORM_PACK8,
-	gli::FORMAT_RGBA8_USCALED_PACK8,
-	gli::FORMAT_RGBA8_SSCALED_PACK8,
 	gli::FORMAT_RGBA8_UINT_PACK8,
 	gli::FORMAT_RGBA8_SINT_PACK8,
 	gli::FORMAT_RGBA8_SRGB_PACK8,
 	gli::FORMAT_BGRA8_UNORM_PACK8,
 	gli::FORMAT_BGRA8_SNORM_PACK8,
-	gli::FORMAT_BGRA8_USCALED_PACK8,
-	gli::FORMAT_BGRA8_SSCALED_PACK8,
 	gli::FORMAT_BGRA8_UINT_PACK8,
 	gli::FORMAT_BGRA8_SINT_PACK8,
 	gli::FORMAT_BGRA8_SRGB_PACK8,
 	gli::FORMAT_RGBA8_UNORM_PACK32,
 	gli::FORMAT_RGBA8_SNORM_PACK32,
-	gli::FORMAT_RGBA8_USCALED_PACK32,
-	gli::FORMAT_RGBA8_SSCALED_PACK32,
 	gli::FORMAT_RGBA8_UINT_PACK32,
 	gli::FORMAT_RGBA8_SINT_PACK32,
 	gli::FORMAT_RGBA8_SRGB_PACK32,
 	gli::FORMAT_R16_UNORM_PACK16,
 	gli::FORMAT_R16_SNORM_PACK16,
-	gli::FORMAT_R16_USCALED_PACK16,
-	gli::FORMAT_R16_SSCALED_PACK16,
 	gli::FORMAT_R16_UINT_PACK16,
 	gli::FORMAT_R16_SINT_PACK16,
 	gli::FORMAT_R16_SFLOAT_PACK16,
 	// can not set image data
 	//gli::FORMAT_RG16_UNORM_PACK16,
 	//gli::FORMAT_RG16_SNORM_PACK16,
-	gli::FORMAT_RG16_USCALED_PACK16,
-	gli::FORMAT_RG16_SSCALED_PACK16,
 	gli::FORMAT_RG16_UINT_PACK16,
 	gli::FORMAT_RG16_SINT_PACK16,
 	gli::FORMAT_RG16_SFLOAT_PACK16,
 	gli::FORMAT_RGB16_UNORM_PACK16,
 	gli::FORMAT_RGB16_SNORM_PACK16,
-	gli::FORMAT_RGB16_USCALED_PACK16,
-	gli::FORMAT_RGB16_SSCALED_PACK16,
 	gli::FORMAT_RGB16_UINT_PACK16,
 	gli::FORMAT_RGB16_SINT_PACK16,
 	gli::FORMAT_RGB16_SFLOAT_PACK16,
 	gli::FORMAT_RGBA16_UNORM_PACK16,
 	// gli::FORMAT_RGBA16_SNORM_PACK16, // can not set image data
-	gli::FORMAT_RGBA16_USCALED_PACK16,
-	gli::FORMAT_RGBA16_SSCALED_PACK16,
 	gli::FORMAT_RGBA16_UINT_PACK16,
 	gli::FORMAT_RGBA16_SINT_PACK16,
 	gli::FORMAT_RGBA16_SFLOAT_PACK16,

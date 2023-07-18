@@ -51,11 +51,11 @@ EXPORT(const uint32_t*) get_export_formats(const char* extension, int& numFormat
 /// "uastc srgb" - for .ktx2 export => use uastc for srgb compression (otherwise etc1 is used). Valid for srgb uastc compressable textures
 /// "normalmap" - for .ktx2 export => indicate that the exporter/compressor should optimize data for normal maps. Valid for linear (non-srgb) uastc compressable textures
 
-/// \brief stores the value of the parameter in the results argument and returns true if found. Returns false otherwise
-EXPORT(bool)  get_global_parameter_i(const char* name, int& results);
-
 /// \brief returns the value of the parameter if found. Throws an exception otherwise
 int get_global_parameter_i(const char* name);
+
+/// \brief returns the value of the parameter if found. Otherwise, returns defaultValue (without storing it)
+int get_global_parameter_i(const char* name, int defaultValue);
 
 /// \brief sets the value of a global parameter or 0 if not found
 EXPORT(void) set_global_parameter_i(const char* name, int value);
@@ -74,3 +74,7 @@ void set_error(const std::string& str);
 /// \brief set current progress (for internal use only)
 /// throws an error if the action should be aborted
 void set_progress(uint32_t progress, const char* description = nullptr);
+
+/// \brief returns a pointer to the shape and stores the number if dimensions in dim. Returns nullptr on failure.
+/// WARNING: the return value is not thread safe and should be guarded!
+EXPORT(unsigned int*) npy_get_shape(const char* filename, unsigned int* dim);

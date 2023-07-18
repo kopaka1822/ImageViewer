@@ -1,5 +1,5 @@
 #setting title, Highlighting
-#setting description, Highlights certain colors. Uses RGB average.
+#setting description, Highlights certain colors. Uses RGB average. NaNs will be yellow.
 #setting type, COLOR
 
 #param Negative Values (blue), negative, bool, true
@@ -15,6 +15,9 @@ float4 filter(float4 color)
 		color = float4(average, 0.0, 0.0, 1.0);
 	if( grOne && (average > 1.0) )
 		color = float4(0.0, average, 0.0, 1.0);
+
+	if(isnan(average))
+		color = float4(1.0, 1.0, 0.0, 1.0);
 
 	return color;
 }

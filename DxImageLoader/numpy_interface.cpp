@@ -6,10 +6,58 @@
 
 #include "npy.h"
 #include "convert.h"
+#include "interface.h"
 using namespace npy;
 
-// TODO make this a configurable setting
-static const bool NumpyIs3D = false;
+unsigned* npy_get_shape(const char* filename, unsigned int* dim)
+{
+	std::ifstream stream(filename, std::ifstream::binary);
+	if (!stream)
+	{
+		set_error("could not open file");
+		return nullptr;
+	}
+
+	std::string header_s = read_header(stream);
+	// parse header
+	header_t header = parse_header(header_s);
+	
+	static std::vector<unsigned int> s_shape;
+	s_shape.assign(header.shape.begin(), header.shape.end());
+	
+	if (std::any_of(header.shape.begin(), header.shape.end(), [](ndarray_len_t i){
+		return i > static_cast<ndarray_len_t>(std::numeric_limits<unsigned int>::max());
+		}
+	))
+	{
+		set_error("one of the shape dimensions is larger than 32bit (too large for import)");
+		return nullptr;
+	}
+
+	if(dim) *dim = unsigned(s_shape.size());
+
+	return s_shape.data();
+}
+
+static bool NumpyIs3D()
+{
+	return get_global_parameter_i("npy is3D", 0) != 0;
+}
+
+static bool NumpyUseChannels()
+{
+	return get_global_parameter_i("npy useChannel", 1) != 0;
+}
+
+static int NumpyFirstLayer()
+{
+	return get_global_parameter_i("npy firstLayer", 0);
+}
+
+static int NumpyLastLayer()
+{
+	return get_global_parameter_i("npy lastLayer", -1);
+}
 
 class NumpyImage final : public image::IImage
 {
@@ -22,17 +70,26 @@ public:
 		if (shape.empty())
 			throw std::exception("array shape is empty");
 
+		auto nComponents = 1; // for now nComponents is always 1
+
+		// last dimension is usually the channel size. Try to use it as channel size if it is small enough (and texture is at least 2D)
+		if (NumpyUseChannels() && shape.back() <= 4)
+		{
+			nComponents = shape.back();
+			shape.pop_back(); // remove from list
+		}
+
 		// reverse shape (width is always the last dimension, then height, depth...)
 		std::reverse(shape.begin(), shape.end());
-
+		
 		// split shape information into width, height, layers and components (image format)
-		auto nComponents = 1; // for now nComponents is always 1
-		m_width = shape[0];
+		if(!shape.empty())
+			m_width = shape[0];
 		if (shape.size() > 1)
 			m_height = shape[1];
 		if (shape.size() > 2)
 			m_depth = calcRemainingDimensions(shape, 2);
-		
+
 		// pad format to fit 4 components
 		switch (nComponents)
 		{
@@ -52,18 +109,35 @@ public:
 		default:
 			assert(false);
 		}
+
+		// determine if data needs to be cropped
+		uint32_t firstLayer = NumpyFirstLayer();
+		uint32_t lastLayer = NumpyLastLayer();
+		if (lastLayer == unsigned(-1))
+			lastLayer = m_depth - 1u;
+
+		// crop data if required
+		if(firstLayer != 0 || unsigned(lastLayer) != (m_depth - 1u))
+		{
+			size_t sliceSize = size_t(m_width) * size_t(m_height) * 4;
+
+			std::vector<float> newData;
+			newData.assign(m_data.data() + sliceSize * firstLayer, m_data.data() + sliceSize * (lastLayer + 1));
+			m_data = std::move(newData);
+			m_depth = lastLayer - firstLayer + 1;
+		}
 	}
 
-	uint32_t getNumLayers() const override { return NumpyIs3D ? 1 : m_depth; }
+	uint32_t getNumLayers() const override { return NumpyIs3D() ? 1 : m_depth; }
 	uint32_t getNumMipmaps() const override { return 1; }
 	uint32_t getWidth(uint32_t mipmap) const override { return m_width; }
 	uint32_t getHeight(uint32_t mipmap) const override { return m_height; }
-	uint32_t getDepth(uint32_t mipmap) const override { return NumpyIs3D ? m_depth : 1; }
+	uint32_t getDepth(uint32_t mipmap) const override { return NumpyIs3D() ? m_depth : 1; }
 	gli::format getFormat() const override { return gli::FORMAT_RGBA32_SFLOAT_PACK32; }
 	gli::format getOriginalFormat() const override { return m_originalFormat; }
 	uint8_t* getData(uint32_t layer, uint32_t mipmap, size_t& size) override
 	{
-		if (NumpyIs3D)
+		if (NumpyIs3D())
 		{
 			assert(layer == 0);
 			assert(mipmap == 0);
@@ -83,6 +157,7 @@ public:
 	}
 
 private:
+
 	template<typename T>
 	static void fixEndian(T* data, size_t size, char dataEndian, char hostEndian)
 	{

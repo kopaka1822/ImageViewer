@@ -26,7 +26,14 @@ namespace ImageFramework.Utility
         /// <returns></returns>
         public ITexture GetTexture()
         {
-            if (textures.Count > 0) return textures.Pop();
+            if (textures.Count > 0)
+            {
+                var tex = textures.Pop();
+                if (IsCompatibleWith(tex)) return tex; // all good
+
+                textures.Push(tex);
+                Clear(); // faulty textures in cache => clear (should not happen normally)
+            }
 
             // make new texture with the current configuration
             return templateTex.Create(templateTex.LayerMipmap, templateTex.Size,

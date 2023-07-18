@@ -93,7 +93,7 @@ namespace ImageViewer.Models.Settings
             foreach (var img in Images)
             {
                 if(img.Data == null)
-                    await models.Import.ImportImageAsync(img.Filename, img.Alias);
+                    await models.Import.ImportFileAsync(img.Filename, img.Alias);
                 else
                 {
                     Debug.Assert(img.Format != null);
