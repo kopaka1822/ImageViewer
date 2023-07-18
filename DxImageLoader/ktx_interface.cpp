@@ -760,8 +760,8 @@ std::vector<uint32_t> ktx_get_export_formats()
 			gli::format::FORMAT_BGRA4_UNORM_PACK16,
 			gli::format::FORMAT_R5G6B5_UNORM_PACK16,
 			gli::format::FORMAT_B5G6R5_UNORM_PACK16,
-			gli::format::FORMAT_RGB5A1_UNORM_PACK16,
-			gli::format::FORMAT_BGR5A1_UNORM_PACK16,
+			//gli::format::FORMAT_RGB5A1_UNORM_PACK16,
+			//gli::format::FORMAT_BGR5A1_UNORM_PACK16,
 			gli::format::FORMAT_R8_UNORM_PACK8,
 			gli::format::FORMAT_R8_SNORM_PACK8,
 			gli::FORMAT_R8_UINT_PACK8,
@@ -805,8 +805,8 @@ std::vector<uint32_t> ktx_get_export_formats()
 			//gli::FORMAT_BGR10A2_SINT_PACK32,
 			//gli::format::FORMAT_A8_UNORM_PACK8,
 			//gli::format::FORMAT_A16_UNORM_PACK16,
-			gli::format::FORMAT_BGR8_UNORM_PACK32,
-			gli::format::FORMAT_BGR8_SRGB_PACK32,
+			//gli::format::FORMAT_BGR8_UNORM_PACK32,
+			//gli::format::FORMAT_BGR8_SRGB_PACK32,
 
 			// float formats
 			gli::format::FORMAT_R16_UNORM_PACK16,
