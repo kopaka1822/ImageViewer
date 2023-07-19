@@ -63,7 +63,7 @@ void ktx1_save_image(const char* filename, GliImage& image, gli::format format, 
 	ktxTexture1* ktex;
 	ktxTextureCreateInfo i;
 	i.glInternalformat = get_gl_format(format);
-	i.vkFormat = convertFormat(format);
+	i.vkFormat = convertFormat(format); // it is okay if this is undefined for ktx1
 	i.baseWidth = image.getWidth(0);
 	i.baseHeight = image.getHeight(0);
 	i.baseDepth = image.getDepth(0);
@@ -100,6 +100,8 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 	ktxTextureCreateInfo i;
 	i.glInternalformat = 0; // ignored for ktx2
 	i.vkFormat = convertFormat(format);
+	if(i.vkFormat == VK_FORMAT_UNDEFINED)
+		throw std::runtime_error("Could not find a matching VK_FORMAT for the requested output format");
 	i.baseWidth = image.getWidth(0);
 	i.baseHeight = image.getHeight(0);
 	i.baseDepth = image.getDepth(0);
@@ -241,7 +243,7 @@ std::unique_ptr<image::IImage> ktx2_load(ktxTexture* ktex)
 	else format = originalFormat = convertFormat(VkFormat(ktex2->vkFormat)); // no transcoding needed => read format directly
 
 	if (format == gli::FORMAT_UNDEFINED)
-		throw std::runtime_error("could not interpret format id " + std::to_string(ktex2->vkFormat));
+		throw std::runtime_error("could not translate format id from VK_FORMAT to Image Viewer format. VK_FORMAT: " + std::to_string(ktex2->vkFormat));
 
 	return ktx_load_base(ktex, format, originalFormat);
 }
