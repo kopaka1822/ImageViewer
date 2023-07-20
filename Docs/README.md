@@ -9,6 +9,7 @@ An image viewer for anyone related to computer graphics.
 * bmp, jpg, png, tga, gif
 * hdr, pfm, exr (import only)
 * dds, ktx, ktx2
+* numpy (integer and float types, import only)
 
 ## Download
 
@@ -18,13 +19,7 @@ System Requirements:
 - DirextX 11 compatible graphics card
 - [Microsoft Visual C++ Redistributable for Visual Studio 2019](https://aka.ms/vs/16/release/vc_redist.x64.exe)
 
-Version 3.6 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/blob/Release/Build/ImageViewer3_6.7z?raw=true)
-
-Version 3.5 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/raw/Release/Build/ImageViewer3_5.zip)
-
-Version 3.3.1 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/raw/Release/Build/ImageViewer3_3_1.zip)
-
-Version 2.1 x64 Windows: [Download](https://github.com/kopaka1822/ImageViewer/raw/Release/Build/Texture%20Viewer.zip)
+Download the latest release from the [Releases page](https://github.com/kopaka1822/ImageViewer/releases).
 
 [Used Libraries](about.md)
 

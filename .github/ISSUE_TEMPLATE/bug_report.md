@@ -23,9 +23,12 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
+**File**
+If applicable, attach the file that causes the problem.
+
 **Desktop (please complete the following information):**
  - OS: [e.g. Windows 10]
- - Version [e.g. 22]
+ - Version [e.g. 3.7]
 
 **Additional context**
 Add any other context about the problem here.
