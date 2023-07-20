@@ -9,6 +9,7 @@ An image viewer for anyone related to computer graphics.
 * bmp, jpg, png, tga, gif
 * hdr, pfm, exr (import only)
 * dds, ktx, ktx2
+* numpy (integer and float types, import only)
 
 ## Download
 
