@@ -112,11 +112,14 @@ namespace ImageFramework.Model.Shader
                     shared.Upload.SetData(new LayerLevelFilter
                     {
                         Layer = curLayer,
+                        Layers = image.NumLayers,
                         Level = curMipmap,
+                        Levels = image.NumMipmaps,
                         Iteration = iteration,
                         FilterX = iteration == 0?1:0,
                         FilterY = iteration == 1?1:0,
-                        FilterZ = iteration == 2?1:0
+                        FilterZ = iteration == 2?1:0,
+                        TrueBool = true // hack to force detecting nans
                     });
 
                     dev.Compute.SetConstantBuffer(0, shared.Upload.Handle);
@@ -172,8 +175,6 @@ namespace ImageFramework.Model.Shader
 
         private string GetShaderHeader(FilterLoader.Type kernel, IShaderBuilder builder)
         {
-            string filterDirectionVar = parent.IsSepa ? "int3 filterDirection;" : "";
-
             return $@"
 {builder.UavType}  dst_image : register(u0);
 {builder.SrvSingleType} src_image : register(t0);
@@ -185,10 +186,27 @@ SamplerState pointSampler : register(s1);
 cbuffer LayerLevelBuffer : register(b0) {{
     uint layer;
     uint level;
-    int iteration; // current iteration
-    uint _padding_2;
-    {filterDirectionVar}
+    uint iteration; // current iteration
+    uint layers;
+
+    int3 filterDirection;
+    uint levels;
+
+    bool trueBool; // will always be 1. Hack to force detecting nans
 }};
+
+bool isNan(float v) {{
+    float vi = v;
+    if(!trueBool) vi = 0.0; // true bool is always true, so this won't be executed
+
+    // little trick to detect nans because v[i] != v[i] will be optimized away.
+    return v != vi;
+}}
+bool2 isNan(float2 v) {{ return bool2(isNan(v.x), isNan(v.y)); }}
+bool3 isNan(float3 v) {{ return bool3(isNan(v.xy), isNan(v.z)); }}
+bool4 isNan(float4 v) {{ return bool4(isNan(v.xyz), isNan(v.w)); }}
+// overwrite hlsl isnan intrinsic because it is broken
+#define isnan(v) isNan(v)
 
 // texel helper function
 #if {builder.Is3DInt}

@@ -18,6 +18,24 @@ namespace FrameworkTests.Model.Filter
         }
 
         [TestMethod]
+        public void AlphaTest()
+        {
+            TestFilter("alpha_test.hlsl");
+        }
+
+        [TestMethod]
+        public void AlphaTestPreprocessing()
+        {
+            TestFilter("alpha_test_preprocessing.hlsl");
+        }
+
+        [TestMethod]
+        public void Bilateral()
+        {
+            TestFilter("bilateral.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
+        [TestMethod]
         public void Blur()
         {
             TestFilter("blur.hlsl");
@@ -36,9 +54,33 @@ namespace FrameworkTests.Model.Filter
         }
 
         [TestMethod]
+        public void Dithering()
+        {
+            TestFilter("dithering.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
+        [TestMethod]
+        public void Divergent()
+        {
+            TestFilter("divergent.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
+        [TestMethod]
         public void Enhance()
         {
             TestFilter("enhance.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
+        [TestMethod]
+        public void FixAlpha()
+        {
+            TestFilter("fix_alpha.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
+        [TestMethod]
+        public void FlipCubemap()
+        {
+            TestFilter("flip_cubemap.hlsl", FilterLoader.TargetType.Tex2D);
         }
 
         [TestMethod]
@@ -48,9 +90,27 @@ namespace FrameworkTests.Model.Filter
         }
 
         [TestMethod]
+        public void GuidedBilateral()
+        {
+            TestFilter("guided_bilateral.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
+        [TestMethod]
+        public void HeatDistribution()
+        {
+            TestFilter("heat_distribution.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
+        [TestMethod]
         public void Heatmap()
         {
             TestFilter("heatmap.hlsl");
+        }
+
+        [TestMethod]
+        public void HeightToNormal()
+        {
+            TestFilter("heightToNormal.hlsl", FilterLoader.TargetType.Tex2D);
         }
 
         [TestMethod]
@@ -78,6 +138,12 @@ namespace FrameworkTests.Model.Filter
         }
 
         [TestMethod]
+        public void MovePixels()
+        {
+            TestFilter("move_pixels.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
+        [TestMethod]
         public void Quantile()
         {
             TestFilter("quantile.hlsl", FilterLoader.TargetType.Tex2D);
@@ -89,41 +155,11 @@ namespace FrameworkTests.Model.Filter
             TestFilter("silhouette.hlsl", FilterLoader.TargetType.Tex2D);
         }
 
-        [TestMethod]
-        public void HeightToNormal()
-        {
-            TestFilter("heightToNormal.hlsl", FilterLoader.TargetType.Tex2D);
-        }
 
-        [TestMethod]
-        public void Bilateral()
-        {
-            TestFilter("bilateral.hlsl", FilterLoader.TargetType.Tex2D);
-        }
 
-        [TestMethod]
-        public void GuidedBilateral()
-        {
-            TestFilter("guided_bilateral.hlsl", FilterLoader.TargetType.Tex2D);
-        }
 
-        [TestMethod]
-        public void Divergent()
-        {
-            TestFilter("divergent.hlsl");
-        }
 
-        [TestMethod]
-        public void Dithering()
-        {
-            TestFilter("dithering.hlsl", FilterLoader.TargetType.Tex2D);
-        }
 
-        [TestMethod]
-        public void HeatDistribution()
-        {
-            TestFilter("heat_distribution.hlsl", FilterLoader.TargetType.Tex2D);
-        }
 
         private void TestFilter(string name)
         {

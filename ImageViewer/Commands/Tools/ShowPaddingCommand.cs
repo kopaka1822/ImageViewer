@@ -45,7 +45,14 @@ namespace ImageViewer.Commands.Tools
 
             if(models.Window.ShowDialog(dia) != true) return;
 
-            models.Images.PadImages(vm.LeftPad, vm.RightPad, vm.SelectedFill.Cargo, models);
+            try
+            {
+                models.Images.PadImages(vm.LeftPad, vm.RightPad, vm.SelectedFill.Cargo, models);
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e);
+            }
         }
     }
 }

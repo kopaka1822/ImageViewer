@@ -11,6 +11,7 @@
 * [Videos](#videos)
 * [Cubemaps and 360 degree images](#cubemaps-and-360-degree-images)
 * [3D Images](#image-3d)
+* [Image Console](#image-console) (batch processing via console)
 * [Further Reading](#further-reading)
 
 # Import Images
@@ -169,7 +170,79 @@ Additionally, you can explore the insides of a 3D texture with the 'Slice' featu
 
 For more on 3D images see [here](volumetric.md).
 
-## Further Reading
+# Image Console
+
+Next to the ImageViewer.exe there is also an ImageConsole.exe supplied in each release. 
+This executable is a console application that includes the most important features of the image viewer.
+For example, opening a .bmp file and converting it to a .png file could look like this:
+
+```>> .\ImageConsole.exe -open file.bmp -export file.png RGB8_SRGB```
+
+The '-open' command opens the file.bmp and the '-export' command will export it to file.png with the RGB8_SRGB format.
+If you are unsure which formats are supported for a specific file format, you can use the '-tellformats' command:
+
+```
+>> .\ImageConsole.exe -tellformats pfm
+RGB32_SFLOAT
+R32_SFLOAT
+```
+
+The above format listed all available formats for the pfm extension. RGB represent red green and blue. 32 is the number of bits per color channel. SFLOAT indicates that each color is represented by a signed floating point. The syntax of the image formats is identical to the OpenGL formats. Please refer to the [OpenGL Wiki](https://www.khronos.org/opengl/wiki/Image_Format) for more information.
+
+The full list of commands can be queried with the '-help' command. At the time of writing, the following commands are available:
+```
+>> .\ImageConsole.exe -help
+Commands:
+-addfilter "file1" ["file2" ...]                      adds all filter to the pipeline
+-cin                                                  keeps the console open to retrieve commands via cin
+-close                                                stops reading from cin
+-delete [index]                                       deletes the image with the specified index or all images if no index was specified
+-deletefilter [index]                                 deletes the filter with the given index or all filter if no index is given
+-deletemipmaps                                        keeps only the most detailed mipmap
+-equation "color equation" ["alpha equation"]         sets image combine equations
+-export filename gliFormat                            saves the current image with the filename
+-exportcrop true/false [xStart yStart xEnd yEnd]      enables/disables export cropping and sets cropping boundaries
+-exportlayer layer                                    sets the layer that should be exported. -1 means all layers
+-exportmipmap mipmap                                  sets the mipmap that should be exported. -1 means all mipmaps
+-exportquality quality                                sets the quality level for jpg exports. Between 1 and 100
+-filterparam index "param name" value                 sets the parameter of the filter at index
+-genmipmaps                                           (re)generates mipmaps
+-help                                                 lists all commands
+-move oldIndex newIndex                               moves the image to the given image index
+-open "file1" "file2" ...                             imports all filenames as images
+-silent                                               disables progress output
+-ssim imageId1 imageId2                               prints ssim of the two input images
+-stats "min/max/avg" "luminance/luma/avg/lightness"   prints the statistic
+-tellalpha                                            prints true if any pixel has alpha that is not 1
+-tellfilter                                           prints list of filters
+-tellfilterparams index                               prints the filter parameters of the filter at index
+-tellformats "file extension"                         prints the available export formats for a specific file extension
+-telllayers                                           print number of layers
+-tellmipmaps                                          prints number of mipmaps
+-tellpixel x y [layer mipmap radius]                  prints the pixel color in linear and in srgb
+-tellsize [mipmapIndex]                               prints the width and height of the mipmap
+-thumbnail size                                       creates a thumbnail with the specified size and returns byte stream
+```
+
+The quotation marks "" indicate the the command needs to be put into quotation marks if it contains whitespaces. The arguments in square brackets [] denote optional arguments. The slash / enumerates lists of possible inputs.
+
+### Batch Processing
+
+The following Python script converts all pfm files from the pictures directory to png files:
+```python
+import os
+ImageConsolePath = "C:/ImageViewer/ImageConsole.exe"
+ImageDirectory = "pictures"
+
+files = os.listdir(ImageDirectory)
+files = [ImageDirectory + "/" + f for f in files if f.endswith('.pfm')]
+
+for file in files:
+	command = ImageConsolePath + " -open \"" + file + "\" -export \"" + file + ".png\" RGB8_SRGB"
+	os.system(command)
+```
+
+# Further Reading
 
 Detailed descriptions are available for:
 * [Image Equations](equation.md) (+ list of all instrinsic functions)

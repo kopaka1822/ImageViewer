@@ -34,7 +34,14 @@ namespace ImageFramework.Utility
 
         public ITexture GetTexture()
         {
-            if (textures.Count > 0) return textures.Pop();
+            if (textures.Count > 0)
+            {
+                var tex = textures.Pop();
+                if (IsCompatibleWith(tex)) return tex; // all good
+                
+                textures.Push(tex);
+                Clear(); // textures are invalid. This happens sometimes in async operations, when the event has not fired yet (will happen in the future)
+            }
 
             // make new texture with the current configuration
             return images.CreateEmptyTexture(format, createUav, createRtv);

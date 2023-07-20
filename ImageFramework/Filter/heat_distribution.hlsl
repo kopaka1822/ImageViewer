@@ -31,7 +31,7 @@ float4 filter(int2 pixelCoord, int2 size)
 		srcTemp += delta;
 	}
 	
-	if(iteration + 1 < num_iterations)
+	if(int(iteration) + 1 < num_iterations)
 	{
 		return float4(srcTemp, src.y, 1.0, 1.0);	
 	}

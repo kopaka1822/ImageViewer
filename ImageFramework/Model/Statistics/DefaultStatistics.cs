@@ -80,9 +80,11 @@ namespace ImageFramework.Model.Statistics
         public readonly DefaultStatisticsType Luma;
         public readonly DefaultStatisticsType Lightness;
         public readonly DefaultStatisticsType Alpha;
+        public readonly DefaultStatisticsType Grayscale; // 1 for grayscale pixels, 0 for color pixels
 
         // ReSharper disable twice CompareOfFloatsByEqualityOperator
         public bool HasAlpha => !(Alpha.Min == 1.0f && Alpha.Max == 1.0f);
+        public bool IsGrayscale => (Grayscale.Min == 1.0f);
 
         public float Get(Types type, Metrics metric)
         {
@@ -125,6 +127,7 @@ namespace ImageFramework.Model.Statistics
             Luma = new DefaultStatisticsType(parent.LumaShader, texture, parent, lm);
             Lightness = new DefaultStatisticsType(parent.LightnessShader, texture, parent, lm);
             Alpha = new DefaultStatisticsType(parent.AlphaShader, texture, parent, lm);
+            Grayscale = new DefaultStatisticsType(parent.GrayscaleShader, texture, parent, lm);
         }
 
         /// empty model constructor
@@ -135,6 +138,7 @@ namespace ImageFramework.Model.Statistics
             Luma = Luminance;
             Lightness = Luminance;
             Alpha = Luminance;
+            Grayscale = Luminance;
         }
 
         public static readonly DefaultStatistics Zero = new DefaultStatistics();
@@ -143,12 +147,15 @@ namespace ImageFramework.Model.Statistics
         public int GetFormatRating(GliFormat format)
         {
             const int alphaMissWeight = 1000; // penalty if alpha channel is required but missing
+            const int grayscaleMissWeight = 500; // penalty if only grayscale is needed, but the format has color
             const int alphaMatchWeight = 5; // bonus for same alpha state
+            const int grayscaleMatchWeight = 4; // bonus for correct grayscale
             const int signWeight = 10;
             const int unormWeight = 300;
-
+            
             // determine basic properties of image
             bool hasAlpha = HasAlpha;
+            bool isGrayscale = IsGrayscale;
             bool isUnormed = Average.Min >= 0.0f && Average.Max <= 1.0f
                 && Alpha.Min >= 0.0f && Alpha.Max <= 1.0f;
             bool isSigned = Average.Min < 0.0f;
@@ -159,6 +166,11 @@ namespace ImageFramework.Model.Statistics
                 rating -= alphaMissWeight; // alpha should be present if image needs alpha
             else if (hasAlpha == format.HasAlpha())
                 rating += alphaMatchWeight; // alpha state matching
+
+            if (isGrayscale != format.IsGrayscale())
+                rating -= grayscaleMissWeight;
+            else if (isGrayscale == format.IsGrayscale())
+                rating += grayscaleMatchWeight;
 
             // is a signed format required?
             var pixelType = format.GetDataType();

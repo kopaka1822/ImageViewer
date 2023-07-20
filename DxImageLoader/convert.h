@@ -102,6 +102,57 @@ namespace image
 	}
 
 	template<class T>
+	inline void expandRGtoRGBA(T* data, size_t numPixels, T blueValue, T alphaValue)
+	{
+		T* curEnd = data + numPixels * 2;
+		T* actualEnd = data + numPixels * 4;
+		// move to last pixel
+		curEnd -= 2;
+		actualEnd -= 4;
+
+		while (curEnd >= data)
+		{
+			auto r = curEnd[0];
+			auto g = curEnd[1];
+			actualEnd[0] = r;
+			actualEnd[1] = g;
+			actualEnd[2] = blueValue;
+			actualEnd[3] = alphaValue;
+
+			// move one pixel left
+			curEnd -= 2;
+			actualEnd -= 4;
+		}
+		assert(curEnd + 2 == data);
+		assert(actualEnd + 4 == data);
+	}
+
+	template<class T>
+	inline void expandRtoRGBA(T* data, size_t numPixels, T alphaValue)
+	{
+		T* curEnd = data + numPixels;
+		T* actualEnd = data + numPixels * 4;
+		// move to last pixel
+		curEnd -= 1;
+		actualEnd -= 4;
+
+		while (curEnd >= data)
+		{
+			auto r = curEnd[0];
+			actualEnd[0] = r;
+			actualEnd[1] = r;
+			actualEnd[2] = r;
+			actualEnd[3] = alphaValue;
+
+			// move one pixel left
+			curEnd -= 1;
+			actualEnd -= 4;
+		}
+		assert(curEnd + 1 == data);
+		assert(actualEnd + 4 == data);
+	}
+
+	template<class T>
 	inline void expandBGRtoRGBA(T* data, size_t numPixels, T alphaValue)
 	{
 		T* curEnd = data + numPixels * 3;

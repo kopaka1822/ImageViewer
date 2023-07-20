@@ -143,8 +143,6 @@
     <Compile Include="Model\Equation\Token\ValueToken.cs" />
     <Compile Include="Model\ImagePipeline.cs" />
     <Compile Include="Model\ImagesModel.cs" />
-    <Compile Include="Model\Overlay\HeatmapOverlay.cs" />
-    <Compile Include="Model\Overlay\HeatmapOverlayShader.cs" />
     <Compile Include="Model\Progress\IProgress.cs" />
     <Compile Include="Model\Models.cs" />
     <Compile Include="Model\Overlay\BoxOverlay.cs" />
@@ -167,6 +165,7 @@
     <Compile Include="Model\Scaling\Down\TriangleScalingShader.cs" />
     <Compile Include="Model\Scaling\Down\IDownscalingShader.cs" />
     <Compile Include="Model\Scaling\ScalingModel.cs" />
+    <Compile Include="Model\Shader\ChannelFilterShader.cs" />
     <Compile Include="Model\Shader\ConvertPolarShader.cs" />
     <Compile Include="Model\Shader\ConvertTo3DShader.cs" />
     <Compile Include="Model\Shader\FilterShader.cs" />

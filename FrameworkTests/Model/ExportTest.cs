@@ -730,62 +730,62 @@ namespace FrameworkTests.Model
         {
             Color c;
             // general test if the test function works
-            c = GetExportedTexel(new Color(0.5f), GliFormat.R8_UNORM, ExportDir + "unorm0", "ktx");
+            c = GetExportedTexel(new Color(0.5f), GliFormat.R8_UNORM, ExportDir + "unorm0", "dds");
             Assert.AreEqual(0.5f, c.Red, 0.01f);
 
             // unorm should be between [0, 1]
-            c = GetExportedTexel(new Color(1.1f), GliFormat.R8_UNORM, ExportDir + "unorm1", "ktx");
+            c = GetExportedTexel(new Color(1.1f), GliFormat.R8_UNORM, ExportDir + "unorm1", "dds");
             Assert.AreEqual(1.0f, c.Red);
-            c = GetExportedTexel(new Color(-0.1f), GliFormat.R8_UNORM, ExportDir + "unorm2", "ktx");
+            c = GetExportedTexel(new Color(-0.1f), GliFormat.R8_UNORM, ExportDir + "unorm2", "dds");
             Assert.AreEqual(0.0f, c.Red);
 
             // snorm should be between [-1, 1]
-            c = GetExportedTexel(new Color(1.1f), GliFormat.R8_SNORM, ExportDir + "snorm1", "ktx");
+            c = GetExportedTexel(new Color(1.1f), GliFormat.R8_SNORM, ExportDir + "snorm1", "dds");
             Assert.AreEqual(1.0f, c.Red);
-            c = GetExportedTexel(new Color(-1.1f), GliFormat.R8_SNORM, ExportDir + "snorm2", "ktx");
+            c = GetExportedTexel(new Color(-1.1f), GliFormat.R8_SNORM, ExportDir + "snorm2", "dds");
             Assert.AreEqual(-1.0f, c.Red);
 
             // integer textures should not overflow (for 8 bit signed: [-128, 127])
-            c = GetExportedTexel(new Color(130.0f), GliFormat.R8_SINT, ExportDir + "sint1", "ktx");
+            c = GetExportedTexel(new Color(130.0f), GliFormat.R8_SINT, ExportDir + "sint1", "dds");
             Assert.AreEqual(127.0f, c.Red);
-            c = GetExportedTexel(new Color(-130.0f), GliFormat.R8_SINT, ExportDir + "sint2", "ktx");
+            c = GetExportedTexel(new Color(-130.0f), GliFormat.R8_SINT, ExportDir + "sint2", "dds");
             Assert.AreEqual(-128.0f, c.Red);
 
             // integer textures should not overflow (for 8 bit unsigned: [0, 255])
-            c = GetExportedTexel(new Color(-1.0f), GliFormat.R8_UINT, ExportDir + "uint1", "ktx");
+            c = GetExportedTexel(new Color(-1.0f), GliFormat.R8_UINT, ExportDir + "uint1", "dds");
             Assert.AreEqual(0.0f, c.Red);
-            c = GetExportedTexel(new Color(256.0f), GliFormat.R8_UINT, ExportDir + "uint2", "ktx");
+            c = GetExportedTexel(new Color(256.0f), GliFormat.R8_UINT, ExportDir + "uint2", "dds");
             Assert.AreEqual(255.0f, c.Red);
 
             // 32 bit float textures may represent any number (e.g. infinity without clamp)
-            c = GetExportedTexel(new Color(float.PositiveInfinity), GliFormat.R32_SFLOAT, ExportDir + "float1", "ktx");
+            c = GetExportedTexel(new Color(float.PositiveInfinity), GliFormat.R32_SFLOAT, ExportDir + "float1", "dds");
             Assert.AreEqual(float.PositiveInfinity, c.Red);
-            c = GetExportedTexel(new Color(float.NegativeInfinity), GliFormat.R32_SFLOAT, ExportDir + "float2", "ktx");
+            c = GetExportedTexel(new Color(float.NegativeInfinity), GliFormat.R32_SFLOAT, ExportDir + "float2", "dds");
             Assert.AreEqual(float.NegativeInfinity, c.Red);
             // NaN should be kept NaN
-            c = GetExportedTexel(new Color(float.NaN), GliFormat.R32_SFLOAT, ExportDir + "float3", "ktx");
+            c = GetExportedTexel(new Color(float.NaN), GliFormat.R32_SFLOAT, ExportDir + "float3", "dds");
             Assert.IsTrue(float.IsNaN(c.Red));
 
             // 16 bit float test
-            c = GetExportedTexel(new Color(float.PositiveInfinity), GliFormat.R16_SFLOAT, ExportDir + "hfloat1", "ktx");
+            c = GetExportedTexel(new Color(float.PositiveInfinity), GliFormat.R16_SFLOAT, ExportDir + "hfloat1", "dds");
             Assert.AreEqual(float.PositiveInfinity, c.Red);
-            c = GetExportedTexel(new Color(float.NegativeInfinity), GliFormat.R16_SFLOAT, ExportDir + "hfloat2", "ktx");
+            c = GetExportedTexel(new Color(float.NegativeInfinity), GliFormat.R16_SFLOAT, ExportDir + "hfloat2", "dds");
             Assert.AreEqual(float.NegativeInfinity, c.Red);
             // NaN should be kept NaN
-            c = GetExportedTexel(new Color(float.NaN), GliFormat.R16_SFLOAT, ExportDir + "hfloat3", "ktx");
+            c = GetExportedTexel(new Color(float.NaN), GliFormat.R16_SFLOAT, ExportDir + "hfloat3", "dds");
             Assert.IsTrue(float.IsNaN(c.Red));
             // numbers that exceed the max should go to infinity probably
-            c = GetExportedTexel(new Color(65504.0f), GliFormat.R16_SFLOAT, ExportDir + "hfloat4", "ktx");
+            c = GetExportedTexel(new Color(65504.0f), GliFormat.R16_SFLOAT, ExportDir + "hfloat4", "dds");
             Assert.AreEqual(65504.0f, c.Red); // max representable
-            c = GetExportedTexel(new Color(65504.0f * 2.0f), GliFormat.R16_SFLOAT, ExportDir + "hfloat5", "ktx");
+            c = GetExportedTexel(new Color(65504.0f * 2.0f), GliFormat.R16_SFLOAT, ExportDir + "hfloat5", "dds");
             Assert.AreEqual(float.PositiveInfinity, c.Red); // no longer representable
 
             // unsigned float RGB9E5 should be clamped to 0 but cant represent infinity (only till 65408)
-            c = GetExportedTexel(new Color(float.PositiveInfinity), GliFormat.RGB9E5_UFLOAT, ExportDir + "ufloat1", "ktx");
+            c = GetExportedTexel(new Color(float.PositiveInfinity), GliFormat.RGB9E5_UFLOAT, ExportDir + "ufloat1", "dds");
             Assert.AreEqual(65408.0f, c.Red); // max value according to spec: 65408
-            c = GetExportedTexel(new Color(float.NegativeInfinity), GliFormat.RGB9E5_UFLOAT, ExportDir + "ufloat2", "ktx");
+            c = GetExportedTexel(new Color(float.NegativeInfinity), GliFormat.RGB9E5_UFLOAT, ExportDir + "ufloat2", "dds");
             Assert.AreEqual(0.0f, c.Red);
-            c = GetExportedTexel(new Color(float.NaN), GliFormat.RGB9E5_UFLOAT, ExportDir + "ufloat2", "ktx");
+            c = GetExportedTexel(new Color(float.NaN), GliFormat.RGB9E5_UFLOAT, ExportDir + "ufloat2", "dds");
             Assert.AreEqual(0.0f, c.Red);
         }
 

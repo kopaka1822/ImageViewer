@@ -99,13 +99,20 @@ namespace ImageViewer.Commands.Export
 
             var path = Path.ChangeExtension(filename, null);
 
-            var desc = new ExportDescription(tex, path, ext)
+            try
             {
-                Multiplier = multiplier,
-            };
-            desc.TrySetFormat(format);
+                var desc = new ExportDescription(tex, path, ext)
+                {
+                    Multiplier = multiplier,
+                };
+                desc.TrySetFormat(format);
 
-            models.Export.ExportAsync(desc);
+                models.Export.ExportAsync(desc);
+            }
+            catch(Exception e)
+            {
+                models.Window.ShowErrorDialog(e);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.DirectX;
+using ImageFramework.ImageLoader;
 using ImageFramework.Utility;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
@@ -28,7 +29,8 @@ namespace ImageFramework.Model.Shader
 
         public Texture3D ConvertTo3D(TextureArray2D src)
         {
-            var dst = new Texture3D(1, new Size3(src.Size.X, src.Size.Y, src.NumLayers), Format.R32G32B32A32_Float,
+            Debug.Assert(ImageFormat.IsSupported(src.Format));
+            var dst = new Texture3D(1, new Size3(src.Size.X, src.Size.Y, src.NumLayers), src.Format,
                 false);
 
             var dev = Device.Get();
@@ -57,10 +59,11 @@ namespace ImageFramework.Model.Shader
             if (numLayers < 0)
                 numLayers = dim[layerAxis] - startLayer;
 
+            Debug.Assert(ImageFormat.IsSupported(src.Format));
             var dst = new TextureArray2D(
                 new LayerMipmapCount(numLayers, 1), 
-                new Size3(dim[fixedAxis1], dim[fixedAxis2]), 
-                Format.R32G32B32A32_Float, false
+                new Size3(dim[fixedAxis1], dim[fixedAxis2]),
+                src.Format, false
             );
 
             var data = new LayerBufferData

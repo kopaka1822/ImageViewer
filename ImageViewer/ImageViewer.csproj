@@ -156,6 +156,8 @@
     <Compile Include="Models\Display\HeatmapModel.cs" />
     <Compile Include="Models\Display\IDisplayOverlay.cs" />
     <Compile Include="Models\Display\MovieDisplayModel.cs" />
+    <Compile Include="Models\Display\Overlays\HeatmapOverlay.cs" />
+    <Compile Include="Models\Display\Overlays\HeatmapOverlayShader.cs" />
     <Compile Include="Models\Display\RayCastingDisplayModel.cs" />
     <Compile Include="Models\Display\Single3DDisplayModel.cs" />
     <Compile Include="Models\ExportConfigModel.cs" />
@@ -179,6 +181,7 @@
     <Compile Include="ViewModels\Dialog\GifExportViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ImportArrayViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ImportMovieViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\ImportNpyViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PaddingViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelColorViewModel.cs" />
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
@@ -217,6 +220,7 @@
     <Compile Include="Views\Converter\BoolIntConverter.cs" />
     <Compile Include="Views\Converter\BoolVisibilityConverter.cs" />
     <Compile Include="Views\Converter\NullVisibilityConverter.cs" />
+    <Compile Include="Views\Converter\PathToFilenameConverter.cs" />
     <Compile Include="Views\CustomTextBox.cs" />
     <Compile Include="Views\Dialog\ArrayImportDialog.xaml.cs">
       <DependentUpon>ArrayImportDialog.xaml</DependentUpon>
@@ -244,6 +248,9 @@
     </Compile>
     <Compile Include="Views\Dialog\ImportMovieDialog.xaml.cs">
       <DependentUpon>ImportMovieDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\ImportNpyDialog.xaml.cs">
+      <DependentUpon>ImportNpyDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\PaddingDialog.xaml.cs">
       <DependentUpon>PaddingDialog.xaml</DependentUpon>
@@ -371,6 +378,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialog\ImportMovieDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\ImportNpyDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -648,5 +659,6 @@
   <ItemGroup>
     <Resource Include="Icons\temperature.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

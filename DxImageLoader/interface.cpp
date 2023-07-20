@@ -14,6 +14,7 @@
 #include "ktx_interface.h"
 #include "png_interface.h"
 #include "hdr_interface.h"
+#include "numpy_interface.h"
 #include "threadsafe_unordered_map.h"
 
 static std::atomic<int> s_currentID = 1;
@@ -25,7 +26,8 @@ static uint32_t s_last_progress = -1;
 
 // key = extension (e.g. png), value = DXGI formats
 static std::map<std::string, std::vector<uint32_t>> s_exportFormats;
-static std::map<std::string, int> s_globalParameteri;
+static std::unordered_map<std::string, int> s_globalParameteri;
+static std::mutex s_globalParameterMutex;
 
 bool hasEnding(std::string const& fullString, std::string const& ending) {
 	if (fullString.length() >= ending.length()) {
@@ -68,11 +70,11 @@ int image_open(const char* filename)
 		{
 			res = pfm_load(filename);
 		}
-		else if(hasEnding(fname, ".ktx2"))
+		else if(hasEnding(fname, ".ktx") || hasEnding(fname, ".ktx2"))
 		{
-			res = ktx2_load(filename);
+			res = ktx_load(filename);
 		}
-		else if (hasEnding(fname, ".dds") || hasEnding(fname, ".ktx"))
+		else if (hasEnding(fname, ".dds"))
 		{
 			res = gli_load(filename);
 		}
@@ -87,6 +89,10 @@ int image_open(const char* filename)
 		else if(hasEnding(fname, ".hdr"))
 		{
 			res = hdr_load(filename);
+		}
+		else if(hasEnding(fname, ".npy"))
+		{
+			res = numpy_load(filename);
 		}
 		else
 		{
@@ -205,7 +211,8 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 		if (ext == "dds")
 			gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*img), gli::format(format), false, quality);
 		else if (ext == "ktx")
-			gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*img), gli::format(format), true, quality);
+			//gli_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*img), gli::format(format), true, quality);
+			ktx1_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*img), gli::format(format), quality);
 		else if (ext == "ktx2")
 			ktx2_save_image(fullName.c_str(), dynamic_cast<GliImage&>(*img), gli::format(format), quality);
 		else if(ext == "hdr")
@@ -245,7 +252,7 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 			assertSingleLayerMip(*img);
 			png_write(*img, fullName.c_str(), gli::format(format), quality);
 		}
-		else if (ext == "jpg" || ext == "bmp")
+		else if (ext == "jpg" || ext == "bmp" || ext == "tga")
 		{
 			assertSingleLayerMip(*img);
 			if (img->getFormat() != gli::FORMAT_RGBA8_SRGB_PACK8 &&
@@ -272,6 +279,8 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 				stb_save_bmp(fullName.c_str(), width, height, nComponents, mip);
 			else if (ext == "jpg")
 				stb_save_jpg(fullName.c_str(), width, height, nComponents, mip, quality);
+			else if (ext == "tga")
+				stb_save_tga(fullName.c_str(), width, height, nComponents, mip);
 			else assert(false);
 		}
 		else throw std::runtime_error("file extension not supported");
@@ -297,6 +306,7 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 		s_exportFormats["png"] = png_get_export_formats();
 		s_exportFormats["bmp"] = stb_image_get_export_formats("bmp");
 		s_exportFormats["ktx2"] = ktx2_get_export_formats();
+		s_exportFormats["tga"] = stb_image_get_export_formats("tga");
 	}
 	auto it = s_exportFormats.find(extension);
 	if(it == s_exportFormats.end())
@@ -309,36 +319,33 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 	return it->second.data();
 }
 
-bool get_global_parameter_i(const char* name, int& results)
+int get_global_parameter_i(const char* name)
 {
-	if (s_globalParameteri.empty())
-	{
-		// insert default values
-		set_global_parameter_i("normalmap", 0);
-		set_global_parameter_i("uastc srgb", 0);
-	}
-
+	std::lock_guard<std::mutex> g(s_globalParameterMutex);
 	auto it = s_globalParameteri.find(name);
 	if (it == s_globalParameteri.end())
 	{
-	    set_error("could not find global parameter: " + std::string(name));
-		return false;
+		set_error("global parameter not found: " + std::string(name));
+		throw std::runtime_error(s_error);
 	}
 
-	results = it->second;
-	return true;
+	return it->second;
 }
 
-int get_global_parameter_i(const char* name)
+int get_global_parameter_i(const char* name, int defaultValue)
 {
-	int res = 0;
-	if(get_global_parameter_i(name, res)) return res;
-
-	throw std::runtime_error(s_error);
+	std::lock_guard<std::mutex> g(s_globalParameterMutex);
+	auto it = s_globalParameteri.find(name);
+	if (it == s_globalParameteri.end())
+	{
+		return defaultValue;
+	}
+	return it->second;
 }
 
 void set_global_parameter_i(const char* name, int value)
 {
+	std::lock_guard<std::mutex> g(s_globalParameterMutex);
 	s_globalParameteri[name] = value;
 }
 

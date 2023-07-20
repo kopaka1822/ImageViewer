@@ -53,6 +53,18 @@
             </StackPanel>
         </StatusBarItem>
 
+        <!-- Equation Channel Filter -->
+        <StatusBarItem
+            HorizontalAlignment="Left"
+            BorderThickness="0 0 1 0">
+            <ComboBox 
+                ItemsSource="{Binding Display.AvailableChannelFilter}"
+                SelectedItem="{Binding Display.SelectedChannelFilter}"
+                ItemTemplate="{StaticResource ListItemView}"
+                Width="60"
+                IsEnabled="{Binding Progress.NotProcessing}"/>
+        </StatusBarItem>
+        
         <!-- Equation Colors -->
         <ItemsControl
             ItemsSource="{Binding Equations.Equations}">

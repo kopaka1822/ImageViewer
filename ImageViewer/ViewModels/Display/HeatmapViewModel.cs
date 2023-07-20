@@ -8,12 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using ImageFramework.Annotations;
+using ImageFramework.Model.Filter;
+using ImageFramework.Model.Filter.Parameter;
 using ImageFramework.Model.Overlay;
 using ImageFramework.Utility;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Controller.Overlays;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
+using ImageViewer.Models.Display.Overlays;
 
 namespace ImageViewer.ViewModels.Display
 {
@@ -21,38 +24,91 @@ namespace ImageViewer.ViewModels.Display
     {
         private readonly ModelsEx models;
         private readonly ViewModels viewModels;
-        private HeatmapOverlay.Heatmap lastHeatmap;
+        private FilterModel curFilter = null; // current heatmap filter
+        private Action unsubFilter = null; // unsibscirbe from filter events
 
         public HeatmapViewModel(ModelsEx models, ViewModels viewModels)
         {
             this.models = models;
             this.viewModels = viewModels;
-            models.Heatmap.PropertyChanged += HeatmapOnPropertyChanged;
 
             SetPositionCommand = new ActionCommand(SetPosition);
-            LoadFilterCommand = new ActionCommand(LoadFilter);
+            //LoadFilterCommand = new ActionCommand(LoadFilter);
 
-            // init last heatmap
-            lastHeatmap = new HeatmapOverlay.Heatmap
-            {
-                Border = 2,
-                Start = Float2.Zero,
-                End = new Float2(0.01f, 0.4f),
-                Style = HeatmapOverlay.Style.BlackRed
-            };
+            // listen to filters to synchronize filter with heatmap
+            models.Filter.PropertyChanged += FiltersPropertyChanged;
+            models.Heatmap.PropertyChanged += HeatmapPropertyChanged;
         }
 
-        private void HeatmapOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void HeatmapPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
-                case nameof(HeatmapModel.Heatmap):
+                case nameof(HeatmapModel.IsEnabled):
+                    if (models.Heatmap.IsEnabled && curFilter == null)
+                        LoadFilter(); // load filter if it was not loaded yet
                     OnPropertyChanged(nameof(IsEnabled));
-                    // save last state
-                    if (models.Heatmap.Heatmap.HasValue)
-                        lastHeatmap = models.Heatmap.Heatmap.Value;
                     break;
             }
+        }
+
+        private void FiltersPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(FiltersModel.Filter):
+                    UnregisterFilter();
+                    var newHeatmapFilter = models.Filter.Filter.LastOrDefault(filter => filter.Name == "Heatmap");
+                    RegisterFilter(newHeatmapFilter);
+                    break;
+            }
+        }
+
+        // unregister current filter
+        private void UnregisterFilter()
+        {
+            if (unsubFilter == null)
+                return;
+
+            unsubFilter();
+            curFilter = null;
+            unsubFilter = null;
+        }
+
+        private void RegisterFilter(FilterModel filter)
+        {
+            if (filter == null)
+            {
+                // no filter found => disable heatmap
+                models.Heatmap.IsEnabled = false;
+                return;
+            }
+            Debug.Assert(filter.Name == "Heatmap");
+
+            // look for the relevant parameters
+            var typeParam = filter.Parameters.FirstOrDefault(p => p.GetBase().Name == "Type") as IntFilterParameterModel;
+            if(typeParam != null)
+            {
+                typeParam.PropertyChanged += TypeParameterOnChange;
+                models.Heatmap.Style = (HeatmapModel.ColorStyle)typeParam.Value;
+            }
+
+            // TODO subscribe to base model for "enabled" property
+            curFilter = filter;
+            unsubFilter = () =>
+            {
+                if (typeParam != null)
+                    typeParam.PropertyChanged -= TypeParameterOnChange;
+                
+            };
+        }
+
+        // callback for the type paramter (heatmap style)
+        private void TypeParameterOnChange(object sender, PropertyChangedEventArgs e)
+        {
+            var model = (IntFilterParameterModel)sender;
+            models.Heatmap.Style = (HeatmapModel.ColorStyle)model.Value;
+            
         }
 
         public void SetPosition()
@@ -91,29 +147,10 @@ namespace ImageViewer.ViewModels.Display
 
         public ICommand SetPositionCommand { get; }
 
-        public ICommand ConfigureCommand { get; }
-
-        public ICommand LoadFilterCommand { get; }
-
         public bool IsEnabled
         {
-            get => models.Heatmap.Heatmap.HasValue;
-            set
-            {
-                if (value == IsEnabled) return;
-
-                if (value)
-                {
-                    // set to state before it was disabled
-                    models.Heatmap.Heatmap = lastHeatmap;
-                }
-                else
-                {
-                    models.Heatmap.Heatmap = null;
-                }
-                
-                // OnPropertyChanged(nameof(IsEnabled));
-            }
+            get => models.Heatmap.IsEnabled;
+            set => models.Heatmap.IsEnabled = value;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

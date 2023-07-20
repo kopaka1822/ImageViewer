@@ -11,9 +11,80 @@
 
 #include "GliImage.h"
 #include "interface.h"
+#include "gli_interface.h"
 
 gli::format convertFormat(VkFormat format);
 VkFormat convertFormat(gli::format);
+
+void set_ktx_image_data(ktxTexture* ktex, GliImage& image)
+{
+	// set image data for all layers, faces and levels
+	for (uint32_t layer = 0; layer < image.getNumNonFaceLayers(); ++layer)
+	{
+		for (uint32_t face = 0; face < image.getNumFaces(); ++face)
+		{
+			for (uint32_t level = 0; level < image.getNumMipmaps(); ++level)
+			{
+				size_t byteSize;
+				const uint8_t* data = image.getData(layer * image.getNumFaces() + face, level, byteSize);
+				auto curDepth = image.getDepth(level);
+
+				if (curDepth == 1)
+				{
+					auto err = ktxTexture_SetImageFromMemory(ktex, level, layer, face, data, byteSize);
+					if (err != KTX_SUCCESS)
+						throw std::runtime_error(std::string("could not set image data: ") + ktxErrorString(err));
+				}
+				else // for multiple depth slices => split as if it has multiple faces
+				{
+					auto sliceSize = byteSize / curDepth;
+					for (uint32_t z = 0; z < curDepth; ++z)
+					{
+						auto err = ktxTexture_SetImageFromMemory(ktex, level, layer, z, data + z * sliceSize, sliceSize);
+						if (err != KTX_SUCCESS)
+							throw std::runtime_error(std::string("could not set image data: ") + ktxErrorString(err));
+					}
+				}
+			}
+		}
+	}
+}
+
+void ktx1_save_image(const char* filename, GliImage& image, gli::format format, int quality)
+{
+	// convert format if it does not match
+	if (image.getFormat() != format)
+	{
+		auto tmp = image.convert(format, quality);
+		ktx1_save_image(filename, *tmp, format, quality);
+		return;
+	}
+
+	ktxTexture1* ktex;
+	ktxTextureCreateInfo i;
+	i.glInternalformat = get_gl_format(format);
+	i.vkFormat = convertFormat(format); // it is okay if this is undefined for ktx1
+	i.baseWidth = image.getWidth(0);
+	i.baseHeight = image.getHeight(0);
+	i.baseDepth = image.getDepth(0);
+	if (i.baseDepth > 1) i.numDimensions = 3;
+	else if (i.baseHeight > 1 || quality < 100) i.numDimensions = 2;
+	else i.numDimensions = 1;
+	i.numLevels = image.getNumMipmaps();
+	i.numLayers = image.getNumNonFaceLayers();
+	i.numFaces = image.getNumFaces();
+	i.isArray = i.numLayers > 1;
+	i.generateMipmaps = false; // TODO let the user select
+
+	auto err = ktxTexture1_Create(&i, KTX_TEXTURE_CREATE_ALLOC_STORAGE, &ktex);
+	if (err != KTX_SUCCESS)
+		throw std::runtime_error(std::string("failed create ktx texture storage: ") + ktxErrorString(err));
+
+	set_ktx_image_data(ktxTexture(ktex), image);
+
+	ktxTexture_WriteToNamedFile(ktxTexture(ktex), filename);
+	ktxTexture_Destroy(ktxTexture(ktex));
+}
 
 void ktx2_save_image(const char* filename, GliImage& image, gli::format format, int quality)
 {
@@ -29,6 +100,8 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 	ktxTextureCreateInfo i;
 	i.glInternalformat = 0; // ignored for ktx2
 	i.vkFormat = convertFormat(format);
+	if(i.vkFormat == VK_FORMAT_UNDEFINED)
+		throw std::runtime_error("Could not find a matching VK_FORMAT for the requested output format");
 	i.baseWidth = image.getWidth(0);
 	i.baseHeight = image.getHeight(0);
 	i.baseDepth = image.getDepth(0);
@@ -45,36 +118,7 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 	if(err != KTX_SUCCESS)
 		throw std::runtime_error(std::string("failed create ktx texture storage: ") + ktxErrorString(err));
 
-	// set image data for all layers, faces and levels
-	for(uint32_t layer = 0; layer < i.numLayers; ++layer)
-	{
-		for(uint32_t face = 0; face < i.numFaces; ++face)
-		{
-			for(uint32_t level = 0; level < i.numLevels; ++level)
-			{
-				size_t byteSize;
-				const uint8_t* data = image.getData(layer * i.numFaces + face, level, byteSize);
-				auto curDepth = image.getDepth(level);
-				
-				if(curDepth == 1)
-				{
-					err = ktxTexture_SetImageFromMemory(ktxTexture(ktex), level, layer, face, data, byteSize);
-					if (err != KTX_SUCCESS)
-						throw std::runtime_error(std::string("could not set image data: ") + ktxErrorString(err));
-				}
-				else // for multiple depth slices => split as if it has multiple faces
-				{
-					auto sliceSize = byteSize / curDepth;
-					for(uint32_t z = 0; z < curDepth; ++z)
-					{
-						err = ktxTexture_SetImageFromMemory(ktxTexture(ktex), level, layer, z, data + z * sliceSize, sliceSize);
-						if (err != KTX_SUCCESS)
-							throw std::runtime_error(std::string("could not set image data: ") + ktxErrorString(err));
-					}
-				}
-			}
-		}
-	}
+	set_ktx_image_data(ktxTexture(ktex), image);
 
 	// optionally compress (if it was not already compressed)
 	if(!is_compressed(format) && quality < 100)
@@ -87,11 +131,11 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 		params.qualityLevel = std::max((quality * 254) / 99 + 1, 1); // scale quality [0, 99] between [1, 255]
 		params.normalMap = KTX_FALSE;
 		if (!gli::is_srgb(format)) // only valid for linear textures
-	        params.normalMap = get_global_parameter_i("normalmap") ? KTX_TRUE : KTX_FALSE;
+	        params.normalMap = get_global_parameter_i("normalmap", 0) ? KTX_TRUE : KTX_FALSE;
 
 	    // select uastc for everything that is not color (here: for everyhing that is not SRGB)
 		// unless the "uastc srgb" flag is set => then use usastc as well
-		if(!gli::is_srgb(format) || get_global_parameter_i("uastc srgb"))
+		if(!gli::is_srgb(format) || get_global_parameter_i("uastc srgb", 0))
 		{
 		    params.uastc = KTX_TRUE;
 			params.uastcFlags = KTX_PACK_UASTC_MAX_LEVEL; // maximum supported quality
@@ -108,16 +152,86 @@ void ktx2_save_image(const char* filename, GliImage& image, gli::format format, 
 	ktxTexture_Destroy(ktxTexture(ktex));
 }
 
-std::unique_ptr<image::IImage> ktx2_load(const char* filename)
+std::unique_ptr<image::IImage> ktx_load_base(ktxTexture* ktex, gli::format format, gli::format originalFormat)
 {
-	ktxTexture* ktex;
-	auto err = ktxTexture_CreateFromNamedFile(filename, KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktex);
-	if (err != KTX_SUCCESS)
-		throw std::runtime_error(std::string("failed to load file: ") + ktxErrorString(err));
+	// store data in gli storage to be able to convert it easily
+	auto res = std::make_unique<GliImage>(format, originalFormat,
+		ktex->numLayers, ktex->numFaces, ktex->numLevels,
+		ktex->baseWidth, ktex->baseHeight, ktex->baseDepth);
 
-	if (ktex->classId != ktxTexture2_c)
-		throw std::runtime_error("expected ktx2 texture but got ktx1 texture");
 
+	ktx_uint32_t dstLayer = 0;
+	for (ktx_uint32_t srcLayer = 0; srcLayer < ktex->numLayers; ++srcLayer)
+	{
+		for (ktx_uint32_t srcFace = 0; srcFace < ktex->numFaces; ++srcFace)
+		{
+			for (ktx_uint32_t mip = 0; mip < ktex->numLevels; ++mip)
+			{
+				ktx_size_t offset = 0;
+				ktxTexture_GetImageOffset(ktex, ktx_uint32_t(mip), ktx_uint32_t(srcLayer), ktx_uint32_t(srcFace), &offset);
+				//ktex2->vtbl->GetImageOffset(ktex, mip, srcLayer, srcFace, &offset);
+				auto ktxLvlSize = ktxTexture_GetImageSize(ktex, ktx_uint32_t(mip));
+				ktxLvlSize *= res->getDepth(mip); // is not multiplied with depth layer
+				size_t size;
+				auto dstData = res->getData(dstLayer, mip, size);
+				if(ktxLvlSize == size)
+				{
+					memcpy(dstData, ktex->pData + offset, size); // alignment matches
+				}
+				else if(size < ktxLvlSize)
+				{
+					// calculate size with alignment after each row
+					size_t rows = res->getHeight(mip) * res->getDepth(mip);
+					size_t unalignedRow = size / rows;
+					size_t alignedRow = ktxLvlSize / rows;
+					auto srcData = ktex->pData;
+					//std::vector<uint8_t> debugSrc(srcData, srcData + ktxLvlSize);
+					// copy row by row
+					for(size_t r = 0; r < rows; ++r)
+					{
+						memcpy(dstData, srcData, unalignedRow);
+						dstData += unalignedRow;
+						srcData += alignedRow;
+					}
+				}
+				else throw std::runtime_error("suggested level size of gli does not match with ktx api");
+			}
+			++dstLayer;
+		}
+	}
+
+	ktxTexture_Destroy(ktex);
+
+	if (!image::isSupported(res->getFormat()))
+	{
+		res = res->convert(image::getSupportedFormat(res->getFormat()), 100);
+	}
+
+	if (ktex->orientation.y == KTX_ORIENT_Y_UP)
+		res->flip();
+
+	return res;
+}
+
+std::unique_ptr<image::IImage> ktx1_load(ktxTexture* ktex)
+{
+	assert(ktex->classId == ktxTexture1_c);
+	ktxTexture1* ktex1 = reinterpret_cast<ktxTexture1*>(ktex);
+
+	gli::format format = gli::FORMAT_UNDEFINED;
+	gli::format originalFormat = format;
+	assert(!ktxTexture1_NeedsTranscoding(ktex1)); // currently set to return false 
+	format = originalFormat = get_format_from_GL(ktex1->glInternalformat, ktex1->glFormat, ktex1->glType);
+
+	if (format == gli::FORMAT_UNDEFINED)
+		throw std::runtime_error("could not interpret format id " + std::to_string(ktex1->glFormat));
+
+	return ktx_load_base(ktex, format, originalFormat);
+}
+
+std::unique_ptr<image::IImage> ktx2_load(ktxTexture* ktex)
+{
+	assert(ktex->classId == ktxTexture2_c);
 	ktxTexture2* ktex2 = reinterpret_cast<ktxTexture2*>(ktex);
 
 	gli::format format = gli::FORMAT_UNDEFINED;
@@ -127,7 +241,7 @@ std::unique_ptr<image::IImage> ktx2_load(const char* filename)
 		const auto compressionSheme = ktex2->supercompressionScheme;
 		auto numComponents = ktxTexture2_GetNumComponents(ktex2);
 		// do transcoding
-		err = ktxTexture2_TranscodeBasis(ktex2, KTX_TTF_RGBA32, 0);
+		auto err = ktxTexture2_TranscodeBasis(ktex2, KTX_TTF_RGBA32, 0);
 		if (err != KTX_SUCCESS)
 			throw std::runtime_error(std::string("failed to transcode file: ") + ktxErrorString(err));
 		// set format and (previous) original format
@@ -146,52 +260,26 @@ std::unique_ptr<image::IImage> ktx2_load(const char* filename)
 	else format = originalFormat = convertFormat(VkFormat(ktex2->vkFormat)); // no transcoding needed => read format directly
 
 	if (format == gli::FORMAT_UNDEFINED)
-		throw std::runtime_error("could not interpret format id " + std::to_string(ktex2->vkFormat));
+		throw std::runtime_error("could not translate format id from VK_FORMAT to Image Viewer format. VK_FORMAT: " + std::to_string(ktex2->vkFormat));
 
-	// store data in gli storage to be able to convert it easily
-	auto res = std::make_unique<GliImage>(format, originalFormat,
-	    ktex->numLayers, ktex->numFaces, ktex->numLevels, 
-		ktex->baseWidth, ktex->baseHeight, ktex->baseDepth);
+	return ktx_load_base(ktex, format, originalFormat);
+}
 
-	//auto ktxSize = ktxTexture_GetSize(ktex);
-	//assert(ktxSize == res->getSize());
-	//err = ktxTexture_LoadImageData(ktex, res->getData(), res->getSize());
-	//if (err != KTX_SUCCESS)
-	//	throw std::runtime_error(std::string("could not load image data: ") + ktxErrorString(err));
-	ktx_uint32_t dstLayer = 0;
-	for(ktx_uint32_t srcLayer = 0; srcLayer < ktex->numLayers; ++srcLayer)
+std::unique_ptr<image::IImage> ktx_load(const char* filename)
+{
+	ktxTexture* ktex;
+	auto err = ktxTexture_CreateFromNamedFile(filename, KTX_TEXTURE_CREATE_LOAD_IMAGE_DATA_BIT, &ktex);
+	if (err != KTX_SUCCESS)
+		throw std::runtime_error(std::string("failed to load file: ") + ktxErrorString(err));
+
+	switch (ktex->classId)
 	{
-		for(ktx_uint32_t srcFace = 0; srcFace < ktex->numFaces; ++srcFace)
-		{
-			for(ktx_uint32_t mip = 0; mip < ktex->numLevels; ++mip)
-			{
-				ktx_size_t offset = 0;
-				ktxTexture_GetImageOffset(ktex, ktx_uint32_t(mip), ktx_uint32_t(srcLayer), ktx_uint32_t(srcFace), &offset);
-				//ktex2->vtbl->GetImageOffset(ktex, mip, srcLayer, srcFace, &offset);
-				auto ktxLvlSize = ktxTexture_GetImageSize(ktex, ktx_uint32_t(mip));
-				ktxLvlSize *= res->getDepth(mip); // is not multiplied with depth layer
-				size_t size;
-				auto dstData = res->getData(dstLayer, mip, size);
-				if(ktxLvlSize != size)
-					throw std::runtime_error("suggested level size of gli does not match with ktx api");
-				memcpy(dstData, ktex->pData + offset, size);
-				
-			}
-			++dstLayer;
-		}
+	case ktxTexture1_c:
+		return ktx1_load(ktex);
+	case ktxTexture2_c:
+		return ktx2_load(ktex);
 	}
-
-	ktxTexture_Destroy(ktex);
-
-	if (!image::isSupported(res->getFormat()))
-	{
-		res = res->convert(image::getSupportedFormat(res->getFormat()), 100);
-	}
-
-	if(ktex->orientation.y == KTX_ORIENT_Y_UP)
-		res->flip();
-	
-	return res;
+	throw std::runtime_error("expected ktx2 texture or ktx1 texture class but got unknown class");
 }
 
 gli::format convertFormat(VkFormat format)
@@ -258,14 +346,14 @@ gli::format convertFormat(VkFormat format)
 	//{VK_FORMAT_A2R10G10B10_SNORM_PACK32, gli::FORMAT_ },  
 	//{VK_FORMAT_A2R10G10B10_USCALED_PACK32, gli::FORMAT_ },  
 	//{VK_FORMAT_A2R10G10B10_SSCALED_PACK32, gli::FORMAT_ },  
-	//{VK_FORMAT_A2R10G10B10_UINT_PACK32, gli::FORMAT_ },  
-	//{VK_FORMAT_A2R10G10B10_SINT_PACK32, gli::FORMAT_ },  
-	//{VK_FORMAT_A2B10G10R10_UNORM_PACK32, gli::FORMAT_ },  
-	//{VK_FORMAT_A2B10G10R10_SNORM_PACK32, gli::FORMAT_ },  
+	{VK_FORMAT_A2R10G10B10_UINT_PACK32, gli::FORMAT_RGB10A2_UINT_PACK32 },  
+	{VK_FORMAT_A2R10G10B10_SINT_PACK32, gli::FORMAT_RGB10A2_SINT_PACK32 }, 
+	{VK_FORMAT_A2B10G10R10_UNORM_PACK32, gli::FORMAT_BGR10A2_SNORM_PACK32 },  
+	{VK_FORMAT_A2B10G10R10_SNORM_PACK32, gli::FORMAT_BGR10A2_SNORM_PACK32 },  
 	//{VK_FORMAT_A2B10G10R10_USCALED_PACK32, gli::FORMAT_ },  
 	//{VK_FORMAT_A2B10G10R10_SSCALED_PACK32, gli::FORMAT_ },  
-	//{VK_FORMAT_A2B10G10R10_UINT_PACK32, gli::FORMAT_ },  
-	//{VK_FORMAT_A2B10G10R10_SINT_PACK32, gli::FORMAT_ },  
+	{VK_FORMAT_A2B10G10R10_UINT_PACK32, gli::FORMAT_BGR10A2_UINT_PACK32 },  
+	{VK_FORMAT_A2B10G10R10_SINT_PACK32, gli::FORMAT_BGR10A2_SINT_PACK32 },  
 	{VK_FORMAT_R16_UNORM, gli::FORMAT_R16_UNORM_PACK16 },  
 	{VK_FORMAT_R16_SNORM, gli::FORMAT_R16_SNORM_PACK16 },  
 	{VK_FORMAT_R16_USCALED, gli::FORMAT_R16_USCALED_PACK16 },  
@@ -627,7 +715,8 @@ VkFormat convertFormat(gli::format format)
 	case gli::FORMAT_RGBA_BP_SRGB_BLOCK16: return VK_FORMAT_BC7_SRGB_BLOCK;
 	case gli::FORMAT_RGBA_ETC2_UNORM_BLOCK16: return VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK;
 	case gli::FORMAT_RGBA_ETC2_SRGB_BLOCK16: return VK_FORMAT_ETC2_R8G8B8A8_SRGB_BLOCK;
-		
+
+
 	// order different but same components (TODO experimental)
 	//case gli::FORMAT_RGB10A2_UNORM_PACK32: 
 	//	return VK_FORMAT_A2R10G10B10_UNORM_PACK32;
@@ -637,22 +726,22 @@ VkFormat convertFormat(gli::format format)
 	//	return VK_FORMAT_A2R10G10B10_USCALED_PACK32;
 	//case gli::FORMAT_RGB10A2_SSCALED_PACK32:
 	//	return VK_FORMAT_A2R10G10B10_SSCALED_PACK32;
-	//case gli::FORMAT_RGB10A2_UINT_PACK32:
-	//	return VK_FORMAT_A2R10G10B10_UINT_PACK32;
-	//case gli::FORMAT_RGB10A2_SINT_PACK32:
-	//	return VK_FORMAT_A2R10G10B10_SINT_PACK32;
-	//case gli::FORMAT_BGR10A2_UNORM_PACK32:
-	//	return VK_FORMAT_A2B10G10R10_UNORM_PACK32;
-	//case gli::FORMAT_BGR10A2_SNORM_PACK32:
-	//	return VK_FORMAT_A2B10G10R10_SNORM_PACK32;
+	case gli::FORMAT_RGB10A2_UINT_PACK32:
+		return VK_FORMAT_A2R10G10B10_UINT_PACK32;
+	case gli::FORMAT_RGB10A2_SINT_PACK32:
+		return VK_FORMAT_A2R10G10B10_SINT_PACK32;
+	case gli::FORMAT_BGR10A2_UNORM_PACK32:
+		return VK_FORMAT_A2B10G10R10_UNORM_PACK32;
+	case gli::FORMAT_BGR10A2_SNORM_PACK32:
+		return VK_FORMAT_A2B10G10R10_SNORM_PACK32;
 	//case gli::FORMAT_BGR10A2_USCALED_PACK32:
 	//	return VK_FORMAT_A2B10G10R10_USCALED_PACK32;
 	//case gli::FORMAT_BGR10A2_SSCALED_PACK32:
 	//	return VK_FORMAT_A2B10G10R10_SSCALED_PACK32;
-	//case gli::FORMAT_BGR10A2_UINT_PACK32:
-	//	return VK_FORMAT_A2B10G10R10_UINT_PACK32;
-	//case gli::FORMAT_BGR10A2_SINT_PACK32:
-	//	return VK_FORMAT_A2B10G10R10_SINT_PACK32;
+	case gli::FORMAT_BGR10A2_UINT_PACK32:
+		return VK_FORMAT_A2B10G10R10_UINT_PACK32;
+	case gli::FORMAT_BGR10A2_SINT_PACK32:
+		return VK_FORMAT_A2B10G10R10_SINT_PACK32;
 
 	//case gli::FORMAT_RG11B10_UFLOAT_PACK32:
 	//case gli::FORMAT_RGB9E5_UFLOAT_PACK32: 
@@ -680,6 +769,181 @@ VkFormat convertFormat(gli::format format)
 	return VK_FORMAT_UNDEFINED;
 }
 
+std::vector<uint32_t> ktx_get_export_formats()
+{
+	return std::vector<uint32_t>{
+
+		// uniform
+		gli::format::FORMAT_RG3B2_UNORM_PACK8,
+			gli::format::FORMAT_RGBA4_UNORM_PACK16,
+			gli::format::FORMAT_BGRA4_UNORM_PACK16,
+			gli::format::FORMAT_R5G6B5_UNORM_PACK16,
+			gli::format::FORMAT_B5G6R5_UNORM_PACK16,
+			//gli::format::FORMAT_RGB5A1_UNORM_PACK16,
+			//gli::format::FORMAT_BGR5A1_UNORM_PACK16,
+			gli::format::FORMAT_R8_UNORM_PACK8,
+			gli::format::FORMAT_R8_SNORM_PACK8,
+			gli::FORMAT_R8_UINT_PACK8,
+			gli::FORMAT_R8_SINT_PACK8,
+			gli::format::FORMAT_RG8_UNORM_PACK8,
+			gli::format::FORMAT_RG8_SNORM_PACK8,
+			gli::FORMAT_RG8_UINT_PACK8,
+			gli::FORMAT_RG8_SINT_PACK8,
+			gli::format::FORMAT_RGB8_UNORM_PACK8,
+			gli::format::FORMAT_RGB8_SNORM_PACK8,
+			gli::format::FORMAT_RGB8_SRGB_PACK8,
+			gli::FORMAT_RGB8_UINT_PACK8,
+			gli::FORMAT_RGB8_SINT_PACK8,
+			gli::format::FORMAT_BGR8_UNORM_PACK8,
+			gli::format::FORMAT_BGR8_SNORM_PACK8,
+			gli::format::FORMAT_BGR8_SRGB_PACK8,
+			// those give some block size mismatch error from gli:
+			//gli::FORMAT_BGR8_UINT_PACK8,
+			//gli::FORMAT_BGR8_SINT_PACK8,
+			gli::format::FORMAT_RGBA8_UNORM_PACK8,
+			gli::format::FORMAT_RGBA8_SNORM_PACK8,
+			gli::format::FORMAT_RGBA8_SRGB_PACK8,
+			gli::FORMAT_RGBA8_UINT_PACK8,
+			gli::FORMAT_RGBA8_SINT_PACK8,
+			gli::format::FORMAT_BGRA8_UNORM_PACK8,
+			gli::format::FORMAT_BGRA8_SNORM_PACK8,
+			gli::format::FORMAT_BGRA8_SRGB_PACK8,
+			gli::FORMAT_BGRA8_UINT_PACK8,
+			gli::FORMAT_BGRA8_SINT_PACK8,
+			gli::format::FORMAT_RGBA8_UNORM_PACK32,
+			gli::format::FORMAT_RGBA8_SNORM_PACK32,
+			gli::format::FORMAT_RGBA8_SRGB_PACK32,
+			gli::FORMAT_RGBA8_UINT_PACK32,
+			gli::FORMAT_RGBA8_SINT_PACK32,
+			gli::format::FORMAT_RGB10A2_UNORM_PACK32,
+			//gli::FORMAT_RGB10A2_UINT_PACK32, // no gl format in core
+			//gli::FORMAT_RGB10A2_SINT_PACK32,
+			//gli::format::FORMAT_BGR10A2_UNORM_PACK32,
+			//gli::format::FORMAT_BGR10A2_SNORM_PACK32,
+			//gli::FORMAT_BGR10A2_UINT_PACK32,
+			//gli::FORMAT_BGR10A2_SINT_PACK32,
+			//gli::format::FORMAT_A8_UNORM_PACK8,
+			//gli::format::FORMAT_A16_UNORM_PACK16,
+			//gli::format::FORMAT_BGR8_UNORM_PACK32,
+			//gli::format::FORMAT_BGR8_SRGB_PACK32,
+
+			// float formats
+			gli::format::FORMAT_R16_UNORM_PACK16,
+			gli::format::FORMAT_R16_SNORM_PACK16,
+			gli::FORMAT_R16_UINT_PACK16,
+			gli::FORMAT_R16_SINT_PACK16,
+			gli::format::FORMAT_R16_SFLOAT_PACK16,
+			gli::format::FORMAT_RG16_UNORM_PACK16,
+			gli::format::FORMAT_RG16_SNORM_PACK16,
+			gli::format::FORMAT_RG16_SFLOAT_PACK16,
+			gli::FORMAT_RG16_UINT_PACK16,
+			gli::FORMAT_RG16_SINT_PACK16,
+			gli::format::FORMAT_RGB16_UNORM_PACK16,
+			gli::format::FORMAT_RGB16_SNORM_PACK16,
+			gli::format::FORMAT_RGB16_SFLOAT_PACK16,
+			gli::FORMAT_RGB16_UINT_PACK16,
+			gli::FORMAT_RGB16_SINT_PACK16,
+			gli::format::FORMAT_RGBA16_UNORM_PACK16,
+			gli::format::FORMAT_RGBA16_SNORM_PACK16,
+			gli::format::FORMAT_RGBA16_SFLOAT_PACK16,
+			gli::FORMAT_RGBA16_UINT_PACK16,
+			gli::FORMAT_RGBA16_SINT_PACK16,
+			gli::format::FORMAT_R32_SFLOAT_PACK32,
+			gli::FORMAT_R32_UINT_PACK32,
+			gli::FORMAT_R32_SINT_PACK32,
+			gli::format::FORMAT_RG32_SFLOAT_PACK32,
+			gli::FORMAT_RG32_UINT_PACK32,
+			gli::FORMAT_RG32_SINT_PACK32,
+			gli::format::FORMAT_RGB32_SFLOAT_PACK32,
+			gli::FORMAT_RGB32_UINT_PACK32,
+			gli::FORMAT_RGB32_SINT_PACK32,
+			gli::format::FORMAT_RGBA32_SFLOAT_PACK32,
+			gli::FORMAT_RGBA32_UINT_PACK32,
+			gli::FORMAT_RGBA32_SINT_PACK32,
+			gli::format::FORMAT_RG11B10_UFLOAT_PACK32,
+			gli::format::FORMAT_RGB9E5_UFLOAT_PACK32,
+
+			// dds compressed
+			// DXT
+			gli::format::FORMAT_RGB_DXT1_UNORM_BLOCK8,
+			gli::format::FORMAT_RGB_DXT1_SRGB_BLOCK8,
+			gli::format::FORMAT_RGBA_DXT1_UNORM_BLOCK8,
+			gli::format::FORMAT_RGBA_DXT1_SRGB_BLOCK8,
+			gli::format::FORMAT_RGBA_DXT3_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_DXT3_SRGB_BLOCK16,
+			gli::format::FORMAT_RGBA_DXT5_SRGB_BLOCK16,
+			gli::format::FORMAT_RGBA_DXT5_UNORM_BLOCK16,
+			gli::format::FORMAT_R_ATI1N_UNORM_BLOCK8,
+			gli::format::FORMAT_R_ATI1N_SNORM_BLOCK8,
+			gli::format::FORMAT_RG_ATI2N_UNORM_BLOCK16,
+			gli::format::FORMAT_RG_ATI2N_SNORM_BLOCK16,
+			gli::format::FORMAT_RGB_BP_UFLOAT_BLOCK16,
+			gli::format::FORMAT_RGB_BP_SFLOAT_BLOCK16,
+			gli::format::FORMAT_RGBA_BP_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_BP_SRGB_BLOCK16,
+			/*gli::format::FORMAT_RGB_ETC2_UNORM_BLOCK8,
+			gli::format::FORMAT_RGB_ETC2_SRGB_BLOCK8,
+			gli::format::FORMAT_RGBA_ETC2_UNORM_BLOCK8,
+			gli::format::FORMAT_RGBA_ETC2_SRGB_BLOCK8,
+			gli::format::FORMAT_RGBA_ETC2_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ETC2_SRGB_BLOCK16,
+			gli::format::FORMAT_R_EAC_UNORM_BLOCK8,
+			gli::format::FORMAT_R_EAC_SNORM_BLOCK8,
+			gli::format::FORMAT_RG_EAC_UNORM_BLOCK16,
+			gli::format::FORMAT_RG_EAC_SNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_4X4_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_4X4_SRGB_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_5X4_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_5X4_SRGB_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_5X5_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_5X5_SRGB_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_6X5_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_6X5_SRGB_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_6X6_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_6X6_SRGB_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_8X5_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_8X5_SRGB_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_8X6_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_8X6_SRGB_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_8X8_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_8X8_SRGB_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_10X5_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_10X5_SRGB_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_10X6_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_10X6_SRGB_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_10X8_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_10X8_SRGB_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_10X10_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_10X10_SRGB_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_12X10_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_12X10_SRGB_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_12X12_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ASTC_12X12_SRGB_BLOCK16,
+			gli::format::FORMAT_RGB_PVRTC1_8X8_UNORM_BLOCK32,
+			gli::format::FORMAT_RGB_PVRTC1_8X8_SRGB_BLOCK32,
+			gli::format::FORMAT_RGB_PVRTC1_16X8_UNORM_BLOCK32,
+			gli::format::FORMAT_RGB_PVRTC1_16X8_SRGB_BLOCK32,
+			gli::format::FORMAT_RGBA_PVRTC1_8X8_UNORM_BLOCK32,
+			gli::format::FORMAT_RGBA_PVRTC1_8X8_SRGB_BLOCK32,
+			gli::format::FORMAT_RGBA_PVRTC1_16X8_UNORM_BLOCK32,
+			gli::format::FORMAT_RGBA_PVRTC1_16X8_SRGB_BLOCK32,
+			gli::format::FORMAT_RGBA_PVRTC2_4X4_UNORM_BLOCK8,
+			gli::format::FORMAT_RGBA_PVRTC2_4X4_SRGB_BLOCK8,
+			gli::format::FORMAT_RGBA_PVRTC2_8X4_UNORM_BLOCK8,
+			gli::format::FORMAT_RGBA_PVRTC2_8X4_SRGB_BLOCK8,
+			gli::format::FORMAT_RGB_ETC_UNORM_BLOCK8,
+			gli::format::FORMAT_RGB_ATC_UNORM_BLOCK8,
+			gli::format::FORMAT_RGBA_ATCA_UNORM_BLOCK16,
+			gli::format::FORMAT_RGBA_ATCI_UNORM_BLOCK16,
+			gli::format::FORMAT_L8_UNORM_PACK8,
+
+			gli::format::FORMAT_LA8_UNORM_PACK8,
+			gli::format::FORMAT_L16_UNORM_PACK16,
+			gli::format::FORMAT_LA16_UNORM_PACK16,
+			*/
+	};
+}
+
 std::vector<uint32_t> ktx2_get_export_formats()
 {
 	return std::vector<uint32_t>{
@@ -693,80 +957,58 @@ std::vector<uint32_t> ktx2_get_export_formats()
 	gli::FORMAT_A1RGB5_UNORM_PACK16,
 	gli::FORMAT_R8_UNORM_PACK8,
 	gli::FORMAT_R8_SNORM_PACK8,
-	gli::FORMAT_R8_USCALED_PACK8,
-	gli::FORMAT_R8_SSCALED_PACK8,
 	gli::FORMAT_R8_UINT_PACK8,
 	gli::FORMAT_R8_SINT_PACK8,
 	gli::FORMAT_R8_SRGB_PACK8,
 	gli::FORMAT_RG8_UNORM_PACK8,
 	gli::FORMAT_RG8_SNORM_PACK8,
-	gli::FORMAT_RG8_USCALED_PACK8,
-	gli::FORMAT_RG8_SSCALED_PACK8,
 	gli::FORMAT_RG8_UINT_PACK8,
 	gli::FORMAT_RG8_SINT_PACK8,
 	gli::FORMAT_RG8_SRGB_PACK8,
 	gli::FORMAT_RGB8_UNORM_PACK8,
 	gli::FORMAT_RGB8_SNORM_PACK8,
-	gli::FORMAT_RGB8_USCALED_PACK8,
-	gli::FORMAT_RGB8_SSCALED_PACK8,
 	gli::FORMAT_RGB8_UINT_PACK8,
 	gli::FORMAT_RGB8_SINT_PACK8,
 	gli::FORMAT_RGB8_SRGB_PACK8,
 	gli::FORMAT_BGR8_UNORM_PACK8,
 	gli::FORMAT_BGR8_SNORM_PACK8,
-	gli::FORMAT_BGR8_USCALED_PACK8,
-	gli::FORMAT_BGR8_SSCALED_PACK8,
 	// those give some block size mismatch error from gli:
 	//gli::FORMAT_BGR8_UINT_PACK8,
 	//gli::FORMAT_BGR8_SINT_PACK8,
 	gli::FORMAT_BGR8_SRGB_PACK8,
 	gli::FORMAT_RGBA8_UNORM_PACK8,
 	gli::FORMAT_RGBA8_SNORM_PACK8,
-	gli::FORMAT_RGBA8_USCALED_PACK8,
-	gli::FORMAT_RGBA8_SSCALED_PACK8,
 	gli::FORMAT_RGBA8_UINT_PACK8,
 	gli::FORMAT_RGBA8_SINT_PACK8,
 	gli::FORMAT_RGBA8_SRGB_PACK8,
 	gli::FORMAT_BGRA8_UNORM_PACK8,
 	gli::FORMAT_BGRA8_SNORM_PACK8,
-	gli::FORMAT_BGRA8_USCALED_PACK8,
-	gli::FORMAT_BGRA8_SSCALED_PACK8,
 	gli::FORMAT_BGRA8_UINT_PACK8,
 	gli::FORMAT_BGRA8_SINT_PACK8,
 	gli::FORMAT_BGRA8_SRGB_PACK8,
 	gli::FORMAT_RGBA8_UNORM_PACK32,
 	gli::FORMAT_RGBA8_SNORM_PACK32,
-	gli::FORMAT_RGBA8_USCALED_PACK32,
-	gli::FORMAT_RGBA8_SSCALED_PACK32,
 	gli::FORMAT_RGBA8_UINT_PACK32,
 	gli::FORMAT_RGBA8_SINT_PACK32,
 	gli::FORMAT_RGBA8_SRGB_PACK32,
 	gli::FORMAT_R16_UNORM_PACK16,
 	gli::FORMAT_R16_SNORM_PACK16,
-	gli::FORMAT_R16_USCALED_PACK16,
-	gli::FORMAT_R16_SSCALED_PACK16,
 	gli::FORMAT_R16_UINT_PACK16,
 	gli::FORMAT_R16_SINT_PACK16,
 	gli::FORMAT_R16_SFLOAT_PACK16,
 	// can not set image data
 	//gli::FORMAT_RG16_UNORM_PACK16,
 	//gli::FORMAT_RG16_SNORM_PACK16,
-	gli::FORMAT_RG16_USCALED_PACK16,
-	gli::FORMAT_RG16_SSCALED_PACK16,
 	gli::FORMAT_RG16_UINT_PACK16,
 	gli::FORMAT_RG16_SINT_PACK16,
 	gli::FORMAT_RG16_SFLOAT_PACK16,
 	gli::FORMAT_RGB16_UNORM_PACK16,
 	gli::FORMAT_RGB16_SNORM_PACK16,
-	gli::FORMAT_RGB16_USCALED_PACK16,
-	gli::FORMAT_RGB16_SSCALED_PACK16,
 	gli::FORMAT_RGB16_UINT_PACK16,
 	gli::FORMAT_RGB16_SINT_PACK16,
 	gli::FORMAT_RGB16_SFLOAT_PACK16,
 	gli::FORMAT_RGBA16_UNORM_PACK16,
 	// gli::FORMAT_RGBA16_SNORM_PACK16, // can not set image data
-	gli::FORMAT_RGBA16_USCALED_PACK16,
-	gli::FORMAT_RGBA16_SSCALED_PACK16,
 	gli::FORMAT_RGBA16_UINT_PACK16,
 	gli::FORMAT_RGBA16_SINT_PACK16,
 	gli::FORMAT_RGBA16_SFLOAT_PACK16,

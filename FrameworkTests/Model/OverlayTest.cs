@@ -92,7 +92,7 @@ namespace FrameworkTests.Model
             TestData.CompareColors(refColors, actualColors, Color.Channel.Rgba, 0.0f);
         }
 
-        [TestMethod]
+       /* [TestMethod] TODO move test to image viewer
         public void TestHeatmapOverlay()
         {
             var models = new Models();
@@ -121,7 +121,7 @@ namespace FrameworkTests.Model
             var refColors = models.Images.Images[0].Image.GetPixelColors(LayerMipmapSlice.Mip0);
             var actualColors = models.Overlay.Overlay.GetPixelColors(LayerMipmapSlice.Mip0);
             TestData.CompareColors(refColors, actualColors, Color.Channel.Rgba);
-        }
+        }*/
 
         [TestMethod]
         public void ExportOverlayed()

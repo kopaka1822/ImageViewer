@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -13,6 +15,7 @@ using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
+using ImageFramework.Model.Export;
 using ImageFramework.Utility;
 using ImageViewer.Commands;
 using ImageViewer.Commands.Export;
@@ -155,6 +158,11 @@ namespace ImageViewer.ViewModels
                     e.Handled = true;
                     Application.Current.Dispatcher.Invoke(async () => await OnPasteAsync());
                 }
+                if (e.Key == Key.C || e.Key == Key.X)
+                {
+                    e.Handled = true;
+                    Application.Current.Dispatcher.Invoke(async () => await OnCopyAsync());
+                }
 
                 return;
             }
@@ -175,6 +183,40 @@ namespace ImageViewer.ViewModels
 
             if(Display.HasKeyToInvoke(e.Key))
                 Display.InvokeKey(e.Key);
+        }
+
+        public async Task OnCopyAsync()
+        {
+            try
+            {
+                if (models.NumEnabled < 1) return; // nothing to copy
+                var pipe = models.Pipelines[models.GetFirstEnabledPipeline()];
+                var tex = pipe.Image;
+                if (tex == null) return; // image not ready yet
+
+                // export current view as png into temp and copy file path to clipboard
+                var pngPath = Path.GetTempFileName();
+
+                models.Export.ExportAsync(new ExportDescription(tex, pngPath, "png")
+                {
+                    Multiplier = models.Display.Multiplier,
+                    Overlay = models.Overlay.Overlay,
+                    Layer = Math.Max(models.Display.ActiveLayer, 0), // for png save only the current visible layer
+                    Mipmap = Math.Max(models.Display.ActiveMipmap, 0),
+                    FileFormat = GliFormat.RGBA8_SRGB
+                });
+                await models.Progress.WaitForTaskAsync();
+                if(!String.IsNullOrEmpty(models.Progress.LastError))
+                    throw new Exception(models.Progress.LastError);
+
+                // copy tmpPng as filename to clipboard
+                Clipboard.SetFileDropList(new StringCollection { pngPath + ".png" });
+            }
+            catch (Exception e)
+            {
+                if (!models.Progress.LastTaskCancelledByUser)
+                    models.Window.ShowErrorDialog(e, "Copy to Clipboard");
+            }
         }
 
         public async Task OnPasteAsync()
@@ -228,7 +270,7 @@ namespace ImageViewer.ViewModels
             }
             catch (Exception e)
             {
-                models.Window.ShowErrorDialog(e);   
+                models.Window.ShowErrorDialog(e, "Paste from Clipboard");   
             }
         }
 

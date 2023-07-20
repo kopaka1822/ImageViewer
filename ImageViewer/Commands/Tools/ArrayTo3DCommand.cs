@@ -54,7 +54,16 @@ namespace ImageViewer.Commands.Tools
             var origFormat = firstImage.OriginalFormat;
             var texAlias = firstImage.Alias;
 
-            var tex = models.ConvertTo3D((TextureArray2D) srcTex);
+            Texture3D tex = null;
+            try
+            {
+                tex = models.ConvertTo3D((TextureArray2D)srcTex);
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e);
+                return;
+            }
 
             // clear all images
             models.Reset();

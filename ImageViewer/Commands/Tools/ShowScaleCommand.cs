@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageFramework.Utility;
@@ -42,7 +43,14 @@ namespace ImageViewer.Commands.Tools
 
             if (models.Window.ShowDialog(dia) != true) return;
 
-            models.Images.ScaleImages(new Size3(vm.Width, vm.Height), models.Scaling);
+            try
+            {
+                models.Images.ScaleImages(new Size3(vm.Width, vm.Height), models.Scaling);
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e);
+            }
         }
     }
 }

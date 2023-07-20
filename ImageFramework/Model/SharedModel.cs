@@ -43,6 +43,9 @@ namespace ImageFramework.Model
 
         public SamplerState PointSampler { get; }
 
+        private ChannelFilterShader channelFilter = null;
+        internal ChannelFilterShader ChannelFilter => channelFilter ?? (channelFilter = new ChannelFilterShader());
+
         public SharedModel()
         {
             Upload = new UploadBuffer(256); // big enough for 4 matrix4
@@ -87,6 +90,7 @@ namespace ImageFramework.Model
             padding?.Dispose();
             LinearSampler?.Dispose();
             PointSampler?.Dispose();
+            channelFilter?.Dispose();
         }
     }
 }

@@ -41,15 +41,20 @@
                     <Image Source="../Icons/image_layer.png"/>
                 </MenuItem.Icon>
             </MenuItem>
-            <!--<MenuItem
-                Header="Import Video as TextureArray"
-                ToolTip="Imports frames from the video into a TextureArray"
+            <MenuItem
+                Header="Open Recent"
                 IsEnabled="{Binding Progress.NotProcessing}"
-                Command="{Binding ImportMovieCommand}">
-                <MenuItem.Icon>
-                    <Image Source="../Icons/video.png"/>
-                </MenuItem.Icon>
-            </MenuItem>-->
+                ItemsSource="{Binding Images.RecentFiles}"
+                >
+                <MenuItem.ItemContainerStyle>
+                    <Style>
+                        <Setter Property="MenuItem.Header" Value="{Binding Converter={StaticResource PathToFilenameConverter}}"/>
+                        <Setter Property="MenuItem.ToolTip" Value="{Binding}"/>
+                        <Setter Property="MenuItem.Command" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Path=DataContext.Images.ImportRecentCommand}"/>
+                        <Setter Property="MenuItem.CommandParameter" Value="{Binding}"/>
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+            </MenuItem>
             <Separator/>
 
             <!-- Export -->
@@ -303,10 +308,11 @@
                 </MenuItem.ItemContainerStyle>
             </MenuItem>
 
-            <!--
+            
             
             <Separator/>
             
+            <!-- HEATMAP -->
             <MenuItem 
                 Header="Heatmap"
                 IsEnabled="{Binding Progress.NotProcessing}">
@@ -321,23 +327,19 @@
                     Header="Enable Overlay"
                     IsCheckable="True"
                     IsChecked="{Binding Display.Heatmap.IsEnabled}"/>
-                <MenuItem
-                    Header="Load Filter"
-                    Command="{Binding Display.Heatmap.LoadFilterCommand}"/>
+                
                 <MenuItem
                     Header="Set Position"
                     IsEnabled="{Binding Display.Heatmap.IsEnabled}"
                     Command="{Binding Display.Heatmap.SetPositionCommand}"/>
-                <MenuItem
+                <!--<MenuItem
                     Header="Configure"
                     IsEnabled="{Binding Display.Heatmap.IsEnabled}"
-                    Command="{Binding Display.Heatmap.ConfigureCommand}"/>
+                    Command="{Binding Display.Heatmap.ConfigureCommand}"/>-->
             </MenuItem>
         </MenuItem>
-                
-            -->
-            </MenuItem>
-            <!-- END OVERLAYS -->
+
+        <!-- END OVERLAYS -->
 
         <MenuItem Header="Tools">
             <!-- Scaling + Padding -->

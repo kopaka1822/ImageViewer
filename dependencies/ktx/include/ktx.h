@@ -29,15 +29,23 @@
 #include <stdbool.h>
 #include <sys/types.h>
 
+#include "KHR/khr_df.h"
+
 /*
  * Don't use khrplatform.h in order not to break apps existing
  * before these definitions were needed.
  */
 #if defined(KHRONOS_STATIC)
   #define KTX_API
-#elif defined(_WIN32)
+#elif defined(_WIN32) || defined(__CYGWIN__)
   #if !defined(KTX_API)
-    #define KTX_API __declspec(dllimport)
+    #if __GNUC__
+      #define KTX_API __attribute__ ((dllimport))
+    #elif _MSC_VER
+      #define KTX_API __declspec(dllimport)
+    #else
+      #error "Your compiler's equivalent of dllimport is unknown"
+    #endif
   #endif
 #elif defined(__ANDROID__)
   #define KTX_API __attribute__((visibility("default")))
@@ -176,7 +184,9 @@ typedef enum ktx_error_code_e {
     KTX_UNSUPPORTED_TEXTURE_TYPE, /*!< The KTX file specifies an unsupported texture type. */
     KTX_UNSUPPORTED_FEATURE,  /*!< Feature not included in in-use library or not yet implemented. */
     KTX_LIBRARY_NOT_LINKED,  /*!< Library dependency (OpenGL or Vulkan) not linked into application. */
-    KTX_ERROR_MAX_ENUM = KTX_LIBRARY_NOT_LINKED /*!< For safety checks. */
+    KTX_DECOMPRESS_LENGTH_ERROR, /*!< Decompressed byte count does not match expected byte size */
+    KTX_DECOMPRESS_CHECKSUM_ERROR, /*!< Checksum mismatch when decompressing */
+    KTX_ERROR_MAX_ENUM = KTX_DECOMPRESS_CHECKSUM_ERROR /*!< For safety checks. */
 } ktx_error_code_e;
 /**
  * @deprecated
@@ -326,7 +336,7 @@ typedef struct ktxTexture {
  * KTX_TRUE if mipmaps should be generated for the texture by
  * ktxTexture_GLUpload() or ktxTexture_VkUpload().
  */
-/**
+/**n
  * @typedef ktxTexture::baseWidth
  * @~English
  * @brief Width of the texture's base level.
@@ -513,7 +523,7 @@ typedef KTX_error_code
 /**
  * @~English
  * @brief Helper for calling the Destroy virtual method of a ktxTexture.
- * @copydoc ktxTexture2_Destroy
+ * @copydoc ktxTexture2.ktxTexture2_Destroy
  */
 #define ktxTexture_Destroy(This) (This)->vtbl->Destroy(This)
 
@@ -521,7 +531,7 @@ typedef KTX_error_code
  * @~English
  * @brief Helper for calling the GetImageOffset virtual method of a
  *        ktxTexture.
- * @copydoc ktxTexture2_GetImageOffset
+ * @copydoc ktxTexture2.ktxTexture2_GetImageOffset
  */
 #define ktxTexture_GetImageOffset(This, level, layer, faceSlice, pOffset) \
             (This)->vtbl->GetImageOffset(This, level, layer, faceSlice, pOffset)
@@ -532,7 +542,7 @@ typedef KTX_error_code
  *
  * For a ktxTexture1 this will always return the value of This->dataSize.
  *
- * @copydetails ktxTexture2_GetDataSizeUncompressed
+ * @copydetails ktxTexture2.ktxTexture2_GetDataSizeUncompressed
  */
 #define ktxTexture_GetDataSizeUncompressed(This) \
                                 (This)->vtbl->GetDataSizeUncompressed(This)
@@ -540,7 +550,7 @@ typedef KTX_error_code
 /**
  * @~English
  * @brief Helper for calling the GetImageSize virtual method of a ktxTexture.
- * @copydoc ktxTexture2_GetImageSize
+ * @copydoc ktxTexture2.ktxTexture2_GetImageSize
  */
 #define ktxTexture_GetImageSize(This, level) \
             (This)->vtbl->GetImageSize(This, level)
@@ -548,7 +558,7 @@ typedef KTX_error_code
 /**
  * @~English
  * @brief Helper for calling the IterateLevels virtual method of a ktxTexture.
- * @copydoc ktxTexture2_IterateLevels
+ * @copydoc ktxTexture2.ktxTexture2_IterateLevels
  */
 #define ktxTexture_IterateLevels(This, iterCb, userdata) \
                             (This)->vtbl->IterateLevels(This, iterCb, userdata)
@@ -557,7 +567,7 @@ typedef KTX_error_code
  * @~English
  * @brief Helper for calling the IterateLoadLevelFaces virtual method of a
  * ktxTexture.
- * @copydoc ktxTexture2_IterateLoadLevelFaces
+ * @copydoc ktxTexture2.ktxTexture2_IterateLoadLevelFaces
  */
  #define ktxTexture_IterateLoadLevelFaces(This, iterCb, userdata) \
                     (This)->vtbl->IterateLoadLevelFaces(This, iterCb, userdata)
@@ -565,7 +575,7 @@ typedef KTX_error_code
 /**
  * @~English
  * @brief Helper for calling the LoadImageData virtual method of a ktxTexture.
- * @copydoc ktxTexture2_LoadImageData
+ * @copydoc ktxTexture2.ktxTexture2_LoadImageData
  */
 #define ktxTexture_LoadImageData(This, pBuffer, bufSize) \
                     (This)->vtbl->LoadImageData(This, pBuffer, bufSize)
@@ -573,7 +583,7 @@ typedef KTX_error_code
 /**
  * @~English
  * @brief Helper for calling the NeedsTranscoding virtual method of a ktxTexture.
- * @copydoc ktxTexture2_NeedsTranscoding
+ * @copydoc ktxTexture2.ktxTexture2_NeedsTranscoding
  */
 #define ktxTexture_NeedsTranscoding(This) (This)->vtbl->NeedsTranscoding(This)
 
@@ -581,7 +591,7 @@ typedef KTX_error_code
  * @~English
  * @brief Helper for calling the SetImageFromMemory virtual method of a
  *        ktxTexture.
- * @copydoc ktxTexture2_SetImageFromMemory
+ * @copydoc ktxTexture2.ktxTexture2_SetImageFromMemory
  */
 #define ktxTexture_SetImageFromMemory(This, level, layer, faceSlice, \
                                       src, srcSize)                  \
@@ -591,7 +601,7 @@ typedef KTX_error_code
  * @~English
  * @brief Helper for calling the SetImageFromStdioStream virtual method of a
  *        ktxTexture.
- * @copydoc ktxTexture2_SetImageFromStdioStream
+ * @copydoc ktxTexture2.ktxTexture2_SetImageFromStdioStream
  */
 #define ktxTexture_SetImageFromStdioStream(This, level, layer, faceSlice, \
                                            src, srcSize)                  \
@@ -602,7 +612,7 @@ typedef KTX_error_code
  * @~English
  * @brief Helper for calling the WriteToStdioStream virtual method of a
  *        ktxTexture.
- * @copydoc ktxTexture2_WriteToStdioStream
+ * @copydoc ktxTexture2.ktxTexture2_WriteToStdioStream
  */
 #define ktxTexture_WriteToStdioStream(This, dstsstr) \
                                 (This)->vtbl->WriteToStdioStream(This, dstsstr)
@@ -611,7 +621,7 @@ typedef KTX_error_code
  * @~English
  * @brief Helper for calling the WriteToNamedfile virtual method of a
  *        ktxTexture.
- * @copydoc ktxTexture2_WriteToNamedFile
+ * @copydoc ktxTexture2.ktxTexture2_WriteToNamedFile
  */
 #define ktxTexture_WriteToNamedFile(This, dstname) \
                                 (This)->vtbl->WriteToNamedFile(This, dstname)
@@ -619,7 +629,7 @@ typedef KTX_error_code
 /**
  * @~English
  * @brief Helper for calling the WriteToMemory virtual method of a ktxTexture.
- * @copydoc ktxTexture2_WriteToMemory
+ * @copydoc ktxTexture2.ktxTexture2_WriteToMemory
  */
 #define ktxTexture_WriteToMemory(This, ppDstBytes, pSize) \
                   (This)->vtbl->WriteToMemory(This, ppDstBytes, pSize)
@@ -627,7 +637,7 @@ typedef KTX_error_code
 /**
  * @~English
  * @brief Helper for calling the WriteToStream virtual method of a ktxTexture.
- * @copydoc ktxTexture2_WriteToStream
+ * @copydoc ktxTexture2.ktxTexture2_WriteToStream
  */
 #define ktxTexture_WriteToStream(This, dststr) \
                   (This)->vtbl->WriteToStream(This, dststr)
@@ -664,8 +674,9 @@ typedef enum ktxSupercmpScheme {
     KTX_SS_NONE = 0,            /*!< No supercompression. */
     KTX_SS_BASIS_LZ = 1,        /*!< Basis LZ supercompression. */
     KTX_SS_ZSTD = 2,            /*!< ZStd supercompression. */
+    KTX_SS_ZLIB = 3,            /*!< ZLIB supercompression. */
     KTX_SS_BEGIN_RANGE = KTX_SS_NONE,
-    KTX_SS_END_RANGE = KTX_SS_ZSTD,
+    KTX_SS_END_RANGE = KTX_SS_ZLIB,
     KTX_SS_BEGIN_VENDOR_RANGE = 0x10000,
     KTX_SS_END_VENDOR_RANGE = 0x1ffff,
     KTX_SS_BEGIN_RESERVED = 0x20000,
@@ -700,9 +711,10 @@ typedef struct ktxTexture2 {
 /**
  * @memberof ktxTexture
  * @~English
- * @brief Structure for passing texture information to ktxTexture[12]_Create().
+ * @brief Structure for passing texture information to ktxTexture1_Create() and
+ *        ktxTexture2_Create().
  *
- * @sa ktxTexture_Create()
+ * @sa ktxTexture1_Create() and ktxTexture2_Create().
  */
 typedef struct
 {
@@ -736,7 +748,7 @@ typedef struct
  * @~English
  * @brief Enum for requesting, or not, allocation of storage for images.
  *
- * @sa ktxTexture_Create()
+ * @sa ktxTexture1_Create() and ktxTexture2_Create().
  */
 typedef enum {
     KTX_TEXTURE_CREATE_NO_STORAGE = 0,  /*!< Don't allocate any image storage. */
@@ -757,9 +769,12 @@ enum ktxTextureCreateFlagBits {
     KTX_TEXTURE_CREATE_RAW_KVDATA_BIT = 0x02,
                                    /*!< Load the raw key-value data instead of
                                         creating a @c ktxHashList from it. */
-    KTX_TEXTURE_CREATE_SKIP_KVDATA_BIT = 0x04
+    KTX_TEXTURE_CREATE_SKIP_KVDATA_BIT = 0x04,
                                    /*!< Skip any key-value data. This overrides
                                         the RAW_KVDATA_BIT. */
+    KTX_TEXTURE_CREATE_CHECK_GLTF_BASISU_BIT = 0x08
+                                   /*!< Load texture compatible with the rules
+                                        of KHR_texture_basisu glTF extension */
 };
 /**
  * @memberof ktxTexture
@@ -813,7 +828,7 @@ typedef KTX_error_code (*ktxStream_skip)(ktxStream* str,
 
 /**
  * @~English
- * @brief type for a pointer to a stream reading function
+ * @brief type for a pointer to a stream writing function
  */
 typedef KTX_error_code (*ktxStream_write)(ktxStream* str, const void *src,
                                           const ktx_size_t size,
@@ -854,27 +869,27 @@ typedef void (*ktxStream_destruct)(ktxStream* str);
  */
 struct ktxStream
 {
-    ktxStream_read read;   /*!< @internal pointer to function for reading bytes. */
-    ktxStream_skip skip;   /*!< @internal pointer to function for skipping bytes. */
-    ktxStream_write write; /*!< @internal pointer to function for writing bytes. */
-    ktxStream_getpos getpos; /*!< @internal pointer to function for getting current position in stream. */
-    ktxStream_setpos setpos; /*!< @internal pointer to function for setting current position in stream. */
-    ktxStream_getsize getsize; /*!< @internal pointer to function for querying size. */
-    ktxStream_destruct destruct; /*!< @internal destruct the stream. */
+    ktxStream_read read;   /*!< pointer to function for reading bytes. */
+    ktxStream_skip skip;   /*!< pointer to function for skipping bytes. */
+    ktxStream_write write; /*!< pointer to function for writing bytes. */
+    ktxStream_getpos getpos; /*!< pointer to function for getting current position in stream. */
+    ktxStream_setpos setpos; /*!< pointer to function for setting current position in stream. */
+    ktxStream_getsize getsize; /*!< pointer to function for querying size. */
+    ktxStream_destruct destruct; /*!< destruct the stream. */
 
     enum streamType type;
     union {
-        FILE* file;
-        ktxMem* mem;
+        FILE* file;        /**< a stdio FILE pointer for a ktxFileStream. */
+        ktxMem* mem;       /**< a pointer to a ktxMem struct for a ktxMemStream. */
         struct
         {
-            void* address;
-            void* allocatorAddress;
-            ktx_size_t size;
-        } custom_ptr;
-    } data;                /**< @internal pointer to the stream data. */
-    ktx_off_t readpos;     /**< @internal used by FileStream for stdin. */
-    ktx_bool_t closeOnDestruct; /**< @internal Close FILE* or dispose of memory on destruct. */
+            void* address;           /**< pointer to the data. */
+            void* allocatorAddress;  /**< pointer to a memory allocator. */
+            ktx_size_t size;         /**< size of the data. */
+        } custom_ptr;      /**< pointer to a struct for custom streams. */
+    } data;                /**< pointer to the stream data. */
+    ktx_off_t readpos;     /**< used by FileStream for stdin. */
+    ktx_bool_t closeOnDestruct; /**< Close FILE* or dispose of memory on destruct. */
 };
 
 /*
@@ -1044,6 +1059,9 @@ ktxTexture2_CompressBasis(ktxTexture2* This, ktx_uint32_t quality);
 KTX_API KTX_error_code KTX_APIENTRY
 ktxTexture2_DeflateZstd(ktxTexture2* This, ktx_uint32_t level);
 
+KTX_API KTX_error_code KTX_APIENTRY
+ktxTexture2_DeflateZLIB(ktxTexture2* This, ktx_uint32_t level);
+
 KTX_API void KTX_APIENTRY
 ktxTexture2_GetComponentInfo(ktxTexture2* This, ktx_uint32_t* numComponents,
                              ktx_uint32_t* componentByteLength);
@@ -1051,8 +1069,15 @@ ktxTexture2_GetComponentInfo(ktxTexture2* This, ktx_uint32_t* numComponents,
 KTX_API ktx_uint32_t KTX_APIENTRY
 ktxTexture2_GetNumComponents(ktxTexture2* This);
 
+KTX_API khr_df_transfer_e KTX_APIENTRY
+ktxTexture2_GetOETF_e(ktxTexture2* This);
+
+// For backward compatibility
 KTX_API ktx_uint32_t KTX_APIENTRY
 ktxTexture2_GetOETF(ktxTexture2* This);
+
+KTX_API khr_df_model_e KTX_APIENTRY
+ktxTexture2_GetColorModel_e(ktxTexture2* This);
 
 KTX_API ktx_bool_t KTX_APIENTRY
 ktxTexture2_GetPremultipliedAlpha(ktxTexture2* This);
@@ -1166,41 +1191,57 @@ extern KTX_API const ktx_uint32_t KTX_ETC1S_DEFAULT_COMPRESSION_LEVEL;
  * @brief Structure for passing extended parameters to
  *        ktxTexture_CompressAstc.
  *
- * Passing a struct initialized to 0 (e.g. " = {};") will use the default
- * values. Only those settings to be modified need be non-zero.
+ * Passing a struct initialized to 0 (e.g. " = {0};") will use blockDimension
+ * 4x4, mode LDR and qualityLevel FASTEST. Setting qualityLevel to
+ * KTX_PACK_ASTC_QUALITY_LEVEL_MEDIUM is recommended.
  */
 typedef struct ktxAstcParams {
     ktx_uint32_t structSize;
         /*!< Size of this struct. Used so library can tell which version
              of struct is being passed.
          */
+
     ktx_bool_t verbose;
         /*!< If true, prints Astc encoder operation details to
              @c stdout. Not recommended for GUI apps.
          */
+
     ktx_uint32_t threadCount;
-        /*!< Number of threads used for compression. Default is 1. */
+        /*!< Number of threads used for compression. Default is 1.
+         */
 
     /* astcenc params */
     ktx_uint32_t blockDimension;
         /*!< Combinations of block dimensions that astcenc supports
-          i.e. 6x6, 8x8, 6x5 etc*/
+          i.e. 6x6, 8x8, 6x5 etc
+         */
 
     ktx_uint32_t mode;
-        /*!< Can be {ldr/hdr} from astcenc*/
+        /*!< Can be {ldr/hdr} from astcenc
+         */
 
     ktx_uint32_t qualityLevel;
-        /*!< astcenc supports -fastest, -fast, -medium, -thorough, -exhaustive*/
+        /*!< astcenc supports -fastest, -fast, -medium, -thorough, -exhaustive
+         */
 
     ktx_bool_t normalMap;
         /*!< Tunes codec parameters for better quality on normal maps
           In this mode normals are compressed to X,Y components
           Discarding Z component, reader will need to generate Z
           component in shaders.
-        */
+         */
+
+    ktx_bool_t perceptual;
+        /*!< The codec should optimize for perceptual error, instead of direct
+           RMS error. This aims to improves perceived image quality, but
+           typically lowers the measured PSNR score. Perceptual methods are
+           currently only available for normal maps and RGB color data.
+         */
+
     char inputSwizzle[4];
          /*!< A swizzle to provide as input to astcenc. It must match the regular
-             expression /^[rgba01]{4}$/.*/
+             expression /^[rgba01]{4}$/.
+          */
 } ktxAstcParams;
 
 KTX_API KTX_error_code KTX_APIENTRY
@@ -1213,10 +1254,19 @@ ktxTexture2_CompressAstc(ktxTexture2* This, ktx_uint32_t quality);
  * @memberof ktxTexture2
  * @~English
  * @brief Structure for passing extended parameters to
- *        ktxTexture2_CompressBasisEx.
+ *        ktxTexture2_CompressBasisEx().
  *
- * Passing a struct initialized to 0 (e.g. " = {};") will use the default
- * values. Only those settings to be modified need be non-zero.
+ * If you only want default values, use ktxTexture2_CompressBasis(). Here, at a minimum you
+ * must initialize the structure as follows:
+ * @code
+ *  ktxBasisParams params = {0};
+ *  params.structSize = sizeof(params);
+ *  params.compressionLevel = KTX_ETC1S_DEFAULT_COMPRESSION_LEVEL;
+ * @endcode
+ *
+ * @e compressionLevel has to be explicitly set because 0 is a valid @e compressionLevel
+ * but is not the default used by the BasisU encoder when no value is set. Only the other
+ * settings that are to be non-default must be non-zero.
  */
 typedef struct ktxBasisParams {
     ktx_uint32_t structSize;
@@ -1281,22 +1331,19 @@ typedef struct ktxBasisParams {
              This will override the value chosen by @c qualityLevel.
          */
     char inputSwizzle[4];
-         /*!< A swizzle to apply before encoding. It must match the regular
+        /*!< A swizzle to apply before encoding. It must match the regular
              expression /^[rgba01]{4}$/. If both this and preSwizzle
              are specified ktxTexture_CompressBasisEx will raise
-             KTX_INVALID_OPERATION. */
-
+             KTX_INVALID_OPERATION.
+         */
     ktx_bool_t normalMap;
         /*!< Tunes codec parameters for better quality on normal maps (no
-             selector RDO, no endpoint RDO). Only valid for linear textures.
+             selector RDO, no endpoint RDO) and sets the texture's DFD appropriately.
+             Only valid for linear textures.
          */
     ktx_bool_t separateRGToRGB_A;
-        /*!< Separates the input R and G channels to RGB and A (for tangent
-             space XY normal maps). Equivalent to @c inputSwizzle "rrrg".
-             Separation is the default for 2 component textures. If both this
-             and inputSwizzle are set, the latter wins therefore set
-             @c inputSwizzle to change the default for 2 component
-             textures.
+        /*!< @deprecated. This was and is a no-op. 2-component inputs have always been
+             automatically separated using an "rrrg" inputSwizzle. @sa inputSwizzle and normalMode.
          */
     ktx_bool_t preSwizzle;
         /*!< If the texture has @c KTXswizzle metadata, apply it before
@@ -1331,28 +1378,35 @@ typedef struct ktxBasisParams {
                 KTX_PACK_UASTC_LEVEL_VERYSLOW | 48.24dB
          */
     ktx_bool_t uastcRDO;
-        /*!< Enable Rate Distortion Optimization (RDO) post-processing. */
+        /*!< Enable Rate Distortion Optimization (RDO) post-processing.
+         */
     float uastcRDOQualityScalar;
         /*!< UASTC RDO quality scalar (lambda). Lower values yield higher
              quality/larger LZ compressed files, higher values yield lower
              quality/smaller LZ compressed files. A good range to try is [.2,4].
-             Full range is [.001,50.0]. Default is 1.0. */
+             Full range is [.001,50.0]. Default is 1.0.
+         */
     ktx_uint32_t uastcRDODictSize;
         /*!< UASTC RDO dictionary size in bytes. Default is 4096. Lower
-             values=faster, but give less compression. Range is [64,65536]. */
+             values=faster, but give less compression. Range is [64,65536].
+         */
     float uastcRDOMaxSmoothBlockErrorScale;
         /*!< UASTC RDO max smooth block error scale. Range is [1,300].
              Default is 10.0, 1.0 is disabled. Larger values suppress more
-             artifacts (and allocate more bits) on smooth blocks. */
+             artifacts (and allocate more bits) on smooth blocks.
+         */
     float uastcRDOMaxSmoothBlockStdDev;
         /*!< UASTC RDO max smooth block standard deviation. Range is
              [.01,65536.0]. Default is 18.0. Larger values expand the range of
-             blocks considered smooth. */
+             blocks considered smooth.
+         */
     ktx_bool_t uastcRDODontFavorSimplerModes;
-        /*!< Do not favor simpler UASTC modes in RDO mode. */
+        /*!< Do not favor simpler UASTC modes in RDO mode.
+         */
     ktx_bool_t uastcRDONoMultithreading;
         /*!< Disable RDO multithreading (slightly higher compression,
-             deterministic). */
+             deterministic).
+         */
 
 } ktxBasisParams;
 
@@ -1637,6 +1691,19 @@ KTX_API KTX_error_code KTX_APIENTRY ktxPrintInfoForStdioStream(FILE* stdioStream
 KTX_API KTX_error_code KTX_APIENTRY ktxPrintInfoForNamedFile(const char* const filename);
 KTX_API KTX_error_code KTX_APIENTRY ktxPrintInfoForMemory(const ktx_uint8_t* bytes, ktx_size_t size);
 
+/*===========================================================*
+ * Utilities for printing info about a KTX2 file.            *
+ *===========================================================*/
+
+KTX_API KTX_error_code KTX_APIENTRY ktxPrintKTX2InfoTextForMemory(const ktx_uint8_t* bytes, ktx_size_t size);
+KTX_API KTX_error_code KTX_APIENTRY ktxPrintKTX2InfoTextForNamedFile(const char* const filename);
+KTX_API KTX_error_code KTX_APIENTRY ktxPrintKTX2InfoTextForStdioStream(FILE* stdioStream);
+KTX_API KTX_error_code KTX_APIENTRY ktxPrintKTX2InfoTextForStream(ktxStream* stream);
+KTX_API KTX_error_code KTX_APIENTRY ktxPrintKTX2InfoJSONForMemory(const ktx_uint8_t* bytes, ktx_size_t size, ktx_uint32_t base_indent, ktx_uint32_t indent_width, bool minified);
+KTX_API KTX_error_code KTX_APIENTRY ktxPrintKTX2InfoJSONForNamedFile(const char* const filename, ktx_uint32_t base_indent, ktx_uint32_t indent_width, bool minified);
+KTX_API KTX_error_code KTX_APIENTRY ktxPrintKTX2InfoJSONForStdioStream(FILE* stdioStream, ktx_uint32_t base_indent, ktx_uint32_t indent_width, bool minified);
+KTX_API KTX_error_code KTX_APIENTRY ktxPrintKTX2InfoJSONForStream(ktxStream* stream, ktx_uint32_t base_indent, ktx_uint32_t indent_width, bool minified);
+
 #ifdef __cplusplus
 }
 #endif
@@ -1658,11 +1725,14 @@ KTX_API KTX_error_code KTX_APIENTRY ktxPrintInfoForMemory(const ktx_uint8_t* byt
 /**
  * @deprecated Will be dropped before V4 release.
  */
-#define ktxTexture_GetSize ktxTexture_getDatasize
+#define ktxTexture_GetSize ktxTexture_GetDatasize
 
 /**
 @~English
 @page libktx_history Revision History
+
+No longer updated. Kept to preserve ancient history. For more recent history see the repo log at
+https://github.com/KhronosGroup/KTX-Software. See also the Release Notes in the repo.
 
 @section v8 Version 4.0
 Added:

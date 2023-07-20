@@ -56,7 +56,7 @@ One problem of generating mipmaps for alpha tested images is, that they can gene
 This is explained in detail in [this article](https://www.asawicki.info/articles/alpha_test.php5).
 To avoid the loss of coverage, the alpha values need to be rescaled after mipmap generation. This is implemented by the 'Alpha Scale' option. Below is an example of a foliage texture, with ```Alpha Testing = Disabled``` and ```Alpha Testing = Alpha Scale```. This setting is similar to Unity's *mipMapsPreserveCoverage*.
 
-![](img/alpha_test_degen.png)
+![](img/alpha_test_degen.PNG)
 
 The ```Alpha Testing = Alpha Scale``` setting is able to preserve the overall texel coverage and does not result in vanishing texels over distance.
 

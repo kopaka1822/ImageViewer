@@ -6,46 +6,99 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Annotations;
-using ImageFramework.Model.Overlay;
+using ImageFramework.Utility;
+using ImageViewer.Models.Display.Overlays;
 
 namespace ImageViewer.Models.Display
 {
+    // Display model for heatmap
     public class HeatmapModel : INotifyPropertyChanged
     {
         private readonly ImageFramework.Model.Models models;
         private HeatmapOverlay overlay = null;
 
+        public enum ColorStyle
+        {
+            Grayscale,
+            Inferno,
+            CoolWarm,
+            BlackBody,
+        }
+
         public HeatmapModel(ImageFramework.Model.Models models)
         {
             this.models = models;
         }
-        
-        public HeatmapOverlay.Heatmap? Heatmap
+
+        private Float2 start = Float2.Zero;
+        public Float2 Start
         {
-            get => overlay?.Data;
+            get => start;
             set
             {
-                if (value == null && overlay == null) return;
+                if (value == start) return;
+                start = value;
+                OnPropertyChanged(nameof(Start));
+            }
+        }
 
-                if(value == null)
+        private Float2 end = new Float2(0.04f, 0.8f);
+        public Float2 End
+        {
+            get => end;
+            set
+            {
+                if (value == end) return;
+                end = value;
+                OnPropertyChanged(nameof(End));
+            }
+        }
+
+        private int border = 2;
+        public int Border
+        {
+            get => border;
+            set
+            {
+                if (value == border) return;
+                border = value;
+                OnPropertyChanged(nameof(Border));
+            }
+        }
+
+        private ColorStyle style = ColorStyle.Inferno;
+        public ColorStyle Style
+        {
+            get => style;
+            set
+            {
+                if (value == style) return;
+                style = value;
+                OnPropertyChanged(nameof(Style));
+            }
+        }
+
+        public bool IsEnabled
+        {
+            get => overlay != null;
+            set
+            {
+                if (value == IsEnabled) return;
+
+                if(value)
                 {
-                    // delete overlay
+                    // create new overlay
+                    overlay = new HeatmapOverlay(models, this);
+                    models.Overlay.Overlays.Add(overlay);
+                }
+                else
+                {
+                    // remove overlay
                     models.Overlay.Overlays.Remove(overlay);
                     // dispose is managed by the overlay model
                     overlay = null;
-                    OnPropertyChanged(nameof(Heatmap));
-                    return;
                 }
-
-                if(overlay == null)
-                {
-                    // create a heatmap model in overlays
-                    overlay = new HeatmapOverlay(models);
-                    models.Overlay.Overlays.Add(overlay);
-                }
-
-                overlay.Data = value.Value;
-                OnPropertyChanged(nameof(Heatmap));
+                OnPropertyChanged(nameof(IsEnabled));
             }
         }
 

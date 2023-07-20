@@ -11,6 +11,7 @@ using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
+using ImageFramework.Utility;
 using ImageViewer.Models.Settings;
 using ImageViewer.ViewModels.Dialog;
 using ImageViewer.Views.Dialog;
@@ -22,6 +23,10 @@ namespace ImageViewer.Models
     {
         private readonly ModelsEx models;
         private ImportMovieViewModel movieViewModel = null;
+        private ImportNpyViewModel npyViewModel = null;
+
+        // indicates if the user intervened in the import (and potentially cancelled it)
+        public bool CancelledByUser { get; private set; } = false;
 
         public ImportModel(ModelsEx models)
         {
@@ -48,37 +53,55 @@ namespace ImageViewer.Models
             return ofd.FileNames;
         }
 
-        public async Task ImportFileAsync(string file)
+        public async Task ImportFileAsync(string file, [CanBeNull] string alias = null)
         {
+            CancelledByUser = false; // reset this flag
+
             var extension = file.Substring(file.LastIndexOf('.') + 1).ToLower();
             if (extension == "icfg")
             {
-                var cfg = ViewerConfig.LoadFromFile(file);
-                await cfg.ApplyToModels(models);
+                try
+                {
+                    var cfg = ViewerConfig.LoadFromFile(file);
+                    await cfg.ApplyToModels(models);
+
+                    models.Settings.AddRecentFile(file);
+                }
+                catch (Exception e)
+                {
+                    models.Window.ShowErrorDialog(e, "Could not load config");
+                }
+
             }
             /*else if (ExportDescription.Formats.FirstOrDefault(element => element.Extension == extension) != null)
             {
                 await ImportImageAsync(file);
             }*/
+            else if(extension == "npy")
+            {
+                await ImportNpyAsync(file, alias);
+            }
             else if (FFMpeg.Formats().Contains(extension))
             {
-                await ImportMovieAsync(file);
+                await ImportMovieAsync(file, alias);
             }
             else // try as image
             {
-                await ImportImageAsync(file);
+                await ImportImageAsync(file, alias);
             }
             //else models.Window.ShowErrorDialog($"Unknown file extension \"{extension}\"");
 
         }
 
-        public async Task ImportImageAsync(string file, [CanBeNull] string alias = null)
+        private async Task ImportImageAsync(string file, [CanBeNull] string alias = null)
         {
             try
             {
                 var img = await IO.LoadImageTextureAsync(file, models.Progress);
 
                 ImportTexture(img.Texture, true, file, img.OriginalFormat, alias);
+
+                models.Settings.AddRecentFile(file);
             }
             catch (Exception e)
             {
@@ -124,7 +147,7 @@ namespace ImageViewer.Models
             }
         }
 
-        public async Task ImportMovieAsync(string file, [CanBeNull] string alias = null)
+        private async Task ImportMovieAsync(string file, [CanBeNull] string alias = null)
         {
             if (!FFMpeg.IsAvailable())
             {
@@ -160,7 +183,11 @@ namespace ImageViewer.Models
                     if (movieViewModel == null) movieViewModel = new ImportMovieViewModel(models);
                     movieViewModel.Init(meta, requiredCount);
                     var dia = new ImportMovieDialog(movieViewModel);
-                    if (models.Window.ShowDialog(dia) != true) return;
+                    if (models.Window.ShowDialog(dia) != true)
+                    {
+                        CancelledByUser = true;
+                        return;
+                    }
                     // obtain results
                     movieViewModel.GetFirstFrameAndFrameCount(out firstFrame, out frameCount);
                     frameSkip = movieViewModel.FrameSkip;
@@ -180,12 +207,48 @@ namespace ImageViewer.Models
 
                 if (models.Settings.MovieFps != fps)
                     models.Window.ShowInfoDialog($"The FPS count of the imported video ({meta.FramesPerSecond}) does not match the existing FPS count ({models.Settings.MovieFps}). The previous FPS count will be kept.");
+
+                models.Settings.AddRecentFile(file);
             }
             catch (Exception e)
             {
                 if (!models.Progress.LastTaskCancelledByUser)
                     models.Window.ShowErrorDialog(e);
             }
+        }
+
+        private async Task ImportNpyAsync(string file, [CanBeNull] string alias = null)
+        {
+            try
+            {
+                var shape = IO.NpyGetShape(file);
+
+                if (npyViewModel == null) npyViewModel = new ImportNpyViewModel(models);
+                var status = npyViewModel.Init(file, shape);
+                if (!status.IsCompatible)
+                    throw new Exception("Numpy Shape is incompatible. Found " + npyViewModel.Shape);
+
+                if (status.IsConfigurable)
+                {
+                    // let the user configure
+                    var dia = new ImportNpyDialog(npyViewModel);
+                    if (models.Window.ShowDialog(dia) != true)
+                    {
+                        CancelledByUser = true;
+                        return;
+                    }
+                }
+                
+                npyViewModel.ApplySettings();
+            }
+            catch (Exception e)
+            {
+                if (!models.Progress.LastTaskCancelledByUser)
+                    models.Window.ShowErrorDialog(e);
+            }
+
+            // perform import via normal interface (the dialog is just for settings)
+            await ImportImageAsync(file, alias);
         }
     }
 }

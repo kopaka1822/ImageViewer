@@ -55,10 +55,15 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSourc
 		// formats used by the exporter
 	case gli::format::FORMAT_RGBA8_SRGB_PACK8:
 	case gli::format::FORMAT_RGBA8_UNORM_PACK8:
-	case gli::format::FORMAT_RGBA8_SNORM_PACK8:
 		exInfo.isCompressed = false;
 		exInfo.widthMultiplier = 4;
 		return CMP_FORMAT_RGBA_8888;
+	
+	case gli::format::FORMAT_RGBA8_SNORM_PACK8:
+		exInfo.isCompressed = false;
+		exInfo.widthMultiplier = 4;
+		return CMP_FORMAT_RGBA_8888_S;
+
 	case gli::format::FORMAT_RGBA32_SFLOAT_PACK32:
 		exInfo.isCompressed = false;
 		exInfo.widthMultiplier = 16;
@@ -154,18 +159,18 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSourc
 		return CMP_FORMAT_DXT5;
 
 	case gli::format::FORMAT_R_ATI1N_UNORM_BLOCK8: // BC 4
-		if (isSource) exInfo.overwriteAlpha = 255;
-		return CMP_FORMAT_ATI1N;
+		//if (isSource) exInfo.overwriteAlpha = 255;
+		return CMP_FORMAT_BC4;
 	case gli::format::FORMAT_R_ATI1N_SNORM_BLOCK8:
-		if (isSource) exInfo.overwriteAlpha = 127;
-		return CMP_FORMAT_ATI1N;
+		//if (isSource) exInfo.overwriteAlpha = 127;
+		return CMP_FORMAT_BC4_S;
 
 	case gli::format::FORMAT_RG_ATI2N_UNORM_BLOCK16: // BC 5
-		if (isSource) exInfo.overwriteAlpha = 255;
-		return CMP_FORMAT_ATI2N_XY;
+		//if (isSource) exInfo.overwriteAlpha = 255;
+		return CMP_FORMAT_BC5;
 	case gli::format::FORMAT_RG_ATI2N_SNORM_BLOCK16:
-		if (isSource) exInfo.overwriteAlpha = 127; // signed 1
-		return CMP_FORMAT_ATI2N_XY;
+		//if (isSource) exInfo.overwriteAlpha = 127; // signed 1
+		return CMP_FORMAT_BC5_S;
 
 	case gli::format::FORMAT_RGB_BP_UFLOAT_BLOCK16: // BC 6
 		return CMP_FORMAT_BC6H;
@@ -230,7 +235,7 @@ void swizzleMipmap(uint8_t* data, uint32_t size, CMP_FORMAT format)
 
 void overwriteAlpha(uint8_t* data, uint32_t size, CMP_FORMAT format, uint8_t /*overwrite*/ value)
 {
-	assert(format == CMP_FORMAT_RGBA_8888);
+	assert(format == CMP_FORMAT_RGBA_8888 || format == CMP_FORMAT_RGBA_8888_S);
 
 	for(auto i = data + 3, end = data + size; i < end; i += 4)
 	{

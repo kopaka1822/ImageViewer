@@ -2,8 +2,9 @@
 using System.Collections.Generic;
  using System.Diagnostics;
  using System.Linq;
+ using System.Runtime.CompilerServices;
  using System.Runtime.InteropServices;
- using System.Text;
+using System.Text;
  using System.Threading;
  using System.Threading.Tasks;
  using ImageFramework.DirectX;
@@ -117,6 +118,26 @@ namespace ImageFramework.ImageLoader
             return res;
         }
 
-        
+        // sets a global parameter for export
+        public static void SetGlobalParameter(string name, int value)
+        {
+            Dll.set_global_parameter_i(name, value);
+        }
+
+        /// <summary>
+        /// returns the shape of a numpy array
+        /// </summary>
+        [MethodImpl(MethodImplOptions.Synchronized)] // this method needs to be synchronized because the return value is not thread safe
+        public static int[] NpyGetShape(string filename)
+        {
+            var ptr = Dll.npy_get_shape(filename, out var nDims);
+            if (ptr == IntPtr.Zero)
+                throw new Exception(Dll.GetError());
+
+            // extract an integer array with nDims entries from IntPtr ptr
+            var res = new int[nDims];
+            Marshal.Copy(ptr, res, 0, (int)nDims);
+            return res;
+        }
     }
 }

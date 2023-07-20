@@ -69,6 +69,7 @@
     <Compile Include="DirectX\Texture3DTests.cs" />
     <Compile Include="DirectX\TextureArray2DTests.cs" />
     <Compile Include="ImageLoader\DllTest.cs" />
+    <Compile Include="ImageLoader\KtxSamples.cs" />
     <Compile Include="Model\FFmpegTest.cs" />
     <Compile Include="Model\Filter\FilterLoaderTest.cs" />
     <Compile Include="Model\Filter\FiltersModelTest.cs" />
