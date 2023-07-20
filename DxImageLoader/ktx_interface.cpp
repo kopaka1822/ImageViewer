@@ -174,10 +174,27 @@ std::unique_ptr<image::IImage> ktx_load_base(ktxTexture* ktex, gli::format forma
 				ktxLvlSize *= res->getDepth(mip); // is not multiplied with depth layer
 				size_t size;
 				auto dstData = res->getData(dstLayer, mip, size);
-				if (ktxLvlSize != size)
-					throw std::runtime_error("suggested level size of gli does not match with ktx api");
-				memcpy(dstData, ktex->pData + offset, size);
-
+				if(ktxLvlSize == size)
+				{
+					memcpy(dstData, ktex->pData + offset, size); // alignment matches
+				}
+				else if(size < ktxLvlSize)
+				{
+					// calculate size with alignment after each row
+					size_t rows = res->getHeight(mip) * res->getDepth(mip);
+					size_t unalignedRow = size / rows;
+					size_t alignedRow = ktxLvlSize / rows;
+					auto srcData = ktex->pData;
+					//std::vector<uint8_t> debugSrc(srcData, srcData + ktxLvlSize);
+					// copy row by row
+					for(size_t r = 0; r < rows; ++r)
+					{
+						memcpy(dstData, srcData, unalignedRow);
+						dstData += unalignedRow;
+						srcData += alignedRow;
+					}
+				}
+				else throw std::runtime_error("suggested level size of gli does not match with ktx api");
 			}
 			++dstLayer;
 		}
