@@ -5,9 +5,11 @@
 #texture Guide, GuideTex
 #param Radius, blur_radius, int, 20, 1
 #param Spatial Variance, variance_spatial, float, 26, 0.0000001
-#param Intensity Variance, variance_intensity, float, 0.05, 0.000000001
-#paramprop Intensity Variance, OnAdd, 2.0, multiply
-#paramprop Intensity Variance, OnSubtract, 0.5, multiply
+#param Use Source Intensity, use_source_intensity, bool, true
+#param Intensity Variance (Source), variance_intensity_source, float, 0.05, 0.000000001
+#param Use Guide Intensity, use_guide_intensity, bool, true
+#param Intensity Variance (Guide), variance_intensity_guide, float, 0.05, 0.000000001
+
 #param Blur Alpha, blur_alpha, bool, false
 
 // Simple Gauss-Kernel. Normalization is not included and must be
@@ -39,7 +41,7 @@ float4 filter(int2 pixelCoord, int2 size)
 	float4 pixelSum = 0.0;
 	float weightSum = 0.0;
 	float4 srcPixel = src_image[pixelCoord];
-	srcPixel.rgb = GuideTex[pixelCoord].rgb;
+	float4 guidePixel = GuideTex[pixelCoord];
 	
 	int2 d;
 	for(d.y = -blur_radius; d.y <= blur_radius; ++d.y)
@@ -48,9 +50,14 @@ float4 filter(int2 pixelCoord, int2 size)
 		int2 pos = pixelCoord + d;
 
 		float spatialWeight = kernel(length(d), variance_spatial);
-		float intensityWeight = kernel(luminance(abs(getGuidePixel(pos, size) - srcPixel)), variance_intensity);
+		float sourceIntensityWeight = kernel(luminance(abs(getPixel(pos, size) - srcPixel)), variance_intensity_source);
+		float guideIntensityWeight = kernel(luminance(abs(getGuidePixel(pos, size) - guidePixel)), variance_intensity_guide);
 
-		float w = spatialWeight * intensityWeight;
+		float w = spatialWeight;
+		if(use_source_intensity)
+			w *= sourceIntensityWeight;
+		if(use_guide_intensity)
+			w *= guideIntensityWeight;
 		
 		weightSum += w;
 		pixelSum += w * getPixel(pos, size);
