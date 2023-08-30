@@ -144,7 +144,7 @@ namespace ImageFramework.Model.Statistics
         public static readonly DefaultStatistics Zero = new DefaultStatistics();
 
         // gets a suitability rating for the format based on the statistic values
-        public int GetFormatRating(GliFormat format)
+        public int GetFormatRating(GliFormat format, bool coloredOverlay)
         {
             const int alphaMissWeight = 1000; // penalty if alpha channel is required but missing
             const int grayscaleMissWeight = 500; // penalty if only grayscale is needed, but the format has color
@@ -155,7 +155,7 @@ namespace ImageFramework.Model.Statistics
             
             // determine basic properties of image
             bool hasAlpha = HasAlpha;
-            bool isGrayscale = IsGrayscale;
+            bool isGrayscale = IsGrayscale && !coloredOverlay;
             bool isUnormed = Average.Min >= 0.0f && Average.Max <= 1.0f
                 && Alpha.Min >= 0.0f && Alpha.Max <= 1.0f;
             bool isSigned = Average.Min < 0.0f;
@@ -192,9 +192,9 @@ namespace ImageFramework.Model.Statistics
         }
 
         /// gets suitability rating for format and takes preferred format into account
-        public int GetFormatRating(GliFormat format, GliFormat preferredFormat)
+        public int GetFormatRating(GliFormat format, GliFormat preferredFormat, bool coloredOverlay)
         {
-            var rating = GetFormatRating(format);
+            var rating = GetFormatRating(format, coloredOverlay);
             var preferredPixelType = preferredFormat.GetDataType();
             var pixelType = format.GetDataType();
             bool isSrgb = preferredPixelType == PixelDataType.Srgb;

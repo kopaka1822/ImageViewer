@@ -96,6 +96,13 @@ namespace ImageViewer.ViewModels.Dialog
                 models.ExportConfig.Mipmap = -1;
             }
 
+            // determine statistics of overlay
+            var coloredOverlay = false;
+            if (models.Overlay.Overlay != null)
+            {
+                var overlayStats = models.Stats.GetStatisticsFor(models.Overlay.Overlay);
+                coloredOverlay = !overlayStats.IsGrayscale;
+            }
             // init available pixel data types
             var usedPixelTypes = new SortedSet<PixelDataType>();
             foreach (var format in usedFormat.Formats)
@@ -109,7 +116,7 @@ namespace ImageViewer.ViewModels.Dialog
                     Name = format.ToString(),
                     ToolTip = format.GetDescription()
                 });
-                formatRatings.Add(stats.GetFormatRating(format, preferredFormat));
+                formatRatings.Add(stats.GetFormatRating(format, preferredFormat, coloredOverlay));
                 usedPixelTypes.Add(format.GetDataType());
             }
 
