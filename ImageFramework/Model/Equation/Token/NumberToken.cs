@@ -19,6 +19,11 @@
             return value;
         }
 
+        public override string ToString()
+        {
+            return value.ToString(Models.Culture);
+        }
+
         // for unit testing purposes
         internal static string ToHlsl(float value)
         {

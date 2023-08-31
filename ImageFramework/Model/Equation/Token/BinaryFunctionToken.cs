@@ -48,6 +48,11 @@ namespace ImageFramework.Model.Equation.Token
             throw new Exception("invalid string as function name: " + funcName);
         }
 
+        public override string ToString()
+        {
+            return $"{funcName}({value1.ToString()}, {value2.ToString()})";
+        }
+
         private bool IsHlslFunction()
         {
             switch (funcName)

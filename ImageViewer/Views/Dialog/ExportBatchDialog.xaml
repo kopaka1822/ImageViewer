@@ -33,6 +33,23 @@
                     Text="{Binding Directory}"/>
             </Grid>
 
+            <!-- Variable -->
+            <Grid Margin="{StaticResource DefaultBorderBottom}"
+                  Visibility="{Binding ShowVariableSelection, Converter={StaticResource VisibleCollapsedConverter}}"
+                  ToolTip="This image will be replaced with all selected images in the list below">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock 
+                    Text="Variable:"/>
+                <ComboBox 
+                    Grid.Column="1"
+                    ItemsSource="{Binding AvailableVariables}"
+                    SelectedItem="{Binding SelectedVariable}"
+                    ItemTemplate="{StaticResource ListItemView}"/>
+            </Grid>
+
             <!-- Format -->
             <Grid Margin="{StaticResource DefaultBorderBottom}">
                 <Grid.ColumnDefinitions>

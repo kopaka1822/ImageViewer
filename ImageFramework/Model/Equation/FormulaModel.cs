@@ -51,6 +51,7 @@ namespace ImageFramework.Model.Equation
                     OnPropertyChanged(nameof(MinImageId));
                 if(imgLast != HasImages)
                     OnPropertyChanged(nameof(HasImages));
+                OnPropertyChanged(nameof(ImageIds));
 
                 OnPropertyChanged(nameof(Formula));
             }
@@ -68,6 +69,8 @@ namespace ImageFramework.Model.Equation
         // indicates if any images were used in the formula
         public bool HasImages { get; private set; }
 
+        public HashSet<int> ImageIds { get; private set; } = new HashSet<int>();
+
         // the converted formula
         public string Converted { get; private set; }
 
@@ -83,6 +86,8 @@ namespace ImageFramework.Model.Equation
             public bool HasImages;
             // id of the first used image
             public int FirstId;
+
+            public HashSet<int> ImageIds;
         }
 
         /// <summary>
@@ -102,7 +107,8 @@ namespace ImageFramework.Model.Equation
                     MaxId = eq.MaxImageId,
                     FirstId = eq.FirstImageId,
                     MinId = eq.MinImageId,
-                    HasImages = eq.HasImageId
+                    HasImages = eq.HasImageId,
+                    ImageIds = eq.ImageIds
                 };
             }
             catch (Exception e)
@@ -128,7 +134,14 @@ namespace ImageFramework.Model.Equation
             MaxImageId = eq.MaxImageId;
             MinImageId = eq.MinImageId;
             HasImages = eq.HasImageId;
+            ImageIds = eq.ImageIds;
             return res;
+        }
+
+        public void ReplaceImage(int oldId, int newId)
+        {
+            var eq = new HlslEquation();
+            Formula = eq.ReplaceImageInFormula(Formula, oldId, newId);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

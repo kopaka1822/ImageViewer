@@ -57,6 +57,16 @@ namespace ImageViewer.Commands.Export
             return models.Images.NumImages > 1 && models.NumEnabled > 0;
         }
 
+        private static List<int> GetPossibleImageVariables(ImagePipeline pipe)
+        {
+            var possibleImageVariables = new HashSet<int>(pipe.Color.ImageIds);
+            possibleImageVariables.UnionWith(pipe.Alpha.ImageIds);
+
+            var list = possibleImageVariables.ToList();
+            list.Sort();
+            return list;
+        }
+
         public override async void Execute()
         {
             // make sure only one image is visible
@@ -78,7 +88,8 @@ namespace ImageViewer.Commands.Export
             }
 
             // check if pipeline is compatible with batch export
-            if (!pipe.Color.HasImages)
+            var possibleImageVariables = GetPossibleImageVariables(pipe);
+            if (possibleImageVariables.Count == 0)
             {
                 models.Window.ShowErrorDialog("Batch export is only supported if images are used in the color equation");
                 return;
@@ -108,7 +119,7 @@ namespace ImageViewer.Commands.Export
             ExportBatchViewModel batchViewModel;
             try
             {
-                batchViewModel = new ExportBatchViewModel(models, models.Images.Is3D, path);
+                batchViewModel = new ExportBatchViewModel(models, models.Images.Is3D, path, possibleImageVariables);
             }
             catch (Exception e)
             {
@@ -130,7 +141,13 @@ namespace ImageViewer.Commands.Export
             ExportViewModel viewModel;
             try
             {
-                viewModel = new ExportViewModel(models, path.Extension, exportFormat.Value, path.Filename, models.Images.Is3D, models.Statistics[pipeId].Stats);
+                // create filenames array
+                string filenames = "";
+                foreach (var batchId in batchIDs)
+                    filenames += models.Images.Images[batchId].Alias + ", ";
+                filenames = filenames.TrimEnd(',', ' ');
+
+                viewModel = new ExportViewModel(models, path.Extension, exportFormat.Value, filenames, models.Images.Is3D, models.Statistics[pipeId].Stats);
             }
             catch (Exception e)
             {
@@ -147,12 +164,10 @@ namespace ImageViewer.Commands.Export
             {
                 using (var newPipe = pipe.Clone())
                 {
-                    // TODO replace image id with batch id in equations
-                    newPipe.Color.Formula = $"I{batchId}";
-                    newPipe.Alpha.Formula = $"I{batchId}";
+                    newPipe.Color.ReplaceImage(batchViewModel.SelectedImageVariable, batchId);
+                    newPipe.Alpha.ReplaceImage(batchViewModel.SelectedImageVariable, batchId);
                     newPipe.SetValid();
-                    // TODO make sure we have a valid (and potentially unique) filename
-                    path.InitFromFilename(models.Images.Images[batchId].Filename);
+                    path.UpdateFromFilename(models.Images.Images[batchId].Alias, false, true, false);
 
                     // calculate new image
                     await newPipe.UpdateImagePipelineAsync(models, pipeId);

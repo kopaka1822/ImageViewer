@@ -8,10 +8,12 @@ namespace ImageFramework.Model.Equation.Token
 {
     public class ConstantToken : ValueToken
     {
+        private readonly string name;
         private readonly float value;
 
-        public ConstantToken(float value)
+        public ConstantToken(string name, float value)
         {
+            this.name = name;
             this.value = value;
         }
 
@@ -37,7 +39,12 @@ namespace ImageFramework.Model.Equation.Token
 
         public override float ToFloat()
         {
-            throw new NotImplementedException("ConstantToken::ToFloat");
+            return value;
+        }
+
+        public override string ToString()
+        {
+            return name;
         }
     }
 }

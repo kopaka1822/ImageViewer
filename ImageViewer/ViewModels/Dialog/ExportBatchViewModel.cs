@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -22,6 +23,7 @@ namespace ImageViewer.ViewModels.Dialog
         private readonly bool is3D;
 
         private static HashSet<int> _excludeList = new HashSet<int>(); // list with items to exclude
+        private static int _lastVariableId = 0;
 
         public class ImageSelectorViewModel
         {
@@ -29,11 +31,26 @@ namespace ImageViewer.ViewModels.Dialog
             public bool IsSelected { get; set; }
         }
 
-        public ExportBatchViewModel(ModelsEx models, bool is3D, PathManager path)
+        public ExportBatchViewModel(ModelsEx models, bool is3D, PathManager path, List<int> possibleImageVariables)
         {
             this.models = models;
             this.is3D = is3D;
             this.path = path;
+
+            // init available variables
+            Debug.Assert(possibleImageVariables.Count > 0);
+            AvailableVariables = new List<ListItemViewModel<int>>();
+            foreach (var i in possibleImageVariables)
+            {
+                AvailableVariables.Add(new ListItemViewModel<int>()
+                {
+                    Cargo = i,
+                    Name = $"I{i} - {models.Images.Images[i].Alias}"
+                });
+                if(i == _lastVariableId)
+                    selectedVariable = AvailableVariables.Last();
+            }
+            if (selectedVariable == null) selectedVariable = AvailableVariables.First();
 
             // init formats
             List<ListItemViewModel<string>> availableFormats = new List<ListItemViewModel<string>>();
@@ -80,6 +97,7 @@ namespace ImageViewer.ViewModels.Dialog
             }
 
             _excludeList = excludeList;
+            _lastVariableId = selectedVariable.Cargo;
         }
 
         public List<ListItemViewModel<string>> AvailableFormats { get; }
@@ -98,6 +116,24 @@ namespace ImageViewer.ViewModels.Dialog
         }
 
         public string ExportExtension => selectedFormat.Cargo;
+
+        public List<ListItemViewModel<int>> AvailableVariables { get; }
+        private ListItemViewModel<int> selectedVariable;
+
+        public ListItemViewModel<int> SelectedVariable
+        {
+            get => selectedVariable;
+            set
+            {
+                if (value == null || value == selectedVariable) return;
+                selectedVariable = value;
+                OnPropertyChanged(nameof(SelectedVariable));
+            }
+        }
+
+        public bool ShowVariableSelection => AvailableVariables.Count > 1;
+
+        public int SelectedImageVariable => selectedVariable.Cargo;
 
         public List<ImageSelectorViewModel> ImagesList { get; private set; }
 

@@ -9,5 +9,10 @@
         {
             this.FuncName = name;
         }
+
+        public override string ToString()
+        {
+            return FuncName;
+        }
     }
 }

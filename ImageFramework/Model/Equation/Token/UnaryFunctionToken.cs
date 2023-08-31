@@ -34,6 +34,11 @@ namespace ImageFramework.Model.Equation.Token
             throw new Exception("invalid string as function name: " + funcName);
         }
 
+        public override string ToString()
+        {
+            return $"{funcName}({value.ToString()})";
+        }
+
         public static string GetUnaryHelperFunctions()
         {
             return @"

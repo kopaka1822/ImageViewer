@@ -138,7 +138,15 @@ namespace ImageViewer.UtilityEx
             if (firstImageId >= models.Images.NumImages) return false;
 
             var firstImageName = models.Images.Images[firstImageId].Filename;
-            if (String.IsNullOrEmpty(firstImageName)) return false;
+            if (String.IsNullOrEmpty(firstImageName))
+            {
+                // try alias if name does not exist
+                firstImageName = models.Images.Images[firstImageId].Alias;
+                if (String.IsNullOrEmpty(firstImageName))
+                    return false;
+                Filename = firstImageName; // use as filename only
+                return true;
+            }
 
             InitFromFilename(firstImageName);
 

@@ -44,5 +44,10 @@ namespace ImageFramework.Model.Equation.Token
             }
             throw new Exception("unknown operator: " + operat.Symbol);
         }
+
+        public override string ToString()
+        {
+            return $"({left.ToString()} {operat.Symbol} {right.ToString()})";
+        }
     }
 }

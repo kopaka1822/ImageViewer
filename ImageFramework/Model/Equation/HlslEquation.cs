@@ -16,6 +16,7 @@ namespace ImageFramework.Model.Equation
         private int firstImageId = -1;
         private int maxImageId = -1;
         private int minImageId = Int32.MaxValue;
+        private HashSet<int> imageIds = new HashSet<int>();
         private static readonly float EpsilonValue = float.Epsilon;
         private static readonly Dictionary<string, float> Constants = new Dictionary<string, float>
         {
@@ -42,13 +43,36 @@ namespace ImageFramework.Model.Equation
             {
                 if (token is ImageToken itoken)
                 {
-                    firstImageId = itoken.Id;
-                    break;
+                    if(firstImageId == -1) firstImageId = itoken.Id;
+                    imageIds.Add(itoken.Id);
                 }
             }
 
             // check for syntax
             finalToken = Compile(tokens);
+        }
+
+        public HlslEquation()
+        {
+            // does nothing
+        }
+
+        public string ReplaceImageInFormula(string formular, int oldImage, int newImage)
+        {
+            var tokens = GetToken(formular);
+            string res = "";
+            foreach (var token in tokens)
+            {
+                if (token is ImageToken itoken)
+                {
+                    if (itoken.Id == oldImage)
+                        itoken.Id = newImage;
+                }
+
+                res += token.ToString();
+            }
+
+            return res;
         }
 
         public string GetHlslExpression()
@@ -73,6 +97,8 @@ namespace ImageFramework.Model.Equation
 
         public bool HasImageId => firstImageId != -1;
 
+        // hash set with all images that are used in the formula
+        public HashSet<int> ImageIds => imageIds;
 
         protected override List<MarkovRule> GetRules()
         {
@@ -117,7 +143,7 @@ namespace ImageFramework.Model.Equation
             if (!Constants.TryGetValue(lower, out var value))
                 throw new Exception($"Unknown Identifier: {identifier}");
 
-            return new ConstantToken(value);
+            return new ConstantToken(lower, value);
         }
     }
 }

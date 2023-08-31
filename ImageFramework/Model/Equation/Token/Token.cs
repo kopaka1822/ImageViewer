@@ -1,6 +1,6 @@
 ﻿namespace ImageFramework.Model.Equation.Token
 {
-    public class Token
+    public abstract class Token
     {
         public enum Type
         {
@@ -20,5 +20,7 @@
         {
             TokenType = type;
         }
+
+        public abstract override string ToString();
     }
 }

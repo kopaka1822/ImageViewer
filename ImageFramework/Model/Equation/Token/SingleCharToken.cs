@@ -7,5 +7,10 @@
         {
             this.Symbol = symbol;
         }
+
+        public override string ToString()
+        {
+            return Symbol.ToString();
+        }
     }
 }

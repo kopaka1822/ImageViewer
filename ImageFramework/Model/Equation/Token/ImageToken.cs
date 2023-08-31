@@ -4,7 +4,7 @@ namespace ImageFramework.Model.Equation.Token
 {
     internal class ImageToken : ValueToken
     {
-        public readonly int Id;
+        public int Id;
 
         public ImageToken(int id)
         {
@@ -19,6 +19,11 @@ namespace ImageFramework.Model.Equation.Token
         public override float ToFloat()
         {
             throw new NotImplementedException();
+        }
+
+        public override string ToString()
+        {
+            return $"I{Id}";
         }
     }
 }

@@ -28,6 +28,11 @@ namespace ImageFramework.Model.Equation.Token
             throw new NotImplementedException();
         }
 
+        public override string ToString()
+        {
+            return funcName + "()";
+        }
+
         private static bool GetIntrinsicFunction(string name, out string res)
         {
             switch (name)
