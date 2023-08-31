@@ -98,6 +98,7 @@ namespace ImageViewer.ViewModels
             ImportCommand = new ImportCommand(models);
             ImportEquationImageCommand = new ImportEquationImageCommand(models);
             ExportCommand = new ExportCommand(models);
+            ExportBatchCommand = new ExportBatchCommand(models);
             ExportMovieCommand = new ExportMovieCommand(models);
             ExportOverwriteCommand = new ExportOverwriteCommand(models);
             ReloadImagesCommand = new ReloadImagesCommand(models);
@@ -290,6 +291,8 @@ namespace ImageViewer.ViewModels
         public ICommand ImportEquationImageCommand { get; }
 
         public ICommand ExportCommand { get; }
+
+        public ICommand ExportBatchCommand { get; }
 
         public ICommand ExportMovieCommand { get; }
         public ICommand ExportOverwriteCommand { get; }

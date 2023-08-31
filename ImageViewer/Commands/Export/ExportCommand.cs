@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
@@ -12,6 +14,8 @@ using ImageViewer.UtilityEx;
 using ImageViewer.ViewModels.Dialog;
 using ImageViewer.Views.Dialog;
 using Microsoft.Win32;
+using static ImageViewer.UtilityEx.CropManager;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ImageViewer.Commands.Export
 {
@@ -129,6 +133,12 @@ namespace ImageViewer.Commands.Export
 
             if (models.Window.ShowDialog(dia) != true) return;
 
+            exportFormat = viewModel.SelectedFormatValue;
+            await ExportTexAsync(tex, path, multiplier, models, viewModel);
+        }
+
+        public static async Task ExportTexAsync(ITexture tex, PathManager path, float multiplier, ModelsEx models, ExportViewModel viewModel)
+        {
             var desc = new ExportDescription(tex, path.Directory + "/" + path.Filename, path.Extension)
             {
                 Multiplier = multiplier,
@@ -141,7 +151,6 @@ namespace ImageViewer.Commands.Export
                 Quality = models.Settings.LastQuality
             };
             desc.TrySetFormat(viewModel.SelectedFormatValue);
-            exportFormat = desc.FileFormat;
 
             models.Export.ExportAsync(desc);
 
@@ -170,7 +179,6 @@ namespace ImageViewer.Commands.Export
                     models.Export.ExportAsync(zdesc);
                 }
             }
-            
         }
 
         private static Dictionary<string, string> filter = new Dictionary<string, string>

@@ -16,7 +16,7 @@ namespace ImageViewer.UtilityEx
         public string Directory
         {
             get => directory;
-            private set
+            set
             {
                 if (String.IsNullOrEmpty(value)) return;
                 directory = value;
