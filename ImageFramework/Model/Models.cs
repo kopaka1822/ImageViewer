@@ -272,6 +272,19 @@ namespace ImageFramework.Model
             throw new Exception("no pipeline enabled");
         }
 
+        // gets a list of active filters for the given pipeline index
+        public List<FilterModel> GetPipeFilters(int index)
+        {
+            var res = new List<FilterModel>();
+            foreach (var filter in Filter.Filter)
+            {
+                if (filter.IsEnabledFor(index))
+                    res.Add(filter);
+            }
+
+            return res;
+        }
+
         /// <summary>
         /// Forces all pending pipeline changes to be computed
         /// </summary>

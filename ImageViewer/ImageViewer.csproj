@@ -177,6 +177,7 @@
     <Compile Include="UtilityEx\ColorExtension.cs" />
     <Compile Include="UtilityEx\CropManager.cs" />
     <Compile Include="UtilityEx\PathManager.cs" />
+    <Compile Include="ViewModels\Dialog\ExportBatchViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ExportConfigViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ExportMovieViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ExportViewModel.cs" />
@@ -232,6 +233,9 @@
     </Compile>
     <Compile Include="Views\Dialog\ColorPickerDialog.xaml.cs">
       <DependentUpon>ColorPickerDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\ExportBatchDialog.xaml.cs">
+      <DependentUpon>ExportBatchDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\ExportConfigDialog.xaml.cs">
       <DependentUpon>ExportConfigDialog.xaml</DependentUpon>
@@ -356,6 +360,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialog\ColorPickerDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\ExportBatchDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

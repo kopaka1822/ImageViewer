@@ -181,20 +181,20 @@ namespace ImageViewer.Commands.Export
             }
         }
 
-        private static Dictionary<string, string> filter = new Dictionary<string, string>
+        public static readonly Dictionary<string, string> Filter = new Dictionary<string, string>
         {
-            {"png", "PNG (*.png)|*.png" },
-            {"bmp", "BMP (*.bmp)|*.bmp" },
-            {"jpg", "JPEG (*.jpg)|*.jpg" },
-            {"tga", "TGA (*.tga)|*.tga"},
-            {"hdr", "HDR (*.hdr)|*.hdr" },
-            {"pfm", "Portable float map (*.pfm)|*.pfm" },
-            {"ktx", "Khronos Texture (*.ktx)|*.ktx" },
-            {"ktx2", "Khronos Texture (*.ktx2)|*.ktx2"},
-            {"dds", "DirectDraw Surface (*.dds)|*.dds" },
+            {"png", "PNG (*.png)" },
+            {"bmp", "BMP (*.bmp)" },
+            {"jpg", "JPEG (*.jpg)" },
+            {"tga", "TGA (*.tga)"},
+            {"hdr", "HDR (*.hdr)" },
+            {"pfm", "Portable float map (*.pfm)" },
+            {"ktx", "Khronos Texture (*.ktx)" },
+            {"ktx2", "Khronos Texture (*.ktx2)"},
+            {"dds", "DirectDraw Surface (*.dds)" },
         };
 
-        private static bool Is3DFilter(string key)
+        public static bool Is3DFilter(string key)
         {
             return key == "dds" || key == "ktx" || key == "ktx2";
         }
@@ -203,16 +203,16 @@ namespace ImageViewer.Commands.Export
         {
             string pref = null;
             if(preferred != null && (!is3D || Is3DFilter(preferred)))
-                filter.TryGetValue(preferred, out pref);
+                Filter.TryGetValue(preferred, out pref);
 
             var res = "";
             if (pref != null)
-                res += pref + "|";
+                res += $"{pref}|*.{preferred}|";
 
-            foreach (var f in filter)
+            foreach (var f in Filter)
             {
                 if (f.Value != pref && (!is3D || Is3DFilter(f.Key)))
-                    res += f.Value + "|";
+                    res += $"{f.Value}|*.{f.Key}|";
             }
 
             return res.TrimEnd('|');

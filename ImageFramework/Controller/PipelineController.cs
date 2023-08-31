@@ -120,7 +120,7 @@ namespace ImageFramework.Controller
                     var pipe = models.Pipelines[i];
                     if (pipe.HasChanges && pipe.IsValid && pipe.IsEnabled)
                     {
-                        args.Filters = pipe.UseFilter ? GetPipeFilters(i) : null;
+                        args.Filters = pipe.UseFilter ? models.GetPipeFilters(i) : null;
 
                         await pipe.UpdateImageAsync(args, progress.CreateSubProgress((++curCompute) / (float)numCompute));
                     }
@@ -132,21 +132,6 @@ namespace ImageFramework.Controller
                 throw;
             }
             models.OnPipelineUpdate(this, true);
-        }
-
-        /// <summary>
-        /// returns all filters that are enabled for this pipline
-        /// </summary>
-        private List<FilterModel> GetPipeFilters(int index)
-        {
-            var res = new List<FilterModel>();
-            foreach (var filter in models.Filter.Filter)
-            {
-                if(filter.IsEnabledFor(index))
-                    res.Add(filter);
-            }
-
-            return res;
         }
 
         private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)

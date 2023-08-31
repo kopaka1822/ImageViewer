@@ -37,6 +37,18 @@ namespace ImageFramework.Model
             Alpha = new FormulaModel(defaultImage);
         }
 
+        // clones the settings of the pipeline with a deep copy for image formulas
+        public ImagePipeline Clone()
+        {
+            var pipe = new ImagePipeline(0);
+            pipe.Color.Formula = Color.Formula;
+            pipe.Alpha.Formula = Alpha.Formula;
+            pipe.useFilter = useFilter;
+            pipe.channelFilter = channelFilter;
+            pipe.recomputeMipmaps = recomputeMipmaps;
+            return pipe;
+        }
+
         public FormulaModel Color { get; }
         public FormulaModel Alpha { get; }
 

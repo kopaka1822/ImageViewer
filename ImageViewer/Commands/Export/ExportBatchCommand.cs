@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -66,10 +67,16 @@ namespace ImageViewer.Commands.Export
             }
 
             // get active final image
-            var id = models.GetFirstEnabledPipeline();
-            var pipe = models.Pipelines[id];
-            if(pipe.Image == null) return; // not yet computed?
-            
+            var pipeId = models.GetFirstEnabledPipeline();
+            var pipe = models.Pipelines[pipeId];
+            if(pipe.Image == null || !pipe.IsValid) return; // not yet computed?
+
+            if (exportFormat == null)
+            {
+                var firstImageId = pipe.Color.FirstImageId;
+                exportFormat = models.Images.Images[firstImageId].OriginalFormat;
+            }
+
             // check if pipeline is compatible with batch export
             if (!pipe.Color.HasImages)
             {
@@ -80,12 +87,15 @@ namespace ImageViewer.Commands.Export
             float multiplier = ExportCommand.GetImageMultiplier(models);
             path.InitFromEquations(models);
 
-
+            // DIRECTORY SELECT
 
             var fd = new CommonOpenFileDialog
             {
                 InitialDirectory = path.Directory,
-                IsFolderPicker = true
+                IsFolderPicker = true,
+                Title = "Select export directory",
+                EnsurePathExists = true,
+                Multiselect = false,
             };
 
             if (fd.ShowDialog(models.Window.TopmostWindow) != CommonFileDialogResult.Ok)
@@ -93,16 +103,34 @@ namespace ImageViewer.Commands.Export
 
             path.Directory = fd.FileName;
 
-            // TODO select extension and which files to export
+            // BATCH FILE SELECT
 
-            // default file export dialog
-            // TODO update path.Filename to the first export image
-            // TODO set export format
+            ExportBatchViewModel batchViewModel;
+            try
+            {
+                batchViewModel = new ExportBatchViewModel(models, models.Images.Is3D, path);
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e);
+                return;
+            }
+
+            var batchDia = new ExportBatchDialog(batchViewModel);
+
+            if (models.Window.ShowDialog(batchDia) != true) return;
+
+            var batchIDs = batchViewModel.GetSelectedImages();
+            Debug.Assert(batchIDs.Count > 0);
+            path.InitFromFilename(models.Images.Images[batchIDs.First()].Filename); // TODO workaround if file has empty filename (use alias?/always use alias?)
+            path.Extension = batchViewModel.ExportExtension;
+
+            // OUTPUT FORMAT SELECT
 
             ExportViewModel viewModel;
             try
             {
-                viewModel = new ExportViewModel(models, path.Extension, exportFormat.Value, path.Filename, models.Images.Is3D, models.Statistics[id].Stats);
+                viewModel = new ExportViewModel(models, path.Extension, exportFormat.Value, path.Filename, models.Images.Is3D, models.Statistics[pipeId].Stats);
             }
             catch (Exception e)
             {
@@ -115,10 +143,24 @@ namespace ImageViewer.Commands.Export
             if (models.Window.ShowDialog(dia) != true) return;
             exportFormat = viewModel.SelectedFormatValue;
 
-            // TODO export all images
+            /*var pipelineArgs = new ImagePipeline.UpdateImageArgs
+            {
+                Models = models,
+                Filters = pipe.UseFilter ? models.GetPipeFilters(pipeId) : null
+            };*/
 
-            // FOR ...
-            await ExportCommand.ExportTexAsync(null, path, multiplier, models, viewModel);
+            foreach (var batchID in batchIDs)
+            {
+                // TODO update path
+                
+                // clone pipeline and use batchID instead
+                var newPipe = pipe.Clone();
+                // TODO replace image id with batch id in equations
+
+                //await newPipe.UpdateImageAsync(pipelineArgs, null); // TODO progress model
+
+                await ExportCommand.ExportTexAsync(newPipe.Image, path, multiplier, models, viewModel);
+            }
         }
     }
 }

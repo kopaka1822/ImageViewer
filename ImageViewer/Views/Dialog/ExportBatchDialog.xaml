@@ -1,0 +1,104 @@
+﻿<Window x:Class="ImageViewer.Views.Dialog.ExportBatchDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImageViewer.Views.Dialog"
+        mc:Ignorable="d"
+        Title="Export Batch" 
+        Width="400"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Icon="../../Icons/app.png"
+        Style="{StaticResource WindowStyle}">
+    <Window.Resources>
+        <GridLength x:Key="GridWidth">60</GridLength>
+        <GridLength x:Key="BoxesGridWidth">100</GridLength>
+    </Window.Resources>
+    <Border Padding="5">
+        <StackPanel>
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock 
+                    Grid.Column="0" 
+                    Text="Directory:"/>
+                <TextBox 
+                    Grid.Column="1" 
+                    IsEnabled="False"
+                    Text="{Binding Directory}"/>
+            </Grid>
+
+            <!-- Format -->
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock 
+                    Text="Format:"/>
+                <ComboBox 
+                    Grid.Column="1"
+                    ItemsSource="{Binding AvailableFormats}"
+                    SelectedItem="{Binding SelectedFormat}"
+                    ItemTemplate="{StaticResource ListItemView}"/>
+            </Grid>
+
+            <GroupBox
+                Margin="{StaticResource DefaultBorderBottom}">
+                <GroupBox.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Select:" Margin="{StaticResource DefaultBorderRight}" HorizontalAlignment="Center"/>
+
+                        <TextBlock Margin="{StaticResource DefaultBorderRight}">
+                            <Hyperlink Command="{Binding SelectAllCommand}">All</Hyperlink>
+                        </TextBlock>
+
+                        <TextBlock Margin="{StaticResource DefaultBorderRight}">
+                            <Hyperlink Command="{Binding SelectNoneCommand}">None</Hyperlink>
+                        </TextBlock>
+
+                    </StackPanel>
+                </GroupBox.Header>
+                <ListBox
+                    ScrollViewer.VerticalScrollBarVisibility="Visible"  
+                    BorderThickness="0"
+                    Height="180"
+                    ItemsSource="{Binding ImagesList, UpdateSourceTrigger=PropertyChanged}"
+                    HorizontalContentAlignment="Stretch">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox 
+                                Content="{Binding Name}"
+                                IsChecked="{Binding IsSelected}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </GroupBox>
+
+            <Grid HorizontalAlignment="Right">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button 
+                    Content="_Continue" 
+                    Margin="{StaticResource DefaultBorderRight}"
+                    Width="60"
+                    Click="ButtonExport_OnClick"
+                    IsDefault="True"
+                />
+                <Button 
+                    Grid.Column="1" 
+                    Content="_Cancel" 
+                    Width="60"
+                    Click="ButtonCancel_OnClick"
+                    IsCancel="True"/>
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>

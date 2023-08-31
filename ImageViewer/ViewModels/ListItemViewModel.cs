@@ -13,4 +13,11 @@ namespace ImageViewer.ViewModels
         public string Name { get; set; }
         public string ToolTip { get; set; }
     }
+
+    // variant without cargo
+    public class ListItemViewModel
+    {
+        public string Name { get; set; }
+        public string ToolTip { get; set; }
+    }
 }
