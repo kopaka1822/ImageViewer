@@ -143,23 +143,22 @@ namespace ImageViewer.Commands.Export
             if (models.Window.ShowDialog(dia) != true) return;
             exportFormat = viewModel.SelectedFormatValue;
 
-            /*var pipelineArgs = new ImagePipeline.UpdateImageArgs
+            foreach (var batchId in batchIDs)
             {
-                Models = models,
-                Filters = pipe.UseFilter ? models.GetPipeFilters(pipeId) : null
-            };*/
+                using (var newPipe = pipe.Clone())
+                {
+                    // TODO replace image id with batch id in equations
+                    newPipe.Color.Formula = $"I{batchId}";
+                    newPipe.Alpha.Formula = $"I{batchId}";
+                    newPipe.SetValid();
+                    // TODO make sure we have a valid (and potentially unique) filename
+                    path.InitFromFilename(models.Images.Images[batchId].Filename);
 
-            foreach (var batchID in batchIDs)
-            {
-                // TODO update path
-                
-                // clone pipeline and use batchID instead
-                var newPipe = pipe.Clone();
-                // TODO replace image id with batch id in equations
-
-                //await newPipe.UpdateImageAsync(pipelineArgs, null); // TODO progress model
-
-                await ExportCommand.ExportTexAsync(newPipe.Image, path, multiplier, models, viewModel);
+                    // calculate new image
+                    await newPipe.UpdateImagePipelineAsync(models, pipeId);
+                    Debug.Assert(newPipe.Image != null);
+                    await ExportCommand.ExportTexAsync(newPipe.Image, path, multiplier, models, viewModel);
+                }
             }
         }
     }

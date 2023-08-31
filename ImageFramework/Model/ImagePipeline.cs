@@ -134,6 +134,12 @@ namespace ImageFramework.Model
             }
         }
 
+        // set equation to valid. should only be done if the image ids in the equations are available in the model
+        public void SetValid()
+        {
+            IsValid = true;
+        }
+
         private bool hasChanges = true;
 
         /// <summary>
@@ -151,7 +157,7 @@ namespace ImageFramework.Model
         }
 
         /// <summary>
-        /// indicates if the Image was taken from a texture cache or lend from the images model
+        /// indicates if the Image was taken from a texture cache. If false, image was taken from ImageModel and ownership belongs to the ImageModel
         /// </summary>
         private bool cachedTexture = true;
 
@@ -179,6 +185,20 @@ namespace ImageFramework.Model
         {
             public Models Models;
             public List<FilterModel> Filters;
+        }
+
+        // enqueus the application of a single pipeline
+        public async Task UpdateImagePipelineAsync(Models models, int pipelineId)
+        {
+            var args = new UpdateImageArgs
+            {
+                Models = models,
+                Filters = UseFilter ? models.GetPipeFilters(pipelineId) : null
+            };
+
+            var cts = new CancellationTokenSource();
+            models.Progress.AddTask(UpdateImageAsync(args, models.Progress.GetProgressInterface(cts.Token)), cts, false);
+            await models.Progress.WaitForTaskAsync();
         }
 
         internal async Task UpdateImageAsync(UpdateImageArgs args, IProgress progress)
@@ -353,7 +373,7 @@ namespace ImageFramework.Model
 
         public void Dispose()
         {
-            Image?.Dispose();
+            if(cachedTexture) Image?.Dispose(); // reset images from cache, dont reset images from image model
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

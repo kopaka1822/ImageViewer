@@ -179,6 +179,8 @@ namespace ImageViewer.Commands.Export
                     models.Export.ExportAsync(zdesc);
                 }
             }
+
+            await models.Progress.WaitForTaskAsync();
         }
 
         public static readonly Dictionary<string, string> Filter = new Dictionary<string, string>
