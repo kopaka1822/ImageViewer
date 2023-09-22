@@ -34,6 +34,7 @@ namespace ImageConsole
             AddCommand(new MoveCommand());
             AddCommand(new GenerateMipmapsCommand());
             AddCommand(new DeleteMipmapsCommand());
+            AddCommand(new RecomputeMipmapsCommand());
             AddCommand(new TellLayersCommand());
             AddCommand(new TellMipmapsCommand());
             AddCommand(new TellSizeCommand());
