@@ -69,6 +69,7 @@
             </MenuItem>
             <MenuItem 
                 Header="Export Batch"
+                ToolTip="Export all imported images to the selected folder"
                 Command="{Binding ExportBatchCommand}"
                 IsEnabled="{Binding Progress.NotProcessing}">
                 <MenuItem.Icon>
