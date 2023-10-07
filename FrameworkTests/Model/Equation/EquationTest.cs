@@ -125,6 +125,39 @@ namespace FrameworkTests.Model.Equation
             Assert.ThrowsException<Exception>(() => new FloatEquation("width**2"));
         }
 
+        [TestMethod]
+        public void ReplaceTest()
+        {
+            var eq = new ImageFramework.Model.Equation.HlslEquation("I0");
+            var formla = eq.ReplaceImageInFormula("I0", 0, 1);
+            // basic replace
+            Assert.AreEqual("I1", formla);
+
+            // nothing to replace
+            formla = eq.ReplaceImageInFormula("I0", 1, 2); 
+            Assert.AreEqual("I0", formla);
+
+            // math operations replace
+            formla = eq.ReplaceImageInFormula("(1/3+I2*3)^2-1", 2, 1);
+            Assert.AreEqual("(1/3+I1*3)^2-1", formla);
+
+            // functions replace
+            formla = eq.ReplaceImageInFormula("max(I2, I3)", 2, 1);
+            Assert.AreEqual("max(I1,I3)", formla);
+
+            // multiple replace
+            formla = eq.ReplaceImageInFormula("I2 + I2", 2, 1);
+            Assert.AreEqual("I1+I1", formla);
+
+            // multiple replace with multiple images
+            formla = eq.ReplaceImageInFormula("I2+I3+I2+I1+I2", 2, 1);
+            Assert.AreEqual("I1+I3+I1+I1+I1", formla);
+
+            // replace with special constants
+            formla = eq.ReplaceImageInFormula("e+I2", 2, 1);
+            Assert.AreEqual("e+I1", formla);
+        }
+
         // equation should fail
         private void AssertThrow(string formula)
         {
