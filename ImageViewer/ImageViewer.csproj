@@ -89,7 +89,6 @@
     <Compile Include="Commands\Export\ExportConfigCommand.cs" />
     <Compile Include="Commands\Export\ExportMovieCommand.cs" />
     <Compile Include="Commands\Export\ExportOverwriteCommand.cs" />
-    <Compile Include="Commands\Export\SharedExportData.cs" />
     <Compile Include="Commands\Helper\Command.cs" />
     <Compile Include="Commands\Import\ImportConfigCommand.cs" />
     <Compile Include="Commands\Import\ReloadImagesCommand.cs" />

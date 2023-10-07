@@ -21,14 +21,13 @@ namespace ImageViewer.Commands.Export
 {
     public class ExportCommand : Command
     {
-        private readonly ModelsEx models;
-        private GliFormat? exportFormat = null;
-        private readonly PathManager path;
+        private readonly ModelsEx models; 
+        private readonly PathManager path; // == models.ExportConfig.Path
 
         public ExportCommand(ModelsEx models)
         {
             this.models = models;
-            path = models.ExportPath;
+            path = models.ExportConfig.Path;
             this.models.PropertyChanged += ModelsOnPropertyChanged;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
@@ -101,9 +100,9 @@ namespace ImageViewer.Commands.Export
             // set proposed filename
             var firstImageId = models.Pipelines[id].Color.FirstImageId;
 
-            if (exportFormat == null)
+            if (models.ExportConfig.Format == null)
             {
-                exportFormat = models.Images.Images[firstImageId].OriginalFormat;
+                models.ExportConfig.Format = models.Images.Images[firstImageId].OriginalFormat;
             }
 
             var sfd = new SaveFileDialog
@@ -121,7 +120,7 @@ namespace ImageViewer.Commands.Export
             ExportViewModel viewModel;
             try
             {
-                 viewModel = new ExportViewModel(models, path.Extension, exportFormat.Value, sfd.FileName, tex.Is3D, models.Statistics[id].Stats);
+                 viewModel = new ExportViewModel(models, path.Extension, models.ExportConfig.Format.Value, sfd.FileName, tex.Is3D, models.Statistics[id].Stats);
             }
             catch (Exception e)
             {
@@ -133,7 +132,7 @@ namespace ImageViewer.Commands.Export
 
             if (models.Window.ShowDialog(dia) != true) return;
 
-            exportFormat = viewModel.SelectedFormatValue;
+            models.ExportConfig.Format = viewModel.SelectedFormatValue;
             await ExportTexAsync(tex, path, multiplier, models, viewModel);
         }
 

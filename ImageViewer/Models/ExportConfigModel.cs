@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Annotations;
+using ImageFramework.ImageLoader;
 using ImageFramework.Utility;
 using ImageViewer.UtilityEx;
 
@@ -52,5 +53,21 @@ namespace ImageViewer.Models
                 OnPropertyChanged(nameof(Mipmap));
             }
         }
+
+        private GliFormat? format = null;
+        // last format that was used for exporting
+        public GliFormat? Format
+        {
+            get => format;
+            set
+            {
+                if (value == null || value == format) return;
+                format = value;
+                OnPropertyChanged(nameof(Format));
+            }
+        }
+
+        // path manager for intermediate directories etc.
+        public PathManager Path { get; } = new PathManager();
     }
 }

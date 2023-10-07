@@ -21,12 +21,12 @@ namespace ImageViewer.Commands.Export
     public class ExportMovieCommand : Command
     {
         private readonly ModelsEx models;
-        private readonly PathManager path;
+        private readonly PathManager path; // == models.ExportConfig.Path
 
         public ExportMovieCommand(ModelsEx models)
         {
             this.models = models;
-            path = models.ExportPath;
+            path = models.ExportConfig.Path;
             this.models.PropertyChanged += ModelsOnPropertyChanged;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }

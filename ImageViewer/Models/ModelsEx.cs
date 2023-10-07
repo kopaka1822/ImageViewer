@@ -29,7 +29,6 @@ namespace ImageViewer.Models
 
         public ExportConfigModel ExportConfig { get; }
 
-        public PathManager ExportPath { get; } = new PathManager();
         private PathManager viewerConfigPath = null;
 
         public PathManager ViewerConfigPath => viewerConfigPath ??

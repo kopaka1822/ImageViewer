@@ -22,12 +22,11 @@ namespace ImageViewer.Commands.Export
     public class ExportBatchCommand : Command
     {
         private readonly ModelsEx models;
-        private GliFormat? exportFormat = null;
-        private readonly PathManager path;
+        private readonly PathManager path; // == models.ExportConfig.Path
         public ExportBatchCommand(ModelsEx models)
         {
             this.models = models;
-            path = models.ExportPath;
+            path = models.ExportConfig.Path;
             this.models.PropertyChanged += ModelsOnPropertyChanged;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
@@ -81,10 +80,10 @@ namespace ImageViewer.Commands.Export
             var pipe = models.Pipelines[pipeId];
             if(pipe.Image == null || !pipe.IsValid) return; // not yet computed?
 
-            if (exportFormat == null)
+            if (models.ExportConfig.Format == null)
             {
                 var firstImageId = pipe.Color.FirstImageId;
-                exportFormat = models.Images.Images[firstImageId].OriginalFormat;
+                models.ExportConfig.Format = models.Images.Images[firstImageId].OriginalFormat;
             }
 
             // check if pipeline is compatible with batch export
@@ -147,7 +146,7 @@ namespace ImageViewer.Commands.Export
                     filenames += models.Images.Images[batchId].Alias + ", ";
                 filenames = filenames.TrimEnd(',', ' ');
 
-                viewModel = new ExportViewModel(models, path.Extension, exportFormat.Value, filenames, models.Images.Is3D, models.Statistics[pipeId].Stats);
+                viewModel = new ExportViewModel(models, path.Extension, models.ExportConfig.Format.Value, filenames, models.Images.Is3D, models.Statistics[pipeId].Stats);
             }
             catch (Exception e)
             {
@@ -158,7 +157,7 @@ namespace ImageViewer.Commands.Export
             var dia = new ExportDialog(viewModel);
 
             if (models.Window.ShowDialog(dia) != true) return;
-            exportFormat = viewModel.SelectedFormatValue;
+            models.ExportConfig.Format = viewModel.SelectedFormatValue;
 
             foreach (var batchId in batchIDs)
             {
