@@ -145,12 +145,7 @@
                         Background="{Binding Display.NaNColor, FallbackValue=Red}"/>
                 </MenuItem.Icon>
             </MenuItem>
-            <MenuItem
-                    Header="Show Crop Box"
-                    IsCheckable="True"
-                    IsChecked="{Binding Display.ShowCropRectangle}"
-                    ToolTip="Shows the crop box if cropping is enabled for export"
-                    />
+            
             
             <Separator/>
             <MenuItem
@@ -218,6 +213,23 @@
 
         <MenuItem Header="Overlays"
                   IsEnabled="{Binding Images.IsEmptyOr2D}">
+            <!-- Crop Box -->
+            <MenuItem
+                Header="Show Cropping"
+                IsCheckable="True"
+                IsChecked="{Binding Display.ShowCropRectangle}"
+                ToolTip="Shows the crop box if cropping is enabled for export"
+            />
+            
+            <MenuItem
+                Header="Modify Cropping"
+                Command="{Binding ModifyCropBoxCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}"
+                ToolTip="Modify the crop box for export"
+                />
+
+            <Separator/>
+
             <!-- Zoombox -->
             <MenuItem
                 Header="Add Zoombox"

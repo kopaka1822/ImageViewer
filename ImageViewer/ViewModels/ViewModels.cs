@@ -20,6 +20,7 @@ using ImageFramework.Utility;
 using ImageViewer.Commands;
 using ImageViewer.Commands.Export;
 using ImageViewer.Commands.Import;
+using ImageViewer.Commands.Overlays;
 using ImageViewer.Commands.Tools;
 using ImageViewer.Commands.View;
 using ImageViewer.Controller;
@@ -105,6 +106,7 @@ namespace ImageViewer.ViewModels
             ReplaceEquationImageCommand = new ReplaceEquationImageCommand(models);
             ExportConfigCommand = new ExportConfigCommand(models);
             ImportConfigCommand = new ImportConfigCommand(models);
+            ModifyCropBoxCommand = new ModifyCropBoxCommand(models);
 
             ShowPixelDisplayCommand = new ShowPixelDisplayCommand(models);
             ShowPixelColorCommand = new ShowPixelColorCommand(models);
@@ -338,6 +340,8 @@ namespace ImageViewer.ViewModels
         public ICommand ExportConfigCommand { get; }
 
         public ICommand ImportConfigCommand { get; }
+
+        public ICommand ModifyCropBoxCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
