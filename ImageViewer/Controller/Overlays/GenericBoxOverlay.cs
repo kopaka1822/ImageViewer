@@ -277,6 +277,20 @@ namespace ImageViewer.Controller.Overlays
                 case Key.Escape:
                     models.Display.ActiveOverlay = null;
                     return true;
+                case Key.Enter:
+                    if (Start.HasValue && End.HasValue)
+                    {
+                        // accept current points
+                        Debug.Assert(Start.HasValue);
+                        Debug.Assert(End.HasValue);
+
+                        OnFinished(Start.Value.XY, End.Value.XY);
+
+                        models.Display.ActiveOverlay = null;
+
+                        OnDisplayDestroyed();
+                    }
+                    return true;
             }
 
             return false;
