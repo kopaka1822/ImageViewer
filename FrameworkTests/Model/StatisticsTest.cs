@@ -12,6 +12,7 @@ using ImageFramework.Model.Statistics;
 using ImageFramework.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SharpDX.DXGI;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace FrameworkTests.Model
 {
@@ -117,6 +118,48 @@ namespace FrameworkTests.Model
             Assert.AreEqual(cpuStats.Max, stats.Alpha.Max);
             Assert.AreEqual(cpuStats.Avg, stats.Alpha.Avg, 0.01f);
         }
+
+        [TestMethod]
+        public void MultisampleAlphaTest()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "checkers_2x1.png");
+            models.Pipelines[0].Alpha.Formula = "Red(I0)"; // use this as alpha channel
+            models.Apply();
+
+            var tex = models.Pipelines[0].Image;
+            Assert.IsNotNull(tex);
+
+            // get statistics
+            var stats = models.Stats.GetAlphaStatisticsFor(tex, 0.5f, LayerMipmapRange.MostDetailed);
+            Assert.AreEqual(0.5, stats.Coverage, 0.01);
+
+            // since its only 2x1 and black to white, all interpolated values should be either: 0.125, 0.375, 0.625 or 0.875 (4x4 interpolation)
+            stats = models.Stats.GetAlphaStatisticsFor(tex, 0.25f, LayerMipmapRange.MostDetailed);
+            Assert.AreEqual(0.75, stats.Coverage, 0.01);
+            stats = models.Stats.GetAlphaStatisticsFor(tex, 0.1f, LayerMipmapRange.MostDetailed);
+            Assert.AreEqual(1.0, stats.Coverage, 0.01);
+            stats = models.Stats.GetAlphaStatisticsFor(tex, 0.75f, LayerMipmapRange.MostDetailed);
+            Assert.AreEqual(0.25, stats.Coverage, 0.01);
+        }
+
+        [TestMethod]
+        public void Multisample3DTest()
+        {
+            var models = new Models(1);
+            models.AddImageFromFile(TestData.Directory + "checkers3d.dds");
+            models.Pipelines[0].Alpha.Formula = "Red(I0)"; // use this as alpha channel
+            models.Apply();
+
+            var tex = models.Pipelines[0].Image;
+            Assert.IsNotNull(tex);
+
+            // get statistics
+            var stats = models.Stats.GetAlphaStatisticsFor(tex, 0.5f, LayerMipmapRange.MostDetailed);
+            Assert.AreEqual(stats.Coverage, 0.5, 0.01);
+        }
+
+
 
         private AlphaStats CalcCpuStats(Color[] colors)
         {

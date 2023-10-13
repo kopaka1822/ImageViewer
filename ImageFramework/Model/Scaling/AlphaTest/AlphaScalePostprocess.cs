@@ -38,10 +38,11 @@ namespace ImageFramework.Model.Scaling.AlphaTest
             for (int layer = 0; layer < uav.NumLayers; ++layer)
             {
                 // obtain the desired coverage when alpha blending is used
-                float desiredCoverage = stats.GetStatisticsFor(uav, new LayerMipmapSlice(layer, 0)).Alpha.Avg;
+                //float desiredCoverage = stats.GetStatisticsFor(uav, new LayerMipmapSlice(layer, 0)).Alpha.Avg;
+                float desiredCoverage = stats.GetAlphaStatisticsFor(uav, 0.5f, new LayerMipmapSlice(layer, 0)).Coverage;
 
-                // fix alpha values for all mipmaps (including the most detailed)
-                for (int mip = 0; mip < uav.NumMipmaps; ++mip)
+                // fix alpha values for all mipmaps (excluding the most detailed)
+                for (int mip = 1; mip < uav.NumMipmaps; ++mip)
                 {
                     var lm = new LayerMipmapSlice(layer, mip);
                     // iteratively find the alpha threshold that results in the desired coverage (using bisection)

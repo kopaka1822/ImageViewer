@@ -38,7 +38,7 @@ namespace ImageFramework.Model.Statistics
         internal StatisticsShader AlphaShader => alphaShader ?? (alphaShader = new StatisticsShader(shared.Upload, StatisticsShader.AlphaValue));
         internal StatisticsShader GrayscaleShader => grayscaleShader ?? (grayscaleShader = new StatisticsShader(shared.Upload, StatisticsShader.GrayscaleValue));
 
-        internal StatisticsShader AlphaCoverageShader => alphaCoverageShader ?? (alphaCoverageShader = new StatisticsShader(shared.Upload, StatisticsShader.AlphaTestCoverage));
+        internal StatisticsShader AlphaCoverageShader => alphaCoverageShader ?? (alphaCoverageShader = new StatisticsShader(shared.Upload, StatisticsShader.AlphaTestCoverage, true));
 
         internal ReduceShader MinReduce => minReduce ?? (minReduce = new ReduceShader(shared.Upload, "min(a,b)", float.MaxValue.ToString(Models.Culture)));
         internal ReduceShader MaxReduce => maxReduce ?? (maxReduce = new ReduceShader(shared.Upload, "max(a,b)", float.MinValue.ToString(Models.Culture)));

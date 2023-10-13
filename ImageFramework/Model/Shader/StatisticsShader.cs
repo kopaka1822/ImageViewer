@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.Utility;
+using SharpDX.Direct3D11;
 using SharpDX.Mathematics.Interop;
+using Device = ImageFramework.DirectX.Device;
 
 namespace ImageFramework.Model.Shader
 {
@@ -22,9 +24,12 @@ namespace ImageFramework.Model.Shader
         private readonly int LocalSizeY = 4;
         private readonly UploadBuffer cbuffer;
         private readonly string returnValue;
+        private readonly bool multisample = false; // if true, the shader will evaluate 4x4 positions inside a pixel with linear interpolation
 
         // (optional) user parameter than can be used for the return value
         public float UserParameter { get; set; } = 0.0f;
+
+        private SamplerState linearSampler = null;
 
         // predefined return values
         public static readonly string LuminanceValue = "return dot(value.a * value.rgb, float3(0.2125, 0.7154, 0.0721))";
@@ -42,9 +47,11 @@ return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
         /// shader used for statistics calculation
         /// </summary>
         /// <param name="returnValue">one of the values declared above this function (*Value)</param>
-        public StatisticsShader(UploadBuffer upload, string returnValue)
+        /// <param name="multisample">uses multisampling to evaluate the expression. For 2D it will bi-linear interpolate 4x4 position</param>
+        public StatisticsShader(UploadBuffer upload, string returnValue, bool multisample = false)
         {
             this.returnValue = returnValue;
+            this.multisample = multisample;
             cbuffer = upload;
 
             shader = new DirectX.Shader(DirectX.Shader.Type.Compute, GetSource(ShaderBuilder.Builder2D), "StatisticsShader");
@@ -80,7 +87,8 @@ return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
                 TrueBool = true,
                 Offset = offset,
                 Size = dim,
-                UserParameter = UserParameter
+                Resolution = source.Size.GetMip(lm.Mipmap),
+                UserParameter = UserParameter,
             };
 
             if (lm.AllLayer)
@@ -102,12 +110,37 @@ return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
             dev.Compute.SetUnorderedAccessView(0, buffer.View);
             dev.Compute.SetConstantBuffer(0, cbuffer.Handle);
 
+            if (multisample) BindLinearSampler(dev); // only required for multisampling
+
             dev.Dispatch(Utility.Utility.DivideRoundUp(dim.Width, LocalSizeX), 
                 Utility.Utility.DivideRoundUp(dim.Height, LocalSizeY),
                     Math.Max(dim.Depth, numLayers));
 
             dev.Compute.SetUnorderedAccessView(0, null);
             dev.Compute.SetShaderResource(0, null);
+            dev.Compute.SetSampler(0, null);
+        }
+
+        private void BindLinearSampler(Device dev)
+        {
+            if (linearSampler == null)
+            {
+                // assume wrap for our purposes
+                linearSampler = new SamplerState(dev.Handle, new SamplerStateDescription
+                {
+                    AddressU = TextureAddressMode.Wrap,
+                    AddressV = TextureAddressMode.Wrap,
+                    AddressW = TextureAddressMode.Wrap,
+                    Filter = SharpDX.Direct3D11.Filter.MinMagLinearMipPoint, // linear but nearest mipmap
+                    MaximumLod = float.MaxValue,
+                    MinimumLod = 0,
+                    MipLodBias = 0,
+                    ComparisonFunction = Comparison.Never,
+                    MaximumAnisotropy = 1,
+                    BorderColor = new RawColor4(0, 0, 0, 0),
+                });
+            }
+            dev.Compute.SetSampler(0, linearSampler);
         }
 
         private void AdjustDim(ref Size3 dim, ref Size3 offset, bool is3D)
@@ -140,22 +173,28 @@ return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
         {
             public Size3 Offset;
             public int Level;
-            public Size3 Size;
+            public Size3 Size; // size of the region to be processed ()
             public RawBool TrueBool;
+            public Size3 Resolution; // Resolution of the texture
             public float UserParameter; // optional, can be supplied for the return value
         }
 
         private string GetSource(IShaderBuilder builder)
         {
             return $@"
+{(multisample ? "#define MULTISAMPLE":"")}
+
 {builder.SrvType} src_image : register(t0);
 RWStructuredBuffer<float> dst_buffer : register(u0);
+
+SamplerState sampler_linear : register(s0);
 
 cbuffer InputBuffer : register(b0) {{
     uint3 offset;
     uint level;
     uint3 size;
     bool trueBool;
+    uint3 resolution;
     float userParameter;
 }};
 
@@ -183,8 +222,8 @@ float4 zeroNans(float4 v) {{
     return res;
 }}
 
-float getPixel(int3 pos) {{
-    float4 value = src_image.mips[level][pos];
+float processPixel(float4 value)
+{{
     value = zeroNans(value);
     {returnValue};
 }}
@@ -195,8 +234,24 @@ void main(ComputeIn i){{
 
     if(pos.x >= size.x || pos.y >= size.y) return;
     
-    float value = getPixel(pos + offset);
-    
+    #ifdef MULTISAMPLE
+    float value = 0.0;
+    uint N = {(builder.Is3D ? "3" : "4")}; // 4x4 samples for 2d, 3x3x3 for 3d
+    uint3 s = 0u;
+    {(builder.Is3D?"for(s.z = 0; s.z < N; ++s.z)":"")}
+    for(s.y = 0; s.y < N; ++s.y)
+    for(s.x = 0; s.x < N; ++s.x)
+    {{
+        float3 pixelF = float3(pos + offset) + 1.0 / (2.0 * float(N)) + float3(s) / float(N);
+        pixelF = pixelF / float3(resolution);
+        value += processPixel(src_image.SampleLevel(sampler_linear, pixelF, level));
+    }}
+    {(builder.Is3D ? "value /= float(N*N*N);" : "value /= float(N*N);")} // normalize value
+
+    #else // no multisample => single pixel fetch
+    float value = processPixel(src_image.mips[level][pos + offset]);
+    #endif    
+
     dst_buffer[pos.z * size.x * size.y  + pos.y * size.x + pos.x] = value;
 }}
 ";
@@ -204,6 +259,7 @@ void main(ComputeIn i){{
 
         public void Dispose()
         {
+            linearSampler?.Dispose();
             shader?.Dispose();
             shader3d?.Dispose();
         }
