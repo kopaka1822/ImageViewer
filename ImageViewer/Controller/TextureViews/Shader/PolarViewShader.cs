@@ -128,7 +128,7 @@ float4 main(PixelIn i) : SV_TARGET {{
     float4 color = tex.Sample(texSampler, polarDirection);
     {ApplyColorTransform()}
     {ApplyOverlay2D("polarDirection", "color")}
-    return toSrgb(color);
+    return {ApplyMonitorTransform()};
 }}
 ";
         }

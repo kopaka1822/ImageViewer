@@ -190,7 +190,7 @@ float4 main(PixelIn i) : SV_TARGET {{
         color /= N_SAMPLES;
     }} else color = getColor(texcoord);
 
-    return toSrgb(color);
+    return {ApplyMonitorTransform()};
 }}
 ";
         }

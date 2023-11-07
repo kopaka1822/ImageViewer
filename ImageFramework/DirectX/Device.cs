@@ -48,6 +48,14 @@ namespace ImageFramework.DirectX
             var adapter = obj.Adapter;
             FactoryHandle = adapter.GetParent<SharpDX.DXGI.Factory>();
             context = Handle.ImmediateContext;
+
+            // check outputs for HDR
+            foreach (var o in adapter.Outputs)
+            {
+                var output6 = o.QueryInterface<Output6>();
+                var d6 = output6.Description1;
+                isHdr |= d6.BitsPerColor >= 9;
+            }
             
             SetDefaults();
             SupportsDouble = Handle.CheckFeatureSupport(SharpDX.Direct3D11.Feature.ShaderDoubles);
@@ -56,6 +64,8 @@ namespace ImageFramework.DirectX
 
         // it is probably a low end device if feature level 11.1 was not available
         public bool IsLowEndDevice => Handle.FeatureLevel == FeatureLevel.Level_11_0;
+        private bool isHdr = false;
+        public bool IsHDR => isHdr;
 
         // resource size limits for textures
         public static readonly int MAX_TEXTURE_2D_DIMENSION = 16384;

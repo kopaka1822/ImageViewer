@@ -38,19 +38,23 @@ namespace ImageViewer.DirectX
             Width = width;
             Height = height;
 
+            var device = ImageFramework.DirectX.Device.Get();
+            
+            var format = Format.R8G8B8A8_UNorm;
+            if (device.IsHDR) format = Format.R16G16B16A16_Float;
+            
             var desc = new SwapChainDescription
             {
                 BufferCount = bufferCount,
                 Flags = flags,
                 IsWindowed = true,
-                ModeDescription = new ModeDescription(width, height, new Rational(0, 1), Format.R8G8B8A8_UNorm),
+                ModeDescription = new ModeDescription(width, height, new Rational(0, 1), format),
                 OutputHandle = hwnd,
                 SampleDescription = new SampleDescription(1, 0),
                 SwapEffect = SwapEffect.FlipSequential,
                 Usage = Usage.RenderTargetOutput
             };
 
-            var device = ImageFramework.DirectX.Device.Get();
             chain = new SharpDX.DXGI.SwapChain(device.FactoryHandle, device.Handle, desc);
         }
 

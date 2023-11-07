@@ -114,6 +114,12 @@ if(any(isnan({color}))) {color} = nancolor;
 ";
         }
 
+        protected static string ApplyMonitorTransform(string color = "color")
+        {
+            if (Device.Get().IsHDR) return color;
+            return $"toSrgb({color})";
+        }
+
         protected void BindShader(Device dev)
         {
             dev.Vertex.Set(vertex.Vertex);

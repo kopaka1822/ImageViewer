@@ -113,7 +113,7 @@ float4 main(PixelIn i) : SV_TARGET {{
     float4 color = tex.Sample(texSampler, i.viewDir);
     {ApplyColorTransform()}
     {ApplyOverlayCube("i.viewDir", "color")}
-    return toSrgb(color);
+    return {ApplyMonitorTransform()};
 }}
 ";
         }
