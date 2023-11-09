@@ -192,6 +192,14 @@
                         <system:Int32>2</system:Int32>
                     </MenuItem.CommandParameter>
                 </MenuItem>
+                <MenuItem
+                    Header="Black"
+                    Command="{Binding SetThemeCommand}"
+                    IsEnabled="{Binding SetThemeCommand.BlackEnabled}">
+                    <MenuItem.CommandParameter>
+                        <system:Int32>3</system:Int32>
+                    </MenuItem.CommandParameter>
+                </MenuItem>
             </MenuItem>
             <MenuItem 
                 Header="Alpha Background"

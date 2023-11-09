@@ -16,6 +16,7 @@ namespace ImageViewer.Views.Theme
             Default,
             White,
             Dark,
+            Black,
             Size
         }
 
@@ -54,6 +55,15 @@ namespace ImageViewer.Views.Theme
             set
             {
                 if(curTheme == Themes.Dark)
+                    UpdateSource(value);
+            }
+        }
+
+        public Uri BlackSource
+        {
+            set
+            {
+                if (curTheme == Themes.Black)
                     UpdateSource(value);
             }
         }

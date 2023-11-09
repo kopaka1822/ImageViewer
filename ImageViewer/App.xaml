@@ -16,7 +16,8 @@
                 <theme:ThemeDictionary
                     DefaultSource="Views/Theme/DefaultTheme.xaml"
                     WhiteSource="Views/Theme/WhiteTheme.xaml"
-                    DarkSource="Views/Theme/DarkTheme.xaml"/>
+                    DarkSource="Views/Theme/DarkTheme.xaml"
+                    BlackSource="Views/Theme/BlackTheme.xaml"/>
 
                 <ResourceDictionary Source="Views/Theme/MenuStyle.xaml"/>
                 <ResourceDictionary Source="Views/Theme/TabItemStyle.xaml"/>

@@ -36,5 +36,7 @@ namespace ImageViewer.Commands.View
         public bool WhiteEnabled => current != ThemeDictionary.Themes.White;
 
         public bool DarkEnabled => current != ThemeDictionary.Themes.Dark;
+
+        public bool BlackEnabled => current != ThemeDictionary.Themes.Black;
     }
 }

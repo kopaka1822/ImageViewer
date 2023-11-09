@@ -1,0 +1,12 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:ImageViewer.Views.Theme">
+    <SolidColorBrush x:Key="BackgroundBrush" Color="#000000"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="#555555"/>
+    <SolidColorBrush x:Key="FontBrush" Color="#C8C8C8"/>
+    <SolidColorBrush x:Key="HoverBrush" Color="#094771"/>
+    <SolidColorBrush x:Key="ClickBrush" Color="#0d68a5"/>
+    <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="#000000"/>
+    <SolidColorBrush x:Key="DisabledFontBrush" Color="#555555"/>
+    <SolidColorBrush x:Key="ListingBackgroundBrush" Color="#000000"/>
+</ResourceDictionary>
