@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Annotations;
+using ImageFramework.DirectX;
 using ImageFramework.Model.Export;
 using ImageFramework.Model.Shader;
 using ImageFramework.Model.Statistics;
@@ -86,6 +87,9 @@ namespace ImageViewer.Models
                     break;
                 case nameof(Properties.Settings.Default.RecentFiles):
                     OnPropertyChanged(nameof(RecentFiles));
+                    break;
+                case nameof(Properties.Settings.Default.HdrMode):
+                    OnPropertyChanged(nameof(HdrMode));
                     break;
             }
         }
@@ -277,6 +281,12 @@ namespace ImageViewer.Models
                 OnPropertyChanged(nameof(ZoomBoxBorder));
                 OnPropertyChanged(nameof(ArrowWidth));
             }
+        }
+
+        public bool HdrMode
+        {
+            set => Properties.Settings.Default.HdrMode = value;
+            get => Properties.Settings.Default.HdrMode && Device.Get().IsHDR;
         }
 
         public int ArrowWidth // for now shared with zoom box

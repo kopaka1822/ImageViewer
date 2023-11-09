@@ -94,6 +94,9 @@ namespace ImageViewer.ViewModels.Display
                 case nameof(SettingsModel.NaNColor):
                     OnPropertyChanged(nameof(NaNColor));
                     break;
+                case nameof(SettingsModel.HdrMode):
+                    OnPropertyChanged(nameof(HDRMode));
+                    break;
             }
         }
 
@@ -673,6 +676,18 @@ namespace ImageViewer.ViewModels.Display
             if (!models.Settings.FlipYAxis) return value;
             if (models.Images.NumImages == 0) return 0;
             return models.Images.GetHeight(models.Display.ActiveMipmap) - value - 1;
+        }
+
+        public bool HDRSupported => Device.Get().IsHDR;
+
+        public bool HDRMode
+        {
+            get => models.Settings.HdrMode;
+            set
+            {
+                if (value == models.Settings.HdrMode) return;
+                models.Settings.HdrMode = value;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

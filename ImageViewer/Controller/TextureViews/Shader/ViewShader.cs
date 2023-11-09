@@ -23,9 +23,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
             public float Multiplier;
             public int UseAbs;
             public int UseOverlay;
-#pragma warning disable 169 // never used
-            private int pad0;
-#pragma warning restore 169
+            public int HdrMode;
 
             public Color NanColor;
         }
@@ -44,7 +42,8 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 Multiplier = models.Display.Multiplier,
                 UseAbs = models.Display.DisplayNegative?1:0,
                 NanColor = models.Settings.NaNColor,
-                UseOverlay = overlay == null ? 0 : 1
+                UseOverlay = overlay == null ? 0 : 1,
+                HdrMode = models.Settings.HdrMode ? 1 : 0,
             };
 
             return res;
@@ -95,7 +94,7 @@ if(useOverlay) {{
 float multiplier;
 bool useAbs;
 bool useOverlay;
-int pad0_;
+bool hdrMode;
 
 float4 nancolor;
 ";
@@ -116,8 +115,7 @@ if(any(isnan({color}))) {color} = nancolor;
 
         protected static string ApplyMonitorTransform(string color = "color")
         {
-            if (Device.Get().IsHDR) return color;
-            return $"toSrgb({color})";
+            return $"if(!hdrMode) {color} = toSrgb({color});";
         }
 
         protected void BindShader(Device dev)

@@ -29,7 +29,7 @@ namespace ImageViewer.Controller
         private readonly ModelsEx models;
         private readonly ViewModeController viewMode;
         private bool scheduledRedraw = false;
-        private RawColor4 clearColor;
+        private Color clearColor;
         private readonly AdvancedGpuTimer gpuTimer;
         public PaintController(ModelsEx models)
         {
@@ -53,11 +53,7 @@ namespace ImageViewer.Controller
             }
 
             // clear color
-            var col = models.Window.ThemeColor;
-            clearColor.R = col.Red;
-            clearColor.G = col.Green;
-            clearColor.B = col.Blue;
-            clearColor.A = 1.0f;
+            clearColor = models.Window.ThemeColor;
         }
 
         private void ExportConfigOnPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -128,14 +124,17 @@ namespace ImageViewer.Controller
             if (swapChain == null || swapChain.IsDisposed) return;
 
             var timerStarted = false;
-            swapChain.BeginFrame();
+            swapChain.BeginFrame(models.Settings.HdrMode);
             try
             {
                 var dev = Device.Get();
                 // recompute overlay before binding rendertargets
                 models.Overlay.Recompute();
 
-                dev.ClearRenderTargetView(swapChain.Rtv, clearColor);
+                var bgColor = models.Settings.HdrMode
+                    ? clearColor.FromSrgb().ToRawColor4()
+                    : clearColor.ToRawColor4();
+                dev.ClearRenderTargetView(swapChain.Rtv, bgColor);
 
                 var size = new Size(swapChain.Width, swapChain.Height);
                 dev.Rasterizer.SetViewport(0.0f, 0.0f, size.Width, size.Height);

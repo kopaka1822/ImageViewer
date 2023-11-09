@@ -145,7 +145,12 @@
                         Background="{Binding Display.NaNColor, FallbackValue=Red}"/>
                 </MenuItem.Icon>
             </MenuItem>
-            
+            <MenuItem
+                Header="HDR Mode"
+                IsCheckable="True"
+                IsEnabled="{Binding Display.HDRSupported}"
+                IsChecked="{Binding Display.HDRMode}"
+                ToolTip="Enables HDR output if an HDR compatible display was detected"/>
             
             <Separator/>
             <MenuItem

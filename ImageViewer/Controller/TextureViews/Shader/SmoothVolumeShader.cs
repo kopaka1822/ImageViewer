@@ -150,7 +150,8 @@ float4 main(PixelIn i) : SV_TARGET {{
    
     float4 color = float4(c, dot(t, 1.0 / 3.0));
     {ApplyColorTransform()}
-    return {ApplyMonitorTransform()};
+    {ApplyMonitorTransform()}
+    return color;
 }}
 ";
         }

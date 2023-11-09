@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Media3D;
 using ImageFramework.DirectX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
@@ -13,12 +14,14 @@ namespace ImageViewer.DirectX
 {
     public class SwapChain : IDisposable
     {
-        private readonly SharpDX.DXGI.SwapChain chain;
+        private SharpDX.DXGI.SwapChain chain;
         private readonly int bufferCount = 2;
         private readonly SwapChainFlags flags = SwapChainFlags.None;
         private RenderTargetView curView;
         private Texture2D curTarget;
         private Direct2D curDraw;
+        private bool isHdr = false; // keeps track if the rtv is hdr
+        private readonly IntPtr hwnd;
 
         public int Width { get; private set; }
         public int Height { get; private set; }
@@ -35,14 +38,21 @@ namespace ImageViewer.DirectX
 
         public SwapChain(IntPtr hwnd, int width, int height)
         {
+            this.hwnd = hwnd;
+            Initialize(width, height, false);
+        }
+
+        void Initialize(int width, int height, bool useHdr)
+        {
             Width = width;
             Height = height;
+            this.isHdr = useHdr;
 
             var device = ImageFramework.DirectX.Device.Get();
-            
+
             var format = Format.R8G8B8A8_UNorm;
-            if (device.IsHDR) format = Format.R16G16B16A16_Float;
-            
+            if (useHdr) format = Format.R16G16B16A16_Float;
+
             var desc = new SwapChainDescription
             {
                 BufferCount = bufferCount,
@@ -79,10 +89,16 @@ namespace ImageViewer.DirectX
             chain.ResizeBuffers(bufferCount, width, height, Format.Unknown, flags);
         }
 
-        public void BeginFrame()
+        public void BeginFrame(bool useHdr)
         {
             Debug.Assert(curView == null);
             Debug.Assert(curTarget == null);
+
+            if (isHdr != useHdr)
+            {
+                Dispose();
+                Initialize(Width, Height, useHdr);
+            }
 
             curTarget = chain.GetBackBuffer<Texture2D>(0);
             curView = new RenderTargetView(ImageFramework.DirectX.Device.Get().Handle, curTarget);

@@ -372,12 +372,13 @@ namespace ImageViewer.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Specialized.StringCollection Setting {
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool HdrMode {
             get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["Setting"]));
+                return ((bool)(this["HdrMode"]));
             }
             set {
-                this["Setting"] = value;
+                this["HdrMode"] = value;
             }
         }
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Model;
+using SharpDX.Mathematics.Interop;
 
 namespace ImageFramework.Utility
 {
@@ -285,6 +286,11 @@ namespace ImageFramework.Utility
             if ((channels & Channel.A) != 0)
                 res.Alpha *= scalar;
             return res;
+        }
+
+        public RawColor4 ToRawColor4()
+        {
+            return new RawColor4(Red, Green, Blue, Alpha);
         }
     }
 
