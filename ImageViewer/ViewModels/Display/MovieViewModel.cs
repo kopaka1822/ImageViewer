@@ -8,6 +8,7 @@ using System.Media;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Input;
 using ImageFramework.Annotations;
 using ImageFramework.Utility;
@@ -20,10 +21,13 @@ namespace ImageViewer.ViewModels.Display
 {
     public class MovieViewModel : INotifyPropertyChanged, IDisposable
     {
+
+
         private ModelsEx models;
         private bool playVideo = false;
         private DispatcherTimer clock = new DispatcherTimer(DispatcherPriority.Render);
         private DateTime lastTickStamp;
+        private bool mirrorForward = true; // mirror replay direction is forward
 
         public MovieViewModel(ModelsEx models, MovieDisplayModel baseModel)
         {
@@ -34,12 +38,28 @@ namespace ImageViewer.ViewModels.Display
 
             PreviousCommand = new ActionCommand(PreviousFrame);
             NextCommand = new ActionCommand(NextFrame);
-            ToggleRepeatCommand = new ActionCommand(() =>
-            {
-                models.Settings.MovieRepeat = !models.Settings.MovieRepeat;
-            });
             PlayCommand = new ActionCommand(PlayPause);
             StopCommand = new ActionCommand(Stop);
+
+            ReplayModes = new List<ListItemViewModel<SettingsModel.MovieRepeatMode>>
+            {
+                new ListItemViewModel<SettingsModel.MovieRepeatMode>
+                {
+                    Cargo = SettingsModel.MovieRepeatMode.NoRepeat,
+                    Name = "Once"
+                },
+                new ListItemViewModel<SettingsModel.MovieRepeatMode>
+                {
+                    Cargo = SettingsModel.MovieRepeatMode.Repeat,
+                    Name = "Repeat"
+                },
+                new ListItemViewModel<SettingsModel.MovieRepeatMode>
+                {
+                    Cargo = SettingsModel.MovieRepeatMode.Mirror,
+                    Name = "Mirror"
+                }
+            };
+            selectedReplayMode = ReplayModes.Find(model => model.Cargo == models.Settings.MovieRepeat);
 
             lastTickStamp = DateTime.Now;
             clock.Tick += ClockOnTick;
@@ -76,7 +96,7 @@ namespace ImageViewer.ViewModels.Display
                     OnPropertyChanged(nameof(TimeText));
                     break;
                 case nameof(SettingsModel.MovieRepeat):
-                    OnPropertyChanged(nameof(RepeatVideo));
+                    SelectedReplayMode = ReplayModes.Find(model => model.Cargo == models.Settings.MovieRepeat);
                     break;
             }
         }
@@ -113,7 +133,7 @@ namespace ImageViewer.ViewModels.Display
             var prev = models.Display.ActiveLayer - 1;
             if (prev < 0)
             {
-                if (!RepeatVideo) return;
+                if (models.Settings.MovieRepeat != SettingsModel.MovieRepeatMode.Repeat) return;
                 // set to last frame
                 prev = models.Images.NumLayers - 1;
             }
@@ -128,7 +148,7 @@ namespace ImageViewer.ViewModels.Display
             var next = models.Display.ActiveLayer + 1;
             if (next >= models.Images.NumLayers)
             {
-                if (!RepeatVideo) return;
+                if (models.Settings.MovieRepeat != SettingsModel.MovieRepeatMode.Repeat) return;
                 // set to first frame
                 next = 0;
             }
@@ -137,18 +157,36 @@ namespace ImageViewer.ViewModels.Display
 
         public void AdvanceFrames(int numFrames)
         {
-            var next = Math.Max(models.Display.ActiveLayer + numFrames, 0);
+            if (models.Settings.MovieRepeat == SettingsModel.MovieRepeatMode.Mirror && !mirrorForward)
+                numFrames = -numFrames; // advance in negative direction
+
+            var next = models.Display.ActiveLayer + numFrames;
+
             if (next >= models.Images.NumLayers)
             {
-                if (!RepeatVideo)
+                switch (models.Settings.MovieRepeat)
                 {
-                    models.Display.ActiveLayer = MaxFrameId; // set last frame
-                    return;
+                    case SettingsModel.MovieRepeatMode.NoRepeat:
+                        models.Display.ActiveLayer = MaxFrameId; // set last frame
+                        return;
+                    case SettingsModel.MovieRepeatMode.Repeat:
+                        models.Display.ActiveLayer = 0; // set to first frame
+                        lastTickStamp = DateTime.Now; // reset fractional frame count
+                        return;
+                    case SettingsModel.MovieRepeatMode.Mirror:
+                        models.Display.ActiveLayer = MaxFrameId; // mirror at the end, set to last frame
+                        mirrorForward = false;
+                        return;
                 }
-
-                next = 0; // set to first frame
-                lastTickStamp = DateTime.Now; // reset fractional frame count
             }
+
+            if (next < 0)
+            {
+                next = 0;
+                if (models.Settings.MovieRepeat == SettingsModel.MovieRepeatMode.Mirror)
+                    mirrorForward = true; // mirror in 
+            }
+
             models.Display.ActiveLayer = next;
         }
 
@@ -168,9 +206,6 @@ namespace ImageViewer.ViewModels.Display
         public ICommand StopCommand { get; }
         public ICommand PreviousCommand { get; }
         public ICommand NextCommand { get; }
-        public ICommand ToggleRepeatCommand { get; }
-
-        public bool RepeatVideo => models.Settings.MovieRepeat;
 
         public bool IsPlaying
         {
@@ -281,12 +316,27 @@ namespace ImageViewer.ViewModels.Display
             AdvanceFrames(passedFrames);
 
             // stop playback if we reached the last frame (for non repeat mode)
-            if (models.Display.ActiveLayer == MaxFrameId && !RepeatVideo)
+            if (models.Display.ActiveLayer == MaxFrameId && models.Settings.MovieRepeat == SettingsModel.MovieRepeatMode.NoRepeat)
             {
                 IsPlaying = false;
             }
         }
 
+        public List<ListItemViewModel<SettingsModel.MovieRepeatMode>> ReplayModes { get; }
+
+        private ListItemViewModel<SettingsModel.MovieRepeatMode> selectedReplayMode = null;
+
+        public ListItemViewModel<SettingsModel.MovieRepeatMode> SelectedReplayMode
+        {
+            get => selectedReplayMode;
+            set
+            {
+                if (value == null || value == selectedReplayMode) return;
+                selectedReplayMode = value;
+                OnPropertyChanged(nameof(SelectedReplayMode));
+                models.Settings.MovieRepeat = value.Cargo;
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

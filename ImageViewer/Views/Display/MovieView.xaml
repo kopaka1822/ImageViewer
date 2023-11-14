@@ -80,23 +80,13 @@
                     Text="{Binding FrameID}"
                     Margin="{StaticResource DefaultBorderRight}"/>
 
-                <Button
-                    Command="{Binding ToggleRepeatCommand}"
+                <ComboBox
                     Margin="{StaticResource DefaultBorderRight}"
-                    ToolTip="Toogle Repeat"
-                    >
-                    <StackPanel>
-                        <Image 
-                            Visibility="{Binding RepeatVideo, Converter={StaticResource VisibleCollapsedConverter}}"
-                            Width="16" Height="16"
-                            Source="../../Icons/cancel.png"/>
-                        <Image 
-                            Visibility="{Binding RepeatVideo, Converter={StaticResource CollapsedVisibleConverter}}"
-                            Width="16" Height="16"
-                            Source="../../Icons/sync.png"/>
-                    </StackPanel>
-                    
-                </Button>
+                    ItemsSource="{Binding ReplayModes}"
+                    SelectedItem="{Binding SelectedReplayMode}"
+                    ItemTemplate="{StaticResource ListItemView}"
+                    Width="70"
+                    />
             </StackPanel>
         </StatusBarItem>
 

@@ -198,10 +198,16 @@ namespace ImageViewer.Models
             }
         }
 
-        public bool MovieRepeat
+        public enum MovieRepeatMode
         {
-            get => Properties.Settings.Default.MovieRepeat;
-            set => Properties.Settings.Default.MovieRepeat = value;
+            NoRepeat, // play once
+            Repeat, // repeat after end
+            Mirror // mirror after end
+        }
+        public MovieRepeatMode MovieRepeat
+        {
+            get => (MovieRepeatMode)Properties.Settings.Default.MovieRepeat;
+            set => Properties.Settings.Default.MovieRepeat = (int)value;
         }
 
         public FFMpeg.Preset MoviePreset
