@@ -218,6 +218,7 @@ namespace ImageViewer.ViewModels.Display
 
                     OnPropertyChanged(nameof(ChooseLayers));
                     OnPropertyChanged(nameof(Zoom));
+                    OnPropertyChanged(nameof(EnableSplitMode));
                     break;
 
                 case nameof(DisplayModel.Split):
@@ -414,7 +415,7 @@ namespace ImageViewer.ViewModels.Display
         public bool EnableMipMaps => AvailableMipMaps.Count > 1;
         public Visibility EnableLayers => AvailableLayers.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
         public Visibility EnableViewModes => AvailableViewModes.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
-        public bool EnableSplitMode => models.NumEnabled == 2;
+        public bool EnableSplitMode => models.NumEnabled == 2 && models.Display.ActiveView != DisplayModel.ViewMode.SideBySide;
 
         // layers are fixed for cube maps
         public bool ChooseLayers => models.Display.ActiveView == DisplayModel.ViewMode.Single ||

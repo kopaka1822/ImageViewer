@@ -23,17 +23,16 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
         {
             if (texture == null) return;
 
-            var dev = Device.Get();
-            var size = new Size2(models.Window.SwapChain.Width, models.Window.SwapChain.Height);
-            // overwrite viewport
             
 
             var enabled = models.GetEnabledPipelines();
             if(enabled.Count == 0) return;
 
+            var dev = Device.Get();
+            var size = new Size2(models.Window.SwapChain.Width, models.Window.SwapChain.Height);
+
             var texCount = enabled.Count;
             var texId = enabled.IndexOf(id);
-
 
             int xStart = (texId * size.Width) / texCount;
             int xEnd = ((texId + 1) * size.Width) / texCount;
@@ -45,14 +44,13 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
             var lm = models.Display.ActiveLayerMipmap;
             DrawLayer(Matrix.Identity, texture.GetSrView(lm), models.Overlay.Overlay?.GetSrView(lm));
 
-
             // reset view scissors
             dev.SetViewScissors(size.Width, size.Height);
         }
 
         public override Size3? GetTexelPosition(Vector2 mouse)
         {
-            var numViews = models.GetEnabledPipelines().Count;
+            var numViews = models.NumEnabled;
             numViews = Math.Max(numViews, 1);
 
             // mouse is in [-1, 1] coordinates
@@ -72,7 +70,7 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
 
         protected override Matrix GetImageAspectRatio()
         {
-            var numViews = models.GetEnabledPipelines().Count;
+            var numViews = models.NumEnabled;
             numViews = Math.Max(numViews, 1);
             var imgDim = models.Images.Size;
             var clientDim = models.Window.ClientSize;
