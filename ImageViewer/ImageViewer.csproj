@@ -148,6 +148,7 @@
     <Compile Include="Controller\TextureViews\Shader\PolarViewShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\SingleViewShader.cs" />
     <Compile Include="Controller\TextureViews\Shader\ViewShader.cs" />
+    <Compile Include="Controller\TextureViews\Texture2D\SideBySideView.cs" />
     <Compile Include="Controller\TextureViews\Texture3D\VolumeView.cs" />
     <Compile Include="Controller\TextureViews\Texture3D\ShearWarpView.cs" />
     <Compile Include="Controller\TextureViews\Texture3D\Single3DView.cs" />

@@ -418,7 +418,8 @@ namespace ImageViewer.ViewModels.Display
 
         // layers are fixed for cube maps
         public bool ChooseLayers => models.Display.ActiveView == DisplayModel.ViewMode.Single ||
-                                    models.Display.ActiveView == DisplayModel.ViewMode.Polar360;
+                                    models.Display.ActiveView == DisplayModel.ViewMode.Polar360 || 
+                                    models.Display.ActiveView == DisplayModel.ViewMode.SideBySide;
 
         private ListItemViewModel<int> selectedMipMap = EmptyMipMap;
         public ListItemViewModel<int> SelectedMipMap

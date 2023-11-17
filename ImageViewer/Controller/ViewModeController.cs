@@ -296,6 +296,9 @@ namespace ImageViewer.Controller
                             case DisplayModel.ViewMode.Polar360:
                                 currentView = new PolarTextureView(models);
                                 break;
+                            case DisplayModel.ViewMode.SideBySide:
+                                currentView = new SideBySideView(models);
+                                break;
                             case DisplayModel.ViewMode.CubeMap:
                                 currentView = new CubeTextureView(models);
                                 break;

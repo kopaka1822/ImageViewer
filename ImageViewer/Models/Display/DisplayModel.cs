@@ -39,7 +39,8 @@ namespace ImageViewer.Models.Display
             Polar360,
             CubeCrossView,
             Volume,
-            ShearWarp
+            ShearWarp,
+            SideBySide
         }
 
         public enum SplitMode
@@ -466,6 +467,7 @@ namespace ImageViewer.Models.Display
                         else if (models.Images.ImageType == typeof(TextureArray2D))
                         {
                             modes.Add(ViewMode.Polar360);
+                            modes.Add(ViewMode.SideBySide);
                         }
                         else if(models.Images.ImageType == typeof(Texture3D))
                         {
@@ -531,8 +533,11 @@ namespace ImageViewer.Models.Display
                 case DisplayModel.ViewMode.Volume:
                 case DisplayModel.ViewMode.ShearWarp:
                 case DisplayModel.ViewMode.Single:
+                case DisplayModel.ViewMode.SideBySide:
                 case DisplayModel.ViewMode.Empty:
                     return false;
+                case DisplayModel.ViewMode.CubeMap:
+                case DisplayModel.ViewMode.Polar360:
                 default:
                     return true;
             }
