@@ -52,6 +52,7 @@ namespace ImageViewer.ViewModels.Display
         {
             this.models = models;
             selectedSplitMode = AvailableSplitModes[models.Display.Split == DisplayModel.SplitMode.Vertical ? 0 : 1];
+            selectedPrecision = AvailablePrecision.First(p => p.Cargo == models.Settings.CachePrecision);
             models.PropertyChanged += ModelsOnPropertyChanged;
             models.Display.PropertyChanged += DisplayOnPropertyChanged;
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
@@ -96,6 +97,11 @@ namespace ImageViewer.ViewModels.Display
                     break;
                 case nameof(SettingsModel.HdrMode):
                     OnPropertyChanged(nameof(HDRMode));
+                    break;
+                case nameof(SettingsModel.CachePrecision):
+                    selectedPrecision = AvailablePrecision.First(p => p.Cargo == models.Settings.CachePrecision);
+                    Debug.Assert(selectedPrecision != null);
+                    OnPropertyChanged(nameof(SelectedPrecision));
                     break;
             }
         }
@@ -375,6 +381,21 @@ namespace ImageViewer.ViewModels.Display
             }
         };
 
+        public List<ListItemViewModel<SettingsModel.CachePrecisionType>> AvailablePrecision { get; } =
+            new List<ListItemViewModel<SettingsModel.CachePrecisionType>>
+            {
+                new ListItemViewModel<SettingsModel.CachePrecisionType>
+                {
+                    Name = "Float",
+                    Cargo = SettingsModel.CachePrecisionType.Float
+                },
+                new ListItemViewModel<SettingsModel.CachePrecisionType>
+                {
+                    Name = "Byte",
+                    Cargo = SettingsModel.CachePrecisionType.Byte
+                }
+            };
+
         public ObservableCollection<ListItemViewModel<ImagePipeline.ChannelFilters>> AvailableChannelFilter { get; } = new ObservableCollection<ListItemViewModel<ImagePipeline.ChannelFilters>>
         {
             new ListItemViewModel<ImagePipeline.ChannelFilters>
@@ -464,6 +485,18 @@ namespace ImageViewer.ViewModels.Display
                 selectedSplitMode = value;
                 OnPropertyChanged(nameof(SelectedSplitMode));
                 models.Display.Split = value.Cargo;
+            }
+        }
+
+        private ListItemViewModel<SettingsModel.CachePrecisionType> selectedPrecision;
+
+        public ListItemViewModel<SettingsModel.CachePrecisionType> SelectedPrecision
+        {
+            get => selectedPrecision;
+            set
+            {
+                if (value == null || selectedPrecision == value) return;
+                models.Settings.CachePrecision = value.Cargo;
             }
         }
 

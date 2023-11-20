@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using ImageFramework.Annotations;
-using ImageFramework.DirectX;
 using ImageFramework.Model.Export;
 using ImageFramework.Model.Shader;
 using ImageFramework.Model.Statistics;
@@ -14,6 +14,8 @@ using ImageFramework.Utility;
 using ImageViewer.Properties;
 using ImageViewer.ViewModels;
 using ImageViewer.Views.Theme;
+using SharpDX.DXGI;
+using Device = ImageFramework.DirectX.Device;
 
 namespace ImageViewer.Models
 {
@@ -90,6 +92,10 @@ namespace ImageViewer.Models
                     break;
                 case nameof(Properties.Settings.Default.HdrMode):
                     OnPropertyChanged(nameof(HdrMode));
+                    break;
+                case nameof(Properties.Settings.Default.CachePrecision):
+                    OnPropertyChanged(nameof(CachePrecision));
+                    OnPropertyChanged(nameof(CacheFormat));
                     break;
             }
         }
@@ -348,6 +354,35 @@ namespace ImageViewer.Models
 
             OnPropertyChanged(nameof(RecentFiles));
         }
+
+        public enum CachePrecisionType
+        {
+            Float, // = default
+            Byte,
+        }
+
+        public CachePrecisionType CachePrecision
+        {
+            get => (CachePrecisionType) Properties.Settings.Default.CachePrecision;
+            set => Properties.Settings.Default.CachePrecision = (int)value;
+        }
+
+        public Format CacheFormat
+        {
+            get
+            {
+                switch (CachePrecision)
+                {
+                    case CachePrecisionType.Byte:
+                        return Format.R8G8B8A8_UNorm;
+                    case CachePrecisionType.Float:
+                        return Format.R32G32B32A32_Float;
+                }
+                Debug.Assert(false);
+                return Format.Unknown;
+            }
+        }
+            
 
         public void Save()
         {

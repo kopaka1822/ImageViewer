@@ -156,6 +156,12 @@ namespace ImageFramework.Model
             }
         }
 
+        // forces changes and image recomputation (i.e. to force use of a different texture cache)
+        public void ForceChanges()
+        {
+            HasChanges = true;
+        }
+
         /// <summary>
         /// indicates if the Image was taken from a texture cache. If false, image was taken from ImageModel and ownership belongs to the ImageModel
         /// </summary>

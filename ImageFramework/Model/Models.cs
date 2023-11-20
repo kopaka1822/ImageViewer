@@ -97,14 +97,14 @@ namespace ImageFramework.Model
 
         #endregion
 
-        public Models(int numPipelines = 1)
+        public Models(int numPipelines = 1, Format cacheFormat = Format.R32G32B32A32_Float)
         {
             NumPipelines = numPipelines;
             CheckDeviceCapabilities();
 
             SharedModel = new SharedModel();
             Images = new ImagesModel(SharedModel.ScaleShader);
-            TextureCache = new ImageModelTextureCache(Images);
+            TextureCache = new ImageModelTextureCache(Images, cacheFormat);
 
             Filter = new FiltersModel(Images, SharedModel);
             Progress = new ProgressModel();
@@ -118,6 +118,11 @@ namespace ImageFramework.Model
 
             // pipeline controller
             pipelineController = new PipelineController(this);
+        }
+
+        protected void SetTextureCacheFormat(Format format)
+        {
+            TextureCache.SetFormat(format);
         }
 
         // removes all images, filters and resets equations

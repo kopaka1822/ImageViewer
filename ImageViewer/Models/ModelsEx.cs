@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -49,13 +50,17 @@ namespace ImageViewer.Models
         public ImportModel Import { get; }
 
         public ModelsEx(MainWindow window)
-        : base(4)
+            : this(window, new SettingsModel())
+        {}
+
+        private ModelsEx(MainWindow window, SettingsModel settings)
+            : base(4, settings.CacheFormat)
         {
             // only enabled first pipeline
             for (int i = 1; i < NumPipelines; ++i)
                 Pipelines[i].IsEnabled = false;
 
-            Settings = new SettingsModel();
+            Settings = settings;
             Window = new WindowModel(window);
             Display = new DisplayModel(this);
             ExportConfig = new ExportConfigModel();
@@ -79,6 +84,21 @@ namespace ImageViewer.Models
             cropController = new CropController(this);
 
             Import = new ImportModel(this);
+
+            settings.PropertyChanged += SettingsOnPropertyChanged;
+        }
+
+        private void SettingsOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(SettingsModel.CacheFormat):
+                    SetTextureCacheFormat(Settings.CacheFormat);
+                    // force changes to pipelines
+                    for (int i = 0; i < NumPipelines; ++i)
+                        Pipelines[i].ForceChanges();
+                    break;
+            }
         }
 
         /// <summary>

@@ -18,12 +18,12 @@ namespace ImageFramework.Utility
     {
         private readonly Stack<ITexture> textures = new Stack<ITexture>(2);
         private readonly ImagesModel images;
-        private readonly Format format;
+        private Format format;
         private readonly bool createUav;
         private readonly bool createRtv;
         private TextureArray2D[] staging2D;
 
-        public ImageModelTextureCache(ImagesModel images, Format format = Format.R32G32B32A32_Float, bool createUav = true, bool createRtv = true)
+        public ImageModelTextureCache(ImagesModel images, Format format, bool createUav = true, bool createRtv = true)
         {
             this.images = images;
             this.createUav = createUav;
@@ -85,7 +85,7 @@ namespace ImageFramework.Utility
         public bool IsCompatibleWith(ITexture tex)
         {
             Debug.Assert(tex != null);
-            return images.HasMatchingProperties(tex);
+            return images.HasMatchingProperties(tex) && tex.Format == format;
         }
 
         private void Clear()
@@ -116,6 +116,15 @@ namespace ImageFramework.Utility
                 Clear();
                 OnChanged();
             }
+        }
+
+        // change format of cache
+        public void SetFormat(Format newFormat)
+        {
+            if (newFormat == format) return;
+            Clear();
+            format = newFormat;
+            OnChanged();
         }
 
         public void Dispose()

@@ -215,7 +215,7 @@ namespace ImageViewer.ViewModels.Statistics
             Debug.Assert(IsValid);
             var i1 = GetImage(image1);
             var i2 = GetImage(image2);
-            var tex = models.Images.CreateEmptyTexture(Format.R32G32B32A32_Float, true);
+            var tex = models.Images.CreateEmptyTexture(models.Settings.CacheFormat, true);
             models.SSIM.GetLuminanceTexture(i1, i2, tex, parent.Settings);
             models.Images.AddImage(tex, false, null, GliFormat.RGBA32_SFLOAT);
         }
@@ -225,7 +225,7 @@ namespace ImageViewer.ViewModels.Statistics
             Debug.Assert(IsValid);
             var i1 = GetImage(image1);
             var i2 = GetImage(image2);
-            var tex = models.Images.CreateEmptyTexture(Format.R32G32B32A32_Float, true);
+            var tex = models.Images.CreateEmptyTexture(models.Settings.CacheFormat, true);
             models.SSIM.GetContrastTexture(i1, i2, tex, parent.Settings);
             models.Images.AddImage(tex, false, null, GliFormat.RGBA32_SFLOAT);
         }
@@ -235,7 +235,7 @@ namespace ImageViewer.ViewModels.Statistics
             Debug.Assert(IsValid);
             var i1 = GetImage(image1);
             var i2 = GetImage(image2);
-            var tex = models.Images.CreateEmptyTexture(Format.R32G32B32A32_Float, true);
+            var tex = models.Images.CreateEmptyTexture(models.Settings.CacheFormat, true);
             models.SSIM.GetStructureTexture(i1, i2, tex, parent.Settings);
             models.Images.AddImage(tex, false, null, GliFormat.RGBA32_SFLOAT);
         }
@@ -245,7 +245,7 @@ namespace ImageViewer.ViewModels.Statistics
             Debug.Assert(IsValid);
             var i1 = GetImage(image1);
             var i2 = GetImage(image2);
-            var tex = models.Images.CreateEmptyTexture(Format.R32G32B32A32_Float, true);
+            var tex = models.Images.CreateEmptyTexture(models.Settings.CacheFormat, true);
             models.SSIM.GetSSIMTexture(i1, i2, tex, parent.Settings);
             models.Images.AddImage(tex, false, null, GliFormat.RGBA32_SFLOAT);
         }

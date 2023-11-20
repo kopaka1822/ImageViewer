@@ -89,15 +89,44 @@
                 <Separator Height="2"  Visibility="{Binding Display.ExtendedViewVisibility}"/>
 
                 <!--Split Mode-->
-                <TextBlock 
-                    Text="Split Mode:" 
-                    Margin="{StaticResource DefaultBorderBottom}"/>
-                <ComboBox 
-                    Margin="{StaticResource DefaultBorderBottom}"
-                    IsEnabled="{Binding Display.EnableSplitMode}"
-                    SelectedItem="{Binding Display.SelectedSplitMode}"
-                    ItemsSource="{Binding Display.AvailableSplitModes}"
-                    ItemTemplate="{StaticResource ListItemView}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="66"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock 
+                        Grid.Column="0"
+                        Grid.Row="0"
+                        Text="Split Mode:" 
+                        Margin="{StaticResource DefaultBorderBottom}"/>
+                    <ComboBox 
+                        Grid.Column="1"
+                        Grid.Row="0"
+                        Margin="{StaticResource DefaultBorderBottom}"
+                        IsEnabled="{Binding Display.EnableSplitMode}"
+                        SelectedItem="{Binding Display.SelectedSplitMode}"
+                        ItemsSource="{Binding Display.AvailableSplitModes}"
+                        ItemTemplate="{StaticResource ListItemView}"/>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        Grid.Row="1"
+                        Text="Precision:"
+                        Margin="{StaticResource DefaultBorderBottom}"/>
+                    <ComboBox
+                        Grid.Column="1"
+                        Grid.Row="1"
+                        Margin="{StaticResource DefaultBorderBottom}"
+                        SelectedItem="{Binding Display.SelectedPrecision}"
+                        ItemsSource="{Binding Display.AvailablePrecision}"
+                        ItemTemplate="{StaticResource ListItemView}"/>
+                </Grid>
+
 
                 <ItemsControl 
                     ItemsSource="{Binding Equations.Equations}">
