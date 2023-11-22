@@ -425,8 +425,6 @@ return (2*u1*u2+C1) * (2*v12+C2) / ((u1*u1+u2*u2+C1) * (v1 + v2 + C2));
         private void RenderRedToRgba(ITexture src, ITexture dst, LayerMipmapSlice lm)
         {
             Debug.Assert(src.HasSameDimensions(dst));
-            Debug.Assert(src.Format == Format.R32_Float);
-            Debug.Assert(dst.Format == Format.R32G32B32A32_Float);
             redToRgbaTransform.Run(src, dst, lm, models.SharedModel.Upload);
         }
 
