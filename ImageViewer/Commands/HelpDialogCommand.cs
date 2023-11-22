@@ -11,11 +11,8 @@ namespace ImageViewer.Commands
 {
     public class HelpDialogCommand : SimpleCommand<string>
     {
-        private readonly ModelsEx models;
-
-        public HelpDialogCommand(ModelsEx models)
+        public HelpDialogCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
         }
 
         public override void Execute(string parameter)

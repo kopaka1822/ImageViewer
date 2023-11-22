@@ -10,11 +10,8 @@ namespace ImageViewer.Commands.Tools
 {
     public class RemoveZoomBoxCommand : SimpleCommand<int>
     {
-        private readonly ModelsEx models;
-
-        public RemoveZoomBoxCommand(ModelsEx models)
+        public RemoveZoomBoxCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
         }
 
         public override void Execute(int id)

@@ -6,11 +6,8 @@ namespace ImageViewer.Commands.Import
 {
     public class ImportCommand : SimpleCommand
     {
-        private readonly ModelsEx models;
-
-        public ImportCommand(ModelsEx models)
+        public ImportCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
         }
 
         public override async void Execute()

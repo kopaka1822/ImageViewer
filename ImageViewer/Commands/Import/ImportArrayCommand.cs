@@ -10,11 +10,8 @@ namespace ImageViewer.Commands.Import
 {
     public class ImportArrayCommand : SimpleCommand
     {
-        private readonly ModelsEx models;
-
-        public ImportArrayCommand(ModelsEx models)
+        public ImportArrayCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
         }
 
         public override void Execute()

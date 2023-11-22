@@ -13,12 +13,10 @@ namespace ImageViewer.Commands.Import
 {
     public class ImportConfigCommand : SimpleCommand
     {
-        private readonly ModelsEx models;
         private readonly PathManager path;
 
-        public ImportConfigCommand(ModelsEx models)
+        public ImportConfigCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             this.path = models.ViewerConfigPath;
         }
 

@@ -15,15 +15,12 @@ namespace ImageViewer.Commands
 {
     public class AddFilterCommand : SimpleCommand
     {
-        private readonly ModelsEx models;
         private readonly FiltersViewModel viewModel;
         private readonly PathManager path = new PathManager();
 
-        public AddFilterCommand(ModelsEx models, FiltersViewModel viewModel)
+        public AddFilterCommand(ModelsEx models, FiltersViewModel viewModel) : base(models)
         {
-            this.models = models;
             this.viewModel = viewModel;
-
         }
 
         public override void Execute()

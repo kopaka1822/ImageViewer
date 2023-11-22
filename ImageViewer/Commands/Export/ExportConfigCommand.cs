@@ -16,13 +16,11 @@ namespace ImageViewer.Commands.Export
 {
     class ExportConfigCommand : SimpleCommand
     {
-        private readonly ModelsEx models;
         private readonly PathManager path;
         private readonly ExportConfigViewModel viewModel = new ExportConfigViewModel();
 
-        public ExportConfigCommand(ModelsEx models)
+        public ExportConfigCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             this.path = models.ViewerConfigPath;
         }
 

@@ -6,12 +6,10 @@ namespace ImageViewer.Commands.View
 {
     public class SetThemeCommand : SimpleCommand<int>
     {
-        private readonly ModelsEx models;
         private ThemeDictionary.Themes current;
 
-        public SetThemeCommand(ModelsEx models)
+        public SetThemeCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             current = models.Settings.Theme;
         }
 

@@ -6,11 +6,8 @@ namespace ImageViewer.Commands.View
 {
     public class ShowPixelDisplayCommand : SimpleCommand
     {
-        private readonly ModelsEx models;
-
-        public ShowPixelDisplayCommand(ModelsEx models)
+        public ShowPixelDisplayCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
         }
 
         public override void Execute()

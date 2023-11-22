@@ -10,11 +10,8 @@ namespace ImageViewer.Commands.Tools
 {
     public class RemoveArrowCommand : SimpleCommand<int>
     {
-        private readonly ModelsEx models;
-
-        public RemoveArrowCommand(ModelsEx models)
+        public RemoveArrowCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
         }
 
         public override void Execute(int id)

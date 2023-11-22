@@ -11,11 +11,8 @@ namespace ImageViewer.Commands.View
 {
     public class SelectNaNColorCommand : SimpleCommand
     {
-        private readonly ModelsEx models;
-
-        public SelectNaNColorCommand(ModelsEx models)
+        public SelectNaNColorCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
         }
 
         public override void Execute()

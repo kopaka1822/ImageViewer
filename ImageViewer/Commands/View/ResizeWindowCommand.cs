@@ -6,11 +6,9 @@ namespace ImageViewer.Commands.View
 {
     public class ResizeWindowCommand : SimpleCommand
     {
-        private readonly ModelsEx models;
 
-        public ResizeWindowCommand(ModelsEx models)
+        public ResizeWindowCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
         }
 
         public override void Execute()
