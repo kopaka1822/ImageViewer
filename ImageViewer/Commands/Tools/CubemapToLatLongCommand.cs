@@ -11,11 +11,8 @@ namespace ImageViewer.Commands.Tools
 {
     public class CubemapToLatLongCommand : Command
     {
-        private readonly ModelsEx models;
-
-        public CubemapToLatLongCommand(ModelsEx models)
+        public CubemapToLatLongCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
 

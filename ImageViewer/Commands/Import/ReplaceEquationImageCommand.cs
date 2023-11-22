@@ -14,11 +14,8 @@ namespace ImageViewer.Commands.Import
 {
     public class ReplaceEquationImageCommand : Command<int>
     {
-        private readonly ModelsEx models;
-
-        public ReplaceEquationImageCommand(ModelsEx models)
+        public ReplaceEquationImageCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             foreach (var pipe in models.Pipelines)
             {
                 pipe.PropertyChanged += PipeOnPropertyChanged;

@@ -13,11 +13,8 @@ namespace ImageViewer.Commands.Tools
 {
     public class ArrayTo3DCommand : Command
     {
-        private readonly ModelsEx models;
-
-        public ArrayTo3DCommand(ModelsEx models)
+        public ArrayTo3DCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
 

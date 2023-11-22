@@ -15,14 +15,12 @@ namespace ImageViewer.Commands.Export
 {
     public class GifExportCommand : Command
     {
-        private readonly ModelsEx models;
         private readonly GifExportViewModel viewModel = new GifExportViewModel();
         private readonly PathManager path; // == models.ExportConfig.Path
         private bool askForVideo = true;
 
-        public GifExportCommand(ModelsEx models)
+        public GifExportCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             this.path = models.ExportConfig.Path;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }

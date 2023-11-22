@@ -21,11 +21,9 @@ namespace ImageViewer.Commands.Export
 {
     public class ExportBatchCommand : Command
     {
-        private readonly ModelsEx models;
         private readonly PathManager path; // == models.ExportConfig.Path
-        public ExportBatchCommand(ModelsEx models)
+        public ExportBatchCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             path = models.ExportConfig.Path;
             this.models.PropertyChanged += ModelsOnPropertyChanged;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;

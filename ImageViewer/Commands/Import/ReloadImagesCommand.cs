@@ -13,11 +13,8 @@ namespace ImageViewer.Commands.Import
 {
     public class ReloadImagesCommand : Command
     {
-        private readonly ModelsEx models;
-
-        public ReloadImagesCommand(ModelsEx models)
+        public ReloadImagesCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
 

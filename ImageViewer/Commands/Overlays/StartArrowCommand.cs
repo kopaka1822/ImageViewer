@@ -13,11 +13,8 @@ namespace ImageViewer.Commands.Tools
 {
     public class StartArrowCommand : Command
     {
-        private readonly ModelsEx models;
-
-        public StartArrowCommand(ModelsEx models)
+        public StartArrowCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
 

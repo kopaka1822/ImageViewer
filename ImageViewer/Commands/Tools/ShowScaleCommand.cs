@@ -12,11 +12,8 @@ namespace ImageViewer.Commands.Tools
 {
     public class ShowScaleCommand : Command
     {
-        private readonly Models.ModelsEx models;
-
-        public ShowScaleCommand(ModelsEx models)
+        public ShowScaleCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
 

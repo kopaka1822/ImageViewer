@@ -8,11 +8,8 @@ namespace ImageViewer.Commands.Tools
 {
     public class GenerateMipmapsCommand : Command
     {
-        private readonly ModelsEx models;
-
-        public GenerateMipmapsCommand(ModelsEx models)
+        public GenerateMipmapsCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
 

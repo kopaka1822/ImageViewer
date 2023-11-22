@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Input;
+using ImageViewer.Models;
 
 namespace ImageViewer.Commands.Helper
 {
@@ -9,11 +10,28 @@ namespace ImageViewer.Commands.Helper
     /// </summary>
     public abstract class Command : ICommand
     {
+        protected readonly ModelsEx models;
+
+        protected Command(ModelsEx models)
+        {
+            this.models = models;
+        }
+
         public bool CanExecute(object parameter) => CanExecute();
 
         public abstract bool CanExecute();
 
-        public void Execute(object parameter) => Execute();
+        public void Execute(object parameter)
+        {
+            try
+            {
+                Execute();
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e);
+            }
+        }
 
         public abstract void Execute();
 
@@ -32,6 +50,13 @@ namespace ImageViewer.Commands.Helper
     /// <typeparam name="T"></typeparam>
     public abstract class Command<T> : ICommand
     {
+        protected readonly ModelsEx models;
+
+        protected Command(ModelsEx models)
+        {
+            this.models = models;
+        }
+
         public bool CanExecute(object parameter)
         {
             return CanExecute((T)parameter);
@@ -41,7 +66,14 @@ namespace ImageViewer.Commands.Helper
 
         public void Execute(object parameter)
         {
-            Execute((T)parameter);
+            try
+            {
+                Execute((T)parameter);
+            }
+            catch (Exception e)
+            {
+                models.Window.ShowErrorDialog(e);
+            }
         }
 
         public abstract void Execute(T parameter);

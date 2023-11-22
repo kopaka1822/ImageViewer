@@ -13,11 +13,8 @@ namespace ImageViewer.Commands.Tools
 {
     public class StartZoomboxCommand : Command
     {
-        private readonly ModelsEx models;
-
-        public StartZoomboxCommand(ModelsEx models)
+        public StartZoomboxCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
 

@@ -15,11 +15,8 @@ namespace ImageViewer.Commands.Tools
 {
     public class ShowPaddingCommand : Command
     {
-        private readonly Models.ModelsEx models;
-
-        public ShowPaddingCommand(ModelsEx models)
+        public ShowPaddingCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
 

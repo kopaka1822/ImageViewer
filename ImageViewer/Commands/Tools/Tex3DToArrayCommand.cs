@@ -16,11 +16,8 @@ namespace ImageViewer.Commands.Tools
 {
     public class Tex3DToArrayCommand : Command
     {
-        private readonly ModelsEx models;
-
-        public Tex3DToArrayCommand(ModelsEx models)
+        public Tex3DToArrayCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
 

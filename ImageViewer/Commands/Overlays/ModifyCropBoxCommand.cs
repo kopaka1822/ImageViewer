@@ -13,11 +13,8 @@ namespace ImageViewer.Commands.Overlays
 {
     internal class ModifyCropBoxCommand : Command
     {
-        private readonly ModelsEx models;
-
-        public ModifyCropBoxCommand(ModelsEx models)
+        public ModifyCropBoxCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
 

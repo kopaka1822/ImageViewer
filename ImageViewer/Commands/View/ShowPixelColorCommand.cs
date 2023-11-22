@@ -10,11 +10,8 @@ namespace ImageViewer.Commands.View
 {
     public class ShowPixelColorCommand : Command
     {
-        private readonly ModelsEx models;
-
-        public ShowPixelColorCommand(ModelsEx models)
+        public ShowPixelColorCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             this.models.PropertyChanged += ModelsOnPropertyChanged;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }

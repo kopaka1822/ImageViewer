@@ -9,11 +9,8 @@ namespace ImageViewer.Commands.Import
 {
     public class ImportEquationImageCommand : Command<int>
     {
-        private readonly ModelsEx models;
-
-        public ImportEquationImageCommand(ModelsEx models)
+        public ImportEquationImageCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             foreach (var pipe in models.Pipelines)
             {
                 pipe.PropertyChanged += PipeOnPropertyChanged;

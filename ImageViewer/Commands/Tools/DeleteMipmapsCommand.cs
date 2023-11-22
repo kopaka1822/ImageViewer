@@ -8,11 +8,8 @@ namespace ImageViewer.Commands.Tools
 {
     public class DeleteMipmapsCommand : Command
     {
-        private readonly ModelsEx models;
-
-        public DeleteMipmapsCommand(ModelsEx models)
+        public DeleteMipmapsCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
         }
 

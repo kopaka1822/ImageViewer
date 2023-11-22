@@ -43,12 +43,10 @@ namespace ImageViewer.ViewModels.Dialog
 
         public class Import2DCommand : Command
         {
-            private readonly ModelsEx models;
             private readonly ImportArrayViewModel viewModel;
 
-            public Import2DCommand(ModelsEx models, ImportArrayViewModel viewModel)
+            public Import2DCommand(ModelsEx models, ImportArrayViewModel viewModel) : base(models)
             {
-                this.models = models;
                 this.viewModel = viewModel;
                 this.viewModel.ListItems.CollectionChanged += ListItemsOnCollectionChanged;
             }
@@ -94,12 +92,10 @@ namespace ImageViewer.ViewModels.Dialog
 
         public class Import3DCommand : Command
         {
-            private readonly ModelsEx models;
             private readonly ImportArrayViewModel viewModel;
 
-            public Import3DCommand(ModelsEx models, ImportArrayViewModel viewModel)
+            public Import3DCommand(ModelsEx models, ImportArrayViewModel viewModel) : base(models)
             {
-                this.models = models;
                 this.viewModel = viewModel;
                 this.viewModel.ListItems.CollectionChanged += ListItemsOnCollectionChanged;
             }

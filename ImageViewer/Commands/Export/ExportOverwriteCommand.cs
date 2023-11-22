@@ -17,11 +17,8 @@ namespace ImageViewer.Commands.Export
 {
     class ExportOverwriteCommand : Command, INotifyPropertyChanged
     {
-        private readonly ModelsEx models;
-
-        public ExportOverwriteCommand(ModelsEx models)
+        public ExportOverwriteCommand(ModelsEx models) : base(models)
         {
-            this.models = models;
             foreach (var pipe in models.Pipelines)
             {
                 pipe.PropertyChanged += PipeOnPropertyChanged;
