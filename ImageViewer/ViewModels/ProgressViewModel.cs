@@ -61,7 +61,7 @@ namespace ImageViewer.ViewModels
             set => OnPropertyChanged(nameof(ProgressValue));
         }
 
-        public bool ProgressIndeterminate => models.Progress.Progress == 0.0f;
+        public bool ProgressIndeterminate => models.Progress.IsProcessing && models.Progress.Progress == 0.0f;
 
         public string ProgressDescription => models.Progress.What;
 
