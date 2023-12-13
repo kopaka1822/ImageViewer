@@ -153,7 +153,7 @@ namespace ImageViewer.ViewModels.Dialog
             public GliFormat Format { get; set; }
         }
 
-        public ObservableCollection<ImageItem> ListItems { get; } = new ObservableCollection<ImageItem>();
+        public ObservableCollection<ImageItem> ListItems { get; private set; } = new ObservableCollection<ImageItem>();
 
         public ImportArrayViewModel(ModelsEx models)
         {
@@ -162,6 +162,7 @@ namespace ImageViewer.ViewModels.Dialog
             this.ImportCommand = new ActionCommand(Import);
             this.Apply2DCommand = new Import2DCommand(models, this);
             this.Apply3DCommand = new Import3DCommand(models, this);
+            this.SortCommand = new ActionCommand(Sort);
         }
 
         private void Import()
@@ -243,6 +244,13 @@ namespace ImageViewer.ViewModels.Dialog
             models.Window.TopmostWindow.DialogResult = false;
         }
 
+        private void Sort()
+        {
+            var sorted = ListItems.OrderBy(x => x.ShortFilename);
+            ListItems = new ObservableCollection<ImageItem>(sorted);
+            OnPropertyChanged(nameof(ListItems));
+        }
+
         public List<TextureArray2D> GetTextures()
         {
             var res = new List<TextureArray2D>();
@@ -256,6 +264,8 @@ namespace ImageViewer.ViewModels.Dialog
         public ICommand ImportCommand { get; }
         public ICommand Apply2DCommand { get; }
         public ICommand Apply3DCommand { get; }
+
+        public ICommand SortCommand { get; }
         public ICommand CancelCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -22,25 +22,38 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            
-            <Button 
+
+            <StackPanel
                 Grid.Row="0"
-                Width="110" 
+                Orientation="Horizontal"
                 HorizontalAlignment="Right"
-                Command="{Binding ImportCommand}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="21"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Image 
-                        Source="../../Icons/import.png"
-                        Margin="{StaticResource DefaultBorderRight}"/>
-                    <TextBlock 
-                        Grid.Column="1" 
-                        Text="Import Image"/>
-                </Grid>
-            </Button>
+                Margin="{StaticResource DefaultBorderBottom}">
+
+                <Button 
+                    Width="110" 
+                    HorizontalAlignment="Right"
+                    Command="{Binding ImportCommand}"
+                    Margin="{StaticResource DefaultBorderRight}" >
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="21"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Image 
+                            Source="../../Icons/import.png"
+                            Margin="{StaticResource DefaultBorderRight}"/>
+                        <TextBlock 
+                            Grid.Column="1" 
+                            Text="Import Image"/>
+                    </Grid>
+                </Button>
+
+                <Button
+                    Width="60"
+                    Content="Sort"
+                    Command="{Binding SortCommand}"
+                    Margin="0"/>
+            </StackPanel>
 
             <ListBox 
                 Grid.Row="1"
