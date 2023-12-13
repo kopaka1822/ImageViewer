@@ -82,6 +82,7 @@
     <Compile Include="Commands\Filter\TellFilterParamsCommand.cs" />
     <Compile Include="Commands\Image\DeleteMipmapsCommand.cs" />
     <Compile Include="Commands\Image\GenerateMipmapsCommand.cs" />
+    <Compile Include="Commands\Image\OpenAsArrayCommand.cs" />
     <Compile Include="Commands\Image\RecomputeMipmapsCommand.cs" />
     <Compile Include="Commands\Program\CinCommand.cs" />
     <Compile Include="Commands\Command.cs" />
@@ -111,5 +112,6 @@
       <Name>ImageFramework</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

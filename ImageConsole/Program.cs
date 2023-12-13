@@ -30,6 +30,7 @@ namespace ImageConsole
         {
             // setup commands
             AddCommand(new OpenCommand());
+            AddCommand(new OpenAsArrayCommand());
             AddCommand(new DeleteCommand());
             AddCommand(new MoveCommand());
             AddCommand(new GenerateMipmapsCommand());
