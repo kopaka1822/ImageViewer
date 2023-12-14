@@ -5,6 +5,7 @@ using ImageViewer.Models;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
 using ImageViewer.Controller;
@@ -33,7 +34,7 @@ namespace ImageViewer.Commands.Import
             return models.Images.NumImages > 0;
         }
 
-        public override async void Execute()
+        public override async Task ExecuteAsync()
         {
             for (var index = 0; index < models.Images.Images.Count; index++)
             {

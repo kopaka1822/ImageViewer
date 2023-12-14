@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -99,6 +100,23 @@ namespace ImageViewer.Models
                         Pipelines[i].ForceChanges();
                     break;
             }
+        }
+
+        public int GetExportPipelineId()
+        {
+            if (NumEnabled == 0)
+            {
+                throw new Exception("An image equation must be enabled when exporting");
+            }
+            var id = GetFirstEnabledPipeline();
+            
+            if (NumEnabled > 1)
+            {
+                if(!Window.ShowYesNoDialog($"More than one image equations are enabled. Do you want to use equation {id + 1} for export?", "Export"))
+                    throw new Exception("Export canceled. Make sure only one image equation is enabled");
+            }
+
+            return id;
         }
 
         /// <summary>

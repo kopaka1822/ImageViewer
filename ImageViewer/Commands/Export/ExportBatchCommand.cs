@@ -64,17 +64,10 @@ namespace ImageViewer.Commands.Export
             return list;
         }
 
-        public override async void Execute()
+        public override async Task ExecuteAsync()
         {
-            // make sure only one image is visible
-            if (models.NumEnabled != 1)
-            {
-                models.Window.ShowErrorDialog("Exactly one image equation should be visible when exporting.");
-                return;
-            }
-
             // get active final image
-            var pipeId = models.GetFirstEnabledPipeline();
+            var pipeId = models.GetExportPipelineId();
             var pipe = models.Pipelines[pipeId];
             if(pipe.Image == null || !pipe.IsValid) return; // not yet computed?
 

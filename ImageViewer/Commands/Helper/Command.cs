@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using ImageViewer.Models;
 
@@ -21,11 +22,11 @@ namespace ImageViewer.Commands.Helper
 
         public abstract bool CanExecute();
 
-        public void Execute(object parameter)
+        public async void Execute(object parameter)
         {
             try
             {
-                Execute();
+                await ExecuteAsync();
             }
             catch (Exception e)
             {
@@ -33,7 +34,13 @@ namespace ImageViewer.Commands.Helper
             }
         }
 
-        public abstract void Execute();
+        public virtual void Execute() {}
+
+        public virtual Task ExecuteAsync()
+        {
+            Execute();
+            return Task.CompletedTask;
+        }
 
         public event EventHandler CanExecuteChanged;
 

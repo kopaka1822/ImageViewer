@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Threading.Tasks;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
 using ImageFramework.Model.Export;
@@ -40,7 +41,7 @@ namespace ImageViewer.Commands.Export
             return models.Images.NumImages > 0;
         }
 
-        public override async void Execute()
+        public override async Task ExecuteAsync()
         {
             if (models.NumEnabled != 2)
             {

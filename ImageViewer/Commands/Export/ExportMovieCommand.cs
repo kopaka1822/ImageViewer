@@ -54,15 +54,8 @@ namespace ImageViewer.Commands.Export
             return models.Images.NumImages > 0 && models.NumEnabled > 0;
         }
 
-        public override async void Execute()
+        public override async Task ExecuteAsync()
         {
-            // make sure only one image is visible
-            if (models.NumEnabled != 1)
-            {
-                models.Window.ShowErrorDialog("Exactly one image equation should be visible when exporting.");
-                return;
-            }
-
             // make sure that we actually have frames
             if (models.Images.NumLayers <= 1)
             {
@@ -77,7 +70,7 @@ namespace ImageViewer.Commands.Export
             }
 
             // get active final image
-            var id = models.GetFirstEnabledPipeline();
+            var id = models.GetExportPipelineId();
             var tex = models.Pipelines[id].Image;
             if (tex == null) return; // not computed?
 
