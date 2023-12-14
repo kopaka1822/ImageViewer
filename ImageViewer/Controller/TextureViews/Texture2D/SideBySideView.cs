@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,9 +16,18 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
 {
     public class SideBySideView : PlainTextureView
     {
-        public SideBySideView(ModelsEx models) 
+        public SideBySideView(ModelsEx models)
             : base(models, ShaderBuilder.Builder2D)
-        {}
+        {
+            // conditionally enabled other equations when switching to this view
+            if (models.NumEnabled < 2)
+            {
+                foreach(var pipe in models.Pipelines)
+                {
+                    if (pipe.IsValid) pipe.IsEnabled = true;
+                }
+            }
+        }
 
         public override void Draw(int id, ITexture texture)
         {
