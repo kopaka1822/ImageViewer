@@ -230,6 +230,11 @@ namespace ImageFramework.Model
                 numLayer);
         }
 
+        public List<TextureArray2D> ConvertTo2D(TextureArray2D tex)
+        {
+            return SharedModel.Convert.FlattenToArray(tex);
+        }
+
         /// <summary>
         /// exports a pipeline image with the given format and extension.
         /// Apply will be called by this method if required

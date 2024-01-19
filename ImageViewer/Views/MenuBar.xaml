@@ -550,6 +550,18 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+            <MenuItem
+                Header="TextureArray to 2D Textures"
+                Command="{Binding ArrayTo2DCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}"
+                ToolTip="Flattens the active texture array to 2D textures with one layer">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/image_layer.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+            </MenuItem>
         </MenuItem>
         <!--END TOOLS-->
 

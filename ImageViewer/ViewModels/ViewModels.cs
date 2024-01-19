@@ -121,6 +121,7 @@ namespace ImageViewer.ViewModels
             CubemapToLatLongCommand = new CubemapToLatLongCommand(models);
             ArrayTo3DCommand = new ArrayTo3DCommand(models);
             Tex3DToArrayCommand = new Tex3DToArrayCommand(models);
+            ArrayTo2DCommand = new ArrayTo2DCommand(models);
             SelectNaNColorCommand = new SelectNaNColorCommand(models);
 
             ResizeCommand = new ResizeWindowCommand(models);
@@ -336,6 +337,8 @@ namespace ImageViewer.ViewModels
         public ICommand ArrayTo3DCommand { get; }
 
         public ICommand Tex3DToArrayCommand { get; }
+
+        public ICommand ArrayTo2DCommand { get; }
 
         public ICommand ExportConfigCommand { get; }
 

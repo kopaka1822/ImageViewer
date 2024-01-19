@@ -94,6 +94,7 @@
     <Compile Include="Commands\Import\ReloadImagesCommand.cs" />
     <Compile Include="Commands\Import\ReplaceEquationImageCommand.cs" />
     <Compile Include="Commands\Overlays\ModifyCropBoxCommand.cs" />
+    <Compile Include="Commands\Tools\ArrayTo2DCommand.cs" />
     <Compile Include="Commands\Tools\ArrayTo3DCommand.cs" />
     <Compile Include="Commands\Tools\CubemapToLatLongCommand.cs" />
     <Compile Include="Commands\Tools\DeleteMipmapsCommand.cs" />

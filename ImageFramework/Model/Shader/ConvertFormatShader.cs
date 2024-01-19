@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
@@ -243,6 +244,25 @@ namespace ImageFramework.Model.Shader
             }
 
             return tex;
+        }
+
+        public List<TextureArray2D> FlattenToArray(TextureArray2D src)
+        {
+            List<TextureArray2D> res = new List<TextureArray2D>(src.NumLayers);
+            
+            for (int i = 0; i < src.NumLayers; ++i)
+            {
+                var dst = new TextureArray2D(new LayerMipmapCount(1, src.NumMipmaps), src.Size, src.Format, false);
+
+                for (int curMip = 0; curMip < src.NumMipmaps; ++curMip)
+                {
+                    CopyLayer(src, new LayerMipmapSlice(i, curMip), dst, new LayerMipmapSlice(0, curMip));
+                }
+
+                res.Add(dst);
+            }
+
+            return res;
         }
 
         /// <summary>
