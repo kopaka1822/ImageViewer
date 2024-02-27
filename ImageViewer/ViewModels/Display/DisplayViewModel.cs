@@ -317,6 +317,10 @@ namespace ImageViewer.ViewModels.Display
                         host.Visibility = Visibility.Visible;
                     }
                     break;
+
+                case nameof(DisplayModel.UseAlphaTest):
+                    OnPropertyChanged(nameof(UseAlphaTest));
+                    break;
             }
         }
 
@@ -700,6 +704,15 @@ namespace ImageViewer.ViewModels.Display
             set
             {
                 if (value) models.Settings.AlphaBackground = SettingsModel.AlphaType.Theme;
+            }
+        }
+
+        public bool UseAlphaTest
+        {
+            get => models.Display.UseAlphaTest;
+            set
+            {
+                models.Display.UseAlphaTest = value;
             }
         }
 

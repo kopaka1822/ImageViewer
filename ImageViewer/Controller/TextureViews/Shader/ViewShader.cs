@@ -26,6 +26,11 @@ namespace ImageViewer.Controller.TextureViews.Shader
             public int HdrMode;
 
             public Color NanColor;
+
+            public int UseAlphaTest;
+            public int Pad01;
+            public int Pad02;
+            public int Pad03;
         }
 
         protected ViewShader(ModelsEx models, string vertex, string pixel, string debugName)
@@ -44,6 +49,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
                 NanColor = models.Settings.NaNColor,
                 UseOverlay = overlay == null ? 0 : 1,
                 HdrMode = models.Settings.HdrMode ? 1 : 0,
+                UseAlphaTest = models.Display.UseAlphaTest ? 1 : 0
             };
 
             return res;
@@ -97,6 +103,11 @@ bool useOverlay;
 bool hdrMode;
 
 float4 nancolor;
+
+bool useAlphaTest;
+uint pad01;
+uint pad02;
+uint pad03;
 ";
         }
 
@@ -110,6 +121,7 @@ float4 nancolor;
 {color}.rgb *= multiplier;
 if(useAbs) {color}.rgb = abs({color}.rgb);
 if(any(isnan({color}))) {color} = nancolor;
+if(useAlphaTest) {color}.a = {color}.a < 0.5 ? 0.0 : 1.0;
 ";
         }
 

@@ -221,6 +221,11 @@
                     IsCheckable="True"
                     IsChecked="{Binding Display.IsAlphaTheme}"/>
             </MenuItem>
+            <MenuItem
+                Header="Alpha Test"
+                ToolTip="Enables Alpha Test for transparent images"
+                IsCheckable="True"
+                IsChecked="{Binding Display.UseAlphaTest}"/>
         </MenuItem>
         <!--END VIEW-->
 

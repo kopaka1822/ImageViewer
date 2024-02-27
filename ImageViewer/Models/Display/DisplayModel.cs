@@ -374,6 +374,19 @@ namespace ImageViewer.Models.Display
             }
         }
 
+        private bool useAlphaTest = false;
+        
+        public bool UseAlphaTest
+        {
+            get => useAlphaTest;
+            set
+            {
+                if (useAlphaTest == value) return;
+                useAlphaTest = value;
+                OnPropertyChanged(nameof(UseAlphaTest));
+            }
+        }
+
         private SplitMode splitMode = SplitMode.Vertical;
         public SplitMode Split
         {
