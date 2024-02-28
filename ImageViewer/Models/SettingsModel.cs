@@ -361,10 +361,20 @@ namespace ImageViewer.Models
             Byte,
         }
 
+        // cache precision is saved for the active instance and resets to float on default to prevent accidental precision loss
+        private CachePrecisionType cachePrecision = CachePrecisionType.Float;
         public CachePrecisionType CachePrecision
         {
-            get => (CachePrecisionType) Properties.Settings.Default.CachePrecision;
-            set => Properties.Settings.Default.CachePrecision = (int)value;
+            //get => (CachePrecisionType) Properties.Settings.Default.CachePrecision;
+            //set => Properties.Settings.Default.CachePrecision = (int)value;
+            get => cachePrecision;
+            set
+            {
+                if (cachePrecision == value) return;
+                cachePrecision = value;
+                OnPropertyChanged(nameof(CachePrecision));
+                OnPropertyChanged(nameof(CacheFormat));
+            }
         }
 
         public Format CacheFormat
