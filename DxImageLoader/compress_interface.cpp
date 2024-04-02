@@ -201,14 +201,18 @@ CMP_FORMAT get_cmp_format(gli::format format, ExFormatInfo& exInfo, bool isSourc
 		return CMP_FORMAT_ETC2_RGB;
 	case gli::format::FORMAT_RGBA_ETC2_SRGB_BLOCK8:
 		if (isSource) exInfo.swizzleRGB = true;
-		return CMP_FORMAT_ETC2_SRGBA;
+		return CMP_FORMAT_ETC2_SRGBA1;
 	case gli::format::FORMAT_RGBA_ETC2_UNORM_BLOCK8:
 		if (isSource) exInfo.swizzleRGB = true;
-		return CMP_FORMAT_ETC2_RGBA;
+		return CMP_FORMAT_ETC2_RGBA1;
 
 	case gli::format::FORMAT_RGBA_ETC2_SRGB_BLOCK16:
+		if (isSource) exInfo.swizzleRGB = true;
+		return CMP_FORMAT_ETC2_SRGBA;
 	case gli::format::FORMAT_RGBA_ETC2_UNORM_BLOCK16:
-		throw std::runtime_error("ETC2 Block16 formats are not supported");
+		if (isSource) exInfo.swizzleRGB = true;
+		return CMP_FORMAT_ETC2_RGBA;
+		
 
 	case gli::format::FORMAT_R_EAC_UNORM_BLOCK8:
 	case gli::format::FORMAT_R_EAC_SNORM_BLOCK8:
