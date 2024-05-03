@@ -184,11 +184,12 @@ namespace ImageViewer.Commands.Export
             {"ktx", "Khronos Texture (*.ktx)" },
             {"ktx2", "Khronos Texture (*.ktx2)"},
             {"dds", "DirectDraw Surface (*.dds)" },
+            {"npy", "Python NumPy Array (*.npy)"}
         };
 
         public static bool Is3DFilter(string key)
         {
-            return key == "dds" || key == "ktx" || key == "ktx2";
+            return key == "dds" || key == "ktx" || key == "ktx2" || key == "npy";
         }
 
         private static string GetFilter(string preferred, bool is3D)
