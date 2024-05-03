@@ -53,6 +53,12 @@ namespace FrameworkTests.Model
             CompareAfterExport(TestData.Directory + "small.bmp", ExportDir + "small", "png", GliFormat.RGB8_SRGB);
         }
 
+        [TestMethod]
+        public void ExportNpy()
+        {
+            CompareAfterExport(TestData.Directory + "small.bmp", ExportDir + "small", "npy", GliFormat.RGBA32_SFLOAT);
+        }
+
 
         [TestMethod]
         public void ExportLdrUnorm()
@@ -210,6 +216,12 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void GrayTestAllNpy()
+        {
+            TryExportAllFormatsAndCompareGray("npy", false);
+        }
+
+        [TestMethod]
         public void ColorTestAllJpg()
         {
             TryExportAllFormatsAndCompareColor("jpg", true);
@@ -234,9 +246,21 @@ namespace FrameworkTests.Model
         }
 
         [TestMethod]
+        public void ColorTestAllNpy()
+        {
+            TryExportAllFormatsAndCompareColor("npy");
+        }
+
+        [TestMethod]
         public void ExportAllBmp()
         {
             TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "bmp");
+        }
+
+        [TestMethod]
+        public void ExportAllNpy()
+        {
+            TryExportAllFormats(TestData.Directory + "small.pfm", ExportDir + "tmp", "npy");
         }
 
         [TestMethod]

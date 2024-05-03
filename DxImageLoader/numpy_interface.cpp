@@ -316,3 +316,157 @@ std::unique_ptr<image::IImage> numpy_load(const char* filename)
 {
 	return std::make_unique<NumpyImage>(filename);
 }
+
+std::vector<uint32_t> numpy_get_export_formats()
+{
+	return std::vector<uint32_t>{
+		// float formats
+		gli::format::FORMAT_R32_SFLOAT_PACK32,
+		gli::format::FORMAT_RG32_SFLOAT_PACK32,
+		gli::format::FORMAT_RGB32_SFLOAT_PACK32,
+		gli::format::FORMAT_RGBA32_SFLOAT_PACK32,
+
+		// int formats
+		// 32 bit signed
+		gli::format::FORMAT_R32_SINT_PACK32,
+		gli::format::FORMAT_RG32_SINT_PACK32,
+		gli::format::FORMAT_RGB32_SINT_PACK32,
+		gli::format::FORMAT_RGBA32_SINT_PACK32,
+		// 32 bit unsigned
+		gli::format::FORMAT_R32_UINT_PACK32,
+		gli::format::FORMAT_RG32_UINT_PACK32,
+		gli::format::FORMAT_RGB32_UINT_PACK32,
+		gli::format::FORMAT_RGBA32_UINT_PACK32,
+
+		// 16 bit signed
+		gli::format::FORMAT_R16_SINT_PACK16,
+		gli::format::FORMAT_RG16_SINT_PACK16,
+		gli::format::FORMAT_RGB16_SINT_PACK16,
+		gli::format::FORMAT_RGBA16_SINT_PACK16,
+		// 16 bit unsigned
+		gli::format::FORMAT_R16_UINT_PACK16,
+		gli::format::FORMAT_RG16_UINT_PACK16,
+		gli::format::FORMAT_RGB16_UINT_PACK16,
+		gli::format::FORMAT_RGBA16_UINT_PACK16,
+
+		// 8 bit signed
+		gli::format::FORMAT_R8_SINT_PACK8,
+		gli::format::FORMAT_RG8_SINT_PACK8,
+		gli::format::FORMAT_RGB8_SINT_PACK8,
+		gli::format::FORMAT_RGBA8_SINT_PACK8,
+
+		// 8 bit unsigned
+		gli::format::FORMAT_R8_UINT_PACK8,
+		gli::format::FORMAT_RG8_UINT_PACK8,
+		gli::format::FORMAT_RGB8_UINT_PACK8,
+		gli::format::FORMAT_RGBA8_UINT_PACK8,
+	};
+}
+
+
+template<class T>
+void numpy_save_t(const char* filename, const image::IImage* image, uint32_t nChannels, glm::vec4 minClamp, glm::vec4 maxClamp)
+{
+	assert(image->getFormat() == gli::FORMAT_RGBA32_SFLOAT_PACK32);
+
+	unsigned long shape[4] = {
+		static_cast<unsigned long>(image->getDepth(0) * image->getNumLayers()),
+		static_cast<unsigned long>(image->getHeight(0)),
+		static_cast<unsigned long>(image->getWidth(0)),
+		nChannels
+	};
+
+	std::vector<T> outData;
+	outData.resize(shape[0] * shape[1] * shape[2] * shape[3]);
+
+	auto cur = outData.begin();
+	for(size_t layer = 0; layer < image->getNumLayers(); ++layer)
+	{
+		size_t size = 0;
+		auto data = image->getData(layer, 0, size);
+		auto fdata = reinterpret_cast<const glm::vec4*>(data);
+		auto fdataEnd = fdata + (size / sizeof(glm::vec4));
+
+		// convert vec4 data to T with nChannels
+		for(; fdata != fdataEnd; ++fdata)
+		{
+			// clamp data to prevent overflows
+			auto src = glm::clamp(*fdata, minClamp, maxClamp);
+			for(uint32_t i = 0; i < nChannels; ++i)
+				*cur++ = static_cast<T>(src[i]);
+		}
+	}
+
+	//npy::SaveArrayAsNumpy(filename, false, nChannels > 1 ? 4u : 3u, shape, outData);
+	// TODO let the user choose if the last channel is exported as a separate channel or not for grayscale
+	npy::SaveArrayAsNumpy(filename, false, 4u, shape, outData);
+}
+
+void numpy_save(const char* filename, const image::IImage* image, uint32_t format)
+{
+	const auto fi = gli::detail::get_format_info(gli::format(format));
+	const auto nChannels = fi.Component;
+	auto [minClamp, maxClamp] = gli::min_max_values(gli::format(format));
+
+	switch(gli::format(format))
+	{
+		// float formats
+		case gli::format::FORMAT_R32_SFLOAT_PACK32:
+		case gli::format::FORMAT_RG32_SFLOAT_PACK32:
+		case gli::format::FORMAT_RGB32_SFLOAT_PACK32:
+		case gli::format::FORMAT_RGBA32_SFLOAT_PACK32:
+			numpy_save_t<float>(filename, image, nChannels, minClamp, maxClamp);
+			break;
+		// int formats
+		// 32 bit signed
+		case gli::format::FORMAT_R32_SINT_PACK32:
+		case gli::format::FORMAT_RG32_SINT_PACK32:
+		case gli::format::FORMAT_RGB32_SINT_PACK32:
+		case gli::format::FORMAT_RGBA32_SINT_PACK32:
+			numpy_save_t<int32_t>(filename, image, nChannels, minClamp, maxClamp);
+			break;
+
+		// 32 bit unsigned
+		case gli::format::FORMAT_R32_UINT_PACK32:
+		case gli::format::FORMAT_RG32_UINT_PACK32:
+		case gli::format::FORMAT_RGB32_UINT_PACK32:
+		case gli::format::FORMAT_RGBA32_UINT_PACK32:
+			numpy_save_t<uint32_t>(filename, image, nChannels, minClamp, maxClamp);
+			break;
+
+		// 16 bit signed
+		case gli::format::FORMAT_R16_SINT_PACK16:
+		case gli::format::FORMAT_RG16_SINT_PACK16:
+		case gli::format::FORMAT_RGB16_SINT_PACK16:
+		case gli::format::FORMAT_RGBA16_SINT_PACK16:
+			numpy_save_t<int16_t>(filename, image, nChannels, minClamp, maxClamp);
+			break;
+
+		// 16 bit unsigned
+		case gli::format::FORMAT_R16_UINT_PACK16:
+		case gli::format::FORMAT_RG16_UINT_PACK16:
+		case gli::format::FORMAT_RGB16_UINT_PACK16:
+		case gli::format::FORMAT_RGBA16_UINT_PACK16:
+			numpy_save_t<uint16_t>(filename, image, nChannels, minClamp, maxClamp);
+			break;
+
+		// 8 bit signed
+		case gli::format::FORMAT_R8_SINT_PACK8:
+		case gli::format::FORMAT_RG8_SINT_PACK8:
+		case gli::format::FORMAT_RGB8_SINT_PACK8:
+		case gli::format::FORMAT_RGBA8_SINT_PACK8:
+			numpy_save_t<int8_t>(filename, image, nChannels, minClamp, maxClamp);
+			break;
+
+		// 8 bit unsigned
+		case gli::format::FORMAT_R8_UINT_PACK8:
+		case gli::format::FORMAT_RG8_UINT_PACK8:
+		case gli::format::FORMAT_RGB8_UINT_PACK8:
+		case gli::format::FORMAT_RGBA8_UINT_PACK8:
+			numpy_save_t<uint8_t>(filename, image, nChannels, minClamp, maxClamp);
+			break;
+
+	default:
+		throw std::runtime_error("Unsupported format");
+	}
+}

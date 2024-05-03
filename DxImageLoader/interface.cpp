@@ -283,6 +283,13 @@ bool image_save(int id, const char* filename, const char* extension, uint32_t fo
 				stb_save_tga(fullName.c_str(), width, height, nComponents, mip);
 			else assert(false);
 		}
+		else if (ext == "npy")
+		{
+			if (img->getNumMipmaps() != 1)
+				throw std::runtime_error("expected single mipmap image");
+
+			numpy_save(fullName.c_str(), img.get(), format);
+		}
 		else throw std::runtime_error("file extension not supported");
 	}
 	catch(const std::exception& e)
@@ -307,6 +314,7 @@ const uint32_t* get_export_formats(const char* extension, int& numFormats)
 		s_exportFormats["bmp"] = stb_image_get_export_formats("bmp");
 		s_exportFormats["ktx2"] = ktx2_get_export_formats();
 		s_exportFormats["tga"] = stb_image_get_export_formats("tga");
+		s_exportFormats["npy"] = numpy_get_export_formats();
 	}
 	auto it = s_exportFormats.find(extension);
 	if(it == s_exportFormats.end())

@@ -280,6 +280,7 @@ namespace ImageFramework.Model.Export
                     formats.Add(new ExportFormatModel("ktx"));
                     formats.Add(new ExportFormatModel("ktx2"));
                     formats.Add(new ExportFormatModel("tga"));
+                    formats.Add(new ExportFormatModel("npy"));
                     s_exportFormatModels = formats;
                 }
 
