@@ -536,6 +536,19 @@ namespace FrameworkTests.Model
                 Color.Channel.Rgb, 0.0f);
         }
 
+        [TestMethod]
+        public void ExportNumpyCheckers3D()
+        {
+            // configure numpy for import
+            IO.SetGlobalParameter("npy is3D", 1);
+            IO.SetGlobalParameter("npy useChannel", 1);
+            IO.SetGlobalParameter("npy firstLayer", 0);
+            IO.SetGlobalParameter("npy lastLayer", -1);
+
+            CompareAfterExport(TestData.Directory + "checkers3d.dds", ExportDir + "tmp", "npy", GliFormat.RGBA32_SFLOAT,
+                Color.Channel.Rgba, 0.0f, 100, 0); // only mip 0
+        }
+
         /// <summary>
         /// tests if all dds formats actually run on gpu
         /// </summary>
@@ -884,7 +897,7 @@ namespace FrameworkTests.Model
         }
 
         private void CompareAfterExport(string inputImage, string outputImage, string outputExtension, GliFormat format,
-            Color.Channel channels = Color.Channel.Rgb, float tolerance = 0.01f, int quality = 100)
+            Color.Channel channels = Color.Channel.Rgb, float tolerance = 0.01f, int quality = 100, int mipmap = -1)
         {
             var model = new Models(1);
             model.AddImageFromFile(inputImage);
@@ -894,7 +907,8 @@ namespace FrameworkTests.Model
             model.Export.Export(new ExportDescription(origTex, outputImage, outputExtension)
             {
                 FileFormat = format,
-                Quality = quality
+                Quality = quality,
+                Mipmap = mipmap
             });
             ITexture expTex;
             if (model.Pipelines[0].Image is Texture3D)
@@ -908,10 +922,13 @@ namespace FrameworkTests.Model
 
             foreach (var lm in origTex.LayerMipmap.Range)
             {
-                var origColors = origTex.GetPixelColors(lm);
-                var expColor = expTex.GetPixelColors(lm);
+                if (lm.Mipmap == mipmap || mipmap == -1)
+                {
+                    var origColors = origTex.GetPixelColors(lm);
+                    var expColor = expTex.GetPixelColors(lm);
 
-                TestData.CompareColors(origColors, expColor, channels, tolerance);
+                    TestData.CompareColors(origColors, expColor, channels, tolerance);
+                }
             }
         }
 
