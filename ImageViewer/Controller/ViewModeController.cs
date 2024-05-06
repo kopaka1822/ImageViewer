@@ -225,6 +225,10 @@ namespace ImageViewer.Controller
                     var right = i.Right == 0 ? size.Width - 1 : i.Right;
                     var y = i.Top ? 0.0f : size.Height - h;
 
+                    //var bgRect = draw.TextSize(new Float2(i.Left + padding, y + padding), new Float2(right - padding, y + h), fontSize, i.Name, i.Align);
+                    //bgRect = bgRect.Expand(padding);
+
+                    //draw.FillRectangle(bgRect.Start, bgRect.End, bgBrush);
                     draw.FillRectangle(new Float2(i.Left, y), new Float2(right, y + h), bgBrush);
                     draw.Text(new Float2(i.Left + padding, y + padding), new Float2(right - padding, y + h), fontSize, fontBrush, i.Name, i.Align);
                 }

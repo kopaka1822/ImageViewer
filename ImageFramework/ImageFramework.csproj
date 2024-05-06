@@ -201,6 +201,7 @@
     <Compile Include="Utility\LayerMipmapRange.cs" />
     <Compile Include="Utility\LayerMipmapCount.cs" />
     <Compile Include="Utility\LayerMipmapSlice.cs" />
+    <Compile Include="Utility\Rect.cs" />
     <Compile Include="Utility\Size2.cs" />
     <Compile Include="Utility\TextureCache.cs" />
     <Compile Include="Properties\Annotations.cs" />

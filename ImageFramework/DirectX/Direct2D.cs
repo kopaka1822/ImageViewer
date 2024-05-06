@@ -137,14 +137,15 @@ namespace ImageFramework.DirectX
             /// returns the size of the text in screen pixels based on the Text function
             /// </summary>
             /// <returns></returns>
-            public Float2 TextSize(Float2 start, Float2 end, float size, string text, TextAlignment alignment = TextAlignment.Leading)
+            public Rect TextSize(Float2 start, Float2 end, float size, string text, TextAlignment alignment = TextAlignment.Leading)
             {
                 var font = parent.GetFont(size);
                 font.TextAlignment = alignment;
 
                 var layout = new RawRectangleF(start.X, start.Y, end.X, end.Y);
                 var textLayout = new TextLayout(Direct2D.core.WriteFactory, text, font, layout.Right - layout.Left, layout.Bottom - layout.Top);
-                return new Float2(textLayout.Metrics.Width, textLayout.Metrics.Height);
+                
+                return new Rect(start.X + textLayout.Metrics.Left, start.Y + textLayout.Metrics.Top, textLayout.Metrics.Width, textLayout.Metrics.Height);
             }
 
             /// <summary>
