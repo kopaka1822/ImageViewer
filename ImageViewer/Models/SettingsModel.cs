@@ -97,6 +97,9 @@ namespace ImageViewer.Models
                     OnPropertyChanged(nameof(CachePrecision));
                     OnPropertyChanged(nameof(CacheFormat));
                     break;
+                case nameof(Properties.Settings.Default.ImageNameOverlay):
+                    OnPropertyChanged(nameof(ImageNameOverlay));
+                    break;
             }
         }
 
@@ -299,6 +302,12 @@ namespace ImageViewer.Models
         {
             set => Properties.Settings.Default.HdrMode = value;
             get => Properties.Settings.Default.HdrMode && Device.Get().IsHDR;
+        }
+
+        public bool ImageNameOverlay
+        {
+            get => Properties.Settings.Default.ImageNameOverlay;
+            set => Properties.Settings.Default.ImageNameOverlay = value;
         }
 
         public int ArrowWidth // for now shared with zoom box

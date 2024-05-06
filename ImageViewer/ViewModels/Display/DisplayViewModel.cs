@@ -103,6 +103,9 @@ namespace ImageViewer.ViewModels.Display
                     Debug.Assert(selectedPrecision != null);
                     OnPropertyChanged(nameof(SelectedPrecision));
                     break;
+                case nameof(SettingsModel.ImageNameOverlay):
+                    OnPropertyChanged(nameof(ImageNameOverlay));
+                    break;
             }
         }
 
@@ -714,6 +717,12 @@ namespace ImageViewer.ViewModels.Display
             {
                 models.Display.UseAlphaTest = value;
             }
+        }
+
+        public bool ImageNameOverlay
+        {
+            get => models.Settings.ImageNameOverlay;
+            set => models.Settings.ImageNameOverlay = value;
         }
 
         /// <summary>

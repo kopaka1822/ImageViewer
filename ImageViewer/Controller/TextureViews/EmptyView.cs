@@ -31,5 +31,9 @@ namespace ImageViewer.Controller.TextureViews
         }
 
         public void UpdateImage(int id, ITexture texture) { }
+        public bool CustomImageNameOverlay()
+        {
+            return false;
+        }
     }
 }

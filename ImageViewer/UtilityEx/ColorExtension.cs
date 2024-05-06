@@ -19,5 +19,10 @@ namespace ImageViewer.UtilityEx
         {
             return new SolidColorBrush(c.ToMediaColor());
         }
+
+        public static Color ToFramework(this System.Windows.Media.SolidColorBrush c)
+        {
+            return new Color(c.Color.ScR, c.Color.ScG, c.Color.ScB, c.Color.ScA);
+        }
     }
 }

@@ -131,6 +131,10 @@
                     Header="Linear Interpolation" 
                     IsCheckable="True"
                     IsChecked="{Binding Display.LinearInterpolation}"/>
+            <MenuItem
+                    Header="Image Names"
+                    IsCheckable="True"
+                    IsChecked="{Binding Display.ImageNameOverlay}"/>
             <MenuItem 
                 Header="Display Absolute Values" 
                 IsCheckable="True"

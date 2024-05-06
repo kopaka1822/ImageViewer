@@ -24,5 +24,8 @@ namespace ImageViewer.Controller.TextureViews
         /// <param name="id">id of the images [0, models.NumPipelines-1]</param>
         /// <param name="texture">new texture or null if removed</param>
         void UpdateImage(int id, ITexture texture);
+
+        // true if the view has a custom image name overlay. If false, the view is expected to draw its own text overlay if models.Settings.ImageNameOverlay is true, and more than one image is displayed
+        bool CustomImageNameOverlay();
     }
 }

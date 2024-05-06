@@ -63,6 +63,11 @@ namespace ImageViewer.Controller.TextureViews.Shared
             
         }
 
+        public virtual bool CustomImageNameOverlay()
+        {
+            return false;
+        }
+
         private Matrix GetTransform()
         {
             return Matrix.Scaling(models.Display.Zoom, models.Display.Zoom, 1.0f) *

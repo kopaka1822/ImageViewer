@@ -50,6 +50,11 @@ namespace ImageViewer.Controller.TextureViews.Shared
             
         }
 
+        public virtual bool CustomImageNameOverlay()
+        {
+            return false;
+        }
+
         protected Matrix GetTransform()
         {
             return models.Display.ClientAspectRatio * GetRotation() * GetOrientation();

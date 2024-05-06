@@ -4,12 +4,19 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
 using ImageFramework.DirectX;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 using ImageViewer.Controller.TextureViews.Shared;
 using ImageViewer.Models;
+using ImageViewer.UtilityEx;
 using SharpDX;
+using SharpDX.DirectWrite;
+using Color = ImageFramework.Utility.Color;
+using Colors = ImageFramework.Utility.Colors;
+using Matrix = SharpDX.Matrix;
 using Size2 = ImageFramework.Utility.Size2;
 
 namespace ImageViewer.Controller.TextureViews.Texture2D
@@ -54,8 +61,33 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
             var lm = models.Display.ActiveLayerMipmap;
             DrawLayer(Matrix.Identity, texture.GetSrView(lm), models.Overlay.Overlay?.GetSrView(lm));
 
+            // draw image name if requested
+            if (models.Settings.ImageNameOverlay)
+            {
+                var imgId = Math.Max(0, models.Pipelines[id].GetFirstImageId());
+                var imgName = models.Images.Images[imgId].Alias;
+
+                using (var draw = models.Window.SwapChain.Draw.Begin())
+                {
+                    var padding = (float)(double)(Application.Current.Resources["DefaultBorderValue"]);
+                    float fontSize = 12.0f;
+                    float h = 2 * padding + fontSize;
+
+                    var fontBrush = (Application.Current.Resources["FontBrush"] as SolidColorBrush).ToFramework().ToSrgb();
+                    var bgBrush = (Application.Current.Resources["BackgroundBrush"] as SolidColorBrush).ToFramework().ToSrgb();
+
+                    draw.FillRectangle(new Float2(xStart, 0.0f), new Float2(xEnd, h), bgBrush);
+                    draw.Text(new Float2(xStart + padding, padding), new Float2(xEnd - padding, h - padding), fontSize, fontBrush, imgName, SharpDX.DirectWrite.TextAlignment.Center);
+                }
+            }
+
             // reset view scissors
             dev.SetViewScissors(size.Width, size.Height);
+        }
+
+        public override bool CustomImageNameOverlay()
+        {
+            return true; // uses custom overlay
         }
 
         public override Size3? GetTexelPosition(Vector2 mouse)
