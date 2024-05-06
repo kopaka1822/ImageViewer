@@ -3,27 +3,32 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using ImageFramework.DirectX;
 using ImageFramework.Model;
+using ImageFramework.Utility;
 using ImageViewer.Controller.TextureViews;
 using ImageViewer.Controller.TextureViews.Shared;
 using ImageViewer.Controller.TextureViews.Texture2D;
 using ImageViewer.Controller.TextureViews.Texture3D;
 using ImageViewer.Models;
 using ImageViewer.Models.Display;
+using ImageViewer.UtilityEx;
 using SharpDX;
 using SharpDX.Direct3D11;
 using Device = ImageFramework.DirectX.Device;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
+using TextAlignment = SharpDX.DirectWrite.TextAlignment;
 using Texture3D = ImageFramework.DirectX.Texture3D;
 
 namespace ImageViewer.Controller
@@ -85,6 +90,28 @@ namespace ImageViewer.Controller
                 ConvertToCanonical(mousePosition));
         }
 
+        private struct ImageNameInfo
+        {
+            public ImageNameInfo(ModelsEx models, int pipeID, int left = 0, int right = 0, bool top = true, SharpDX.DirectWrite.TextAlignment align = SharpDX.DirectWrite.TextAlignment.Center)
+            {
+                var imgId = Math.Max(models.Pipelines[pipeID].GetFirstImageId(), 0);
+                if(imgId < models.Images.Images.Count)
+                    Name = models.Images.Images[imgId].Alias;
+                else
+                    Name = "";
+                Left = left;
+                Right = right;
+                Top = top;
+                Align = align;
+            }
+
+            public string Name;
+            public int Left; // left pos in pixels
+            public int Right; // right pos in pixels or 0 for full width
+            public bool Top; // true for top, false for bottom
+            public SharpDX.DirectWrite.TextAlignment Align;
+        }
+
         /// <summary>
         /// draws the active view
         /// </summary>
@@ -104,10 +131,13 @@ namespace ImageViewer.Controller
             if (fixedMousePosition.HasValue)
                 scissorsPos = ConvertFromDpiToPixels(fixedMousePosition.Value, size);
 
+            var imageNameInfos = models.Settings.ImageNameOverlay && !currentView.CustomImageNameOverlay() ? new List<ImageNameInfo>(4) : null;
+
             if (visible.Count == 1)
             {
                 // draw single image
                 currentView.Draw(visible[0],models.Pipelines[visible[0]].Image);
+                imageNameInfos?.Add(new ImageNameInfo(models, visible[0]));
             }
             else if (visible.Count == 2)
             {
@@ -116,18 +146,31 @@ namespace ImageViewer.Controller
                 scissorsPos.X = Math.Min(size.Width - 1, Math.Max(0, scissorsPos.X));
                 scissorsPos.Y = Math.Min(size.Height - 1, Math.Max(0, scissorsPos.Y));
 
-                if(models.Display.Split == DisplayModel.SplitMode.Vertical)
+                if (models.Display.Split == DisplayModel.SplitMode.Vertical)
+                {
                     dev.Rasterizer.SetScissorRectangle(0, 0, scissorsPos.X, size.Height);
-                else 
+                    imageNameInfos?.Add(new ImageNameInfo(models, visible[0], right: scissorsPos.X, align: TextAlignment.Leading));
+                }
+                else
+                {
                     dev.Rasterizer.SetScissorRectangle(0, 0, size.Width, scissorsPos.Y);
+                    imageNameInfos?.Add(new ImageNameInfo(models, visible[0]));
+                }
+                    
 
                 // first image
                 currentView.Draw(visible[0], models.Pipelines[visible[0]].Image);
 
                 if (models.Display.Split == DisplayModel.SplitMode.Vertical)
+                {
                     dev.Rasterizer.SetScissorRectangle(scissorsPos.X, 0, size.Width, size.Height);
+                    imageNameInfos?.Add(new ImageNameInfo(models, visible[1], left: scissorsPos.X, align: TextAlignment.Trailing));
+                }
                 else
+                {
                     dev.Rasterizer.SetScissorRectangle(0, scissorsPos.Y, size.Width, size.Height);
+                    imageNameInfos?.Add(new ImageNameInfo(models, visible[1], top: false));
+                }
 
                 // second image
                 currentView.Draw(visible[1], models.Pipelines[visible[1]].Image);
@@ -139,21 +182,53 @@ namespace ImageViewer.Controller
 
                 // upper left
                 dev.Rasterizer.SetScissorRectangle(0, 0, scissorsPos.X, scissorsPos.Y);
+                imageNameInfos?.Add(new ImageNameInfo(models, visible[0], right: scissorsPos.X, align: TextAlignment.Leading));
                 currentView.Draw(visible[0], models.Pipelines[visible[0]].Image);
 
                 // upper right
                 dev.Rasterizer.SetScissorRectangle(scissorsPos.X, 0, size.Width, scissorsPos.Y);
+                imageNameInfos?.Add(new ImageNameInfo(models, visible[1], left: scissorsPos.X, align: TextAlignment.Trailing));
                 currentView.Draw(visible[1], models.Pipelines[visible[1]].Image);
 
                 // draw third texture (entire bottom if only 3 are visible, lower left if 4 are visible)
                 dev.Rasterizer.SetScissorRectangle(0, scissorsPos.Y, visible.Count == 3 ? size.Width : scissorsPos.X, size.Height);
+                imageNameInfos?.Add(new ImageNameInfo(models, visible[2], right: visible.Count == 3 ? 0 : scissorsPos.X, top: false, align: visible.Count == 3 ? TextAlignment.Center : TextAlignment.Leading));
                 currentView.Draw(visible[2], models.Pipelines[visible[2]].Image);
 
                 if(visible.Count == 4)
                 {
                     dev.Rasterizer.SetScissorRectangle(scissorsPos.X, scissorsPos.Y, size.Width, size.Height);
+                    imageNameInfos?.Add(new ImageNameInfo(models, visible[3], left: scissorsPos.X, top: false, align: TextAlignment.Trailing));
                     currentView.Draw(visible[3], models.Pipelines[visible[3]].Image);
                 }
+            }
+
+            if(imageNameInfos != null)
+                DrawDefaultImageNameOverlay(imageNameInfos, size);
+        }
+
+        void DrawDefaultImageNameOverlay(List<ImageNameInfo> info, Size size)
+        {
+            Debug.Assert(models.Settings.ImageNameOverlay);
+
+            using (var draw = models.Window.SwapChain.Draw.Begin())
+            {
+                var padding = (float)(double)(System.Windows.Application.Current.Resources["DefaultBorderValue"]);
+                float fontSize = 12.0f;
+                float h = 2 * padding + fontSize;
+
+                var fontBrush = (System.Windows.Application.Current.Resources["FontBrush"] as SolidColorBrush).ToFramework().ToSrgb();
+                var bgBrush = (System.Windows.Application.Current.Resources["BackgroundBrush"] as SolidColorBrush).ToFramework().ToSrgb();
+
+                foreach (var i in info)
+                {
+                    var right = i.Right == 0 ? size.Width - 1 : i.Right;
+                    var y = i.Top ? 0.0f : size.Height - h;
+
+                    draw.FillRectangle(new Float2(i.Left, y), new Float2(right, y + h), bgBrush);
+                    draw.Text(new Float2(i.Left + padding, y + padding), new Float2(right - padding, y + h), fontSize, fontBrush, i.Name, i.Align);
+                }
+                
             }
         }
 
