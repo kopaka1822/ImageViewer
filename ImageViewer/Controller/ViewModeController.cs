@@ -92,7 +92,7 @@ namespace ImageViewer.Controller
 
         private struct ImageNameInfo
         {
-            public ImageNameInfo(ModelsEx models, int pipeID, int left = 0, int right = 0, bool top = true, SharpDX.DirectWrite.TextAlignment align = SharpDX.DirectWrite.TextAlignment.Center)
+            public ImageNameInfo(ModelsEx models, int pipeID, int left = 0, int right = -1, bool top = true, SharpDX.DirectWrite.TextAlignment align = SharpDX.DirectWrite.TextAlignment.Center)
             {
                 var imgId = Math.Max(models.Pipelines[pipeID].GetFirstImageId(), 0);
                 if(imgId < models.Images.Images.Count)
@@ -107,7 +107,7 @@ namespace ImageViewer.Controller
 
             public string Name;
             public int Left; // left pos in pixels
-            public int Right; // right pos in pixels or 0 for full width
+            public int Right; // right pos in pixels or -1 for full width
             public bool Top; // true for top, false for bottom
             public SharpDX.DirectWrite.TextAlignment Align;
         }
@@ -222,14 +222,15 @@ namespace ImageViewer.Controller
 
                 foreach (var i in info)
                 {
-                    var right = i.Right == 0 ? size.Width - 1 : i.Right;
+                    var right = i.Right < 0 ? size.Width : i.Right;
                     var y = i.Top ? 0.0f : size.Height - h;
 
-                    //var bgRect = draw.TextSize(new Float2(i.Left + padding, y + padding), new Float2(right - padding, y + h), fontSize, i.Name, i.Align);
-                    //bgRect = bgRect.Expand(padding);
+                    var bgRect = draw.TextSize(new Float2(i.Left + padding, y + padding), new Float2(right - padding, y + h), fontSize, i.Name, i.Align);
+                    bgRect = bgRect.Expand(padding);
+                    bgRect.End.Y = y + h; // fix the height
 
-                    //draw.FillRectangle(bgRect.Start, bgRect.End, bgBrush);
-                    draw.FillRectangle(new Float2(i.Left, y), new Float2(right, y + h), bgBrush);
+                    draw.FillRectangle(bgRect.Start, bgRect.End, bgBrush);
+                    //draw.FillRectangle(new Float2(i.Left, y), new Float2(right, y + h), bgBrush);
                     draw.Text(new Float2(i.Left + padding, y + padding), new Float2(right - padding, y + h), fontSize, fontBrush, i.Name, i.Align);
                 }
                 

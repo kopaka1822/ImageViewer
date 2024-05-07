@@ -71,7 +71,7 @@ namespace ImageViewer.Controller.TextureViews.Texture2D
                 {
                     var padding = (float)(double)(Application.Current.Resources["DefaultBorderValue"]);
                     float fontSize = 12.0f;
-                    float h = 2 * padding + fontSize;
+                    float h = 2 * padding + fontSize + 2.0f; // some extra space for letters like 'g' that occupy bottom area
 
                     var fontBrush = (Application.Current.Resources["FontBrush"] as SolidColorBrush).ToFramework().ToSrgb();
                     var bgBrush = (Application.Current.Resources["BackgroundBrush"] as SolidColorBrush).ToFramework().ToSrgb();

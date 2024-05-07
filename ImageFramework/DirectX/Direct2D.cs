@@ -142,10 +142,22 @@ namespace ImageFramework.DirectX
                 var font = parent.GetFont(size);
                 font.TextAlignment = alignment;
 
-                var layout = new RawRectangleF(start.X, start.Y, end.X, end.Y);
-                var textLayout = new TextLayout(Direct2D.core.WriteFactory, text, font, layout.Right - layout.Left, layout.Bottom - layout.Top);
+                // rectify end so that the rectangle is at least one pixel in each direction
+                end.X = Math.Max(start.X + 1, end.X);
+                end.Y = Math.Max(start.Y + 1, end.Y);
+
+                float width = end.X - start.X;
+                float height = end.Y - start.Y;
+
+                var textLayout = new TextLayout(Direct2D.core.WriteFactory, text, font, width, height);
                 
-                return new Rect(start.X + textLayout.Metrics.Left, start.Y + textLayout.Metrics.Top, textLayout.Metrics.Width, textLayout.Metrics.Height);
+                var outRect = new Rect(start.X + textLayout.Metrics.Left, start.Y + textLayout.Metrics.Top, textLayout.Metrics.Width, textLayout.Metrics.Height);
+                
+                // clamp to original rect
+                outRect.End.X = Math.Min(outRect.End.X, end.X);
+                outRect.End.Y = Math.Min(outRect.End.Y, end.Y);
+
+                return outRect;
             }
 
             /// <summary>
