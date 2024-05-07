@@ -192,7 +192,7 @@ namespace ImageViewer.Controller
 
                 // draw third texture (entire bottom if only 3 are visible, lower left if 4 are visible)
                 dev.Rasterizer.SetScissorRectangle(0, scissorsPos.Y, visible.Count == 3 ? size.Width : scissorsPos.X, size.Height);
-                imageNameInfos?.Add(new ImageNameInfo(models, visible[2], right: visible.Count == 3 ? 0 : scissorsPos.X, top: false, align: visible.Count == 3 ? TextAlignment.Center : TextAlignment.Leading));
+                imageNameInfos?.Add(new ImageNameInfo(models, visible[2], right: visible.Count == 3 ? -1 : scissorsPos.X, top: false, align: visible.Count == 3 ? TextAlignment.Center : TextAlignment.Leading));
                 currentView.Draw(visible[2], models.Pipelines[visible[2]].Image);
 
                 if(visible.Count == 4)
