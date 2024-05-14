@@ -20,6 +20,7 @@ namespace ImageFramework.Model.Statistics
         private StatisticsShader alphaShader;
         private StatisticsShader grayscaleShader;
         private StatisticsShader alphaCoverageShader;
+        private StatisticsShader alphaToCoverageShader;
         private ReduceShader minReduce;
         private ReduceShader maxReduce;
         private ReduceShader avgReduce;
@@ -39,6 +40,8 @@ namespace ImageFramework.Model.Statistics
         internal StatisticsShader GrayscaleShader => grayscaleShader ?? (grayscaleShader = new StatisticsShader(shared.Upload, StatisticsShader.GrayscaleValue));
 
         internal StatisticsShader AlphaCoverageShader => alphaCoverageShader ?? (alphaCoverageShader = new StatisticsShader(shared.Upload, StatisticsShader.AlphaTestCoverage, true));
+
+        internal StatisticsShader AlphaToCoverageShader => alphaToCoverageShader ?? (alphaToCoverageShader = new StatisticsShader(shared.Upload, StatisticsShader.AlphaTestAlphaToCoverage8spp, true));
 
         internal ReduceShader MinReduce => minReduce ?? (minReduce = new ReduceShader(shared.Upload, "min(a,b)", float.MaxValue.ToString(Models.Culture)));
         internal ReduceShader MaxReduce => maxReduce ?? (maxReduce = new ReduceShader(shared.Upload, "max(a,b)", float.MinValue.ToString(Models.Culture)));
@@ -107,6 +110,19 @@ namespace ImageFramework.Model.Statistics
             };
         }
 
+        public AlphaStatistics GetAlphaToCoverageStatisticsFor(ITexture texture, float threshold, LayerMipmapRange lm)
+        {
+            // set user parameter for alpha coverage statistics
+            float scale = 0.5f / threshold;
+            AlphaCoverageShader.UserParameter = scale;
+
+            return new AlphaStatistics
+            {
+                Threshold = threshold,
+                Coverage = GetStats(texture, lm, AlphaToCoverageShader, AvgReduce, true)
+            };
+        }
+
         public void Dispose()
         {
             buffer?.Dispose();
@@ -116,6 +132,7 @@ namespace ImageFramework.Model.Statistics
             lightnessShader?.Dispose();
             alphaShader?.Dispose();
             alphaCoverageShader?.Dispose();
+            alphaToCoverageShader?.Dispose();
             minReduce?.Dispose();
             maxReduce?.Dispose();
             avgReduce?.Dispose();

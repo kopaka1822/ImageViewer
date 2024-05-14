@@ -15,6 +15,7 @@ namespace ImageFramework.Model.Scaling.AlphaTest
     {
         private float threshold = 0.5f;
         private bool singlePixelFix = true; // enabling this will force at least one pixel to pass the alpha test (prevents the texture from completely disappearing over distance)
+        private bool useAlphaToCoverage = false; // assume alpha to coverage instead of alpha test
 
         private readonly StatisticsModel stats;
         private readonly TransformShader scaleAlphaShader;
@@ -39,7 +40,9 @@ namespace ImageFramework.Model.Scaling.AlphaTest
             {
                 // obtain the desired coverage when alpha blending is used
                 //float desiredCoverage = stats.GetStatisticsFor(uav, new LayerMipmapSlice(layer, 0)).Alpha.Avg;
-                float desiredCoverage = stats.GetAlphaStatisticsFor(uav, 0.5f, new LayerMipmapSlice(layer, 0)).Coverage;
+                float desiredCoverage;
+                if(!useAlphaToCoverage) desiredCoverage = stats.GetAlphaStatisticsFor(uav, threshold, new LayerMipmapSlice(layer, 0)).Coverage;
+                else desiredCoverage = stats.GetAlphaToCoverageStatisticsFor(uav, threshold, new LayerMipmapSlice(layer, 0)).Coverage;
 
                 // fix alpha values for all mipmaps (excluding the most detailed)
                 for (int mip = 1; mip < uav.NumMipmaps; ++mip)
@@ -56,7 +59,10 @@ namespace ImageFramework.Model.Scaling.AlphaTest
 
                     for (int i = 0; i < 10; ++i)
                     {
-                        float currentCoverage = stats.GetAlphaStatisticsFor(uav, midThreshold, lm).Coverage;
+                        float currentCoverage;
+                        if (!useAlphaToCoverage) currentCoverage = stats.GetAlphaStatisticsFor(uav, midThreshold, lm).Coverage;
+                        else currentCoverage = stats.GetAlphaToCoverageStatisticsFor(uav, midThreshold, lm).Coverage;
+
                         float error = Math.Abs(currentCoverage - desiredCoverage);
                         // fix to guarantee that at least one pixel passes the alpha test
                         if (singlePixelFix && desiredCoverage > 0.0 && currentCoverage == 0.0f)

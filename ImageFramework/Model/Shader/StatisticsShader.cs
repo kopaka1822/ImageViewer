@@ -41,6 +41,8 @@ return max(116.0 * pow(max(lum, 0.0), 1.0 / 3.0) - 16.0, 0.0)";
         public static readonly string AlphaValue = "return value.a";
         public static readonly string RedValue = "return value.r";
         public static readonly string AlphaTestCoverage = "return ((value.a < userParameter) ? 0.0 : 1.0)";
+        public static readonly string AlphaTestAlphaToCoverage8spp = "return round(saturate(value.a * userParameter) * 8.0) / 8.0";
+        //public static readonly string AlphaTestAlphaToCoverage8spp = "return floor(saturate(value.a * userParameter) * 8.999)) / 8.0";
         public static readonly string GrayscaleValue = "return (value.r == value.g && value.r == value.b) ? 1.0 : 0.0";
 
         /// <summary>
