@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
@@ -230,7 +231,7 @@ void abort_iterations() {{
 
 float4 filter{GetKernelDeclaration(kernel)};
 
-[numthreads({localSize}, {localSize}, {(builder.Is3D?localSize:1)})]
+[numthreads({localSize}, {localSize}, {(builder.Is3D ? localSize : 1)})]
 void main(uint3 coord : SV_DISPATCHTHREADID) {{
     
     uint width, height, depth;
@@ -245,7 +246,7 @@ void main(uint3 coord : SV_DISPATCHTHREADID) {{
     size.z = 1;
 #endif
 
-#if {(kernel == FilterLoader.Type.Tex2D?1:0)}
+#if {(kernel == FilterLoader.Type.Tex2D ? 1 : 0)}
      dst_image[dstCoord] = filter(coord.xy, size.xy);
 #elif {(kernel == FilterLoader.Type.Color ? 1 : 0)}
     dst_image[dstCoord] = filter(src_image[texel(coord)]);
@@ -259,7 +260,9 @@ void main(uint3 coord : SV_DISPATCHTHREADID) {{
         _g_continue_iterations_buffer[0] = true;
 #endif
 }}
-" + GetParamBufferDescription(parent.Parameters) + GetTextureParamBindings(parent.TextureParameters, builder);
+" + GetParamBufferDescription(parent.Parameters) 
+  + GetTextureParamBindings(parent.TextureParameters, builder)
+  + GetEnumParameterDefines(parent.Parameters);
         }
 
         private static string GetKernelDeclaration(FilterLoader.Type kernel)
@@ -301,6 +304,28 @@ void main(uint3 coord : SV_DISPATCHTHREADID) {{
             foreach (var tex in parameters)
             {
                 res += $"{builder.SrvSingleType} {tex.TextureName} : register(t{i++});\n";
+            }
+
+            return res;
+        }
+
+        private static string GetEnumParameterDefines(IReadOnlyList<IFilterParameter> parameters)
+        {
+            string res = "\n";
+            foreach (var filterParameter in parameters)
+            {
+                if (filterParameter is EnumFilterParameterModel enumFilterParameter)
+                {
+                    var index = 0;
+                    foreach (var enumName in enumFilterParameter.EnumValues)
+                    {
+                        var defineName = enumName.Trim().Replace(' ', '_');
+                        // check if only letters and digits and _ are used and continue otherwise
+                        if (!Regex.IsMatch(defineName, "^[a-zA-Z0-9_]*$")) continue;
+
+                        res += $"#define E_{defineName} {index++}\n";
+                    }
+                }
             }
 
             return res;

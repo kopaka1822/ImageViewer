@@ -64,6 +64,14 @@ The syntax is:
 
 *Maximum*: (Optional) Maximum allowed value of the variable.
 
+***Enum Example:***
+
+`#param Type, type, enum {A; B; C}, A`
+
+`if(type == E_A) ... // enum usage (E_A == 0, E_B == 1, E_C == 2)`
+
+Note: Do not put '`,`' inside the enum brackets, only '`;`' to separate. Enum values will be available via define: `#define E_<name> <index>`.
+
 ---
 
 Additional properties can be specified via:
@@ -85,13 +93,6 @@ Additional properties can be specified via:
 
 `float a = pow(0.5, gma); // variable usage`
 
-***Enum Example:***
-
-`#param Type, type, enum {A; B; C}, A`
-
-`if(type == 0) ... // enum usage (A == 0, B == 1, C == 2)`
-
-Note: Do not put '`,`' inside the enum brackets, only '`;`' to separate
 
 ---
 
