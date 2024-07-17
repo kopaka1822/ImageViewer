@@ -184,7 +184,7 @@ float4 main(PixelIn i) : SV_TARGET
     // calc src texture coordinate
     coord = (coord - toTex(offset)) * toTex(scale);
 
-    return in_tex.Sample(texSampler, coord);
+    return in_tex.SampleLevel(texSampler, coord, 0);
 }}
 ";
         }

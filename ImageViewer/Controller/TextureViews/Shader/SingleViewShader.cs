@@ -168,7 +168,7 @@ static const float2 samplePoints[N_SAMPLES] = {{
 
 float4 getColor(TexcoordT coord)
 {{
-    float4 color = tex.Sample(texSampler, coord);
+    float4 color = tex.SampleLevel(texSampler, coord, 0);
     {ApplyColorTransform()}
     {(builder.Is3D ? ApplyOverlay3D("coord", "color") : ApplyOverlay2D("coord", "color"))}
     return color;

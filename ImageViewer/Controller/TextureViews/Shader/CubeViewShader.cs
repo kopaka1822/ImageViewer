@@ -110,7 +110,7 @@ struct PixelIn {{
 }};
 
 float4 main(PixelIn i) : SV_TARGET {{
-    float4 color = tex.Sample(texSampler, i.viewDir);
+    float4 color = tex.SampleLevel(texSampler, i.viewDir, 0);
     {ApplyColorTransform()}
     {ApplyOverlayCube("i.viewDir", "color")}
     {ApplyMonitorTransform()}

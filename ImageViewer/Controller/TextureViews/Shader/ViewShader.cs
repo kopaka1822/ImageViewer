@@ -59,7 +59,7 @@ namespace ImageViewer.Controller.TextureViews.Shader
         {
             return $@"
 if(useOverlay) {{
-    float4 ol = overlay.Sample(texSampler, {texcoord});
+    float4 ol = overlay.SampleLevel(texSampler, {texcoord}, 0);
     {CalcOverlay(color)}
 }}
 ";
@@ -69,7 +69,7 @@ if(useOverlay) {{
         {
             return $@"
 if(useOverlay) {{
-    float4 ol = overlay.Sample(texSampler, {texcoord});
+    float4 ol = overlay.SampleLevel(texSampler, {texcoord}, 0);
     {CalcOverlay(color)}
 }}
 ";
@@ -79,7 +79,7 @@ if(useOverlay) {{
         {
             return $@"
 if(useOverlay) {{
-    float4 ol = overlay.Sample(texSampler, {dir});
+    float4 ol = overlay.SampleLevel(texSampler, {dir}, 0);
     {CalcOverlay(color)}
 }}
 ";

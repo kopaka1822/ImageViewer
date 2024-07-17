@@ -125,7 +125,7 @@ float4 main(PixelIn i) : SV_TARGET {{
     polarDirection.x = polarDirection.x / (2.0 * PI) + 0.25;
     if(polarDirection.x < 0.0) polarDirection.x += 1.0;
     
-    float4 color = tex.Sample(texSampler, polarDirection);
+    float4 color = tex.SampleLevel(texSampler, polarDirection, 0);
     {ApplyColorTransform()}
     {ApplyOverlay2D("polarDirection", "color")}
     {ApplyMonitorTransform()}

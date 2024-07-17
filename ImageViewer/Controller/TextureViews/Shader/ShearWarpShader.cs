@@ -137,7 +137,7 @@ struct PixelIn {
 };
 
 float4 main(PixelIn i) : SV_TARGET {
-    return tex.Sample(texSampler, i.texcoord);
+    return tex.SampleLevel(texSampler, i.texcoord, 0);
 }
 ";
         }
