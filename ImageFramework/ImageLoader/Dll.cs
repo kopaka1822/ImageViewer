@@ -52,6 +52,9 @@ namespace ImageFramework.ImageLoader
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr npy_get_shape(string filename, out uint nDims);
 
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int noise_generate_white(int width, int height, int depth, int layer, int mipmaps, int seed);
+
         public static string GetError()
         {
             var ptr = get_error(out var length);

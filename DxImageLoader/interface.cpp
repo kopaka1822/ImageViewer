@@ -14,6 +14,7 @@
 #include "ktx_interface.h"
 #include "png_interface.h"
 #include "hdr_interface.h"
+#include "noise_interface.h"
 #include "numpy_interface.h"
 #include "threadsafe_unordered_map.h"
 
@@ -384,4 +385,12 @@ void set_progress(uint32_t progress, const char* description)
 
 	if (s_progress_callback(progress / 100.0f, description))
 		throw std::runtime_error("aborted by user");
+}
+
+int noise_generate_white(int width, int height, int depth, int layer, int mipmaps, int seed)
+{
+	auto res = noise_get_white_noise(width, height, depth, layer, mipmaps, seed);
+	const int id = s_currentID++;
+	s_resources.insert(id, std::move(res));
+	return id;
 }

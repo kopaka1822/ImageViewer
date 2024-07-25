@@ -18,6 +18,20 @@ namespace ImageFramework.ImageLoader
                 throw new Exception("error in " + file + ": " + Dll.GetError());
         }
 
+        private Resource()
+        {
+            Id = 0;
+        }
+
+        public static Resource CreateWhiteNoise(Size3 size, LayerMipmapCount lm, int seed)
+        {
+            var res = new Resource();
+            res.Id = Dll.noise_generate_white(size.Width, size.Height, size.Depth, lm.Layers, lm.Mipmaps, seed);
+            if (res.Id == 0)
+                throw new Exception("error generating white noise: " + Dll.GetError());
+            return res;
+        }
+
         public Resource(uint format, Size3 size, LayerMipmapCount lm)
         {
             Id = Dll.image_allocate(format, size.Width, size.Height, size.Depth, lm.Layers, lm.Mipmaps);

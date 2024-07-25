@@ -571,6 +571,22 @@
                         Height="16"/>
                 </MenuItem.Icon>
             </MenuItem>
+
+            <Separator/>
+            <MenuItem
+                Header="Noise"
+                IsEnabled="{Binding Progress.NotProcessing}"
+                ToolTip="Generates an additional noise texture.">
+                <MenuItem.Icon>
+                    <Image 
+                        Source="../Icons/noise.png"
+                        Width="16"
+                        Height="16"/>
+                </MenuItem.Icon>
+                <MenuItem
+                    Header="WhiteNoise"
+                    Command="{Binding GenerateWhiteNoiseCommand}"/>
+            </MenuItem>
         </MenuItem>
         <!--END TOOLS-->
 

@@ -45,6 +45,14 @@ namespace ImageFramework.ImageLoader
             return new DllImageData(res, file, new LayerMipmapCount(nLayer, nMipmaps), new ImageFormat((GliFormat)gliFormat), (GliFormat)originalFormat);
         }
 
+        public static DllImageData LoadWhiteNoise(Size3 size, LayerMipmapCount lm, int seed)
+        {
+            var res = Resource.CreateWhiteNoise(size, lm, seed);
+            Dll.image_info(res.Id, out var gliFormat, out var originalFormat, out var nLayer, out var nMipmaps);
+
+            return new DllImageData(res, "white noise", new LayerMipmapCount(nLayer, nMipmaps), new ImageFormat((GliFormat)gliFormat), (GliFormat)originalFormat);
+        }
+
 
         /// <summary>
         /// loads image into the correct texture type

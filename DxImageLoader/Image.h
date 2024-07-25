@@ -33,7 +33,7 @@ namespace image
 		virtual bool requiresGrayscalePostprocess() { return false; }
 	};
 
-	// default interface that supplies internal storage for a single layer/mipmap
+	// default interface that supplies internal storage for a single m_layer/mipmap
 	class SimpleImage final : public IImage
 	{
 	public:

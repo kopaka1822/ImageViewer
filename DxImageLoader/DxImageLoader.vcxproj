@@ -181,6 +181,7 @@
     <ClInclude Include="ktx_interface.h" />
     <ClInclude Include="Layer.h" />
     <ClInclude Include="Mipmap.h" />
+    <ClInclude Include="noise_interface.h" />
     <ClInclude Include="npy.h" />
     <ClInclude Include="numpy_interface.h" />
     <ClInclude Include="pch.h" />
@@ -200,6 +201,7 @@
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="interface.cpp" />
     <ClCompile Include="ktx_interface.cpp" />
+    <ClCompile Include="noise_interface.cpp" />
     <ClCompile Include="numpy_interface.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

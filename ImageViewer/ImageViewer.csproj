@@ -106,6 +106,7 @@
     <Compile Include="Commands\Import\ImportArrayCommand.cs" />
     <Compile Include="Commands\Import\ImportCommand.cs" />
     <Compile Include="Commands\Import\ImportEquationImageCommand.cs" />
+    <Compile Include="Commands\Tools\GenerateWhiteNoiseCommand.cs" />
     <Compile Include="Commands\Tools\LatLongToCubemapCommand.cs" />
     <Compile Include="Commands\Import\OpenCommand.cs" />
     <Compile Include="Commands\Overlays\RemoveArrowCommand.cs" />
@@ -679,6 +680,8 @@
   <ItemGroup>
     <Resource Include="Icons\temperature.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Icons\noise.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

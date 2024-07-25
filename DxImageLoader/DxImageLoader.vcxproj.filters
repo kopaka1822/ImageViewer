@@ -54,6 +54,9 @@
     <Filter Include="Source Files\numpy">
       <UniqueIdentifier>{993fbd38-db0b-4ae3-9a34-ac6c70f7d61a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\noise">
+      <UniqueIdentifier>{f8f54884-9df5-4d79-88d6-956978589a6d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Layer.h">
@@ -128,6 +131,9 @@
     <ClInclude Include="npy.h">
       <Filter>Source Files\numpy</Filter>
     </ClInclude>
+    <ClInclude Include="noise_interface.h">
+      <Filter>Source Files\noise</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -171,6 +177,9 @@
     </ClCompile>
     <ClCompile Include="numpy_interface.cpp">
       <Filter>Source Files\numpy</Filter>
+    </ClCompile>
+    <ClCompile Include="noise_interface.cpp">
+      <Filter>Source Files\noise</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

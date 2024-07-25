@@ -78,3 +78,6 @@ void set_progress(uint32_t progress, const char* description = nullptr);
 /// \brief returns a pointer to the shape and stores the number if dimensions in dim. Returns nullptr on failure.
 /// WARNING: the return value is not thread safe and should be guarded!
 EXPORT(unsigned int*) npy_get_shape(const char* filename, unsigned int* dim);
+
+// additional noise function
+EXPORT(int) noise_generate_white(int width, int height, int depth, int layer, int mipmaps, int seed);
