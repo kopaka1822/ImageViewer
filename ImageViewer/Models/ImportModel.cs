@@ -137,6 +137,19 @@ namespace ImageViewer.Models
                     models.Window.ShowErrorDialog(e);
                 }
             }
+            catch (ImagesModel.ImageSizeMismatch e)
+            {
+                if (!tex.Is3D)
+                {
+                    // prompt if the image should be resized (only for 2D currently)
+                    if (models.Window.ShowYesNoDialog(e.Message + ". Do you want to resize the image?", "Image Size Mismatch"))
+                    {
+                        var scaledTex = models.SharedModel.ScaleShader.Run((TextureArray2D)tex, models.Images.Size, null /*discard mipmaps*/);
+                        ImportTexture(scaledTex, isFile, file, imgOriginalFormat, alias);
+                    }
+                }
+                else models.Window.ShowErrorDialog(e);
+            }
             catch (Exception e)
             {
                 models.Window.ShowErrorDialog(e);

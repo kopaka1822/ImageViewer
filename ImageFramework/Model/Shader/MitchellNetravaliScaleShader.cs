@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.DirectX.Structs;
 using ImageFramework.Model.Scaling;
@@ -26,10 +27,17 @@ namespace ImageFramework.Model.Shader
             cbuffer = upload;
         }
 
-        public TextureArray2D Run(TextureArray2D src, Size3 dstSize, ScalingModel scaling)
+        /// <summary>
+        /// scales src to dstSize using the mitchell netravali filter
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="dstSize"></param>
+        /// <param name="scaling">scaling model to generate mipmaps, if src has mipmaps. If null, no mipmaps will be generated</param>
+        /// <returns></returns>
+        public TextureArray2D Run(TextureArray2D src, Size3 dstSize, [CanBeNull] ScalingModel scaling)
         {
             Debug.Assert(src.Size != dstSize);
-            var genMipmaps = src.NumMipmaps > 1;
+            var genMipmaps = src.NumMipmaps > 1 && scaling != null;
             var numMipmaps = 1;
             if (genMipmaps)
                 numMipmaps = dstSize.MaxMipLevels;

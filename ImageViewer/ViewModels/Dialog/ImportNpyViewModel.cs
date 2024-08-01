@@ -66,6 +66,8 @@ namespace ImageViewer.ViewModels.Dialog
                     UseRGBAEnabled = false;
                     UseRGBA = false;
                 }
+                // shape is configurable if it has more than 2 dimensions (array or 3D?) or if the last dimension could be RGBA color
+                status.IsConfigurable = shape.Length > 2 || shape.Last() <= 4;
             }
             else
             {

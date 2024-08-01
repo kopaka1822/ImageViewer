@@ -30,6 +30,18 @@ namespace ImageFramework.Model
             { }
         }
 
+        public class ImageSizeMismatch : Exception
+        {
+            public ImageSizeMismatch(string message) : base(message)
+            { }
+        }
+
+        public class ImageLayerMismatch : Exception
+        {
+            public ImageLayerMismatch(string message) : base(message)
+            { }
+        }
+
         public class ImageData : IDisposable
         {
             public ITexture Image { get; private set; }
@@ -412,16 +424,16 @@ namespace ImageFramework.Model
                 throw new Exception($"{name}: Incompatible with internal texture types. Expected {ImageType.Name} but got {image.GetType().Name}");
 
             if (image.NumLayers != NumLayers)
-                throw new Exception(
+                throw new ImageLayerMismatch(
                     $"{name}: Inconsistent amount of layers. Expected {NumLayers} got {image.NumLayers}");
 
             if (image.Size != Size)
             {
                 if (Size.Depth > 1)
-                    throw new Exception(
+                    throw new ImageSizeMismatch(
                         $"{name}: Image resolution mismatch. Expected {Size.X}x{Size.Y}x{Size.Z} but got {image.Size.X}x{image.Size.Y}x{image.Size.Z}");
 
-                throw new Exception(
+                throw new ImageSizeMismatch(
                     $"{name}: Image resolution mismatch. Expected {Size.X}x{Size.Y} but got {image.Size.X}x{image.Size.Y}");
             }
 
