@@ -84,6 +84,12 @@ namespace FrameworkTests.Model.Filter
         }
 
         [TestMethod]
+        public void FXAA()
+        {
+            TestFilter("FXAA.hlsl", FilterLoader.TargetType.Tex2D);
+        }
+
+        [TestMethod]
         public void Gamma()
         {
             TestFilter("gamma.hlsl");
