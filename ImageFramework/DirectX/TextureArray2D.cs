@@ -209,7 +209,7 @@ namespace ImageFramework.DirectX
                     Format = Format,
                     Texture2DArray = new ShaderResourceViewDescription.Texture2DArrayResource
                     {
-                        MipLevels = NumMipmaps - lm.Mipmap, // attach all mipmaps
+                        MipLevels = 1,//NumMipmaps - lm.Mipmap, // attach all mipmaps
                         MostDetailedMip = lm.Mipmap,
                         ArraySize = 1,
                         FirstArraySlice = lm.Layer
