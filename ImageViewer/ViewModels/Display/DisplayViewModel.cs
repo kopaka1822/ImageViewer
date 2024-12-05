@@ -129,6 +129,9 @@ namespace ImageViewer.ViewModels.Display
                 case Key.Subtract:
                 case Key.OemMinus:
                     return true;
+                case Key.Down:
+                case Key.Up:
+                    return Keyboard.IsKeyDown(Key.M);
             }
 
             return false;
@@ -145,6 +148,18 @@ namespace ImageViewer.ViewModels.Display
                 case Key.Subtract:
                 case Key.OemMinus:
                     models.Display.DecreaseMultiplier();
+                    break;
+                case Key.Down:
+                    if (Keyboard.IsKeyDown(Key.M))
+                    {
+                        models.Display.ActiveMipmap = Math.Min(models.Display.ActiveMipmap + 1, models.Images.NumMipmaps - 1);
+                    }
+                    break;
+                case Key.Up:
+                    if (Keyboard.IsKeyDown(Key.M))
+                    {
+                        models.Display.ActiveMipmap = Math.Max(models.Display.ActiveMipmap - 1, 0);
+                    }
                     break;
             }
         }

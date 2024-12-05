@@ -172,8 +172,12 @@ namespace ImageViewer.ViewModels
                 return;
             }
 
+            // overlay
             if (Display.HasPriorityKeyInvoked(e.Key))
+            {
+                e.Handled = true;
                 return;
+            }
 
             if (Filter.HasKeyToInvoke(e.Key))
             {
@@ -183,11 +187,15 @@ namespace ImageViewer.ViewModels
                 if (Filter.ApplyCommand.CanExecute(null))
                     Filter.ApplyCommand.Execute(null);
 
+                e.Handled = true;
                 return;
             }
 
-            if(Display.HasKeyToInvoke(e.Key))
+            if (Display.HasKeyToInvoke(e.Key))
+            {
                 Display.InvokeKey(e.Key);
+                e.Handled = true;
+            }
         }
 
         public async Task OnCopyAsync()
