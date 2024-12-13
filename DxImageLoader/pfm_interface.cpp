@@ -8,17 +8,6 @@
 
 using uchar = unsigned char;
 
-void skip_space(std::fstream& fileStream)
-{
-	// skip white space in the headers or pnm files
-
-	char c;
-	do {
-		c = fileStream.get();
-	} while (c == '\n' || c == ' ' || c == '\t' || c == '\r');
-	fileStream.unget();
-}
-
 void swapBytes(float* fptr)
 { // if endianness doesn't agree, swap bytes
 	uchar* ptr = reinterpret_cast<uchar*>(fptr);
@@ -31,6 +20,12 @@ struct Pixel
 {
 	float r, g, b;
 };
+
+void skipNewlines(std::fstream& file)
+{
+	while (file.peek() == '\n' || file.peek() == 0 || file.peek() == ' ' || file.peek() == '\r' || file.peek() == '\t')
+		file.get();
+}
 
 std::unique_ptr<image::IImage> pfm_load(const char* filename)
 {
@@ -50,12 +45,15 @@ std::unique_ptr<image::IImage> pfm_load(const char* filename)
 	char bandBuffer[3];
 	file.read(bandBuffer, 2);
 	bandBuffer[2] = '\0';
-	skip_space(file);
-	std::string bands = bandBuffer;
 
+	std::string bands = bandBuffer;
+	skipNewlines(file);
 	file >> width;
+	skipNewlines(file);
 	file >> height;
+	skipNewlines(file);
 	file >> scalef;
+
 
 	// determine endianness 
 	int littleEndianFile = (scalef < 0);
