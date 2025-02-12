@@ -55,6 +55,9 @@ namespace ImageFramework.ImageLoader
         [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
         public static extern int noise_generate_white(int width, int height, int depth, int layer, int mipmaps, int seed);
 
+        [DllImport(DllFilePath, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int noise_generate_blue(int width, int height, int depth, int layer, int mipmaps);
+
         public static string GetError()
         {
             var ptr = get_error(out var length);

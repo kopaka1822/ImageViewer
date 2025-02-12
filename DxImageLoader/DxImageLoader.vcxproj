@@ -192,6 +192,7 @@
     <ClInclude Include="VkFormat.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="blue_noise_interface.cpp" />
     <ClCompile Include="compress_interface.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="exr_interface.cpp" />

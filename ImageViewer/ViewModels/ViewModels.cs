@@ -123,6 +123,7 @@ namespace ImageViewer.ViewModels
             Tex3DToArrayCommand = new Tex3DToArrayCommand(models);
             ArrayTo2DCommand = new ArrayTo2DCommand(models);
             GenerateWhiteNoiseCommand = new GenerateWhiteNoiseCommand(models);
+            GenerateBlueNoiseCommand = new GenerateBlueNoiseCommand(models);
             SelectNaNColorCommand = new SelectNaNColorCommand(models);
 
             ResizeCommand = new ResizeWindowCommand(models);
@@ -349,6 +350,7 @@ namespace ImageViewer.ViewModels
 
         public ICommand ArrayTo2DCommand { get; }
         public ICommand GenerateWhiteNoiseCommand { get; }
+        public ICommand GenerateBlueNoiseCommand { get; }
 
         public ICommand ExportConfigCommand { get; }
 

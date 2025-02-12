@@ -99,6 +99,7 @@
     <Compile Include="Commands\Tools\CubemapToLatLongCommand.cs" />
     <Compile Include="Commands\Tools\DeleteMipmapsCommand.cs" />
     <Compile Include="Commands\Export\ExportCommand.cs" />
+    <Compile Include="Commands\Tools\GenerateBlueNoiseCommand.cs" />
     <Compile Include="Commands\Tools\GenerateMipmapsCommand.cs" />
     <Compile Include="Commands\Export\GifExportCommand.cs" />
     <Compile Include="Commands\HelpDialogCommand.cs" />

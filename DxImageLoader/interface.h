@@ -81,3 +81,6 @@ EXPORT(unsigned int*) npy_get_shape(const char* filename, unsigned int* dim);
 
 // additional noise function
 EXPORT(int) noise_generate_white(int width, int height, int depth, int layer, int mipmaps, int seed);
+
+// additional blue noise function (returns 0 on failure)
+EXPORT(int) noise_generate_blue(int width, int height, int depth, int layer, int mipmaps);

@@ -57,6 +57,9 @@
     <Filter Include="Source Files\noise">
       <UniqueIdentifier>{f8f54884-9df5-4d79-88d6-956978589a6d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\noise\blue_noise">
+      <UniqueIdentifier>{8c22b369-0988-4829-b2b5-b1308cedfaca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Layer.h">
@@ -179,6 +182,9 @@
       <Filter>Source Files\numpy</Filter>
     </ClCompile>
     <ClCompile Include="noise_interface.cpp">
+      <Filter>Source Files\noise</Filter>
+    </ClCompile>
+    <ClCompile Include="blue_noise_interface.cpp">
       <Filter>Source Files\noise</Filter>
     </ClCompile>
   </ItemGroup>

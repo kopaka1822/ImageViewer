@@ -394,3 +394,16 @@ int noise_generate_white(int width, int height, int depth, int layer, int mipmap
 	s_resources.insert(id, std::move(res));
 	return id;
 }
+
+int noise_generate_blue(int width, int height, int depth, int layer, int mipmaps) try
+{
+	auto res = noise_get_blue_noise(width, height, depth, layer, mipmaps);
+	const int id = s_currentID++;
+	s_resources.insert(id, std::move(res));
+	return id;
+}
+catch(const std::exception& e)
+{
+	set_error(e.what());
+	return 0;
+}

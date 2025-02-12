@@ -16,3 +16,6 @@
 [submodule "dependencies/zlib"]
 	path = dependencies/zlib
 	url = https://github.com/madler/zlib.git
+[submodule "dependencies/blue_noise"]
+	path = dependencies/blue_noise
+	url = https://github.com/kopaka1822/BlueNoiseGenerator.git

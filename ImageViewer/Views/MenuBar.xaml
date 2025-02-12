@@ -586,6 +586,9 @@
                 <MenuItem
                     Header="WhiteNoise"
                     Command="{Binding GenerateWhiteNoiseCommand}"/>
+                <MenuItem
+                    Header="Blue Noise"
+                    Command="{Binding GenerateBlueNoiseCommand}"/>
             </MenuItem>
         </MenuItem>
         <!--END TOOLS-->

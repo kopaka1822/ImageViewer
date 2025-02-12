@@ -32,6 +32,15 @@ namespace ImageFramework.ImageLoader
             return res;
         }
 
+        public static Resource CreateBlueNoise(Size3 size, LayerMipmapCount lm)
+        {
+            var res = new Resource();
+            res.Id = Dll.noise_generate_blue(size.Width, size.Height, size.Depth, lm.Layers, lm.Mipmaps);
+            if (res.Id == 0)
+                throw new Exception("error generating blue noise: " + Dll.GetError());
+            return res;
+        }
+
         public Resource(uint format, Size3 size, LayerMipmapCount lm)
         {
             Id = Dll.image_allocate(format, size.Width, size.Height, size.Depth, lm.Layers, lm.Mipmaps);
