@@ -168,7 +168,7 @@ namespace ImageFramework.Model.Progress
         /// <param name="t">new task</param>
         /// <param name="cts">cancellation token that corresponds to the task</param>
         /// <param name="enableDllProgress">if true, the Progress and What property will be set automatically by calls from the DxImageLoader.dll (this should be true when loading or saving single images, it should be false when loading or saving multiple images)</param>
-        internal void AddTask(Task t, CancellationTokenSource cts, bool enableDllProgress)
+        public void AddTask(Task t, CancellationTokenSource cts, bool enableDllProgress)
         {
             if(currentTask != null)
                 WaitForTask();
