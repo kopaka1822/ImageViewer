@@ -1,0 +1,99 @@
+﻿<Window x:Class="ImageViewer.Views.Dialog.SimpleImageDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImageViewer.Views.Dialog"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="New Image" 
+        ResizeMode="NoResize"
+        Width="180"
+        SizeToContent="Height"
+        Icon="../../Icons/noise.png"
+        Background="{StaticResource BackgroundBrush}"
+        Style="{StaticResource WindowStyle}"
+        WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <GridLength x:Key="GridWidth">70</GridLength>
+    </Window.Resources>
+    <Border Padding="{StaticResource DefaultBorder}">
+        <StackPanel>
+            <!-- Width -->
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock 
+                    Grid.Column="0" 
+                    Text="Width:"/>
+                <xctk:IntegerUpDown
+                    Grid.Column="1"
+                    Width="80"
+                    HorizontalAlignment="Left"
+                    Value="{Binding ImageWidth}"
+                    Minimum="1"
+                    Maximum="{Binding MaxImageWidth}"/>
+            </Grid>
+            <!-- Height -->
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock 
+                    Grid.Column="0" 
+                    Text="Height:"/>
+                <xctk:IntegerUpDown
+                    Grid.Column="1"
+                    Width="80"
+                    HorizontalAlignment="Left"
+                    Value="{Binding ImageHeight}"
+                    Minimum="1"
+                    Maximum="{Binding MaxImageHeight}"/>
+            </Grid>
+            <!-- Depth -->
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock 
+                    Grid.Column="0" 
+                    Text="Depth:"/>
+                <xctk:IntegerUpDown
+                    Grid.Column="1"
+                    Width="80"
+                    HorizontalAlignment="Left"
+                    Value="{Binding ImageDepth}"
+                    Minimum="1"
+                    Maximum="{Binding MaxImageDepth}"/>
+            </Grid>
+
+            <Grid HorizontalAlignment="Right">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button 
+                    Content="_Create" 
+                    Margin="{StaticResource DefaultBorderRight}"
+                    Width="60"
+                    Click="ButtonCreate_OnClick"
+                    IsEnabled="{Binding IsValid}"
+                    IsDefault="True"
+                />
+                <Button 
+                    Grid.Column="1" 
+                    Content="_Cancel" 
+                    Width="60"
+                    Click="ButtonCancel_OnClick"
+                    IsCancel="True"/>
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>

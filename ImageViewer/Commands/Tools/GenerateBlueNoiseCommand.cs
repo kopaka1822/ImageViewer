@@ -15,35 +15,32 @@ using ImageViewer.Models;
 
 namespace ImageViewer.Commands.Tools
 {
-    public class GenerateBlueNoiseCommand : Command
+    public class GenerateBlueNoiseCommand : SimpleCommand
     {
         public GenerateBlueNoiseCommand(ModelsEx models) : base(models)
         {
-            this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
-        }
 
-        private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(ImagesModel.NumImages):
-                    OnCanExecuteChanged();
-                    break;
-            }
-        }
-
-        public override bool CanExecute()
-        {
-            return models.Images.NumImages > 0;
         }
 
         public override async void Execute()
         {
+            var lm = new LayerMipmapCount(models.Images.NumLayers, models.Images.NumMipmaps);
+            var size = models.Images.Size;
+            var is3D = models.Images.Is3D;
+            if (size == Size3.Zero) // no image loaded
+            {
+                lm = new LayerMipmapCount(1, 1);
+                size = GenerateWhiteNoiseCommand.ShowNewImageDialogue(models);
+                is3D = size.Z > 1;
+            }
+            if (size == Size3.Zero)
+                return; // user canceled
+
             // generate blue noise texture in c++ DLL
-            using (var img = await LoadNoiseAsync())
+            using (var img = await LoadNoiseAsync(size, lm))
             {
                 ITexture tex;
-                if (models.Images.Is3D)
+                if (is3D)
                     tex = new Texture3D(img);
                 else
                     tex = new TextureArray2D(img);
@@ -53,10 +50,9 @@ namespace ImageViewer.Commands.Tools
             }
         }
 
-        private Task<DllImageData> LoadNoiseAsync()
+        private Task<DllImageData> LoadNoiseAsync(Size3 size, LayerMipmapCount lm)
         {
-            var task = Task.Run(() => IO.LoadBlueNoise(models.Images.Size,
-                new LayerMipmapCount(models.Images.NumLayers, models.Images.NumMipmaps)));
+            var task = Task.Run(() => IO.LoadBlueNoise(size, lm));
 
             var cts = new CancellationTokenSource();
             models.Progress.AddTask(task, cts, true);

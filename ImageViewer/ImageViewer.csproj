@@ -195,6 +195,7 @@
     <Compile Include="ViewModels\Dialog\PixelDisplayViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ResolutionViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ScaleViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\SimpleImageViewModel.cs" />
     <Compile Include="ViewModels\Dialog\Tex3DToArrayViewModel.cs" />
     <Compile Include="ViewModels\Display\DisplayViewModel.cs" />
     <Compile Include="ViewModels\Display\HeatmapViewModel.cs" />
@@ -280,6 +281,9 @@
     </Compile>
     <Compile Include="Views\Dialog\ShaderExceptionDialog.xaml.cs">
       <DependentUpon>ShaderExceptionDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\SimpleImageDialog.xaml.cs">
+      <DependentUpon>SimpleImageDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\Tex3DToArrayDialog.xaml.cs">
       <DependentUpon>Tex3DToArrayDialog.xaml</DependentUpon>
@@ -421,6 +425,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialog\ShaderExceptionDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\SimpleImageDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

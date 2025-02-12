@@ -10,41 +10,39 @@ using ImageFramework.Model;
 using ImageFramework.Utility;
 using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
+using ImageViewer.ViewModels.Dialog;
+using ImageViewer.Views.Dialog;
 
 namespace ImageViewer.Commands.Tools
 {
     
 
-    public class GenerateWhiteNoiseCommand : Command
+    public class GenerateWhiteNoiseCommand : SimpleCommand
     {
         public GenerateWhiteNoiseCommand(ModelsEx models) : base(models)
         {
-            this.models.Images.PropertyChanged += ImagesOnPropertyChanged;
-        }
-
-        private void ImagesOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            switch(e.PropertyName)
-            {
-                case nameof(ImagesModel.NumImages):
-                    OnCanExecuteChanged();
-                    break;
-            }
-        }
-
-        public override bool CanExecute()
-        {
-            return models.Images.NumImages > 0;
+            
         }
 
         public override void Execute()
         {
+            var lm = new LayerMipmapCount(models.Images.NumLayers, models.Images.NumMipmaps);
+            var size = models.Images.Size;
+            var is3D = models.Images.Is3D;
+            if (size == Size3.Zero) // no image loaded
+            {
+                lm = new LayerMipmapCount(1, 1);
+                size = ShowNewImageDialogue(models);
+                is3D = size.Z > 1;
+            }
+            if(size == Size3.Zero)
+                return; // user canceled
+
             // generate white noise texture in c++ DLL
-            using (var img = IO.LoadWhiteNoise(models.Images.Size,
-                       new LayerMipmapCount(models.Images.NumLayers, models.Images.NumMipmaps), 0))
+            using (var img = IO.LoadWhiteNoise(size, lm, 0))
             {
                 ITexture tex;
-                if (models.Images.Is3D)
+                if (is3D)
                     tex = new Texture3D(img);
                 else
                     tex = new TextureArray2D(img);
@@ -52,6 +50,18 @@ namespace ImageViewer.Commands.Tools
                 // add texture
                 models.Images.AddImage(tex, false, img.Filename, img.OriginalFormat, img.Filename);
             }
+        }
+
+        public static Size3 ShowNewImageDialogue(ModelsEx models)
+        {
+            var vm = new SimpleImageViewModel();
+            var dialog = new SimpleImageDialog(vm);
+            if (models.Window.ShowDialog(dialog) == true)
+            {
+                return new Size3(vm.ImageWidth, vm.ImageHeight, vm.ImageDepth);
+            }
+
+            return new Size3(0);
         }
     }
 }
