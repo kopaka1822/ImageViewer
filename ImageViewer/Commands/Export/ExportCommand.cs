@@ -84,8 +84,8 @@ namespace ImageViewer.Commands.Export
             if (path.InitFromEquations(models))
             {
                 // open save file dialog
-                Debug.Assert(path.Directory != null);
-                Debug.Assert(path.Filename != null);
+                // Debug.Assert(path.Directory != null); // can happen if file was generated instead of loaded
+                Debug.Assert(path.Filename != null); // default filename/alias should always be available
             }
 
             // set proposed filename

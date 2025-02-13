@@ -24,7 +24,7 @@ namespace ImageViewer.Commands.Tools
 
         public override async void Execute()
         {
-            var lm = new LayerMipmapCount(models.Images.NumLayers, models.Images.NumMipmaps);
+            var lm = new LayerMipmapCount(Math.Max(models.Images.NumLayers, 1), Math.Max(models.Images.NumMipmaps, 1));
             var size = models.Images.Size;
             var is3D = models.Images.Is3D;
             if (size == Size3.Zero) // no image loaded
