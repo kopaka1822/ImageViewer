@@ -55,7 +55,7 @@ public:
 		params.dimensionSize[2] = depth > 1 ? depth : 0u;
 		params.dimensionSize[3] = 0;
 		params.N_valuesPerItem = 1u;
-		params.useMultithreading = true;
+		params.useMultithreading = false;
 		params.useIncrementalUpdate = true; // required for multithreading
 		params.numIterationsToFindDistribution = 4 * 256 * 1024;
 
