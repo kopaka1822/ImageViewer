@@ -142,7 +142,29 @@ namespace ImageViewer.ViewModels.Display
 
             // switch to filters tab and select this filter
             viewModels.SetViewerTab(ViewModels.ViewerTab.Filters);
-            viewModels.Filter.SelectedFilter = viewModels.Filter.AvailableFilter.First(filterView => ReferenceEquals(filterView.Filter, filter));
+            viewModels.Filter.SelectedFilter = viewModels.Filter.AvailableFilter.First(filterView => ReferenceEquals(filterView.Filter, filter)); ;
+
+            // select appropriate min and max values
+            var minParam = filter.Parameters.FirstOrDefault(p => p.GetBase().Name == "Min Value")?.GetFloatModel();
+            var maxParam = filter.Parameters.FirstOrDefault(p => p.GetBase().Name == "Max Value")?.GetFloatModel();
+
+            // init min with float max and max with float min
+            float minVal = float.MaxValue;
+            float maxVal = -float.MaxValue;
+            // check model statistics for each pipeline
+            for (int i = 0; i < models.Pipelines.Count; i++)
+            {
+                var pipe = models.Pipelines[i];
+                var stats = models.Statistics[i];
+                if (pipe.IsEnabled && pipe.IsValid)
+                {
+                    minVal = Math.Min(minVal, stats.Stats.Average.Min);
+                    maxVal = Math.Max(maxVal, stats.Stats.Average.Max);
+                }
+            }
+
+            if (minVal != float.MaxValue && minParam != null) minParam.Value = minVal;
+            if (maxVal != -float.MaxValue && maxParam != null) maxParam.Value = maxVal;
         }
 
         public ICommand SetPositionCommand { get; }
