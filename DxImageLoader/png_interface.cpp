@@ -7,6 +7,7 @@
 #include "convert.h"
 #include <algorithm>
 #include "interface.h"
+#include "stbi_interface.h"
 
 struct ImportFormatInfo
 {
@@ -381,6 +382,13 @@ std::unique_ptr<image::IImage> png_load(const char* filename)
 				png_destroy_read_struct(&pPng, &pInfo, nullptr);
 			else
 				png_destroy_read_struct(&pPng, nullptr, nullptr);
+
+			// try to open it with stb. sometimes files are saved with .png but are actually jpeg etc.
+			try
+			{
+				return stb_image_load(filename);
+			}
+			catch(...) {}
 		}
 		throw;
 	}
