@@ -1,7 +1,10 @@
 #include "pch.h"
 #include "exr_interface.h"
+#define TINYEXR_USE_MINIZ 0
 #define TINYEXR_IMPLEMENTATION
+#include "../dependencies/zlib/zlib.h"
 #include "../dependencies/tinyexr/tinyexr.h"
+
 
 std::unique_ptr<image::IImage> openexr_load(const char* filename)
 {
