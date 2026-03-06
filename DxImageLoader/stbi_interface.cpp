@@ -149,20 +149,14 @@ std::vector<uint32_t> stb_image_get_export_formats(const char* extension)
 	std::vector<uint32_t> formats;
 	// R8 formats
 	formats.push_back(gli::format::FORMAT_R8_SRGB_PACK8);
-	formats.push_back(gli::format::FORMAT_R8_UNORM_PACK8);
-	formats.push_back(gli::format::FORMAT_R8_SNORM_PACK8);
 
 	// RGB8
 	formats.push_back(gli::format::FORMAT_RGB8_SRGB_PACK8);
-	formats.push_back(gli::format::FORMAT_RGB8_UNORM_PACK8);
-	formats.push_back(gli::format::FORMAT_RGB8_SNORM_PACK8);
 
 	// RGBA8
 	if(ext == "png" || ext == "tga")
 	{
 		formats.push_back(gli::format::FORMAT_RGBA8_SRGB_PACK8);
-		formats.push_back(gli::format::FORMAT_RGBA8_UNORM_PACK8);
-		formats.push_back(gli::format::FORMAT_RGBA8_SNORM_PACK8);
 	}
 
 	return formats;
