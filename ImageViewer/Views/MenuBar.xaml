@@ -77,6 +77,16 @@
                 </MenuItem.Icon>
             </MenuItem>
             <MenuItem 
+                Header="Export Frames"
+                ToolTip="Export each layer of a texture array as individual frames to the selected folder"
+                Command="{Binding ExportFramesCommand}"
+                IsEnabled="{Binding Progress.NotProcessing}">
+                <MenuItem.Icon>
+                    <Image Source="../Icons/save.png"/>
+                </MenuItem.Icon>
+            </MenuItem>
+            <Separator/>
+            <MenuItem 
                 Header="Export Video"
                 Command="{Binding ExportMovieCommand}"
                 IsEnabled="{Binding Progress.NotProcessing}">

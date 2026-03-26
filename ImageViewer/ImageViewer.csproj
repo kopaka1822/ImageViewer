@@ -87,6 +87,7 @@
     <Compile Include="Commands\AddFilterCommand.cs" />
     <Compile Include="Commands\Export\ExportBatchCommand.cs" />
     <Compile Include="Commands\Export\ExportConfigCommand.cs" />
+    <Compile Include="Commands\Export\ExportFramesCommand.cs" />
     <Compile Include="Commands\Export\ExportMovieCommand.cs" />
     <Compile Include="Commands\Export\ExportOverwriteCommand.cs" />
     <Compile Include="Commands\Helper\Command.cs" />
@@ -184,6 +185,7 @@
     <Compile Include="UtilityEx\PathManager.cs" />
     <Compile Include="ViewModels\Dialog\ExportBatchViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ExportConfigViewModel.cs" />
+    <Compile Include="ViewModels\Dialog\ExportFramesViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ExportMovieViewModel.cs" />
     <Compile Include="ViewModels\Dialog\ExportViewModel.cs" />
     <Compile Include="ViewModels\Dialog\GifExportViewModel.cs" />
@@ -248,6 +250,9 @@
     </Compile>
     <Compile Include="Views\Dialog\ExportDialog.xaml.cs">
       <DependentUpon>ExportDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Dialog\ExportFramesDialog.xaml.cs">
+      <DependentUpon>ExportFramesDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Dialog\ExportMovieDialog.xaml.cs">
       <DependentUpon>ExportMovieDialog.xaml</DependentUpon>
@@ -382,6 +387,9 @@
     </Page>
     <Page Include="Views\Dialog\ExportDialog.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Dialog\ExportFramesDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Dialog\ExportMovieDialog.xaml">
