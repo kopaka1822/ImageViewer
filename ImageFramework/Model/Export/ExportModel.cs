@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using ImageFramework.Annotations;
 using ImageFramework.DirectX;
 using ImageFramework.ImageLoader;
+using ImageFramework.Model.Progress;
 using ImageFramework.Model.Shader;
 using ImageFramework.Utility;
 
@@ -37,6 +38,51 @@ namespace ImageFramework.Model.Export
         {
             var cts = new CancellationTokenSource();
             models.Progress.AddTask(ExportAsync(desc, cts.Token), cts, true);
+        }
+
+        /// <summary>
+        /// Exports multiple frames asynchronously with a single progress bar
+        /// </summary>
+        /// <param name="descriptions">List of export descriptions for each frame</param>
+        public void ExportListAsync(List<ExportDescription> descriptions)
+        {
+            var cts = new CancellationTokenSource();
+            var task = ExportFramesAsync(descriptions, models.Progress.GetProgressInterface(cts.Token));
+            models.Progress.AddTask(task, cts, false);
+        }
+
+        internal async Task ExportFramesAsync(List<ExportDescription> descriptions, IProgress progress)
+        {
+            if (descriptions == null || descriptions.Count == 0)
+                throw new ArgumentException("descriptions list cannot be null or empty");
+
+            var exportTasks = new List<Task>();
+            try
+            {
+                progress.What = "exporting frames";
+                int totalFrames = descriptions.Count;
+                int completedFrames = 0;
+
+                foreach (var desc in descriptions)
+                {
+                    var task = ExportAsync(desc, progress.Token);
+                    exportTasks.Add(task);
+                    
+                    await task;
+                    completedFrames++;
+                    progress.Progress = (float)completedFrames / (float)totalFrames;
+                    progress.Token.ThrowIfCancellationRequested();
+                }
+            }
+            finally
+            {
+                // wait for all tasks to finish
+                foreach (var task in exportTasks)
+                {
+                    await task;
+                    progress.Token.ThrowIfCancellationRequested();
+                }
+            }
         }
 
         internal Task ExportAsync(ExportDescription desc, CancellationToken ct)

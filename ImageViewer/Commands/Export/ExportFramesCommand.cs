@@ -121,12 +121,22 @@ namespace ImageViewer.Commands.Export
 
             models.ExportConfig.Format = viewModel.SelectedFormatValue;
 
-            // Export each layer as a separate frame
-            await ExportFramesAsync(tex, path, multiplier, models, viewModel);
+            // Build list of export descriptions
+            var descriptions = BuildExportDescriptions(tex, path, multiplier, models, viewModel);
+
+            // Export all frames with a single progress bar
+            models.Export.ExportListAsync(descriptions);
+            await models.Progress.WaitForTaskAsync();
+
+            if (!models.Progress.LastTaskCancelledByUser && !String.IsNullOrEmpty(models.Progress.LastError))
+            {
+                models.Window.ShowErrorDialog(models.Progress.LastError);
+            }
         }
 
-        private async Task ExportFramesAsync(ITexture tex, PathManager path, float multiplier, ModelsEx models, ExportViewModel viewModel)
+        private List<ExportDescription> BuildExportDescriptions(ITexture tex, PathManager path, float multiplier, ModelsEx models, ExportViewModel viewModel)
         {
+            var descriptions = new List<ExportDescription>();
             var numLayers = tex.NumLayers;
             var baseFilename = path.Filename;
             
@@ -136,6 +146,7 @@ namespace ImageViewer.Commands.Export
 
             int padding = 4; // hardcode to 4 because max layers is 2048
 
+            // Build descriptions for main frames
             for (int layer = 0; layer < numLayers; layer++)
             {
                 // Generate filename: frame0000, frame0001, etc.
@@ -154,27 +165,16 @@ namespace ImageViewer.Commands.Export
                     Fps = models.Settings.MovieFps,
                 };
                 desc.TrySetFormat(viewModel.SelectedFormatValue);
-
-                models.Export.ExportAsync(desc);
-                
-                // Wait for the export to complete before starting the next one
-                await models.Progress.WaitForTaskAsync();
-                
-                // Check if there was an error
-                if (!string.IsNullOrEmpty(models.Progress.LastError))
-                {
-                    models.Window.ShowErrorDialog($"Error exporting frame {layer}: {models.Progress.LastError}");
-                    return;
-                }
+                descriptions.Add(desc);
             }
 
-            // Export zoom boxes if enabled
+            // Build descriptions for zoom boxes if enabled
             if (viewModel.HasZoomBox && viewModel.ExportZoomBox)
             {
                 for (int layer = 0; layer < numLayers; layer++)
                 {
                     var frameFilename = $"{baseFilename}{layer.ToString().PadLeft(padding, '0')}";
-                    
+
                     for (int i = 0; i < models.ZoomBox.Boxes.Count; ++i)
                     {
                         var box = models.ZoomBox.Boxes[i];
@@ -192,14 +192,12 @@ namespace ImageViewer.Commands.Export
                             Fps = models.Settings.MovieFps,
                         };
                         zdesc.TrySetFormat(viewModel.SelectedFormatValue);
-
-                        await models.Progress.WaitForTaskAsync();
-                        models.Export.ExportAsync(zdesc);
+                        descriptions.Add(zdesc);
                     }
                 }
-                
-                await models.Progress.WaitForTaskAsync();
             }
+
+            return descriptions;
         }
     }
 }
