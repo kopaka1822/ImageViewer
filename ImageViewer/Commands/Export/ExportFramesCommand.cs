@@ -100,7 +100,7 @@ namespace ImageViewer.Commands.Export
             try
             {
                 viewModel = new ExportViewModel(models, path.Extension, models.ExportConfig.Format.Value, 
-                    $"{tex.NumLayers} frames", tex.Is3D, models.Statistics[pipeId].Stats);
+                    path.Filename, tex.Is3D, models.Statistics[pipeId].Stats);
                 // Always select "All Layers" for frames export
                 viewModel.AvailableLayers.Clear(); 
                 viewModel.AvailableLayers.Add(new ViewModels.ListItemViewModel<int>{
@@ -128,7 +128,7 @@ namespace ImageViewer.Commands.Export
         private async Task ExportFramesAsync(ITexture tex, PathManager path, float multiplier, ModelsEx models, ExportViewModel viewModel)
         {
             var numLayers = tex.NumLayers;
-            var baseFilename = path.Filename ?? "frame";
+            var baseFilename = path.Filename;
             
             // Remove extension if present
             if (baseFilename.EndsWith(path.Extension))

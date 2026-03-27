@@ -1,4 +1,3 @@
-using ImageFramework.Annotations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +7,7 @@ using ImageViewer.Commands.Helper;
 using ImageViewer.Models;
 using ImageViewer.UtilityEx;
 using System.Linq;
+using ImageFramework.Annotations;
 
 namespace ImageViewer.ViewModels.Dialog
 {
@@ -52,6 +52,17 @@ namespace ImageViewer.ViewModels.Dialog
         {
             get => path.Directory;
             set { }
+        }
+
+        public string Filename
+        {
+            get => path.Filename;
+            set
+            {
+                if (value == path.Filename) return;
+                path.Filename = value;
+                OnPropertyChanged(nameof(Filename));
+            }
         }
 
         public string LayerInfo => $"{numLayers} layers will be exported as individual frames";

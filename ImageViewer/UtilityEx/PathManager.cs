@@ -28,7 +28,7 @@ namespace ImageViewer.UtilityEx
         public string Filename
         {
             get => filename;
-            private set
+            set
             {
                 if (String.IsNullOrEmpty(value)) return;
                 filename = value;

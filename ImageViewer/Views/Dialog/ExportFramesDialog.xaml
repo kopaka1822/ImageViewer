@@ -32,6 +32,21 @@
                     Text="{Binding Directory}"/>
             </Grid>
 
+            <!-- Filename -->
+            <Grid Margin="{StaticResource DefaultBorderBottom}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="{StaticResource GridWidth}"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock 
+                    Grid.Column="0" 
+                    Text="Filename:"/>
+                <TextBox 
+                    Grid.Column="1" 
+                    Text="{Binding Filename, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+
             <!-- Format -->
             <Grid Margin="{StaticResource DefaultBorderBottom}">
                 <Grid.ColumnDefinitions>
@@ -45,14 +60,6 @@
                     ItemsSource="{Binding AvailableFormats}"
                     SelectedItem="{Binding SelectedFormat}"
                     ItemTemplate="{StaticResource ListItemView}"/>
-            </Grid>
-
-            <!-- Info -->
-            <Grid Margin="{StaticResource DefaultBorderBottom}">
-                <TextBlock 
-                    Text="{Binding LayerInfo}"
-                    TextWrapping="Wrap"
-                    FontStyle="Italic"/>
             </Grid>
 
             <!-- Buttons -->
